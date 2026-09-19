@@ -144,7 +144,7 @@ The library tracks which content references each media file so in-use assets are
 
 ### Sources Tracked
 
-Usage is keyed by a **source string** per `media_usage` row, built by `usageSource` in the service. The identity in a source is stable, never a slug: a rename must not orphan a row or hand one page's media to another, and multilang will put the same slug in two language folders (`future-multilang-implementation-plan.md`, step 2).
+Usage is keyed by a **source string** per `media_usage` row, built by `usageSource` in the service. The identity in a source is stable, never a slug: a rename must not orphan a row or hand one page's media to another, and multilang puts the same slug in two language folders.
 
 - **Pages** — source = `page:{uuid}`. Scans every widget/block setting plus the SEO social image (`seo.og_image`).
 - **Global widgets** (header/footer) — source = `global:root:{type}` for the default language's globals, `global:{lang}:{type}` for another language's (`usageId.global` in `@widgetizer/core/contentAddress`; `root` names the position, so a single-language default switch keeps its rows). Scans settings + blocks. The full rescan walks every language folder of pages, globals and collection items.

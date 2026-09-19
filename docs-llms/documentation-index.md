@@ -432,39 +432,27 @@ This document serves as a comprehensive index to all documentation in the Widget
 
 ---
 
-### **[future-roadmap.md](future-roadmap.md)** - Future: Roadmap (eight items in series)
+### **[future-roadmap.md](future-roadmap.md)** - Future: Roadmap (the eight-stage series)
 
-**Purpose**: Entry point for the planned series — groundwork (page-link filter, Site URL helper) → breadcrumbs → collection pagination → structured data → multilang → undo-history fix → rename to "Widgetizer Desktop" → upload file names — with what each stage ships, which doc holds its design, what it lands for later stages, and the reading order when picking the work up; the undo-history, rename and upload-file-names stages are specified inline **When to use**:
+**Purpose**: One-line record of the eight stages built on branch `0.9.10` — groundwork → breadcrumbs → pagination → structured data → multilang → undo-history fix → rename to "Widgetizer Desktop" → upload file names → theme strings — with each stage's ship date and where its record lives, plus the two decisions inside it that must not be undone **When to use**:
 
-- Starting or resuming any of the eight items
-- Deciding what must be finished before a given feature can begin
-- Finding which `future-*` doc to open
+- Checking when a stage shipped and which doc holds its design
+- Before touching Electron's `productName` or the upload file-name normalizer
+- Finding what is still open from the series
 
-**Key topics**: Series order, per-stage design docs, cross-stage groundwork (derived output depth, addressing module, global-widget context, stable-vs-translatable split), rules that hold across all stages
+**Key topics**: Stage table with ship dates, why `productName` stays `Widgetizer`, why stored upload names stay ASCII, the rules that held across all stages (byte-identical exports, URL logic in core, frozen theme contracts)
 
 ---
 
-### **[future-multilang-design.md](future-multilang-design.md)** - Future: Multilanguage Support
+### **[future-multilang-design.md](future-multilang-design.md)** - Multilang: the decisions that still bind
 
-**Purpose**: Locked design decisions for per-language pages within one project (rejected alternatives, activation, seeding, tabs/chips UX, per-language slugs and `pages/<lang>/` layout, shared media with per-language metadata, zero-config export) **When to use**:
+**Purpose**: What survived the multilang build — the approaches that were rejected, the rules a reader cannot infer from the code, and the frozen `page.translations` theme contract. The build order and per-step notes were deleted once the steps shipped (readable at `30304f3a`) **When to use**:
 
-- Designing or implementing any multilanguage feature
+- Before changing anything about language folders, seeding, removal or per-language slugs
 - Checking which multilang approaches were already rejected and why
-- Understanding the per-language page/slug/file-layout contract before touching page identity code
+- Reading or extending the `page.translations` contract a theme's switcher ships against
 
-**Key topics**: Per-language pages with loose translation links, project language setting, skeleton-only seeding, language tabs + status chips, per-language header/footer/menus, shared media library with per-language alt/title/caption, `/lang/` export prefix + hreflang (self-reference + `x-default` rules), slug uniqueness per language, enabled language codes reserved as page/collection names, single Site URL base helper as a prerequisite
-
----
-
-### **[future-multilang-implementation-plan.md](future-multilang-implementation-plan.md)** - Future: Multilanguage Implementation Plan
-
-**Purpose**: Ordered, step-by-step build plan for the design locked in `future-multilang-design.md` — prerequisites first, then the addressing layer, storage/API, editor UI, rendering/export, collections, forms, dates, theme — each step naming the files it touches and what "done" means **When to use**:
-
-- Starting or resuming multilang implementation work
-- Deciding what must land before a given multilang feature can be built
-- Checking a step's exit criteria before moving to the next
-
-**Key topics**: series order (groundwork → pagination → structured data → multilang), phase-one blockers (media-usage ids, global render context, derived output depth, Site URL base helper), addressing layer contract, per-step file lists and done-when criteria, test coverage per step
+**Key topics**: Language derived from the folder (persisted empty, resolved never empty), the default language locked once a second exists, skeleton-only seeding that never rewrites links, enabled codes reserved as page/collection names, per-language slug uniqueness, shared media with per-language metadata, uuid-based usage identities, the frozen `page.translations` fields, hreflang set rules, the open hosted count-limit questions
 
 ---
 

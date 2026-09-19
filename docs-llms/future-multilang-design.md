@@ -1,379 +1,76 @@
-# Future: Multilanguage Support
+# Multilang — the decisions that still bind
 
-> **Status: Direction locked, detailed design pending.** This doc records the decisions already made so deeper design work builds on them instead of re-opening settled questions. Target: the simplest workable multilang for small-to-medium sites.
+> **Status: built.** Steps 0–24 shipped 2026-09-16 … 2026-09-19 (`d0442659`); only step 25 (docs) is open — moving what is here into `core-architecture.md`, `core-packages.md`, `theming.md` and `user-test-checklist.md`, after which this file goes.
 >
-> Revised 2026-08-06 after two review passes (Codex, Claude) and a product decision round. Both review passes are folded into the sections below — there is one answer per question here, not a discussion thread.
->
-> Revised 2026-09-09 (fifth revision): four additions folded in — enabled language codes are reserved names (§8a), one Site URL base helper is a phase-one blocker (§Implementation Contracts, blocker 4), the hreflang set rules are locked (§7d) and `dir` joins the §7c contract, and menus move to language folders (§5). The step-by-step build order lives in `future-multilang-implementation-plan.md`, where multilang is stage 4 of the series in `future-roadmap.md` (groundwork → breadcrumbs → pagination → structured data → multilang → undo-history fix → rename → upload file names).
+> This is what a reader still needs: the approaches that were rejected, the rules that are not visible in the code, and the contract that cannot change. The build order and the per-step "as built" notes were deleted once the steps were done — they are readable in full at `30304f3a` (`future-multilang-design.md`, `future-multilang-implementation-plan.md`).
 
----
+## The model
 
-## Rejected Approaches (do not re-propose)
+Per-language pages inside **one** project. A page carries a `translationGroupId` (falling back to its own `uuid`) linking sibling translations; at most one page per language per group. Links between siblings are **loose, not mirrors** — a page may exist in one language only, and translations may use different widgets entirely. Cultural adaptation is a feature, not drift. The group exists for exactly two consumers: hreflang pairs and the language switcher.
 
-1. **One project per language.** Rejected because projects drift: separate theme settings, separate theme-update states, separate media libraries, and nothing keeping structure or configuration in sync over years of editing. Also duplicates every upload.
-2. **Field-level overlays** (Webflow-style: one page structure, per-language values on every text setting). Kills drift by construction, but touches every setting input, richtext, and the save flow — the deepest possible integration. Also enforces structural parity across languages, which we explicitly do **not** want (see below).
+A duplicate gets a **fresh** group; "Create `<lang>` version" **joins** the source's group; project duplication **preserves** groups.
 
-## Core Model: Per-Language Pages in One Project
+**Rejected, do not re-propose:** one project per language (projects drift — separate theme settings, update states, media libraries, and every upload duplicated) and field-level overlays (Webflow-style per-language values on every setting — touches every input and the save flow, and enforces structural parity we explicitly do not want).
 
-- Pages get a `language` field plus a shared **`translationGroupId`** linking sibling translations. Page uuids stay globally unique; the group id is what makes sibling lookup reliable.
-  - *Why a group id rather than a `translationOf` pointer chain:* a pointer chain creates a privileged "root" translation and awkward behaviour when that page is deleted. A group id has no root — deleting any sibling leaves the rest intact.
-- Links are **loose, not mirrors**. A page can exist in only one language. Translated versions may use completely different widgets and layouts — cultural adaptation per language is a feature, not drift to be prevented. Nothing enforces parity after creation.
-- The translation group exists for exactly two consumers: **hreflang pairs** and the **language switcher**. "Translate page" seeds a copy of the source page as a starting point, then the two are independent.
+## Rules that are not obvious from the code
 
-**Invariant: at most one page per language in a translation group.** Two Greek siblings would make both consumers ambiguous — hreflang would emit conflicting alternates and the switcher would not know which to link. Enforced on create and on "Create <lang> version". The same invariant applies to collection items (§9a).
+**Language is derived from the folder, never stored.** Default-language content carries no `language` value; the root folder *is* the default language. Non-default content lives in `pages/<lang>/`, `pages/<lang>/global/`, `menus/<lang>/`, `collections/<type>/<lang>/`. A stored tag can drift out of sync with the folder a file lives in; a derived one cannot. **Persisted is empty; resolved is never empty** — the absence stops at the loader, so no consumer writes its own `language || defaultLanguage` fallback. Every key is built by `packages/core/src/utils/contentAddress.js`, which is the single place the two are compared.
 
-**Group behaviour on copy:**
+**The default language is locked once a second language exists.** While a project is single-language it is freely editable — someone who builds twenty pages and then realises the site should be Greek must not start over. After that, changing it would move every page between the root and a language folder, change every public URL, and shift which media metadata sits in the default columns. A static export cannot issue redirects, so a flip is an SEO event for the whole site. If it is ever wanted it comes back as an explicit "change site language" migration. *(The form disables that select with nothing explaining why — TODO §76.)*
 
-| action | group |
-|---|---|
-| ordinary "Duplicate page/item" | **fresh** group — a duplicate is a new piece of content, not a translation |
-| "Create <lang> version" | **joins** the source's group |
-| project duplication | groups **preserved** as-is, so translations survive the copy |
+**Adding a language seeds only the skeleton** — header, footer and menus, never pages. Mass-copying would produce dozens of fake translations full of source-language text exported under `/el/`.
 
-## Locked Decisions
+**Seeding never rewrites links, and that is not a bug.** A seeded page or menu keeps the page references it inherited. For menus it is the only coherent option: at the moment a language is added no pages exist in it yet, so there is nothing to remap *to*. The choice is "keep the source-language targets" or "clear them and leave items pointing nowhere", and keeping them preserves the structure that makes the menu a useful starting point. An unfixed Greek menu sending visitors to English pages is the author's to fix as they translate each page — visible, not silent, and not a defect to report.
 
-### 1. Activation via a project setting
+Distinct from that: adding a language **does** rewrite the header and footer's *menu references*, because menus are copied first with fresh uuids and the scaffolding we generated must point at the copies.
 
-- Every project has a **default language**, even single-language ones (this also replaces the currently hardcoded `lang="en"` in theme layouts).
-- Additional languages are added in the project form ("Languages" section). **One language = the entire multilang UI stays invisible everywhere.** Adding a second language is the switch that turns it all on.
-- Stored in project metadata (SQLite), exposed app-wide via `projectStore`, and to themes as `project.languages` / `page.language`.
+**Removing a language deletes that language's content** — pages, items, header/footer, menus, media metadata rows, and the media-usage records of everything deleted. Shared binaries are never touched. Behind the standard `variant: "danger"` modal, stating the counts. The default language cannot be removed.
 
-#### 1a. The default language is editable only while the project is single-language
+**Pickers show every language**, grouped and filterable, defaulting to the current page's language. The model allows a page to exist in one language only, so a picker that hides other languages makes such a page impossible to link to. A cross-language target carries a small language tag on the item — a label, not a warning.
 
-- **One language: freely editable.** Someone who accepts the default without thinking, builds twenty pages, then realises the site should be Greek must not be told to start over.
-- **Two or more: locked**, with a clear message. Changing it then moves every page between the root and its language folder, changes every public URL in every language, and shifts which media metadata lives in the default columns versus the translations table. A static export cannot issue its own redirects, so a flip is an SEO event for the whole site.
+**Enabled language codes are reserved names.** A root page slug or a collection `slugPrefix` may not equal an enabled code, and enabling a code that collides with one is refused, naming the conflict. `pages/el.json` exports to `el.html` while Greek exports under `el/`; with Clean URLs on, `/el` is both. Only *enabled* codes are reserved. `page` is reserved too, in every language folder — it is the pagination segment. Non-root slugs are unaffected: `pages/el/it.json` is the Greek page named "it".
 
-If it is ever wanted after translations exist, it returns as an explicit "change site language" migration — contained work, provided the addressing layer (§Implementation Contracts) exists. Not v1.
+**Slugs are unique per language, not per project** — otherwise `gallery-1` leaks into a public URL forever. Storage and output order differ deliberately: `collections/news/el/story.json` → `el/news/story.html`. Storage nests language under the type so a type's items stay together; output puts language first because the public URL groups the site by language. **`slugPrefix` is not translated** — `/el/news/my-story`, never `/el/nea/my-story`.
 
-#### 1a-i. Language is empty for default-language content
+**Media is one shared library with per-language metadata** (alt/title/caption), stored in a translations table keyed by `(media_file_id, language)`; the existing columns are the default language. `NULL` means inherit; `""` means intentionally blank — without that a decorative image cannot have deliberately empty alt text in a translated language.
 
-Default-language content carries **no** `language` value; only non-default content is tagged explicitly. The root folder *is* the default language.
+**Media-usage identities are uuid-based** (`page:<uuid>`, `collection:<uuid>`), and globals use `global:root:<type>` for the default language. `root` names the position, which survives a default-language switch; `global:en:header` would strand its rows the moment a single-language project changed its default.
 
-This is what makes the single-language switch above genuinely free — it updates one project setting and nothing else, instead of retagging every page, menu, global, and collection item. It also removes a whole class of bug: a stored tag can drift out of sync with the folder a file lives in, a derived one cannot.
+**Translated forms are separate submission streams.** Form keys are language-qualified; unifying them would need an author-set form id, which belongs to the forms work.
 
-The cost is that "find all English pages" means matching empty-when-English. That lives in the addressing layer, so it is one place, not everywhere.
+**An enabled language with no homepage is skipped from the export** and named in a prominent user-visible warning. A missing *default*-language homepage still fails the whole export — skipping the root language would produce a site with no `/` at all.
 
-**Persisted is empty; resolved is never empty.** The absence is a storage detail and must not leak past the loader, or every consumer ends up writing its own `language || defaultLanguage` fallback and one of them gets it wrong.
+## `page.translations` — frozen theme contract
 
-| layer | value |
-|---|---|
-| persisted root-language file | `language` absent |
-| loaded page / item / menu / global model | `language` = `project.defaultLanguage` |
-| `page.language` in Liquid | always a real code, never empty |
-
-#### 1b. Language identifier format
-
-- **Simple ISO 639-1 codes in the UI** (`en`, `el`, `it`) — valid in `<html lang>` and `hreflang`, and right for the target sites.
-- **Validation and storage accept a wider BCP 47 subset** (`^[a-z]{2}(-[a-z0-9]{2,8})?$`), so adding `pt-br` later needs no migration. Cheap insurance, no v1 complexity.
-- Store and path-build in **lowercase**; emit canonical casing (`pt-BR`) in `lang` / `hreflang` output.
-- **RTL languages are not supported in v1** — they need `dir="rtl"` plumbing and theme work. They are absent from the picker *and* **rejected by the service/API**: hiding an option is not enforcement, and the language endpoint would otherwise accept `ar` from any direct call. Revisit as its own piece.
-- **Existing projects migrate to `en`**, which is also the default for new projects.
-
-#### 1c. Removing a language is destructive, behind a confirmation modal
-
-Removing a language is supported in v1 and **deletes** that language's content: its pages, its collection items, its header/footer, its menus, and its media metadata rows — and cleans the media-usage records of everything deleted, so no orphaned usage keeps an image marked as in-use. Uploaded binaries are shared and are never touched.
-
-- The confirmation modal states exactly what will be deleted — counts of pages, collection items, and menus — and that it cannot be undone. It uses the standard destructive-action modal (`variant: "danger"`).
-- **The default language cannot be removed.** Removing it would be the root-ownership change §1a rules out; the only way to drop it is to remove the other languages first, at which point §1a's single-language rule applies.
-
-#### 1d. Site language is not editor language
-
-The project's language is the *visitor-facing* site language. It has no relationship to the language of the admin interface (which is driven by the editor's own i18n locales, currently `en` only). Setting a site to Greek must never switch the editor UI to Greek.
-
-### 2. Adding a language seeds only the skeleton
-
-Auto-copy just the singletons the new language needs to render at all: **header, footer, and menus** (tagged with the new language). **Never mass-copy pages** — that would produce dozens of fake "translated" pages full of source-language text exported under `/en/`. Pages are translated one by one, deliberately.
-
-#### 2a. Seeding never rewrites links
-
-A seeded page or menu keeps the page references it inherited from the source language. We do not remap, clear, or rewrite them.
-
-- **Page content is the author's.** Links inside widgets and richtext are content; the author owns them.
-- **For menus this is also the only coherent option.** At the moment a language is added, no pages exist in it yet (see above) — so there is nothing in the target language to remap *to*. The real choice is "keep the source-language targets" or "clear them and leave items pointing nowhere". Keeping them preserves the menu's structure, which is what makes it a useful starting point: the author re-points each item as they translate that page.
-- The failure mode is visible, not silent: an unfixed Greek menu sends visitors to English pages, which anyone opening their own site notices immediately. That is a different class of problem from silent data loss and is acceptable to leave to the author.
-
-### 3. Pages list: language tabs + status chips
-
-- Language tabs above the pages table. The active tab filters the list; new pages inherit the tab's language.
-- Each row shows small chips for the other languages: **filled** = translation exists (click to open), **hollow** = missing (click = "Create <lang> version", which seeds from this page and joins them into the same translation group). That one control is the whole translation workflow.
-
-### 4. Page editor: context follows the page, no global mode
-
-- No app-wide "editing language" state to forget about. Opening a Greek page renders the Greek header/footer in the canvas automatically.
-- A small language menu on the current page jumps to its siblings or creates a missing one.
-
-#### 4a. Pickers show every language, grouped and filterable
-
-Link pickers and menu pickers list pages from **all** languages, grouped by language, with a language filter. The view defaults to the current page's language so the common case stays one click.
-
-*Why not filter to the page's language:* the Core Model explicitly allows a page to exist in only one language. If a Careers page exists solely in English, a picker that hides other languages makes it impossible to link to — the design permits the situation while the UI forbids the remedy. It also fits the same principle as §2a: authors own their links; hiding options decides for them.
-
-The original intent — don't let authors wire cross-language links *by accident* — is preserved through visibility instead of prohibition: **a link pointing at another language carries a small language tag on the item.** It is a label, not a warning. This also means the cross-language targets inherited by seeded menus (§2a) need no special-case UI; they render as ordinary entries that happen to sit in another language's group.
-
-### 5. Per-language singletons
-
-- **Header/footer**: independent per-language instances (no shared-with-overrides machinery). Default globals stay at `pages/global/`; non-default at `pages/<lang>/global/`.
-- **Menus**: multiple menus already exist per project. Default-language menus stay in `menus/`; non-default menus live in `menus/<lang>/`. Language is **derived from the folder**, like pages, items and globals — never a stored tag.
-  - *Why folders and not a `language` field:* §1a-i's argument — a stored tag can drift from where the file lives, a derived one cannot — applies to menus exactly as it does to pages. One convention keeps the addressing layer to a single rule, and removing a language (§1c) is deleting a folder. Menus are referenced by uuid, so header/footer and the pickers are unaffected. (Revised 2026-09-09: an earlier revision kept menus flat with an empty-means-default tag; that was the one content type breaking the derived-language rule.)
-
-#### 5a. Seeding order: menus first, then remap
-
-Adding a language copies singletons in a fixed order, because the header and footer reference menus *by uuid*:
-
-1. Copy the default language's menus into `menus/<lang>/`, giving each a **fresh uuid**
-2. Keep an old-uuid → new-uuid map
-3. Copy header/footer, rewriting their **menu references** through that map
-
-Without step 3 the Greek header still points at the English menus. Note this is a different thing from §2a: rewriting a header's *menu reference* is fixing scaffolding we generated, not touching the *page links* inside menu items, which stay exactly as inherited.
-
-### 6. Media: one shared library, per-language metadata
-
-- The grid, uploads, and binaries stay exactly as today — shared across languages (the whole point of staying in one project).
-- Only the metadata drawer changes: language pills above **alt/title/caption**. The default language keeps the existing `media_files` columns; other languages **fall back to the default at render time**, so untranslated metadata never breaks output. The `{% image %}` tag already reads metadata at render time and just picks the current language.
-- **Storage: a normalized translations table keyed by `(media_file_id, language)`**, with the existing columns remaining the default language. Chosen over a JSON column because it indexes and batches, avoids rewriting a blob to change one language, and matches the existing `mediaRepository` pattern.
-- **`NULL` and `""` mean different things.** `NULL` (or no row) = inherit the default language. `""` = intentionally blank. Without that distinction a decorative image cannot have deliberately empty alt text in a translated language — it would silently inherit the default's description instead, which is worse for accessibility than no alt at all.
-
-### 7. Export: zero configuration
-
-- Default language exports at `/`, others at `/el/`, `/it/`, etc.
-- Emits `<html lang>`, hreflang pairs from the translation group, and per-language sitemap entries.
-- Rendering non-default languages at `/<lang>/` depth reuses the machinery collection item pages already use (`outputPathPrefix` + `prefixInternalHref`), with the depth **derived** rather than hardcoded (see §Implementation Contracts).
-- The language switcher is a **theme concern**: a header setting reading `page.translations`. This depends on the render-context change in §Implementation Contracts.
-
-#### 7a. File shape and Clean URLs
-
-The language is a folder; nothing about the existing file shape changes. Clean URLs keeps doing exactly what it does today — it picks the emitted shape of SEO URLs (canonical links and the sitemap) **and of every uuid-resolved internal link** (`pageHref` / `itemHref` in `internalHref.js`), never the exported filenames; author-typed hrefs are emitted as written. Switcher links must go through the same helpers so they follow the flag.
-
-| | file on disk | canonical / sitemap URL |
-|---|---|---|
-| Clean URLs **off** | `el/contact.html` | `/el/contact.html` |
-| Clean URLs **on** | `el/contact.html` | `/el/contact` |
-
-- **hreflang URLs follow Clean URLs**, since they are SEO URLs like the canonical.
-- **The language switcher emits ordinary internal links**, so it takes the same shape as every other uuid-resolved link in the output — `.html` file names, or extensionless when Clean URLs is on (`pageHref` / `itemHref`).
-
-#### 7b. An enabled language with no homepage is skipped
-
-Adding a language enables its authoring UI immediately; that does not make it exportable. An enabled **non-default** language with no homepage is **omitted from the export**, and the export result carries a **prominent user-visible warning** naming it. A server-log-only warning would make a partially published site too easy to miss. No readiness state machine — one rule.
-
-**The default language is not subject to this.** A missing default-language homepage still fails the entire export, as it does today (`exportController` throws "Export failed: No homepage found"). Skipping the root language would produce a site with no `/` at all.
-
-#### 7c. `page.translations` — the theme contract
-
-One array, two consumers with different rules, so each entry carries both link forms and says which kind it is:
-
-```liquid
-{% for t in page.translations %}
-  <a href="{{ t.href }}" {% if t.active %}aria-current="true"{% endif %}>{{ t.label }}</a>
-{% endfor %}
-```
+One array, supplied to pages and collection item pages alike. Frozen: Arch ships a switcher against it.
 
 | field | meaning |
 |---|---|
 | `language` | code as stored, lowercase (`el`) |
-| `hreflang` | canonically cased code for markup (`el`, `pt-BR`) |
+| `hreflang` | canonically cased for markup (`el`, `pt-BR`) |
 | `label` | the language's **native** name (`Ελληνικά`, not "Greek") — a switcher is read by someone who does not yet read the current language |
-| `href` | internal link for the switcher: **depth-aware and Clean-URLs-aware** (`../el/contact.html`, or `../el/contact` when the setting is on) |
+| `href` | internal link for the switcher: depth-aware and Clean-URLs-aware (`../el/contact.html`, or `../el/contact`) |
 | `seoUrl` | **absolute** and Clean-URL-aware (`https://site.com/el/contact`) |
 | `active` | this is the page being rendered |
 | `fallback` | `true` when this points at the language's homepage because no sibling exists |
-| `dir` | text direction of the language — `ltr` for everything v1 accepts; `rtl` reserved. In the contract from day one so RTL support (§1b) never changes a shipped theme's switcher |
+| `dir` | text direction — `ltr` for everything v1 accepts; `rtl` reserved, so RTL support never changes a shipped theme's switcher |
 
-**`href` and `seoUrl` cannot be one field.** The switcher is a link inside a static page, so it needs a relative path to a real file; hreflang is metadata for crawlers, so it needs an absolute canonical URL. One value cannot be both.
+`href` and `seoUrl` cannot be one field: the switcher is a link inside a static page and needs a relative path to a real file; hreflang is crawler metadata and needs an absolute canonical URL.
 
-- **The switcher uses `href`, and may use every entry**, fallbacks included — landing a visitor on the homepage beats a dead end.
-- **hreflang uses `seoUrl`, and only entries where `fallback` is false.** Declaring the homepage as the English version of `/el/contact` is false, and search engines either ignore the whole set or index the wrong page.
-- **Both exclude languages omitted from the export** (§7b). A link to a language that was never written is a 404.
+- **The switcher uses `href` and may use every entry**, fallbacks included — landing a visitor on the homepage beats a dead end.
+- **hreflang uses `seoUrl` and only entries where `fallback` is false.** Declaring the homepage as the English version of `/el/contact` is false, and search engines either ignore the whole set or index the wrong page.
+- **Every hreflang set includes a self-reference** (a set without one is invalid) **and `x-default`**, pointing at the default-language sibling or, failing that, the default-language homepage. That is the one place a `fallback` entry is legitimate.
+- **A single-language project emits no hreflang at all.**
+- Both exclude languages omitted from the export — a link to a language that was never written is a 404.
 
-Locking this shape early matters because the switcher is a theme feature: once themes ship against it, it cannot be changed retroactively.
+## Not in v1
 
-The same array is supplied to collection item pages (§9a), so a theme's switcher works identically there.
+- **RTL languages.** They need `dir="rtl"` plumbing and theme work; absent from the picker *and* rejected by the service, because hiding an option is not enforcement.
+- **A per-language site title**, and a per-language 404 page.
+- **Editor-side language indicators** beyond the tabs, chips and page menu that shipped.
 
-#### 7d. hreflang set rules
+## Hosted questions (no OSS impact — the local adapter returns `Infinity`)
 
-Locked now because both rules shape what `page.translations` must carry, and §7c cannot change once a theme ships against it.
-
-- **Every set includes a self-referential entry.** The page being rendered lists itself (the `active: true` entry, with its own `seoUrl`). Search engines treat a set without a self-reference as invalid and ignore it, so this is not optional.
-- **Every set includes `x-default`, pointing at the default-language sibling.** When no default-language sibling exists, `x-default` points at the default-language homepage — the same fallback target the switcher already uses. This is the one place a `fallback: true` entry is legitimate in hreflang output, and only for `x-default`: an ordinary language alternate still never points at a fallback (§7c).
-- **A single-language project emits no hreflang at all** — no self-reference, no `x-default`. The block is part of the multilang UI that stays invisible with one language (§1).
-- **Site title stays project-wide in v1.** A per-language site title is real but separable work; it is recorded under §Open Questions and does not block the contract.
-
-### 8. Slugs are unique per language, not per project
-
-Both languages naturally want the same slug (e.g. `gallery`). With project-wide uniqueness, `generateUniqueSlug` would mint `gallery-1` and the suffix leaks into the public URL forever (`/el/gallery-1`). Instead:
-
-```
-source file              exported file        public URL (Clean URLs on)
-pages/gallery.json    →  gallery.html      →  mysite.com/gallery       (default language)
-pages/el/gallery.json →  el/gallery.html   →  mysite.com/el/gallery    (Greek)
-```
-
-- Non-default languages live in `pages/<lang>/` subfolders, mirroring the export URL structure.
-- **Collection items follow the same principle** — they live flat at `collections/<type>/<slug>.json` today and have the identical collision problem — but note the **storage and output orders differ**, deliberately:
-
-```
-collections/news/story.json     →  news/story.html      →  mysite.com/news/story
-collections/news/el/story.json  →  el/news/story.html   →  mysite.com/el/news/story
-```
-
-  Storage nests language *under* the type, so a collection type's items stay together in one folder. Output puts language *first*, because the public URL groups the whole site by language. Both are right for their own purpose; the addressing layer owns the translation between them.
-- Uniqueness checks scope to the language folder. Page uuids (and collection item uuids) stay globally unique, so links and menus are unaffected.
-- Nothing forces slug parity either: Greek `epikoinonia` pairs with English `contact` through the translation group, not the slug.
-- **Why locked early:** everything downstream keys off page identity — `getAllPages` listing, media-usage source strings, link resolution, export paths. Deciding the layout first makes the language folder part of the page's path from day one; retrofitting it later means a migration.
-
-#### 8a. Enabled language codes are reserved names
-
-A language folder and a same-named page or collection prefix are one public address. `pages/el.json` exports to `el.html` while Greek exports under `el/`; with Clean URLs on, `/el` is the URL of both. A collection whose `slugPrefix` is `el` collides the same way at `/el/<item>`. Preview is unaffected — its routes carry an explicit content namespace (§Assumptions) — but the published site has nothing to disambiguate with.
-
-- **A root-level page slug and a collection `slugPrefix` may not equal an enabled language code.** Rejected on create and rename with a message naming the language.
-- **Enabling a language whose code equals an existing root page slug or `slugPrefix` is refused**, naming the conflicting page or collection, so the author renames it first. Enforcement is in the service layer, not only the picker — the same rule as RTL in §1b.
-- Only *enabled* codes are reserved, not every string matching the language regex — a two-letter page called `tv` on a project with no such language is fine.
-- The existing reserved-prefix mechanism (`assets`) is the natural home for the collection side; pages need the equivalent check.
-- **`page` is reserved as well**, in every language folder and as an item slug — it is the pagination segment (`blog/page/2`, `el/page/2` for a paginated Greek homepage). Pagination ships before multilang and introduces the reservation; see `future-pagination-design.md`.
-
-Non-root slugs are unaffected by the language rule: `pages/el/it.json` is the Greek page named "it", not Italian.
-
-### 9. Collections are in scope for v1
-
-Collections ship with multilang, not after it. Items get a `language` + translation group like pages; collection widgets (the `| collection` filter) filter items by the rendering page's language. Item URLs nest as `/<lang>/<slugPrefix>/<itemSlug>`.
-
-This makes the §8 collection storage layout an implemented contract rather than a reserved one, and makes the derived-output-depth work (§Implementation Contracts) mandatory in v1 — a Greek news item sits two directory levels deep where today the exporter assumes one.
-
-#### 9a. Item authoring mirrors the pages workflow
-
-Collections get the same three controls as pages (§3, §4), for the same reasons — there is no argument for a second, different translation workflow in the same product:
-
-- **Language tabs** above the items table; the active tab filters, new items inherit its language.
-- **Translation chips** per row: filled = sibling exists (click to open), hollow = missing (click = "Create <lang> version", seeding from this item and joining the group).
-- **A language menu on the item editor** jumping to siblings or creating a missing one.
-
-Items obey the same one-per-language invariant and the same copy rules as pages (§Core Model).
-
-Item pages receive the same `page.translations` contract as pages (§7c) so a theme's switcher works identically on an item page.
-
-**`slugPrefix` is NOT translated** (decided): the prefix from the collection-type definition is identical across languages — `/news/my-story` and `/el/news/my-story`, never `/el/nea/my-story`. Only the `/<lang>/` segment varies. This matches how mainstream CMSs and their multilang plugins handle base slugs by default, and keeps the type definition language-free.
-
-### UI conventions
-
-- Language labels are **codes or names, never flags** (flags are countries, not languages).
-- Tabs are the model up to ~4–5 languages, which covers the small/medium target. Don't design for more now.
-
----
-
-## Implementation Contracts
-
-Derived from tracing the page, link, preview, media, rendering, and export code. The principal engineering risk is not the language UI — it is that page identity and slug-derived paths already participate in many systems. These are the contracts to make explicit before implementation.
-
-### A single language-aware addressing layer (the central seam)
-
-Language awareness belongs in shared helpers, not in scattered `if (language !== defaultLanguage)` branches. One layer should own:
-
-- page storage keys and global-widget keys
-- collection-item keys
-- public output paths and **derived output depth**
-- media-usage source identities
-- language-scoped uniqueness checks
-
-Callers pass language plus content identity; they never assemble `pages/<lang>/...` themselves. This mirrors why the backend went scope-first with `Scope` and adapters (see `core-packages.md`) — callers stopped building paths by hand. The pure path/URL helpers belong in `@widgetizer/core` beside `linkPrefixer.js`, so both shells and the render engine can use them.
-
-### Phase-one correctness blockers
-
-1. **Media-usage identity must become collision-proof for every translated content type.** Usage sources are currently human-readable strings that all collide once the same name exists per language:
-
-   | today | collides because | replace with |
-   |---|---|---|
-   | `<pageSlug>` | §8 allows the same slug per language | `page:<uuid>` |
-   | `collection:<type>/<slug>` | same, for items | `collection:<uuid>` |
-   | `global:header` | one header per language, same id | `global:root:<type>` (default) / `global:<language>:<type>` (non-default) |
-
-   Uuids are already globally unique, so they sidestep the problem entirely; globals have no uuid, hence the segment. **Default globals use `root`, not the language code** — `global:en:header` would strand its usage rows the moment a single-language project switches its default from `en` to `el`, breaking §1a's one-setting-only guarantee. `root` names the position, which survives the switch. This is **data loss, not an addressing cleanup** — deleting a Greek page can strip media still in use by its English sibling — and must land before same-slug translations can be saved. (`global:theme-settings` is project-wide and unaffected; theme settings stay shared.)
-
-2. **Global-widget render context must carry `page` and `project`.** `renderWidget()` receives no page data — only `renderPageLayout()` does. Header and footer render through `renderWidget()`, so the §7 language switcher (a header setting reading `page.translations`) cannot be built until the context contract is extended. This is a prerequisite of a locked decision, not an optional cleanup.
-
-3. **Output depth must be derived, not hardcoded.** `exportController.js` passes `outputPathPrefix: "../"` as a literal. Replacing it with another literal is insufficient — the correct prefix depends on the final path (`el/news/story.html` is two levels deep, `news/story.html` one). Note `depthRenderSmoke.test.js` only exercises depth-1 today, so nothing currently guards this.
-
-4. **Every absolute SEO URL must come from one Site URL base helper.** Today the canonical (page, item, and og:image) is built by concatenating onto the Site URL, while the sitemap and `robots.txt` resolve relative URLs against it — three join styles that already disagree the moment the Site URL carries a path or query (`https://example.com/sites/foo` yields a canonical under `/sites/foo/`, a sitemap entry under `/sites/`, and a home entry at the origin root). Multilang pushes a `/<lang>/` segment through every one of these, then adds hreflang `seoUrl`s (§7c) and per-language sitemap entries on top. Land the helper first: reject query and hash at validation, normalise the Site URL once to a directory base, expose one join in `@widgetizer/core` beside `isHomeSlug`, and route canonical, og:image, sitemap, robots and hreflang through it. Collapse the three `isValidSiteUrl` copies (core, the sitemap builder, the collection service — the latter two accept anything `new URL()` parses) into the core one. Test a path base with and without a trailing slash under both Clean URLs values. This is a prerequisite of §7c/§7d, not a cleanup.
-
-### Assumptions that must change
-
-- Page API/storage readers enumerate only root-level `pages/*.json` (`listPagesFromDir` filters `isFile()`, so subfolders are invisible); global widgets are fixed at `pages/global/{header,footer}.json`.
-- Page UUID maps, link-target pickers, menu resolution, richtext resolution, delete cleanup, project duplication, and preset enrichment assume one project-wide page set with no render-language filter.
-- Standalone preview routes are slug-only (`/preview/:pageId`), and the in-iframe link mapper understands only root pages and one-level collection item paths. **Preview routes keep an explicit content namespace** — `/preview/page/el/contact`, `/preview/collection/el/news/story` — rather than mirroring the public path literally. `/preview/el/contact` is ambiguous: `el` could be a language or a collection prefix, and nothing in the path resolves it.
-- Static export requires one root `index` page, writes flat root `.html` files, generates one canonical per slug, and builds sitemap/robots data without language alternates.
-- **Translated forms are separate submission streams in v1 — and that separation must be built, not assumed.** The forms manifest derives form and field identifiers from visitor-facing labels (`handleizeKey(label)`, which transliterates non-Latin scripts), so an English "Contact" and a Greek "Epikoinonia" naturally become two forms. But label-derived keys alone do **not** guarantee separation: a copied not-yet-translated form has identical labels, so the manifest silently merges the two streams into one; a *partially* translated form (same transliterated name, different field labels) collides on the key with different fields, which today **fails the whole export** (`formsManifestService` treats same-key/different-fields as an error). And `page_path` is built flat (`/${outputFilename}`) with no language folder. v1 therefore needs **language-qualified form keys** and **addressing-layer-generated page paths**. Unifying streams instead would need an author-set form id (a seeded copy gets a fresh uuid, so uuid identity cannot work) — product surface belonging to the forms work. Splitting by language is also defensible on its own: knowing which language a visitor wrote in is useful. How per-language streams count against the forms-per-site ceiling is an open hosted decision (see §Hosted product questions); OSS is unbounded.
-
-### Hosted product questions (no OSS impact — the local adapter returns `Infinity`/unbounded for every count limit)
-
-- `LIMIT_KEYS.MAX_PAGES_PER_PROJECT` exists in `@widgetizer/core` and the local adapter answers it, but **no controller enforces it** — whether translations count toward a per-project page ceiling is a hosted pricing question with nothing to change in code today.
-- `LIMIT_KEYS.MAX_COLLECTION_ITEMS` **is actively enforced** (`collectionController` checks it on create). **OPEN:** do translated items count physically (one story in three languages = three items against the cap) or per translation group? Until decided, physical counting is what the code does.
-- `LIMIT_KEYS.MAX_FORMS_PER_SITE` — was a constant hardcoded in `formsManifestService.js` and thus enforced on OSS exports too; now adapter-backed like every other count limit (OSS `Infinity`, hosted-contract default 5, checked at export). **OPEN:** how the cap works on a multilingual site. Note **group-based counting is not available here**, unlike collection items: forms deliberately have no stable cross-language identity in v1 (that is what makes them separate streams), so there is no group to count. The viable choices are: each language-qualified stream consumes a slot (5 collapses at the 4–5-language target — 2 forms × 3 languages = 6 keys); raise or remove the hosted cap for multilingual sites; or introduce stable form-group ids, which expands v1 scope.
-
----
-
-## Phase Boundaries
-
-**In v1:** everything in Locked Decisions above, including collections (§9), dynamic `<html lang>`, hreflang generation, and localized month names (scheduled last — see below).
-
-**Deferred to its own project — a site-runtime theme translation API.** Visitor-facing strings baked into layouts, snippets, and collection `template.liquid` (Arch currently hardcodes "Skip to main content") cannot be translated today. The eventual answer is a site-runtime translation namespace usable from layouts, snippets, widgets, and collection templates, kept conceptually separate from the existing editor-facing `tTheme:` schema-label locales. That is a new theme-facing API surface plus a locale-authoring story plus adoption work in every theme — comparable in size to multilang itself, so it does not ride along.
-
-For v1: **move** Arch's hardcoded visitor-facing strings into per-language header content or settings, and document the authoring rule that themes must not hardcode site-facing copy.
-
-**"Move", never "delete".** Arch's `layout.liquid` hardcodes "Skip to main content" — an accessibility feature for keyboard and screen-reader users. Removing the string to satisfy the no-hardcoded-copy rule would remove the feature. The label becomes translatable content; the skip link itself stays.
-
-**Theme settings stay shared** (they're design tokens). Rule of thumb: translatable text belongs in widgets, not theme settings.
-
----
-
-## Open Questions (for the next design round)
-
-- **SEO details:** whether site-facing `siteTitle` becomes per-language (hreflang self-reference and `x-default` are decided — §7d).
-- **Per-language 404 page** in exports.
-- **Editor-side language indicators** beyond the tabs/chips/menus already specified.
-
----
-
-## Localized month names — in v1, scheduled last
-
-`packages/core/src/utils/dateFormat.js` holds fixed `MONTHS_SHORT` / `MONTHS_FULL` arrays and nothing is locale-aware, so a Greek site renders "31 December 2026" — an English month on a Greek page, visible on every article.
-
-**In scope for v1 and release-blocking** — a multilingual site emitting English month names is a multilang output defect, not a background gap, so v1 does not ship without it. **Sequenced last** only because it is independent of everything above: no other decision waits on it.
-
-Two constraints for whoever picks it up:
-
-- `Intl.DateTimeFormat` makes this contained, but the file's timezone-safe contract must survive — it deliberately splits the `YYYY-MM-DD` string rather than constructing a local `Date`, so any replacement must format in UTC explicitly.
-- The existing format tokens are a fixed, user-chosen list (the app's date-format setting). Localizing must not silently change which format a site already uses — only which language the month is rendered in.
-
-This is not covered by the theme-string work above: these strings live in core, not in a theme.
-
----
-
-## Note for the next reviewer
-
-Fifth revision. All review passes and product decision rounds are folded into the sections above — one authoritative answer per question, no appended discussion, and no historical change-log here: the sections themselves are the record. (Earlier revisions of this note summarized superseded states of the doc and had drifted out of sync with it — per review, the summaries are gone.)
-
-**This round's additions (2026-09-09), applied:**
-
-| raised | now |
-|---|---|
-| language codes collide with root page slugs and collection prefixes on the published site | §8a — enabled codes are reserved names both ways, enforced in the service |
-| absolute SEO URLs are joined three different ways onto the Site URL; multilang multiplies it | §Blocker 4 — one Site URL base helper in core, landed before hreflang |
-| hreflang self-reference and `x-default` left open while §7c is about to freeze | §7d locked; `dir` added to §7c |
-| menus were the one content type carrying a stored language tag | §5 — menus in `menus/<lang>/`, language derived from the folder |
-
-**Previous round's corrections (2026-08-06), applied:**
-
-| raised | now |
-|---|---|
-| stale closing note contradicting the sections | this note rewritten; historical tables removed |
-| separate form streams not actually guaranteed | §Assumptions — identical labels currently *merge* streams, partial translation *fails export*, `page_path` is flat; v1 needs language-qualified form keys + addressing-layer paths |
-| `global:<language>:<type>` breaks the free default switch | §Blocker 1 — default globals use `global:root:<type>`; language codes only on non-default |
-| language removal omitted collection items | §1c — items deleted, usage records cleaned, counts shown |
-| month names both required and optional | §Localized month names — release-blocking, sequenced last |
-| `MAX_COLLECTION_ITEMS` interaction unrecorded | §Hosted product questions — enforced today, so translations consume the item allowance; hosted must lock that or count groups. OSS unaffected (`Infinity`) |
-| `MAX_FORMS_PER_SITE` misfiled as hosted-only | **fixed in code, not just the doc** — the hardcoded constant is now adapter-backed (`LIMIT_KEYS.MAX_FORMS_PER_SITE`; OSS `Infinity`, hosted default 5). §Hosted product questions marks the two remaining counting decisions OPEN: items physical-vs-group, and form slots × languages |
-
-**Worth a look:**
-
-1. **§7c is the last thing that should move.** It is a frozen theme contract in both link forms; once a theme ships a switcher against it, it cannot change. `dir` is now in; if a field is still missing — a region label, say — this is the moment.
-2. **§9a assumes collections mirror the pages workflow exactly.** Deliberate, but collections carry different volumes: if a hundred news items make tabs-and-chips the wrong shape, say so now.
-3. **Separate form streams (v1) is a product call, not a technical limit.** Defensible on its own merits, but if per-language submission splitting is unacceptable to users, stable form ids become a v1 dependency and that changes scope.
+- `MAX_PAGES_PER_PROJECT` exists but no controller enforces it; whether translations count toward a ceiling is a pricing question.
+- `MAX_COLLECTION_ITEMS` **is** enforced on create. Open: do translated items count physically (one story in three languages = three) or per translation group? Physical is what the code does.
+- `MAX_FORMS_PER_SITE` is adapter-backed (hosted default 5), checked at export. Open: group counting is **not** available here — forms deliberately have no cross-language identity, so there is no group to count. Either each language-qualified stream takes a slot (2 forms × 3 languages = 6 keys, so 5 collapses), or the cap rises for multilingual sites, or stable form-group ids get built.

@@ -1,6 +1,6 @@
 # Future: Collection Pagination
 
-> **Status: shipped 2026-09-14 on branch `0.9.10`; direction locked 2026-09-09.** Where the build departs from the design below, §What changed wins. Pagination is stage 2 of the series in `future-roadmap.md` — groundwork (page-link filter, Site URL helper) → breadcrumbs → pagination → structured data → multilang → undo-history fix → rename → upload file names — and deliberately lands groundwork the later stages need. The shared groundwork steps, with files and done-when criteria, are Phase 0 of `future-multilang-implementation-plan.md`. Design vocabulary follows `future-multilang-design.md`.
+> **Status: shipped 2026-09-14 on branch `0.9.10`; direction locked 2026-09-09.** Where the build departs from the design below, §What changed wins. Pagination is stage 2 of the series in `future-roadmap.md` — groundwork (page-link filter, Site URL helper) → breadcrumbs → pagination → structured data → multilang → undo-history fix → rename → upload file names — and deliberately lands groundwork the later stages need. Design vocabulary follows `future-multilang-design.md`.
 
 ---
 

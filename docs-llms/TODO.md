@@ -978,9 +978,8 @@ guessing at authorial intent from string shape alone.
 **Decision (2026-09-09) on the theme-Liquid bullet:** the engine will expose a `page_url`
 filter (`{{ 'index' | page_url }}`, plus `item_url`) built on `pageHref` / `itemHref`, and
 the arch header logo goes back to one expression. It is stage 0 of the pagination →
-multilang series — the pager and the language switcher link through the same filter — and is
-specified as step 0 in `docs-llms/future-multilang-implementation-plan.md`. The custom-string and
-schema-default bullets stay as decided above.
+multilang series — the pager and the language switcher link through the same filter. The
+custom-string and schema-default bullets stay as decided above.
 
 **Questions to revisit:**
 
