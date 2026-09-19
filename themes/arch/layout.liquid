@@ -21,7 +21,6 @@
     {% header_assets %}
   </head>
   <body class="{{ body_class }} corner-{{ theme.style.corner_style | default: 'sharp' }} spacing-{{ theme.style.spacing_density | default: 'default' }} buttons-{{ theme.style.button_shape | default: 'auto' }}">
-    <a href="#main-content" class="visually-hidden skip-link">Skip to main content</a>
     {{ header | raw }}
     {% if theme.general.show_breadcrumbs %}
       {% render 'breadcrumbs', class_nav: 'site-breadcrumbs', class_list: 'breadcrumbs-list', class_item: 'breadcrumbs-item', class_link: 'breadcrumbs-link', class_current: 'is-current' %}

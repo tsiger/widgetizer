@@ -1,0 +1,36 @@
+{%- comment -%}
+  `render` gets no parent scope, so the caller passes `translations` in.
+  `landmark: false` drops the <nav> wrapper, for the copy that sits inside the
+  header's own navigation — one landmark per switcher.
+{%- endcomment -%}
+{%- if translations and translations.size > 1 -%}
+  {%- if landmark == false -%}
+    <ul class="header-languages-list">
+      {%- for entry in translations -%}
+        <li class="header-languages-item">
+          <a
+            href="{{ entry.href }}"
+            class="header-languages-link{% if entry.active %} is-active{% endif %}"
+            lang="{{ entry.hreflang }}"
+            {%- if entry.active %} aria-current="true"{% endif -%}
+          >{{ entry.label }}</a>
+        </li>
+      {%- endfor -%}
+    </ul>
+  {%- else -%}
+    <nav class="header-languages" aria-label="{{ label }}">
+      <ul class="header-languages-list">
+        {%- for entry in translations -%}
+          <li class="header-languages-item">
+            <a
+              href="{{ entry.href }}"
+              class="header-languages-link{% if entry.active %} is-active{% endif %}"
+              lang="{{ entry.hreflang }}"
+              {%- if entry.active %} aria-current="true"{% endif -%}
+            >{{ entry.label }}</a>
+          </li>
+        {%- endfor -%}
+      </ul>
+    </nav>
+  {%- endif -%}
+{%- endif -%}

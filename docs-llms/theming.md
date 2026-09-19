@@ -1154,7 +1154,7 @@ Within individual widget templates (`widgets/{name}/widget.liquid`), you have ac
 - `{{ widget.index }}`: 1-based index of the widget in the page (first widget = 1, second = 2, etc.). This is `null` for global widgets (header/footer) or when the index is not available.
 - `{{ theme.* }}`: Global theme settings organized by group
 
-**Note:** `page.*` and `project.*` objects are only available in `layout.liquid`, not in individual widget templates.
+- `{{ page.* }}` and `{{ project.* }}`: the page being rendered and the project, the same objects `layout.liquid` sees. A widget rendered without a page in context (a preview morph of a widget alone) gets no `page`, so guard anything that reads it.
 
 #### Widget Index Example
 
@@ -1170,6 +1170,59 @@ The widget index can be useful for styling alternate widgets, creating numbered 
   <!-- Widget content -->
 </div>
 ```
+
+### Visitor-facing text
+
+**A theme never hardcodes a string a visitor reads.** Every one of them — a heading, a button label, a skip link, an `aria-label`, an image `alt` — belongs in a setting with the English wording as its `default`. A hardcoded string cannot be changed by the site owner and cannot be translated, so on a site with more than one language it leaves English chrome around translated content.
+
+```liquid
+<!-- No: nobody can change this, in any language -->
+<nav aria-label="Primary">
+
+<!-- Yes: a setting, with the same words as its default -->
+<nav aria-label="{{ widget.settings.nav_label | default: 'Primary' }}">
+```
+
+Global widgets make this work by themselves: a header or footer is stored per language, so each language's copy carries its own text. A page widget's settings are per page, and pages are per language, so the same holds there.
+
+Theme `locales/` files are **not** the mechanism — those are `tTheme:` keys for setting labels in the editor, which stays English.
+
+### The language switcher (`page.translations`)
+
+`page.translations` is one entry per language the site actually publishes, in the project's language order. It is empty on a single-language site, so a switcher built on it disappears on its own. Each entry carries:
+
+| Field | What it is |
+| --- | --- |
+| `language` | the language code (`el`) |
+| `hreflang` | the same code in the case hreflang wants — use it for the link's `lang` attribute |
+| `label` | the language's name in that language (`Ελληνικά`) — what a switcher shows |
+| `href` | link to that language's version of this page, depth-aware and Clean-URLs-aware |
+| `seoUrl` | the same page's absolute canonical address, for metadata rather than links |
+| `active` | true for the language being rendered |
+| `fallback` | true when this language has no version of this page, so `href` points at its homepage |
+| `dir` | `ltr` or `rtl` |
+
+A switcher may link every entry, fallbacks included — landing someone on a language's homepage beats a dead end. Mark the active one with `aria-current`:
+
+```liquid
+{%- if translations and translations.size > 1 -%}
+  <nav class="header-languages" aria-label="{{ label }}">
+    <ul>
+      {%- for entry in translations -%}
+        <li>
+          <a href="{{ entry.href }}" lang="{{ entry.hreflang }}"{% if entry.active %} aria-current="true"{% endif %}>
+            {{ entry.label }}
+          </a>
+        </li>
+      {%- endfor -%}
+    </ul>
+  </nav>
+{%- endif -%}
+```
+
+`{% render %}` gets no parent scope, so a snippet like the one above must be passed what it needs: `{% render 'language-switcher', translations: page.translations, label: widget.settings.language_switcher_label %}`. Arch ships exactly this as `snippets/language-switcher.liquid`.
+
+The hreflang tags in `<head>` are built from the same array by `{% seo %}` — a theme does not emit them itself.
 
 ### Global Widgets
 

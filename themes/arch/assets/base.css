@@ -2195,6 +2195,43 @@ b {
     gap: var(--space-lg);
   }
 
+  & .header-languages-list {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  & .header-languages-link {
+    display: inline-block;
+    padding: var(--space-xs);
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: var(--font-size-sm);
+    line-height: var(--line-height-normal);
+    white-space: nowrap;
+    transition: color var(--transition-speed-fast);
+
+    &:hover,
+    &:focus-visible {
+      color: var(--text-content);
+    }
+
+    &.is-active {
+      color: var(--text-content);
+      font-weight: var(--font-weight-semibold);
+    }
+  }
+
+  /* Inside the open navigation panel, where it sits under the menu items. */
+  & .header-nav .header-languages-list {
+    margin-block-start: var(--space-md);
+    padding-block-start: var(--space-md);
+    border-block-start: var(--border-width-thin) solid var(--border-color);
+  }
+
   & .header-contact-line {
     line-height: var(--line-height-normal);
     white-space: nowrap;

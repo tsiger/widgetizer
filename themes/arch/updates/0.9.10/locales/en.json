@@ -1386,6 +1386,36 @@
       "center_nav": {
         "label": "Center Navigation",
         "description": "Centers the navigation menu in the header with the logo on the left and CTA on the right (desktop only)"
+      },
+      "languages_header": {
+        "label": "Languages"
+      },
+      "show_language_switcher": {
+        "label": "Show language switcher",
+        "description": "Lets visitors move between this page's languages. Hidden on a site with one language."
+      },
+      "language_switcher_label": {
+        "label": "Language switcher name",
+        "description": "Read out by screen readers to say what the list of languages is."
+      },
+      "labels_header": {
+        "label": "Visitor-facing labels"
+      },
+      "skip_link_text": {
+        "label": "Skip link",
+        "description": "The first link on the page, for people who navigate by keyboard."
+      },
+      "nav_label": {
+        "label": "Navigation name",
+        "description": "Read out by screen readers to tell this menu apart from others on the page."
+      },
+      "menu_title": {
+        "label": "Menu title",
+        "description": "Shown above the navigation on small screens."
+      },
+      "menu_close_label": {
+        "label": "Close menu label",
+        "description": "Read out by screen readers for the button that closes the navigation."
       }
     }
   },

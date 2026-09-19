@@ -410,10 +410,19 @@ The server has been language-aware since step 7 (`GET /menus` merges every folde
 
 ## Phase 5 — Theme, dates, migration, docs
 
-### Step 22. Arch: switcher and no hardcoded site-facing copy (§7, §Phase Boundaries)
+### Step 22. Arch: switcher and no hardcoded site-facing copy (§7, §Phase Boundaries) — *done 2026-09-19*
 
 - `themes/arch/widgets/global/header/schema.json` + `widget.liquid` — a "Language switcher" setting rendering `page.translations` (labels are native names; `aria-current` on the active entry). Hidden when the array is empty.
 - `themes/arch/layout.liquid` — the skip link's text moves into per-language header content or a header setting; the link itself stays. Document the rule in the theme-authoring docs: themes never hardcode visitor-facing strings.
+
+**As built.** `snippets/language-switcher.liquid` renders the entries; the header calls it twice, once inside the navigation panel for small screens and once in the bar for wide ones, and `landmark: false` drops the `<nav>` on the nested copy so a page never has two landmarks with the same name. `{% render %}` gets no parent scope, so `page.translations` is passed in — the reason the first attempt rendered nothing.
+
+- **The skip link moved into the header widget**, because its text has to be per language and the layout has no settings of its own to read. It is still the first thing in the body: the header is the first thing the layout renders.
+- **The header's own strings became settings too** — `skip_link_text`, `nav_label`, `menu_title`, `menu_close_label`, `language_switcher_label` — each with its English wording as the default, so nothing changes for a site that never touches them. The toggle button now reads `aria-label="{{ menu_title }}"` with its existing `aria-expanded`, which is the disclosure pattern and says the same thing in fewer strings.
+- **The rest of the theme still hardcodes about sixty visitor-facing strings** — carousel `Previous`/`Next`, `Pagination`, audio-player controls, and so on (brand names like `Facebook` are not translatable and do not count). Settings do not scale to that, so it wants a mechanism rather than more settings; recorded as its own tracker item.
+- **A missing snippet takes the whole header down**, not just the switcher. `cleanUrlsExport.test.js` copied only `widget.liquid` and `schema.json` out of Arch and started failing for that reason; it now copies `snippets/` too. The update folder ships the snippet, so an existing project applying the update gets both.
+
+**Done when:** `archLanguageSwitcher.test.js` drives the real Arch header through an export and pins the §7c contract: every published language by its native name at that page's address, the active one marked, a fallback to a language's homepage, nothing at all on a single-language site, and the labels reading whatever the settings say.
 
 ### Step 23. Localized month names (§Localized month names)
 

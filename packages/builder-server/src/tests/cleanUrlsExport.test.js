@@ -293,6 +293,12 @@ describe("export — arch header logo home link", () => {
   before(async () => {
     await fs.copy(path.join(ARCH_HEADER_DIR, "widget.liquid"), path.join(headerDir(), "widget.liquid"));
     await fs.copy(path.join(ARCH_HEADER_DIR, "schema.json"), path.join(headerDir(), "schema.json"));
+    // The header renders theme snippets, so a partial copy of the theme takes
+    // the whole widget down rather than the piece that is missing.
+    await fs.copy(
+      fileURLToPath(new URL("../../../../themes/arch/snippets/", import.meta.url)),
+      path.join(getProjectDir(PROJECT_FOLDER), "snippets"),
+    );
     await fs.writeFile(
       path.join(getProjectPagesDir(PROJECT_FOLDER), "global", "header.json"),
       JSON.stringify({ type: "header", settings: { headerNavigation: "m-main", logoText: "Arch" } }),
