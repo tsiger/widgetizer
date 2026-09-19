@@ -501,3 +501,65 @@ describe("a morphed widget on a translated page", () => {
     assert.deepEqual(labels(html), ["Home", "About"]);
   });
 });
+
+// The canvas is the first place an owner sees the words, and it renders one
+// widget at a time. This theme has no `locales/` at all, so anything readable
+// here came from the built-in widgets' own dictionary.
+describe("a built-in widget on the canvas", () => {
+  const morphForm = async (page, settings = {}) => {
+    let html = "";
+    const res = {
+      send(body) {
+        html = body;
+        return res;
+      },
+      status() {
+        return res;
+      },
+      json(body) {
+        html = JSON.stringify(body);
+        return res;
+      },
+    };
+    await renderSingleWidget(
+      mockReq({
+        widgetId: "form",
+        widget: {
+          type: "core-form",
+          settings,
+          blocks: { b1: { type: "field", settings: { label: "Your name", type: "text", required: true } } },
+          blocksOrder: ["b1"],
+        },
+        themeSettings: RAW_THEME_SETTINGS,
+        currentCanonicalPath: page.slug === "index" ? "index.html" : `${page.slug}.html`,
+        page,
+      }),
+      res,
+    );
+    return html;
+  };
+
+  it("reads in the language of the page being edited", async () => {
+    const greek = JSON.parse(await storage.read(scope, "pages/el/sxetika.json"));
+    const html = await morphForm({ ...greek, language: "el" });
+
+    assert.ok(html.includes("Υποχρεωτικά πεδία"), html.slice(0, 800));
+    assert.ok(html.includes("Αποστολή μηνύματος"));
+  });
+
+  it("reads in English on the default language's page", async () => {
+    const about = JSON.parse(await storage.read(scope, "pages/about.json"));
+    const html = await morphForm({ ...about, language: "en" });
+
+    assert.ok(html.includes("Required fields"), html.slice(0, 800));
+    assert.ok(html.includes("Send message"));
+  });
+
+  it("shows what the owner typed instead", async () => {
+    const greek = JSON.parse(await storage.read(scope, "pages/el/sxetika.json"));
+    const html = await morphForm({ ...greek, language: "el" }, { submit_label: "Πάμε" });
+
+    assert.ok(html.includes("Πάμε"));
+    assert.ok(!html.includes("Αποστολή μηνύματος"));
+  });
+});

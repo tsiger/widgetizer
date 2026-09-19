@@ -1173,14 +1173,14 @@ The widget index can be useful for styling alternate widgets, creating numbered 
 
 ### Visitor-facing text
 
-**A theme never hardcodes a string a visitor reads.** Every one of them — a heading, a button label, a skip link, an `aria-label`, an image `alt` — belongs in a setting with the English wording as its `default`. A hardcoded string cannot be changed by the site owner and cannot be translated, so on a site with more than one language it leaves English chrome around translated content.
+**A theme never hardcodes a string a visitor reads.** Put theme UI words in its `site` dictionary and read them with `t`. Where owners should be able to edit the wording, expose a setting with `defaultKey`; use a literal `default` alongside it only when the resolved initial value must be stored as content. Existing authored headings, descriptions and other saved text remain independently editable in each language.
 
 ```liquid
 <!-- No: nobody can change this, in any language -->
 <nav aria-label="Primary">
 
-<!-- Yes: a setting, with the same words as its default -->
-<nav aria-label="{{ widget.settings.nav_label | default: 'Primary' }}">
+<!-- A setting whose schema uses defaultKey for its localized default -->
+<nav aria-label="{{ widget.settings.nav_label }}">
 ```
 
 Global widgets make this work by themselves: a header or footer is stored per language, so each language's copy carries its own text. A page widget's settings are per page, and pages are per language, so the same holds there.
@@ -1204,6 +1204,8 @@ A theme's `locales/<lang>.json` has two halves, and the split is visible from th
 
 A translation is a file with the `site` block alone — `locales/el.json` — and nothing else. Each language is merged over English, so a half-finished translation falls back word by word rather than leaving blanks.
 
+The built-in widgets (`core-form` and friends) keep their own `site` block in `packages/core/src/widgets/locales/<lang>.json`, because they belong to no theme and have to read correctly inside one that ships no words at all. **A theme's word wins over the built-in one**, key by key and language by language, so redefining `site.core_form.submit` rewords the built-in form without touching core; anything a theme leaves alone falls back to it. `npm run validate:theme-locales` knows about that inheritance in both directions: a theme may use a `site.core_form.*` key it never wrote, and a key it rewords is not an orphan just because only core's templates ask for it.
+
 #### Reading one: the `t` filter
 
 ```liquid
@@ -1222,6 +1224,14 @@ Keyword arguments fill `{{ name }}` placeholders in the string. A key nothing de
 ```
 
 Use it for words an owner might reasonably want to change. Screen-reader labels repeated across a dozen widgets are better left to the strings file alone.
+
+**A cleared setting is a choice.** The resolved word fills the setting only when it has no stored value at all, so an owner who empties the field gets an empty one. If the template also guards the value, guard on `nil` rather than `blank` — `nil` means nothing reached it, `""` means the owner emptied it — or the wording comes straight back over their blank.
+
+**`defaultKey` beside a literal `default` means something stronger:** the resolved word is written into the widget when it is added, because the value is one content must hold. Keep the two together only where something downstream reads the stored value — a form field's label is its submitted name, so it cannot be left to a suggestion. Everywhere else, `defaultKey` alone is what you want. A `defaultBlocks` entry names its words the same way, through a `defaultKeys` map, since one block schema cannot hold several starting labels:
+
+```json
+{ "type": "field", "settings": { "label": "Your name" }, "defaultKeys": { "label": "site.core_form.name_field" } }
+```
 
 #### Words a script builds
 

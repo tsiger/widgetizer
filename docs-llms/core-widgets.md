@@ -10,7 +10,7 @@ Unlike theme widgets (which live inside each theme's `widgets/` folder), core wi
 
 1. Provide a consistent baseline of essential building-blocks (spacer, divider, form, …).
 2. Avoid forcing theme authors to reinvent the wheel for every theme.
-3. Guarantee that a page created in one theme can still render when the user switches to another theme.
+3. Keep these essential definitions available independently of a project's theme files. This does not provide an automatic migration between unrelated themes.
 
 ---
 
@@ -91,6 +91,8 @@ Core widget schemas use the same format as theme widgets, plus additional metada
 
 **Note:** Core widgets use `tTheme:`-prefixed keys in their schemas, but those translations are owned by the shared core locale files in `packages/core/src/widgets/locales/`, not by any theme. At runtime the server merges core widget locales with the active project's copied theme locales before returning them to the editor (`themeController` merges `CORE_WIDGET_LOCALES_DIR` with the project's theme locale via `deepMerge`). See [Widget Authoring Guide](theming-widgets.md) for theme-side locale details.
 
+**The same files carry the words a visitor reads**, under a `site` root, exactly as a theme's `locales/<lang>.json` does. `siteStringsService` merges the two the same way round — a theme's word wins over core's, key by key and language by language, and whatever a theme says nothing about falls back to core. That is what lets `core-form` read in the page's language inside a theme that ships no `locales/` directory at all. `packages/core/src/widgets/locales/el.json` carries the `site` block only: the editor half stays English.
+
 ---
 
 ## 4. Theme Opt-Out
@@ -112,12 +114,12 @@ If the flag is **absent or `true`**, core widgets are included.
 
 The editor fetches the active project's full widget catalog (core **and** theme widgets) from a single endpoint:
 
-1. The editor calls `GET /api/widgets` (project-scoped). In the OSS shell this maps to the `widgets` router → `projectController.getProjectWidgets`. The editor-ui client function is `getProjectWidgets()` in `packages/editor-ui/src/queries/previewManager.js`.
+1. The editor calls `GET /api/widgets` (project-scoped), passing `?language=<code>` for the language being edited. In the OSS shell this maps to the `widgets` router → `projectController.getProjectWidgets`. The editor-ui client function is `getProjectWidgets()` in `packages/editor-ui/src/queries/previewManager.js`.
 2. The request is scope-resolved: `getProjectWidgets` reads `req.scope` and `req.adapters.storage`. It reads `theme.json` **through the storage adapter** (`storage.read(scope, "theme.json")`) so it resolves the correct project dir under any backend (OSS global dir or hosted per-user dir) — never a global `DATA_DIR` path. If `useCoreWidgets === false`, core widgets are skipped.
 3. If core widgets are included, `getProjectWidgets` calls `getCoreWidgets()` (`packages/builder-server/src/controllers/coreWidgetsController.js`). That helper reads `CORE_WIDGETS_DIR` directly via `fs-extra` — core widgets ship with the app and are **not** scoped or routed through the storage adapter.
 4. `getCoreWidgets` enumerates `CORE_WIDGETS_DIR`, keeping only directory entries that both start with `core-` and contain a `schema.json`. For each, it parses `schema.json` and sets `hasPreview: true` when a sibling `preview.png` exists. Malformed schemas are logged and skipped (returned as `null`, then filtered out).
 5. Theme widget folders are then listed via the storage adapter (`widgets/<name>/schema.json`, plus the global widgets under `widgets/global/<name>/schema.json`), each probed for a `schema.json` and flagged with `hasPreview` the same way.
-6. Core and theme schemas are concatenated, nulls filtered, and the combined array is returned to the editor.
+6. Core and theme schemas are concatenated and nulls filtered. Settings with `defaultKey` receive a language-resolved `resolvedDefault` suggestion from the merged core + theme dictionaries before the combined array is returned, as do `defaultBlocks` entries naming words through `defaultKeys` (each starting block needs its own, since one block schema cannot hold several labels). A suggestion is displayed, not copied into authored content — **unless the setting also carries a literal `default`**, which marks a value content must hold: a form field's label is its submitted name, so the resolved word is stored there and the owner edits it from there.
 
 **Asar / read-only note:** in packaged Electron builds `CORE_WIDGETS_DIR` lives inside `app.asar` (read-only). If the directory does not exist, `getCoreWidgets` checks `isAsarPath(CORE_WIDGETS_DIR)` and returns `[]` rather than attempting `fs.ensureDir` (which would throw on the read-only archive). In normal builds the directory always exists, so this is a safety fallback.
 
@@ -147,10 +149,12 @@ Core widget **assets** (referenced by a widget's Liquid) are served separately: 
 2. Add `schema.json` and `widget.liquid` (and optionally `preview.png`) to the folder.
 3. Ensure the schema's `type` matches the folder name and uses the `core-` prefix.
 4. Include `"isCore": true` and a `"category"` in the schema.
-5. Add any `tTheme:`-prefixed locale keys to `packages/core/src/widgets/locales/en.json`.
+5. Add any `tTheme:`-prefixed locale keys to `packages/core/src/widgets/locales/en.json`, and any words a visitor will read under that file's `site` root, reached from the template with `| t` or from a schema with `defaultKey`. `npm run validate:theme-locales` fails on a key nothing wrote.
 6. Commit – no additional registration is required.
 
 ---
+
+The domain handbook covers [all three built-ins](domain/entities/core-widget.md) and [form ownership, identity and lifecycle](domain/entities/form.md). `core-spacer` and `core-divider` emit no words at all, so nothing localizes them; `core-form`'s visitor text comes from the `site` root described above.
 
 **See also:**
 

@@ -837,7 +837,13 @@ export async function duplicateProject(req, res) {
  */
 async function withResolvedDefaults(schemas, req, res) {
   const names = (list) => Array.isArray(list) && list.some((setting) => setting?.defaultKey);
-  const wanted = schemas.some((s) => names(s?.settings) || (Array.isArray(s?.blocks) && s.blocks.some((b) => names(b?.settings))));
+  const startingBlocksName = (list) => Array.isArray(list) && list.some((block) => block?.defaultKeys);
+  const wanted = schemas.some(
+    (s) =>
+      names(s?.settings) ||
+      (Array.isArray(s?.blocks) && s.blocks.some((b) => names(b?.settings))) ||
+      startingBlocksName(s?.defaultBlocks),
+  );
   if (!wanted) return schemas;
 
   const lang = requestLanguage(req, res);
@@ -861,12 +867,25 @@ async function withResolvedDefaults(schemas, req, res) {
           return found === undefined ? setting : { ...setting, resolvedDefault: found };
         });
 
+  // A starting block names its words itself, one key per setting, because the
+  // blocks a widget opens with can differ while sharing one block schema.
+  const fillStartingBlock = (block) => {
+    if (!block?.defaultKeys) return block;
+    const resolvedDefaults = {};
+    for (const [settingId, key] of Object.entries(block.defaultKeys)) {
+      const found = resolveSiteString(strings, key, lang.language, defaultLanguage);
+      if (found !== undefined) resolvedDefaults[settingId] = found;
+    }
+    return Object.keys(resolvedDefaults).length ? { ...block, resolvedDefaults } : block;
+  };
+
   return schemas.map((schema) => ({
     ...schema,
     settings: fill(schema.settings),
     ...(Array.isArray(schema.blocks)
       ? { blocks: schema.blocks.map((block) => ({ ...block, settings: fill(block?.settings) })) }
       : {}),
+    ...(Array.isArray(schema.defaultBlocks) ? { defaultBlocks: schema.defaultBlocks.map(fillStartingBlock) } : {}),
   }));
 }
 

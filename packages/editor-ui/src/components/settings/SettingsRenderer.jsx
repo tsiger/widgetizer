@@ -69,10 +69,11 @@ export default function SettingsRenderer({
   }
 
   // A setting whose default is one of the theme's own words carries it as
-  // `resolvedDefault` — shown here, never stored, so it stays a default rather
-  // than becoming the owner's content in whichever language they happened to
-  // add the widget in.
-  const effectiveDefault = setting.default !== undefined ? setting.default : setting.resolvedDefault;
+  // `resolvedDefault`, in the language being edited. It wins over the literal
+  // beside it, because that literal is the same word in the theme author's
+  // language — showing it would tell the owner their Greek page starts in
+  // English when it does not.
+  const effectiveDefault = setting.resolvedDefault !== undefined ? setting.resolvedDefault : setting.default;
   const currentValue = value !== undefined ? value : effectiveDefault;
 
   const inputProps = {

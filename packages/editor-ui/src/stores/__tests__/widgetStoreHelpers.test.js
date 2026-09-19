@@ -109,6 +109,22 @@ describe("buildDefaultSettings", () => {
     expect(buildDefaultSettings(null)).toEqual({});
     expect(buildDefaultSettings(undefined)).toEqual({});
   });
+
+  // A setting naming a site string arrives with the word already resolved in the
+  // language being edited. Whether it is stored turns on whether the setting
+  // also has a literal default: with one, the value is something content must
+  // carry; without one, the render resolves it per page and nothing is written.
+  it("stores the resolved word only where content must carry a value", () => {
+    const schema = [
+      { id: "label", default: "Your name", resolvedDefault: "Το όνομά σας" },
+      { id: "submit", resolvedDefault: "Αποστολή" },
+    ];
+    expect(buildDefaultSettings(schema)).toEqual({ label: "Το όνομά σας" });
+  });
+
+  it("keeps the literal default when nothing resolved", () => {
+    expect(buildDefaultSettings([{ id: "label", default: "Your name" }])).toEqual({ label: "Your name" });
+  });
 });
 
 describe("buildDefaultWidget", () => {
@@ -135,6 +151,39 @@ describe("buildDefaultWidget", () => {
     const widget = buildDefaultWidget(simpleSchema, "simple", () => "unused");
     expect(widget.blocks).toEqual({});
     expect(widget.blocksOrder).toEqual([]);
+  });
+
+  // Three starting fields cannot take three different labels from one block
+  // schema, so each names its own word and the resolved one wins over the
+  // English written beside it.
+  it("gives each starting block the word it named", () => {
+    const named = {
+      type: "form",
+      settings: [],
+      blocks: [{ type: "field", settings: [{ id: "label", default: "Your name" }] }],
+      defaultBlocks: [
+        { type: "field", settings: { label: "Your name" }, resolvedDefaults: { label: "Το όνομά σας" } },
+        { type: "field", settings: { label: "Email address" }, resolvedDefaults: { label: "Διεύθυνση email" } },
+      ],
+    };
+    let counter = 0;
+    const widget = buildDefaultWidget(named, "form", () => `block_${counter++}`);
+
+    expect(widget.blocksOrder.map((id) => widget.blocks[id].settings.label)).toEqual([
+      "Το όνομά σας",
+      "Διεύθυνση email",
+    ]);
+  });
+
+  it("falls back to the English beside it when nothing resolved", () => {
+    const named = {
+      type: "form",
+      settings: [],
+      blocks: [{ type: "field", settings: [{ id: "label", default: "Your name" }] }],
+      defaultBlocks: [{ type: "field", settings: { label: "Email address" } }],
+    };
+    const widget = buildDefaultWidget(named, "form", () => "block_0");
+    expect(widget.blocks["block_0"].settings.label).toBe("Email address");
   });
 });
 

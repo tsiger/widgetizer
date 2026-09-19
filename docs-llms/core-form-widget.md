@@ -6,10 +6,12 @@ on the site. Together these are the two artifacts the **Widgetizer Hosted**
 forms service consumes to recognise forms, accept submissions, and surface them
 in its dashboard.
 
-This widget is **only useful when the exported site is deployed to Widgetizer
-Hosting** — the platform Worker is what intercepts submissions and stores them.
-On any other static host the form renders correctly but submissions POST to a
-404.
+The export targets the Widgetizer Hosting submission contract. A serving
+platform must handle `POST /__widgetizer/forms/<key>`; a static host without
+that handler cannot process submissions. This repository generates the markup
+and manifest, but has no submission-storage, inbox or delivery API. Downstream
+recognition and delivery behavior must be verified with the serving platform.
+See the [domain guide](domain/entities/form.md) and [form workflow](domain/operations/forms.md).
 
 ## Implementation Files
 
@@ -20,7 +22,7 @@ On any other static host the form renders correctly but submissions POST to a
 | Authoring/usage guidance | `packages/core/src/widgets/core-form/insights.md` |
 | Manifest builder | `packages/builder-server/src/services/formsManifestService.js` |
 | Export wiring | `packages/builder-server/src/controllers/exportController.js` (writes `widgetizer.forms.json`) |
-| Locale strings | `packages/core/src/widgets/locales/en.json` (`core_form.*`) |
+| Locale strings | `packages/core/src/widgets/locales/en.json` (editor labels and `site.core_form.*`); `el.json` supplies Greek visitor strings |
 | Tests | `packages/builder-server/src/tests/formsManifest.test.js` |
 
 ---
@@ -36,8 +38,10 @@ Both live inside the exported ZIP:
 
 If either is missing or malformed, the hosted service ignores forms for that
 site. There is no partial recognition — the manifest must validate and the
-markup must match it exactly. The export fails fast (HTTP 400) if any form
+markup must match it exactly. Export rejects the build (HTTP 400) if any form
 configuration violates the hosted contract, so a broken manifest never ships.
+
+Forms validation runs late in export, after rendering/assets work, rather than in the initial page/collection preflight. The error prevents a successful export; it is not a claim that no intermediate output was written.
 
 ### Minimal rendered markup (one field)
 
@@ -115,8 +119,8 @@ rendered HTML `name`/`value` attributes can never drift apart.
 project slugs, so non-Latin labels are converted, not stripped:
 
 - The **form identifier** comes from the form name (`"Contact"` → `contact`,
-  `"Quote Request"` → `quote-request`, `"Επικοινωνία"` → `epikoinwnia`). Two
-  forms with the same name on different pages are treated as the same form.
+  `"Quote Request"` → `quote-request`, `"Επικοινωνία"` → `epikoinwnia`). Within one language, two
+  forms with the same derived key on different pages are treated as the same form.
 - The **field identifier** comes from each field's label (`"Email address"` →
   `email-address`, `"Το όνομα σας"` → `to-onoma-sas`). Two fields with the same
   derived identifier inside one form fail the export with a clear message naming
@@ -135,8 +139,12 @@ positional. The counters match the widget template's loops exactly so the HTML
 and manifest stay in sync. (An empty/whitespace-only label is still a hard error —
 that is a *missing* label, not an untranslatable one.)
 
-All derived keys satisfy the hosted contract (`/^[a-z0-9_-]{1,64}$/`), since
+Base form keys and field keys match `/^[a-z0-9_-]{1,64}$/`, since
 `slugify(strict)` emits only `[a-z0-9-]` and the positional fallbacks are ASCII.
+Additional-language form keys prepend `<language>:` (for example `el:contact`);
+the qualified key does not match the base-key regex or share its total-length cap.
+Default-language form keys remain unchanged. The HTML action and manifest use
+the same qualified key, and each language counts separately toward the form limit.
 Error messages reference the form name or field label, never the derived key.
 
 > **Key vs. option-value cap.** Form/field keys truncate at 64 chars; option
@@ -154,7 +162,8 @@ Defined in `schema.json`. Labels are `tTheme:` i18n keys resolved from
 | Setting | Values | Effect |
 |---|---|---|
 | `form_name` | Text ≤ 200 chars (default "Contact") | Display name in the dashboard; source of the derived form identifier. Use a unique name per form on a site. |
-| `submit_label` | Any text (default "Send message") | Submit button label. |
+| `submit_label` | Text; English fallback "Send message" | Localized runtime default; an explicit edit is stored. |
+| `required_note` | Text; English fallback "Required fields" | Localized note above required fields. Clearing it removes the entire line, including its asterisk. |
 | `eyebrow` | Any text (default "Contact") | Small label above the headline; omit to hide. |
 | `eyebrow_uppercase` | `true` / `false` | Uppercases the eyebrow. |
 | `title` | Any text (default "Get in touch") | Section heading. Renders `<h1>` when first widget on the page, `<h2>` otherwise. |
@@ -176,7 +185,16 @@ Defined in `schema.json`. Labels are `tTheme:` i18n keys resolved from
 | `social` | none — pulls from `theme.social` | Sidebar block rendering theme social icons. |
 
 The default form (`defaultBlocks` in the schema) is three required fields: Your
-name (text), Email address (email), Message (textarea).
+name (text), Email address (email), Message (textarea). Each starting block
+names its own word through `defaultKeys`, so the three arrive in the language of
+the page being edited. They are then authored starting values like any other —
+a field's label is its submitted name, so the form cannot hold an unresolved
+suggestion there.
+The required-fields note, the submit label and the select placeholder are
+settings whose default comes from the built-in dictionary (`defaultKey`), so
+their unresolved defaults read in the page's language and are not written
+into content when adding a form. An owner's explicit edits are stored. The form's `form_name` is deliberately **not** localized: it is
+not visitor-facing text; it supplies the form key and the manifest's display name.
 
 ---
 
@@ -205,9 +223,16 @@ would leak it or break the widget in the wrong environment.
 
 The widget adds these on top of the hosted markup contract. None of them are read by the Worker.
 
-- **Required-fields note.** When any block is required, the form opens with "* Required fields". The asterisk is `aria-hidden`; screen readers get the requirement from `required` / `aria-required` on each control.
+- **Required-fields note.** When any block is required, the form opens with "* Required fields" — `site.core_form.required_note` in the page's language, or whatever the owner typed into the `required_note` setting. **Clearing the setting removes the line**, asterisk and all: the template distinguishes an unset value (`nil`, nothing reached it) from an emptied one (`""`, a choice), so the wording that arrives by itself never comes back over a deliberate blank. The submit label keeps a floor instead — a button with no label is not a form. The asterisk is `aria-hidden`; screen readers get the requirement from `required` / `aria-required` on each control.
 - **Autocomplete hints.** `email`, `tel` and `url` fields get the matching `autocomplete` token. A `text` field whose derived key is `name`, `your-name` or `full-name` gets `autocomplete="name"`; any other label gets none.
 - **Per-field errors.** Every field, choice and consent block renders an empty `<p class="form-error" id="form-<widgetId>-<blockId>-error" hidden>`. An inline script listens for the browser's `invalid` events: it suppresses the native bubble, writes the browser's `validationMessage` into that slot, sets `aria-invalid="true"`, links the slot through `aria-describedby` and focuses the first invalid control. It clears all three once the control is valid. Native constraint validation still gates submission, and the Worker's client script still owns submit and the `data-widgetizer-form-status` message.
+
+**Two visitor messages the site's language does not reach.** The text written
+into a field's error slot is the browser's own `validationMessage`, which
+follows the *visitor's browser* language, not the page's — localizing it would
+mean replacing native validation with per-type messages of our own. And the
+line after submit is written by the hosted Worker's client script, which lives
+outside this repository. Neither is covered by the built-in dictionary.
 
 ---
 
@@ -232,7 +257,7 @@ Limits enforced at export time (`packages/builder-server/src/services/formsManif
 - **Forms per site** (distinct derived form keys) — adapter-backed via `LIMIT_KEYS.MAX_FORMS_PER_SITE`: OSS is unbounded (`Infinity` from the local limits adapter); the hosted-contract default is 5, which also applies when no limits adapter is wired
 - **Max 30 fields per form**
 - **Max 50 options per choice field**, each value/label ≤ 200 chars
-- Form/field keys match `/^[a-z0-9_-]{1,64}$/`
+- Base form handles and field keys match `/^[a-z0-9_-]{1,64}$/`; translated form keys additionally carry the language prefix
 
 ---
 
@@ -243,10 +268,10 @@ When a project is exported (`packages/builder-server/src/controllers/exportContr
 1. Each `core-form` widget renders the markup above — required
    `data-widgetizer-*` attributes, off-screen honeypot named `website`, empty
    Turnstile placeholder, status element.
-2. `buildFormsManifest(pagesDataArray, appVersion)` walks every page, finds
+2. `buildFormsManifest(pagesDataArray, appVersion, maxForms, { defaultLanguage })` walks included stored pages, finds
    every `core-form` widget, derives keys, validates, and returns
    `{ manifest, warnings }`.
-3. Forms sharing a derived key (same name) across pages are **deduped** — the
+3. Forms sharing a language-qualified derived key across pages are **deduped** — the
    first page's field definitions win. If two same-key forms have *different*
    field shapes (including differing choice option values), the export **fails**
    with a clear message, because the hosted service would reject submissions
@@ -270,7 +295,7 @@ When a project is exported (`packages/builder-server/src/controllers/exportContr
   "generator_version": "0.10.0", // the app version, passed in by the exporter
   "forms": [
     {
-      "key": "contact",          // /^[a-z0-9_-]{1,64}$/, derived from name
+      "key": "contact",          // base handle; e.g. el:contact in an additional language
       "name": "Contact",         // ≤ 200 chars, the user-facing form name
       "widget": "widgetizer/core-form", // constant identifier of the emitter
       "page_path": "/index.html",// the page the form was found on
@@ -290,8 +315,10 @@ When a project is exported (`packages/builder-server/src/controllers/exportContr
 }
 ```
 
-`page_path` uses `index.html` for the `index`/`home` page id and `<id>.html`
-otherwise.
+`page_path` uses the shared `pageOutputPath` builder: `/index.html` for the
+default homepage, `/contact.html` for a default page, or `/el/contact.html` for
+an additional-language page. This records the output file path, not a Clean URLs
+href. A deduplicated entry retains only its first occurrence's path.
 
 ---
 
@@ -317,8 +344,8 @@ per-setting authoring guidance.
 
 ## Authoring gotchas
 
-- **Form name = dashboard name = identifier.** The same name on two pages is one
-  shared form receiving submissions from both. Two distinct intents need two
+- **Form name = dashboard name = identifier.** The same derived name in one language on two pages is one
+  exported identity; matching field definitions are required. Two distinct intents need two
   distinct names.
 - **The honeypot is hardcoded.** The Worker rejects any submission where
   `website` is non-empty. The widget bakes the field in — don't override it.
@@ -327,8 +354,8 @@ per-setting authoring guidance.
 - **Renaming a form after deployment splits it.** Old submissions keep going to
   the existing dashboard entry; the renamed form starts a new one. Migrate
   before going live.
-- **The widget only works on Widgetizer Hosting.** On Netlify/Vercel/S3 the
-  form looks right but submissions 404. Flag this in any preset that uses it.
+- **Submission processing is a hosting integration.** A static host needs a
+  compatible handler for the generated action. Successful export does not test delivery.
 
 ---
 

@@ -61,14 +61,21 @@ export function getNextSelectedId(order, removedId) {
 
 /**
  * Build a flat settings object from a schema settings array.
+ *
+ * A setting naming a site string carries `resolvedDefault`, the word in the
+ * language being edited. Whether that word is written into the new widget is
+ * decided by whether the setting ALSO has a literal `default`: with one, the
+ * value is something content must carry — a form field's label is its submitted
+ * name — so the resolved word is stored and the owner edits it from there.
+ * Without one, it stays a suggestion the render resolves per page, which is
+ * what keeps one language's wording from following a page into its translations.
  */
 export function buildDefaultSettings(settingsSchema) {
   const defaults = {};
   if (Array.isArray(settingsSchema)) {
     settingsSchema.forEach((setting) => {
-      if (setting.default !== undefined) {
-        defaults[setting.id] = setting.default;
-      }
+      if (setting.default === undefined) return;
+      defaults[setting.id] = setting.resolvedDefault !== undefined ? setting.resolvedDefault : setting.default;
     });
   }
   return defaults;
@@ -82,6 +89,10 @@ export function buildDefaultBlock(widgetSchema, blockDef, generateBlockId) {
   const blockSettings = {
     ...buildDefaultSettings(blockSchema?.settings),
     ...(blockDef.settings || {}),
+    // Each starting block names its own words, because one block schema cannot
+    // hold three different labels. English stays above as the fallback for a
+    // language nothing was written in.
+    ...(blockDef.resolvedDefaults || {}),
   };
   return {
     id: generateBlockId(),
