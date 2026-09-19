@@ -273,7 +273,10 @@
           <div class="widget-actions grid-view-all reveal reveal-up">{{ view_all_button | raw }}</div>
         {% endif %}
       {% else %}
-        <p class="w-body t-muted">No news items yet. Add some under News.</p>
+        <p class="w-body t-muted">{{ widget.settings.empty_text }}</p>
+        {%- if renderMode == 'preview' -%}
+          <p class="widget-empty-hint w-meta t-sm t-muted">Add some under News.</p>
+        {%- endif -%}
       {% endif %}
     </div>
   </div>

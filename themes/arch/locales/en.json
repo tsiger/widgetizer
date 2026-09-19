@@ -1,4 +1,99 @@
 {
+  "site": {
+    "audio_player": {
+      "play": "Play",
+      "play_track": "Play {{ title }}",
+      "previous_track": "Previous track",
+      "next_track": "Next track",
+      "mute": "Mute",
+      "volume": "Volume",
+      "seek": "Seek",
+      "playback_speed": "Playback speed",
+      "download": "Download current track",
+      "pause": "Pause",
+      "unmute": "Unmute",
+      "playback_speed_rate": "Playback speed {{ rate }}x"
+    },
+    "class_schedule": {
+      "empty": "No classes scheduled."
+    },
+    "common": {
+      "next": "Next",
+      "previous": "Previous"
+    },
+    "comparison_slider": {
+      "drag": "Drag to compare before and after images"
+    },
+    "comparison_table": {
+      "included": "Included",
+      "not_included": "Not included"
+    },
+    "content_switcher": {
+      "options": "Content options"
+    },
+    "countdown": {
+      "days": "Days",
+      "hours": "Hours",
+      "minutes": "Minutes",
+      "seconds": "Seconds"
+    },
+    "embed": {
+      "content": "Embedded content"
+    },
+    "icon_card_grid": {
+      "featured_image": "Featured image"
+    },
+    "image_hotspots": {
+      "close_tooltip": "Close tooltip"
+    },
+    "job_listing": {
+      "all_positions": "All Positions",
+      "filters": "Job filters"
+    },
+    "lightbox": {
+      "preview": "Image preview",
+      "previous": "Previous image",
+      "next": "Next image",
+      "close": "Close lightbox"
+    },
+    "map": {
+      "iframe_title": "Map showing {{ address }}"
+    },
+    "menu": {
+      "toggle_submenu": "Toggle submenu"
+    },
+    "news_grid": {
+      "empty": "No news items yet."
+    },
+    "pagination": {
+      "label": "Pagination"
+    },
+    "projects_grid": {
+      "empty": "No projects yet."
+    },
+    "schedule_table": {
+      "closed": "Closed"
+    },
+    "services_grid": {
+      "empty": "No services yet."
+    },
+    "slideshow": {
+      "previous_slide": "Previous slide",
+      "next_slide": "Next slide",
+      "go_to_slide": "Go to slide {{ number }}",
+      "pause": "Pause",
+      "pause_autoplay": "Pause autoplay",
+      "play": "Play",
+      "start_autoplay": "Start autoplay"
+    },
+    "testimonial_slider": {
+      "go_to": "Go to testimonial {{ number }}"
+    },
+    "video_popup": {
+      "close": "Close video",
+      "player": "Video player"
+    }
+  },
   "global": {
     "general": {
       "name": "General",
@@ -917,6 +1012,9 @@
       },
       "view_all_link": {
         "label": "'View all' link"
+      },
+      "empty_text": {
+        "label": "Empty message"
       }
     }
   },
@@ -1542,6 +1640,9 @@
     "settings": {
       "show_filters": {
         "label": "Show department filters"
+      },
+      "all_positions_text": {
+        "label": "All positions label"
       }
     },
     "blocks": {
@@ -1875,6 +1976,9 @@
       },
       "view_all_link": {
         "label": "'View all' link"
+      },
+      "empty_text": {
+        "label": "Empty message"
       }
     }
   },
@@ -1902,6 +2006,9 @@
       },
       "view_all_link": {
         "label": "'View all' link"
+      },
+      "empty_text": {
+        "label": "Empty message"
       }
     }
   },
@@ -1957,6 +2064,9 @@
       "highlight_today": {
         "label": "Highlight current day",
         "description": "Emphasize today's row with an accent border and bold text"
+      },
+      "closed_text": {
+        "label": "Closed label"
       }
     },
     "blocks": {
@@ -2009,6 +2119,12 @@
           "medium": "Medium",
           "large": "Large"
         }
+      },
+      "pause_text": {
+        "label": "Pause label"
+      },
+      "play_text": {
+        "label": "Play label"
       }
     },
     "blocks": {
@@ -2388,7 +2504,6 @@
   },
   "class_schedule": {
     "name": "Class schedule",
-    "empty": "No classes scheduled.",
     "settings": {
       "note": {
         "label": "Footer note",
@@ -2445,6 +2560,9 @@
       },
       "show_book_button": {
         "label": "Show book button"
+      },
+      "empty_text": {
+        "label": "Empty message"
       }
     },
     "blocks": {

@@ -1185,7 +1185,47 @@ The widget index can be useful for styling alternate widgets, creating numbered 
 
 Global widgets make this work by themselves: a header or footer is stored per language, so each language's copy carries its own text. A page widget's settings are per page, and pages are per language, so the same holds there.
 
-Theme `locales/` files are **not** the mechanism — those are `tTheme:` keys for setting labels in the editor, which stays English.
+#### Where they live
+
+A theme's `locales/<lang>.json` has two halves, and the split is visible from the key:
+
+- **Outside `site`** — `tTheme:` keys naming settings in the editor. The editor stays English, so only `en.json` needs them.
+- **Inside `site`** — the words a visitor reads. These resolve in the language of the page being rendered.
+
+```json
+{
+  "site": {
+    "common": { "next": "Next", "previous": "Previous" },
+    "slideshow": { "go_to_slide": "Go to slide {{ number }}" }
+  },
+  "header": { "settings": { "logoText": { "label": "Logo Text" } } }
+}
+```
+
+A translation is a file with the `site` block alone — `locales/el.json` — and nothing else. Each language is merged over English, so a half-finished translation falls back word by word rather than leaving blanks.
+
+#### Reading one: the `t` filter
+
+```liquid
+<button aria-label="{{ 'site.common.next' | t }}">
+<span>{{ 'site.slideshow.go_to_slide' | t: number: forloop.index }}</span>
+```
+
+Keyword arguments fill `{{ name }}` placeholders in the string. A key nothing defines renders its last segment (`next`) rather than nothing, so a gap is visible without taking a control's label away.
+
+#### A setting that starts in the page's language
+
+`defaultKey` names a site string instead of a fixed `default`. The setting still behaves like any other — whatever the owner types is stored with their content, per language — but until they do, it reads in the language of the page:
+
+```json
+{ "type": "text", "id": "empty_text", "label": "tTheme:news_grid.settings.empty_text.label", "defaultKey": "site.news_grid.empty" }
+```
+
+Use it for words an owner might reasonably want to change. Screen-reader labels repeated across a dozen widgets are better left to the strings file alone.
+
+#### Words a script builds
+
+A script that creates controls in the browser runs long after the language is gone, so it cannot read a Liquid filter. The page hands the words down instead — Arch puts them on `<body>` as `data-t-*` attributes in `layout.liquid`, and `lightbox.js` reads them from `document.body.dataset`.
 
 ### The language switcher (`page.translations`)
 

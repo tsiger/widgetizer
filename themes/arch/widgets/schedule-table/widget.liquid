@@ -125,7 +125,7 @@
                 >
                   <span class="schedule-label w-body" data-setting="day">{{ block.settings.day }}</span>
                   {% if block.settings.closed %}
-                    <span class="schedule-closed w-body t-muted">Closed</span>
+                    <span class="schedule-closed w-body t-muted">{{ widget.settings.closed_text }}</span>
                   {% else %}
                     <span class="schedule-value w-body t-heading" data-setting="hours">{{ block.settings.hours }}</span>
                   {% endif %}

@@ -1,8 +1,17 @@
 {
   "type": "projects-grid",
-  "collection": { "type": "projects", "perPageSetting": "limit" },
+  "collection": {
+    "type": "projects",
+    "perPageSetting": "limit"
+  },
   "displayName": "tTheme:projects_grid.name",
-  "aliases": ["portfolio", "work", "case studies", "projects", "showcase"],
+  "aliases": [
+    "portfolio",
+    "work",
+    "case studies",
+    "projects",
+    "showcase"
+  ],
   "settings": [
     {
       "type": "text",
@@ -33,15 +42,25 @@
       "label": "tTheme:global.widgets.settings.alignment.label",
       "default": "center",
       "options": [
-        { "value": "start", "label": "tTheme:global.widgets.settings.alignment.options.start" },
-        { "value": "center", "label": "tTheme:global.widgets.settings.alignment.options.center" }
+        {
+          "value": "start",
+          "label": "tTheme:global.widgets.settings.alignment.options.start"
+        },
+        {
+          "value": "center",
+          "label": "tTheme:global.widgets.settings.alignment.options.center"
+        }
       ]
     },
     {
       "type": "link",
       "id": "view_all_link",
       "label": "tTheme:projects_grid.settings.view_all_link.label",
-      "default": { "text": "View all projects", "href": "", "target": "_self" }
+      "default": {
+        "text": "View all projects",
+        "href": "",
+        "target": "_self"
+      }
     },
     {
       "type": "header",
@@ -54,8 +73,14 @@
       "label": "tTheme:global.widgets.settings.layout.label",
       "default": "card",
       "options": [
-        { "value": "card", "label": "tTheme:global.widgets.settings.layout.options.card" },
-        { "value": "overlay", "label": "tTheme:global.widgets.settings.layout.options.overlay" }
+        {
+          "value": "card",
+          "label": "tTheme:global.widgets.settings.layout.options.card"
+        },
+        {
+          "value": "overlay",
+          "label": "tTheme:global.widgets.settings.layout.options.overlay"
+        }
       ]
     },
     {
@@ -65,8 +90,14 @@
       "description": "tTheme:global.widgets.settings.text_display.description",
       "default": "always",
       "options": [
-        { "value": "hover", "label": "tTheme:global.widgets.settings.text_display.options.hover" },
-        { "value": "always", "label": "tTheme:global.widgets.settings.text_display.options.always" }
+        {
+          "value": "hover",
+          "label": "tTheme:global.widgets.settings.text_display.options.hover"
+        },
+        {
+          "value": "always",
+          "label": "tTheme:global.widgets.settings.text_display.options.always"
+        }
       ]
     },
     {
@@ -97,11 +128,26 @@
       "label": "tTheme:global.widgets.settings.aspect_ratio.label",
       "default": "4 / 3",
       "options": [
-        { "value": "auto", "label": "tTheme:global.widgets.settings.aspect_ratio.options.auto" },
-        { "value": "1 / 1", "label": "tTheme:global.widgets.settings.aspect_ratio.options.1 / 1" },
-        { "value": "4 / 3", "label": "tTheme:global.widgets.settings.aspect_ratio.options.4 / 3" },
-        { "value": "3 / 2", "label": "tTheme:global.widgets.settings.aspect_ratio.options.3 / 2" },
-        { "value": "16 / 9", "label": "tTheme:global.widgets.settings.aspect_ratio.options.16 / 9" }
+        {
+          "value": "auto",
+          "label": "tTheme:global.widgets.settings.aspect_ratio.options.auto"
+        },
+        {
+          "value": "1 / 1",
+          "label": "tTheme:global.widgets.settings.aspect_ratio.options.1 / 1"
+        },
+        {
+          "value": "4 / 3",
+          "label": "tTheme:global.widgets.settings.aspect_ratio.options.4 / 3"
+        },
+        {
+          "value": "3 / 2",
+          "label": "tTheme:global.widgets.settings.aspect_ratio.options.3 / 2"
+        },
+        {
+          "value": "16 / 9",
+          "label": "tTheme:global.widgets.settings.aspect_ratio.options.16 / 9"
+        }
       ]
     },
     {
@@ -146,10 +192,22 @@
       "label": "tTheme:global.widgets.settings.color_scheme.label",
       "default": "standard-primary",
       "options": [
-        { "value": "standard-primary", "label": "tTheme:global.widgets.settings.color_scheme.options.standard_primary" },
-        { "value": "standard-secondary", "label": "tTheme:global.widgets.settings.color_scheme.options.standard_secondary" },
-        { "value": "highlight-primary", "label": "tTheme:global.widgets.settings.color_scheme.options.highlight_primary" },
-        { "value": "highlight-secondary", "label": "tTheme:global.widgets.settings.color_scheme.options.highlight_secondary" }
+        {
+          "value": "standard-primary",
+          "label": "tTheme:global.widgets.settings.color_scheme.options.standard_primary"
+        },
+        {
+          "value": "standard-secondary",
+          "label": "tTheme:global.widgets.settings.color_scheme.options.standard_secondary"
+        },
+        {
+          "value": "highlight-primary",
+          "label": "tTheme:global.widgets.settings.color_scheme.options.highlight_primary"
+        },
+        {
+          "value": "highlight-secondary",
+          "label": "tTheme:global.widgets.settings.color_scheme.options.highlight_secondary"
+        }
       ]
     },
     {
@@ -158,9 +216,18 @@
       "label": "tTheme:global.widgets.settings.top_spacing.label",
       "default": "auto",
       "options": [
-        { "value": "auto", "label": "tTheme:global.widgets.settings.top_spacing.options.auto" },
-        { "value": "small", "label": "tTheme:global.widgets.settings.top_spacing.options.small" },
-        { "value": "none", "label": "tTheme:global.widgets.settings.top_spacing.options.none" }
+        {
+          "value": "auto",
+          "label": "tTheme:global.widgets.settings.top_spacing.options.auto"
+        },
+        {
+          "value": "small",
+          "label": "tTheme:global.widgets.settings.top_spacing.options.small"
+        },
+        {
+          "value": "none",
+          "label": "tTheme:global.widgets.settings.top_spacing.options.none"
+        }
       ]
     },
     {
@@ -169,10 +236,25 @@
       "label": "tTheme:global.widgets.settings.bottom_spacing.label",
       "default": "auto",
       "options": [
-        { "value": "auto", "label": "tTheme:global.widgets.settings.bottom_spacing.options.auto" },
-        { "value": "small", "label": "tTheme:global.widgets.settings.bottom_spacing.options.small" },
-        { "value": "none", "label": "tTheme:global.widgets.settings.bottom_spacing.options.none" }
+        {
+          "value": "auto",
+          "label": "tTheme:global.widgets.settings.bottom_spacing.options.auto"
+        },
+        {
+          "value": "small",
+          "label": "tTheme:global.widgets.settings.bottom_spacing.options.small"
+        },
+        {
+          "value": "none",
+          "label": "tTheme:global.widgets.settings.bottom_spacing.options.none"
+        }
       ]
+    },
+    {
+      "type": "text",
+      "id": "empty_text",
+      "label": "tTheme:projects_grid.settings.empty_text.label",
+      "defaultKey": "site.projects_grid.empty"
     }
   ]
 }

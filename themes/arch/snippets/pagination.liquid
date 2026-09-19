@@ -1,7 +1,7 @@
-<nav class="pagination" aria-label="Pagination">
+<nav class="pagination" aria-label="{{ 'site.pagination.label' | t }}">
   <ul class="pagination-list">
     {%- if pagination.prevHref -%}
-      <li><a class="pagination-link pagination-step" href="{{ pagination.prevHref }}" rel="prev">Previous</a></li>
+      <li><a class="pagination-link pagination-step" href="{{ pagination.prevHref }}" rel="prev">{{ 'site.common.previous' | t }}</a></li>
     {%- endif -%}
     {%- for entry in pagination.pages -%}
       <li>
@@ -13,7 +13,7 @@
       </li>
     {%- endfor -%}
     {%- if pagination.nextHref -%}
-      <li><a class="pagination-link pagination-step" href="{{ pagination.nextHref }}" rel="next">Next</a></li>
+      <li><a class="pagination-link pagination-step" href="{{ pagination.nextHref }}" rel="next">{{ 'site.common.next' | t }}</a></li>
     {%- endif -%}
   </ul>
 </nav>

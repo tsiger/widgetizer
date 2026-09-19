@@ -196,9 +196,9 @@
                 allowfullscreen=""
                 loading="lazy"
                 referrerpolicy="no-referrer-when-downgrade"
-                title="Map showing {{ widget.settings.address }}"
+                title="{{ 'site.map.iframe_title' | t: address: widget.settings.address }}"
               ></iframe>
-            {% else %}
+            {%- elsif renderMode == 'preview' -%}
               <div class="map-placeholder w-body t-muted height-{{ widget.settings.height }}">
                 <div class="map-placeholder-icon" aria-hidden="true">
                   {% render 'icon', icon: 'map', style: 'plain', size: 'lg' %}

@@ -1,0 +1,97 @@
+{
+  "site": {
+    "audio_player": {
+      "play": "Αναπαραγωγή",
+      "play_track": "Αναπαραγωγή {{ title }}",
+      "previous_track": "Προηγούμενο κομμάτι",
+      "next_track": "Επόμενο κομμάτι",
+      "mute": "Σίγαση",
+      "volume": "Ένταση",
+      "seek": "Αναζήτηση",
+      "playback_speed": "Ταχύτητα αναπαραγωγής",
+      "download": "Λήψη του κομματιού",
+      "pause": "Παύση",
+      "unmute": "Κατάργηση σίγασης",
+      "playback_speed_rate": "Ταχύτητα αναπαραγωγής {{ rate }}x"
+    },
+    "class_schedule": {
+      "empty": "Δεν υπάρχουν προγραμματισμένα μαθήματα."
+    },
+    "common": {
+      "next": "Επόμενο",
+      "previous": "Προηγούμενο"
+    },
+    "comparison_slider": {
+      "drag": "Σύρετε για να συγκρίνετε τις δύο εικόνες"
+    },
+    "comparison_table": {
+      "included": "Περιλαμβάνεται",
+      "not_included": "Δεν περιλαμβάνεται"
+    },
+    "content_switcher": {
+      "options": "Επιλογές περιεχομένου"
+    },
+    "countdown": {
+      "days": "Ημέρες",
+      "hours": "Ώρες",
+      "minutes": "Λεπτά",
+      "seconds": "Δευτερόλεπτα"
+    },
+    "embed": {
+      "content": "Ενσωματωμένο περιεχόμενο"
+    },
+    "icon_card_grid": {
+      "featured_image": "Κύρια εικόνα"
+    },
+    "image_hotspots": {
+      "close_tooltip": "Κλείσιμο"
+    },
+    "job_listing": {
+      "all_positions": "Όλες οι θέσεις",
+      "filters": "Φίλτρα θέσεων"
+    },
+    "lightbox": {
+      "preview": "Προεπισκόπηση εικόνας",
+      "previous": "Προηγούμενη εικόνα",
+      "next": "Επόμενη εικόνα",
+      "close": "Κλείσιμο"
+    },
+    "map": {
+      "iframe_title": "Χάρτης για {{ address }}"
+    },
+    "menu": {
+      "toggle_submenu": "Άνοιγμα υπομενού"
+    },
+    "news_grid": {
+      "empty": "Δεν υπάρχουν νέα ακόμα."
+    },
+    "pagination": {
+      "label": "Σελίδες"
+    },
+    "projects_grid": {
+      "empty": "Δεν υπάρχουν έργα ακόμα."
+    },
+    "schedule_table": {
+      "closed": "Κλειστά"
+    },
+    "services_grid": {
+      "empty": "Δεν υπάρχουν υπηρεσίες ακόμα."
+    },
+    "slideshow": {
+      "previous_slide": "Προηγούμενη διαφάνεια",
+      "next_slide": "Επόμενη διαφάνεια",
+      "go_to_slide": "Μετάβαση στη διαφάνεια {{ number }}",
+      "pause": "Παύση",
+      "pause_autoplay": "Παύση αυτόματης εναλλαγής",
+      "play": "Αναπαραγωγή",
+      "start_autoplay": "Έναρξη αυτόματης εναλλαγής"
+    },
+    "testimonial_slider": {
+      "go_to": "Μετάβαση στη μαρτυρία {{ number }}"
+    },
+    "video_popup": {
+      "close": "Κλείσιμο βίντεο",
+      "player": "Πρόγραμμα βίντεο"
+    }
+  }
+}
