@@ -1,6 +1,6 @@
 # Multilang — the decisions that still bind
 
-> **Status: built.** Steps 0–24 shipped 2026-09-16 … 2026-09-19 (`d0442659`); only step 25 (docs) is open — moving what is here into `core-architecture.md`, `core-packages.md`, `theming.md` and `user-test-checklist.md`, after which this file goes.
+> **Status: built.** Steps 0–24 shipped 2026-09-16 … 2026-09-19 (`d0442659`). Only step 25 (docs) is open, and it is deliberately held until the domain review questions are settled so it records decisions rather than guesses: it moves what is here into `core-architecture.md`, `core-packages.md`, `theming.md` and `user-test-checklist.md`, after which this file goes.
 >
 > This is what a reader still needs: the approaches that were rejected, the rules that are not visible in the code, and the contract that cannot change. The build order and the per-step "as built" notes were deleted once the steps were done — they are readable in full at `30304f3a` (`future-multilang-design.md`, `future-multilang-implementation-plan.md`).
 

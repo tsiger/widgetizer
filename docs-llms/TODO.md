@@ -31,6 +31,7 @@ permission. The working branch is decided per task — do not assume one.
 ### High priority
 
 - [⬜ 74. Page-render prep is assembled per call site — an embedding shell's own export loop silently drops pagination and `page` (`builder-server` / `render-engine`) — high (hosted-readiness / correctness)](#-74-page-render-prep-is-assembled-per-call-site--an-embedding-shells-own-export-loop-silently-drops-pagination-and-page-builder-server--render-engine--high-hosted-readiness--correctness)
+- [⬜ 77. Work the domain review questions R1–R8 — decide each rule, then prove it (`builder-server` / cross-cutting) — high (pre-launch data integrity) — docs last](#-77-work-the-domain-review-questions-r1r8--decide-each-rule-then-prove-it-builder-server--cross-cutting--high-pre-launch-data-integrity--docs-last)
 
 ### Medium priority
 
@@ -39,7 +40,6 @@ permission. The working branch is decided per task — do not assume one.
 - [⬜ 41. Richtext sanitize CPU degrades over process lifetime — DOMPurify + jsdom accumulation (`builder-server`) — low (OSS-standalone) / moderate (hosted, long-lived process) — investigate (perf)](#-41-richtext-sanitize-cpu-degrades-over-process-lifetime--dompurify--jsdom-accumulation-builder-server--low-oss-standalone--moderate-hosted-long-lived-process--investigate-perf)
 - [⬜ 44. Extract the published-media selection rules into `@widgetizer/core` + finish `seedPresetMedia`'s scope-first conversion (`builder-server` / `core`) — not started](#-44-extract-the-published-media-selection-rules-into-widgetizercore--finish-seedpresetmedias-scope-first-conversion-builder-server--core--not-started)
 - [✅ 62. Export lifecycle races — version reservation and fs/DB cleanup aren't coordinated (`builder-server`) — fixed, pending reference-table move](#-62-export-lifecycle-races--version-reservation-and-fsdb-cleanup-arent-coordinated-builder-server--fixed-pending-reference-table-move)
-- [⬜ 75. Mine the domain docs for simplification candidates, multilang first (`docs-llms` / cross-cutting) — medium — investigate](#-75-mine-the-domain-docs-for-simplification-candidates-multilang-first-docs-llms--cross-cutting--medium--investigate)
 - [⬜ 76. The default language is locked once a site has a second one — decide whether that is the right rule (`builder-server` / `editor-ui`) — medium — needs a decision](#-76-the-default-language-is-locked-once-a-site-has-a-second-one--decide-whether-that-is-the-right-rule-builder-server--editor-ui--medium--needs-a-decision)
 - [⬜ 66. Editor surfaces raw server error strings — `Slug "suite" already exists`, `Validation failed` — instead of field-anchored, localized messages (`editor-ui` / `builder-server`) — medium (UX) — sweep all error paths](#-66-editor-surfaces-raw-server-error-strings--slug-suite-already-exists-validation-failed--instead-of-field-anchored-localized-messages-editor-ui--builder-server--medium-ux--sweep-all-error-paths)
 
@@ -1207,28 +1207,6 @@ partial pipeline by omission, and the next stage that adds a per-page global (mu
 Raised 2026-09-16, after stage 3; noticed because the same two steps had to be remembered twice
 while building pagination and structured data.
 
-## ⬜ 75. Mine the domain docs for simplification candidates, multilang first (`docs-llms` / cross-cutting) — medium — investigate
-
-**Priority:** Medium
-
-`docs-llms/domain/` describes what the app *does* rather than how it is built — entities,
-operation walkthroughs, what is shared and what varies per language, and a coverage map of which
-expectations have test evidence. It already carries its own `review-questions.md`
-("simplification candidates"), and `multilingual.md` states the language rules in one place.
-
-That is a different view of the system from the one the code gives, which makes it the right
-place to look for a model that is more complicated than the product needs. Read it end to end
-with multilang in mind and write up what could be simpler or better — concepts that could
-collapse into one, rules that exist only because of how something was built, workflows that ask
-the user to understand an implementation detail. Land findings as their own items here rather
-than changing anything during the read.
-
-Multilang first because it is the newest and largest surface and the one still open: steps 22–25
-are unbuilt, so a simplification found now is cheaper than one found after the theme work ships
-against the current contracts.
-
-Raised 2026-09-18.
-
 ## ⬜ 76. The default language is locked once a site has a second one — decide whether that is the right rule (`builder-server` / `editor-ui`) — medium — needs a decision
 
 **Priority:** Medium
@@ -1249,6 +1227,70 @@ between. The copy that explained the lock in the form was removed on 2026-09-18 
 decision, so the select is currently disabled with nothing saying why.
 
 Raised 2026-09-18, during hands-on testing of the two-language project.
+
+## ⬜ 77. Work the domain review questions R1–R8 — decide each rule, then prove it (`builder-server` / cross-cutting) — high (pre-launch data integrity) — docs last
+
+**Priority:** High
+
+`docs-llms/domain/review-questions.md` raises nine questions about places where the app's rules
+may be incomplete, inconsistent, or silently different between two paths that ought to agree.
+R9 (built-in form localization) is closed — `22a93fa5`. The other eight are this item.
+
+**None of them is evidence the architecture is wrong.** Read them again and each one is "decide
+what the rule should be, then make the paths follow it": a policy about leftover links, a
+consistency boundary, an agreement on what "success" means. That is contracts and tests on top
+of the structure, not a reason to move it. This item exists so they get worked deliberately
+rather than discovered by a user. Decided 2026-09-19 after two independent reviews of the domain
+map reached the same conclusion; the architecture question is settled and must not be reopened
+here.
+
+Order below is by what it costs the user when it goes wrong, not by where it sits in that file.
+**Each one is: decide the intended behaviour first, write it down, then prove it with a test —
+and only then extract shared code, if the check showed the same mistake in more than one place.**
+Land anything bigger as its own item.
+
+1. **R1 — usage goes stale after a save that half-failed.** A page save can persist content and
+   only warn when usage synchronization fails; media deletion then trusts the recorded usage. So
+   an image the saved content still needs can look unused and be deleted. Decide what the user
+   sees and what makes a later "unused" deletion safe. This one destroys work that was already
+   saved, which is why it is first.
+2. **R3 — removing a language while another window is writing to it.** Language add/remove has
+   its own serializer and translation creation has another; ordinary page/menu/item writes have
+   neither. A request validated before the removal can write after the cleanup. Decide the
+   lifecycle boundary, then a freshness check where it is actually needed — not a lock per
+   workflow. Two tabs is ordinary behaviour, not an edge case.
+3. **R8 — a backup or duplicate has to come back whole.** Translations, groups whose original
+   member was deleted, per-language media overrides, manual order, every reference kind. One
+   shared multilingual fixture and a comparison that allows each operation its intended identity
+   changes — a duplicate remaps uuids, an import keeps them.
+4. **R6 — an operation that only partly finished must not report success.** Theme update can
+   continue past path-copy errors and still record the target version. Decide what counts as
+   success, partial success and retryable failure, and make the result shape carry it.
+5. **R2 — one policy for references to deleted targets.** Deleting a page cleans up references;
+   removing a whole language deletes the partition without running those helpers. Decide whether
+   surviving references get rewritten in both cases or whether leaving them unresolved is a
+   deliberate recoverability choice — then make both paths match the decision.
+6. **R4 — Create, Duplicate and Create-version go through different branches.** Some differences
+   are intentional (a duplicate clears listing flags, a version keeps them). Creation limits are
+   not: a quota must not disappear because the user chose Duplicate. Write the behaviour matrix
+   before touching any handler.
+7. **R5 — one catalogue of where a link or an image can live.** Seeding, cloning, deletion
+   cleanup, rendering and usage tracking each walk content their own way, so a new setting type
+   has to be remembered in all of them. Check first whether they actually disagree today; share
+   the traversal, keep the transformations separate.
+8. **R7 — the exported site agreeing with itself.** The combinations, not the happy path, which
+   `__plain` already covered: an explicit link into a skipped language, translated item
+   alternates, noindex siblings, and `manifest.collections[].itemCount` still being a
+   default-language count while the site is not.
+
+**Docs go last, once the rules above are settled**, so they describe decisions rather than
+guesses. That pass carries multilang step 25 (`core-architecture.md`, `core-packages.md`, the
+frozen `page.translations` contract, and `user-test-checklist.md` gaining language add/remove,
+translate-a-page, switcher and export layout), folds `future-multilang-design.md` into the
+permanent docs and deletes it, and reconciles whatever the domain handbook says against what was
+decided here.
+
+Raised 2026-09-19, replacing the read-the-domain-docs item it supersedes.
 
 ## Completed — reference table
 
@@ -1298,3 +1340,4 @@ Bodies live in git, not here. `Fix` is the first commit that implemented the ite
 | 56 | `EditorShell`/`PluginProvider` default-param object/array literals defeat memoization for a non-memoizing caller (`editor-ui`) | ✅ DONE 2026-08-23 | `9279c720` | `9279c720` |
 | 59 | `getCachedThemeValue` — an in-flight loader can repopulate an invalidated cache entry (`builder-server`) | ✅ DONE 2026-08-23 | `d9c9a8bb` | `9279c720` |
 | 60 | `layerThemeSnapshot` swallows per-update apply errors, so a partial snapshot can be promoted (`builder-server`) | ✅ DONE 2026-08-23 | `d9c9a8bb` | `9279c720` |
+| 75 | Mine the domain docs for simplification candidates, multilang first (`docs-llms` / cross-cutting) | ❌ SUPERSEDED 2026-09-19 | — | `22a93fa5` |
