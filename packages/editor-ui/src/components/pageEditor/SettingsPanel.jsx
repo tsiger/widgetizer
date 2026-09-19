@@ -222,9 +222,14 @@ export default function SettingsPanel({
                 onChange={handleSettingChange}
                 isFirst={index === 0}
                 allowExpand
-                // Richtext stable-link picker is available for widget/block/global
-                // settings, but not theme settings.
-                allowInternalLinkTargets={!isThemeSettings}
+                // The richtext stable-link picker is offered everywhere, theme
+                // settings included. It was withheld from them while nothing
+                // maintained a reference stored there — the picker would have
+                // produced links that never resolved, never followed a rename and
+                // were never cleared on deletion. Theme settings now go through the
+                // same resolution, seeding, duplication and cleanup as widgets, so
+                // the reason no longer holds.
+                allowInternalLinkTargets
               />
             );
           })}

@@ -45,6 +45,7 @@ const { remapCollectionItemLinkRefs, enrichSeededRichtextLinksFromDir } = await 
   "../utils/linkEnrichment.js"
 );
 const { renderPageLayout, renderWidget } = await import("../services/renderingService.js");
+const { saveProjectThemeSettings } = await import("../controllers/themeController.js");
 const { closeDb } = await import("../db/index.js");
 const { LocalStorageAdapter } = await import("@widgetizer/adapters-local");
 
@@ -61,6 +62,23 @@ after(async () => {
   closeDb();
   await fs.remove(TEST_ROOT);
 });
+
+/** A bare response capture, for the handlers this suite drives directly. */
+function mockRes() {
+  const res = {
+    _status: 200,
+    _json: null,
+    status(code) {
+      res._status = code;
+      return res;
+    },
+    json(data) {
+      res._json = data;
+      return res;
+    },
+  };
+  return res;
+}
 
 const themeJsonPath = () => path.join(getProjectDir(PROJECT_FOLDER), "theme.json");
 
@@ -563,5 +581,98 @@ describe("a preset's article link, in a widget and in a theme setting", () => {
     const renamed = (html.match(/news\/story-renamed\.html/g) || []).length;
     assert.equal(renamed, 2, "both the widget's link and the theme setting's followed the rename");
     assert.doesNotMatch(html, /news\/story\.html/, "and neither kept the address the preset shipped");
+  });
+});
+
+describe("a reference a user picked in theme richtext", () => {
+  // Exactly what the editor's internal-link picker writes: the anchor carries the
+  // target's uuid, and the href is the fallback.
+  const PICKED_PAGE = `<p>Read <a href="about.html" data-page-uuid="${PAGE_UUID}">about us</a> today</p>`;
+  const ITEM_UUID = "u-item-story";
+  const PICKED_ITEM = `<p>Read <a href="news/story.html" data-collection-item-uuid="${ITEM_UUID}">the story</a> today</p>`;
+
+  const richTheme = (value) => ({
+    name: "Refs",
+    version: "1.0.0",
+    settings: { global: { general: [{ type: "richtext", id: "intro", value }] } },
+  });
+  const introOf = async () => (await readTheme()).settings.global.general.find((s) => s.id === "intro").value;
+
+  it("survives the save, reference and all", async () => {
+    // The picker is worthless if saving strips what it wrote. Theme richtext is
+    // sanitized when theme.json is saved, so this goes through the real save path.
+    const res = mockRes();
+    await saveProjectThemeSettings(
+      {
+        params: {},
+        body: richTheme(PICKED_PAGE),
+        query: {},
+        scope,
+        activeProject: projectRepo.getProjectById(PROJECT_ID),
+        adapters: { storage, assetStorage: null },
+        app: { locals: {} },
+        [Symbol.for("express-validator#contexts")]: [],
+      },
+      res,
+    );
+
+    assert.equal(res._status, 200, JSON.stringify(res._json));
+    assert.match(await introOf(), new RegExp(`data-page-uuid="${PAGE_UUID}"`), "the reference is stored");
+    assert.equal(res._json.warnings, undefined, "and saving it is not reported as an invalid value");
+  });
+
+  it("follows the page when it is renamed", async () => {
+    await writeTheme(richTheme(PICKED_PAGE));
+    await fs.outputJson(
+      path.join(getProjectPagesDir(PROJECT_FOLDER), "about.json"),
+      { uuid: PAGE_UUID, slug: "about-moved", name: "About", widgets: {} },
+      { spaces: 2 },
+    );
+    await fs.outputFile(
+      path.join(getProjectDir(PROJECT_FOLDER), "layout.liquid"),
+      `<!DOCTYPE html><html><body>{{ theme.general.intro | raw }}{{ main_content | raw }}</body></html>`,
+    );
+
+    const html = await renderPageLayout(
+      PROJECT_ID,
+      { headerContent: "", mainContent: "", footerContent: "" },
+      { name: "Home", slug: "index" },
+      await readTheme(),
+      "publish",
+      {},
+    );
+
+    assert.match(html, /href="about-moved\.html"/);
+    assert.doesNotMatch(html, /href="about\.html"/);
+  });
+
+  it("is re-pointed at the duplicate's own page", async () => {
+    await writeTheme(richTheme(PICKED_PAGE));
+
+    await remapDuplicatedProjectUuids(PROJECT_FOLDER);
+
+    const about = await fs.readJson(path.join(getProjectPagesDir(PROJECT_FOLDER), "about.json"));
+    assert.notEqual(about.uuid, PAGE_UUID, "the duplicate regenerated the page uuid");
+    assert.match(await introOf(), new RegExp(`data-page-uuid="${about.uuid}"`), "and the anchor followed it");
+  });
+
+  it("loses its destination but keeps the words when the page is deleted", async () => {
+    await writeTheme(richTheme(PICKED_PAGE));
+
+    await clearDeletedReferencesInSection(storage, scope, { pageUuids: [PAGE_UUID], defaultLanguage: "en" });
+
+    const intro = await introOf();
+    assert.doesNotMatch(intro, /<a /, "the anchor is gone");
+    assert.match(intro, /Read about us today/, "and the sentence is intact, link text included");
+  });
+
+  it("does the same for a collection-item reference", async () => {
+    await writeTheme(richTheme(PICKED_ITEM));
+
+    await clearDeletedReferencesInSection(storage, scope, { itemUuids: [ITEM_UUID], defaultLanguage: "en" });
+
+    const intro = await introOf();
+    assert.doesNotMatch(intro, /<a /);
+    assert.match(intro, /Read the story today/);
   });
 });
