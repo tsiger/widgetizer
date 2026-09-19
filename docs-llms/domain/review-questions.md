@@ -9,7 +9,7 @@ These are places where we should check whether the app's rules are complete, con
 | Question | Why it matters to someone using the app |
 | --- | --- |
 | [R1: Is image usage still accurate after a save problem?](#r1-content-persistence-and-media-usage) *(implemented; follow-ups tracked)* | An image should not appear safe to delete while saved content still needs it. |
-| [R2: Does deleting related content have consistent consequences?](#r2-one-deletion-policy-for-references) | Deleting a page by itself and deleting its whole language should have a clear policy for links left behind. |
+| [R2: Does deleting related content have consistent consequences?](#r2-one-deletion-policy-for-references) *(implemented; follow-ups tracked)* | Deleting a page by itself and deleting its whole language should have a clear policy for links left behind. |
 | [R3: What if a language is removed while another window is editing it?](#r3-language-lifecycle-and-content-writes) *(implemented; follow-ups tracked)* | A late save should not unexpectedly bring back content from a removed language. |
 | [R4: Do different ways of creating content obey the right rules?](#r4-shared-write-rules-without-forcing-one-workflow) | Create, Duplicate and Create language version should differ intentionally, not accidentally bypass limits or checks. |
 | [R5: Do we find every place that uses an image or link?](#r5-one-description-of-reference-bearing-values) | A link inside formatted text matters just as much as one in a button or menu. |
@@ -47,13 +47,25 @@ Evidence: [pageController](../../packages/builder-server/src/controllers/pageCon
 
 ## R2 One deletion policy for references
 
-**Observed:** individual page/item deletion invokes stable-reference cleanup; language removal deletes its partition and usage without invoking those helpers. Render-time resolution separately handles missing targets. Menu deletion also relies on missing-menu behavior rather than scrubbing every selecting setting.
+**Status:** OSS implementation reviewed; remaining work has [priorities and checkpoints](review-status.md#r2--one-policy-for-references-to-deleted-content).
+
+**Original observation:** individual page/item deletion invokes stable-reference cleanup; language removal deletes its partition and usage without invoking those helpers. Render-time resolution separately handles missing targets. Menu deletion also relies on missing-menu behavior rather than scrubbing every selecting setting.
 
 **Question:** should bulk language removal rewrite surviving page/item/menu/richtext/parent references just as individual deletion does, or is retaining unresolved references an intentional recoverability policy?
 
-**Simplification candidate:** document one target-deletion policy, then share a batch cleanup operation where appropriate. Keep custom URLs and explicit UUID references distinct.
+**Answered: it should, and the retention was not a policy.** Reproduced side by side from one starting state — English content referencing a Greek page four ways. Deleting that page cleared all four; removing the language that contained it cleared none. Reachable rather than theoretical, because the link picker deliberately offers targets in every language.
 
-Evidence: [languageService](../../packages/builder-server/src/services/languageService.js), [pageController](../../packages/builder-server/src/controllers/pageController.js), [collectionController](../../packages/builder-server/src/controllers/collectionController.js), [linkEnrichment](../../packages/builder-server/src/utils/linkEnrichment.js). Coverage: L4, C2/C6/C7.
+What settled it is that retention here has no recovery value. Re-adding a language does not restore its pages and new content gets new uuids, so a reference into removed content is permanently dead rather than temporarily unresolvable. Rendering already degrades gracefully, so the cost falls on the editor, where the picker deliberately preserves a reference it cannot resolve ("never inferred-deleted") and would keep showing a selection that can never work again.
+
+A third gap fell out of the same question: **nothing anywhere cleared references to a deleted menu**, on any path, including single-language sites.
+
+The one case where retention IS right turned out to be already present and unrecognised: a removal that fails partway keeps the language listed for retry, so its surviving targets are still there. The policy therefore turns on *confirmed* deletion rather than attempted deletion — uuids are recorded as each delete returns, not before.
+
+See [one policy for references to deleted content](operations/content.md#one-policy-for-references-to-deleted-content) for the rule, what it deliberately leaves alone, and what happens when the sweep cannot finish.
+
+**Simplification candidate (taken):** "document one target-deletion policy, then share a batch cleanup operation where appropriate" is what was built. One batch walk handles pages, items and menus together; the per-uuid walks it replaced meant a bulk delete of twenty pages read and rewrote the whole project twenty times. Custom URLs and explicit uuid references stayed distinct, as the candidate asked — a hand-typed address is never rewritten.
+
+Evidence: [linkEnrichment](../../packages/builder-server/src/utils/linkEnrichment.js), [languageService](../../packages/builder-server/src/services/languageService.js), [pageController](../../packages/builder-server/src/controllers/pageController.js), [collectionController](../../packages/builder-server/src/controllers/collectionController.js). Coverage: L4, C2/C6/C7.
 
 ## R3 Language lifecycle and content writes
 

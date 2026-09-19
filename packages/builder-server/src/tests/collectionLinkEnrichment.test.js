@@ -171,7 +171,9 @@ describe("cleanupDeletedPageReferences — collection items", () => {
     });
     await cleanupDeletedPageReferences(storage, SCOPE, { deletedPageUuid: "DELETED" });
     const item = await readItem("portfolio", "alpha");
-    assert.deepEqual(item.settings.cta, { href: "", text: "", target: "_self" });
+    // The destination is cleared; the label the author wrote is not theirs to
+    // delete. Only the explicit reference to deleted content goes.
+    assert.deepEqual(item.settings.cta, { href: "", text: "Go", target: "_self" });
     assert.equal(item.settings.other.pageUuid, "KEEP"); // untouched
   });
 
@@ -373,7 +375,7 @@ describe("cleanupDeletedCollectionItemReferences — menu refs", () => {
     });
     await cleanupDeletedCollectionItemReferences(storage, SCOPE, { deletedItemUuids: "item-suite" });
     const page = await readPage("home");
-    assert.deepEqual(page.widgets.w1.settings.cta, { href: "", text: "", target: "_self" });
+    assert.deepEqual(page.widgets.w1.settings.cta, { href: "", text: "Suite", target: "_self" });
     assert.equal(page.widgets.w1.settings.keep.collectionItemUuid, "item-villa"); // untouched
   });
 
@@ -384,7 +386,7 @@ describe("cleanupDeletedCollectionItemReferences — menu refs", () => {
     });
     await cleanupDeletedCollectionItemReferences(storage, SCOPE, { deletedItemUuids: "item-suite" });
     const item = await readItem("portfolio", "alpha");
-    assert.deepEqual(item.settings.related, { href: "", text: "", target: "_self" });
+    assert.deepEqual(item.settings.related, { href: "", text: "Suite", target: "_self" });
   });
 });
 

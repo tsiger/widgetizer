@@ -177,6 +177,33 @@ describe("removing a language", () => {
     expect(showToast).toHaveBeenCalledWith(`${GREEK} removed.`, "success");
   });
 
+  it("says the language went but its links did not, when the server reports that", async () => {
+    // The removal succeeded; some content still points at what went. A warning, not
+    // an error — telling someone the removal failed would be false, and would push
+    // them to retry something that is already done.
+    fetchJsonImpl = vi.fn(async (path) =>
+      path.endsWith("/summary")
+        ? { pages: 0, items: 0, menus: 0 }
+        : {
+            languages: [],
+            warnings: [{ code: "REFERENCE_CLEANUP_INCOMPLETE", count: 2, paths: ["pages/index.json", "menus/main-menu.json"] }],
+          },
+    );
+    renderSection({ languages: ["el"] });
+
+    fireEvent.click(screen.getByRole("button", { name: `Remove ${GREEK}` }));
+    await screen.findByRole("dialog");
+    fireEvent.click(screen.getByRole("button", { name: "Remove Language" }));
+
+    await waitFor(() => expect(showToast).toHaveBeenCalled());
+    const [message, severity] = showToast.mock.calls.at(-1);
+    expect(severity).toBe("warning");
+    expect(message).toContain(GREEK);
+    expect(message).toMatch(/couldn't be updated/i);
+    // The storage keys are for logs; they mean nothing to the person reading this.
+    expect(message).not.toMatch(/pages\/index\.json|menus\/|\.json/);
+  });
+
   it("deletes nothing when the confirmation is dismissed", async () => {
     fetchJsonImpl = vi.fn(async () => ({ pages: 1, items: 0, menus: 0 }));
     const { onChange } = renderSection({ languages: ["el"] });

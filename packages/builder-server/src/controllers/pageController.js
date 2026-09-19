@@ -9,7 +9,7 @@ import {
   assertIntroducedMediaExists,
   assertLanguageStillEnabled,
 } from "../services/contentCoordination.js";
-import { cleanupDeletedPageReferences } from "../utils/linkEnrichment.js";
+import { clearDeletedReferencesInSection, referenceCleanupWarnings } from "../utils/linkEnrichment.js";
 import { stripHtmlToText } from "../services/sanitizationService.js";
 import { LIMIT_KEYS, MAX_WIDGETS_PER_PAGE } from "@widgetizer/core/adapters";
 import { sanitizeSlug, generateUniqueSlug } from "../utils/slugHelpers.js";
@@ -176,10 +176,9 @@ async function persistPageWithMediaTracking(args) {
   return withContentWriteLock(args.scope.projectId, () => persistPageInSection(args));
 }
 
-async function deletePageWithMediaTracking({ scope, storage, pageId, lang }) {
-  // Same section as the writes and as media deletion: a verification scan must not
-  // read a half-removed page and mistake its images for unreferenced ones.
-  return withContentWriteLock(scope.projectId, async () => {
+/** The delete itself, WITHOUT taking the section — the caller holds it. */
+async function deletePageInSection({ scope, storage, pageId, lang }) {
+  {
     // Usage rows are keyed by uuid, so read it while the file still exists. A page with
     // no uuid was recorded under its slug, which the service resolves from the slug below.
     let pageUuid = null;
@@ -197,8 +196,33 @@ async function deletePageWithMediaTracking({ scope, storage, pageId, lang }) {
     } catch (usageError) {
       console.warn(`Failed to update media usage tracking for deleted page ${pageId}:`, usageError);
     }
-  });
+  }
 }
+
+/**
+ * Clear references to pages this request has deleted. One walk for the whole set:
+ * the bulk path used to run a full project walk per page, so deleting twenty pages
+ * read and rewrote every page, global, menu and item twenty times.
+ *
+ * Call inside the section holding the deletes. A failure is logged rather than
+ * thrown — the pages ARE deleted, and a dangling reference renders as a dead link
+ * rather than a wrong one.
+ */
+async function clearRefsToDeletedPages(storage, scope, uuids, lang) {
+  const pageUuids = uuids.filter(Boolean);
+  if (pageUuids.length === 0) return [];
+  try {
+    const { incomplete } = await clearDeletedReferencesInSection(storage, scope, {
+      pageUuids,
+      defaultLanguage: lang.defaultLanguage,
+    });
+    return incomplete;
+  } catch (cleanupError) {
+    console.warn(`Failed to clear references for deleted pages ${pageUuids.join(", ")}:`, cleanupError.message);
+    return [{ key: "*", reason: cleanupError.message }];
+  }
+}
+
 
 /**
  * Retrieves a single page by its slug from the active project.
@@ -441,33 +465,30 @@ export async function deletePage(req, res) {
     const lang = requestLanguage(req, res);
     if (!lang) return;
 
-    // Read the page (existence + UUID for reference cleanup) before deleting
-    const pageBuf = await storage.read(scope, pageKey(pageId, lang));
-    if (pageBuf == null) {
-      return res.status(404).json({ error: "Page not found" });
-    }
+    // Existence check, identity read, delete and sweep are ONE section. Reading the
+    // identity before the lock meant the page could be renamed in between — a rename
+    // keeps the uuid and moves the file, so the delete then removed nothing while the
+    // sweep cleared every link to a page that is still there, under its new slug.
+    // Only the identity this request actually deleted may be swept.
+    const found = await withContentWriteLock(scope.projectId, async () => {
+      const pageBuf = await storage.read(scope, pageKey(pageId, lang));
+      if (pageBuf == null) return null;
 
-    let deletedPageUuid = null;
-    try {
-      deletedPageUuid = JSON.parse(pageBuf.toString("utf8")).uuid || null;
-    } catch (readError) {
-      console.warn(`Could not read page UUID before deletion for ${pageId}:`, readError.message);
-    }
-
-    await deletePageWithMediaTracking({ scope, storage, pageId, lang });
-
-    // Clean up orphaned references in menus and widget links, via the scope-aware
-    // storage adapter so this runs against the correct per-tenant tree in hosted
-    // (Cloud) and DATA_DIR in OSS (Local).
-    if (deletedPageUuid) {
+      let deletedPageUuid = null;
       try {
-        await cleanupDeletedPageReferences(storage, scope, { deletedPageUuid, defaultLanguage: lang.defaultLanguage });
-      } catch (cleanupError) {
-        console.warn(`Failed to clean up references for deleted page ${pageId}:`, cleanupError.message);
+        deletedPageUuid = JSON.parse(pageBuf.toString("utf8")).uuid || null;
+      } catch (readError) {
+        console.warn(`Could not read page UUID before deletion for ${pageId}:`, readError.message);
       }
-    }
 
-    res.json({ success: true });
+      await deletePageInSection({ scope, storage, pageId, lang });
+      return { incomplete: await clearRefsToDeletedPages(storage, scope, [deletedPageUuid], lang) };
+    });
+
+    if (!found) return res.status(404).json({ error: "Page not found" });
+
+    const warnings = referenceCleanupWarnings(found.incomplete);
+    res.json({ success: true, ...(warnings ? { warnings } : {}) });
   } catch (error) {
     console.error("Error deleting page:", error);
     res.status(500).json({ error: "Failed to delete page" });
@@ -495,48 +516,50 @@ export async function bulkDeletePages(req, res) {
   };
 
   const deletedUuids = [];
+  let incompleteCleanup = [];
 
-  // Process each page deletion
-  for (const pageId of pageIds) {
-    try {
-      // Read the page (existence + UUID for reference cleanup) before deleting
-      const pageBuf = await storage.read(scope, pageKey(pageId, lang));
-      if (pageBuf == null) {
-        results.notFound.push(pageId);
-        continue;
-      }
-
+  // One section for the whole batch, so a save cannot slip a new reference to any
+  // of these pages in between the deletes and the sweep that clears them.
+  await withContentWriteLock(scope.projectId, async () => {
+    for (const pageId of pageIds) {
       try {
-        const pageData = JSON.parse(pageBuf.toString("utf8"));
-        if (pageData.uuid) deletedUuids.push(pageData.uuid);
-      } catch (readError) {
-        console.warn(`Could not read page UUID before deletion for ${pageId}:`, readError.message);
+        // Read the page (existence + UUID for reference cleanup) before deleting
+        const pageBuf = await storage.read(scope, pageKey(pageId, lang));
+        if (pageBuf == null) {
+          results.notFound.push(pageId);
+          continue;
+        }
+
+        // Read the uuid before deleting (the file is about to go) but record it
+        // as deleted only after the delete returns — a page whose delete threw may
+        // still be there, and clearing references to it would break live links.
+        let uuid = null;
+        try {
+          uuid = JSON.parse(pageBuf.toString("utf8")).uuid ?? null;
+        } catch (readError) {
+          console.warn(`Could not read page UUID before deletion for ${pageId}:`, readError.message);
+        }
+
+        await deletePageInSection({ scope, storage, pageId, lang });
+
+        if (uuid) deletedUuids.push(uuid);
+        results.deleted.push(pageId);
+      } catch (error) {
+        console.error(`Error deleting page ${pageId}:`, error);
+        results.errors.push({ pageId, error: error.message });
       }
-
-      await deletePageWithMediaTracking({ scope, storage, pageId, lang });
-
-      results.deleted.push(pageId);
-    } catch (error) {
-      console.error(`Error deleting page ${pageId}:`, error);
-      results.errors.push({ pageId, error: error.message });
     }
-  }
 
-  // Clean up orphaned references for all deleted pages (per-tenant dir via the adapter).
-  for (const uuid of deletedUuids) {
-    try {
-      await cleanupDeletedPageReferences(storage, scope, {
-        deletedPageUuid: uuid,
-        defaultLanguage: lang.defaultLanguage,
-      });
-    } catch (cleanupError) {
-      console.warn(`Failed to clean up references for deleted page UUID ${uuid}:`, cleanupError.message);
-    }
-  }
+    // Confirmed deletions only, in one walk.
+    incompleteCleanup = await clearRefsToDeletedPages(storage, scope, deletedUuids, lang);
+  });
 
   // Determine response status based on results
   const hasErrors = results.errors.length > 0 || results.notFound.length > 0;
   const hasSuccesses = results.deleted.length > 0;
+  // The pages went; some content may still point at them. A warning either way —
+  // never a reason to call a completed deletion a failure.
+  const cleanupWarnings = referenceCleanupWarnings(incompleteCleanup);
 
   if (hasSuccesses && !hasErrors) {
     // All deletions successful
@@ -544,6 +567,7 @@ export async function bulkDeletePages(req, res) {
       success: true,
       message: `Successfully deleted ${results.deleted.length} page(s)`,
       results,
+      ...(cleanupWarnings ? { warnings: cleanupWarnings } : {}),
     });
   } else if (hasSuccesses && hasErrors) {
     // Partial success
@@ -551,6 +575,7 @@ export async function bulkDeletePages(req, res) {
       success: false,
       message: `Deleted ${results.deleted.length} page(s), but encountered ${results.errors.length + results.notFound.length} error(s)`,
       results,
+      ...(cleanupWarnings ? { warnings: cleanupWarnings } : {}),
     });
   } else {
     // No successes

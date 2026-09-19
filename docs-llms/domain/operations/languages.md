@@ -125,7 +125,13 @@ On either, the editor:
 
 ### Reference cleanup
 
-The language-removal service is distinct from individual page/item deletion and does not call their reference-scrubbing helpers. Whether surviving content should be rewritten or rely on missing-target rendering needs an explicit [review](../review-questions.md#r2-one-deletion-policy-for-references).
+Removal clears the references to what it deleted, exactly as deleting one page does — the [deletion policy](content.md#one-policy-for-references-to-deleted-content) is one rule for both. It used to be the lenient path: deleting a single Greek page scrubbed the English link to it, while removing the whole Greek language left that same link behind.
+
+**Only what it confirmed deleting.** The uuids are recorded as each delete *returns*, not before. A partial removal therefore clears references to the content that did go and leaves every other reference alone: a target whose delete threw may still be there, and removal is retryable, so guessing would break links to live content. A retry clears the rest.
+
+Menus need their uuids read before deletion for this, because a widget selects a menu by uuid and those selections have to be cleared with it.
+
+The sweep runs inside the content-write section the removal already holds, so nothing can write a fresh reference to the removed content in between.
 
 ## Change the sole default language
 

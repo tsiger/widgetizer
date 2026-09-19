@@ -83,7 +83,7 @@ Implementation: [pageController](../../../packages/builder-server/src/controller
 | Duplicate | New menu ID/UUID and item IDs; copy name and nested content in the same language |
 | Delete | Delete selected-language menu file; linked pages/items remain |
 
-Menu render resolution handles absent targets separately from persisted cleanup. Deleting a menu does not itself walk all widget settings to remove selections; missing selections render as an empty menu.
+Menu render resolution handles absent targets separately from persisted cleanup, and still does: a selection that has not been cleared yet renders as an empty menu rather than the wrong one. Deleting a menu now also clears the selections that pointed at it — see the policy below.
 
 Implementation: [menuController](../../../packages/builder-server/src/controllers/menuController.js), [menuResolver](../../../packages/render-engine/src/menuResolver.js). Tests: [menus](../../../packages/builder-server/src/tests/menus.test.js), [MenusLanguages](../../../packages/editor-ui/src/pages/__tests__/MenusLanguages.test.jsx).
 
@@ -100,7 +100,7 @@ Implementation: [menuController](../../../packages/builder-server/src/controller
 | Duplicate | Fresh UUID/group, unique copy slug/title; place after source in manual order when source is listed |
 | Reorder | Write that type/language's `_order.json`, pruning nonexistent slugs |
 | Discard archived settings | Remove only fields no longer in current schema; keep identity/timestamps; resync usage |
-| Delete | Remove file, prune ordering, remove usage, attempt stable-target reference cleanup |
+| Delete | Remove file, prune ordering, remove usage, clear references to the deleted item |
 | Bulk delete | Report deleted/not-found/errors; update order and cleanup for deleted targets |
 | Create version | Copy into another language, same group, new UUID, separate order; see [language operations](languages.md) |
 
@@ -109,3 +109,29 @@ Storage writes, order changes, usage changes, and reference cleanup are separate
 Saved changes feed listings in the item's own language, including that language's ordering and pagination count. Missing versions are not filled from default-language entries. Export includes the items only when their language is included and validates all included languages before writing output. See [collection rendering](../entities/collection.md#listings-and-multilingual-output).
 
 Implementation: [collectionController](../../../packages/builder-server/src/controllers/collectionController.js), [collectionService](../../../packages/builder-server/src/services/collectionService.js). Tests: [collectionApi](../../../packages/builder-server/src/tests/collectionApi.test.js), [collectionService](../../../packages/builder-server/src/tests/collectionService.test.js), [collectionMediaUsage](../../../packages/builder-server/src/tests/collectionMediaUsage.test.js).
+
+## One policy for references to deleted content
+
+Deleting a page, a collection item, a menu, or a whole language all follow the same rule, because the loss is the same either way and the route to it should not change the outcome.
+
+**What is cleared.** Explicit references to Widgetizer-managed content: `pageUuid` and `collectionItemUuid` on link settings and menu items, the matching `data-…-uuid` attributes inside richtext, `parentPageUuid`, and a `menu` setting holding a deleted menu's uuid. Across every surviving language, the default one included.
+
+**What is kept.** The destination goes; the content around it does not. A link keeps its text and target and loses only its href and reference, a menu item keeps its label, and richtext keeps the words while losing the anchor around them. Nothing is substituted — no nearest page, no other menu, no guessing at what was meant.
+
+**Hand-typed URLs are never rewritten.** They are not references to managed content, so they are left exactly as written even when they happen to point at the address of a page that was just deleted. The author wrote it and it is theirs to change.
+
+**Only confirmed deletions.** References are cleared against what the operation actually deleted, never what it set out to delete. A partial bulk delete, or a language removal that failed partway, clears only the targets that went. This is the one case where keeping a reference is right: the target may still be there and the operation is retryable.
+
+Why clear at all, rather than leave the reference in case the target returns? Because it cannot. Re-adding a language does not restore its pages, and new content gets new uuids — a reference to deleted content is permanently dead rather than temporarily unresolvable. Rendering already degrades gracefully (a missing target resolves to no link), so this is about the editor, where a stored reference would otherwise keep showing a selection that can never work again.
+
+### When the sweep cannot finish
+
+The content is deleted either way, so an incomplete sweep is reported as a **warning on a successful deletion**, never as a failure. Calling a completed deletion a failure would push someone to retry something already done.
+
+The sweep continues past a file it cannot write or a folder it cannot list, cleans everything else it can reach, and returns what it missed. Each delete endpoint turns that into a `REFERENCE_CLEANUP_INCOMPLETE` warning carrying a count and the storage keys. The keys are for logs: the message a person reads names pages and menus, never a path.
+
+A collection folder that cannot be listed is reported the same way. Skipping it silently made an unreadable collection indistinguishable from a project that has none.
+
+Nothing repairs this automatically. The remaining references render as dead destinations and are fixed by editing the content that holds them; automatic repair is not part of this behaviour.
+
+Implementation: [linkEnrichment](../../../packages/builder-server/src/utils/linkEnrichment.js). Tests: [deletedReferenceCleanup](../../../packages/builder-server/src/tests/deletedReferenceCleanup.test.js).

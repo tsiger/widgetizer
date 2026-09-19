@@ -26,8 +26,9 @@ import {
   assertIntroducedMediaExists,
   assertLanguageStillEnabled,
 } from "../services/contentCoordination.js";
-import { cleanupDeletedCollectionItemReferences } from "../utils/linkEnrichment.js";
+import { clearDeletedReferencesInSection, referenceCleanupWarnings } from "../utils/linkEnrichment.js";
 import { requestLanguage, projectLanguageContexts } from "../utils/contentLanguage.js";
+
 import {
   assertHasIdentity,
   assertLanguageFree,
@@ -103,6 +104,27 @@ async function writeItemInMediaSection({
       return true;
     }
   });
+}
+
+/**
+ * Clear references to items this request has deleted — one walk for the whole set,
+ * rather than a full project walk per item. Call inside the section holding the
+ * deletes. A failure is logged, not thrown: the items ARE deleted, and a dangling
+ * reference renders as a dead link rather than a wrong one.
+ */
+async function clearRefsToDeletedItems(storage, scope, uuids, lang) {
+  const itemUuids = uuids.filter(Boolean);
+  if (itemUuids.length === 0) return [];
+  try {
+    const { incomplete } = await clearDeletedReferencesInSection(storage, scope, {
+      itemUuids,
+      defaultLanguage: lang.defaultLanguage,
+    });
+    return incomplete;
+  } catch (cleanupError) {
+    console.warn(`Failed to clear references for deleted items ${itemUuids.join(", ")}:`, cleanupError.message);
+    return [{ key: "*", reason: cleanupError.message }];
+  }
 }
 
 /** Attach the "saved, but image tracking is behind" signal without changing the body's shape. */
@@ -303,31 +325,34 @@ export async function deleteItem(req, res) {
     // In the section: deleting prunes the collection's order file, which is a WRITE.
     // Outside it, a delete aimed at a language that had just been removed answered
     // 404 while putting _order.json back into the emptied folder.
+    let incomplete = [];
     const result = await withContentWriteLock(scope.projectId, async () => {
       assertLanguageStillEnabled(scope.projectId, lang);
-      const deleted = await collectionService.deleteCollectionItem(storage, scope, collectionType, itemSlug, lang);
-      if (deleted.deleted) {
-        await removeCollectionItemFromMediaUsage(
-          scope.projectId,
-          { uuid: existing?.uuid, slug: itemSlug },
-          collectionType,
-          lang,
-        );
+      try {
+        const deleted = await collectionService.deleteCollectionItem(storage, scope, collectionType, itemSlug, lang);
+        if (deleted.deleted) {
+          await removeCollectionItemFromMediaUsage(
+            scope.projectId,
+            { uuid: existing?.uuid, slug: itemSlug },
+            collectionType,
+            lang,
+          );
+          incomplete = await clearRefsToDeletedItems(storage, scope, [existing?.uuid], lang);
+        }
+        return deleted;
+      } catch (err) {
+        // The file went and the bookkeeping after it did not. The deletion is real
+        // and cannot be retried — the item is no longer there to find — so its
+        // references must be cleared now or never.
+        if (err?.deletedSlugs?.length) {
+          await clearRefsToDeletedItems(storage, scope, [existing?.uuid], lang);
+        }
+        throw err;
       }
-      return deleted;
     });
     if (!result.deleted) return noStore(res).status(404).json({ error: "Item not found" });
-    if (existing?.uuid) {
-      try {
-        await cleanupDeletedCollectionItemReferences(storage, scope, {
-          deletedItemUuids: existing.uuid,
-          defaultLanguage: lang.defaultLanguage,
-        });
-      } catch (cleanupError) {
-        console.warn(`Failed to clean up references for deleted item ${itemSlug} (${existing.uuid}):`, cleanupError.message);
-      }
-    }
-    noStore(res).json({ success: true, slug: itemSlug });
+    const warnings = referenceCleanupWarnings(incomplete);
+    noStore(res).json({ success: true, slug: itemSlug, ...(warnings ? { warnings } : {}) });
   } catch (err) {
     respondError(res, err);
   }
@@ -353,40 +378,53 @@ export async function bulkDeleteItems(req, res) {
     }
     // Same as the single delete: pruning the order file is a write, so it belongs
     // in the section and must not outlive the language it is addressed to.
+    let incomplete = [];
     const result = await withContentWriteLock(scope.projectId, async () => {
       assertLanguageStillEnabled(scope.projectId, lang);
-      const deleted = await collectionService.bulkDeleteCollectionItems(
-        storage,
-        scope,
-        collectionType,
-        req.body.itemSlugs,
-        lang,
-      );
-      for (const slug of deleted.deleted) {
-        await removeCollectionItemFromMediaUsage(
-          scope.projectId,
-          { uuid: uuidBySlug.get(slug), slug },
+      try {
+        const deleted = await collectionService.bulkDeleteCollectionItems(
+          storage,
+          scope,
           collectionType,
+          req.body.itemSlugs,
           lang,
         );
+        for (const slug of deleted.deleted) {
+          await removeCollectionItemFromMediaUsage(
+            scope.projectId,
+            { uuid: uuidBySlug.get(slug), slug },
+            collectionType,
+            lang,
+          );
+        }
+        // Only what the service reports as deleted: on a partial bulk, the items
+        // that were not removed keep their references, because they are still there.
+        incomplete = await clearRefsToDeletedItems(
+          storage,
+          scope,
+          deleted.deleted.map((slug) => uuidBySlug.get(slug)),
+          lang,
+        );
+        return deleted;
+      } catch (err) {
+        // Same as the single delete: files gone, bookkeeping failed. Clear the
+        // references to what did go before the error leaves here.
+        if (err?.deletedSlugs?.length) {
+          await clearRefsToDeletedItems(
+            storage,
+            scope,
+            err.deletedSlugs.map((slug) => uuidBySlug.get(slug)),
+            lang,
+          );
+        }
+        throw err;
       }
-      return deleted;
     });
-    const deletedUuids = result.deleted.map((slug) => uuidBySlug.get(slug)).filter(Boolean);
-    if (deletedUuids.length > 0) {
-      try {
-        await cleanupDeletedCollectionItemReferences(storage, scope, {
-          deletedItemUuids: deletedUuids,
-          defaultLanguage: lang.defaultLanguage,
-        });
-      } catch (cleanupError) {
-        console.warn(`Failed to clean up references for deleted items ${deletedUuids.join(", ")}:`, cleanupError.message);
-      }
-    }
     const partial = result.notFound.length > 0 || result.errors.length > 0;
+    const warnings = referenceCleanupWarnings(incomplete);
     noStore(res)
       .status(partial ? 207 : 200)
-      .json(result);
+      .json({ ...result, ...(warnings ? { warnings } : {}) });
   } catch (err) {
     respondError(res, err);
   }

@@ -156,7 +156,10 @@ describe("cleanupDeletedPageReferences", () => {
     await cleanupDeletedPageReferences(storage, SCOPE, { deletedPageUuid: "dead-uuid" });
 
     const home = JSON.parse(storage._files.get("pages/home.json"));
-    assert.deepEqual(home.widgets.w1.settings.link, { href: "", text: "", target: "_self" });
+    // The destination goes; the label the author wrote stays. Blanking the text
+    // too left the editor showing an empty button rather than a named one whose
+    // target needs re-picking, and threw away work nobody asked to delete.
+    assert.deepEqual(home.widgets.w1.settings.link, { href: "", text: "X" });
     assert.equal(home.widgets.w2.settings.body, "<p>see our page now</p>");
     const menu = JSON.parse(storage._files.get("menus/main.json"));
     assert.equal(menu.items[0].link, "");
@@ -201,10 +204,10 @@ describe("cleanupDeletedCollectionItemReferences", () => {
     await cleanupDeletedCollectionItemReferences(storage, SCOPE, { deletedItemUuids: ["item-a"] });
 
     const home = JSON.parse(storage._files.get("pages/home.json"));
-    assert.deepEqual(home.widgets.w1.settings.cta, { href: "", text: "", target: "_self" });
+    assert.deepEqual(home.widgets.w1.settings.cta, { href: "", text: "X", target: "_self" });
     assert.equal(home.widgets.w2.settings.body, "x");
     const item = JSON.parse(storage._files.get("collections/rooms/alpha.json"));
-    assert.deepEqual(item.settings.related, { href: "", text: "", target: "_self" });
+    assert.deepEqual(item.settings.related, { href: "", text: "X", target: "_self" });
     const menu = JSON.parse(storage._files.get("menus/main.json"));
     assert.equal(menu.items[0].link, "");
     assert.equal("collectionItemUuid" in menu.items[0], false);

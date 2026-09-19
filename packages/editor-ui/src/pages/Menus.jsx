@@ -9,6 +9,7 @@ import Table from "../components/ui/Table";
 import Button, { IconButton } from "../components/ui/Button";
 import useConfirmationAction from "../hooks/useConfirmationAction";
 import useFormatDate from "../hooks/useFormatDate";
+import { hasIncompleteReferenceCleanup } from "../lib/referenceCleanupWarning";
 
 import { getAllMenus, deleteMenu, duplicateMenu } from "../queries/menuManager";
 import { sortItemsByCopyName } from "../utils/copyNameSort";
@@ -82,9 +83,14 @@ export default function Menus() {
 
   const handleDelete = async (data) => {
     try {
-      await deleteMenu(data.id, data.language);
+      const result = await deleteMenu(data.id, data.language);
       setMenus(menus.filter((menu) => !(menu.id === data.id && menu.language === data.language)));
-      showToast(t("menus.toasts.deleteSuccess", { name: data.name }), "success");
+      showToast(
+        hasIncompleteReferenceCleanup(result)
+          ? t("menus.toasts.deleteLinksIncomplete", { name: data.name })
+          : t("menus.toasts.deleteSuccess", { name: data.name }),
+        hasIncompleteReferenceCleanup(result) ? "warning" : "success",
+      );
     } catch (error) {
       console.error("Failed to delete menu:", error);
       showToast(t("menus.toasts.deleteError"), "error");

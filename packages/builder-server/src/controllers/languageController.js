@@ -81,7 +81,7 @@ export async function deleteLanguage(req, res) {
     const result = await serializeLanguageOps(scope.projectId, async () =>
       withContentWriteLock(scope.projectId, async () => {
         const current = projectRepo.getProjectById(scope.projectId);
-        const { languages, deleted } = await removeLanguage({
+        const { languages, deleted, incompleteCleanup } = await removeLanguage({
           storage,
           scope,
           project: current,
@@ -89,11 +89,17 @@ export async function deleteLanguage(req, res) {
         });
         // Recorded only after the content is gone, so a failure never leaves a
         // language unlisted with its files still on disk.
-        return { project: projectRepo.updateProject(scope.projectId, { languages }), deleted };
+        return { project: projectRepo.updateProject(scope.projectId, { languages }), deleted, incompleteCleanup };
       }),
     );
 
-    res.json({ ...result.project, deleted: result.deleted });
+    // The language IS removed. A warning, not a failure: some surviving content
+    // could not be rewritten and still points at what went, which the editor shows
+    // as a dead destination rather than a wrong one.
+    const warnings = result.incompleteCleanup?.length
+      ? [{ code: "REFERENCE_CLEANUP_INCOMPLETE", paths: result.incompleteCleanup.map((entry) => entry.key) }]
+      : undefined;
+    res.json({ ...result.project, deleted: result.deleted, ...(warnings ? { warnings } : {}) });
   } catch (error) {
     respondError(res, error, "Failed to remove language");
   }

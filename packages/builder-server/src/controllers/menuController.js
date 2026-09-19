@@ -10,6 +10,7 @@ import {
   assertLanguageStillEnabled,
   isLanguageStillEnabled,
 } from "../services/contentCoordination.js";
+import { cleanupDeletedMenuReferences, referenceCleanupWarnings } from "../utils/linkEnrichment.js";
 
 async function listMenuIds(storage, scope, lang) {
   const files = await storage.list(scope, menusDir(lang));
@@ -129,7 +130,7 @@ export async function getAllMenus(req, res) {
             // not a check: a removal landing between the two put the deleted menu
             // straight back. The check stays non-throwing because this is a read
             // path — an obsolete backfill is skipped, the listing still answers.
-            await withContentWriteLock(scope.projectId, async () => {
+    await withContentWriteLock(scope.projectId, async () => {
               if (isLanguageStillEnabled(scope.projectId, lang)) {
                 await writeMenuRaw(storage, scope, { ...menu, id }, lang);
               }
@@ -212,8 +213,37 @@ export async function deleteMenu(req, res) {
     const lang = requestLanguage(req, res);
     if (!lang) return;
 
-    await storage.delete(scope, menuKey(id, lang));
-    res.json({ success: true });
+    let incomplete = [];
+    // Read the uuid while the file is still there: a widget selects a menu BY
+    // uuid, and those selections have to be cleared with it. Deleting and clearing
+    // share one section, so nothing can select this menu in between.
+    await withContentWriteLock(scope.projectId, async () => {
+      let deletedMenuUuid = null;
+      try {
+        const buf = await storage.read(scope, menuKey(id, lang));
+        if (buf != null) deletedMenuUuid = JSON.parse(buf.toString("utf8"))?.uuid ?? null;
+      } catch (readError) {
+        console.warn(`Could not read menu ${id} before delete: ${readError.message}`);
+      }
+
+      await storage.delete(scope, menuKey(id, lang));
+
+      try {
+        const result = await cleanupDeletedMenuReferences(storage, scope, {
+          deletedMenuUuid,
+          defaultLanguage: lang.defaultLanguage,
+        });
+        incomplete = result?.incomplete ?? [];
+      } catch (cleanupError) {
+        // The menu IS deleted; a failed sweep leaves selections pointing at it,
+        // which renders as no menu rather than the wrong one.
+        console.warn(`Failed to clear references to deleted menu ${id}: ${cleanupError.message}`);
+        incomplete = [{ key: "*", reason: cleanupError.message }];
+      }
+    });
+
+    const warnings = referenceCleanupWarnings(incomplete);
+    res.json({ success: true, ...(warnings ? { warnings } : {}) });
   } catch (error) {
     console.error("Error deleting menu:", error);
     res.status(500).json({ error: "Failed to delete menu" });

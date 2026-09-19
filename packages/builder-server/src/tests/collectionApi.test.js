@@ -271,8 +271,13 @@ describe("item mutations", () => {
       },
       res,
     );
+    // The item IS deleted, so this stays a success — but the sweep could not list
+    // the collections it needed to clean, and saying nothing made an unreadable
+    // folder look identical to a project with nothing to clean.
     assert.equal(res._status, 200);
-    assert.deepEqual(res._json, { success: true, slug: "cleanup-boom" });
+    assert.equal(res._json.success, true);
+    assert.equal(res._json.slug, "cleanup-boom");
+    assert.equal(res._json.warnings[0].code, "REFERENCE_CLEANUP_INCOMPLETE");
   });
 
   it("bulkDeleteItems still reports deletions when reference cleanup throws a non-ENOENT error", async () => {
@@ -291,6 +296,7 @@ describe("item mutations", () => {
     );
     assert.equal(res._status, 200);
     assert.deepEqual(res._json.deleted, ["bulk-cleanup-boom"]);
+    assert.equal(res._json.warnings[0].code, "REFERENCE_CLEANUP_INCOMPLETE");
   });
 });
 

@@ -965,7 +965,16 @@ export async function deleteCollectionItem(storage, scope, collectionType, itemS
   const itemPathKey = itemKey(collectionType, itemSlug, lang);
   const existed = await storage.exists(scope, itemPathKey);
   await storage.delete(scope, itemPathKey);
-  await rewriteOrder(storage, scope, collectionType, (order) => order.filter((slug) => slug !== itemSlug), lang);
+  // The item file is already gone; the order file is bookkeeping that follows it.
+  // If that fails, the caller still has to know WHAT was deleted — otherwise the
+  // references to it are never cleared, and a retry cannot help because the item
+  // is no longer there to be found and deleted again.
+  try {
+    await rewriteOrder(storage, scope, collectionType, (order) => order.filter((slug) => slug !== itemSlug), lang);
+  } catch (orderError) {
+    orderError.deletedSlugs = existed ? [itemSlug] : [];
+    throw orderError;
+  }
   return { deleted: existed };
 }
 
@@ -997,7 +1006,14 @@ export async function bulkDeleteCollectionItems(storage, scope, collectionType, 
 
   if (deleted.length > 0) {
     const removed = new Set(deleted);
-    await rewriteOrder(storage, scope, collectionType, (order) => order.filter((slug) => !removed.has(slug)), lang);
+    // As in deleteCollectionItem: the files are gone whether or not the order
+    // file can be rewritten, so a failure here carries the list with it.
+    try {
+      await rewriteOrder(storage, scope, collectionType, (order) => order.filter((slug) => !removed.has(slug)), lang);
+    } catch (orderError) {
+      orderError.deletedSlugs = deleted;
+      throw orderError;
+    }
   }
 
   return { deleted, notFound, errors };

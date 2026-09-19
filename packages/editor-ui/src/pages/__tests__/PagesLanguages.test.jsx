@@ -227,6 +227,40 @@ describe("row actions stay in the row's language", () => {
     await waitFor(() => expect(deletePage).toHaveBeenCalledWith("sxetika", "el"));
   });
 
+  it("warns, rather than celebrates, when the page went but its links did not", async () => {
+    // Same wiring as menus and collection items: the delete succeeded, so this is
+    // never an error — it is a success the user needs one more sentence about.
+    deletePage.mockResolvedValueOnce({
+      success: true,
+      warnings: [{ code: "REFERENCE_CLEANUP_INCOMPLETE", count: 1, paths: ["menus/main-menu.json"] }],
+    });
+    renderList();
+    await screen.findByRole("tablist");
+    await openRowMenu("Sxetika");
+
+    fireEvent.click(screen.getByRole("button", { name: /pages\.actions\.delete/ }));
+    fireEvent.click(await screen.findByRole("button", { name: "pages.deleteModal.confirm" }));
+
+    await waitFor(() => expect(showToast).toHaveBeenCalled());
+    const [key, severity] = showToast.mock.calls.at(-1);
+    expect(key).toBe("pages.toasts.deleteLinksIncomplete");
+    expect(severity).toBe("warning");
+  });
+
+  it("celebrates normally when the sweep finished", async () => {
+    renderList();
+    await screen.findByRole("tablist");
+    await openRowMenu("Sxetika");
+
+    fireEvent.click(screen.getByRole("button", { name: /pages\.actions\.delete/ }));
+    fireEvent.click(await screen.findByRole("button", { name: "pages.deleteModal.confirm" }));
+
+    await waitFor(() => expect(showToast).toHaveBeenCalled());
+    const [key, severity] = showToast.mock.calls.at(-1);
+    expect(key).toBe("pages.toasts.deleteSuccess");
+    expect(severity).toBe("success");
+  });
+
   it("duplicates within that language", async () => {
     renderList();
     await screen.findByRole("tablist");

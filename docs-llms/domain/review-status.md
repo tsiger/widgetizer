@@ -2,7 +2,7 @@
 
 [Review questions](review-questions.md) · [Map](README.md) · [Coverage](coverage.md)
 
-Updated 2026-09-19 (R1 and R3 reviewed). This is the handoff summary; the review questions retain the reasoning and evidence. Update an item's status when it is reviewed, and replace an uncommitted status with the fix commit when available.
+Updated 2026-09-19 (R1, R2 and R3 reviewed). This is the handoff summary; the review questions retain the reasoning and evidence. Update an item's status when it is reviewed, and replace an uncommitted status with the fix commit when available.
 
 **Priority describes the next action, not proof of a bug.** High means check before the stated release or deployment milestone; Medium means planned follow-up; Low means revisit when its trigger occurs. “Before launch” below applies when that feature is included in the launch. Future scaling work does not block a single-process MVP.
 
@@ -34,6 +34,42 @@ These are requirements for any application embedding the public packages, not a 
 | Restart behavior and deleted-path memory | Low | Before launch operations review; revisit with uptime/deletion-volume evidence | Make the restart limitation explicit and assess process-lifetime retention. Any future memory bound must refuse unverifiable writes rather than silently discard protection. |
 
 **Closure:** the reviewed OSS change is implemented; follow-ups above remain separate. Multi-process support is not a blocker for a single-process MVP. The complete participation boundary is in [media operations](operations/media.md#delete-or-bulk-delete). R3 generalised this fix's per-project media section into the shared content-write section, so the two items share one mechanism (`contentCoordination`).
+
+## R2 — One policy for references to deleted content
+
+**OSS status:** Implemented and reviewed. Deleting a page, collection item, menu or language clears the references to what was confirmed deleted, across every surviving language. Changes are not yet committed.
+
+Confirmed defects, each reproduced before fixing and each covered by a regression verified to fail without its fix: language removal left every reference to its content dangling while single-page deletion cleared the same references; nothing on any path cleared references to a deleted menu; the sweep could clear links to a page that had been renamed rather than deleted (identity read before the lock); collection deletion skipped cleanup entirely when the order-file rewrite failed afterwards, unrecoverably, since a retry finds nothing left to delete; a cleanup failure reported flat success; collection folders that could not be listed were skipped silently; and the parent-reference scan ran once per deleted page on top of the widget walk.
+
+One behaviour was deliberately reversed rather than fixed: clearing a link used to blank its text as well as its destination. Labels, targets and surrounding words are now kept — only the destination and the dead reference go.
+
+**Verification:** 1,845 backend and 1,560 frontend tests pass, plus targeted lint and locale validation. Full lint still has the pre-existing theme-deletion-marker parsing errors. Regression tests live in [deletedReferenceCleanup.test.js](../../packages/builder-server/src/tests/deletedReferenceCleanup.test.js), with the user-facing half in [LanguagesSection.test.jsx](../../app/src/components/projects/__tests__/LanguagesSection.test.jsx) and [PagesLanguages.test.jsx](../../packages/editor-ui/src/pages/__tests__/PagesLanguages.test.jsx).
+
+### Verified limitations
+
+| Limitation | Why it stands |
+| --- | --- |
+| Remaining references are not repaired automatically | An incomplete sweep leaves references that render as dead destinations. They are fixed by editing the content that holds them. Automatic repair is deliberately outside this change. |
+| A hand-typed URL to deleted content is left as written | It is not a reference to managed content. Rewriting it would be editing the author's words on their behalf. |
+| Retention on partial failure is intentional | A target whose delete threw may still exist and the operation is retryable, so its references are kept. Only confirmed deletions are swept. |
+| The warning names counts, not paths | Storage keys are carried for logs only. A person cannot act on `pages/el/index.json`; they can act on "check pages and menus that linked to it". |
+
+### OSS follow-ups
+
+| Point | Priority | When to check | Next action |
+| --- | --- | --- | --- |
+| Automatic repair of references left behind | Low | If incomplete sweeps are seen in ordinary use rather than only under induced failures | Today the warning is the whole remedy. A repair pass would need to re-derive which references are dead, which is the same walk — evaluate only with evidence it is needed. |
+| Menu-setting matching is by uuid equality, not schema | Low | When a setting type could hold a bare uuid that is not a menu | A `menu` setting is matched by exact equality against a deleted menu's uuid rather than by reading each widget's schema, which would cost a second walk. Unique enough today; revisit if a new setting type makes it ambiguous. |
+| Structural flows still outside the sweep | Medium | During R4/R6 | Link enrichment and project create/duplicate/import/theme update copy content that already exists and do not participate. Shared with R1's boundary item. |
+
+### Hosted follow-ups — generic integration checklist
+
+| Point | Priority | When to check | Next action |
+| --- | --- | --- | --- |
+| Custom delete handlers | High | Before launching with the deletion-policy change | A host that deletes managed content must clear its references the same way, against confirmed deletions only, inside the shared content-write section. |
+| Surfacing `REFERENCE_CLEANUP_INCOMPLETE` | Medium | Before launch, if the host renders its own delete UI | The code arrives on every delete response. A host that ignores it reports a clean deletion when some content still points at what went. |
+
+**Closure:** the reviewed OSS change is implemented; follow-ups above remain separate. Automatic repair and draft recovery are outside this change.
 
 ## R3 — Removing a language while someone is editing it
 
@@ -70,7 +106,7 @@ These priorities are initial triage, not completed investigations. None of these
 
 | Item | OSS status | Review priority | When to check | Hosted follow-up |
 | --- | --- | --- | --- | --- |
-| [R2 — Deletion consequences](review-questions.md#r2-one-deletion-policy-for-references) | Not reviewed | Medium | Next review in the series; settle policy before changing deletion behavior | To assess |
+| [R2 — Deletion consequences](review-questions.md#r2-one-deletion-policy-for-references) | Reviewed and implemented — see [above](#r2--one-policy-for-references-to-deleted-content) | — | — | Listed above |
 | [R3 — Removing a language during editing](review-questions.md#r3-language-lifecycle-and-content-writes) | Reviewed and implemented — see [above](#r3--removing-a-language-while-someone-is-editing-it) | — | — | Listed above |
 | [R4 — Rules across create, duplicate and translate](review-questions.md#r4-shared-write-rules-without-forcing-one-workflow) | Not reviewed | Medium | Before releasing these workflows under enforced quotas; include R1's copy-path checks | To assess |
 | [R5 — Finding every image and link reference](review-questions.md#r5-one-description-of-reference-bearing-values) | Not reviewed | Medium | During the reference-safety review, and whenever a new reference-bearing setting type is added | To assess |

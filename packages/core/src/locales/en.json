@@ -35,8 +35,11 @@
     "toasts": {
       "loadError": "Failed to load items",
       "deleteSuccess": "Item deleted successfully",
+      "deleteLinksIncomplete": "Item deleted, but some links to it couldn't be updated. Check pages and menus that linked to it.",
       "deleteBulkSuccess": "Successfully deleted {{count}} item",
       "deleteBulkSuccess_other": "Successfully deleted {{count}} items",
+      "deleteBulkLinksIncomplete": "Deleted {{count}} item, but some links to it couldn't be updated. Check pages and menus that linked to it.",
+      "deleteBulkLinksIncomplete_other": "Deleted {{count}} items, but some links to them couldn't be updated. Check pages and menus that linked to them.",
       "deleteError": "Failed to delete item(s)",
       "duplicateSuccess": "Item duplicated successfully",
       "duplicateError": "Failed to duplicate item",
@@ -231,6 +234,7 @@
         "removeUndone": "This cannot be undone.",
         "removeConfirm": "Remove Language",
         "removeSuccess": "{{name}} removed.",
+        "removedLinksIncomplete": "{{name}} was removed, but some links couldn't be updated. Check pages and menus that linked to it.",
         "removeError": "The language could not be removed.",
         "summaryError": "What this language contains could not be read, so it was not removed."
       },
@@ -621,7 +625,10 @@
     "toasts": {
       "deleteBulkSuccess": "Successfully deleted {{count}} page",
       "deleteBulkSuccess_other": "Successfully deleted {{count}} pages",
+      "deleteBulkLinksIncomplete": "Deleted {{count}} page, but some links to it couldn't be updated. Check pages and menus that linked to it.",
+      "deleteBulkLinksIncomplete_other": "Deleted {{count}} pages, but some links to them couldn't be updated. Check pages and menus that linked to them.",
       "deleteSuccess": "Page deleted successfully",
+      "deleteLinksIncomplete": "Page deleted, but some links to it couldn't be updated. Check pages and menus that linked to it.",
       "deleteError": "Failed to delete page(s)",
       "loadError": "Failed to load pages",
       "duplicateSuccess": "Page duplicated successfully",
@@ -660,6 +667,7 @@
     "toasts": {
       "loadError": "Failed to load menus",
       "deleteSuccess": "Menu \"{{name}}\" was deleted successfully",
+    "deleteLinksIncomplete": "Menu \"{{name}}\" was deleted, but some sections that used it couldn't be updated. Check the pages that showed it.",
       "deleteError": "Failed to delete menu",
       "duplicateSuccess": "Menu duplicated successfully",
       "duplicateError": "Failed to duplicate menu"
