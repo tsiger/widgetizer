@@ -8,7 +8,7 @@ Updated 2026-09-19. This is the handoff summary; the review questions retain the
 
 ## R1 — Image usage and safe deletion
 
-**OSS status:** Implemented and reviewed for participating operations within one backend process. The reported review defects are fixed. Changes are not yet committed.
+**OSS status:** Implemented and reviewed for participating operations within one backend process. The reported review defects are fixed. Fixed in `ae8102a3`.
 
 Deletion checks saved content, refuses incomplete verification, and coordinates with participating writes. Saves distinguish saved content with stale usage tracking from a rejected missing-image reference. The usage label can remain stale until refreshed.
 
