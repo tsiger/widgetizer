@@ -29,6 +29,11 @@ const useAutoSave = create((set, get) => ({
   // Set when a save moved a collection's listing anchor onto this page; read and
   // cleared by a mounted component, which has the i18n provider this store does not.
   listingAnchorMoved: null,
+  // Set when the server saved the content but could not update its image-usage
+  // records. The save SUCCEEDED — this is not a failure, and must not be shown as
+  // one; it only means the media library may label a file wrongly until a refresh.
+  // Announced by a mounted component, same as listingAnchorMoved.
+  mediaUsageStale: null,
   modifiedWidgets: new Set(),
   structureModified: false,
   themeSettingsModified: false,
@@ -258,12 +263,21 @@ const useAutoSave = create((set, get) => ({
             ? !isEqual(globalWidgets.footer, pageStore.originalGlobalWidgets.footer)
             : false;
 
+        // Kept so their responses can be read: a header-only save carries its
+        // "saved, but image tracking is behind" warning here and nowhere else.
+        // Discarding these results lost that warning entirely for globals.
+        const globalSaves = [];
+
         if (globalWidgets.header && (modifiedWidgets.has("header") || hasHeaderDiff)) {
-          guardedPromises.push(saveGlobalWidget("header", globalWidgets.header, page?.language));
+          const headerSave = saveGlobalWidget("header", globalWidgets.header, page?.language);
+          globalSaves.push(headerSave);
+          guardedPromises.push(headerSave);
         }
 
         if (globalWidgets.footer && (modifiedWidgets.has("footer") || hasFooterDiff)) {
-          guardedPromises.push(saveGlobalWidget("footer", globalWidgets.footer, page?.language));
+          const footerSave = saveGlobalWidget("footer", globalWidgets.footer, page?.language);
+          globalSaves.push(footerSave);
+          guardedPromises.push(footerSave);
         }
 
         const hasPageWidgetChanges = [...modifiedWidgets].some((id) => id !== "header" && id !== "footer");
@@ -281,11 +295,14 @@ const useAutoSave = create((set, get) => ({
         // awaiting a settled promise still yields, and a reset landing in that
         // gap would slip past the guard it is supposed to be caught by.
         const pageSaveResult = pageSave ? await pageSave : null;
+        // Settled above by the same Promise.all, so these are already resolved.
+        const globalSaveResults = await Promise.all(globalSaves);
 
         // Phase 2: theme settings via themeStore's canonical save path.
         // This handles warning/correction reloads from the server automatically.
         const hasThemeDrift = themeStore.hasUnsavedThemeChanges();
         let themeCorrection = null;
+        let themeUsageStale = false;
         if ((themeSettingsModified || hasThemeDrift) && themeSettings && activeProject) {
           const sentTheme = useThemeStore.getState().settings;
           const themeResult = await useThemeStore.getState().saveSettings(activeProject.id);
@@ -310,7 +327,16 @@ const useAutoSave = create((set, get) => ({
               if (serverTheme) usePageStore.getState().applyThemeCorrections(discardedDraft, serverTheme);
             }
           } else if (themeResult?.warnings?.length && useThemeStore.getState().loadedProjectId === activeProject.id) {
-            themeCorrection = { sent: sentTheme, saved: useThemeStore.getState().originalSettings };
+            // Theme warnings are not all the same kind. A sanitization warning means
+            // the server changed what it stored, so undo history has to be rewritten
+            // to match. "Image tracking is behind" changed nothing about the settings
+            // — treating it as a correction would rewrite history over a save the
+            // server took verbatim.
+            const corrections = themeResult.warnings.filter((w) => w?.code !== "MEDIA_USAGE_STALE");
+            themeUsageStale = themeResult.warnings.some((w) => w?.code === "MEDIA_USAGE_STALE");
+            if (corrections.length) {
+              themeCorrection = { sent: sentTheme, saved: useThemeStore.getState().originalSettings };
+            }
           }
         }
 
@@ -348,6 +374,13 @@ const useAutoSave = create((set, get) => ({
             listingAnchorMoved: pageSaveResult?.listingAnchorMovedFrom?.length
               ? { pages: pageSaveResult.listingAnchorMovedFrom }
               : state.listingAnchorMoved,
+            // Any of the three can carry it: a header-only save reports it on the
+            // global response, and theme settings on theirs.
+            mediaUsageStale: [pageSaveResult, ...globalSaveResults].some((result) =>
+              result?.warnings?.some((w) => w?.code === "MEDIA_USAGE_STALE"),
+            ) || themeUsageStale
+              ? { at: Date.now() }
+              : state.mediaUsageStale,
           };
         });
 
@@ -506,6 +539,8 @@ const useAutoSave = create((set, get) => ({
 
   clearListingAnchorMoved: () => set({ listingAnchorMoved: null }),
 
+  clearMediaUsageStale: () => set({ mediaUsageStale: null }),
+
   reset: () => {
     const { stopAutoSave, saveGeneration } = get();
     stopAutoSave();
@@ -526,6 +561,7 @@ const useAutoSave = create((set, get) => ({
       saveGeneration: saveGeneration + 1,
       lastSaved: null,
       listingAnchorMoved: null,
+      mediaUsageStale: null,
       modifiedWidgets: new Set(),
       structureModified: false,
       themeSettingsModified: false,

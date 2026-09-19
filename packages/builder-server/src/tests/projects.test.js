@@ -33,6 +33,8 @@ process.env.NODE_ENV = "test";
 const { DATA_DIR, THEMES_SEED_DIR, getThemeDir, getProjectDir, getProjectPagesDir, getProjectMenusDir } =
   await import("../config.js");
 
+const { LocalAssetStorageAdapter, LocalStorageAdapter } = await import("@widgetizer/adapters-local");
+
 const {
   getAllProjects,
   getActiveProject,
@@ -229,6 +231,13 @@ function mockReq({ params = {}, body = {}, file = null } = {}) {
     body,
     file,
     app: { locals: {} },
+    // setupBuilderServer attaches the adapter set to EVERY request reaching these
+    // routers, so handlers may use it without a scope-resolving middleware — the
+    // identity logo check does, to confirm a picked file still exists.
+    adapters: {
+      assetStorage: new LocalAssetStorageAdapter({ dataRoot: TEST_DATA_DIR }),
+      storage: new LocalStorageAdapter({ dataRoot: TEST_DATA_DIR }),
+    },
     // express-validator needs these to exist
     [Symbol.for("express-validator#contexts")]: [],
   };

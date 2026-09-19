@@ -28,7 +28,11 @@ Refresh usage asks Widgetizer to check saved content again. An unsaved image sel
 
 ### Deleting files
 
-The app blocks deletion when a file is recorded as in use. To remove a used photograph, first replace or remove its uses and save those content changes. Other languages or shared settings may still use it.
+The app blocks deletion when a file is in use. Before deleting, it re-reads your saved content rather than relying on the recorded usage list, so a file is protected even if that list has fallen behind. To remove a used photograph, first replace or remove its uses and save those content changes. Other languages or shared settings may still use it.
+
+If the app cannot read all of your content, it cannot tell whether a file is still needed — so it refuses to delete and says which content it could not read. This is not a failed deletion so much as an unanswered question; it is safe to try again once the content is readable.
+
+Two promises worth keeping apart: **deletion is safe**, and the **"unused" label is accurate**. The first always holds. The second can be temporarily wrong — the library may show a file as unused while a recent save has not been fully accounted for. Refresh usage corrects the label; deletion does not depend on it being correct in the first place.
 
 Deleting an unused image removes the file and its generated sizes. Deleting several files can succeed for some and fail for others; inspect the results rather than assuming the entire selection was removed.
 
@@ -64,11 +68,33 @@ Test assertions inspected in [media](../../../packages/builder-server/src/tests/
 
 Usage queries return the file's recorded sources. Refresh enumerates pages/globals across language folders, collection items, theme settings and site identity, then rebuilds usage. Legacy usage identities are migrated through a rescan where required.
 
-Usage is derived state. Several content paths deliberately warn rather than fail when syncing it. Review how the UI communicates/repairs this before using “unused” as an absolute statement about all current content.
+Usage is derived state. Several content paths deliberately warn rather than fail when syncing it — the content IS saved, so reporting a failed save would be false; they return a `MEDIA_USAGE_STALE` warning alongside the success instead. Because the rows can therefore be behind, deletion re-derives usage rather than trusting them (below), and the stored rows are not a promise about current content.
 
 ## Delete or bulk delete
 
-Single deletion checks ownership/existence and refuses a nonempty usage list. It removes the original and generated assets, then deletes the database record and dependent metadata. Bulk deletion reports per-file outcomes, including files still in use. Neither workflow should treat removing one language's usage as evidence that the file is unused in the whole project.
+Deletion does not trust the recorded usage list. It re-derives usage from content through the same traversal the Refresh Usage button runs — every language's pages, headers/footers, collection items, theme settings and the site identity — and a file is deletable only when **both** the recorded rows and that fresh scan agree it is unused. The rescan exists to catch a *missing* row, not to overrule a present one: a row with no matching content is the harmless direction of staleness, and honouring it keeps a delete that was previously refused from suddenly going through.
+
+An incomplete scan is not an answer. When any content could not be read, the traversal reports it in `skipped`, and deletion answers `409 MEDIA_USAGE_UNVERIFIED` naming that content instead of deleting — an unreadable page contributes no references, which is otherwise indistinguishable from a page that has none.
+
+Verification and deletion run inside a per-project media section that content writes also take, so a save cannot land a new reference between the scan and the delete it authorised. Ordering alone does not cover the save that was *queued behind* the delete, which would otherwise introduce a reference to a file that is now gone; deletion therefore records what it removed, and a write that would newly introduce one of those paths is refused with `409 MEDIA_REFERENCE_MISSING`. That check is deliberately narrow — only newly introduced paths, only paths this process deleted, and only while the asset is still absent, so re-uploading the same filename clears it. An upload path with nothing behind it stays legitimate everywhere else.
+
+**What a write may still reference.** Only one case is refused: a path this process deleted, newly introduced, while the asset is still absent. A path that is **present but unregistered** (bytes on disk, no media record) and a path that is **genuinely missing but was not deleted here** (imported content whose binaries did not travel, hand-edited JSON, a file deleted before this process started) both keep saving. A dangling reference is a tolerated state in this system, not an error; what is prevented is a save *creating* one out of a file the library showed a moment ago.
+
+**Scope of the guarantee.** An image is not deleted while saved content references it — **for participating operations, within one backend process.** Both qualifiers matter.
+
+*Participating* means the operation takes the media section: media delete and bulk delete, plus page content save, page delete, global widget save, collection item create and update, theme settings save and site identity save — the paths where someone picks a file from the library. Collection item duplicate / discard-archived / language version, language seeding, link enrichment and the structural flows (project create, duplicate, import, theme update) do **not** participate. Each copies content that already exists in the project, so the reference it introduces is normally also held by the source a verification scan reads — a reason to expect no harm, not a proof of exclusion.
+
+*Within one backend process* is **not** softened by verification reading shared storage. Two processes against one project can both scan concurrently and both conclude a file is unused, and one can write a reference between the other's scan and its delete. Re-reading shared content orders nothing; only the section does, and the section is in-process. **Cross-process deletion safety is not established here.** An embedding host running more than one backend process against a project must coordinate in the database and should not treat this as cover.
+
+**The restart case.** The record of what was deleted is in memory, kept for the **lifetime of the process** — never expired, never capped. Two bounded versions were tried and both ended by letting a write through: a count cap dropped the oldest entries once enough files had been deleted (generated image sizes spending several slots each), and a time window merely postponed that, since an editor can hold unsaved work overnight and elapsed time is not evidence that a pending edit is gone. The only thing that genuinely ends the race is the process ending, because a save that was in flight or queued dies with it. Any bound reintroduced here must fail **closed** at its limit — refusing writes it cannot vouch for — never by quietly accepting a missing reference.
+
+The record is not shared between processes, and is gone on restart. Within one process the cover is complete, because the race it closes cannot outlive that process either. What escapes: an editor still holding **pending edits** across a backend restart can, on saving afterwards, write a reference to an image deleted before the restart. That save succeeds and leaves a **broken reference in that content** — the tolerated state above, visible and fixable in the editor — rather than a lost image.
+
+These limits are accepted for the OSS desktop and web shells, which run a single backend process.
+
+Single deletion checks ownership/existence. It removes the original and generated assets, then deletes the database record and dependent metadata. Bulk deletion verifies the whole batch in one scan and reports per-file outcomes, including files still in use. Neither workflow should treat removing one language's usage as evidence that the file is unused in the whole project.
+
+Implementation: [mediaCoordination](../../../packages/builder-server/src/services/mediaCoordination.js). Tests: [mediaDeletionSafety](../../../packages/builder-server/src/tests/mediaDeletionSafety.test.js).
 
 ## Serve and browse
 

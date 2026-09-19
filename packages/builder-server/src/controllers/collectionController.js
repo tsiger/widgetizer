@@ -19,7 +19,9 @@ import {
   syncCollectionItemMediaUsageOnWrite,
   updateCollectionItemMediaUsage,
   removeCollectionItemFromMediaUsage,
+  extractMediaPathsFromCollectionItem,
 } from "../services/mediaUsageService.js";
+import { withMediaLock, assertIntroducedMediaExists } from "../services/mediaCoordination.js";
 import { cleanupDeletedCollectionItemReferences } from "../utils/linkEnrichment.js";
 import { requestLanguage, projectLanguageContexts } from "../utils/contentLanguage.js";
 import {
@@ -32,9 +34,81 @@ import {
 } from "../services/translationService.js";
 
 /** Map a service error to an HTTP response, or 500 for the unexpected. */
+/**
+ * Write an item and sync its media usage as one media section, so media deletion
+ * (which verifies and deletes in the same section) cannot run between the two.
+ * Refuses first if the item introduces a reference to a file that is already gone —
+ * the save queued behind a delete, which ordering alone cannot make safe.
+ *
+ * @returns {Promise<boolean>} true when the item was written but its usage rows are
+ *   behind. The item IS saved in that case; reporting a failed save would be false.
+ */
+async function writeItemInMediaSection({
+  storage,
+  scope,
+  assetStorage,
+  collectionType,
+  item,
+  baselineSlug = null,
+  previousSlug,
+  lang,
+}) {
+  return withMediaLock(scope.projectId, async () => {
+    // Re-read the comparison baseline HERE, not from a snapshot taken before the
+    // lock. A snapshot read earlier can still show a reference that another save
+    // has since removed and a delete has since acted on — which classified the
+    // image as "already present", skipped the check, and restored a broken
+    // reference. The baseline has to be what is on disk inside this section.
+    let previousItem = null;
+    if (baselineSlug) {
+      try {
+        previousItem = await collectionService.readRawCollectionItem(
+          storage,
+          scope,
+          collectionType,
+          baselineSlug,
+          lang,
+        );
+      } catch {
+        // Unreadable: nothing is known to be pre-existing, so every path in the
+        // incoming item counts as introduced. That is the cautious direction.
+      }
+    }
+
+    await assertIntroducedMediaExists({
+      assetStorage,
+      scope,
+      previousPaths: previousItem ? extractMediaPathsFromCollectionItem(previousItem) : [],
+      nextPaths: extractMediaPathsFromCollectionItem(item),
+    });
+
+    await collectionService.writeCollectionItem(storage, scope, collectionType, item, previousSlug, lang);
+
+    try {
+      await syncCollectionItemMediaUsageOnWrite(scope.projectId, item, collectionType, lang);
+      return false;
+    } catch (usageError) {
+      // Previously this propagated and answered 500 — after the item had already
+      // been written. Saying the save failed when it did not is the worse lie.
+      console.warn(`Failed to update media usage tracking for item ${item?.slug}:`, usageError.message);
+      return true;
+    }
+  });
+}
+
+/** Attach the "saved, but image tracking is behind" signal without changing the body's shape. */
+function withUsageWarning(body, usageStale, slug) {
+  if (!usageStale) return body;
+  return { ...body, warnings: [{ code: "MEDIA_USAGE_STALE", path: slug }] };
+}
+
 function respondError(res, err) {
   if (err?.name === "TranslationError") {
     return res.status(err.status).json({ error: "Version not created", message: err.message });
+  }
+  // Nothing was written: the item refers to a file that is no longer there.
+  if (err?.code === "MEDIA_REFERENCE_MISSING") {
+    return res.status(err.statusCode).json({ error: "Missing media", message: err.message, code: err.code });
   }
   if (err?.code === "VALIDATION") {
     return res.status(400).json({ error: "Validation failed", validationErrors: err.validationErrors });
@@ -148,9 +222,19 @@ export async function createItem(req, res) {
     }
 
     const { item } = collectionService.buildCollectionItemData(schema, req.body, null);
-    await collectionService.writeCollectionItem(storage, scope, collectionType, item, null, lang);
-    await syncCollectionItemMediaUsageOnWrite(scope.projectId, item, collectionType, lang);
-    noStore(res).status(201).json(collectionService.normalizeCollectionItem(item, schema, lang));
+    const usageStale = await writeItemInMediaSection({
+      storage,
+      scope,
+      assetStorage: req.adapters.assetStorage,
+      collectionType,
+      item,
+      baselineSlug: null,
+      previousSlug: null,
+      lang,
+    });
+    noStore(res)
+      .status(201)
+      .json(withUsageWarning(collectionService.normalizeCollectionItem(item, schema, lang), usageStale, item.slug));
   } catch (err) {
     respondError(res, err);
   }
@@ -170,9 +254,19 @@ export async function updateItem(req, res) {
     if (!existing) return res.status(404).json({ error: "Item not found" });
 
     const { item, previousSlug } = collectionService.buildCollectionItemData(schema, req.body, existing);
-    await collectionService.writeCollectionItem(storage, scope, collectionType, item, previousSlug, lang);
-    await syncCollectionItemMediaUsageOnWrite(scope.projectId, item, collectionType, lang);
-    noStore(res).json(collectionService.normalizeCollectionItem(item, schema, lang));
+    const usageStale = await writeItemInMediaSection({
+      storage,
+      scope,
+      assetStorage: req.adapters.assetStorage,
+      collectionType,
+      item,
+      baselineSlug: itemSlug,
+      previousSlug,
+      lang,
+    });
+    noStore(res).json(
+      withUsageWarning(collectionService.normalizeCollectionItem(item, schema, lang), usageStale, item.slug),
+    );
   } catch (err) {
     respondError(res, err);
   }

@@ -73,6 +73,17 @@ export default function PageEditor() {
     useAutoSave.getState().clearListingAnchorMoved();
   }, [listingAnchorMoved, t]);
 
+  // The page saved, but the server could not update which images it records as
+  // used. Deliberately a warning and not an error: the work IS saved, and the
+  // only consequence is that the media library may call a file unused until a
+  // refresh — deletion checks the content itself, so nothing is at risk.
+  const mediaUsageStale = useAutoSave((state) => state.mediaUsageStale);
+  useEffect(() => {
+    if (!mediaUsageStale) return;
+    useToastStore.getState().showToast(t("pageEditor.mediaUsage.stale"), "warning");
+    useAutoSave.getState().clearMediaUsageStale();
+  }, [mediaUsageStale, t]);
+
   // Handle block selection (cross-component coordination)
   const handleBlockSelect = (blockId) => {
     setSelectedBlockId(blockId);

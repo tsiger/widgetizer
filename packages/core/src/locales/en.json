@@ -705,6 +705,10 @@
       "description": "Marks this page as the home of this collection. Its items show it in their breadcrumbs, e.g. Home › Blog › A post. Only one page per collection.",
       "moved": "This is now the main page for that collection — moved from {{pages}}. If that page was split into pages, it no longer is."
     },
+    "mediaUsage": {
+      "stale": "Your page is saved. Widgetizer could not update its record of which images this page uses, so the media library may show one as unused until you press Refresh usage there.",
+      "missing": "Your changes were not saved: this page uses an image that is no longer in the media library. Choose a different image, or upload it again, then save."
+    },
     "widgetName": {
       "header": "Internal name",
       "label": "Widget Name",
@@ -737,7 +741,8 @@
       "undo": "Undo",
       "redo": "Redo",
       "saving": "Saving...",
-      "save": "Save"
+      "save": "Save",
+      "saveFailed": "Your changes could not be saved. They are still here — try again."
     },
     "preview": {
       "loading": "Loading Preview...",

@@ -1,6 +1,6 @@
 # Review questions and simplification candidates
 
-[Map](README.md) · [Coverage](coverage.md) · [Operations](operations/README.md)
+[Map](README.md) · [Coverage](coverage.md) · [Operations](operations/README.md) · [Status, priorities and checkpoints](review-status.md)
 
 ## Plain-language guide
 
@@ -8,7 +8,7 @@ These are places where we should check whether the app's rules are complete, con
 
 | Question | Why it matters to someone using the app |
 | --- | --- |
-| [R1: Is image usage still accurate after a save problem?](#r1-content-persistence-and-media-usage) | An image should not appear safe to delete while saved content still needs it. |
+| [R1: Is image usage still accurate after a save problem?](#r1-content-persistence-and-media-usage) *(implemented; follow-ups tracked)* | An image should not appear safe to delete while saved content still needs it. |
 | [R2: Does deleting related content have consistent consequences?](#r2-one-deletion-policy-for-references) | Deleting a page by itself and deleting its whole language should have a clear policy for links left behind. |
 | [R3: What if a language is removed while another window is editing it?](#r3-language-lifecycle-and-content-writes) | A late save should not unexpectedly bring back content from a removed language. |
 | [R4: Do different ways of creating content obey the right rules?](#r4-shared-write-rules-without-forcing-one-workflow) | Create, Duplicate and Create language version should differ intentionally, not accidentally bypass limits or checks. |
@@ -25,11 +25,23 @@ These are concrete follow-up questions identified while mapping source. They are
 
 ## R1 Content persistence and media usage
 
-**Observed:** page/global/project-identity saves can persist content and warn on failed usage synchronization. Media deletion trusts recorded usage. Collection and language-removal paths use different ordering and error handling.
+**Status:** OSS implementation reviewed; remaining work and generic hosted integration checks have separate [priorities and checkpoints](review-status.md#r1--image-usage-and-safe-deletion).
+
+**Original observation:** page/global/project-identity saves could persist content and warn on failed usage synchronization. Media deletion trusted recorded usage. Collection and language-removal paths used different ordering and error handling.
 
 **Question:** when content is saved but usage is stale, what should the user see, and what makes a subsequent “unused” deletion safe?
 
-**Simplification candidate:** one explicit contract for content-write results and usage reconciliation, reused by callers while keeping their individual lifecycle rules. A structured “saved, usage needs refresh” outcome or durable reconciliation state may make recovery easier to reason about. Evaluate the complexity before choosing a mechanism.
+**Answered.** The three paths were found to have opposite failure biases: page/global/theme/identity saves swallowed a usage-sync failure and reported plain success; collection items propagated it and answered 500 *after writing the item*; only `languageService.removeLanguage` was ordered so that staleness could only ever fall in the safe direction. That last one's rule was adopted as the contract: **never report a file unused while saved content references it.**
+
+What settled the "what makes deletion safe" half is that staleness has a direction. Over-reporting (a row outliving its reference) blocks a delete and is harmless; under-reporting loses an image. So deletion stopped trusting the rows — it re-derives usage from content through the existing traversal and deletes only when the rows and the fresh scan agree, refuses when the scan is incomplete, runs inside a per-project section content writes also take, and records what it removed so a save queued behind it cannot reintroduce the reference. Saves keep succeeding and now carry a `MEDIA_USAGE_STALE` warning; the collection 500 became a warning too, since the item was in fact written.
+
+Two promises were deliberately separated rather than conflated: deletion is safe, the "unused" label is accurate **eventually**. Only the first is a guarantee, and it is scoped: it holds **for participating operations, within one backend process**. Verification re-reading shared storage does *not* extend it — two processes can scan concurrently and both conclude a file is unused. The operations wired in are the ones where someone picks a file from the library; the copy-and-remap flows are not, and are listed in [delete or bulk delete](operations/media.md#delete-or-bulk-delete) along with why they are expected to be harmless rather than proven excluded.
+
+**Embedding-host follow-up:** custom writes that introduce media references must use the same coordination as shared deletion, even within one process. Cross-process coordination is a separate, deferred requirement: check it before allowing more than one backend process to write the same project. It does not block a single-process MVP. See the [integration checklist](review-status.md#hosted-follow-ups--generic-integration-checklist) for priorities and checkpoints.
+
+See [delete or bulk delete](operations/media.md#delete-or-bulk-delete) for the rule and its limits, and [mediaCoordination](../../packages/builder-server/src/services/mediaCoordination.js) for why each of the three parts is needed on its own.
+
+**Simplification candidate (still open):** one explicit contract for content-write results and usage reconciliation, reused by callers while keeping their individual lifecycle rules. Deliberately NOT taken as part of the above: the hazard did not require it, and collapsing the write paths is a much wider change than closing the deletion hole. The `warnings: [{code, path}]` channel the saves now use (shared with theme sanitization and `LANGUAGE_SKIPPED`) is the natural shape for it if it is ever done.
 
 Evidence: [pageController](../../packages/builder-server/src/controllers/pageController.js), [previewController](../../packages/builder-server/src/controllers/previewController.js), [mediaController](../../packages/builder-server/src/controllers/mediaController.js), [mediaUsageService](../../packages/builder-server/src/services/mediaUsageService.js). Coverage: M3/M4, C1/C5.
 

@@ -10,6 +10,7 @@ import { LIMIT_KEYS } from "@widgetizer/core/adapters";
 import { ALLOWED_MIME_TYPES, ALLOWED_UPLOAD_EXTENSIONS, getContentType, getMediaCategory } from "../utils/mimeTypes.js";
 import { getSetting } from "./appSettingsController.js";
 import { getMediaUsage, refreshAllMediaUsageFromDir, ensureUsageSourceFormat } from "../services/mediaUsageService.js";
+import { withMediaLock, verifyFileUnused, recordDeletedMediaPaths } from "../services/mediaCoordination.js";
 import { getProjectFolderName, getProjectDetails } from "../utils/projectHelpers.js";
 import { handleProjectResolutionError } from "../utils/projectErrors.js";
 import { requestLanguage } from "../utils/contentLanguage.js";
@@ -87,6 +88,15 @@ function decodeFileName(filename) {
 // The adapter key for a media file (the original) and its sizes. The original
 // lives under its category subdir; generated sizes are always images. Mirrors
 // the historical disk layout, minus the `/uploads/` URL prefix.
+/** Every path this record can be referenced by: its own, plus each generated size. */
+function referencePathsOf(file) {
+  const paths = [file.path];
+  for (const size of Object.values(file.sizes || {})) {
+    if (size?.path) paths.push(size.path);
+  }
+  return paths.filter(Boolean);
+}
+
 function deleteMediaAssets(assetStorage, scope, file) {
   const subdir = getMediaCategory(file.type) === "file" ? "files" : "images";
   const keys = [`${subdir}/${file.filename}`];
@@ -96,6 +106,9 @@ function deleteMediaAssets(assetStorage, scope, file) {
       if (size && size.path) keys.push(`images/${path.basename(size.path)}`);
     }
   }
+  // A save that was queued behind this delete must not be allowed to reference
+  // what it just removed; only deletion knows which paths those are.
+  recordDeletedMediaPaths(scope.projectId, referencePathsOf(file));
   return Promise.all(
     keys.map((key) =>
       Promise.resolve(assetStorage.delete(scope, key)).catch((err) =>
@@ -584,30 +597,52 @@ export async function deleteProjectMedia(req, res) {
     const scope = req.scope;
     const { projectId } = scope;
     const assetStorage = req.adapters.assetStorage;
+    const projectDir = req.adapters.storage.getProjectBase(scope);
 
     // Validate project ownership
     await getProjectFolderName(projectId);
 
-    // Get the specific file from DB (scoped to project)
-    const fileToDelete = mediaRepo.getMediaFileById(projectId, fileId);
-    if (!fileToDelete) {
+    // Verify and delete in one section no content write can interleave with: the
+    // stored usage rows are best-effort, so they are re-derived here rather than
+    // trusted, and a save must not slip a new reference in between the two steps.
+    const outcome = await withMediaLock(projectId, async () => {
+      const fileToDelete = mediaRepo.getMediaFileById(projectId, fileId);
+      if (!fileToDelete) return { notFound: true };
+
+      const check = await verifyFileUnused({ projectId, projectDir, fileIds: [fileId] });
+      if (!check.verified) return { unverified: check };
+
+      const usedIn = check.usedInByFileId.get(fileId) || [];
+      if (usedIn.length > 0) return { inUse: { usedIn, filename: fileToDelete.filename } };
+
+      // Remove the original + every generated size through the storage adapter.
+      await deleteMediaAssets(assetStorage, scope, fileToDelete);
+
+      // Remove metadata from DB (cascade deletes sizes + usage, scoped to project)
+      mediaRepo.deleteMediaFile(projectId, fileId);
+      return { deleted: true };
+    });
+
+    if (outcome.notFound) {
       return res.status(404).json({ error: "File not found" });
     }
-
-    // Check if file is currently in use
-    if (fileToDelete.usedIn && fileToDelete.usedIn.length > 0) {
-      return res.status(400).json({
-        error: "Cannot delete file that is currently in use",
-        usedIn: fileToDelete.usedIn,
-        filename: fileToDelete.filename,
+    if (outcome.unverified) {
+      // Not "in use" and not "unused" — we could not tell. Deleting on an
+      // unreadable scan is exactly how an image in use gets lost.
+      return res.status(409).json({
+        error: "Cannot verify whether this file is still in use",
+        message: `The file was not deleted because ${outcome.unverified.reason}. Try again once the project content can be read.`,
+        code: "MEDIA_USAGE_UNVERIFIED",
+        skipped: outcome.unverified.skipped,
       });
     }
-
-    // Remove the original + every generated size through the storage adapter.
-    await deleteMediaAssets(assetStorage, scope, fileToDelete);
-
-    // Remove metadata from DB (cascade deletes sizes + usage, scoped to project)
-    mediaRepo.deleteMediaFile(projectId, fileId);
+    if (outcome.inUse) {
+      return res.status(400).json({
+        error: "Cannot delete file that is currently in use",
+        usedIn: outcome.inUse.usedIn,
+        filename: outcome.inUse.filename,
+      });
+    }
 
     res.json({ message: "File deleted successfully" });
   } catch (error) {
@@ -736,51 +771,74 @@ export async function bulkDeleteProjectMedia(req, res) {
     // Validate project ownership
     await getProjectFolderName(projectId);
 
-    // Read all media to check usage (needed for in-use validation)
-    const mediaData = mediaRepo.getMediaFiles(projectId);
+    const projectDir = req.adapters.storage.getProjectBase(scope);
 
-    const filesToDelete = [];
-    const filesInUse = [];
+    // One verification scan for the whole batch, then delete — all inside the media
+    // section, so no save can introduce a reference to any of these between the
+    // scan and the deletes it authorises.
+    const outcome = await withMediaLock(projectId, async () => {
+      const mediaData = mediaRepo.getMediaFiles(projectId);
+      const requested = mediaData.files.filter((file) => fileIds.includes(file.id));
+      if (requested.length === 0) return { noneFound: true };
 
-    // Separate files to delete from files in use
-    mediaData.files.forEach((file) => {
-      if (fileIds.includes(file.id)) {
-        if (file.usedIn && file.usedIn.length > 0) {
-          filesInUse.push({
-            id: file.id,
-            filename: file.filename,
-            usedIn: file.usedIn,
-          });
+      const check = await verifyFileUnused({
+        projectId,
+        projectDir,
+        fileIds: requested.map((file) => file.id),
+      });
+      if (!check.verified) return { unverified: check };
+
+      const filesToDelete = [];
+      const filesInUse = [];
+      for (const file of requested) {
+        const usedIn = check.usedInByFileId.get(file.id) || [];
+        if (usedIn.length > 0) {
+          filesInUse.push({ id: file.id, filename: file.filename, usedIn });
         } else {
           filesToDelete.push(file);
         }
       }
+
+      if (filesToDelete.length > 0) {
+        // Remove every original + size through the storage adapter.
+        await Promise.all(filesToDelete.map((file) => deleteMediaAssets(assetStorage, scope, file)));
+
+        // Batch delete from DB (cascade handles sizes + usage, scoped to project)
+        mediaRepo.deleteMediaFiles(projectId, filesToDelete.map((f) => f.id));
+      }
+
+      return { deleted: filesToDelete.length, filesInUse };
     });
 
-    // If all files are in use, return success with info (not an error - the request was valid)
-    if (filesToDelete.length === 0 && filesInUse.length > 0) {
-      return res.status(200).json({
-        message: "No files were deleted because they are all currently in use.",
-        deletedCount: 0,
-        filesInUse: filesInUse,
-      });
-    }
-
     // If no files found at all
-    if (filesToDelete.length === 0 && filesInUse.length === 0) {
+    if (outcome.noneFound) {
       return res.status(404).json({ error: "No matching files found to delete" });
     }
 
-    // Remove every original + size through the storage adapter.
-    await Promise.all(filesToDelete.map((file) => deleteMediaAssets(assetStorage, scope, file)));
+    if (outcome.unverified) {
+      return res.status(409).json({
+        error: "Cannot verify whether these files are still in use",
+        message: `Nothing was deleted because ${outcome.unverified.reason}. Try again once the project content can be read.`,
+        code: "MEDIA_USAGE_UNVERIFIED",
+        skipped: outcome.unverified.skipped,
+      });
+    }
 
-    // Batch delete from DB (cascade handles sizes + usage, scoped to project)
-    mediaRepo.deleteMediaFiles(projectId, filesToDelete.map((f) => f.id));
+    const { deleted, filesInUse } = outcome;
+
+    // If all files are in use, return success with info (not an error - the request was valid)
+    if (deleted === 0 && filesInUse.length > 0) {
+      return res.status(200).json({
+        message: "No files were deleted because they are all currently in use.",
+        deletedCount: 0,
+        filesInUse,
+      });
+    }
 
     // Build response message
     const response = {
-      message: `${filesToDelete.length} file${filesToDelete.length !== 1 ? "s" : ""} deleted successfully.`,
-      deletedCount: filesToDelete.length,
+      message: `${deleted} file${deleted !== 1 ? "s" : ""} deleted successfully.`,
+      deletedCount: deleted,
     };
 
     if (filesInUse.length > 0) {

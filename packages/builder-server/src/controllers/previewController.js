@@ -24,7 +24,8 @@ import { listPagesFromDir, readGlobalWidgetFromDir, readThemeDataFromDir } from 
 import { globalKey, pageOutputPath, itemOutputPath } from "@widgetizer/core/contentAddress";
 import { requestLanguage, withoutLanguage, projectLanguageContexts, projectLanguages } from "../utils/contentLanguage.js";
 import { getProjectFolderName } from "../utils/projectHelpers.js";
-import { updateGlobalWidgetMediaUsage } from "../services/mediaUsageService.js";
+import { updateGlobalWidgetMediaUsage, extractMediaPathsFromGlobalWidget } from "../services/mediaUsageService.js";
+import { withMediaLock, assertIntroducedMediaExists } from "../services/mediaCoordination.js";
 import { isProjectResolutionError } from "../utils/projectErrors.js";
 import { generateToken, getToken } from "../services/previewTokenStore.js";
 import { LANGUAGE_CODE_RE, DEFAULT_LANGUAGE } from "@widgetizer/core/languages";
@@ -643,19 +644,50 @@ export async function saveGlobalWidget(req, res) {
     const lang = requestLanguage(req, res);
     if (!lang) return;
 
-    // Save the widget — storage.write creates parent directories as needed.
-    await storage.write(scope, globalKey(type, lang), JSON.stringify(withoutLanguage(widgetData), null, 2));
+    // The write and its usage sync are one media section, so media deletion — which
+    // verifies and deletes in the same section — cannot run between them and read
+    // this header as not yet using an image it is about to. See mediaCoordination.
+    const { usageStale } = await withMediaLock(scope.projectId, async () => {
+      // Don't let a save queued behind a delete introduce a reference to the file
+      // that delete just removed. Only newly added paths are checked.
+      let previousPaths = [];
+      try {
+        const buf = await storage.read(scope, globalKey(type, lang));
+        if (buf != null) previousPaths = extractMediaPathsFromGlobalWidget(JSON.parse(buf.toString("utf8")));
+      } catch {
+        // First save of this global, or unreadable: nothing known to be pre-existing.
+      }
+      await assertIntroducedMediaExists({
+        assetStorage: req.adapters.assetStorage,
+        scope,
+        previousPaths,
+        nextPaths: extractMediaPathsFromGlobalWidget(widgetData),
+      });
 
-    // Update media usage
-    try {
-      await updateGlobalWidgetMediaUsage(scope.projectId, type, widgetData, lang);
-    } catch (usageError) {
-      console.error("Error updating media usage for global widget:", usageError);
-      // Don't fail the save if usage update fails, but log it
-    }
+      // Save the widget — storage.write creates parent directories as needed.
+      await storage.write(scope, globalKey(type, lang), JSON.stringify(withoutLanguage(widgetData), null, 2));
 
-    res.json({ success: true, data: widgetData });
+      // Update media usage
+      try {
+        await updateGlobalWidgetMediaUsage(scope.projectId, type, widgetData, lang);
+        return { usageStale: false };
+      } catch (usageError) {
+        console.error("Error updating media usage for global widget:", usageError);
+        // Don't fail the save if usage update fails — the widget IS saved. Report it
+        // as a warning instead, so "saved" and "image tracking is behind" stay distinct.
+        return { usageStale: true };
+      }
+    });
+
+    res.json({
+      success: true,
+      data: widgetData,
+      ...(usageStale ? { warnings: [{ code: "MEDIA_USAGE_STALE", path: `global:${type}` }] } : {}),
+    });
   } catch (error) {
+    if (error?.code === "MEDIA_REFERENCE_MISSING") {
+      return res.status(error.statusCode).json({ error: "Missing media", message: error.message, code: error.code });
+    }
     console.error("Error saving global widget:", error);
     if (isProjectResolutionError(error)) {
       return res.status(404).json({ error: "Project not found", message: error.message });

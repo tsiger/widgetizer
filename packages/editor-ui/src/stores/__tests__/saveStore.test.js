@@ -209,6 +209,140 @@ describe("saveStore (useAutoSave)", () => {
   });
 
   // --------------------------------------------------------------------------
+  // A save the server refused
+  // --------------------------------------------------------------------------
+
+  describe("a rejected save", () => {
+    /** The server refusing a page that references an image that has been deleted. */
+    function rejectWithMissingMedia() {
+      const err = new Error("This content refers to a file that is no longer in the media library");
+      err.code = "MEDIA_REFERENCE_MISSING";
+      err.status = 409;
+      savePageContent.mockRejectedValueOnce(err);
+      return err;
+    }
+
+    it("keeps the edit and stays dirty, so nothing the user typed is lost", async () => {
+      seedPageStore();
+      // An edit the server is about to refuse.
+      usePageStore.setState({
+        page: {
+          ...usePageStore.getState().page,
+          widgets: { "w-1": { type: "rich-text", settings: { text: "Edited, and refused" } } },
+        },
+      });
+      useAutoSave.getState().markWidgetModified("w-1");
+      rejectWithMissingMedia();
+
+      await expect(useAutoSave.getState().save(false)).rejects.toThrow(/no longer in the media library/);
+
+      // The whole point: a refusal writes nothing, so the editor must still hold
+      // the work and still know it is unsaved. A cleared flag here would let the
+      // user navigate away believing the page was saved.
+      expect(useAutoSave.getState().modifiedWidgets.has("w-1")).toBe(true);
+      expect(useAutoSave.getState().hasUnsavedChanges()).toBe(true);
+      expect(usePageStore.getState().page.widgets["w-1"].settings.text).toBe("Edited, and refused");
+      expect(useAutoSave.getState().lastSaved).toBe(null);
+    });
+
+    it("rethrows with its code, so the editor can name the reason", async () => {
+      seedPageStore();
+      useAutoSave.getState().markWidgetModified("w-1");
+      rejectWithMissingMedia();
+
+      // EditorTopBar distinguishes this from a generic failure on `code` alone.
+      await expect(useAutoSave.getState().save(false)).rejects.toMatchObject({
+        code: "MEDIA_REFERENCE_MISSING",
+      });
+    });
+
+    it("leaves the baseline alone, so the next save still sends the refused edit", async () => {
+      const page = seedPageStore();
+      useAutoSave.getState().markWidgetModified("w-1");
+      rejectWithMissingMedia();
+      await expect(useAutoSave.getState().save(false)).rejects.toThrow();
+
+      // Rebaselining on a failure would make the refused change invisible to the
+      // next save — it would look clean and never be sent again.
+      expect(usePageStore.getState().originalPage).toEqual(page);
+
+      savePageContent.mockResolvedValueOnce({});
+      const second = await useAutoSave.getState().save(false);
+      expect(second).toEqual({ status: "success" });
+      expect(savePageContent).toHaveBeenCalledTimes(2);
+    });
+  });
+
+  // --------------------------------------------------------------------------
+  // "Saved, but image tracking is behind"
+  // --------------------------------------------------------------------------
+
+  describe("a save whose media-usage sync failed server-side", () => {
+    it("is a success that records a warning, not a failure", async () => {
+      seedPageStore();
+      useAutoSave.getState().markWidgetModified("w-1");
+      savePageContent.mockResolvedValueOnce({ warnings: [{ code: "MEDIA_USAGE_STALE", path: "page-1" }] });
+
+      const result = await useAutoSave.getState().save(false);
+
+      // The content IS saved; only the derived usage rows are behind. Showing this
+      // as a failed save would be false, and would push the user to re-save work
+      // that is already stored.
+      expect(result).toEqual({ status: "success" });
+      expect(useAutoSave.getState().hasUnsavedChanges()).toBe(false);
+      expect(useAutoSave.getState().mediaUsageStale).not.toBe(null);
+    });
+
+    it("records nothing when the save carries no such warning", async () => {
+      seedPageStore();
+      useAutoSave.getState().markWidgetModified("w-1");
+
+      await useAutoSave.getState().save(false);
+
+      expect(useAutoSave.getState().mediaUsageStale).toBe(null);
+    });
+
+    it("notices it on a header-only save, whose response used to be discarded", async () => {
+      // Globals were fired into the fan-out and their results thrown away, so a
+      // save that touched only the header lost its warning entirely.
+      seedPageStore();
+      usePageStore.setState({
+        globalWidgets: { header: { type: "header", settings: { logo: "/uploads/images/a.png" } }, footer: null },
+        originalGlobalWidgets: { header: { type: "header", settings: { logo: "" } }, footer: null },
+      });
+      useAutoSave.getState().markWidgetModified("header");
+      saveGlobalWidget.mockResolvedValueOnce({ warnings: [{ code: "MEDIA_USAGE_STALE", path: "global:header" }] });
+
+      const result = await useAutoSave.getState().save(false);
+
+      expect(result).toEqual({ status: "success" });
+      expect(saveGlobalWidget).toHaveBeenCalled(); // not vacuous: the header really was saved
+      expect(useAutoSave.getState().mediaUsageStale).not.toBe(null);
+    });
+
+    it("notices it on a theme save without mistaking it for a settings correction", async () => {
+      // Theme warnings are not all one kind. A sanitization warning means the server
+      // stored something different and undo history must be rewritten; this one
+      // changed no setting, so treating it as a correction would rewrite history
+      // over a save the server took verbatim.
+      seedPageStore();
+      makeThemeStoreLive({ colors: { primary: "#fff" } }, { colors: { primary: "#000" } });
+      useAutoSave.getState().setThemeSettingsModified(true);
+      mockThemeStoreState.saveSettings.mockResolvedValueOnce({
+        warnings: [{ code: "MEDIA_USAGE_STALE", path: "theme.json" }],
+      });
+      const applyThemeCorrections = vi.spyOn(usePageStore.getState(), "applyThemeCorrections");
+
+      const result = await useAutoSave.getState().save(false);
+
+      expect(result).toEqual({ status: "success" });
+      expect(mockThemeStoreState.saveSettings).toHaveBeenCalled(); // not vacuous
+      expect(useAutoSave.getState().mediaUsageStale).not.toBe(null);
+      expect(applyThemeCorrections).not.toHaveBeenCalled();
+    });
+  });
+
+  // --------------------------------------------------------------------------
   // Initial state
   // --------------------------------------------------------------------------
 

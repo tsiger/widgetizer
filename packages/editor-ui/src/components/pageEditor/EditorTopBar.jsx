@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { getAllPages, createPageLanguageVersion } from "../../queries/pageManager";
 import useAutoSave from "../../stores/saveStore";
+import useToastStore from "../../stores/toastStore";
 import usePageStore from "../../stores/pageStore";
 import { useDefaultLanguage, useIsMultilang } from "../../stores/projectStore";
 import useTranslationVersions from "../../hooks/useTranslationVersions";
@@ -22,6 +23,20 @@ export default function EditorTopBar({
 }) {
   const { t } = useTranslation();
   const { hasUnsavedChanges, hasUnsavedPageChanges, isSaving, save, stopAutoSave } = useAutoSave();
+
+  // A manual save that the server refused. Nothing was written and the editor still
+  // holds every edit, so the one thing that must not happen is failing silently —
+  // the refusal the user can act on is an image that has left the library.
+  const saveAndReport = useCallback(() => {
+    save(false).catch((err) => {
+      if (err?.code === "MEDIA_REFERENCE_MISSING") {
+        useToastStore.getState().showToast(t("pageEditor.mediaUsage.missing"), "error");
+      } else {
+        useToastStore.getState().showToast(t("pageEditor.toolbar.saveFailed"), "error");
+      }
+      console.error("Failed to save:", err);
+    });
+  }, [save, t]);
   const [allPages, setAllPages] = useState([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isLanguageMenuOpen, setIsLanguageMenuOpen] = useState(false);
@@ -95,7 +110,7 @@ export default function EditorTopBar({
         e.preventDefault();
         // Prevent multiple simultaneous saves if one is already in progress
         if (hasUnsavedChanges() && !isSaving) {
-          save(false).catch((err) => console.error("Failed to save:", err));
+          saveAndReport();
         }
       }
 
@@ -124,7 +139,7 @@ export default function EditorTopBar({
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [safeUndo, safeRedo, save, hasUnsavedChanges, isSaving]);
+  }, [safeUndo, safeRedo, saveAndReport, hasUnsavedChanges, isSaving]);
 
   // Handle click outside to close dropdown
   useEffect(() => {
@@ -320,7 +335,7 @@ export default function EditorTopBar({
         </div>
 
         <button
-          onClick={() => save(false).catch((err) => console.error("Failed to save:", err))}
+          onClick={() => saveAndReport()}
           disabled={!hasUnsavedChanges() || isSaving}
           title={`${t("pageEditor.toolbar.save")} (Ctrl+S)`}
           className={`flex items-center justify-center gap-2 px-3 h-9 min-w-24 rounded-sm text-sm ${

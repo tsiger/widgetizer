@@ -28,7 +28,12 @@ import {
   isValidLanguageCode,
   normalizeLanguageCode,
 } from "@widgetizer/core/languages";
-import { refreshMediaUsageAfterStructuralChange, updateSiteIdentityMediaUsage } from "../services/mediaUsageService.js";
+import {
+  refreshMediaUsageAfterStructuralChange,
+  updateSiteIdentityMediaUsage,
+  extractMediaPathsFromSiteIdentity,
+} from "../services/mediaUsageService.js";
+import { withMediaLock, assertIntroducedMediaExists } from "../services/mediaCoordination.js";
 import { generateUniqueSlug, sanitizeSlug } from "../utils/slugHelpers.js";
 
 import { generateCopyName } from "../utils/namingHelpers.js";
@@ -644,8 +649,11 @@ export async function updateProject(req, res) {
     const sanitizedSiteTitle = sanitizeOptionalText(updates.siteTitle);
     const sanitizedSiteUrl = sanitizeOptionalText(updates.siteUrl);
 
-    // Everything that can reject or throw must run above: the rename below moves
-    // the directory before the row is written, so a failure after it strands the project.
+    // Only VALIDATED here; the move itself happens inside the media section below,
+    // after every check that can refuse this request. Moving first is what stranded
+    // a project whose logo was then rejected: directory renamed, row still naming
+    // the old folder.
+    let folderRename = null;
     if (updates.folderName && updates.folderName.trim() !== currentFolderName) {
       const newFolderName = updates.folderName.trim();
 
@@ -662,51 +670,91 @@ export async function updateProject(req, res) {
         });
       }
 
-      // Rename the project directory
-      const oldDir = getProjectDir(currentFolderName);
-      const newDir = getProjectDir(newFolderName);
-
-      try {
-        // Use copy + remove instead of rename for better Windows compatibility
-        await fs.copy(oldDir, newDir);
-        await new Promise((resolve) => setTimeout(resolve, 100));
-        await fs.remove(oldDir);
-      } catch (renameError) {
-        // If copy succeeded but remove failed, try to clean up the new directory
-        try {
-          if (await fs.pathExists(newDir)) {
-            await fs.remove(newDir);
-          }
-        } catch (cleanupError) {
-          console.warn(`Failed to cleanup new directory after error: ${cleanupError.message}`);
-        }
-        throw new Error(`Failed to rename project directory: ${renameError.message}`);
-      }
+      folderRename = { from: currentFolderName, to: newFolderName };
     }
 
-    const updatedProject = projectRepo.updateProject(id, {
-      folderName: updates.folderName || currentFolderName,
-      name: updates.name,
-      description: updates.description,
-      siteTitle: sanitizedSiteTitle,
-      siteUrl: sanitizedSiteUrl,
-      cleanUrls: updates.cleanUrls,
-      siteIdentity,
-      defaultLanguage: languageFields.defaultLanguage,
-      languages: languageFields.languages,
-      receiveThemeUpdates: updates.receiveThemeUpdates,
+    // The logo is a media reference like any other, so the row write and its usage
+    // sync are one media section. This route is actor-scoped (it edits a project by
+    // id, not the resolved one), so the scope for the asset check is built here.
+    //
+    // The folder rename happens INSIDE this section and AFTER the media check, not
+    // before it: a rejected logo used to leave the directory already moved while the
+    // row still named the old one, which strands the project. Everything that can
+    // refuse this request now refuses before anything on disk has moved.
+    const { updatedProject, usageStale } = await withMediaLock(id, async () => {
+      if (siteIdentity !== undefined) {
+        // Re-read the row HERE rather than comparing against the copy loaded before
+        // the lock. A baseline read earlier can still show a logo that another save
+        // has since removed and a delete has since acted on, which classifies the
+        // path as "already present" and skips the check — the same race that was
+        // fixed for pages and collection items.
+        const baseline = projectRepo.getProjectById(id);
+        // Checked against the folder the assets are STILL in — the rename below
+        // has not run yet.
+        await assertIntroducedMediaExists({
+          assetStorage: req.adapters.assetStorage,
+          scope: { projectId: id, folderName: currentFolderName },
+          previousPaths: extractMediaPathsFromSiteIdentity(baseline?.siteIdentity),
+          nextPaths: extractMediaPathsFromSiteIdentity(siteIdentity),
+        });
+      }
+
+      if (folderRename) {
+        const oldDir = getProjectDir(folderRename.from);
+        const newDir = getProjectDir(folderRename.to);
+
+        try {
+          // Use copy + remove instead of rename for better Windows compatibility
+          await fs.copy(oldDir, newDir);
+          await new Promise((resolve) => setTimeout(resolve, 100));
+          await fs.remove(oldDir);
+        } catch (renameError) {
+          // If copy succeeded but remove failed, try to clean up the new directory
+          try {
+            if (await fs.pathExists(newDir)) {
+              await fs.remove(newDir);
+            }
+          } catch (cleanupError) {
+            console.warn(`Failed to cleanup new directory after error: ${cleanupError.message}`);
+          }
+          throw new Error(`Failed to rename project directory: ${renameError.message}`);
+        }
+      }
+
+      const saved = projectRepo.updateProject(id, {
+        folderName: updates.folderName || currentFolderName,
+        name: updates.name,
+        description: updates.description,
+        siteTitle: sanitizedSiteTitle,
+        siteUrl: sanitizedSiteUrl,
+        cleanUrls: updates.cleanUrls,
+        siteIdentity,
+        defaultLanguage: languageFields.defaultLanguage,
+        languages: languageFields.languages,
+        receiveThemeUpdates: updates.receiveThemeUpdates,
+      });
+
+      if (siteIdentity === undefined) return { updatedProject: saved, usageStale: false };
+
+      try {
+        await updateSiteIdentityMediaUsage(id, saved.siteIdentity);
+        return { updatedProject: saved, usageStale: false };
+      } catch (error) {
+        // The details ARE saved; only the derived usage rows are behind.
+        console.warn(`[ProjectController] Failed to update business details media usage: ${error.message}`);
+        return { updatedProject: saved, usageStale: true };
+      }
     });
 
-    if (siteIdentity !== undefined) {
-      try {
-        await updateSiteIdentityMediaUsage(id, updatedProject.siteIdentity);
-      } catch (error) {
-        console.warn(`[ProjectController] Failed to update business details media usage: ${error.message}`);
-      }
-    }
-
-    res.json(updatedProject);
+    res.json(
+      usageStale
+        ? { ...updatedProject, warnings: [{ code: "MEDIA_USAGE_STALE", path: "site-identity" }] }
+        : updatedProject,
+    );
   } catch (error) {
+    if (error?.code === "MEDIA_REFERENCE_MISSING") {
+      return res.status(error.statusCode).json({ error: "Missing media", message: error.message, code: error.code });
+    }
     console.error("Error updating project:", error);
     res.status(500).json({ error: error.message || "Failed to update project" });
   }
