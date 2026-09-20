@@ -37,6 +37,7 @@ import {
   resolveLanguage,
 } from "@widgetizer/core/contentAddress";
 import { validateCollectionStructuredData } from "@widgetizer/core/structuredData";
+import { translationSibling } from "@widgetizer/core/translations";
 import {
   sanitizeCollectionItemData,
   sanitizeDateValue,
@@ -1323,14 +1324,16 @@ export async function loadCollectionItemsByUuid(storage, scope, reader = null, l
           // uuid and group id come along because this map is also how a render
           // finds an item's siblings — matching a translation group needs the
           // identity, not just where the item ended up.
-          map.set(item.uuid, {
-            uuid: item.uuid,
-            translationGroupId: item.translationGroupId,
-            collectionType: schema.type,
-            slugPrefix: schema.slugPrefix,
-            slug: item.slug,
-            language: item.language,
-          });
+          // Built through the shared sibling shape rather than field by field:
+          // this map is how a render sees an item's hreflang siblings, and the
+          // SEO builders see the whole item record, so anything the two must
+          // agree on has to be defined once. `slugPrefix` comes from the
+          // schema, not the item, and `collectionType` is for this map's other
+          // readers.
+          map.set(
+            item.uuid,
+            translationSibling(item, { collectionType: schema.type, slugPrefix: schema.slugPrefix }),
+          );
         }
       }
     }

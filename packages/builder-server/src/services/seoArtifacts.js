@@ -28,16 +28,19 @@ const addressOf = (slug, siteUrl, cleanUrls, lang) => {
 };
 
 // The alternates a sitemap entry carries, in the same shape and by the same
-// rules as the hreflang link tags (§7d): every non-fallback entry, plus
-// x-default at the default language. Nothing at all for one language.
+// rules as the hreflang link tags (§7d): every non-fallback, indexable entry,
+// plus x-default at the default language. Nothing at all for one language.
+// A noindex sibling is left out here too — the sitemap is a list of URLs the
+// site is asking to have crawled, and naming one it has told crawlers to skip
+// is the contradiction Search Console reports back as an error.
 const alternateLinks = (translations, defaultLanguage) => {
   if (!Array.isArray(translations) || translations.length < 2) return "";
   const links = translations
-    .filter((entry) => !entry.fallback && entry.seoUrl)
+    .filter((entry) => !entry.fallback && !entry.noindex && entry.seoUrl)
     .map((entry) => `
     <xhtml:link rel="alternate" hreflang="${entry.hreflang}" href="${entry.seoUrl}"/>`);
   const fallbackEntry = translations.find((entry) => entry.language === defaultLanguage);
-  if (fallbackEntry?.seoUrl) {
+  if (fallbackEntry?.seoUrl && !fallbackEntry.noindex) {
     links.push(`
     <xhtml:link rel="alternate" hreflang="x-default" href="${fallbackEntry.seoUrl}"/>`);
   }

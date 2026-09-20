@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { buildTranslations } from "../translations.js";
+import { buildTranslations, translationSibling } from "../translations.js";
 
 /**
  * §7c is a theme contract: once a theme ships a switcher against this shape it
@@ -31,12 +31,64 @@ describe("page.translations", () => {
       seoUrl: "https://example.com/about.html",
       active: true,
       fallback: false,
+      noindex: false,
       dir: "ltr",
     });
     expect(el.href).toBe("el/sxetika.html");
     expect(el.seoUrl).toBe("https://example.com/el/sxetika.html");
     expect(el.label).toBe("Ελληνικά");
     expect(el.active).toBe(false);
+  });
+
+  // The switcher and hreflang part company here too: a noindex page is still a
+  // page a visitor may be sent to, and only the crawler-facing consumer cares.
+  it("marks a sibling that asked not to be indexed, without hiding it", () => {
+    const elNoindex = { ...EL_ABOUT, seo: { robots: "noindex,follow" } };
+    const [en, el] = buildTranslations({
+      ...SITE,
+      pages: [EN_HOME, EL_HOME, EN_ABOUT, elNoindex],
+      current: EN_ABOUT,
+    });
+
+    expect(el.noindex).toBe(true);
+    expect(el.href).toBe("el/sxetika.html");
+    expect(en.noindex).toBe(false);
+  });
+
+  // A fallback entry points at a homepage, so it is the HOMEPAGE's directive
+  // that decides whether the entry may be an alternate. The missing sibling has
+  // no directive at all.
+  it("reads a fallback entry's noindex off the homepage it points at", () => {
+    const elHomeNoindex = { ...EL_HOME, seo: { robots: "noindex,follow" } };
+    const [, el] = buildTranslations({
+      ...SITE,
+      pages: [EN_HOME, elHomeNoindex, EN_ALONE],
+      current: EN_ALONE,
+    });
+
+    expect(el.fallback).toBe(true);
+    expect(el.noindex).toBe(true);
+    expect(el.href).toBe("el/index.html");
+  });
+
+  // The defect this guards against: the SEO builders pass whole records and a
+  // render passes the uuid reference map, so a field missing from the map made
+  // the sitemap and the HTML describe the same site differently. Feeding both
+  // shapes through must give one answer, whatever fields are added later.
+  it("gives the same answer for whole records and for reference-map entries", () => {
+    const elNoindex = { ...EL_ABOUT, seo: { robots: "noindex,follow" } };
+    const pages = [EN_HOME, EL_HOME, EN_ABOUT, elNoindex];
+
+    const fromRecords = buildTranslations({ ...SITE, pages, current: EN_ABOUT });
+    const fromReferences = buildTranslations({
+      ...SITE,
+      pages: pages.map((page) => translationSibling(page)),
+      current: translationSibling(EN_ABOUT),
+    });
+
+    expect(fromReferences).toEqual(fromRecords);
+    // Not vacuous: the flag the two used to disagree about is set.
+    expect(fromRecords.find((entry) => entry.language === "el").noindex).toBe(true);
   });
 
   it("marks the page being rendered, from either side of the group", () => {

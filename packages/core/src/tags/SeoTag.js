@@ -55,16 +55,22 @@ export const SeoTag = {
       // claim it is the translation of this page, which it is not. A
       // single-language project emits none of this, because `translations` is
       // empty for one language.
+      //
+      // A noindex page is outside the cluster on both sides: it publishes no
+      // alternates of its own (it cannot be a member without a self-reference
+      // a crawler will honour), and no sibling advertises it. Search engines
+      // drop such annotations anyway, so emitting them only puts a page's
+      // robots directive at odds with its own markup.
       const translations = Array.isArray(page.translations) ? page.translations : [];
-      if (translations.length > 1) {
+      if (translations.length > 1 && !robots.includes("noindex")) {
         for (const entry of translations) {
-          if (entry.fallback || !entry.seoUrl) continue;
+          if (entry.fallback || entry.noindex || !entry.seoUrl) continue;
           metaTags.push(
             `<link rel="alternate" hreflang="${escapeHtml(entry.hreflang)}" href="${escapeHtml(entry.seoUrl)}">`,
           );
         }
         const defaultEntry = translations.find((entry) => entry.language === project?.defaultLanguage);
-        if (defaultEntry?.seoUrl) {
+        if (defaultEntry?.seoUrl && !defaultEntry.noindex) {
           metaTags.push(`<link rel="alternate" hreflang="x-default" href="${escapeHtml(defaultEntry.seoUrl)}">`);
         }
       }

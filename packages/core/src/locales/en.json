@@ -929,8 +929,8 @@
     },
     "languages": {
       "skippedTitle": "Some languages were not exported",
-      "skipped_one": "{{languages}} has no homepage, so it was left out. Create a page with the slug 'index' in it and export again.",
-      "skipped_other": "{{languages}} have no homepage, so they were left out. Create a page with the slug 'index' in each and export again."
+      "skipped_one": "{{languages}} has no homepage, so it was left out — and links pointing into it were removed from the exported pages. Create a page with the slug 'index' in it and export again.",
+      "skipped_other": "{{languages}} have no homepage, so they were left out — and links pointing into them were removed from the exported pages. Create a page with the slug 'index' in each and export again."
     }
   },
   "media": {
