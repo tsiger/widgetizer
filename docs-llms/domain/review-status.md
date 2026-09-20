@@ -156,7 +156,7 @@ Forms and Markdown were checked and found already correct: language-qualified fo
 | Point | Priority | When to check | Next action |
 | --- | --- | --- | --- |
 | Hands-on multilingual testing in a real project | Done | — | Completed 2026-09-20 — see [the bilingual walkthrough](#the-bilingual-walkthrough). |
-| The legacy upgrade path | Medium | Before releasing to existing single-language projects | Out of scope for this review and still unverified: a project created before languages existed, opened and exported after. |
+| The legacy upgrade path | Done | — | Completed 2026-09-20 against a real pre-multilingual backup — see [the legacy-upgrade check](#the-legacy-upgrade-check). |
 
 ### Hosted follow-ups — generic integration checklist
 
@@ -167,7 +167,7 @@ These are requirements for any application embedding the public packages, not a 
 | Hosts building their own render context for publishing | High | Before publishing a multilingual site | A host that lets the renderer load its own page map publishes links into languages it chose not to render. Seed the map from the pages actually being published, and restrict the collection-item map to the same languages. |
 | Hosts assembling their own SEO artifacts | Medium | Before publishing a multilingual site | `buildTranslations` is the single source of the hreflang rules, including the `noindex` and `fallback` flags. An emitter that reads `translations` without honouring both flags republishes the defects above. |
 
-**Closure:** the reviewed OSS change is implemented; follow-ups above remain separate. Hands-on project testing and the legacy upgrade path are the remaining work before multilingual export is release-ready.
+**Closure:** the reviewed OSS change is implemented; follow-ups above remain separate. The hands-on walkthrough and the legacy upgrade path have both since been completed.
 
 ## R8 — Backup and clone completeness
 
@@ -265,7 +265,7 @@ Confirmed defect, reproduced before fixing and covered by regressions verified t
 
 ### Scope of this review
 
-Create, duplicate, edit and create-language-version, for pages and collection items. Quotas were checked where they apply. The legacy single-language upgrade path was kept separate throughout and is still outstanding.
+Create, duplicate, edit and create-language-version, for pages and collection items. Quotas were checked where they apply. The legacy single-language upgrade path was kept separate throughout and has since been completed — see [the legacy-upgrade check](#the-legacy-upgrade-check).
 
 ### Verified limitations
 
@@ -279,7 +279,7 @@ Create, duplicate, edit and create-language-version, for pages and collection it
 
 | Point | Priority | When to check | Next action |
 | --- | --- | --- | --- |
-| Legacy single-language upgrade path | Medium | Before releasing to projects created before languages existed | Kept separate from R4, R7 and R8 throughout. A project created before languages existed, opened and exported after, is still unverified. |
+| Legacy single-language upgrade path | Done | — | Completed 2026-09-20 against a real pre-multilingual backup — see [the legacy-upgrade check](#the-legacy-upgrade-check). |
 
 ### Hosted follow-ups — generic integration checklist
 
@@ -302,13 +302,32 @@ Done 2026-09-20, closing the follow-up R7 and R8 both left open. A real two-lang
 
 Two small editor-UI refinements came out of it and are the owner's own design work, tracked outside this review.
 
-**Still outstanding:** the legacy single-language upgrade path — a project created before languages existed, opened and exported after.
+The legacy single-language upgrade path, which this walkthrough left open, was completed the same day — see [the legacy-upgrade check](#the-legacy-upgrade-check).
+
+## The legacy-upgrade check
+
+Done 2026-09-20 against a **real backup taken before multilingual support existed**, closing the follow-up R7, R8 and R4 each kept separate. The project — an Arch/`bedrock` site with six pages, two menus, six collection items and 37 media originals — was imported by its owner, who confirmed it renders, resolves its 23 stored references and is recognised as English-only. The checks below ran on a **disposable duplicate**; the owner's project was fingerprinted before and after and is byte-for-byte unchanged.
+
+| Check | Result |
+| --- | --- |
+| Edit, save, reopen | Persisted. Only the edited page's timestamp moved; the saved page still stores no `language` field, as the flat legacy shape requires. |
+| Export | **Original addresses preserved** — every page at the root, no `en/` folder. 96 distinct image references, none missing. Navigation resolved on every page. |
+| Back up and restore | 402 files in, 402 out, **zero content differences**; identities kept, the edit survived, 37 media rows restored, no leftover metadata file. |
+| Add a language | Writes only the new language's menus and header/footer — **four files added, nothing in the existing English content changed**. |
+| Translate a page | The translated page takes its own identity, joins the source's group, stores no language field; the English original is untouched. |
+| Theme update 0.9.9 → 0.9.10 | 60 theme files changed, 4 added, none removed. **Nothing of the author's touched** in either language. All 58 preset defaults preserved, one new setting added. No working directories left behind. |
+
+**The one defect found was the theme, not the upgrade.** The first export had six broken links: the header logo on each collection item page pointed at `index.html`, which one level down resolves to a page that does not exist. Arch 0.9.9 hardcodes that href; 0.9.10 uses the depth-aware `page_url` filter. Applying the theme update fixed it — the re-export went from six broken links to **237 anchors with none broken and no missing images**. A legacy project therefore arrives carrying whatever its theme version carried, and the update is the remedy the product already offers.
+
+**Method.** The editor work was manual through the UI. Backup and restore went through the same endpoints the UI calls, because the import file picker cannot be driven from the test browser — the controller path is identical, the picker interaction is not covered. The export checks (link sweep, image resolution, address comparison, before/after fingerprints) were scripts written for the occasion; they verify those artifacts and are not part of the test suite.
+
+**What this establishes, and what it does not.** One real backup, one theme, one preset, taken end to end: import, edit, export, back up, restore, add a language, translate, theme update, export. It is evidence from a real project rather than a fixture, and it is not a survey of every legacy project shape.
 
 ## R2–R8 — Review queue
 
 These priorities are initial triage, not completed investigations. Hosted follow-ups should be added after the corresponding shared behavior is assessed, rather than guessed in advance.
 
-**All eight items are reviewed and implemented.** What remains is recorded as follow-ups under each item rather than as open review questions. The nearest outstanding piece of work is the legacy single-language upgrade path, kept separate throughout: a project created before languages existed, opened and exported after.
+**All eight items are reviewed and implemented, and both hands-on checks are done** — [the bilingual walkthrough](#the-bilingual-walkthrough) and [the legacy-upgrade check](#the-legacy-upgrade-check). What remains is recorded as follow-ups under each item rather than as open review questions; none of it blocks a release.
 
 | Item | OSS status | Review priority | When to check | Hosted follow-up |
 | --- | --- | --- | --- | --- |

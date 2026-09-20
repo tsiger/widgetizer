@@ -74,6 +74,8 @@ Updatable paths are replaced wholesale, which is how a theme deletes a file: it 
 
 One update runs at a time per project. Two at once would each read the other's working directories as their own, and the second would take the first's backup for an abandoned run.
 
+Exercised against a real 0.9.9 → 0.9.10 delta on an imported pre-multilingual project that had since been edited and given a second language: 60 theme files changed and 4 added, none of the author's pages, menus or collection items touched in either language, every preset default preserved, and no working directories left behind. See [the legacy-upgrade check](../review-status.md#the-legacy-upgrade-check).
+
 ### Verified limitations
 
 | Limitation | Why it stands |
