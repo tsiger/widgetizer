@@ -2,7 +2,7 @@
 
 [Review questions](review-questions.md) · [Map](README.md) · [Coverage](coverage.md)
 
-Updated 2026-09-20 (R1, R2, R3, R5, R6, R7 and R8 reviewed). This is the handoff summary; the review questions retain the reasoning and evidence. Update an item's status when it is reviewed, and replace an uncommitted status with the fix commit when available.
+Updated 2026-09-20 (R1–R8 all reviewed). This is the handoff summary; the review questions retain the reasoning and evidence. Update an item's status when it is reviewed, and replace an uncommitted status with the fix commit when available.
 
 **Priority describes the next action, not proof of a bug.** High means check before the stated release or deployment milestone; Medium means planned follow-up; Low means revisit when its trigger occurs. “Before launch” below applies when that feature is included in the launch. Future scaling work does not block a single-process MVP.
 
@@ -253,6 +253,45 @@ These are requirements for any application embedding the public packages, not a 
 
 **Closure:** the reviewed OSS change is implemented; follow-ups above remain separate. Project deletion and a common result shape across the structural handlers are outside it.
 
+## R4 — Shared write rules without forcing one workflow
+
+**OSS status:** Implemented and reviewed. Creating, duplicating, editing and creating a language version agree on identity, addresses, validation and translation relationships; the one place they disagreed was a quota, and it now agrees too. Fixed in `0c730731`.
+
+Confirmed defect, reproduced before fixing and covered by regressions verified to fail without the fix: a collection at its item limit refused **New item** (422) and refused **Create version** (422) but allowed **Duplicate** (201). `createItem` and `createItemLanguageVersion` both read `MAX_COLLECTION_ITEMS` and count items physically across every language; `duplicateItem` never asked, so a collection capped at one item reached five by pressing Duplicate. The check now sits at the top of `duplicateItem`, before the content-write section, counting the same way and returning the same message.
+
+**The rest of the matrix held.** Every creation path mints a new identity and update preserves one; create and duplicate each start their own translation group while a language version joins the source's; addresses are unique per language folder on every path; reserved names are refused everywhere — folded into the page paths' existing slug check and applied when an item record is built. Both language-version paths refuse a source with no identity and refuse a language that already has a version. The listing-role difference between duplicate and language version is deliberate and documented at both call sites.
+
+**Verification:** 1,932 backend and 1,565 frontend tests pass, plus full lint (unchanged pre-existing failures). Regression tests were added to [collectionApi.test.js](../../packages/builder-server/src/tests/collectionApi.test.js) rather than a new file, next to the existing cap tests they mirror.
+
+### Scope of this review
+
+Create, duplicate, edit and create-language-version, for pages and collection items. Quotas were checked where they apply. The legacy single-language upgrade path was kept separate throughout and is still outstanding.
+
+### Verified limitations
+
+| Limitation | Why it stands |
+| --- | --- |
+| The three limit checks are three separate blocks | `createItem`, `createItemLanguageVersion` and `duplicateItem` each read the cap and count. Collapsing them into a helper would abstract over three callers that already read clearly, and the defect was a handler not asking the question — not the absence of somewhere to ask it. |
+| Item duplication does not check reserved item slugs | The language-version path does. Unreachable for a duplicate, whose slug is always `<source>-copy` while the reserved names are `index` and `page`. Recorded so a future change to the copy-naming scheme knows the check is missing. |
+| Page creation renames a reserved or taken slug; page rename refuses it | Deliberate. A slug the system derived from a name is adjusted silently; a slug the user typed is refused with a reason. |
+
+### OSS follow-ups
+
+| Point | Priority | When to check | Next action |
+| --- | --- | --- | --- |
+| Legacy single-language upgrade path | Medium | Before releasing to projects created before languages existed | Kept separate from R4, R7 and R8 throughout. A project created before languages existed, opened and exported after, is still unverified. |
+
+### Hosted follow-ups — generic integration checklist
+
+These are requirements for any application embedding the public packages, not a description of a private deployment.
+
+| Point | Priority | When to check | Next action |
+| --- | --- | --- | --- |
+| `MAX_PAGES_PER_PROJECT` is declared but never consulted | High | Before launching with a finite page allowance | The key is in `LIMIT_KEYS` and the limits adapter answers it, but **no page write path reads it** — not create, not duplicate, not create-version. It is ignored consistently, so it is not an inconsistency between the workflows; it is a gap in the adapter contract that only appears once a host returns a finite cap. A host relying on it today has no page limit at all. Deliberately left outside the R4 fix. |
+| Custom creation handlers | Medium | Before adding a way to create pages or items outside the packaged handlers | Whatever limits a host enforces must be read by every path that creates content, including the copy and translate paths. R4's defect was one handler out of three not asking. |
+
+**Closure:** the reviewed OSS change is implemented; follow-ups above remain separate. The unenforced page limit and the legacy upgrade path are outside it.
+
 ## The bilingual walkthrough
 
 Done 2026-09-20, closing the follow-up R7 and R8 both left open. A real two-language project (Arch theme, `olympic` preset, default `en` plus `el`, two collections) was taken through the editor: Greek homepage and About created, headings translated, all six Greek main-menu labels translated and two items re-pointed at the new Greek pages, a news article translated, a deliberate cross-language link picked (Greek page → English page), site title and address set, then export, duplicate, and backup/restore.
@@ -269,13 +308,13 @@ Two small editor-UI refinements came out of it and are the owner's own design wo
 
 These priorities are initial triage, not completed investigations. Hosted follow-ups should be added after the corresponding shared behavior is assessed, rather than guessed in advance.
 
-**Suggested next: R4**, the last open item. The hands-on two-language walkthrough that R7 and R8 both left outstanding is **done** — see [below](#the-bilingual-walkthrough) — so the remaining multilingual gap is the legacy single-language upgrade path.
+**All eight items are reviewed and implemented.** What remains is recorded as follow-ups under each item rather than as open review questions. The nearest outstanding piece of work is the legacy single-language upgrade path, kept separate throughout: a project created before languages existed, opened and exported after.
 
 | Item | OSS status | Review priority | When to check | Hosted follow-up |
 | --- | --- | --- | --- | --- |
 | [R2 — Deletion consequences](review-questions.md#r2-one-deletion-policy-for-references) | Reviewed and implemented — see [above](#r2--one-policy-for-references-to-deleted-content) | — | — | Listed above |
 | [R3 — Removing a language during editing](review-questions.md#r3-language-lifecycle-and-content-writes) | Reviewed and implemented — see [above](#r3--removing-a-language-while-someone-is-editing-it) | — | — | Listed above |
-| [R4 — Rules across create, duplicate and translate](review-questions.md#r4-shared-write-rules-without-forcing-one-workflow) | Not reviewed | Medium | Before releasing these workflows under enforced quotas; include R1's copy-path checks | To assess |
+| [R4 — Rules across create, duplicate and translate](review-questions.md#r4-shared-write-rules-without-forcing-one-workflow) | Reviewed and implemented — see [above](#r4--shared-write-rules-without-forcing-one-workflow) | — | — | Listed above |
 | [R5 — Finding every image and link reference](review-questions.md#r5-one-description-of-reference-bearing-values) | Reviewed and implemented — see [above](#r5--one-description-of-reference-bearing-values) | — | — | Listed above |
 | [R6 — Operations that partly finish](review-questions.md#r6-structural-operations-and-partial-success) | Reviewed and implemented — see [above](#r6--structural-operations-and-partial-success) | — | — | Listed above |
 | [R7 — Multilingual website output](review-questions.md#r7-multilingual-output-completion) | Reviewed and implemented — see [above](#r7--multilingual-website-output) | — | — | Listed above |

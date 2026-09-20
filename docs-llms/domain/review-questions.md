@@ -91,13 +91,32 @@ Evidence: [languageController](../../packages/builder-server/src/controllers/lan
 
 ## R4 Shared write rules without forcing one workflow
 
-**Observed:** page metadata update, content save, duplication and version creation build/write pages through different branches. Collection create/duplicate/version paths also differ. Limits, pagination, identity and sanitization must be checked on every relevant entry point.
+**Status:** OSS implementation reviewed — see [priorities and checkpoints](review-status.md#r4--shared-write-rules-without-forcing-one-workflow).
+
+**Original observation:** page metadata update, content save, duplication and version creation build/write pages through different branches. Collection create/duplicate/version paths also differ. Limits, pagination, identity and sanitization must be checked on every relevant entry point.
 
 **Question:** which invariants are universal, and which deliberately differ? A page duplicate clears listing flags; a language version keeps them. Creation quotas should not disappear merely because the user chose Duplicate or Create version.
 
-**Simplification candidate:** shared normalization/validation and an explicit identity/copy policy, with separate orchestration for distinct operations. First compare the behavior matrix; do not collapse handlers solely because they look alike.
+**Answered: the invariants held everywhere except one, and the exception was the quota the question named.** A collection at its item limit refused **New item** and refused **Create version**, and allowed **Duplicate** — pressing it four more times took a collection capped at one to five items. `createItem` and `createItemLanguageVersion` both read `MAX_COLLECTION_ITEMS` and count physically across every language; `duplicateItem` never asked. It asks now, the same way and with the same message.
 
-Evidence: [pageController](../../packages/builder-server/src/controllers/pageController.js), [collectionController](../../packages/builder-server/src/controllers/collectionController.js), [collectionService](../../packages/builder-server/src/services/collectionService.js). Coverage: C1/C7/C8, L3.
+**What was universal, and verified to be:**
+
+| Invariant | Create | Duplicate | Language version | Update |
+| --- | --- | --- | --- | --- |
+| Identity | new uuid | new uuid | new uuid | preserved |
+| Translation group | its own uuid | its own uuid — a copy is not a translation | the source's group | preserved |
+| Address | unique per language folder | unique per language folder | unique in the target folder | rename re-checked |
+| Reserved names | refused | refused | refused | refused |
+
+Pages fold the reserved-slug rule into the check that also tests for an existing file, so all three creation paths honour it without repeating it, while rename and save reject an explicitly typed reserved slug rather than quietly renaming — the right difference, since one is a name the system chose and the other is a name the user typed. Collection items validate slug shape and reserved names when the record is built, which covers create and update alike. Both language-version paths refuse a source with no identity and refuse a language that already has a version.
+
+**The deliberate difference is the listing role, and it survives review.** A page duplicate clears `listing_anchor` and `paginate`; a language version keeps them. A duplicate is a second page in the *same* language and would fight the original for an anchor that belongs to one page per collection; a version is that language's own listing page. Collection items have no equivalent, so there is nothing to keep consistent.
+
+**Simplification candidate (deliberately not taken).** The candidate proposed shared normalisation and an explicit identity/copy policy. The policy is already explicit and already shared where it matters — item records are built by one function for create and update, and pages route every creation path through one slug check. What remains is three short limit checks in three handlers, and collapsing those into a helper would have been the abstraction this review series keeps declining: the fix was to make the third handler ask the same question, not to invent somewhere for all three to ask it.
+
+**Scope:** create, duplicate, edit and create-language-version, for pages and collection items. Quotas were checked where they apply.
+
+Evidence: [pageController](../../packages/builder-server/src/controllers/pageController.js), [collectionController](../../packages/builder-server/src/controllers/collectionController.js), [collectionService](../../packages/builder-server/src/services/collectionService.js), [collection API tests](../../packages/builder-server/src/tests/collectionApi.test.js). Coverage: C1/C7/C8, L3.
 
 ## R5 One description of reference-bearing values
 
