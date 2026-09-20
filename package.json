@@ -47,6 +47,7 @@
     "electron:build:win": "node scripts/build-electron.mjs --platform win",
     "electron:build:win:unsigned": "node scripts/build-electron.mjs --platform win --unsigned",
     "electron:build:linux": "node scripts/build-electron.mjs --platform linux",
+    "electron:build:linux:arm64": "node scripts/build-electron.mjs --platform linux --arch arm64",
     "electron:preflight": "npm run validate:all-locales && npm run lint:all"
   },
   "dependencies": {

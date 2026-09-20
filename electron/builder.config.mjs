@@ -59,7 +59,8 @@ export default {
   afterSign: "electron/notarize.cjs",
   linux: {
     maintainer: "Widgetizer <hello@widgetizer.org>",
-    target: [{ target: "deb", arch: ["x64"] }],
+    // The build script selects one architecture after preparing its native libs.
+    target: ["deb"],
     artifactName: "Widgetizer-${version}-${arch}.${ext}",
     category: "Development",
     icon: "electron/resources/icon.icns",
