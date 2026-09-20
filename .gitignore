@@ -30,7 +30,6 @@ themes/widgetizer-saas-theme/
 temp/
 tmp/
 temp-webp/
-docs-entities/.obsidian/
+.obsidian/
 docs-entities/.trash/
-/docs-llms/domain/.obsidian/
 /themes/__*/
