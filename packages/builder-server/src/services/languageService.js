@@ -77,30 +77,107 @@ async function assertCodeIsFree(storage, scope, code) {
 }
 
 /**
- * Copy the default language's menus into the new language, each with a fresh
- * uuid. Returns the reference map the globals are rewritten through, keyed by
- * every form a stored menu setting can take. Menu items keep the page
- * references they inherited: at this moment no page exists in the new language,
- * so there is nothing to re-point them at.
+ * A file that may already exist in the language being seeded. `null` means
+ * absent, and an unreadable one throws rather than reading as absent, because
+ * the two lead to opposite actions — create it, or touch nothing at all.
  */
-async function seedMenus(storage, scope, lang) {
-  const files = (await storage.list(scope, menusDir())).filter((name) => name.endsWith(".json"));
+async function readSeedTarget(storage, scope, key) {
+  try {
+    return await readJson(storage, scope, key);
+  } catch (error) {
+    throw new LanguageError(
+      `"${key}" already exists in this language but could not be read, so nothing was changed: ${error.message}`,
+      500,
+    );
+  }
+}
+
+/**
+ * A file the seed copies FROM. Absent is ordinary — a site may have no footer,
+ * and a global widget may declare no schema — but one that cannot be parsed
+ * stops the run, because copying from it would either fail later or silently
+ * produce a copy with its menu settings left pointing at the source language.
+ */
+async function readSeedSource(storage, scope, key, what) {
+  try {
+    return await readJson(storage, scope, key);
+  } catch (error) {
+    throw new LanguageError(`${what} ("${key}") could not be read, so nothing was changed: ${error.message}`, 500);
+  }
+}
+
+/**
+ * Everything the seed reads or writes, read before it writes any of it — both
+ * the destinations it must not clobber and the sources it copies from.
+ * Checking as it goes would let a corrupt English header stop a run that had
+ * already created the Greek menus: a half-seeded language nobody asked for.
+ */
+async function assertSeedIsSafe(storage, scope, lang, menuIds) {
+  for (const id of menuIds) {
+    await readSeedSource(storage, scope, menuKey(id), "A menu this language would be given");
+    await readSeedTarget(storage, scope, menuKey(id, lang));
+  }
+  for (const type of GLOBAL_TYPES) {
+    await readSeedTarget(storage, scope, globalKey(type, lang));
+    const widget = await readSeedSource(storage, scope, globalKey(type), `The site's ${type}`);
+    if (!widget) continue;
+    // The schema says which of the widget's settings name a menu, so a copy
+    // made without it keeps the source language's menus.
+    await readSeedSource(
+      storage,
+      scope,
+      `widgets/global/${widget.type || type}/schema.json`,
+      `The ${type} widget's schema`,
+    );
+  }
+}
+
+/**
+ * Give the new language the menus it needs, each with its own uuid. Returns the
+ * reference map the globals are rewritten through, keyed by every form a stored
+ * menu setting can take. Menu items keep the page references they inherited: at
+ * this moment no page exists in the new language, so there is nothing to
+ * re-point them at.
+ *
+ * **Seeding creates what is missing and never replaces what is there.** A menu
+ * already in this language belongs to the site — a retry after a run that
+ * stopped partway, or translated content that came back with a restore — and
+ * overwriting it would hand someone back the default language's words in place
+ * of their own.
+ */
+async function seedMenus(storage, scope, lang, menuIds) {
   // Keyed by both forms a stored menu setting can take, since the renderer
   // accepts a uuid or the menu's slug and only the uuid identifies the copy.
   const menuRefs = new Map();
 
-  for (const file of files) {
-    const id = file.replace(/\.json$/, "");
-    const menu = await readJson(storage, scope, menuKey(id));
-    if (!menu) continue;
+  for (const id of menuIds) {
+    const source = await readJson(storage, scope, menuKey(id));
+    if (!source) continue;
+
+    const existing = await readSeedTarget(storage, scope, menuKey(id, lang));
+    if (existing) {
+      // Adopt what is already there, so anything created below connects to the
+      // real menu instead of a copy nobody is using. One that carries no uuid
+      // is stamped with one — adding an identity, not replacing content —
+      // because a reference needs something to name.
+      let uuid = existing.uuid;
+      if (!uuid) {
+        uuid = randomUUID();
+        await storage.write(scope, menuKey(id, lang), JSON.stringify({ ...existing, uuid }, null, 2));
+      }
+      if (source.uuid) menuRefs.set(source.uuid, uuid);
+      menuRefs.set(id, uuid);
+      continue;
+    }
+
     const uuid = randomUUID();
-    if (menu.uuid) menuRefs.set(menu.uuid, uuid);
+    if (source.uuid) menuRefs.set(source.uuid, uuid);
     menuRefs.set(id, uuid);
     const now = new Date().toISOString();
     await storage.write(
       scope,
       menuKey(id, lang),
-      JSON.stringify({ ...menu, id, uuid, created: now, updated: now }, null, 2),
+      JSON.stringify({ ...source, id, uuid, created: now, updated: now }, null, 2),
     );
   }
 
@@ -119,16 +196,28 @@ function menuSettingIds(schema) {
 const remapped = (value, menuRefs) => (typeof value === "string" && menuRefs.has(value) ? menuRefs.get(value) : value);
 
 /**
- * Copy header and footer into the new language, repointing their menu settings
- * at the copies made above. This rewrites scaffolding we generated, not the
- * author's links: the page references inside the menu items are left alone.
+ * Give the new language a header and footer, pointed at the menus above. This
+ * writes scaffolding we generate, not the author's links: the page references
+ * inside the menu items are left alone.
+ *
+ * Like the menus, an existing one is kept rather than replaced. Its media usage
+ * is refreshed even so: a previous run may have stopped before recording it,
+ * and a restore brings the file back without the rows.
  */
 async function seedGlobals(storage, scope, lang, menuRefs) {
   for (const type of GLOBAL_TYPES) {
+    const existing = await readSeedTarget(storage, scope, globalKey(type, lang));
+    if (existing) {
+      await updateGlobalWidgetMediaUsage(scope.projectId, type, existing, lang);
+      continue;
+    }
+
     const widget = await readJson(storage, scope, globalKey(type));
     if (!widget) continue;
 
-    const schema = await readJson(storage, scope, `widgets/global/${widget.type || type}/schema.json`).catch(() => null);
+    // Preflight has already proven this readable, so a parse error here would
+    // be a real surprise rather than a missing file.
+    const schema = await readJson(storage, scope, `widgets/global/${widget.type || type}/schema.json`);
     const menuIds = menuSettingIds(schema);
 
     const settings = { ...(widget.settings || {}) };
@@ -181,7 +270,12 @@ export async function addLanguage({ storage, scope, project, code }) {
   await assertCodeIsFree(storage, scope, language);
 
   const lang = { language, defaultLanguage };
-  const menuRefs = await seedMenus(storage, scope, lang);
+  const menuIds = (await storage.list(scope, menusDir()))
+    .filter((name) => name.endsWith(".json"))
+    .map((name) => name.replace(/\.json$/, ""));
+  // Read everything the seed could touch before it touches any of it.
+  await assertSeedIsSafe(storage, scope, lang, menuIds);
+  const menuRefs = await seedMenus(storage, scope, lang, menuIds);
   await seedGlobals(storage, scope, lang, menuRefs);
 
   return { languages: [...languages, language] };

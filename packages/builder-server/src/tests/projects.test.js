@@ -2112,12 +2112,30 @@ describe("site languages", () => {
     assert.deepEqual(importRes._json.languages, ["it"]);
   });
 
-  it("falls back to a single English site when an import carries an unusable code", async () => {
+  // Importing anyway used to "succeed" as a single English site, which put the
+  // backup's other-language pages, menus and items on disk with nothing listing
+  // them — a restore that silently returns part of a website.
+  it("refuses an import whose languages this version cannot restore, and creates nothing", async () => {
+    const before = projectRepo.getAllProjects().length;
     const zipFile = buildImportZip(
       {
         formatVersion: "1.1",
         project: { name: "Foreign Export", theme: TEST_THEME_ID, defaultLanguage: "ar", languages: ["nonsense"] },
       },
+      { "theme.json": { name: "Test Theme", version: "1.0.0" }, "pages/index.json": { name: "Home", slug: "index", widgets: {} } },
+    );
+
+    const res = await callController(importProject, { file: zipFile });
+    assert.equal(res._status, 400, JSON.stringify(res._json));
+    assert.match(res._json.error, /cannot work with/i);
+    assert.match(res._json.error, /nothing has changed/i);
+    assert.equal(projectRepo.getAllProjects().length, before, "a refused import creates no project");
+  });
+
+  // A backup older than languages names none, and is a single-language site.
+  it("still imports a backup that names no languages at all", async () => {
+    const zipFile = buildImportZip(
+      { formatVersion: "1.0", project: { name: "Legacy Export", theme: TEST_THEME_ID } },
       { "theme.json": { name: "Test Theme", version: "1.0.0" }, "pages/index.json": { name: "Home", slug: "index", widgets: {} } },
     );
 
