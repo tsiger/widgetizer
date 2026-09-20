@@ -131,7 +131,7 @@ Every collection read in the export goes through one `createCollectionReader` sn
 
 Before any HTML is written, `exportProjectToDir` enumerates `listCollectionSchemas(storage, scope)` and, for each schema, `collectionReader.sorted(type)`:
 
-- **Pass 1 — gather.** Every collection contributes to `manifestCollections` (`{ type, itemPages, itemCount }`, feeds `manifest.json`). Invalid items (`item.invalid`) are accumulated into `invalidCollectionItems` with their per-field `validationErrors`. For `hasItemPages` collections, valid items (in listing order) are pushed into `itemPagesForSeo` (feeds sitemap/robots) and the item render loop.
+- **Pass 1 — gather.** Every collection contributes to `manifestCollections` (`{ type, itemPages, itemCount, itemCountByLanguage }`, feeds `manifest.json`; the counts are accumulated over the exported languages and pushed once per collection). Invalid items (`item.invalid`) are accumulated into `invalidCollectionItems` with their per-field `validationErrors`. For `hasItemPages` collections, valid items (in listing order) are pushed into `itemPagesForSeo` (feeds sitemap/robots) and the item render loop.
 - **Pass 1 — template preflight.** A `hasItemPages` collection that has renderable (valid) items but **no** `template.liquid` (`loadCollectionTemplate` returns `null`) is recorded in `missingTemplates`.
 - **Pass 2 — refuse.** If any invalid items exist, the export throws `statusCode 400` / "Export failed: invalid collection items" with the full per-item-per-field error list. If any templates are missing, it throws `statusCode 400` / "Export failed: missing collection template". Either way **no HTML is written**.
 
@@ -186,7 +186,7 @@ Issues are collected across all pages and item pages with severity, line/column,
 
 Written after asset copying:
 
-- **`manifest.json`** (always) — `{ generator: "widgetizer", widgetizerVersion, themeId, themeVersion, exportVersion, assetVersion, exportedAt, projectName, collections }`. `assetVersion` is the `?v=` token stamped on this export's CSS/JS, so a live page can be traced back to the export that produced it. `collections` is `manifestCollections` from the two-pass validation: one entry per collection with `{ type, itemPages, itemCount }`.
+- **`manifest.json`** (always) — `{ generator: "widgetizer", widgetizerVersion, themeId, themeVersion, exportVersion, assetVersion, exportedAt, projectName, collections }`. `assetVersion` is the `?v=` token stamped on this export's CSS/JS, so a live page can be traced back to the export that produced it. `collections` is `manifestCollections` from the two-pass validation: one entry per collection with `{ type, itemPages, itemCount, itemCountByLanguage }`. `itemCount` is the total across every exported language — the same scope `itemPages` describes — and `itemCountByLanguage` maps each exported language code to its own count. A language the export skipped is absent from both.
 - **`widgetizer.forms.json`** (only when the project contains `core-form` widgets) — `buildFormsManifest(pages, appVersion)` (`services/formsManifestService.js`) produces a forms manifest describing each form's fields. Manifest validation errors throw `statusCode 400` and are surfaced to the client; non-fatal warnings are logged. See [Form Widget](core-form-widget.md).
 - **`site.webmanifest`** (when site icons were generated) — references `icon-192.png` and `icon-512.png`.
 

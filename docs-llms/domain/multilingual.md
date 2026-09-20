@@ -98,7 +98,7 @@ A slug identifies content within a language (and collection type for items); a U
 | Menu selected by bare slug | Resolves in rendering language; explicit UUID can select a menu from another language |
 | Theme language-switch destination with no sibling | Current `buildTranslations` uses the language's homepage and marks it as fallback; languages without a homepage are omitted |
 
-Do not generalize media metadata fallback into a whole-site fallback policy. [buildTranslations](../../packages/core/src/utils/translations.js) supplies the current theme language-switch contract. Homepage fallbacks are excluded from ordinary language alternates; the special `x-default` destination may use the default homepage. [Export rules](operations/output.md#multilingual-boundary-at-this-snapshot) explain the sitemap, canonical and form behavior.
+Do not generalize media metadata fallback into a whole-site fallback policy. [buildTranslations](../../packages/core/src/utils/translations.js) supplies the current theme language-switch contract. Homepage fallbacks are excluded from ordinary language alternates; the special `x-default` destination may use the default homepage, unless that homepage is itself `noindex`. [Export rules](operations/output.md#multilingual-boundary-at-this-snapshot) explain the sitemap, canonical and form behavior.
 
 ## Rendered language destinations
 
@@ -112,7 +112,10 @@ Do not generalize media metadata fallback into a whole-site fallback policy. [bu
 | `seoUrl` | Absolute published address for search metadata; empty without a usable Site URL |
 | `active` | Whether this is the rendered content's language |
 | `fallback` | Whether the destination is a homepage because no sibling exists |
+| `noindex` | Whether the destination asked not to be indexed. Read from the destination itself — the sibling, or for a fallback entry the homepage it points at. The SEO builders drop these entries, `x-default` included; the visitor-facing switcher ignores the flag |
 | `dir` | Language text direction |
+
+What `buildTranslations` reads off a sibling is defined once, as `translationSibling`. The SEO builders hold whole page and item records while a render holds the uuid reference map, and both are narrowed through that projection before anything is read. Both paths now use one definition of the sibling fields, preventing the missing-field mismatch found in the R7 review.
 
 Additional languages without homepages are omitted. The default destination assumes the required root homepage; export fails when that homepage is missing. For a listing's generated copies, language destinations point to the related base page or homepage, not the same page number in another language: the two lists may have different lengths. This describes the current [builder](../../packages/core/src/utils/translations.js); final theme-contract documentation remains part of step 25.
 

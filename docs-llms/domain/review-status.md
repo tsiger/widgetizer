@@ -2,7 +2,7 @@
 
 [Review questions](review-questions.md) · [Map](README.md) · [Coverage](coverage.md)
 
-Updated 2026-09-19 (R1, R2, R3 and R5 reviewed). This is the handoff summary; the review questions retain the reasoning and evidence. Update an item's status when it is reviewed, and replace an uncommitted status with the fix commit when available.
+Updated 2026-09-20 (R1, R2, R3, R5 and R7 reviewed). This is the handoff summary; the review questions retain the reasoning and evidence. Update an item's status when it is reviewed, and replace an uncommitted status with the fix commit when available.
 
 **Priority describes the next action, not proof of a bug.** High means check before the stated release or deployment milestone; Medium means planned follow-up; Low means revisit when its trigger occurs. “Before launch” below applies when that feature is included in the launch. Future scaling work does not block a single-process MVP.
 
@@ -131,11 +131,49 @@ A follow-on change lifted the last inconsistency: the editor withheld the richte
 
 **Closure:** the reviewed OSS change is implemented; the nested-settings item is deferred with the trigger recorded above.
 
+## R7 — Multilingual website output
+
+**OSS status:** Implemented and reviewed. The export's link resolution, its collection-item inventory and its manifest summary now describe the site being published rather than the project on disk, and a page that asked not to be indexed is kept out of the hreflang clusters. Fixed in `ef3b96ae`.
+
+Confirmed defects, each reproduced through a real export before being fixed and each covered by a regression verified to fail without its fix: links into a language the export refused to publish resolved to real-looking hrefs for files that were never written, in widget links, richtext anchors, menus and theme settings alike; `manifest.collections[].itemCount` counted only the default language while `itemPages` beside it described the whole site; a noindex page was advertised as an hreflang alternate in both the HTML and the sitemap; a noindex *item* translation was excluded from the sitemap but still advertised in the HTML, because the two artifacts read a sibling's robots directive through different objects and the item reference carried no SEO fields; and a fallback alternate tested the missing sibling's noindex status rather than the homepage it actually points at, so a noindex homepage was still published as `x-default`.
+
+The item-alternate defect was addressed at the shape rather than at the instance. `buildTranslations` now defines what it reads off a sibling as one exported projection, `translationSibling`; it narrows whatever it is given before reading, and the uuid reference map is built from the same function. Both paths now use one definition of the sibling fields, preventing the missing-field mismatch found in this review.
+
+Forms and Markdown were checked and found already correct: language-qualified form keys, export refused on same-language collisions with differing fields, the distinct-form limit enforced, and Markdown twins emitted for every exported page and item and for none of a skipped language.
+
+**Verification:** 1,885 backend and 1,565 frontend tests pass, plus targeted lint. Full lint still has the pre-existing theme-deletion-marker parsing errors. The reviewer's independent reproduction script passes unchanged. Regression tests live in [multilangExport.test.js](../../packages/builder-server/src/tests/multilangExport.test.js) and [translations.test.js](../../packages/core/src/utils/__tests__/translations.test.js).
+
+### Verified limitations
+
+| Limitation | Why it stands |
+| --- | --- |
+| A noindex translation leaves its language cluster entirely | Nothing then points an alternate at that page from anywhere. That is the correct outcome for a page asking not to be indexed, but it means setting noindex on one translation quietly removes it from the cluster. Recorded as deliberate rather than discovered later. |
+| A link into a skipped language is cleared, not reported per link | The export names the skipped language and says links into it were removed. It does not list which pages held them, for the same reason R2's cleanup warning names counts rather than storage keys. |
+| The manifest is informational only | Nothing in the product reads `manifest.json` back. The count was corrected because it is published to whoever unzips the export, not because a consumer depended on it. |
+
+### OSS follow-ups
+
+| Point | Priority | When to check | Next action |
+| --- | --- | --- | --- |
+| Hands-on multilingual testing in a real project | Medium | Before declaring multilingual export release-ready | The review was driven through real exports in the test harness, which is stronger than assertion review but is not the same as using a two-language project. The paused hands-on testing remains the last step. |
+| The legacy upgrade path | Medium | Before releasing to existing single-language projects | Out of scope for this review and still unverified: a project created before languages existed, opened and exported after. |
+
+### Hosted follow-ups — generic integration checklist
+
+These are requirements for any application embedding the public packages, not a description of a private deployment.
+
+| Point | Priority | When to check | Next action |
+| --- | --- | --- | --- |
+| Hosts building their own render context for publishing | High | Before publishing a multilingual site | A host that lets the renderer load its own page map publishes links into languages it chose not to render. Seed the map from the pages actually being published, and restrict the collection-item map to the same languages. |
+| Hosts assembling their own SEO artifacts | Medium | Before publishing a multilingual site | `buildTranslations` is the single source of the hreflang rules, including the `noindex` and `fallback` flags. An emitter that reads `translations` without honouring both flags republishes the defects above. |
+
+**Closure:** the reviewed OSS change is implemented; follow-ups above remain separate. Hands-on project testing and the legacy upgrade path are the remaining work before multilingual export is release-ready.
+
 ## R2–R8 — Review queue
 
 These priorities are initial triage, not completed investigations. Hosted follow-ups should be added after the corresponding shared behavior is assessed, rather than guessed in advance.
 
-**Suggested next: R7.** It is High priority and it is the item that gates calling multilingual export release-ready, which is where the project sits — multilang is at step 25 of 25 with only documentation left. It is also partly a testing question, so it pairs with resuming the hands-on two-language testing that has been paused while R1, R2, R3 and R5 were worked through. R4, R6 and R8 gate releases that are not imminent.
+**Suggested next: R8.** It is the remaining High-priority item, and it shares R7's subject matter — R7 established that the export publishes a deliberately narrower site than the project on disk, and R8 asks the converse question of whether a backup or clone preserves the whole of it. The hands-on two-language testing paused during R1–R7 pairs naturally with either. R4 and R6 gate releases that are not imminent.
 
 | Item | OSS status | Review priority | When to check | Hosted follow-up |
 | --- | --- | --- | --- | --- |
@@ -144,5 +182,5 @@ These priorities are initial triage, not completed investigations. Hosted follow
 | [R4 — Rules across create, duplicate and translate](review-questions.md#r4-shared-write-rules-without-forcing-one-workflow) | Not reviewed | Medium | Before releasing these workflows under enforced quotas; include R1's copy-path checks | To assess |
 | [R5 — Finding every image and link reference](review-questions.md#r5-one-description-of-reference-bearing-values) | Reviewed and implemented — see [above](#r5--one-description-of-reference-bearing-values) | — | — | Listed above |
 | [R6 — Operations that partly finish](review-questions.md#r6-structural-operations-and-partial-success) | Not reviewed | Medium | Before the next release changing import, clone, theme update or project deletion | To assess |
-| [R7 — Multilingual website output](review-questions.md#r7-multilingual-output-completion) | Not reviewed | High | Before declaring multilingual export release-ready | To assess |
+| [R7 — Multilingual website output](review-questions.md#r7-multilingual-output-completion) | Reviewed and implemented — see [above](#r7--multilingual-website-output) | — | — | Listed above |
 | [R8 — Backup and clone completeness](review-questions.md#r8-backup-and-clone-completeness) | Not reviewed | High | Before releasing multilingual backup/restore as a supported recovery path | To assess |
