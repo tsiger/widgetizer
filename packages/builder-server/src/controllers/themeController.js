@@ -702,17 +702,23 @@ export async function resolvePresetPaths(themeId, presetId) {
     // No preset menus, use root
   }
 
-  // Read settings overrides
+  // Read settings overrides. A preset without a preset.json simply has no
+  // overrides; one that HAS it and cannot be read is a different thing, and
+  // reading both as "no settings" gives the project the preset's name and the
+  // theme's appearance.
   let settingsOverrides = null;
   const presetJsonPath = path.join(presetDir, "preset.json");
-  try {
-    const content = await fs.readFile(presetJsonPath, "utf8");
-    const presetData = JSON.parse(content);
+  if (await fs.pathExists(presetJsonPath)) {
+    let presetData;
+    try {
+      presetData = JSON.parse(await fs.readFile(presetJsonPath, "utf8"));
+    } catch (error) {
+      console.error(`[themeController] Could not read ${presetJsonPath}: ${error.message}`);
+      throw new Error(`The "${presetId}" preset's settings file could not be read.`);
+    }
     if (presetData.settings && Object.keys(presetData.settings).length > 0) {
       settingsOverrides = presetData.settings;
     }
-  } catch {
-    // No preset.json or invalid JSON, no overrides
   }
 
   // Resolve preset collections/ (item DATA only). Collection-type SCHEMAS are

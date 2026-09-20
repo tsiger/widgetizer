@@ -327,6 +327,28 @@ export async function seedPresetMedia(folderName, projectId, presetMediaDir) {
  * @param {string} [desiredFolder] - Optional folder slug; if absent, derived from name
  * @returns {Promise<{ name: string, folder: string }>}
  */
+/**
+ * Undo a project that was only partly made. Both halves are best-effort: the
+ * caller is already failing, and a leftover row or directory must not replace
+ * the reason it failed.
+ */
+async function discardHalfMadeProject(projectId, projectDir) {
+  if (projectId) {
+    try {
+      projectRepo.deleteProject(projectId);
+    } catch (error) {
+      console.warn(`[ProjectController] Could not remove the half-made project row: ${error.message}`);
+    }
+  }
+  if (projectDir) {
+    try {
+      await fs.remove(projectDir);
+    } catch (error) {
+      console.warn(`[ProjectController] Could not remove the half-made project directory: ${error.message}`);
+    }
+  }
+}
+
 async function resolveProjectIdentity(desiredName, desiredFolder) {
   const existingNames = projectRepo.getAllProjects().map((p) => p.name);
   const collides = existingNames.some((existing) => existing.toLowerCase() === desiredName.toLowerCase());
@@ -497,13 +519,30 @@ export async function createProject(req, res) {
     // the theme via copyThemeToProject — never the preset).
     // Collection items are fs-only so they seed before the DB row; media files
     // register against the project_id, so that runs after createProject below.
-    const { collectionsDir: presetCollectionsDir, mediaDir: presetMediaDir } =
-      await themeController.resolvePresetPaths(theme, preset);
+    let presetCollectionsDir;
+    let presetMediaDir;
+    try {
+      ({ collectionsDir: presetCollectionsDir, mediaDir: presetMediaDir } = await themeController.resolvePresetPaths(
+        theme,
+        preset,
+      ));
+    } catch (error) {
+      await discardHalfMadeProject(null, projectDir);
+      console.error(`[ProjectController] Reading the preset failed: ${error.message}`);
+      throw new Error("The project could not be created from this preset, so nothing was created.");
+    }
+    // A preset the user picked and did not get is a failed creation, not a
+    // warning: the project would claim that preset while missing its content,
+    // and nothing afterwards would say so. An absent component is fine — the
+    // guard above is what distinguishes "this preset has no collections" from
+    // "this preset's collections could not be applied".
     if (presetCollectionsDir) {
       try {
         await seedPresetCollections(folderName, presetCollectionsDir);
       } catch (error) {
-        console.warn(`[ProjectController] Failed to seed preset collections: ${error.message}`);
+        await discardHalfMadeProject(null, projectDir);
+        console.error(`[ProjectController] Seeding preset collections failed: ${error.message}`);
+        throw new Error("The project could not be created from this preset, so nothing was created.");
       }
     }
 
@@ -539,7 +578,10 @@ export async function createProject(req, res) {
       try {
         await seedPresetMedia(folderName, newProject.id, presetMediaDir);
       } catch (error) {
-        console.warn(`[ProjectController] Failed to seed preset media: ${error.message}`);
+        // The row exists by now, so both halves have to go.
+        await discardHalfMadeProject(newProject.id, projectDir);
+        console.error(`[ProjectController] Seeding preset media failed: ${error.message}`);
+        throw new Error("The project could not be created from this preset, so nothing was created.");
       }
     }
 
@@ -830,11 +872,14 @@ export async function duplicateProject(req, res) {
     try {
       await fs.copy(originalDir, newDir);
 
-      try {
-        await remapDuplicatedProjectUuids(newFolderName);
-      } catch (uuidUpdateError) {
-        console.warn(`[ProjectController] Failed to update UUIDs in cloned project: ${uuidUpdateError.message}`);
-      }
+      // Not a warning. The copy regenerates every page, item and menu identity
+      // and then re-points the links, menus, parents and translation groups that
+      // named the old ones; a failure between those two halves leaves a project
+      // whose references all name the ORIGINAL project's content, which renders
+      // as a site that has lost its internal links. Nothing of the user's is
+      // lost by removing a copy that was made seconds ago, so the copy goes and
+      // they can try again.
+      await remapDuplicatedProjectUuids(newFolderName);
     } catch (copyError) {
       try {
         await fs.remove(newDir);
@@ -843,13 +888,16 @@ export async function duplicateProject(req, res) {
           `[ProjectController] Failed to clean up new directory after copy failure: ${cleanupError.message}`,
         );
       }
-      throw new Error(`Failed to copy project files: ${copyError.message}`);
+      console.error(`[ProjectController] Duplication failed: ${copyError.message}`);
+      throw new Error("The project could not be duplicated, so no copy was made.");
     }
 
     // Save new project to DB
     projectRepo.createProject(newProject);
 
-    // Copy media metadata from original project to the duplicate in SQLite
+    // Copy media metadata from original project to the duplicate in SQLite. The
+    // library is part of the project: a copy that silently has none would show
+    // an empty Media page beside pages that still display the images.
     try {
       const originalMedia = mediaRepo.getMediaFiles(originalProjectId);
       if (originalMedia.files && originalMedia.files.length > 0) {
@@ -860,7 +908,9 @@ export async function duplicateProject(req, res) {
         mediaRepo.writeMediaData(newProject.id, originalMedia);
       }
     } catch (mediaError) {
-      console.warn("Could not duplicate media metadata:", mediaError.message);
+      await discardHalfMadeProject(newProject.id, newDir);
+      console.error(`[ProjectController] Duplicating the media library failed: ${mediaError.message}`);
+      throw new Error("The project could not be duplicated, so no copy was made.");
     }
 
     await refreshMediaUsageAfterStructuralChange(newProject.id, "project duplication");

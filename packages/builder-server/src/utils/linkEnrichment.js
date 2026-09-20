@@ -405,16 +405,19 @@ function transformThemeSettings(themeData, handlers) {
   return changed;
 }
 
-/** fs variant, for the seeding and duplication passes. */
+/**
+ * fs variant, for the seeding and duplication passes.
+ *
+ * Absent is ordinary and returns quietly. Anything else throws: a duplication
+ * whose site-wide link or menu was not re-pointed still names the ORIGINAL
+ * project's content, and swallowing that here turned a failed remap into a
+ * copy that looked finished.
+ */
 async function updateThemeSettingsFile(themeJsonPath, handlers) {
   if (!(await fs.pathExists(themeJsonPath))) return;
-  try {
-    const themeData = JSON.parse(await fs.readFile(themeJsonPath, "utf8"));
-    if (transformThemeSettings(themeData, handlers)) {
-      await fs.outputFile(themeJsonPath, JSON.stringify(themeData, null, 2));
-    }
-  } catch (error) {
-    console.warn(`[linkEnrichment] Failed to process theme settings at ${themeJsonPath}: ${error.message}`);
+  const themeData = JSON.parse(await fs.readFile(themeJsonPath, "utf8"));
+  if (transformThemeSettings(themeData, handlers)) {
+    await fs.outputFile(themeJsonPath, JSON.stringify(themeData, null, 2));
   }
 }
 
