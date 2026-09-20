@@ -199,6 +199,35 @@ describe("item mutations", () => {
     assert.equal(res._status, 404);
   });
 
+  // The cap applied to New item and to Create version but not to Duplicate, so
+  // whoever pressed the third button had no limit at all.
+  it("refuses a duplicate at the item cap, creating nothing", async () => {
+    await createNews({ settings: { title: "Only" } });
+    const before = (await storage.list(scope, "collections/news")).filter((n) => n.endsWith(".json")).length;
+    itemLimit = 1;
+
+    const res = await call(collectionController.duplicateItem, {
+      params: { collectionType: "news", itemSlug: "only" },
+    });
+
+    assert.equal(res._status, 422);
+    assert.equal(res._json.error, "This collection has reached its item limit (1).", "the same words as New item");
+    const after = (await storage.list(scope, "collections/news")).filter((n) => n.endsWith(".json")).length;
+    assert.equal(after, before, "a refused duplicate writes nothing");
+  });
+
+  it("allows a duplicate below the item cap", async () => {
+    await createNews({ settings: { title: "Only" } });
+    itemLimit = 2;
+
+    const res = await call(collectionController.duplicateItem, {
+      params: { collectionType: "news", itemSlug: "only" },
+    });
+
+    assert.equal(res._status, 201, JSON.stringify(res._json));
+    assert.equal(res._json.slug, "only-copy");
+  });
+
   it("duplicates (201), reorders, deletes (200), then 404s re-delete", async () => {
     await createNews({ settings: { title: "Src" } });
     const dup = await call(collectionController.duplicateItem, {
@@ -313,6 +342,23 @@ describe("items in another language (API)", () => {
     delete activeProject.defaultLanguage;
     delete activeProject.languages;
     projectRepo.updateProject(activeProject.id, { defaultLanguage: "en", languages: [] });
+  });
+
+  // Items count physically across every language, the way New item counts them.
+  it("counts another language's items against the cap when duplicating", async () => {
+    await createNews({ settings: { title: "Only" } });
+    const version = await call(collectionController.createItemLanguageVersion, {
+      params: { collectionType: "news", itemSlug: "only" },
+      body: { targetLanguage: "el" },
+    });
+    assert.equal(version._status, 201, JSON.stringify(version._json));
+    itemLimit = 2; // one English item plus its Greek version
+
+    const res = await call(collectionController.duplicateItem, {
+      params: { collectionType: "news", itemSlug: "only" },
+    });
+
+    assert.equal(res._status, 422, JSON.stringify(res._json));
   });
 
   it("creates, lists and reads Greek items in their folder", async () => {

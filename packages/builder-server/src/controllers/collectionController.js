@@ -440,6 +440,22 @@ export async function duplicateItem(req, res) {
 
     const lang = requestLanguage(req, res);
     if (!lang) return;
+
+    // A copy is another item, counted like any other. Without this the cap
+    // applies to New item and to Create version but not to Duplicate, and the
+    // limit disappears for whoever presses the third button.
+    const cap = await req.adapters?.limits?.getLimit?.(scope, LIMIT_KEYS.MAX_COLLECTION_ITEMS);
+    const maxItems = typeof cap === "number" && cap > 0 ? cap : Infinity;
+    if (Number.isFinite(maxItems)) {
+      let existing = 0;
+      for (const each of projectLanguageContexts(req.activeProject)) {
+        existing += (await collectionService.listCollectionItems(storage, scope, collectionType, {}, each)).length;
+      }
+      if (existing >= maxItems) {
+        return res.status(422).json({ error: `This collection has reached its item limit (${maxItems}).` });
+      }
+    }
+
     const dup = await withContentWriteLock(scope.projectId, async () => {
       assertLanguageStillEnabled(scope.projectId, lang);
       const copy = await collectionService.duplicateCollectionItem(storage, scope, collectionType, itemSlug, lang);
