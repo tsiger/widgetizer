@@ -2,7 +2,7 @@
 
 [Review questions](review-questions.md) · [Map](README.md) · [Coverage](coverage.md)
 
-Updated 2026-09-20 (R1, R2, R3, R5, R7 and R8 reviewed). This is the handoff summary; the review questions retain the reasoning and evidence. Update an item's status when it is reviewed, and replace an uncommitted status with the fix commit when available.
+Updated 2026-09-20 (R1, R2, R3, R5, R6, R7 and R8 reviewed). This is the handoff summary; the review questions retain the reasoning and evidence. Update an item's status when it is reviewed, and replace an uncommitted status with the fix commit when available.
 
 **Priority describes the next action, not proof of a bug.** High means check before the stated release or deployment milestone; Medium means planned follow-up; Low means revisit when its trigger occurs. “Before launch” below applies when that feature is included in the launch. Future scaling work does not block a single-process MVP.
 
@@ -155,7 +155,7 @@ Forms and Markdown were checked and found already correct: language-qualified fo
 
 | Point | Priority | When to check | Next action |
 | --- | --- | --- | --- |
-| Hands-on multilingual testing in a real project | Medium | Before declaring multilingual export release-ready | The review was driven through real exports in the test harness, which is stronger than assertion review but is not the same as using a two-language project. The paused hands-on testing remains the last step. |
+| Hands-on multilingual testing in a real project | Done | — | Completed 2026-09-20 — see [the bilingual walkthrough](#the-bilingual-walkthrough). |
 | The legacy upgrade path | Medium | Before releasing to existing single-language projects | Out of scope for this review and still unverified: a project created before languages existed, opened and exported after. |
 
 ### Hosted follow-ups — generic integration checklist
@@ -197,7 +197,7 @@ It covered the content model across both workflows and the failure paths named a
 | --- | --- | --- | --- |
 | Other archive shapes | Medium | When a real malformed backup is reported, or before offering restore as a supported recovery path | The refusals cover the shapes this review reproduced. A truncated ZIP, a manifest with a future `formatVersion`, and content files that parse but are not content have not been examined. |
 | Structural flows still outside content coordination | Medium | During R6 | Shares R1's and R2's boundary item: project create, duplicate, import and theme update do not take the content-write section. R8 did not change that. |
-| Hands-on multilingual testing in a real project | Medium | Before declaring multilingual backup/restore and export release-ready | Shared with R7. Both reviews were driven through the real controllers, which is stronger than assertion review and still not the same as using a two-language project. |
+| Hands-on multilingual testing in a real project | Done | — | Completed 2026-09-20 — see [the bilingual walkthrough](#the-bilingual-walkthrough). |
 
 ### Hosted follow-ups — generic integration checklist
 
@@ -210,11 +210,66 @@ These are requirements for any application embedding the public packages, not a 
 
 **Closure:** the reviewed OSS change is implemented; follow-ups above remain separate. Other archive shapes and hands-on project testing are outside it.
 
+## R6 — Structural operations and partial success
+
+**OSS status:** Implemented and reviewed for the agreed scope. Creating a project from a preset, duplicating one, and applying a theme update now either complete or leave nothing behind, and each can be retried. Fixed in `1bc5ab27`.
+
+Every defect took one shape: remove or regenerate first, fail, then report success. Confirmed defects, each reproduced through the real controllers before being fixed and each covered by a regression verified to fail without its fix: a theme update removed each updatable path before copying its replacement and swallowed the copy's failure, so an unreadable source deleted the project's layout while reporting success — and recorded the new version anyway, which made the obvious repair answer "No update available"; a duplicate whose identity remap failed was returned as a success whose links, menus and translation groups all named the original project's content; creating from a preset deleted the theme's menus before copying the preset's, leaving a project that recorded the preset and had no menus at all; preset collections, media and settings failures were warnings; an unreadable `preset.json` was read as "no settings"; and `updateThemeSettingsFile` swallowed its own failures, so a site-wide link that was never re-pointed did not reach the duplicate's rollback.
+
+**Four more only became reachable once the recovery machinery existed**, and are worth recording as the shape this class of bug takes: two overlapping updates each read the other's working directory, and the second took the first's backup for an abandoned run; a rollback whose own restore failed then deleted the recovery copies; a file half-written before the failure was absent from a rollback list built from what had succeeded; and crash recovery restored what had been displaced while leaving behind what had been added. A rollback is a code path like any other.
+
+**Messages are for desktop users.** No message names a path, a filename or an errno, and none asks anyone to inspect or repair files — those details are in the log. A message claims the project was left as it was only where that is verified: after a prepare-phase failure, which has written only into staging, and after a rollback that confirmed it completed. Where the rollback itself failed, the message says only that the update could not be completed and to try again.
+
+**Verification:** 1,929 backend and 1,565 frontend tests pass, plus full lint (unchanged pre-existing failures). The reviewer's reproductions pass apart from one whose fixture uses the pre-plan marker shape (see limitations). Regression tests live in [structuralFailureRecovery.test.js](../../packages/builder-server/src/tests/structuralFailureRecovery.test.js), which asserts the files on disk, the recorded version and whether a retry works — not the response message.
+
+### Scope of this review
+
+Create, duplicate and theme update. Import was confirmed already covered by R8. **Project deletion was deliberately left out** and keeps its existing boundary: the row is deleted before the directory, so a filesystem failure can leave files with no row.
+
+### Verified limitations
+
+| Limitation | Why it stands |
+| --- | --- |
+| The theme version write is not covered by the rollback | Deferred deliberately. If recording the version fails after a successful swap, the project holds the new files while reporting the old version, and the next update re-applies the same files over themselves — wasteful, not damaging, since updatable paths are replaced wholesale either way. Holding the backup across a database write is more machinery than the outcome warrants. |
+| An interrupted update is undone by the next update, not at startup | Recovery runs as part of applying an update, and only when one is available. A project whose update was interrupted and which is never updated again keeps its backup directory. It is inert and excluded from backups. |
+| Recovery needs the plan the update wrote | The plan names what the update adds; without it there is no safe way to tell an added page from one the user wrote, and removing the wrong one would be worse than leaving it. The plan is written atomically before the first change, so a present one is always complete; an unreadable one restores what it can and stops rather than guessing. |
+| A duplicate is all-or-nothing including its media library | A copy with no media library is the same class of broken result as one with no links, so it rolls back too. This is broader than "identities and references" and is recorded as a deliberate choice. |
+
+### OSS follow-ups
+
+| Point | Priority | When to check | Next action |
+| --- | --- | --- | --- |
+| Project deletion's partial-failure boundary | Medium | Before offering deletion as a recoverable operation, or if orphaned directories are reported | Out of this review's scope. The row goes before the directory, so a filesystem failure leaves files with no row and nothing cleans them up. |
+| Structural flows still outside content coordination | Medium | When a structural operation must not interleave with ordinary content writes | Shares R1's and R2's boundary item. R6 made these operations atomic in themselves; it did not put them inside the content-write section. |
+
+### Hosted follow-ups — generic integration checklist
+
+These are requirements for any application embedding the public packages, not a description of a private deployment.
+
+| Point | Priority | When to check | Next action |
+| --- | --- | --- | --- |
+| Hosts applying theme updates through their own flow | High | Before offering theme updates | Prepare the whole update before changing anything, and record the version only after it succeeds. Replacing paths one at a time leaves a project running half of one theme and half of another, and recording the version first makes the failure unretryable. |
+| Hosts running more than one structural operation per project | Medium | Before allowing concurrent updates | The update serializer is per process. A host that can run two updates of one project at once needs its own coordination, or each will read the other's working directories as its own. |
+
+**Closure:** the reviewed OSS change is implemented; follow-ups above remain separate. Project deletion and a common result shape across the structural handlers are outside it.
+
+## The bilingual walkthrough
+
+Done 2026-09-20, closing the follow-up R7 and R8 both left open. A real two-language project (Arch theme, `olympic` preset, default `en` plus `el`, two collections) was taken through the editor: Greek homepage and About created, headings translated, all six Greek main-menu labels translated and two items re-pointed at the new Greek pages, a news article translated, a deliberate cross-language link picked (Greek page → English page), site title and address set, then export, duplicate, and backup/restore.
+
+**Verified in the generated site:** the Greek navigation renders the Greek menu at root, `el/` and `el/news/` depth with the right relative prefixes; the cross-language link resolved correctly; hreflang is symmetric on pages and on the translated article; the language switcher is right at every depth, including the homepage fallback for a page with no sibling; and **419 anchors across 19 pages had no broken or empty links**, with the sitemap matching the shipped files exactly in both directions. The manifest reported the collection counts R7 introduced, matching what shipped. The backup carried exactly one media-metadata entry and the restore left none behind, as R8 requires. Duplicate and restore each returned the whole project under their own identity rules, and the source was unchanged after both.
+
+**Method:** the editor work was manual. Backup and restore went through the same endpoints the UI calls, because the file picker could not be driven from the test browser — the controller path is identical, the picker interaction is not covered. Everything after the export was checked by scripts written for the occasion; they verify those artifacts and are not part of the test suite.
+
+Two small editor-UI refinements came out of it and are the owner's own design work, tracked outside this review.
+
+**Still outstanding:** the legacy single-language upgrade path — a project created before languages existed, opened and exported after.
+
 ## R2–R8 — Review queue
 
 These priorities are initial triage, not completed investigations. Hosted follow-ups should be added after the corresponding shared behavior is assessed, rather than guessed in advance.
 
-**Suggested next: R6, then R4.** Both are Medium and neither gates an imminent release, so the more valuable next step may be the hands-on two-language testing paused since R1 — R7 and R8 both left it recorded as outstanding, and it is the last thing between multilingual export and calling it release-ready. R6 (operations that partly finish) is the closer follow-on of the two: R8 turned three silent partial results into refusals, and R6 asks the same question of project create, duplicate, import and theme update as whole operations.
+**Suggested next: R4**, the last open item. The hands-on two-language walkthrough that R7 and R8 both left outstanding is **done** — see [below](#the-bilingual-walkthrough) — so the remaining multilingual gap is the legacy single-language upgrade path.
 
 | Item | OSS status | Review priority | When to check | Hosted follow-up |
 | --- | --- | --- | --- | --- |
@@ -222,6 +277,6 @@ These priorities are initial triage, not completed investigations. Hosted follow
 | [R3 — Removing a language during editing](review-questions.md#r3-language-lifecycle-and-content-writes) | Reviewed and implemented — see [above](#r3--removing-a-language-while-someone-is-editing-it) | — | — | Listed above |
 | [R4 — Rules across create, duplicate and translate](review-questions.md#r4-shared-write-rules-without-forcing-one-workflow) | Not reviewed | Medium | Before releasing these workflows under enforced quotas; include R1's copy-path checks | To assess |
 | [R5 — Finding every image and link reference](review-questions.md#r5-one-description-of-reference-bearing-values) | Reviewed and implemented — see [above](#r5--one-description-of-reference-bearing-values) | — | — | Listed above |
-| [R6 — Operations that partly finish](review-questions.md#r6-structural-operations-and-partial-success) | Not reviewed | Medium | Before the next release changing import, clone, theme update or project deletion | To assess |
+| [R6 — Operations that partly finish](review-questions.md#r6-structural-operations-and-partial-success) | Reviewed and implemented — see [above](#r6--structural-operations-and-partial-success) | — | — | Listed above |
 | [R7 — Multilingual website output](review-questions.md#r7-multilingual-output-completion) | Reviewed and implemented — see [above](#r7--multilingual-website-output) | — | — | Listed above |
 | [R8 — Backup and clone completeness](review-questions.md#r8-backup-and-clone-completeness) | Reviewed and implemented — see [above](#r8--backup-and-clone-completeness) | — | — | Listed above |

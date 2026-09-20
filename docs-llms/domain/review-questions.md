@@ -123,13 +123,27 @@ Evidence: [linkEnrichment](../../packages/builder-server/src/utils/linkEnrichmen
 
 ## R6 Structural operations and partial success
 
-**Observed:** project creation/duplication/import, theme update and project deletion cross files/assets/SQLite. Some subordinate failures become warnings; theme update can continue after path-copy errors and still record the target version. An atomic local file write cannot make the full workflow atomic.
+**Status:** OSS implementation reviewed — see [priorities and checkpoints](review-status.md#r6--structural-operations-and-partial-success).
+
+**Original observation:** project creation/duplication/import, theme update and project deletion cross files/assets/SQLite. Some subordinate failures became warnings; theme update could continue after path-copy errors and still record the target version. An atomic local file write cannot make the full workflow atomic.
 
 **Question:** which outcomes count as success, partial success, or a retryable failure? Can the UI accurately explain what remains to repair?
 
-**Simplification candidate:** consistent operation-result shapes and explicit recovery stages. Consider staging/commit boundaries for operations needing all-or-nothing behavior; use retryable cleanup where that better fits the product.
+**Answered: there was no partial success worth keeping, and the question about explaining the repair was the wrong question.** Every failure reproduced took the same shape — remove or regenerate first, fail, then report success — and in each case the honest outcome was not a better explanation but a refusal that leaves nothing behind.
 
-Evidence: [projectController](../../packages/builder-server/src/controllers/projectController.js), [projectScaffold](../../packages/builder-server/src/utils/projectScaffold.js), [projectService](../../packages/builder-server/src/services/projectService.js), [themeUpdateService](../../packages/builder-server/src/services/themeUpdateService.js). Coverage: P1/P2/P4/P5/P6, T2.
+- **A theme update deleted a file and reported success.** Each updatable path was removed and then copied, with the copy's failure caught and logged; the version was recorded regardless. With the theme's `layout.liquid` unreadable, the project lost its layout, was told the update succeeded, and the obvious repair — running the update again — answered "No update available", because the version had already been recorded. The site could not render and the user could not fix it.
+- **A duplicate whose identity remap failed reported success.** The copy regenerates every page, item and menu identity and then re-points the references that named the old ones. A failure between those halves left a project whose links, menus and translation groups all named the *original* project's content, which renders as a site with no internal navigation.
+- **Creating from a preset could leave a project with no menus.** The same remove-then-copy shape: the theme's menus were deleted before the preset's were copied. The project was created, recorded the preset, and had no menus at all.
+
+**The rule that came out of it: a structural operation either completes or leaves nothing behind.** The theme update is now prepared whole and swapped in, with a plan written before the swap so an interrupted run can be undone automatically. Duplication and preset creation roll back and can be retried. What is *not* done is telling the user which files to repair — these are desktop users who cannot act on a path, so the messages say plainly that the operation failed and whether the project was left as it was, and say only that much when the latter is not known.
+
+**Reproducing these needed more than forcing one failure.** Four of the defects only appeared once the recovery machinery existed: two overlapping updates each reading the other's working directory, a rollback whose own restore fails, a file half-written before the failure, and a crash that has to undo additions as well as replacements. A rollback is a code path like any other and fails in its own ways.
+
+**Simplification candidate (partly taken):** the staging/commit boundary exists for the theme update, and creation and duplication have retryable cleanup, which was the "use retryable cleanup where that better fits" half. A single result shape across all the structural operations was not done — each already has a natural failure answer, and inventing a common envelope for three handlers would have been the kind of abstraction this review series keeps declining.
+
+**Scope:** this covered create, duplicate and theme update, and confirmed import was already handled by R8. Project deletion was deliberately left out.
+
+Evidence: [project workflows](operations/projects.md), [theme updates](operations/themes.md#check-and-apply-a-project-update), [themeUpdateService](../../packages/builder-server/src/services/themeUpdateService.js), [projectScaffold](../../packages/builder-server/src/utils/projectScaffold.js), [structural failure tests](../../packages/builder-server/src/tests/structuralFailureRecovery.test.js). Coverage: P1/P2/P4/P5/P6, T2.
 
 ## R7 Multilingual output completion
 
