@@ -33,7 +33,7 @@ A preview must open the intended language version. English About and Greek About
 
 The default language needs a homepage for export to succeed. An additional language needs its own homepage to be included; otherwise the build skips that language and reports it. Its editable content remains. Included languages get their own pages, collection entries and shared header/footer. This checks whether the language has a starting destination, not whether you have finished translating its words.
 
-Listings contain only entries in their own language. English can have three news-list pages while Greek has one. Search-engine information describes the included output, and translated forms receive separate identities. See the [output walkthrough](../operations/output.md#multilingual-boundary-at-this-snapshot) for details and the remaining theme/date work.
+Listings contain only entries in their own language. English can have three news-list pages while Greek has one. Search-engine information describes the included output, and translated forms receive separate identities. See the [output walkthrough](../operations/output.md#multilingual-boundary-at-this-snapshot) for the current rules.
 
 ### Example
 
@@ -61,4 +61,4 @@ Implementation: [previewController](../../../packages/builder-server/src/control
 
 Tests: [preview](../../../packages/builder-server/src/tests/preview.test.js), [export](../../../packages/builder-server/src/tests/export.test.js), [pagination export](../../../packages/builder-server/src/tests/paginationExport.test.js), [collection item export](../../../packages/builder-server/src/tests/collectionItemExport.test.js), [forms manifest](../../../packages/builder-server/src/tests/formsManifest.test.js).
 
-Multilingual export and listing behavior were reviewed through `1775a245`, with focused test runs recorded in [coverage](../coverage.md#latest-validation). The [output status](../operations/output.md#multilingual-boundary-at-this-snapshot) separates implemented behavior from the remaining phase-5 acceptance work.
+Multilingual export and listings have focused regression evidence and two real-project walkthroughs recorded in [coverage](../coverage.md#latest-validation). The [output rules](../operations/output.md#multilingual-boundary-at-this-snapshot) describe the current contract; the walkthroughs do not certify every possible project.

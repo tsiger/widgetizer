@@ -68,7 +68,7 @@ All single-document operations resolve the requested language, defaulting to the
 | Bulk delete | Process IDs in selected language and collect outcomes | Supports partial success; inspect actual successful deletions and cleanup behavior |
 | Claim listing/pagination | Validate widget schema/page size; save claim | Clear competing anchors/pagination within the same language; report moved anchors |
 
-The metadata update and editor-content save are distinct handlers with overlapping rules. Do not assume validation equivalence: [R4](../review-questions.md#r4-shared-write-rules-without-forcing-one-workflow).
+Metadata update and editor-content save remain distinct handlers. The reviewed create/duplicate/version paths mint fresh identities; updates preserve them. Create and duplicate start independent translation groups, while versions join the source group. Derived creation slugs are made unique; explicitly typed invalid or conflicting rename/save slugs are refused. A duplicate clears listing roles because it competes in the same language; a version keeps them for its own language.
 
 Implementation: [pageController](../../../packages/builder-server/src/controllers/pageController.js), [linkEnrichment](../../../packages/builder-server/src/utils/linkEnrichment.js). Tests: [pages](../../../packages/builder-server/src/tests/pages.test.js), [paginationExport](../../../packages/builder-server/src/tests/paginationExport.test.js).
 
@@ -135,3 +135,9 @@ A collection folder that cannot be listed is reported the same way. Skipping it 
 Nothing repairs this automatically. The remaining references render as dead destinations and are fixed by editing the content that holds them; automatic repair is not part of this behaviour.
 
 Implementation: [linkEnrichment](../../../packages/builder-server/src/utils/linkEnrichment.js). Tests: [deletedReferenceCleanup](../../../packages/builder-server/src/tests/deletedReferenceCleanup.test.js).
+
+## Count limits
+
+Collection create, duplicate and language-version creation consult `MAX_COLLECTION_ITEMS` and count physical items across all project languages. A reached finite cap returns 422 before creating an item. OSS returns Infinity.
+
+`MAX_PAGES_PER_PROJECT` is declared in the adapter contract but is not enforced by the current page creation handlers. An embedding app cannot rely on that value alone to impose a page allowance. This has no limiting effect in OSS, whose allowance is unbounded.

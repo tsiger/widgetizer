@@ -40,7 +40,7 @@ While the project has only one language, you can change its default language des
 
 Editor language controls select content for you to edit. A visitor-facing language selector is supplied by the theme. The current rendering support can point to a related version, or to that language's homepage when the specific version is missing. A language without a homepage is left out of that selector's available destinations.
 
-That fallback does not create or translate a missing page, and it does not silently retarget every ordinary link on the site. The Arch header's visible selector is still pending at this baseline; the rendering support alone does not add a control to the theme.
+That fallback does not create or translate a missing page, and it does not silently retarget every ordinary link on the site. Arch 0.9.10 has an optional header selector in desktop and mobile navigation; another theme must provide its own control.
 
 ### Including the language in an export
 
@@ -144,3 +144,5 @@ Use project editing while `languages` is empty. Root paths stay the same and the
 Implementation: [languageController](../../../packages/builder-server/src/controllers/languageController.js), [languageService](../../../packages/builder-server/src/services/languageService.js), [translationService](../../../packages/builder-server/src/services/translationService.js), [pageController](../../../packages/builder-server/src/controllers/pageController.js), [collectionController](../../../packages/builder-server/src/controllers/collectionController.js), [projectController](../../../packages/builder-server/src/controllers/projectController.js).
 
 Test evidence: [languageService](../../../packages/builder-server/src/tests/languageService.test.js) and [translationGroups](../../../packages/builder-server/src/tests/translationGroups.test.js). Inspected assertions include untouched source files, new target identities, per-language conflicts, deleting a group member, survivor usage after failed removal, and shared binaries remaining. UI suites are listed in [coverage](../coverage.md).
+
+Removal may leave empty language directories. Current readers enumerate content rather than treating directory existence as a language or a page.

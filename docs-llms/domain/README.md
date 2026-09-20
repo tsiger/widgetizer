@@ -4,7 +4,7 @@ Start here when asking **what exists, what owns it, and what else changes when I
 
 Every entity and workflow page starts with a **plain-language guide**: what it means, what you can do, what else changes, and when the result is saved. You can read those guides without opening code. Stop at **Technical details** unless you want implementation and test evidence.
 
-Reviewed through **`1775a245` (multilingual step 21)**. Multilingual export and language-specific collection listings are now included. The remaining theme, date-formatting, upgrade-verification and documentation steps are listed in [output status](operations/output.md#multilingual-boundary-at-this-snapshot).
+Updated 2026-09-20 against the completed R1–R8 review and real-project checks recorded through `f10e20ce`. This folder describes current behaviour, boundaries and evidence. It is not a task queue.
 
 ## A reading route through the app
 
@@ -20,7 +20,7 @@ For a quick distinction that applies throughout: **editing changes your working 
 | What happens when I create, import, duplicate, or delete something | [Operation directory](operations/README.md) |
 | What is shared and what changes with language | [Multilingual rules](multilingual.md) |
 | Which expectations have test evidence | [Coverage map](coverage.md) |
-| Where the model or implementation could be simpler | [Review questions and simplification candidates](review-questions.md) |
+| What an embedding app must preserve | [Integration contracts](operations/integration.md) |
 | Where the code lives | [Architecture](../core-architecture.md) and [package contracts](../core-packages.md) |
 
 ## The relationship map
@@ -86,7 +86,7 @@ The English About page and its Greek version are related but separately editable
 ## How to read and maintain this map
 
 - **Current behavior** describes a traced code path. It does not automatically endorse that behavior as the desired product rule.
-- **Review question** means a decision or further investigation is needed; it is not a confirmed defect or proof of a missing test.
+- **Known limitation** describes a current boundary; it is not an instruction to build a feature or a release requirement. Keep planned work outside this folder.
 - **Test evidence** names existing suites and, where inspected, specific cases. A suite's existence is not complete coverage. See the [coverage legend](coverage.md#evidence-levels).
 - Keep rules in the entity or multilingual page; operation pages describe their consequences. Link instead of copying the same rule into every workflow.
 - Keep the plain-language guide and technical details in agreement. Explain consequences in ordinary words first; code names and storage formats belong below the technical boundary. Do not turn behavior still under review into a product promise.
@@ -97,12 +97,13 @@ Scope: application domain objects, supported user workflows, derived artifacts, 
 
 ## Inspection history
 
-**Last reviewed commit: `1775a245` — 2026-09-18.** Use this commit as the starting point for the next handbook update.
+**Evidence baseline: `f10e20ce` — 2026-09-20.** Review scope and method limits are recorded in coverage; no claim of exhaustive verification is made.
 
 | Pass | Commits included | What was reviewed |
 | --- | --- | --- |
 | Initial map | `6500c601`, then `cb81f267` | Domain and operation inventory; language-qualified previews |
 | Plain-language guides | Through `a0f7c545` | Everyday explanations; rendered language and language-switch destinations |
 | Export and listings update | `0d4815ba`, `1775a245` | Export eligibility, translated output/SEO/forms, language-specific listings and pagination; affected source and new test assertions |
+| Completed domain review | R1–R8; documentation through `f10e20ce` | Media safety, deletion references, language lifecycle, write rules, theme references, structural failures, export and backup/clone; two real-project walkthroughs |
 
-The latest pass ran four focused backend test files and three frontend/package test files successfully; see [validation details](coverage.md#latest-validation). It did not run a full suite or complete the remaining phase-5 acceptance work. Source links point to the working implementation, so recheck affected descriptions as development proceeds.
+The completed reviews, reported full-suite results and both hands-on walkthroughs are recorded in [validation details](coverage.md#latest-validation). The initial export/listings pass above was narrower; it is retained as inspection history, not current pending work.

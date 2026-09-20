@@ -29,7 +29,7 @@ Opening **another editing language version** takes you to a different page or en
 
 Using a **visitor-facing language selector** depends on the theme. Current rendering support offers the related page when it exists, or that language's homepage when it does not. Languages without a homepage are omitted from those destinations. This is navigation help, not automatic translation.
 
-Arch's visible header selector is still pending at the reviewed step-21 baseline. The destinations exist in the rendering system; the theme control is the next step.
+Arch 0.9.10 offers a header language-selector setting, using `page.translations` in desktop and mobile navigation. Existing projects receive the updated template through a theme update.
 
 ### What happens when a translation is missing?
 
@@ -47,7 +47,7 @@ Removing a language deletes its authored content and translated image descriptio
 
 Add Greek, create Greek Home and About, and translate the Greek menu. Reuse the café photographs, giving them Greek descriptions where needed. Later, add a news article only in English. The site can contain this mix while you decide which additional versions to write.
 
-Export requires the default homepage and includes additional languages only when they have a homepage of their own. A skipped language is named in the result; its editable content is kept. An included Greek news list shows only Greek articles, even when the English list has more. Translated forms have separate exported identities. See [output rules and remaining work](operations/output.md#multilingual-boundary-at-this-snapshot).
+Export requires the default homepage and includes additional languages only when they have a homepage of their own. A skipped language is named in the result; its editable content is kept. An included Greek news list shows only Greek articles, even when the English list has more. Translated forms have separate exported identities. See [output rules](operations/output.md#multilingual-boundary-at-this-snapshot).
 
 ## Technical details
 
@@ -128,10 +128,10 @@ Additional languages without homepages are omitted. The default destination assu
 5. Remove a language: delete that partition and its usage/metadata overrides; retain shared assets and other versions.
 6. Change the default code only while no additional languages exist. Root content stays in place and is relabeled.
 
-## Cases to check for each operation
+## Behaviour evidence
 
-Use meaningful combinations, not a blind Cartesian product: default-only project; added language with no pages; two versions with the same slug; versions with different slugs; missing/deleted source member; explicit cross-language links; inherited versus empty metadata; language removal partway through a write; project copy/backup round-trip.
+The coverage map records evidence for default-only and multilingual projects, independent translation structures, missing siblings, cross-language links, inherited versus blank metadata, language removal and backup/copy identity rules. Evidence for one combination does not establish every other combination.
 
 Source: [contentAddress](../../packages/core/src/utils/contentAddress.js), [contentLanguage](../../packages/builder-server/src/utils/contentLanguage.js), [translationService](../../packages/builder-server/src/services/translationService.js), [languageService](../../packages/builder-server/src/services/languageService.js), [metadata resolver](../../packages/core/src/utils/mediaMetadata.js), [renderEngine](../../packages/render-engine/src/renderEngine.js).
 
-The [coverage map](coverage.md) distinguishes inspected assertions, focused test runs and suites merely located. The [output status](operations/output.md#multilingual-boundary-at-this-snapshot) records implemented behavior and the remaining phase-5 checks.
+The [coverage map](coverage.md) distinguishes inspected assertions, focused test runs and suites merely located. The [output rules](operations/output.md#multilingual-boundary-at-this-snapshot) describe current rendering and export behaviour.
