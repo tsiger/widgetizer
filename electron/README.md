@@ -22,10 +22,16 @@ See [CLAUDE.md](../CLAUDE.md#electron-desktop-app) for the full list. Quick refe
 npm run electron:dev               # Run Electron against the Vite + Express dev servers
 npm run electron:build:mac         # Package signed/notarized macOS installer
 npm run electron:build:win         # Package signed Windows installer (run on Windows)
+npm run electron:build:linux       # Package Linux x64 .deb (run on Linux x64)
 npm run electron:preflight         # Pre-release sanity check: lint + locale validation
 ```
 
-The four `electron:build:*` scripts are thin wrappers over `scripts/build-electron.mjs`, which runs Vite build → platform prep → `@electron/rebuild` → `electron-builder`.
+The `electron:build:*` scripts are thin wrappers over `scripts/build-electron.mjs`, which runs Vite build → platform prep → `@electron/rebuild` → `electron-builder`.
+
+Linux produces `dist-electron/Widgetizer-<version>-amd64.deb` for Debian/Ubuntu/Mint.
+The command builds locally and never publishes a release. It reuses the existing app
+icon and generates a **Widgetizer Desktop** applications-menu entry. See
+[Linux packaging](../docs-llms/core-electron.md#linux-packaging) for prerequisites and verification.
 
 ## Notes
 

@@ -2,6 +2,7 @@
   "name": "widgetizer",
   "version": "0.9.10",
   "description": "A visual website builder with theme support",
+  "homepage": "https://widgetizer.org",
   "author": "Widgetizer",
   "private": true,
   "type": "module",
@@ -45,6 +46,7 @@
     "electron:build:mac:unsigned": "node scripts/build-electron.mjs --platform mac --unsigned",
     "electron:build:win": "node scripts/build-electron.mjs --platform win",
     "electron:build:win:unsigned": "node scripts/build-electron.mjs --platform win --unsigned",
+    "electron:build:linux": "node scripts/build-electron.mjs --platform linux",
     "electron:preflight": "npm run validate:all-locales && npm run lint:all"
   },
   "dependencies": {
