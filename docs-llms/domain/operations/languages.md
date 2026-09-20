@@ -56,9 +56,13 @@ Add Greek, create Greek Home and About, and translate the Greek menu. Leave your
 
 **Before:** supported normalized code, not the default or already enabled, no clash with a root page slug or public collection URL prefix.
 
-Inside a per-project language-operation queue, read fresh project metadata; copy default-language menus with new menu UUIDs; copy globals and rewrite schema-declared menu selections to those copies; create global media-usage rows; finally record the new additional language in the project row. Copied menu items retain their original page/item targets. No pages or collection items are copied.
+Inside a per-project language-operation queue, read fresh project metadata; give the language the menus it needs, each with its own UUID; give it globals whose schema-declared menu selections point at those menus; create global media-usage rows; finally record the new additional language in the project row. Copied menu items retain their original page/item targets. No pages or collection items are copied.
 
-If seeding fails, the language is not recorded as enabled. Files may already have been written; retry behavior matters. Tests include a half-finished seed converging on retry and concurrent add requests retaining both languages.
+**Seeding creates what is missing and replaces nothing.** A menu, header or footer already present in that language belongs to the site — left by an earlier run that stopped partway, or restored from a backup — and is kept as it is. Newly created globals point at the menus that are already there rather than at fresh copies; a menu carrying no UUID has one stamped, which adds an identity without changing content. An existing global's media-usage rows are refreshed even though its file is untouched, because an interrupted run or a restore may not have recorded them.
+
+**Everything the seed reads or writes is read before any of it is written** — the destinations it must not overwrite, the menus and globals it copies from, and the global widgets' schemas. Absent is ordinary: a site may have no footer, and a widget may declare no schema. Unreadable stops the operation with nothing changed, because checking as it goes would let a corrupt header halt a run that had already created menus. The schema matters here specifically: it names which settings hold a menu, so a copy made without it would keep pointing at the source language's menus.
+
+If seeding fails, the language is not recorded as enabled. Retrying is safe by construction rather than by convergence: a second run creates only the pieces the first did not reach. Tests cover a finished seed re-run changing nothing, a half-finished seed completing and connecting to what survived, translated content already in the language being left alone, unreadable source and destination content stopping before any write, and concurrent add requests retaining both languages.
 
 ## Create a language version
 

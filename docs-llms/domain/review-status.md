@@ -2,7 +2,7 @@
 
 [Review questions](review-questions.md) · [Map](README.md) · [Coverage](coverage.md)
 
-Updated 2026-09-20 (R1, R2, R3, R5 and R7 reviewed). This is the handoff summary; the review questions retain the reasoning and evidence. Update an item's status when it is reviewed, and replace an uncommitted status with the fix commit when available.
+Updated 2026-09-20 (R1, R2, R3, R5, R7 and R8 reviewed). This is the handoff summary; the review questions retain the reasoning and evidence. Update an item's status when it is reviewed, and replace an uncommitted status with the fix commit when available.
 
 **Priority describes the next action, not proof of a bug.** High means check before the stated release or deployment milestone; Medium means planned follow-up; Low means revisit when its trigger occurs. “Before launch” below applies when that feature is included in the launch. Future scaling work does not block a single-process MVP.
 
@@ -169,11 +169,52 @@ These are requirements for any application embedding the public packages, not a 
 
 **Closure:** the reviewed OSS change is implemented; follow-ups above remain separate. Hands-on project testing and the legacy upgrade path are the remaining work before multilingual export is release-ready.
 
+## R8 — Backup and clone completeness
+
+**OSS status:** Implemented and reviewed for the agreed scope. Both workflows preserve the whole project, including a language the static site export would skip; a backup this version cannot fully restore is refused instead of importing part of a site; and adding a language no longer overwrites translated content. Fixed in `57a57bfd`.
+
+The content model itself was already correct in both workflows. One bilingual fixture carrying page and item translation groups, groups whose original identifying member was deleted, out-of-schema item fields, per-language manual order, `siteIdentity`, per-language media overrides including the difference between "inherit" and "deliberately blank", and every reference kind in the root, in language folders and in per-language globals, came through duplication and through backup/restore intact — under new identities for a duplicate and the backup's own for a restore.
+
+Confirmed defects, each reproduced through the real controllers before being fixed and each covered by a regression verified to fail without its fix: the backup archived any `uploads/media.json` found on disk *and* appended the serialized library under the same name, so an extractor keeping the first entry made a leftover file the restored library; a media library that could not be read, was not a library (`{}`, or a `files` that is not a list), or could not be written restored as empty and reported success; the intermediate media file was deleted even when the restore had failed, turning a recoverable state into a silent loss; a single unreadable language code dropped every language including the valid ones, leaving their content on disk with nothing listing it and returning 201; adding a language back — the natural response to that — overwrote the restored menus and globals with copies of the default language's; the seeding preflight checked the files it would overwrite but not the ones it copied from, so an unreadable source header halted a run that had already created menus; rejected imports left the server's temporary upload behind; and the first refusal message told a non-technical user to remove the language it named, which is advice to delete a site's content.
+
+**Verification:** 1,909 backend and 1,565 frontend tests pass, plus full lint (unchanged pre-existing failures) and locale validation. The reviewer's independent reproduction scripts pass unchanged. Regression tests live in [backupCloneCompleteness.test.js](../../packages/builder-server/src/tests/backupCloneCompleteness.test.js), which keeps the bilingual round-trip as one assertion applied to both workflows, and [languageService.test.js](../../packages/builder-server/src/tests/languageService.test.js) for the seeding contract.
+
+### Scope of this review
+
+It covered the content model across both workflows and the failure paths named above. **It is not an audit of every way an archive can be malformed**, and a successful restore of the fixture does not establish that every archive shape is handled.
+
+### Verified limitations
+
+| Limitation | Why it stands |
+| --- | --- |
+| A duplicate still copies a stale `uploads/media.json` | The file is inert: the backup path no longer reads it, so the duplicate's own backups are correct. Removing it would be a cleanup nobody asked for during a copy. |
+| A refused import leaves nothing, including nothing to inspect | The failure handler removes the row and directory. Someone diagnosing a rejected backup works from the message and their own file, not from a partial project. |
+| Identity rules stay different by design | A duplicate re-keys content so two projects can coexist; a restore keeps the backup's identities because they are the project. They are not being converged. |
+
+### OSS follow-ups
+
+| Point | Priority | When to check | Next action |
+| --- | --- | --- | --- |
+| Other archive shapes | Medium | When a real malformed backup is reported, or before offering restore as a supported recovery path | The refusals cover the shapes this review reproduced. A truncated ZIP, a manifest with a future `formatVersion`, and content files that parse but are not content have not been examined. |
+| Structural flows still outside content coordination | Medium | During R6 | Shares R1's and R2's boundary item: project create, duplicate, import and theme update do not take the content-write section. R8 did not change that. |
+| Hands-on multilingual testing in a real project | Medium | Before declaring multilingual backup/restore and export release-ready | Shared with R7. Both reviews were driven through the real controllers, which is stronger than assertion review and still not the same as using a two-language project. |
+
+### Hosted follow-ups — generic integration checklist
+
+These are requirements for any application embedding the public packages, not a description of a private deployment.
+
+| Point | Priority | When to check | Next action |
+| --- | --- | --- | --- |
+| Hosts offering their own backup or restore | High | Before offering restore as a recovery path | Serialize the media library from the database rather than from a file in the project folder, refuse an archive this version cannot fully restore instead of importing part of it, and treat a library that cannot be read or written as a failure rather than an empty library. |
+| Hosts seeding languages through their own flow | Medium | Before adding languages outside the packaged handler | Seeding must create what is missing and replace nothing, and read everything it touches before writing any of it. A host that copies unconditionally will overwrite translated content the moment a language is added over existing files. |
+
+**Closure:** the reviewed OSS change is implemented; follow-ups above remain separate. Other archive shapes and hands-on project testing are outside it.
+
 ## R2–R8 — Review queue
 
 These priorities are initial triage, not completed investigations. Hosted follow-ups should be added after the corresponding shared behavior is assessed, rather than guessed in advance.
 
-**Suggested next: R8.** It is the remaining High-priority item, and it shares R7's subject matter — R7 established that the export publishes a deliberately narrower site than the project on disk, and R8 asks the converse question of whether a backup or clone preserves the whole of it. The hands-on two-language testing paused during R1–R7 pairs naturally with either. R4 and R6 gate releases that are not imminent.
+**Suggested next: R6, then R4.** Both are Medium and neither gates an imminent release, so the more valuable next step may be the hands-on two-language testing paused since R1 — R7 and R8 both left it recorded as outstanding, and it is the last thing between multilingual export and calling it release-ready. R6 (operations that partly finish) is the closer follow-on of the two: R8 turned three silent partial results into refusals, and R6 asks the same question of project create, duplicate, import and theme update as whole operations.
 
 | Item | OSS status | Review priority | When to check | Hosted follow-up |
 | --- | --- | --- | --- | --- |
@@ -183,4 +224,4 @@ These priorities are initial triage, not completed investigations. Hosted follow
 | [R5 — Finding every image and link reference](review-questions.md#r5-one-description-of-reference-bearing-values) | Reviewed and implemented — see [above](#r5--one-description-of-reference-bearing-values) | — | — | Listed above |
 | [R6 — Operations that partly finish](review-questions.md#r6-structural-operations-and-partial-success) | Not reviewed | Medium | Before the next release changing import, clone, theme update or project deletion | To assess |
 | [R7 — Multilingual website output](review-questions.md#r7-multilingual-output-completion) | Reviewed and implemented — see [above](#r7--multilingual-website-output) | — | — | Listed above |
-| [R8 — Backup and clone completeness](review-questions.md#r8-backup-and-clone-completeness) | Not reviewed | High | Before releasing multilingual backup/restore as a supported recovery path | To assess |
+| [R8 — Backup and clone completeness](review-questions.md#r8-backup-and-clone-completeness) | Reviewed and implemented — see [above](#r8--backup-and-clone-completeness) | — | — | Listed above |

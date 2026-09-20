@@ -157,13 +157,27 @@ Evidence: [output boundaries](operations/output.md#multilingual-boundary-at-this
 
 ## R8 Backup and clone completeness
 
-**Observed:** duplication remaps content UUIDs; import keeps copied content UUIDs inside a new project; both regenerate media IDs. Repository-level metadata rewrite assertions exist, while a complete multilingual artifact round-trip requires more than that one layer.
+**Status:** OSS implementation reviewed for the agreed scope — see [priorities and checkpoints](review-status.md#r8--backup-and-clone-completeness).
+
+**Original observation:** duplication remaps content UUIDs; import keeps copied content UUIDs inside a new project; both regenerate media IDs. Repository-level metadata rewrite assertions exist, while a complete multilingual artifact round-trip requires more than that one layer.
 
 **Question:** do both workflows preserve all translations, groups with deleted original members, archived fields, manual orders, media overrides and every reference kind?
 
-**Simplification candidate:** a small shared multilingual fixture and a semantic comparison helper that accounts for each operation's intentional identity changes. Keep backup and clone semantics separate instead of forcing identical identity behavior.
+**Answered: yes, and the content was never the problem.** One bilingual fixture — carrying both kinds of translation group, page and item groups whose original identifying member was deleted, out-of-schema item fields, per-language manual order, `siteIdentity`, per-language media overrides including the difference between "inherit" and "deliberately blank", and every reference kind in the root, in language folders and in per-language globals — came through both workflows intact, under each one's own identity rule. A language the [static site export](operations/output.md#multilingual-boundary-at-this-snapshot) refuses to publish, because it has content but no homepage, survives both.
 
-Evidence: [project workflows](operations/projects.md), [remapping](../../packages/builder-server/src/utils/linkEnrichment.js), [projects tests](../../packages/builder-server/src/tests/projects.test.js), [media tests](../../packages/builder-server/src/tests/media.test.js). Coverage: P4/P5/M2.
+**What failed was everything around the content.** Three defects, each reproduced through the real controllers before being fixed, and one wording correction:
+
+- **A backup could restore the wrong media library.** The file walk archived any `uploads/media.json` in the project folder, and the serialized library was appended under the same name. Two entries, one name, and an extractor keeps the first — so a leftover file became the restored library while the real one was lost. SQLite is now the only source; older backups carrying both copies are refused rather than guessed at; and a library that cannot be read, is not a library, or cannot be written fails the import instead of restoring as empty.
+- **A backup this version could not read imported as a success that had lost part of the site.** One unreadable language code dropped every language, valid ones included, while their pages, menus and items stayed on disk with nothing listing them. The import is now refused before a name, folder or row exists.
+- **Seeding a language overwrote translated content.** The natural response to the defect above — add the language back — replaced the restored menus and header with copies of the default language's. Seeding now creates what is missing and replaces nothing, reads everything it touches before writing any of it, and points new globals at the menus already there.
+
+**The lesson worth keeping: a workflow that "succeeds" while returning part of a project is worse than one that refuses.** Every fix here turns a silent partial result into a refusal that says what happened and leaves nothing behind. The wording matters for the same reason — the first refusal message suggested removing the language it named, which is advice to delete a site's content, and now points at a newer version instead.
+
+**Simplification candidate (taken):** the shared multilingual fixture exists, asserted through one helper applied to both workflows and parameterised only by the identity rule — new uuids for a duplicate, the backup's own for a restore. Backup and clone semantics stay separate, as intended.
+
+**Scope:** this covered the content model and the failure paths named above. It is not an audit of every way an archive can be malformed.
+
+Evidence: [project workflows](operations/projects.md), [language seeding](operations/languages.md#add-a-language), [remapping](../../packages/builder-server/src/utils/linkEnrichment.js), [backup and clone tests](../../packages/builder-server/src/tests/backupCloneCompleteness.test.js). Coverage: P4/P5/M2, L1.
 
 ## What is already simplifying the model
 
