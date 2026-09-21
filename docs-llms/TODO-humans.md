@@ -23,7 +23,7 @@ The same IDs appear in [the agent version](TODO-agents.md). Technical detail and
 
 Multilingual websites work and both real-project walkthroughs passed. Some broader documentation may still lag.
 
-**Next:** Reconcile the remaining documentation before closing the feature locally. [GitHub #115](https://github.com/tsiger/widgetizer/issues/115)
+**Next:** Reconcile the remaining documentation before closing the feature locally, starting with the [multilingual rules](domain/multilingual.md) and [user checklist](user-test-checklist.md). [GitHub #115](https://github.com/tsiger/widgetizer/issues/115)
 
 ### GH118 · Review export asset naming
 
@@ -39,7 +39,7 @@ Exports should identify their assets using a number, app version and date.
 
 Automatic structured information for search engines has been implemented.
 
-**Next:** Check the shipped feature against the original intention before closing the issue. [GitHub #122](https://github.com/tsiger/widgetizer/issues/122)
+**Next:** Check the shipped feature against the [documented rules](core-export.md#structured-data-json-ld) and [business details](core-projects.md#6-site-identity-and-business-details) before closing the issue. [GitHub #122](https://github.com/tsiger/widgetizer/issues/122)
 
 ### GH126 · Review the Windows leave-page prompt fix
 
@@ -71,7 +71,7 @@ Undo history now survives saves, so autosave should not prevent undoing an edit.
 
 The visible app rename has already been implemented.
 
-**Next:** Check the user-facing names before closing the task. [GitHub #135](https://github.com/tsiger/widgetizer/issues/135)
+**Next:** Check the user-facing names and preserve the [existing installation identity](core-electron.md#display-name-and-installation-identity) before closing the task. [GitHub #135](https://github.com/tsiger/widgetizer/issues/135)
 
 ## Decisions to make
 

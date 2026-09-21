@@ -166,6 +166,8 @@ sweep takes the anchor from a page it also turns that page's `paginate` off (§5
 
 ## 5b. Pagination
 
+Pagination belongs to a listing widget on an ordinary editable page. Dedicated theme archive pages would take that page's layout out of the author's control; client-side load-more alone would not provide the static, independently addressable pages needed for navigation and search engines. Numbered copies preserve the surrounding widgets and change only the listing's slice.
+
 A listing widget can split its page into numbered copies. The schema names the setting that holds items per page:
 
 ```json

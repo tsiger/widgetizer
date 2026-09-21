@@ -1,6 +1,6 @@
 # Future: Image Optimization — formats, delivery sizes, one-click cleanup
 
-> **Status: approaches proposed 2026-09-09, decision pending.** Standalone backlog item — deliberately **not** part of the feature series in `future-roadmap.md`; it has no dependency on those stages and none of them depend on it. Pick it up whenever.
+> **Status: approaches proposed 2026-09-09, decision pending.** Standalone backlog item with no dependency on the completed breadcrumbs, pagination, structured-data or multilingual features. Pick it up whenever.
 >
 > **Problem statement (Gerasimos, 2026-09-09):** users — increasingly with AI-generated images — upload large PNGs and end up with sites full of files that are far heavier than they need to be. The fix must not put a non-technical user through a process they don't understand. Facts below were verified against the code on `0.9.10` the same day.
 

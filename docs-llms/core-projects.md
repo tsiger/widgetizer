@@ -172,6 +172,8 @@ Projects can be imported from ZIP files previously exported from Widgetizer.
 
 ### 6. Site Identity and Business Details
 
+Business facts belong to the project, independently of theme presentation. Themes can display them in ordinary page or footer blocks, so authors maintain useful visible content rather than a second set of SEO-only fields. Core derives search metadata from those facts; category determines identity kind, and public name can default from Site Title. Reusing the Site Icon as the identity logo requires the author's confirmation.
+
 A project stores who is behind the site — the facts core publishes as structured data ([Site Exporting](core-export.md#structured-data-json-ld)) and themes read as `project.identity` ([Theming](theming.md)). It lives in the `site_identity` JSON column (migration v6, [Database](core-database.md)) and reaches controllers as `project.siteIdentity`.
 
 **Shape.** Owned, validated and resolved by `packages/core/src/utils/siteIdentity.js`. Values that will need translation sit under a `text` key; everything else never will.

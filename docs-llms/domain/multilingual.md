@@ -53,6 +53,14 @@ Export requires the default homepage and includes additional languages only when
 
 The main distinction is **independent documents versus shared resources**. Language support does not multiply every entity or introduce a translation wrapper around every setting.
 
+One project per language was rejected because theme settings, updates and media libraries would drift apart and uploads would be duplicated. Per-field translation overlays were rejected because they would affect every input and save flow while forcing translations to retain the same structure. Independent pages deliberately allow cultural adaptation, including different widgets and blocks.
+
+The default language can change while the project has only one language. Once another language exists, changing the default would move content between root and language folders, change public URLs and reinterpret default media metadata. Static exports cannot issue redirects, so supporting that later requires an explicit migration rather than unlocking the selector.
+
+### Current language limits
+
+Right-to-left languages are excluded from the picker and rejected by the service; supporting them needs direction handling and theme work. `page.translations.dir` reserves that extension without changing the theme contract. Per-language site titles and per-language 404 pages are not supported. Further editor language indicators beyond the existing tabs, chips and page menu remain outside the current feature.
+
 ## What changes by language?
 
 | Object | Shared | Language-specific |
@@ -117,7 +125,7 @@ Do not generalize media metadata fallback into a whole-site fallback policy. [bu
 
 What `buildTranslations` reads off a sibling is defined once, as `translationSibling`. The SEO builders hold whole page and item records while a render holds the uuid reference map, and both are narrowed through that projection before anything is read. Both paths now use one definition of the sibling fields, preventing the missing-field mismatch found in the R7 review.
 
-Additional languages without homepages are omitted. The default destination assumes the required root homepage; export fails when that homepage is missing. For a listing's generated copies, language destinations point to the related base page or homepage, not the same page number in another language: the two lists may have different lengths. This describes the current [builder](../../packages/core/src/utils/translations.js); final theme-contract documentation remains part of step 25.
+Additional languages without homepages are omitted. The default destination assumes the required root homepage; export fails when that homepage is missing. For a listing's generated copies, language destinations point to the related base page or homepage, not the same page number in another language: the two lists may have different lengths. See the [builder](../../packages/core/src/utils/translations.js) and the [theme language-switcher contract](../theming.md#the-language-switcher-pagetranslations).
 
 ## Lifecycle expectations
 

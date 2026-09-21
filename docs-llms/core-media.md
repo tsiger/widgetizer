@@ -20,6 +20,12 @@ The controller chooses the subdir inline from `getMediaCategory(file.mimetype)` 
 - **Smart size generation**: Only sizes meaningfully smaller than the original are generated (`sizeConfig.width >= metadata.width` is skipped). If an 800px image has `large` configured at 1920px, no `large` variant is produced.
 - **Original compression**: When the original is no larger than the largest enabled size (so the original is the effective top delivery asset), it is recompressed in place at the configured quality — dimensions preserved, only file size reduced. GIFs are excluded to preserve animation frames. When the original exceeds the largest enabled size, it is stored untouched (the `large` variant becomes the public delivery ceiling).
 
+### Filename compatibility and future changes
+
+The ASCII filename restriction is also a security boundary: the image-path allowlist protects image output that writes `src` without escaping. Supporting non-ASCII stored names requires reviewing and escaping every affected output, not merely relaxing the upload normalizer. Successful upload or thumbnail generation alone does not establish safe widget rendering or export.
+
+Renaming a stored file after upload is not supported; any future rename must update every reference and generated variant. Automatically stripping camera or tool prefixes from uploaded names remains an undecided enhancement.
+
 ### Decompression-Bomb Guards
 
 Image processing through `sharp` is bounded so a small malicious file cannot exhaust memory:

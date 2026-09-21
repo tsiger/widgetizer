@@ -4,6 +4,12 @@ Widgetizer runs as a native desktop app using Electron. The app embeds the React
 
 This doc covers the **Electron-runtime-specific** material: dev mode, the dynamic-port server model, runtime data paths, the preview window, error handling, build output/distribution, and the local Windows update test. The full **release / auto-update flow** is in [CLAUDE.md](../CLAUDE.md); **asar bundling rules** for the workspace packages live in [core-packages.md](core-packages.md).
 
+## Display name and installation identity
+
+The visible OSS app name is **Widgetizer Desktop**, supplied to the editor by `packages/editor-ui/src/lib/appName.js`. This is a display-name change only. Keep Electron's internal `productName` as **Widgetizer**, and preserve `appId`, installer `artifactName` and the macOS app-menu name.
+
+Electron derives its user-data location, macOS bundle and Windows installation folder from the internal identity. Renaming it can make existing projects appear missing or leave a second installation after an update. Any future internal rename requires an explicit migration for existing installs and data.
+
 ## Development
 
 Run the API server, Vite dev server, and Electron together:

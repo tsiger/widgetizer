@@ -28,7 +28,7 @@ Steps 0–24 and R1–R8 implemented; domain cleanup is part of this task. Check
 
 **Done when:** Current contracts/checklist agree and remaining issues, if any, have their own task.
 
-**Start:** [future-multilang-design.md](future-multilang-design.md). **Source:** GitHub #115. [GitHub #115](https://github.com/tsiger/widgetizer/issues/115)
+**Start:** [Multilingual rules](domain/multilingual.md), [theme language switcher](theming.md#the-language-switcher-pagetranslations) and [user checklist](user-test-checklist.md). **Source:** GitHub #115. [GitHub #115](https://github.com/tsiger/widgetizer/issues/115)
 
 ### GH118 · Review export asset naming
 
@@ -48,7 +48,7 @@ Structured-data commits e3ae2f424/e48731228 and docs d065e7ae9 exist. Review the
 
 **Done when:** Existing implementation satisfies the agreed feature, or concrete gaps get separate tasks.
 
-**Start:** [future-structured-data-design.md](future-structured-data-design.md). **Source:** GitHub #122. [GitHub #122](https://github.com/tsiger/widgetizer/issues/122)
+**Start:** [Structured data](core-export.md#structured-data-json-ld), [site identity](core-projects.md#6-site-identity-and-business-details) and [collection mappings](core-collections.md#5c-structured-data-structureddata-block). **Source:** GitHub #122. [GitHub #122](https://github.com/tsiger/widgetizer/issues/122)
 
 ### GH126 · Review the Windows leave-page prompt fix
 
@@ -88,7 +88,7 @@ Implemented in 8fae65c5. Product IDs, installer/data paths and update identity d
 
 **Done when:** Agreed UI names are correct with existing installs unaffected.
 
-**Start:** [future-roadmap.md](future-roadmap.md). **Source:** GitHub #135. [GitHub #135](https://github.com/tsiger/widgetizer/issues/135)
+**Start:** [Display name and installation identity](core-electron.md#display-name-and-installation-identity). **Source:** GitHub #135. [GitHub #135](https://github.com/tsiger/widgetizer/issues/135)
 
 ## Decisions to make
 

@@ -1,11 +1,10 @@
 /**
- * Breadcrumb trail builder (docs-llms/future-breadcrumbs-design.md).
+ * Breadcrumb trail builder.
  *
  * Hierarchy comes only from what the user stated: a page's `parentPageUuid`, or
  * for a collection item the listing widget flagged as that collection's anchor
  * (else the one page that lists it). Nothing is inferred from menus or URLs, so
- * a nav edit can never rewrite a trail — or, once stage 3 lands, the
- * BreadcrumbList built from it.
+ * a nav edit can never rewrite a trail or the BreadcrumbList built from it.
  *
  * Pure: callers pass the page map and the listing index in. Rendering lives in
  * the `breadcrumbs` snippet.

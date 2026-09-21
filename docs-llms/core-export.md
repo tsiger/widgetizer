@@ -102,6 +102,8 @@ After pages: collection item pages ([§3](#3-collection-item-page-export)), the 
 
 ### Structured data (JSON-LD)
 
+**Product rules.** Structured data is automatic: derive it from the project's identity, page relationships and declared collection fields rather than asking authors to write SEO markup. It should describe the site's actual content. Core owns safe graph output; themes declare collection field meanings and display the same project-owned business details. Use plain-language readiness messages and actions, not a technical configuration screen. Widget-level schemas, arbitrary JSON-LD editors and special About/Contact page types are outside the current feature.
+
 `{% seo %}` appends one `<script type="application/ld+json">` to every page, numbered copy and item page. It does this in preview and export alike, and a project gets it with no theme change. The graph is built by `packages/core/src/structuredData/`: `buildGraph` runs the builders in `GRAPH_BUILDERS`, isolating any that throw, and `serializeJsonLd` prunes empty values and writes `<`, `>`, `&`, U+2028 and U+2029 as `\u` escapes so user text cannot close the element. The tag appends the script inside its own `try`, so a structured-data failure never costs the page its other meta tags.
 
 **Site URL required.** Every node carries an absolute `@id`, so without a usable `siteUrl` the graph is empty and no script is written — never a relative or preview address.
