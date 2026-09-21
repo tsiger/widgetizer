@@ -221,14 +221,6 @@ Messages such as “Validation failed” do not explain what the user should cha
 
 **Next:** Start with duplicate or reserved page and item filenames.
 
-### T70 · Preserve nested widget scripts and styles on export
-
-**Open · Low · Shared**
-
-A custom widget can work in preview but lose a script stored in a subfolder when exported.
-
-**Next:** Reproduce with a widget using vendor/lib.js.
-
 ### T73 · Let themes choose the page-title separator
 
 **Open · Low · Shared**

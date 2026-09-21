@@ -600,7 +600,7 @@ The full icon set is listed in [arch-icons-list.txt](arch-icons-list.txt).
 
 ### Enqueuing External CSS & JS
 
-For complex widgets, place external files directly in the widget folder and enqueue them:
+Widget-specific JavaScript and CSS files must live directly in the widget folder, alongside `widget.liquid` and `schema.json`. Nested widget asset folders are not supported. Keep each widget's files flat and enqueue them by filename:
 
 ```
 widgets/
@@ -628,13 +628,15 @@ Enqueued assets are rendered by `{% header_assets %}` (styles) and `{% footer_as
 {% enqueue_script src: "carousel.js", defer: true, location: "footer", priority: 40, theme: true %}
 ```
 
-**Deduplication:** the enqueue system keys on the filename, so multiple widgets can safely enqueue the same asset and it is output only once.
+**Deduplication:** the enqueue system keys on the exact `src` string, so multiple widgets can enqueue the same shared asset and it is output only once. Different files must not share the same `src`; a later registration replaces the earlier registration's options, including its widget origin.
 
-> [!IMPORTANT] **Asset Filename Collisions**
+> [!IMPORTANT] **Flat Widget Assets and Unique Filenames**
 >
-> During export, all widget CSS/JS files are flattened into a single `assets/` folder. If two widgets ship files with the same name (e.g. both have `styles.css`), **the last one copied wins** and the other widget breaks in the exported site.
+> Export intentionally places enqueued widget CSS/JS files directly in a single `assets/` folder. Use unique, widget-prefixed filenames (`slideshow.css`, `accordion-scripts.js`), not generic names (`styles.css`, `scripts.js`). Names must not conflict with other widgets or shared theme assets: later copies overwrite earlier files.
 >
-> **Best practice:** use unique, widget-prefixed filenames (`slideshow.css`, `accordion-scripts.js`) instead of generic ones (`styles.css`, `scripts.js`). In preview mode each widget's assets are served from separate paths, so the collision only occurs during export. See [Export](core-export.md).
+> Put shared libraries or dependencies requiring subfolders in the theme's `assets/` directory and enqueue them with `theme: true`, for example `{% enqueue_script src: "vendor/slider.js", theme: true %}`. Theme asset subfolders are preserved on export. A nested widget asset working in preview does not make it supported in exports. See [Export](core-export.md).
+
+These are authoring requirements; the app does not currently validate nested widget assets or filename conflicts. Automated checks are reserved for the future theme-author CLI, not theme upload or update validation.
 
 ### Re-initialization on Partial Updates (external scripts)
 
@@ -1291,7 +1293,8 @@ Before submitting a widget:
 - [ ] Uses `w-*` base classes and `t-*` modifiers (no hardcoded typography CSS)
 - [ ] Carousel layout option added for card-based grid widgets (if applicable)
 - [ ] Color-scheme setting + inline `--widget-bg-color` pattern wired up (if applicable)
-- [ ] Unique, widget-prefixed asset filenames to avoid export collisions
+- [ ] Widget CSS/JS files live directly in the widget folder; dependencies needing subfolders live in theme `assets/` and use `theme: true`
+- [ ] Widget asset filenames are widget-prefixed and unique across widgets and shared theme assets
 - [ ] Scroll-reveal animations added to content elements (`.reveal .reveal-up` with `--reveal-delay`)
 - [ ] `maxBlocks` set where block count should be limited
 - [ ] All `tTheme:` keys in schema have matching entries in `locales/*.json`, and no orphaned keys exist (run `npm run validate:theme-locales`)

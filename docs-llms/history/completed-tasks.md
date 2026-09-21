@@ -65,6 +65,18 @@ The pre-cleanup snapshot is `f10e20ce`.
 | GH121 | Icon search marked completed on GitHub | [Issue #121](https://github.com/tsiger/widgetizer/issues/121), closed 2026-08-06 | GitHub issue |
 | GH132 | Widget shortcuts marked completed on GitHub | [Issue #132](https://github.com/tsiger/widgetizer/issues/132), closed 2026-08-06 | GitHub issue |
 
+## Resolved after the documentation cleanup
+
+### T70 · Document flat widget assets
+
+**Done · Low · Shared · 2026-09-21**
+
+The owner chose flat widget assets as the supported contract instead of adding nested widget export support. Widget CSS/JS lives directly beside the template/schema, with widget-prefixed filenames unique across widgets and shared theme assets. Dependencies requiring subfolders belong in theme `assets/` and use `theme: true` when enqueued by a widget.
+
+**Resolution:** documented in [Widget authoring](../theming-widgets.md#enqueuing-external-css--js), [Theming](../theming.md#asset-management-tags), the author checklist and [Export](../core-export.md#4-asset-copying). Documentation-only; export behaviour is unchanged. Automatic checks are reserved for the future theme-author CLI, with no upload/update validation work scheduled here.
+
+**Body at:** `33cc699a:docs-llms/TODO-agents.md` (the original nested-export proposal). Resolution is recorded in the documentation changes accompanying this entry.
+
 ## Reconciliation decisions
 
 - GitHub #115, #122, #126, #133, #134 and #135 have implementation evidence. Their remaining local entries are review/documentation/integration work, not instructions to rebuild the features. GitHub statuses were left unchanged.

@@ -274,16 +274,6 @@ Map ApiError.data conflicts/validationErrors to localized form errors using visi
 
 **Start:** [CollectionItemForm.jsx](../packages/editor-ui/src/components/collections/CollectionItemForm.jsx). **Source:** Original §66.
 
-### T70 · Preserve nested widget scripts and styles on export
-
-**Open · Low · Shared**
-
-Rendered URLs retain widget asset subpaths; export selection/copy historically uses basenames. Prefer a supported subpath contract; check collisions and enqueue preload too. Arch currently uses flat widget assets.
-
-**Done when:** Preview and export load the same nested asset, with no basename collision.
-
-**Start:** [exportController.js](../packages/builder-server/src/controllers/exportController.js). **Source:** Original §70.
-
 ### T73 · Let themes choose the page-title separator
 
 **Open · Low · Shared**

@@ -686,9 +686,11 @@ These tags allow for efficient, deduplicated loading of assets (CSS and JS) in y
 - **Inside `layout.liquid` or snippets**: `enqueue_*` loads assets from the theme `assets/` folder
 - **`theme: true` option**: When a widget needs to enqueue a shared theme-level asset (e.g., `carousel.js` in `assets/`), pass `theme: true` to force resolution from the theme `assets/` folder, bypassing the widget folder lookup entirely. This generates the correct URL and avoids relying on fallback resolution.
 
-> [!IMPORTANT] **Asset Filename Collisions During Export**
+> [!IMPORTANT] **Flat Widget Assets and Unique Filenames**
 >
-> During export, all widget CSS and JS files are flattened into a single `assets/` folder. If two different widgets have files with the same name (e.g., both have `styles.css`), **the last one copied will overwrite the first**. Use unique, widget-prefixed filenames (e.g., `slideshow.css`, `accordion.js`) to avoid collisions.
+> Widget CSS/JS files must live directly in the widget folder; nested widget asset folders are not supported. Export intentionally places enqueued widget CSS/JS files directly in one `assets/` folder. Use widget-prefixed filenames (e.g., `slideshow.css`, `accordion.js`) that are unique across widgets and shared theme assets, since later copies overwrite earlier files.
+>
+> Shared libraries or dependencies requiring subfolders belong in the theme's `assets/` directory and must be enqueued from widgets with `theme: true`. Theme asset subfolders are preserved. See [Widget asset rules](theming-widgets.md#enqueuing-external-css--js) for the authoring contract and validation policy.
 
 #### Enqueue Script
 
@@ -1760,7 +1762,7 @@ The widget template conditionally renders carousel markup (navigation buttons, a
 
 The `theme: true` option tells the enqueue system to resolve the asset from the theme `assets/` folder rather than the widget's own folder. This is the correct approach for shared theme-level assets used across multiple widgets — `carousel.js` is only loaded when at least one carousel widget is present on the page, and the enqueue system deduplicates it automatically if multiple carousel widgets appear on the same page.
 
-For widget-specific assets (scripts/styles that belong to a single widget), place them in the widget's folder and enqueue without `theme: true`:
+For widget-specific assets (scripts/styles that belong to a single widget), place them directly in the widget's folder, use unique widget-prefixed filenames, and enqueue without `theme: true`:
 
 ```liquid
 {% enqueue_style src: "slideshow.css", priority: 30 %}
@@ -1771,7 +1773,7 @@ These will be automatically rendered by `{% header_assets %}` (for styles) and `
 
 ### Assets During Export
 
-When a project is exported to static HTML, theme `assets/` are copied to the output, all widget `.css`/`.js` files are **flattened** into a single output `assets/` folder, and only images in active use are copied (with public size variants under `assets/images/`; `thumb` variants are skipped). Because widget assets are flattened, files with the same name from different widgets collide — always use unique, widget-prefixed filenames (e.g., `slideshow.css`, not `styles.css`).
+When a project is exported to static HTML, theme `assets/` are copied with their subfolders preserved, enqueued widget `.css`/`.js` files are intentionally **flattened** into the output `assets/` folder, and only images in active use are copied (with public size variants under `assets/images/`; `thumb` variants are skipped). Widget asset subfolders are unsupported. Keep widget CSS/JS directly in the widget folder and use widget-prefixed filenames (e.g., `slideshow.css`, not `styles.css`) that do not conflict with other widgets or shared theme assets.
 
 > See [Export](core-export.md) for the full export pipeline, image-variant delivery rules, and path-rewriting details.
 
