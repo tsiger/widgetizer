@@ -1838,8 +1838,7 @@ describe("saveStore (useAutoSave)", () => {
 
       expect(result).toEqual({ status: "success" });
       // The in-flight save actually sent "Changed" (what it captured at entry) to
-      // the server — per the design (docs-llms/plan-savestore-concurrency-redesign.md),
-      // the write-back rebaselines originalPage to THAT captured snapshot, not to
+      // the server. The write-back rebaselines originalPage to THAT captured snapshot, not to
       // whatever pageStore's live `page` has become — because that's genuinely
       // what the server now holds, regardless of a later local undo.
       expect(usePageStore.getState().originalPage.widgets["w-1"].settings.text).toBe("Changed");

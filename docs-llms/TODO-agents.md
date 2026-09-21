@@ -194,6 +194,18 @@ Distinguish display name from storage folder. Preserve existing project paths an
 
 ## Fixes and investigations
 
+### R-THEME-SAVE · Keep theme-settings saves in order
+
+**Open · Medium · Shared**
+
+Confirmed 2026-09-21 at `8846ab29` with a controlled delayed-response test against the real theme store. Settings permits repeated saves while a request is pending; `themeStore.saveSettings()` has no shared queue. Save red, then blue; let the server store both in order but deliver blue's response before red's. The late red response replaces `originalSettings`, reports the blue draft dirty, and Reset restores red while declaring it clean although the server holds blue. The 17 existing theme-store tests passed; the temporary diagnostic reproduced the gap and was removed.
+
+Coordinate saves at the shared theme-store boundary used by Settings and the page editor. Preserve newer edits, warning corrections, project/load isolation and manual failure reporting. Do not redo the completed page-save redesign or expand into unrelated cross-window/backend coordination.
+
+**Done when:** A retained regression test covers the demonstrated response ordering and Reset agrees with saved content. Shared callers cannot race theme writes or saved baselines; edits during a save remain dirty, and failures/corrections do not overwrite newer work. Check the Settings controls and page-editor caller together.
+
+**Start:** [themeStore.js](../packages/editor-ui/src/stores/themeStore.js), [Settings.jsx](../packages/editor-ui/src/pages/Settings.jsx), [saveStore.js](../packages/editor-ui/src/stores/saveStore.js), [theme-store tests](../packages/editor-ui/src/stores/__tests__/themeStore.test.js). **Source:** 2026-09-21 follow-up check; the retired redesign is retrievable with `git show 8846ab29:docs-llms/plan-savestore-concurrency-redesign.md`.
+
 ### T32 · Check theme-upload validation cleanup
 
 **Investigate · Low · OSS**

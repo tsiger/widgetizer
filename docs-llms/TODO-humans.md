@@ -157,6 +157,14 @@ The folder-name field may expose a technical detail users do not need.
 
 ## Fixes and investigations
 
+### R-THEME-SAVE · Keep theme-settings saves in order
+
+**Open · Medium · Shared**
+
+Confirmed with delayed save responses: save a red color, then blue, and an older response can make the app remember red as the saved value. Reset then brings back red even though blue is actually saved. The settings screen allows these saves to overlap.
+
+**Next:** Coordinate theme-settings saves from both the settings screen and page editor. Verify that delayed responses cannot bring back old values, Reset reflects what was saved, and changes made while saving are preserved.
+
 ### T32 · Check theme-upload validation cleanup
 
 **Investigate · Low · OSS**
