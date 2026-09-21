@@ -434,13 +434,13 @@ This document serves as a comprehensive index to all documentation in the Widget
 
 ### **[future-image-optimization.md](future-image-optimization.md)** - Future: Image Optimization
 
-**Purpose**: Standalone backlog item (not part of the feature series) — why uploaded PNGs stay heavy (format never changed, PNG quality quantises to a palette, no reprocess action, missing `sizes` hints), measured WebP/AVIF gains, and four approaches: silent WebP conversion on upload, theme `sizes` hints, a one-button cleanup for existing libraries built from the existing CLI script, and preset-style quality settings **When to use**:
+**Purpose**: Early concept for lighter website images without extra work for the owner: use the right image size first, optimize new uploads automatically, then safely improve existing projects. Implementation choices remain open. **When to use**:
 
 - Deciding how to reduce image weight for non-technical users
-- Touching the upload pipeline, the `{% image %}` tag, or the media settings
-- Promoting `scripts/optimize-project-media.mjs` into a product feature
+- Discussing automatic upload improvements and preserving original images
+- Planning a safe way to optimize images already used in a project
 
-**Key topics**: Format conversion at upload, retained originals, near-lossless for graphics, `sizes` audit in Arch, reference-rewriting cleanup job, quality presets, `og:image` crawler caveat, definition of done
+**Key topics**: Appropriate image sizes, appearance and transparency, worthwhile savings, retained originals, storage versus download size, progress and recovery, existing image uses, re-exporting, quality controls deferred until needed
 
 ---
 
