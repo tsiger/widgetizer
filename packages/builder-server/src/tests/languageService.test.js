@@ -150,16 +150,107 @@ describe("addLanguage — seeding", () => {
     assert.deepEqual(entries, ["global"]);
   });
 
-  it("re-running after a half-finished seed converges, menus and globals together", async () => {
+  // Seeding creates what is missing and replaces nothing. A second run happens
+  // after a first one stopped partway, or over content a restore brought back —
+  // in both cases what is already in the language is the site's, not ours.
+  it("re-running over a finished seed changes nothing", async () => {
     await addLanguage({ storage, scope, project: project(), code: "el" });
-    const first = await fs.readJSON(path.join(projectBase(), "menus", "el", "main.json"));
+    // Stand in for translated work done after the language was added.
+    const menuPath = path.join(projectBase(), "menus", "el", "main.json");
+    const headerPath = path.join(projectBase(), "pages", "el", "global", "header.json");
+    const translated = { ...(await fs.readJSON(menuPath)), name: "Κύριο" };
+    await fs.writeJSON(menuPath, translated);
+    const headerBefore = await fs.readJSON(headerPath);
 
     // The row was never written (the caller does that), so the code is still addable.
     await addLanguage({ storage, scope, project: project(), code: "el" });
-    const second = await fs.readJSON(path.join(projectBase(), "menus", "el", "main.json"));
+
+    assert.deepEqual(await fs.readJSON(menuPath), translated, "the translated menu is untouched");
+    assert.deepEqual(await fs.readJSON(headerPath), headerBefore, "so is the header");
+  });
+
+  it("re-running after a half-finished seed creates only what is missing, and connects it to what is there", async () => {
+    await addLanguage({ storage, scope, project: project(), code: "el" });
+    const menuPath = path.join(projectBase(), "menus", "el", "main.json");
+    const seededMenu = await fs.readJSON(menuPath);
+    // The shape a run that stopped between the menus and the globals leaves behind.
+    await fs.remove(path.join(projectBase(), "pages", "el", "global"));
+
+    await addLanguage({ storage, scope, project: project(), code: "el" });
+
+    assert.deepEqual(await fs.readJSON(menuPath), seededMenu, "the menu that survived keeps its identity");
     const header = await fs.readJSON(path.join(projectBase(), "pages", "el", "global", "header.json"));
-    assert.notEqual(second.uuid, first.uuid);
-    assert.equal(header.settings.headerNavigation, second.uuid, "the globals follow the newest copies");
+    assert.equal(header.settings.headerNavigation, seededMenu.uuid, "the new header points at it, not at a fresh copy");
+    assert.ok(await fs.pathExists(path.join(projectBase(), "pages", "el", "global", "footer.json")));
+  });
+
+  // The case R8 found: a restore leaves translated content on disk while the
+  // project row lists no languages, so the user adds the language back.
+  it("never replaces translated content that is already in the language", async () => {
+    const menuPath = path.join(projectBase(), "menus", "el", "main.json");
+    const headerPath = path.join(projectBase(), "pages", "el", "global", "header.json");
+    await fs.outputJSON(menuPath, { id: "main", uuid: "restored-menu", name: "Κύριο", items: [] });
+    await fs.outputJSON(headerPath, { type: "header", settings: { logoText: "ΕΛΛΗΝΙΚΑ" } });
+
+    await addLanguage({ storage, scope, project: project(), code: "el" });
+
+    assert.equal((await fs.readJSON(menuPath)).name, "Κύριο");
+    assert.equal((await fs.readJSON(headerPath)).settings.logoText, "ΕΛΛΗΝΙΚΑ");
+    // The footer it had no copy of is created, and points at the restored menu.
+    assert.ok(await fs.pathExists(path.join(projectBase(), "pages", "el", "global", "footer.json")));
+  });
+
+  // The destinations are only half the story: a corrupt file the seed copies
+  // FROM fails just as late, after the menus have already been created.
+  it("stops before writing anything when the header it would copy cannot be read", async () => {
+    await fs.outputFile(path.join(projectBase(), "pages", "global", "header.json"), "{ not json");
+
+    await assert.rejects(
+      () => addLanguage({ storage, scope, project: project(), code: "el" }),
+      (error) => error.name === "LanguageError" && /could not be read/.test(error.message),
+    );
+
+    assert.equal(await fs.pathExists(path.join(projectBase(), "menus", "el")), false, "no menus were created");
+    assert.equal(await fs.pathExists(path.join(projectBase(), "pages", "el", "global")), false);
+  });
+
+  it("stops before writing anything when a global widget's schema cannot be read", async () => {
+    await fs.outputFile(path.join(projectBase(), "widgets", "global", "header", "schema.json"), "{ not json");
+
+    await assert.rejects(
+      () => addLanguage({ storage, scope, project: project(), code: "el" }),
+      (error) => error.name === "LanguageError" && /schema/.test(error.message),
+    );
+
+    assert.equal(await fs.pathExists(path.join(projectBase(), "menus", "el")), false, "no menus were created");
+  });
+
+  it("stops before writing anything when a menu it would copy cannot be read", async () => {
+    await fs.outputFile(path.join(projectBase(), "menus", "main.json"), "{ not json");
+
+    await assert.rejects(
+      () => addLanguage({ storage, scope, project: project(), code: "el" }),
+      (error) => error.name === "LanguageError" && /could not be read/.test(error.message),
+    );
+
+    assert.equal(await fs.pathExists(path.join(projectBase(), "menus", "el")), false, "not even the readable ones");
+  });
+
+  it("stops before writing anything when content already in the language cannot be read", async () => {
+    const menuPath = path.join(projectBase(), "menus", "el", "main.json");
+    await fs.outputFile(menuPath, "{ this is not json");
+
+    await assert.rejects(
+      () => addLanguage({ storage, scope, project: project(), code: "el" }),
+      (error) => error.name === "LanguageError" && /could not be read/.test(error.message),
+    );
+
+    assert.equal(await fs.readFile(menuPath, "utf8"), "{ this is not json", "the unreadable file is left as it was");
+    assert.equal(
+      await fs.pathExists(path.join(projectBase(), "menus", "el", "legal.json")),
+      false,
+      "and nothing else was created either",
+    );
   });
 
   it("repoints a menu setting that names the menu by slug, not by uuid", async () => {

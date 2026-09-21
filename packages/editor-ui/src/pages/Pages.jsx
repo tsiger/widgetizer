@@ -10,6 +10,7 @@ import {
   createPageLanguageVersion,
 } from "../queries/pageManager";
 import { invalidateMediaCache } from "../queries/mediaManager";
+import { hasIncompleteReferenceCleanup } from "../lib/referenceCleanupWarning";
 import { invalidateLinkTargetsCache } from "../hooks/useLinkTargets";
 import { usePageSelection } from "../hooks/usePageSelection";
 import useConfirmationAction from "../hooks/useConfirmationAction";
@@ -57,15 +58,27 @@ export default function Pages() {
   const handleDelete = async (data) => {
     try {
       if (data.isBulkDelete) {
-        await bulkDeletePages(data.pageIds, data.language);
+        const result = await bulkDeletePages(data.pageIds, data.language);
         deselectPages(data.pageIds);
-        showToast(t("pages.toasts.deleteBulkSuccess", { count: data.pageIds.length }), "success");
+        // Deleted either way; the warning is about links elsewhere that still
+        // point at them, not about the deletion having failed.
+        showToast(
+          hasIncompleteReferenceCleanup(result)
+            ? t("pages.toasts.deleteBulkLinksIncomplete", { count: data.pageIds.length })
+            : t("pages.toasts.deleteBulkSuccess", { count: data.pageIds.length }),
+          hasIncompleteReferenceCleanup(result) ? "warning" : "success",
+        );
       } else {
-        await deletePage(data.pageId, data.language);
+        const result = await deletePage(data.pageId, data.language);
         // The deleted page may also be checkbox-selected; drop it so the
         // selection count and bulk actions don't keep referencing a gone id.
         deselectPage(data.pageId);
-        showToast(t("pages.toasts.deleteSuccess"), "success");
+        showToast(
+          hasIncompleteReferenceCleanup(result)
+            ? t("pages.toasts.deleteLinksIncomplete")
+            : t("pages.toasts.deleteSuccess"),
+          hasIncompleteReferenceCleanup(result) ? "warning" : "success",
+        );
       }
       if (activeProject) {
         invalidateMediaCache(activeProject.id);

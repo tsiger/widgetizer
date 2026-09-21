@@ -19,7 +19,8 @@ import { handleProjectResolutionError } from "../utils/projectErrors.js";
 import { sortVersions, getLatestVersion, isValidVersion, isNewerVersion } from "../utils/semver.js";
 import { hasAvailableUpdate } from "../utils/updateStatus.js";
 import { ZIP_MIME_TYPES } from "../utils/mimeTypes.js";
-import { updateThemeSettingsMediaUsage } from "../services/mediaUsageService.js";
+import { updateThemeSettingsMediaUsage, extractMediaPathsFromThemeSettings } from "../services/mediaUsageService.js";
+import { withContentWriteLock, assertIntroducedMediaExists } from "../services/contentCoordination.js";
 import { sanitizeThemeSettings } from "../services/sanitizationService.js";
 import { validateThemeCollectionSchemas } from "../services/collectionService.js";
 import { readAppSettingsFile } from "./appSettingsController.js";
@@ -701,17 +702,23 @@ export async function resolvePresetPaths(themeId, presetId) {
     // No preset menus, use root
   }
 
-  // Read settings overrides
+  // Read settings overrides. A preset without a preset.json simply has no
+  // overrides; one that HAS it and cannot be read is a different thing, and
+  // reading both as "no settings" gives the project the preset's name and the
+  // theme's appearance.
   let settingsOverrides = null;
   const presetJsonPath = path.join(presetDir, "preset.json");
-  try {
-    const content = await fs.readFile(presetJsonPath, "utf8");
-    const presetData = JSON.parse(content);
+  if (await fs.pathExists(presetJsonPath)) {
+    let presetData;
+    try {
+      presetData = JSON.parse(await fs.readFile(presetJsonPath, "utf8"));
+    } catch (error) {
+      console.error(`[themeController] Could not read ${presetJsonPath}: ${error.message}`);
+      throw new Error(`The "${presetId}" preset's settings file could not be read.`);
+    }
     if (presetData.settings && Object.keys(presetData.settings).length > 0) {
       settingsOverrides = presetData.settings;
     }
-  } catch {
-    // No preset.json or invalid JSON, no overrides
   }
 
   // Resolve preset collections/ (item DATA only). Collection-type SCHEMAS are
@@ -1795,25 +1802,55 @@ export async function saveProjectThemeSettings(req, res) {
     // Validate and sanitize theme settings before writing.
     const { data: sanitizedThemeData, warnings } = sanitizeThemeSettings(req.body);
 
-    // Write theme.json through the injected storage adapter over the resolved scope.
-    // The active project's existence is already guaranteed by the
-    // resolveActiveProject middleware (and the write-guard asserts route :projectId
-    // matches scope), so the former manual fs.access project-existence check is gone.
-    await storage.write(scope, "theme.json", JSON.stringify(sanitizedThemeData, null, 2));
+    // The write and its usage sync are one media section, so media deletion cannot
+    // verify between them. See services/contentCoordination.
+    const usageStale = await withContentWriteLock(scope.projectId, async () => {
+      // A favicon picked from the library just before it was deleted must not be
+      // written in; references the settings already carried are left alone.
+      let previousPaths = [];
+      try {
+        const buf = await storage.read(scope, "theme.json");
+        if (buf != null) previousPaths = extractMediaPathsFromThemeSettings(JSON.parse(buf.toString("utf8")));
+      } catch {
+        // No theme.json yet, or unreadable: nothing known to be pre-existing.
+      }
+      await assertIntroducedMediaExists({
+        assetStorage: req.adapters.assetStorage,
+        scope,
+        previousPaths,
+        nextPaths: extractMediaPathsFromThemeSettings(sanitizedThemeData),
+      });
 
-    // Track media used in theme settings (e.g. favicon) for usage and export
-    try {
-      await updateThemeSettingsMediaUsage(scope.projectId, sanitizedThemeData);
-    } catch (usageError) {
-      console.warn("Failed to update theme settings media usage:", usageError.message);
-    }
+      // Write theme.json through the injected storage adapter over the resolved scope.
+      // The active project's existence is already guaranteed by the
+      // resolveActiveProject middleware (and the write-guard asserts route :projectId
+      // matches scope), so the former manual fs.access project-existence check is gone.
+      await storage.write(scope, "theme.json", JSON.stringify(sanitizedThemeData, null, 2));
+
+      // Track media used in theme settings (e.g. favicon) for usage and export
+      try {
+        await updateThemeSettingsMediaUsage(scope.projectId, sanitizedThemeData);
+        return false;
+      } catch (usageError) {
+        console.warn("Failed to update theme settings media usage:", usageError.message);
+        return true;
+      }
+    });
 
     const response = { message: "Theme settings saved successfully" };
-    if (warnings.length > 0) {
-      response.warnings = warnings;
+    // Joins the sanitization warnings already carried here: the settings ARE saved,
+    // and this says only that the derived image-usage rows are behind.
+    const allWarnings = usageStale
+      ? [...warnings, { code: "MEDIA_USAGE_STALE", path: "theme.json" }]
+      : warnings;
+    if (allWarnings.length > 0) {
+      response.warnings = allWarnings;
     }
     res.json(response);
   } catch (error) {
+    if (error?.code === "MEDIA_REFERENCE_MISSING") {
+      return res.status(error.statusCode).json({ message: error.message, code: error.code });
+    }
     if (handleProjectResolutionError(res, error)) return;
     console.error("Error saving project theme:", error);
     res.status(500).json({ message: "Error saving project theme" });

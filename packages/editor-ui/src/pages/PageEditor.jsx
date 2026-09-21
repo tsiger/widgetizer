@@ -54,6 +54,11 @@ export default function PageEditor() {
     // A slug is unique per language, so which language is being edited travels
     // in the URL. Saving already targets it: the loaded page carries its own
     // language and every save sends the page back.
+    // A page load is a new editing session. If the previous one ended with its
+    // language removed, saving was suspended on purpose and has to be re-enabled
+    // here — a suspension that outlived its session would silently stop saving a
+    // page that is perfectly fine.
+    useAutoSave.getState().resumeSaving();
     usePageStore.getState().loadPage(pageId, searchParams.get("language") || undefined);
     if (activeProject?.id) {
       useWidgetStore.getState().loadSchemas(searchParams.get("language") || "");
@@ -72,6 +77,17 @@ export default function PageEditor() {
       .showToast(t("pageEditor.listingAnchor.moved", { pages: listingAnchorMoved.pages.join(", ") }), "info");
     useAutoSave.getState().clearListingAnchorMoved();
   }, [listingAnchorMoved, t]);
+
+  // The page saved, but the server could not update which images it records as
+  // used. Deliberately a warning and not an error: the work IS saved, and the
+  // only consequence is that the media library may call a file unused until a
+  // refresh — deletion checks the content itself, so nothing is at risk.
+  const mediaUsageStale = useAutoSave((state) => state.mediaUsageStale);
+  useEffect(() => {
+    if (!mediaUsageStale) return;
+    useToastStore.getState().showToast(t("pageEditor.mediaUsage.stale"), "warning");
+    useAutoSave.getState().clearMediaUsageStale();
+  }, [mediaUsageStale, t]);
 
   // Handle block selection (cross-component coordination)
   const handleBlockSelect = (blockId) => {

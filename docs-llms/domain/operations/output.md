@@ -45,7 +45,7 @@ Included languages use their own pages, entries, header and footer. A Greek news
 
 A translated contact form also has a separate exported identity, even when it keeps the same form name. Translating its labels does not merge it with the original form. The actual handling of submissions depends on the system serving the exported website.
 
-A homepage is the inclusion rule, not a translation-quality check: copied English text inside a Greek page can still be exported. Check the content and copied navigation destinations before publishing. The Arch theme's visitor language selector and localized month names remain pending; see the status below.
+A homepage is the inclusion rule, not a translation-quality check: copied English text inside a Greek page can still be exported. Check the content and copied navigation destinations before publishing. Arch 0.9.10 provides the optional visitor language selector. Month names use the page language while retaining the author's selected date format.
 
 ### If a build fails
 
@@ -92,7 +92,7 @@ Preflight failure, rendering failure, asset-copy fallback, failure recording, an
 
 ## Multilingual boundary at this snapshot
 
-Reviewed through `1775a245`: step 20 (`0d4815ba`) completes multilingual export selection/artifacts; step 21 (`1775a245`) makes collection listings and pagination use the rendered language. These replace the earlier provisional export notes.
+Current behaviour includes multilingual export selection, language-specific collection listings/pagination and the R7 corrections in `ef3b96ae`. The completed review and hands-on evidence are recorded in [coverage](../coverage.md#latest-validation).
 
 | Area | Current behavior |
 | --- | --- |
@@ -104,22 +104,21 @@ Reviewed through `1775a245`: step 20 (`0d4815ba`) completes multilingual export 
 | Canonicals | Automatic page/item addresses include the language folder and respect Site URL/Clean URLs. An explicit canonical wins on the first page; generated pagination copies use their own addresses. |
 | Sitemap and robots | Describe included languages and their generated listing pages, respecting existing `noindex` rules. Language folders and any Site URL subfolder are retained. A usable Site URL is required for these artifacts. |
 | Alternates | Page/item translation groups supply ordinary hreflang alternates for actual siblings, excluding homepage fallbacks. `x-default` points to the default-language destination and may use its homepage fallback. Sitemap pagination copies have their own entries without translation alternates. |
+| Alternates and `noindex` | A destination marked `noindex` is not advertised as an alternate, in the HTML or in the sitemap, and that includes `x-default` — whether the destination is a sibling page, a sibling item or the homepage a fallback entry points at. A `noindex` page publishes no cluster of its own. The language switcher is unaffected: it reads the same `translations` entries and still offers the language. |
+| Links into a skipped language | Cleared, not published. Link resolution is seeded from the pages and items the export is publishing, so a reference into a skipped language reads as absent and is treated exactly like a deleted target — the destination goes, labels and surrounding words stay. Covers widget links, richtext anchors, menus and theme settings. The `LANGUAGE_SKIPPED` warning states that such links were removed. |
 | Forms | Default form keys stay unchanged; additional languages use `<language>:<form-key>`. The rendered form and manifest agree, and the manifest records the language-qualified page path. Identical names across languages therefore stay separate. |
-| Collection summary | `manifest.collections[].itemCount` still counts default-language items. It is not an all-language total even though export renders other languages' items. |
+| Collection summary | `manifest.collections[].itemCount` totals the items published across every exported language, matching the scope of `itemPages` beside it, and `itemCountByLanguage` breaks the total down per language code. A language the export skipped appears in neither. |
 
-### Remaining phase 5
+### Theme controls and dates
 
-These steps are pending at this baseline; they are not export implementation gaps from steps 20–21.
+Arch 0.9.10 draws the language selector from `page.translations` when the header setting is enabled. Visitor-facing strings come from the theme's site locale dictionary. Existing projects keep their installed templates until a theme update is applied.
 
-| Step | Remaining work and handbook follow-up |
-| --- | --- |
-| 22 — Arch | Build the visible header language selector from `page.translations` and extract remaining hardcoded visitor-facing text. Recheck theme controls and language navigation after it lands. |
-| 23 — localized months | Replace the English month lookup tables with locale-aware formatting and pass the page language to the date filter. Until then, changing content language does not localize month names. |
-| 24 — upgrade verification | Verify existing projects keep their default-language content and output without manual migration. Focused single-language assertions exist; they do not replace the upgrade check. |
-| 25 — documentation | Reconcile architecture/packages references, the theme-facing translation contract and the user-test checklist with the completed implementation. |
+`dateFormat` obtains month names through `Intl.DateTimeFormat` and retains the chosen token order and separators. Date-only handling avoids shifting the day across time zones. The published date filter passes the page language.
+
+A real legacy project retained its root addresses, saved edits, backup contents and English content after adding Greek. The [legacy check](../coverage.md#the-legacy-upgrade-check) records the evidence and its limits.
 
 Source: [exportProjectToDir](../../../packages/builder-server/src/controllers/exportController.js), [collection rendering](../../../packages/builder-server/src/services/renderingService.js), [pagination/rendering](../../../packages/render-engine/src/renderEngine.js), [SEO artifacts](../../../packages/builder-server/src/services/seoArtifacts.js), [forms manifest](../../../packages/builder-server/src/services/formsManifestService.js), [published URLs](../../../packages/core/src/utils/publishedUrls.js), [date formatting](../../../packages/core/src/utils/dateFormat.js).
 
-Focused assertions inspected and tests passed: [multilangExport](../../../packages/builder-server/src/tests/multilangExport.test.js), [collectionFilter](../../../packages/builder-server/src/tests/collectionFilter.test.js), [paginationExport](../../../packages/builder-server/src/tests/paginationExport.test.js), [previewLanguages](../../../packages/builder-server/src/tests/previewLanguages.test.js), and the three package/UI suites listed in [validation details](../coverage.md#latest-validation). This is focused evidence, not full multilingual sign-off.
+Focused assertions inspected and tests passed: [multilangExport](../../../packages/builder-server/src/tests/multilangExport.test.js), [collectionFilter](../../../packages/builder-server/src/tests/collectionFilter.test.js), [paginationExport](../../../packages/builder-server/src/tests/paginationExport.test.js), [previewLanguages](../../../packages/builder-server/src/tests/previewLanguages.test.js), and the three package/UI suites listed in [validation details](../coverage.md#latest-validation). These focused suites are supplemented by the real-project walkthroughs in coverage; neither is exhaustive.
 
 Tests located: [export](../../../packages/builder-server/src/tests/export.test.js), [collectionItemExport](../../../packages/builder-server/src/tests/collectionItemExport.test.js), [paginationExport](../../../packages/builder-server/src/tests/paginationExport.test.js), [cleanUrlsExport](../../../packages/builder-server/src/tests/cleanUrlsExport.test.js), [seoArtifacts](../../../packages/builder-server/src/tests/seoArtifacts.test.js), [structuredDataExport](../../../packages/builder-server/src/tests/structuredDataExport.test.js), [formsManifest](../../../packages/builder-server/src/tests/formsManifest.test.js), [preview](../../../packages/builder-server/src/tests/preview.test.js).

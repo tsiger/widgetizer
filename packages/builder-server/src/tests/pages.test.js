@@ -45,7 +45,7 @@ const {
 
 const projectRepo = await import("../db/repositories/projectRepository.js");
 const { closeDb, getDb } = await import("../db/index.js");
-const { LocalStorageAdapter, LocalScopeResolver } = await import("@widgetizer/adapters-local");
+const { LocalStorageAdapter, LocalScopeResolver, LocalAssetStorageAdapter } = await import("@widgetizer/adapters-local");
 const { writeMediaFile } = await import("../controllers/mediaController.js");
 const { updateCollectionItemMediaUsage, syncPageMediaUsageOnWrite, getMediaUsage } = await import(
   "../services/mediaUsageService.js"
@@ -54,6 +54,9 @@ const { updateCollectionItemMediaUsage, syncPageMediaUsageOnWrite, getMediaUsage
 // The page handlers operate on req.adapters.storage over req.scope. Use the real
 // OSS storage adapter against the isolated test data root, matching production.
 const pageStorage = new LocalStorageAdapter({ dataRoot: TEST_DATA_DIR });
+// Page writes validate that a newly referenced image still exists, so the asset
+// adapter is not optional here any more than it is in a real request.
+const pageAssetStorage = new LocalAssetStorageAdapter({ dataRoot: TEST_DATA_DIR });
 // resolveActiveProject now delegates scope resolution to the injected resolver.
 const scopeResolver = new LocalScopeResolver(getDb());
 
@@ -91,7 +94,7 @@ function mockReq({ params = {}, body = {}, query = {} } = {}) {
       projectId: activeProject.id,
       folderName: activeProject.folderName,
     },
-    adapters: { storage: pageStorage },
+    adapters: { storage: pageStorage, assetStorage: pageAssetStorage },
     app: { locals: {} },
     [Symbol.for("express-validator#contexts")]: [],
   };
@@ -1290,11 +1293,15 @@ describe("pages in another language", () => {
   before(() => {
     activeProject.defaultLanguage = "en";
     activeProject.languages = ["el"];
+    // Persisted too, not just on the in-memory request object: the language check
+    // at each write re-reads the project row, which is what a real removal updates.
+    projectRepo.updateProject(activeProject.id, { defaultLanguage: "en", languages: ["el"] });
   });
 
   after(() => {
     delete activeProject.defaultLanguage;
     delete activeProject.languages;
+    projectRepo.updateProject(activeProject.id, { defaultLanguage: "en", languages: [] });
   });
 
   beforeEach(async () => {

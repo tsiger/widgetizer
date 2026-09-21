@@ -3,13 +3,14 @@
  * Packages the Electron app for a target platform.
  *
  * Usage:
- *   node scripts/build-electron.mjs --platform <mac|win> [--unsigned]
+ *   node scripts/build-electron.mjs --platform <mac|win|linux> [--unsigned]
  *
  * Pipeline (runs sequentially; aborts on any failure):
  *   1. Vite build (`npm run build`)
  *   2. Platform prep
  *        mac: swap in per-arch Sharp binaries via electron/prepare-mac-sharp.cjs
  *        win: install win32 x64 optional deps without saving
+ *        linux: use the Linux x64 host's native dependencies
  *   3. Native rebuild for Electron (`@electron/rebuild --force`)
  *   4. electron-builder with the right platform flag, env vars, and target arg
  */
@@ -24,8 +25,13 @@ const platformIdx = args.indexOf("--platform");
 const platform = platformIdx !== -1 ? args[platformIdx + 1] : null;
 const unsigned = args.includes("--unsigned");
 
-if (platform !== "mac" && platform !== "win") {
-  console.error("Usage: node scripts/build-electron.mjs --platform <mac|win> [--unsigned]");
+if (!["mac", "win", "linux"].includes(platform)) {
+  console.error("Usage: node scripts/build-electron.mjs --platform <mac|win|linux> [--unsigned]");
+  process.exit(1);
+}
+
+if (platform === "linux" && (process.platform !== "linux" || process.arch !== "x64")) {
+  console.error("Build the Linux .deb on a Linux x64 machine so native dependencies match the package.");
   process.exit(1);
 }
 
@@ -92,7 +98,7 @@ run("npm", ["run", "build"]);
 // 2. Platform prep
 if (platform === "mac") {
   run("node", ["electron/prepare-mac-sharp.cjs"]);
-} else {
+} else if (platform === "win") {
   run("npm", ["install", "--no-save", "--platform=win32", "--arch=x64", "--include=optional"]);
 }
 
@@ -102,6 +108,10 @@ run("npx", ["@electron/rebuild", "--force"]);
 // 4. electron-builder
 const builderArgs = ["electron-builder", "--config", "electron/builder.config.mjs", `--${platform}`];
 const builderEnv = {};
+
+if (platform === "linux") {
+  builderArgs.push("--x64", "--publish", "never");
+}
 
 if (platform === "mac" && unsigned) {
   builderArgs.push("dir");

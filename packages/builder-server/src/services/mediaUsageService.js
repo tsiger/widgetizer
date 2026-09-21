@@ -147,7 +147,7 @@ function normalizeMediaPath(value) {
  * @param {object} pageData - Page data object containing widgets
  * @returns {string[]} Array of unique media paths found (e.g., '/uploads/images/photo.jpg')
  */
-function extractMediaPathsFromPage(pageData) {
+export function extractMediaPathsFromPage(pageData) {
   const mediaPaths = new Set();
 
   // Check SEO social media image (og_image)
@@ -188,7 +188,7 @@ function extractMediaPathsFromPage(pageData) {
  * @param {object} widgetData - Widget data object containing settings and blocks
  * @returns {string[]} Array of unique media paths found
  */
-function extractMediaPathsFromGlobalWidget(widgetData) {
+export function extractMediaPathsFromGlobalWidget(widgetData) {
   const mediaPaths = new Set();
 
   function extractFromSettings(settings) {
@@ -219,7 +219,7 @@ function extractMediaPathsFromGlobalWidget(widgetData) {
  * @param {object} themeData - Theme data object (theme.json shape) with settings.global
  * @returns {string[]} Array of unique media paths found
  */
-function extractMediaPathsFromThemeSettings(themeData) {
+export function extractMediaPathsFromThemeSettings(themeData) {
   const mediaPaths = new Set();
   const globalSettings = themeData?.settings?.global;
   if (!globalSettings || typeof globalSettings !== "object") return Array.from(mediaPaths);
@@ -275,7 +275,7 @@ export async function updateThemeSettingsMediaUsage(projectId, themeData) {
   }
 }
 
-function extractMediaPathsFromSiteIdentity(identity) {
+export function extractMediaPathsFromSiteIdentity(identity) {
   const logo = normalizeMediaPath(identity?.logo);
   return logo ? [logo] : [];
 }
@@ -526,12 +526,21 @@ export async function getMediaUsage(projectId, fileId) {
  * any shell can drive it by supplying the right working dir — OSS getProjectDir(folder),
  * or hosted's per-user CloudStorageAdapter.getProjectBase(scope).
  * @param {{ projectId: string, projectDir: string }} args
- * @returns {Promise<{success: boolean, message: string}>} Result with summary message
+ * @returns {Promise<{success: boolean, message: string, skipped: Array<{source: string, reason: string}>}>}
+ *   `skipped` lists content this pass could not read. The rebuilt rows are then
+ *   INCOMPLETE — a file referenced only by skipped content looks unused. Callers
+ *   that merely repair rows may ignore it; a caller about to act on "unused"
+ *   (media deletion) must refuse instead. See verifyFileUnused in contentCoordination.
  * @throws {Error} If media file read/write fails
  */
 export async function refreshAllMediaUsageFromDir({ projectId, projectDir }) {
   try {
     const pagesDir = path.join(projectDir, "pages");
+
+    // Content this pass could not read. A swallowed read error used to be
+    // indistinguishable from "this file references nothing", which is the one
+    // way a rebuild can silently under-report usage.
+    const skipped = [];
 
     // The pages dir may be absent on a collections-only or freshly-imported
     // project. Don't early-return on it — theme settings and collection items
@@ -610,6 +619,7 @@ export async function refreshAllMediaUsageFromDir({ projectId, projectDir }) {
             );
           } catch (error) {
             console.warn(`Error processing page ${pageId} for media usage:`, error.message);
+            skipped.push({ source: `page:${language ? `${language}/` : ""}${pageId}`, reason: error.message });
           }
         }
       }
@@ -630,6 +640,7 @@ export async function refreshAllMediaUsageFromDir({ projectId, projectDir }) {
             addUsageForPaths(extractMediaPathsFromGlobalWidget(globalData), globalId);
           } catch (error) {
             console.warn(`Error processing global widget ${fileName} for media usage:`, error.message);
+            skipped.push({ source: `global:${language || "root"}:${fileName}`, reason: error.message });
           }
         }
       }
@@ -644,6 +655,7 @@ export async function refreshAllMediaUsageFromDir({ projectId, projectDir }) {
         addUsageForPaths(extractMediaPathsFromThemeSettings(themeData), THEME_SETTINGS_USAGE_ID);
       } catch (error) {
         console.warn("Error processing theme settings for media usage:", error.message);
+        skipped.push({ source: THEME_SETTINGS_USAGE_ID, reason: error.message });
       }
     }
 
@@ -655,6 +667,7 @@ export async function refreshAllMediaUsageFromDir({ projectId, projectDir }) {
       );
     } catch (error) {
       console.warn("Error processing business details for media usage:", error.message);
+      skipped.push({ source: SITE_IDENTITY_USAGE_ID, reason: error.message });
     }
 
     // Also scan collection items (collections/<type>/<slug>.json). This is the
@@ -694,6 +707,7 @@ export async function refreshAllMediaUsageFromDir({ projectId, projectDir }) {
               `Error processing collection item ${collectionType}/${itemSlug} for media usage:`,
               error.message,
             );
+            skipped.push({ source: `collection:${collectionType}/${itemSlug}`, reason: error.message });
           }
         }
       }
@@ -709,6 +723,7 @@ export async function refreshAllMediaUsageFromDir({ projectId, projectDir }) {
     return {
       success: true,
       message: `Refreshed usage tracking for ${pageCount} pages, ${collectionItemCount} collection items, global widgets, and theme settings`,
+      skipped,
     };
   } catch (error) {
     console.error("Error refreshing media usage:", error);

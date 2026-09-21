@@ -26,11 +26,11 @@ Use Electron dev mode when testing Electron-specific features (menus, native dia
 
 ### Build entry: `scripts/build-electron.mjs`
 
-All four `electron:build:*` npm scripts call `node scripts/build-electron.mjs --platform <mac|win> [--unsigned]`. The script:
+The `electron:build:*` npm scripts call `node scripts/build-electron.mjs --platform <mac|win|linux> [--unsigned]`. The script:
 
 1. Preflights `.env.production` (prompts to create it if missing — see below).
 2. Runs the Vite frontend build (`npm run build`).
-3. Runs platform prep: mac swaps in per-arch Sharp binaries via `electron/prepare-mac-sharp.cjs`; Windows builds install win32 x64 optional native deps (`npm install --no-save --platform=win32 --arch=x64 --include=optional`) so modules like `sharp` are present.
+3. Runs platform prep: mac swaps in per-arch Sharp binaries via `electron/prepare-mac-sharp.cjs`; Windows builds install win32 x64 optional native deps (`npm install --no-save --platform=win32 --arch=x64 --include=optional`) so modules like `sharp` are present. Linux uses dependencies installed on the Linux x64 build host; cross-building and ARM are not configured.
 4. Runs `npx @electron/rebuild --force` for Electron's native-module ABI.
 5. Runs `electron-builder --config electron/builder.config.mjs --<platform>`, passing the unsigned flag/env where requested. For Windows unsigned it sets `WIN_UNSIGNED=1`, which `builder.config.mjs` reads to drop the `signtoolOptions` block.
 
@@ -61,6 +61,9 @@ npm run electron:build:win
 
 # Windows unsigned (fast, skips Authenticode signing, local testing only)
 npm run electron:build:win:unsigned
+
+# Linux x64 only; creates a .deb without publishing
+npm run electron:build:linux
 ```
 
 Output directory: `dist-electron/`
@@ -72,8 +75,55 @@ If you build the Windows app on macOS, native modules like `sharp` may be missin
 ### Packaging targets
 
 - **Windows** target is `nsis` (installer), `x64` only — required for auto-updates.
+- **Linux** target is `deb`, `x64` only, for Debian-family distributions.
 - **macOS** targets are `dmg` (first-time install) + `zip` (for seamless auto-updates via electron-updater), each for `arm64` and `x64`.
 - macOS builds are signed and notarized with a Developer ID Application certificate.
+
+### Linux packaging
+
+Build on Linux x64 with the repository's supported Node version and dependencies
+installed (including optional dependencies for Sharp). Native compilation may need
+Python 3, Make and a C/C++ compiler. The packager downloads its Linux packaging tools
+as needed; the first build requires network access.
+
+`npm run electron:build:linux` produces `dist-electron/Widgetizer-<version>-amd64.deb`
+and an unpacked app. It passes `--publish never`, so it does not create or upload a
+GitHub release. Package metadata uses `https://widgetizer.org` and
+`Widgetizer <hello@widgetizer.org>`; the desktop launcher is **Widgetizer Desktop**.
+The existing `.icns` is converted into Linux launcher icons by electron-builder.
+
+Install the package with the distribution's software installer or
+`sudo apt install ./dist-electron/Widgetizer-<version>-amd64.deb` (substitute the version).
+Check launch, project save/reopen, images, preview, export and backup/restore on the
+installed app. Test upgrading over an older package with a disposable project before
+shipping an update. Linux Mint/Ubuntu installation and in-app update verification are
+separate from successfully producing the archive.
+
+The existing electron-updater dependency supports `.deb` packages. Linux release
+updates need the `.deb` and generated `latest-linux.yml` on the GitHub release;
+installation can require administrator authentication. End-to-end update behaviour
+must be verified on an installed package before treating Linux updates as release-ready.
+
+Packaging rebuilds `better-sqlite3` for Electron. Before returning to web development
+or backend tests, run `npm rebuild better-sqlite3` to restore the host Node binary
+(`npm run dev:all` also does this in its pre-hook).
+
+Verified on Linux Mint 22.3 x64 (20 September 2026): the `.deb` builds, its metadata,
+icons and installer scripts check out, and the unpacked production app starts with
+its bundled server. An isolated profile passed project creation with Bedrock,
+page save/re-read, website export and backup/restore through that server. Packaged
+SQLite and Sharp also ran successfully. The owner then installed the `.deb`, launched
+it, created a project, uploaded an image and exported successfully. Installed-package
+upgrades and automatic updates remain untested; no Linux release was published.
+
+Known viewer limitation: **View site** fails under Linux's default `.config` data
+directory. The shared export route passes an absolute filename to Express `sendFile`
+without a root, so its hidden-file filter rejects the `.config` ancestor even when
+the exported page exists. Reproduced separately: the current call returns the same
+500/Not Found response; a relative filename with the export directory as `root`
+serves the page while still refusing hidden files inside the export. That fix has
+not been applied. The initial smoke profile lacked a hidden ancestor and missed
+this case. Mac and Windows have not been tested in this pass.
 
 ### macOS Output
 

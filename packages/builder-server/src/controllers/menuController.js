@@ -5,14 +5,34 @@ import { generateUniqueSlug } from "../utils/slugHelpers.js";
 import { generateCopyName } from "../utils/namingHelpers.js";
 import { menuKey, menusDir } from "@widgetizer/core/contentAddress";
 import { requestLanguage, projectLanguageContexts, withoutLanguage } from "../utils/contentLanguage.js";
+import {
+  withContentWriteLock,
+  assertLanguageStillEnabled,
+  isLanguageStillEnabled,
+} from "../services/contentCoordination.js";
+import { cleanupDeletedMenuReferences, referenceCleanupWarnings } from "../utils/linkEnrichment.js";
 
 async function listMenuIds(storage, scope, lang) {
   const files = await storage.list(scope, menusDir(lang));
   return files.filter((file) => file.endsWith(".json")).map((file) => file.replace(/\.json$/, ""));
 }
 
-const writeMenu = (storage, scope, menu, lang) =>
+/** The bare write. Only the uuid backfill below uses it — see writeMenu. */
+const writeMenuRaw = (storage, scope, menu, lang) =>
   storage.write(scope, menuKey(menu.id, lang), JSON.stringify(withoutLanguage(menu), null, 2));
+
+/**
+ * A menu lives in its language's folder, so removing that language deletes it. A
+ * save that was already queued when the removal ran would otherwise put it back,
+ * in a language the project no longer has. Every deliberate menu write goes through
+ * here; the lazy uuid backfill on the read path deliberately does not, because
+ * refusing there would fail a plain listing rather than a save.
+ */
+const writeMenu = (storage, scope, menu, lang) =>
+  withContentWriteLock(scope.projectId, async () => {
+    assertLanguageStillEnabled(scope.projectId, lang);
+    return writeMenuRaw(storage, scope, menu, lang);
+  });
 
 /**
  * Bound an attacker-controlled menu-item tree BEFORE the recursive
@@ -98,10 +118,23 @@ export async function getAllMenus(req, res) {
           if (buf == null) return null;
           const menu = JSON.parse(buf.toString("utf8"));
 
-          // Lazy backfill: add uuid to existing menus that don't have one
+          // Lazy backfill: add uuid to existing menus that don't have one. This is
+          // a READ endpoint, so a language removed underneath it must not fail the
+          // listing — but it must not write the menu back either, which would
+          // restore a file the removal had just deleted. Skipping the backfill
+          // costs nothing: the uuid is regenerated on the next listing that can
+          // legitimately persist it.
           if (!menu.uuid) {
             menu.uuid = randomUUID();
-            await writeMenu(storage, scope, { ...menu, id }, lang);
+            // Check and write in ONE section. Checking first and writing after is
+            // not a check: a removal landing between the two put the deleted menu
+            // straight back. The check stays non-throwing because this is a read
+            // path — an obsolete backfill is skipped, the listing still answers.
+    await withContentWriteLock(scope.projectId, async () => {
+              if (isLanguageStillEnabled(scope.projectId, lang)) {
+                await writeMenuRaw(storage, scope, { ...menu, id }, lang);
+              }
+            });
           }
 
           return { ...menu, language: lang.language };
@@ -158,6 +191,9 @@ export async function createMenu(req, res) {
 
     res.status(201).json(newMenu);
   } catch (error) {
+    if (error?.code === "LANGUAGE_REMOVED") {
+      return res.status(error.statusCode).json({ error: "Language removed", message: error.message, code: error.code, language: error.language });
+    }
     console.error("Error creating menu:", error);
     res.status(500).json({ error: "Failed to create menu" });
   }
@@ -177,8 +213,37 @@ export async function deleteMenu(req, res) {
     const lang = requestLanguage(req, res);
     if (!lang) return;
 
-    await storage.delete(scope, menuKey(id, lang));
-    res.json({ success: true });
+    let incomplete = [];
+    // Read the uuid while the file is still there: a widget selects a menu BY
+    // uuid, and those selections have to be cleared with it. Deleting and clearing
+    // share one section, so nothing can select this menu in between.
+    await withContentWriteLock(scope.projectId, async () => {
+      let deletedMenuUuid = null;
+      try {
+        const buf = await storage.read(scope, menuKey(id, lang));
+        if (buf != null) deletedMenuUuid = JSON.parse(buf.toString("utf8"))?.uuid ?? null;
+      } catch (readError) {
+        console.warn(`Could not read menu ${id} before delete: ${readError.message}`);
+      }
+
+      await storage.delete(scope, menuKey(id, lang));
+
+      try {
+        const result = await cleanupDeletedMenuReferences(storage, scope, {
+          deletedMenuUuid,
+          defaultLanguage: lang.defaultLanguage,
+        });
+        incomplete = result?.incomplete ?? [];
+      } catch (cleanupError) {
+        // The menu IS deleted; a failed sweep leaves selections pointing at it,
+        // which renders as no menu rather than the wrong one.
+        console.warn(`Failed to clear references to deleted menu ${id}: ${cleanupError.message}`);
+        incomplete = [{ key: "*", reason: cleanupError.message }];
+      }
+    });
+
+    const warnings = referenceCleanupWarnings(incomplete);
+    res.json({ success: true, ...(warnings ? { warnings } : {}) });
   } catch (error) {
     console.error("Error deleting menu:", error);
     res.status(500).json({ error: "Failed to delete menu" });
@@ -285,6 +350,9 @@ export async function updateMenu(req, res) {
 
     res.json(dataToSave);
   } catch (error) {
+    if (error?.code === "LANGUAGE_REMOVED") {
+      return res.status(error.statusCode).json({ error: "Language removed", message: error.message, code: error.code, language: error.language });
+    }
     console.error("Error updating menu:", error);
     res.status(500).json({ error: "Failed to update menu" });
   }
@@ -372,6 +440,9 @@ export async function duplicateMenu(req, res) {
 
     res.status(201).json(duplicatedMenu);
   } catch (error) {
+    if (error?.code === "LANGUAGE_REMOVED") {
+      return res.status(error.statusCode).json({ error: "Language removed", message: error.message, code: error.code, language: error.language });
+    }
     console.error("Error duplicating menu:", error);
     res.status(500).json({ error: "Failed to duplicate menu" });
   }

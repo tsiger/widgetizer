@@ -1,6 +1,15 @@
 import { randomUUID } from "crypto";
-import { syncPageMediaUsageOnDelete, syncPageMediaUsageOnWrite } from "../services/mediaUsageService.js";
-import { cleanupDeletedPageReferences } from "../utils/linkEnrichment.js";
+import {
+  syncPageMediaUsageOnDelete,
+  syncPageMediaUsageOnWrite,
+  extractMediaPathsFromPage,
+} from "../services/mediaUsageService.js";
+import {
+  withContentWriteLock,
+  assertIntroducedMediaExists,
+  assertLanguageStillEnabled,
+} from "../services/contentCoordination.js";
+import { clearDeletedReferencesInSection, referenceCleanupWarnings } from "../utils/linkEnrichment.js";
 import { stripHtmlToText } from "../services/sanitizationService.js";
 import { LIMIT_KEYS, MAX_WIDGETS_PER_PAGE } from "@widgetizer/core/adapters";
 import { sanitizeSlug, generateUniqueSlug } from "../utils/slugHelpers.js";
@@ -68,45 +77,152 @@ async function enforcePaginationRules({ scope, storage, widgets }) {
 // the request boundary (getAllPages below, getPage, etc.) reads through the
 // scope-aware storage adapter. No folderName-based fs readers live here anymore.
 
-async function persistPageWithMediaTracking({ scope, storage, pageId, pageData, previousPageId = null, lang }) {
-  await storage.write(scope, pageKey(pageId, lang), JSON.stringify(withoutLanguage(pageData), null, 2));
+/**
+ * A write refused because it would introduce a reference to a media file that has
+ * been deleted. Nothing was written, so the editor keeps the work and can name the
+ * image — which a generic 500 cannot. Every caller of the persist helper needs this,
+ * or the specific reason is lost behind "Failed to ...".
+ * @returns {boolean} true when it answered
+ */
+function respondMissingMedia(res, error) {
+  if (error?.code === "LANGUAGE_REMOVED") {
+    // Nothing was written. The editor keeps the work and stops retrying; it cannot
+    // be saved anywhere, because the language it belongs to is gone.
+    res.status(error.statusCode).json({ error: "Language removed", message: error.message, code: error.code, language: error.language });
+    return true;
+  }
+  if (error?.code !== "MEDIA_REFERENCE_MISSING") return false;
+  res.status(error.statusCode).json({ error: "Missing media", message: error.message, code: error.code });
+  return true;
+}
 
-  if (previousPageId && previousPageId !== pageId) {
+// The write and its usage sync are one media section: media deletion verifies and
+// deletes inside the same section, so it cannot see this page between the two and
+// conclude an image it just started using is unused. See services/contentCoordination.
+/**
+ * The body of a page write, WITHOUT taking the section — the caller holds it.
+ *
+ * Split out because a save is rarely one write: `savePageContent` also sweeps the
+ * listing anchor off other pages, and that sweep used to run after this function had
+ * released the section. A removal landing in between then deleted the language while
+ * the sweep was still going, and the sweep wrote a Greek page straight back. Related
+ * writes have to share one section, so the lock belongs at the controller edge.
+ */
+async function persistPageInSection({ scope, storage, pageId, pageData, previousPageId = null, lang, assetStorage }) {
+  // Required, not optional. It used to default to null and skip the check, which
+  // meant a caller that simply forgot to pass it lost the protection silently —
+  // the page-details save did exactly that, and could store a deleted image as the
+  // page's social-sharing image. Failing loudly is the only way a missing
+  // dependency stays visible.
+  if (!assetStorage) {
+    throw new Error("persistPageInSection requires assetStorage: media validation must not be skipped");
+  }
+  {
+    // The language this page is addressed to may have been removed while this write
+    // waited for the section. Writing anyway recreates a page in a language the
+    // project no longer has — invisible to the editor and to export, but visible to
+    // the media usage rebuild, where it can hold an image hostage.
+    assertLanguageStillEnabled(scope.projectId, lang);
+
+    // Refuse to introduce a reference to a file that is gone — the save queued
+    // behind a delete, which the lock orders but cannot make safe on its own.
+    // References the page already carried are left alone: a dangling path is
+    // tolerated everywhere else, and a save is the wrong place to start rejecting it.
+    //
+    // Read INSIDE the section: a baseline captured before the lock can still show a
+    // reference another save has since removed, which would wrongly classify the
+    // image as already present and skip the check.
+    let previousPaths = [];
     try {
-      if (await storage.exists(scope, pageKey(previousPageId, lang))) {
-        await storage.delete(scope, pageKey(previousPageId, lang));
+      const buf = await storage.read(scope, pageKey(previousPageId || pageId, lang));
+      if (buf != null) previousPaths = extractMediaPathsFromPage(JSON.parse(buf.toString("utf8")));
+    } catch {
+      // A new page, or one we cannot read: nothing is known to be pre-existing.
+    }
+    await assertIntroducedMediaExists({
+      assetStorage,
+      scope,
+      previousPaths,
+      nextPaths: extractMediaPathsFromPage(pageData),
+    });
+
+    await storage.write(scope, pageKey(pageId, lang), JSON.stringify(withoutLanguage(pageData), null, 2));
+
+    if (previousPageId && previousPageId !== pageId) {
+      try {
+        if (await storage.exists(scope, pageKey(previousPageId, lang))) {
+          await storage.delete(scope, pageKey(previousPageId, lang));
+        }
+      } catch (unlinkError) {
+        console.warn(`Failed to delete old page file ${previousPageId} after slug change: ${unlinkError.message}`);
       }
-    } catch (unlinkError) {
-      console.warn(`Failed to delete old page file ${previousPageId} after slug change: ${unlinkError.message}`);
+    }
+
+    try {
+      await syncPageMediaUsageOnWrite(scope.projectId, pageData, lang);
+      return { usageStale: false };
+    } catch (usageError) {
+      // The page IS saved; only the derived usage rows are behind. Reporting a
+      // failed save would be false. The caller surfaces this as a warning instead,
+      // and media deletion re-derives usage anyway rather than trusting the rows.
+      console.warn(`Failed to update media usage tracking for page ${pageId}:`, usageError);
+      return { usageStale: true };
     }
   }
+}
 
-  try {
-    await syncPageMediaUsageOnWrite(scope.projectId, pageData, lang);
-  } catch (usageError) {
-    console.warn(`Failed to update media usage tracking for page ${pageId}:`, usageError);
+/** Take the section and do one page write in it. For callers with nothing else to do. */
+async function persistPageWithMediaTracking(args) {
+  return withContentWriteLock(args.scope.projectId, () => persistPageInSection(args));
+}
+
+/** The delete itself, WITHOUT taking the section — the caller holds it. */
+async function deletePageInSection({ scope, storage, pageId, lang }) {
+  {
+    // Usage rows are keyed by uuid, so read it while the file still exists. A page with
+    // no uuid was recorded under its slug, which the service resolves from the slug below.
+    let pageUuid = null;
+    try {
+      const buf = await storage.read(scope, pageKey(pageId, lang));
+      if (buf != null) pageUuid = JSON.parse(buf.toString("utf8"))?.uuid ?? null;
+    } catch (readError) {
+      console.warn(`Could not read page ${pageId} before delete for media usage: ${readError.message}`);
+    }
+
+    await storage.delete(scope, pageKey(pageId, lang));
+
+    try {
+      await syncPageMediaUsageOnDelete(scope.projectId, { uuid: pageUuid, slug: pageId }, lang);
+    } catch (usageError) {
+      console.warn(`Failed to update media usage tracking for deleted page ${pageId}:`, usageError);
+    }
   }
 }
 
-async function deletePageWithMediaTracking({ scope, storage, pageId, lang }) {
-  // Usage rows are keyed by uuid, so read it while the file still exists. A page with
-  // no uuid was recorded under its slug, which the service resolves from the slug below.
-  let pageUuid = null;
+/**
+ * Clear references to pages this request has deleted. One walk for the whole set:
+ * the bulk path used to run a full project walk per page, so deleting twenty pages
+ * read and rewrote every page, global, menu and item twenty times.
+ *
+ * Call inside the section holding the deletes. A failure is logged rather than
+ * thrown — the pages ARE deleted, and a dangling reference renders as a dead link
+ * rather than a wrong one.
+ */
+async function clearRefsToDeletedPages(storage, scope, uuids, lang) {
+  const pageUuids = uuids.filter(Boolean);
+  if (pageUuids.length === 0) return [];
   try {
-    const buf = await storage.read(scope, pageKey(pageId, lang));
-    if (buf != null) pageUuid = JSON.parse(buf.toString("utf8"))?.uuid ?? null;
-  } catch (readError) {
-    console.warn(`Could not read page ${pageId} before delete for media usage: ${readError.message}`);
-  }
-
-  await storage.delete(scope, pageKey(pageId, lang));
-
-  try {
-    await syncPageMediaUsageOnDelete(scope.projectId, { uuid: pageUuid, slug: pageId }, lang);
-  } catch (usageError) {
-    console.warn(`Failed to update media usage tracking for deleted page ${pageId}:`, usageError);
+    const { incomplete } = await clearDeletedReferencesInSection(storage, scope, {
+      pageUuids,
+      defaultLanguage: lang.defaultLanguage,
+    });
+    return incomplete;
+  } catch (cleanupError) {
+    console.warn(`Failed to clear references for deleted pages ${pageUuids.join(", ")}:`, cleanupError.message);
+    return [{ key: "*", reason: cleanupError.message }];
   }
 }
+
 
 /**
  * Retrieves a single page by its slug from the active project.
@@ -249,24 +365,30 @@ export async function updatePage(req, res) {
       updated: new Date().toISOString(), // Set new update timestamp
     };
 
-    await persistPageWithMediaTracking({
-      scope,
-      storage,
-      pageId: finalNewSlug,
-      pageData: finalUpdatedPageData,
-      previousPageId: oldSlug,
-      lang,
-    });
+    // Both writes in one section, for the same reason as savePageContent below:
+    // the sweep writes other pages in this language and must not outlive the
+    // section that checked the language still exists.
+    const movedFrom = await withContentWriteLock(scope.projectId, async () => {
+      await persistPageInSection({
+        scope,
+        storage,
+        pageId: finalNewSlug,
+        pageData: finalUpdatedPageData,
+        previousPageId: oldSlug,
+        lang,
+        assetStorage: req.adapters.assetStorage,
+      });
 
-    const movedFrom = pageData.widgets
-      ? await clearListingAnchorsElsewhere({
-          scope,
-          storage,
-          keepPageId: finalNewSlug,
-          widgets: finalUpdatedPageData.widgets,
-          lang,
-        })
-      : [];
+      return pageData.widgets
+        ? clearListingAnchorsElsewhere({
+            scope,
+            storage,
+            keepPageId: finalNewSlug,
+            widgets: finalUpdatedPageData.widgets,
+            lang,
+          })
+        : [];
+    });
 
     res.json({
       success: true,
@@ -274,6 +396,7 @@ export async function updatePage(req, res) {
       ...(movedFrom.length ? { listingAnchorMovedFrom: movedFrom } : {}),
     });
   } catch (error) {
+    if (respondMissingMedia(res, error)) return;
     console.error("Error updating page:", error);
     res.status(500).json({
       success: false,
@@ -342,33 +465,30 @@ export async function deletePage(req, res) {
     const lang = requestLanguage(req, res);
     if (!lang) return;
 
-    // Read the page (existence + UUID for reference cleanup) before deleting
-    const pageBuf = await storage.read(scope, pageKey(pageId, lang));
-    if (pageBuf == null) {
-      return res.status(404).json({ error: "Page not found" });
-    }
+    // Existence check, identity read, delete and sweep are ONE section. Reading the
+    // identity before the lock meant the page could be renamed in between — a rename
+    // keeps the uuid and moves the file, so the delete then removed nothing while the
+    // sweep cleared every link to a page that is still there, under its new slug.
+    // Only the identity this request actually deleted may be swept.
+    const found = await withContentWriteLock(scope.projectId, async () => {
+      const pageBuf = await storage.read(scope, pageKey(pageId, lang));
+      if (pageBuf == null) return null;
 
-    let deletedPageUuid = null;
-    try {
-      deletedPageUuid = JSON.parse(pageBuf.toString("utf8")).uuid || null;
-    } catch (readError) {
-      console.warn(`Could not read page UUID before deletion for ${pageId}:`, readError.message);
-    }
-
-    await deletePageWithMediaTracking({ scope, storage, pageId, lang });
-
-    // Clean up orphaned references in menus and widget links, via the scope-aware
-    // storage adapter so this runs against the correct per-tenant tree in hosted
-    // (Cloud) and DATA_DIR in OSS (Local).
-    if (deletedPageUuid) {
+      let deletedPageUuid = null;
       try {
-        await cleanupDeletedPageReferences(storage, scope, { deletedPageUuid, defaultLanguage: lang.defaultLanguage });
-      } catch (cleanupError) {
-        console.warn(`Failed to clean up references for deleted page ${pageId}:`, cleanupError.message);
+        deletedPageUuid = JSON.parse(pageBuf.toString("utf8")).uuid || null;
+      } catch (readError) {
+        console.warn(`Could not read page UUID before deletion for ${pageId}:`, readError.message);
       }
-    }
 
-    res.json({ success: true });
+      await deletePageInSection({ scope, storage, pageId, lang });
+      return { incomplete: await clearRefsToDeletedPages(storage, scope, [deletedPageUuid], lang) };
+    });
+
+    if (!found) return res.status(404).json({ error: "Page not found" });
+
+    const warnings = referenceCleanupWarnings(found.incomplete);
+    res.json({ success: true, ...(warnings ? { warnings } : {}) });
   } catch (error) {
     console.error("Error deleting page:", error);
     res.status(500).json({ error: "Failed to delete page" });
@@ -396,48 +516,50 @@ export async function bulkDeletePages(req, res) {
   };
 
   const deletedUuids = [];
+  let incompleteCleanup = [];
 
-  // Process each page deletion
-  for (const pageId of pageIds) {
-    try {
-      // Read the page (existence + UUID for reference cleanup) before deleting
-      const pageBuf = await storage.read(scope, pageKey(pageId, lang));
-      if (pageBuf == null) {
-        results.notFound.push(pageId);
-        continue;
-      }
-
+  // One section for the whole batch, so a save cannot slip a new reference to any
+  // of these pages in between the deletes and the sweep that clears them.
+  await withContentWriteLock(scope.projectId, async () => {
+    for (const pageId of pageIds) {
       try {
-        const pageData = JSON.parse(pageBuf.toString("utf8"));
-        if (pageData.uuid) deletedUuids.push(pageData.uuid);
-      } catch (readError) {
-        console.warn(`Could not read page UUID before deletion for ${pageId}:`, readError.message);
+        // Read the page (existence + UUID for reference cleanup) before deleting
+        const pageBuf = await storage.read(scope, pageKey(pageId, lang));
+        if (pageBuf == null) {
+          results.notFound.push(pageId);
+          continue;
+        }
+
+        // Read the uuid before deleting (the file is about to go) but record it
+        // as deleted only after the delete returns — a page whose delete threw may
+        // still be there, and clearing references to it would break live links.
+        let uuid = null;
+        try {
+          uuid = JSON.parse(pageBuf.toString("utf8")).uuid ?? null;
+        } catch (readError) {
+          console.warn(`Could not read page UUID before deletion for ${pageId}:`, readError.message);
+        }
+
+        await deletePageInSection({ scope, storage, pageId, lang });
+
+        if (uuid) deletedUuids.push(uuid);
+        results.deleted.push(pageId);
+      } catch (error) {
+        console.error(`Error deleting page ${pageId}:`, error);
+        results.errors.push({ pageId, error: error.message });
       }
-
-      await deletePageWithMediaTracking({ scope, storage, pageId, lang });
-
-      results.deleted.push(pageId);
-    } catch (error) {
-      console.error(`Error deleting page ${pageId}:`, error);
-      results.errors.push({ pageId, error: error.message });
     }
-  }
 
-  // Clean up orphaned references for all deleted pages (per-tenant dir via the adapter).
-  for (const uuid of deletedUuids) {
-    try {
-      await cleanupDeletedPageReferences(storage, scope, {
-        deletedPageUuid: uuid,
-        defaultLanguage: lang.defaultLanguage,
-      });
-    } catch (cleanupError) {
-      console.warn(`Failed to clean up references for deleted page UUID ${uuid}:`, cleanupError.message);
-    }
-  }
+    // Confirmed deletions only, in one walk.
+    incompleteCleanup = await clearRefsToDeletedPages(storage, scope, deletedUuids, lang);
+  });
 
   // Determine response status based on results
   const hasErrors = results.errors.length > 0 || results.notFound.length > 0;
   const hasSuccesses = results.deleted.length > 0;
+  // The pages went; some content may still point at them. A warning either way —
+  // never a reason to call a completed deletion a failure.
+  const cleanupWarnings = referenceCleanupWarnings(incompleteCleanup);
 
   if (hasSuccesses && !hasErrors) {
     // All deletions successful
@@ -445,6 +567,7 @@ export async function bulkDeletePages(req, res) {
       success: true,
       message: `Successfully deleted ${results.deleted.length} page(s)`,
       results,
+      ...(cleanupWarnings ? { warnings: cleanupWarnings } : {}),
     });
   } else if (hasSuccesses && hasErrors) {
     // Partial success
@@ -452,6 +575,7 @@ export async function bulkDeletePages(req, res) {
       success: false,
       message: `Deleted ${results.deleted.length} page(s), but encountered ${results.errors.length + results.notFound.length} error(s)`,
       results,
+      ...(cleanupWarnings ? { warnings: cleanupWarnings } : {}),
     });
   } else {
     // No successes
@@ -519,10 +643,12 @@ export async function createPage(req, res) {
       pageId: slug,
       pageData: newPage,
       lang,
+      assetStorage: req.adapters.assetStorage,
     });
 
     res.status(201).json(newPage);
   } catch (error) {
+    if (respondMissingMedia(res, error)) return;
     console.error("Error creating page:", error);
     res.status(500).json({ error: "Failed to create page" });
   }
@@ -608,34 +734,47 @@ export async function savePageContent(req, res) {
     };
     updatedPageData.translationGroupId = existingData.translationGroupId || updatedPageData.uuid;
 
-    await persistPageWithMediaTracking({
-      scope,
-      storage,
-      pageId: pageData.slug,
-      pageData: updatedPageData,
-      previousPageId: id,
-      lang,
-    });
+    // ONE section for both writes. The anchor sweep writes other pages in this
+    // language, so leaving it outside let a language removal land between the two
+    // and the sweep then recreated a page in the language that had just gone.
+    const { usageStale, movedFrom } = await withContentWriteLock(scope.projectId, async () => {
+      const persisted = await persistPageInSection({
+        scope,
+        storage,
+        pageId: pageData.slug,
+        pageData: updatedPageData,
+        previousPageId: id,
+        lang,
+        assetStorage: req.adapters.assetStorage,
+      });
 
-    // One listing anchor per collection. Swept on save rather than when the
-    // checkbox is ticked: the editor holds the change until save, so clearing
-    // other pages earlier would strip an anchor for an edit the user then
-    // discarded. Runs after the write so the page that claimed the anchor is
-    // the one that keeps it.
-    const movedFrom = await clearListingAnchorsElsewhere({
-      scope,
-      storage,
-      keepPageId: pageData.slug,
-      widgets: updatedPageData.widgets,
-      lang,
+      // One listing anchor per collection. Swept on save rather than when the
+      // checkbox is ticked: the editor holds the change until save, so clearing
+      // other pages earlier would strip an anchor for an edit the user then
+      // discarded. Runs after the write so the page that claimed the anchor is
+      // the one that keeps it.
+      const moved = await clearListingAnchorsElsewhere({
+        scope,
+        storage,
+        keepPageId: pageData.slug,
+        widgets: updatedPageData.widgets,
+        lang,
+      });
+      return { ...persisted, movedFrom: moved };
     });
 
     res.json({
       success: true,
       message: "Page saved successfully",
       ...(movedFrom.length ? { listingAnchorMovedFrom: movedFrom } : {}),
+      // The page is saved either way; this says only that the derived image-usage
+      // rows are behind, so the media library may label a file wrongly until a refresh.
+      ...(usageStale
+        ? { warnings: [{ code: "MEDIA_USAGE_STALE", path: pageData.slug }] }
+        : {}),
     });
   } catch (error) {
+    if (respondMissingMedia(res, error)) return;
     console.error(`Error saving page content for ${id}:`, error);
     res.status(500).json({ error: "Failed to save page content" });
   }
@@ -779,10 +918,12 @@ export async function duplicatePage(req, res) {
       pageId: newSlug,
       pageData: newPage,
       lang,
+      assetStorage: req.adapters.assetStorage,
     });
 
     res.status(201).json(newPage);
   } catch (error) {
+    if (respondMissingMedia(res, error)) return;
     console.error("Error duplicating page:", error);
     res.status(500).json({ error: "Failed to duplicate page" });
   }
@@ -837,7 +978,14 @@ export async function createPageLanguageVersion(req, res) {
         created: new Date().toISOString(),
         updated: new Date().toISOString(),
       };
-      await persistPageWithMediaTracking({ scope, storage, pageId: slug, pageData: created, lang: target });
+      await persistPageWithMediaTracking({
+        scope,
+        storage,
+        pageId: slug,
+        pageData: created,
+        lang: target,
+        assetStorage: req.adapters.assetStorage,
+      });
       return created;
     });
 
@@ -847,6 +995,7 @@ export async function createPageLanguageVersion(req, res) {
     if (error?.name === "TranslationError") {
       return res.status(error.status).json({ error: "Version not created", message: error.message });
     }
+    if (respondMissingMedia(res, error)) return;
     console.error("Error creating a page language version:", error);
     res.status(500).json({ error: "Failed to create the page version" });
   }

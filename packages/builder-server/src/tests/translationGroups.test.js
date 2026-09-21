@@ -28,12 +28,13 @@ const collectionController = await import("../controllers/collectionController.j
 const translationController = await import("../controllers/translationController.js");
 const projectRepo = await import("../db/repositories/projectRepository.js");
 const { closeDb } = await import("../db/index.js");
-const { LocalStorageAdapter } = await import("@widgetizer/adapters-local");
+const { LocalStorageAdapter, LocalAssetStorageAdapter } = await import("@widgetizer/adapters-local");
 
 const PROJECT_ID = "translations-test-uuid";
 const PROJECT_FOLDER = "translations-test-project";
 
 const storage = new LocalStorageAdapter({ dataRoot: TEST_DATA_DIR });
+const assetStorage = new LocalAssetStorageAdapter({ dataRoot: TEST_DATA_DIR });
 const scope = { actor: { id: "default", kind: "local" }, projectId: PROJECT_ID, folderName: PROJECT_FOLDER };
 const projectBase = () => getProjectDir(PROJECT_FOLDER);
 const project = () => projectRepo.getProjectById(PROJECT_ID);
@@ -76,7 +77,7 @@ const limits = { getLimit: async () => itemLimit };
 const call = async (fn, { params = {}, body = {}, query = {}, storage: override } = {}) => {
   const res = mockRes();
   await fn(
-    { scope, activeProject: project(), adapters: { storage: override || storage, limits }, params, body, query },
+    { scope, activeProject: project(), adapters: { storage: override || storage, assetStorage, limits }, params, body, query },
     res,
   );
   return res;

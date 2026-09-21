@@ -58,14 +58,16 @@ Back up the café website, import that archive into a second installation with t
 
 1. Resolve name/folder and create the project directory.
 2. Copy the installed theme source, excluding templates from the raw copy.
-3. Resolve the preset; optionally replace starter menus.
+3. Resolve the preset; optionally replace starter menus (staged, then moved into place).
 4. Turn theme/preset templates into page/global JSON. Stamp ordinary page UUIDs and enrich starter links/menu references.
 5. Apply preset theme-setting defaults and optional collection-item seed data.
 6. Insert the project row with a fresh project UUID.
 7. Seed optional media binaries and database metadata, now that the owning row exists.
 8. Refresh media usage. Select the new project if there was no active project.
 
-**Failure:** theme-copy/template-processing failures remove the scaffold directory. Some preset/menu/settings/collection/media errors are warnings. Do not assume every post-scaffold failure has an all-or-nothing rollback.
+**Failure:** creation is all-or-nothing. A failure at any step — copying the theme, processing templates, reading or applying the preset's menus, settings, collection items or media — removes the project directory and the row if one was inserted, and reports failure. Creating the project again afterwards works.
+
+**A preset the user chose and did not fully get is a failed creation, not a warning**, because the project would record that preset while missing its content and nothing later would say so. The distinction is between *absent* and *unreadable*: a preset that ships no menus, no collections or no `preset.json` creates normally, while one whose files are present and cannot be read stops the creation.
 
 Evidence: [projectController](../../../packages/builder-server/src/controllers/projectController.js) `createProject`, [projectScaffold](../../../packages/builder-server/src/utils/projectScaffold.js), [projects tests](../../../packages/builder-server/src/tests/projects.test.js), [preset media tests](../../../packages/builder-server/src/tests/presetMediaSeeding.test.js), [preset collections tests](../../../packages/builder-server/src/tests/collectionPresetSeeding.test.js).
 
@@ -92,28 +94,40 @@ The server validates the target and changes the active-project pointer. The shel
 
 Groups whose original identifying member no longer exists keep their group label so surviving versions stay related inside the new project. The group label is interpreted within a project, not as permission to access another project.
 
-Failure boundary: copy failures attempt directory cleanup; UUID-remapping and media-metadata failures are caught as warnings. A successful response therefore does not by itself prove every internal reference was remapped.
+Failure boundary: a duplicate is made whole or not at all. Copying, re-pointing the identities and copying the media library are one operation — a failure in any of them removes the unfinished copy and reports failure, because a copy whose links still name the original project's pages renders as a site that has lost its internal navigation. The original is never touched, and the operation can be retried.
+
+Checked against one bilingual fixture carrying every language (including one the [static site export](output.md#multilingual-boundary-at-this-snapshot) would skip), both kinds of translation group, groups whose original member was deleted, out-of-schema item fields, per-language manual order, `siteIdentity`, theme-update provenance, per-language media overrides, and every reference kind in root and language folders. A duplicate whose source directory still holds a stale `uploads/media.json` copies that file along with the rest; harmless, because the backup path below never reads it.
 
 Evidence: [remapDuplicatedProjectUuids](../../../packages/builder-server/src/utils/linkEnrichment.js), [projectController](../../../packages/builder-server/src/controllers/projectController.js), [projects tests](../../../packages/builder-server/src/tests/projects.test.js).
 
 ## Export an editable-project backup
 
-Produce a ZIP with `project-export.json`, editable project files, uploads, and media metadata serialized from SQLite as `uploads/media.json`. The manifest includes shared settings, site identity, default/additional language codes, theme/version/preset, and export provenance. This is separate from [rendering a static site](output.md#static-site-export).
+Produce a ZIP with `project-export.json`, editable project files, uploads, and media metadata serialized from SQLite as `uploads/media.json`. The manifest includes shared settings, site identity, default/additional language codes, theme/version/preset, optional theme-update provenance, and export provenance. This is separate from [rendering a static site](output.md#static-site-export).
 
-The metadata serialization path logs failures, so review completeness before treating every returned backup as a verified restore point. It is not a snapshot of the whole application database or other projects.
+**SQLite is the only source of the exported media library.** Any `uploads/media.json` sitting in the project folder — a project older than the move of media metadata to SQLite, or a restore that failed and left its input behind — is excluded from the file walk, including when the live library is empty. Otherwise the ZIP would carry two entries of one name and an extractor would keep the first, silently making the leftover file the restored library. The serialized entry is written even for a project with no media, so "this project has no media" is stated rather than inferred.
+
+The library is read before the response starts streaming: once the ZIP is being written the only thing left to send is a truncated archive that looks complete, so a metadata read failure answers with an error instead of a backup missing its library. It is not a snapshot of the whole application database or other projects.
 
 ## Import an editable-project backup
 
-1. Validate upload size, ZIP paths, nonempty archive, manifest shape, and installed theme availability.
+1. Validate upload size, ZIP paths, nonempty archive, one media-metadata entry, manifest shape, restorable languages, and installed theme availability.
 2. Allocate a new project name/folder/UUID and extract into a temporary directory.
-3. Recover theme version from the manifest or copied theme metadata; normalize imported language configuration, falling back to a single-language configuration if invalid.
+3. Recover theme version from the manifest or copied theme metadata.
 4. Copy source files into the destination, excluding the export manifest; insert the project row after successful copying.
 5. Restore media metadata into SQLite with new media file IDs, then remove the intermediate media JSON.
-6. Refresh usage and remove temporary extraction/upload files.
+6. Refresh usage and remove the temporary extraction directory.
 
-Unlike project duplication, this path does **not** run the content-UUID remapper: page/item/menu identities in the backup remain project-scoped. Both paths regenerate media database IDs. Both must preserve translation membership and translated metadata.
+Unlike project duplication, this path does **not** run the content-UUID remapper: page/item/menu identities in the backup remain project-scoped. Both paths regenerate media database IDs. Both preserve translation membership and translated metadata.
 
-Failure: the inner failure handler attempts to delete the new row and directories. Media metadata restoration can fail nonfatally; binaries existing on disk do not prove the library metadata was restored. The test `round-trips media metadata through export and import` verifies filenames, paths, sizes, and new file IDs; it does not prove every multilingual combination.
+**A backup this version cannot fully restore is refused before anything exists.** Language metadata is validated before a name, folder or row is allocated, and a code this version cannot work with produces a 400 naming it and stating that nothing changed and the backup file is untouched. Importing anyway would put the backup's other-language pages, menus and items on disk with nothing listing them — a restore that silently returns part of a website. A backup naming no languages at all predates them and imports on the single-language defaults.
+
+**Two entries named `uploads/media.json`** — the shape older backups can have — is refused too. They describe different libraries and nothing in the archive says which is current, so neither is chosen.
+
+**A media library that cannot be read, is not a library, or cannot be written fails the import.** A `files` that is absent or not a list is refused rather than read as empty, because a project with no media and a file this version cannot interpret are different claims. An empty list is a supported library and restores as one. The intermediate media JSON is removed only after a successful restore: it is the restore's input, and deleting it after a failure would turn a recoverable state into a silent loss.
+
+Failure: the inner failure handler deletes the new row and directories, so a refusal leaves nothing to clean up by hand. The server's own copy of the uploaded ZIP is removed on every exit, successful or not; the user's backup file is never touched.
+
+Verified against one bilingual fixture through both workflows, plus the refusal cases above. That fixture is broad rather than exhaustive — it is not an audit of every way a backup can be malformed, and a successful restore of it does not prove every archive shape is handled.
 
 Evidence: [projectController](../../../packages/builder-server/src/controllers/projectController.js) `exportProject` / `importProject`, [projects tests](../../../packages/builder-server/src/tests/projects.test.js), [media rewrite tests](../../../packages/builder-server/src/tests/media.test.js).
 

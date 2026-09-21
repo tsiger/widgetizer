@@ -53,6 +53,7 @@ One array, supplied to pages and collection item pages alike. Frozen: Arch ships
 | `seoUrl` | **absolute** and Clean-URL-aware (`https://site.com/el/contact`) |
 | `active` | this is the page being rendered |
 | `fallback` | `true` when this points at the language's homepage because no sibling exists |
+| `noindex` | the destination asked not to be indexed — the sibling's own directive, or the homepage's for a fallback |
 | `dir` | text direction — `ltr` for everything v1 accepts; `rtl` reserved, so RTL support never changes a shipped theme's switcher |
 
 `href` and `seoUrl` cannot be one field: the switcher is a link inside a static page and needs a relative path to a real file; hreflang is crawler metadata and needs an absolute canonical URL.
@@ -60,6 +61,7 @@ One array, supplied to pages and collection item pages alike. Frozen: Arch ships
 - **The switcher uses `href` and may use every entry**, fallbacks included — landing a visitor on the homepage beats a dead end.
 - **hreflang uses `seoUrl` and only entries where `fallback` is false.** Declaring the homepage as the English version of `/el/contact` is false, and search engines either ignore the whole set or index the wrong page.
 - **Every hreflang set includes a self-reference** (a set without one is invalid) **and `x-default`**, pointing at the default-language sibling or, failing that, the default-language homepage. That is the one place a `fallback` entry is legitimate.
+- **A `noindex` destination is never an alternate, and `x-default` is not exempt.** A crawler discards an annotation pointing into a page that asked not to be indexed. A `noindex` page emits no set at all, since it cannot carry its own self-reference. The switcher ignores the flag — a visitor can still follow the link. *(Added 2026-09-20, from the R7 review.)*
 - **A single-language project emits no hreflang at all.**
 - Both exclude languages omitted from the export — a link to a language that was never written is a 404.
 

@@ -3,6 +3,42 @@ import { itemUrlAt, pageUrlAt } from "./publishedUrls.js";
 import { homeHref, isHomeSlug, translationGroupIdOf, resolveLanguage } from "./contentAddress.js";
 import { hreflangCase, languageDir, nativeLanguageName } from "./languages.js";
 
+/** Whether a page or item asked not to be indexed (the SEO `robots` field). */
+export function isNoindex(entry) {
+  return !!entry?.seo?.robots?.includes("noindex");
+}
+
+/**
+ * Everything `buildTranslations` reads off a sibling, and nothing else.
+ *
+ * Its two callers hold different objects: the SEO artifact builders pass whole
+ * page and item records, while a render passes the uuid reference map, whose
+ * entries are a projection built for link resolution. When those shapes
+ * disagree the two artifacts describe the same site differently — a `noindex`
+ * item translation was once excluded from the sitemap and advertised in the
+ * HTML, because the reference carried no SEO fields at all.
+ *
+ * So this is the one definition of the shape, and both sides go through it:
+ * `buildTranslations` narrows whatever it is given, and the reference map is
+ * built from it. Adding a field here is what keeps the two paths reading the
+ * same facts; adding one to only one producer is the mistake this prevents.
+ */
+export function translationSibling(source, overrides = undefined) {
+  if (!source) return null;
+  return {
+    uuid: source.uuid,
+    translationGroupId: source.translationGroupId,
+    slug: source.slug,
+    language: source.language,
+    slugPrefix: source.slugPrefix,
+    // Only the directive, not the whole SEO block: this shape is carried per
+    // item through a render, and it exists to answer questions, not to be a
+    // second copy of the content.
+    seo: { robots: source.seo?.robots },
+    ...overrides,
+  };
+}
+
 /**
  * `page.translations` — the theme contract for a language switcher (§7c), and
  * the source of the hreflang set (§7d).
@@ -19,7 +55,15 @@ import { hreflangCase, languageDir, nativeLanguageName } from "./languages.js";
  * thing being rendered has no sibling there. The switcher may use those —
  * landing someone on the homepage beats a dead end — but an ordinary hreflang
  * alternate never may, and says so by reading this flag.
+ *
+ * `noindex` marks an entry whose target asked not to be indexed. It is read by
+ * the hreflang emitters for the same reason: a cluster is a set of pages a
+ * crawler may index, so an annotation pointing into a noindex page is dropped
+ * by search engines and only costs the site a contradictory signal. The
+ * switcher ignores the flag — noindex is about crawlers, and a visitor can
+ * still follow the link.
  */
+
 export function buildTranslations({
   current,
   kind = "page",
@@ -36,10 +80,17 @@ export function buildTranslations({
   if (!languages.length) return [];
 
   // A language publishes only if it has a homepage. The default language is not
-  // subject to this: a site without one fails the export outright.
-  const homepages = new Set([resolvedDefault]);
+  // subject to this: a site without one fails the export outright — so it is
+  // seeded with no page behind it, and a caller that did not pass one simply
+  // cannot be asked anything about it.
+  //
+  // The homepage itself is kept, not just the fact that there is one, because a
+  // fallback entry POINTS AT it: whether that entry may be an hreflang
+  // alternate is a question about the homepage's own robots directive, not
+  // about the missing translation.
+  const homepages = new Map([[resolvedDefault, null]]);
   for (const page of pages) {
-    if (isHomeSlug(page.slug)) homepages.add(resolveLanguage(page.language, resolvedDefault));
+    if (isHomeSlug(page.slug)) homepages.set(resolveLanguage(page.language, resolvedDefault), translationSibling(page));
   }
 
   const groupId = translationGroupIdOf(current);
@@ -48,7 +99,7 @@ export function buildTranslations({
     for (const entry of kind === "item" ? items : pages) {
       if (kind === "item" && slugPrefix && entry.slugPrefix && entry.slugPrefix !== slugPrefix) continue;
       if (translationGroupIdOf(entry) !== groupId) continue;
-      siblings.set(resolveLanguage(entry.language, resolvedDefault), entry);
+      siblings.set(resolveLanguage(entry.language, resolvedDefault), translationSibling(entry));
     }
   }
 
@@ -90,6 +141,9 @@ export function buildTranslations({
         seoUrl,
         active: language === currentLanguage,
         fallback: !sibling,
+        // The destination decides, and for a fallback entry the destination is
+        // that language's homepage.
+        noindex: isNoindex(sibling || homepages.get(language)),
         dir: languageDir(language),
       };
     });

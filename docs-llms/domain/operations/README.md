@@ -40,9 +40,9 @@ Each walkthrough begins with a plain-language guide. It tells you what you start
 
 Not separate content operations: filtering a list, hovering a widget, and opening a drawer only change session state. Form widgets are widget/block content; generated forms metadata is part of export. This repository's listed built-in routes do not define a persistent form-submission domain. Extension-provided operations must be mapped when such an extension is in scope.
 
-## A consistent review checklist
+## Operation boundaries
 
-For each action, check:
+The walkthroughs describe these parts of an operation:
 
 1. **Before:** valid project/scope, language enabled, source/definition exists, identity and limits valid.
 2. **Change:** which documents/rows/assets change; which UUIDs, slugs, groups and order entries are retained or replaced.
@@ -51,3 +51,5 @@ For each action, check:
 5. **Failure:** rejection before mutation, partial writes, retry/compensation, concurrent calls, stale project or language.
 
 This directory inventories the supported workflow families. [API inventory](api-index.md) enumerates the current literal built-in routes as a cross-check; it is not a claim that every error combination has been audited.
+
+[Embedding contracts](integration.md) describe which guarantees a custom host must preserve.

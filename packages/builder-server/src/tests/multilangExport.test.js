@@ -391,3 +391,261 @@ describe("a single-language project", () => {
 // Unused in assertions but proves the storage adapter reached the fixture.
 void storage;
 void scope;
+
+// §7b again, from the other side: deciding not to publish a language is only
+// half a decision. Whatever the rest of the site says ABOUT that language has
+// to agree, or the export ships links to files it deliberately did not write.
+describe("a link into a language that was not published", () => {
+  const widgetDir = () => path.join(getProjectDir(PROJECT_FOLDER), "widgets", "linker");
+
+  before(async () => {
+    await fs.outputFile(
+      path.join(widgetDir(), "schema.json"),
+      JSON.stringify({
+        name: "Linker",
+        settings: [
+          { type: "link", id: "cta", label: "CTA" },
+          { type: "richtext", id: "body", label: "Body" },
+        ],
+      }),
+    );
+    await fs.outputFile(
+      path.join(widgetDir(), "widget.liquid"),
+      `<a id="cta" href="{{ widget.settings.cta.href }}">{{ widget.settings.cta.text }}</a>{{ widget.settings.body | raw }}`,
+    );
+    await writePage("", "links", "Links", {
+      widgets: {
+        w1: {
+          type: "linker",
+          settings: {
+            // The German page exists on disk but its language has no homepage.
+            cta: { pageUuid: "p-de-ueber", href: "de/ueber-uns.html", text: "Read it in German", target: "_self" },
+            body: `<p>See <a href="de/ueber-uns.html" data-page-uuid="p-de-ueber">the German page</a> and <a href="el/sxetika.html" data-page-uuid="p-el-sxetika">the Greek one</a>.</p>`,
+          },
+        },
+      },
+      widgetsOrder: ["w1"],
+    });
+  });
+
+  after(async () => {
+    await fs.remove(path.join(getProjectPagesDir(PROJECT_FOLDER), "links.json"));
+    await fs.remove(widgetDir());
+  });
+
+  it("is cleared, not published as a link to a file that was never written", async () => {
+    const { dir } = await exportSite();
+    const html = await fs.readFile(path.join(dir, "links.html"), "utf8");
+    assert.ok(!html.includes("de/ueber-uns"), html);
+    const cta = html.match(/<a id="cta"[^>]*>/)[0];
+    assert.ok(!/href="[^"]+"/.test(cta), cta);
+  });
+
+  it("leaves the anchor's words behind in richtext, minus the destination", async () => {
+    const { dir } = await exportSite();
+    const html = await fs.readFile(path.join(dir, "links.html"), "utf8");
+    assert.ok(html.includes("the German page"), html);
+    assert.ok(!html.includes('data-page-uuid="p-de-ueber"'), html);
+  });
+
+  it("still resolves a link into a language that WAS published", async () => {
+    const { dir } = await exportSite();
+    const html = await fs.readFile(path.join(dir, "links.html"), "utf8");
+    assert.ok(html.includes('href="el/sxetika.html"'), html);
+  });
+});
+
+// The manifest describes the export. A number scoped to one language sitting
+// next to a flag scoped to the whole site is not a summary anyone can use.
+describe("the collection summary in the manifest", () => {
+  before(async () => {
+    await storage.write(scope, "collection-types/news/schema.json", JSON.stringify(NEWS_SCHEMA));
+    await storage.write(scope, "collection-types/news/template.liquid", "<h1>{{ item.settings.title }}</h1>");
+    for (const [key, title] of [["alpha", "Alpha"], ["beta", "Beta"]]) {
+      await storage.write(
+        scope,
+        `collections/news/${key}.json`,
+        JSON.stringify({ id: key, uuid: `n-${key}`, slug: key, schemaVersion: 1, settings: { title } }),
+      );
+    }
+    await storage.write(
+      scope,
+      "collections/news/el/alpha.json",
+      JSON.stringify({ id: "alpha", uuid: "n-el-alpha", slug: "alpha-el", schemaVersion: 1, settings: { title: "Alpha EL" } }),
+    );
+  });
+
+  after(async () => {
+    await fs.remove(path.join(getProjectDir(PROJECT_FOLDER), "collections"));
+    await fs.remove(path.join(getProjectDir(PROJECT_FOLDER), "collection-types"));
+  });
+
+  it("counts every item the export actually published, not just the default language's", async () => {
+    const { dir } = await exportSite();
+    const manifest = JSON.parse(await fs.readFile(path.join(dir, "manifest.json"), "utf8"));
+    const news = manifest.collections.find((entry) => entry.type === "news");
+
+    assert.equal(await fs.pathExists(path.join(dir, "news", "alpha.html")), true);
+    assert.equal(await fs.pathExists(path.join(dir, "news", "beta.html")), true);
+    assert.equal(await fs.pathExists(path.join(dir, "el", "news", "alpha-el.html")), true);
+    assert.equal(news.itemCount, 3);
+  });
+
+  it("breaks the total down by language, and names no language it skipped", async () => {
+    const { dir } = await exportSite();
+    const manifest = JSON.parse(await fs.readFile(path.join(dir, "manifest.json"), "utf8"));
+    const news = manifest.collections.find((entry) => entry.type === "news");
+
+    assert.deepEqual(news.itemCountByLanguage, { en: 2, el: 1 });
+  });
+});
+
+// A noindex page has asked not to be indexed. An hreflang cluster is a set of
+// pages a crawler may index, so the two cannot both be honoured: search engines
+// discard the annotation and report the sitemap entry as an error.
+describe("a translation that asked not to be indexed", () => {
+  before(async () => {
+    await writePage("", "secret", "Secret", { uuid: "p-en-secret", translationGroupId: "p-en-secret" });
+    await writePage("el", "kryfi", "Kryfi", {
+      uuid: "p-el-kryfi",
+      translationGroupId: "p-en-secret",
+      seo: { title: "Kryfi", robots: "noindex,follow" },
+    });
+  });
+
+  after(async () => {
+    await fs.remove(path.join(getProjectPagesDir(PROJECT_FOLDER), "secret.json"));
+    await fs.remove(path.join(getProjectPagesDir(PROJECT_FOLDER), "el", "kryfi.json"));
+  });
+
+  it("is not offered as the alternate of the page it translates", async () => {
+    const { dir } = await exportSite();
+    const html = await fs.readFile(path.join(dir, "secret.html"), "utf8");
+    assert.ok(!html.includes("el/kryfi"), html);
+    assert.ok(html.includes(`hreflang="en" href="${SITE}/secret.html"`), html);
+  });
+
+  it("is not named in the sitemap, as a URL of its own or as anyone's alternate", async () => {
+    const { dir } = await exportSite();
+    const sitemap = await fs.readFile(path.join(dir, "sitemap.xml"), "utf8");
+    assert.ok(!sitemap.includes("el/kryfi"), sitemap);
+  });
+
+  it("publishes no cluster of its own, because it cannot be a member of one", async () => {
+    const { dir } = await exportSite();
+    const html = await fs.readFile(path.join(dir, "el", "kryfi.html"), "utf8");
+    assert.ok(!html.includes('rel="alternate"'), html);
+    assert.ok(html.includes('content="noindex,follow"'), html);
+    // Its canonical is untouched: dropping the cluster is not the same as
+    // refusing to say where the page lives.
+    assert.match(html, new RegExp(`<link rel="canonical" href="${SITE}/el/kryfi\\.html"\\s*/?>`), html);
+  });
+
+  it("leaves an indexable sibling's cluster alone", async () => {
+    const { dir } = await exportSite();
+    const html = await fs.readFile(path.join(dir, "about.html"), "utf8");
+    assert.ok(html.includes(`hreflang="el" href="${SITE}/el/sxetika.html"`), html);
+  });
+});
+
+// The two halves of the same rule, found by review: the HTML and the sitemap
+// read a sibling's robots directive through DIFFERENT objects, so one of them
+// agreeing is not evidence the other does.
+describe("a collection item whose translation asked not to be indexed", () => {
+  before(async () => {
+    await storage.write(scope, "collection-types/news/schema.json", JSON.stringify(NEWS_SCHEMA));
+    await storage.write(scope, "collection-types/news/template.liquid", "<h1>{{ item.settings.title }}</h1>");
+    await storage.write(
+      scope,
+      "collections/news/story.json",
+      JSON.stringify({
+        id: "story",
+        uuid: "n-story",
+        slug: "story",
+        translationGroupId: "n-story",
+        schemaVersion: 1,
+        settings: { title: "Story" },
+      }),
+    );
+    await storage.write(
+      scope,
+      "collections/news/el/story.json",
+      JSON.stringify({
+        id: "story",
+        uuid: "n-el-story",
+        slug: "story-el",
+        translationGroupId: "n-story",
+        schemaVersion: 1,
+        settings: { title: "Story EL" },
+        seo: { robots: "noindex,follow" },
+      }),
+    );
+  });
+
+  after(async () => {
+    await fs.remove(path.join(getProjectDir(PROJECT_FOLDER), "collections"));
+    await fs.remove(path.join(getProjectDir(PROJECT_FOLDER), "collection-types"));
+  });
+
+  it("is left out of the item page's alternates, the way a page's is", async () => {
+    const { dir } = await exportSite();
+    const html = await fs.readFile(path.join(dir, "news", "story.html"), "utf8");
+    const alternates = (html.match(/<link[^>]*rel="alternate"[^>]*>/g) || []).filter((tag) =>
+      tag.includes("el/news/story-el"),
+    );
+    assert.deepEqual(alternates, []);
+  });
+
+  it("is left out of the sitemap too, so the two artifacts agree", async () => {
+    const { dir } = await exportSite();
+    const sitemap = await fs.readFile(path.join(dir, "sitemap.xml"), "utf8");
+    assert.ok(!sitemap.includes("el/news/story-el"), sitemap);
+  });
+
+  it("still publishes the item page itself, and the sibling it translates", async () => {
+    const { dir } = await exportSite();
+    assert.equal(await fs.pathExists(path.join(dir, "news", "story.html")), true);
+    assert.equal(await fs.pathExists(path.join(dir, "el", "news", "story-el.html")), true);
+  });
+});
+
+// A page with no sibling in some language falls back to that language's
+// homepage, and x-default is the one place such an entry is legitimate. Whether
+// it may be published is a question about the HOMEPAGE, not about the
+// translation that does not exist.
+describe("a fallback alternate pointing at a homepage that asked not to be indexed", () => {
+  const homePath = () => path.join(getProjectPagesDir(PROJECT_FOLDER), "index.json");
+  let savedHome;
+
+  before(async () => {
+    savedHome = await fs.readFile(homePath(), "utf8");
+    await writePage("", "index", "Home", { seo: { title: "Home", robots: "noindex,follow" } });
+    await writePage("el", "mono-ellinika", "Mono Ellinika", { uuid: "p-el-mono" });
+  });
+
+  after(async () => {
+    await fs.outputFile(homePath(), savedHome);
+    await fs.remove(path.join(getProjectPagesDir(PROJECT_FOLDER), "el", "mono-ellinika.json"));
+  });
+
+  it("is not published as x-default, in the HTML or in the sitemap", async () => {
+    const { dir } = await exportSite();
+    const html = await fs.readFile(path.join(dir, "el", "mono-ellinika.html"), "utf8");
+    const sitemap = await fs.readFile(path.join(dir, "sitemap.xml"), "utf8");
+
+    assert.deepEqual(html.match(/<link[^>]*hreflang="x-default"[^>]*>/g) || [], []);
+    const xDefaults = (sitemap.match(/<xhtml:link[^>]*>/g) || []).filter(
+      (tag) => tag.includes('hreflang="x-default"') && tag.includes(`href="${SITE}/"`),
+    );
+    assert.deepEqual(xDefaults, []);
+  });
+
+  it("still gives the visitor a way to reach that language", async () => {
+    const { dir } = await exportSite();
+    const html = await fs.readFile(path.join(dir, "el", "mono-ellinika.html"), "utf8");
+    // The switcher reads `translations`, which keeps the entry; only the
+    // crawler-facing tags drop it.
+    assert.equal(await fs.pathExists(path.join(dir, "index.html")), true);
+    assert.ok(!html.includes('hreflang="en"'), html);
+  });
+});

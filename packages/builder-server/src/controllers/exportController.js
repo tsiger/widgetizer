@@ -34,7 +34,7 @@ import { resolveLanguage } from "@widgetizer/core/contentAddress";
 import { buildTranslations } from "@widgetizer/core/translations";
 import { outputPathPrefixFor, prefixInternalHref } from "@widgetizer/core/linkPrefixer";
 import { languageFolder, pageOutputPath, itemOutputPath as itemOutputPathFor } from "@widgetizer/core/contentAddress";
-import { projectLanguageContexts, projectLanguages } from "../utils/contentLanguage.js";
+import { projectLanguages } from "../utils/contentLanguage.js";
 import { identityReadiness } from "@widgetizer/core/siteIdentity";
 import { emptyArticleFields } from "@widgetizer/core/structuredData";
 import { listingParentStatus } from "@widgetizer/core/breadcrumbs";
@@ -333,6 +333,30 @@ export async function exportProjectToDir(projectId, options = {}, collectionDeps
     const pagesDataArray = allPages.filter((pageData) =>
       exported.has(resolveLanguage(pageData.language, defaultLanguage)),
     );
+    // Link resolution must see the site being PUBLISHED, not the project on
+    // disk. The render engine loads this map itself when nobody supplies one,
+    // and that load reads every page in every language — so a link into a
+    // skipped language (§7b) would resolve to a real-looking href for a file
+    // the export never writes. Seeding it here with the exported pages alone
+    // makes such a target read as absent, and it is cleared exactly like a
+    // deleted one. Built once: the page loop below would otherwise re-read the
+    // whole pages directory for every page it renders.
+    const pagesByUuidForExport = new Map();
+    for (const pageData of pagesDataArray) {
+      if (pageData.uuid) pagesByUuidForExport.set(pageData.uuid, pageData);
+    }
+    // The same rule for collection items, expressed as the language contexts
+    // their loader reads. Stable item refs resolve `link`/`menu` settings and
+    // richtext anchors on pages and on item pages alike, so the map is built
+    // once here and shared by both render loops.
+    const exportLanguageContexts = exportLanguages.map((language) => ({ language, defaultLanguage }));
+    // null, not an empty Map, when there are no collections: "no map" means the
+    // renderer cannot resolve item refs and must leave stored hrefs alone, while
+    // an empty map means it looked and found nothing — which neutralizes every
+    // item anchor.
+    const collectionItemsByUuidForExport = collectionsEnabled
+      ? await loadCollectionItemsByUuid(collectionStorage, collectionScope, collectionReader, exportLanguageContexts)
+      : null;
 
     // Two-pass collection validation (fail-fast): gather every invalid item across
     // all collections up front and refuse the export with a full per-item-per-field
@@ -351,12 +375,11 @@ export async function exportProjectToDir(projectId, options = {}, collectionDeps
       // language it is in, and silently dropping the item would publish a site
       // with a hole and no word about it.
       let renderableInAnyLanguage = 0;
+      const itemCountByLanguage = {};
       for (const language of exportLanguages) {
         const lang = { language, defaultLanguage };
         const items = await collectionReader.sorted(schema.type, {}, lang);
-        if (language === resolveLanguage("", defaultLanguage)) {
-          manifestCollections.push({ type: schema.type, itemPages: !!schema.hasItemPages, itemCount: items.length });
-        }
+        itemCountByLanguage[language] = items.length;
         for (const item of items) {
           if (item.invalid) {
             invalidCollectionItems.push({
@@ -376,6 +399,17 @@ export async function exportProjectToDir(projectId, options = {}, collectionDeps
           seoItemsByPrefix.get(schema.slugPrefix).push(...validItems);
         }
       }
+      // The manifest describes the site that was published, so the total spans
+      // every exported language — as `itemPages` beside it always has. The
+      // per-language breakdown is what makes the total checkable: a reader that
+      // only wants one language's number no longer has to guess which one the
+      // total meant.
+      manifestCollections.push({
+        type: schema.type,
+        itemPages: !!schema.hasItemPages,
+        itemCount: Object.values(itemCountByLanguage).reduce((sum, count) => sum + count, 0),
+        itemCountByLanguage,
+      });
       // A hasItemPages collection with renderable items but no template.liquid
       // must fail BEFORE any disk write, not midway with partial artifacts.
       if (schema.hasItemPages && renderableInAnyLanguage > 0) {
@@ -562,6 +596,11 @@ export async function exportProjectToDir(projectId, options = {}, collectionDeps
         assetVersion, // For cache busting
         currentCanonicalPath: pageOutputPath(pageData.id, 1, pageLang(pageData)),
         currentPageData: pageData,
+        // Seeded, not loaded: see pagesByUuidForExport above. Without these the
+        // engine would resolve links against every language on disk, including
+        // the ones this export refused to publish.
+        pagesByUuid: pagesByUuidForExport,
+        collectionItemsByUuid: collectionItemsByUuidForExport,
         // The flag snapshotted above, so a toggle landing mid-export cannot
         // split this page's links/canonical from the sitemap or other pages.
         cleanUrls,
@@ -732,20 +771,6 @@ Per aspera ad astra
     // receive — at the depth of each item's output path. Runs
     // BEFORE the validation report so item-page issues are included in it.
     if (collectionsEnabled) {
-      // uuid -> page map for resolving item links (built once, shared across items).
-      const pagesByUuidForItems = new Map();
-      for (const page of pagesDataArray) {
-        if (page.uuid) pagesByUuidForItems.set(page.uuid, page);
-      }
-      // Stable collection-item refs for resolving `menu`/`link`-type item settings
-      // that target another item — loaded once, shared across every item. (Menu
-      // maps are loaded lazily inside renderCollectionItemPage.)
-      const collectionItemsByUuidForItems = await loadCollectionItemsByUuid(
-        collectionStorage,
-        collectionScope,
-        collectionReader,
-        projectLanguageContexts(projectData),
-      );
       const itemAppVersion = await getAppVersion();
       const itemEasterEgg = `<!--\nMade with Widgetizer v${itemAppVersion}\nPer aspera ad astra\n-->\n`;
 
@@ -800,8 +825,8 @@ Per aspera ad astra
               enqueuedStyles: new Map(),
               enqueuedScripts: new Map(),
               collectionCache: new Map(),
-              pagesByUuid: pagesByUuidForItems,
-              collectionItemsByUuid: collectionItemsByUuidForItems,
+              pagesByUuid: pagesByUuidForExport,
+              collectionItemsByUuid: collectionItemsByUuidForExport,
               assetVersion,
               outputPathPrefix: outputPathPrefixFor(itemOutputPath),
               currentCanonicalPath: itemOutputPath,

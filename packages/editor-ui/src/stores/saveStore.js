@@ -29,6 +29,17 @@ const useAutoSave = create((set, get) => ({
   // Set when a save moved a collection's listing anchor onto this page; read and
   // cleared by a mounted component, which has the i18n provider this store does not.
   listingAnchorMoved: null,
+  // Set when the server saved the content but could not update its image-usage
+  // records. The save SUCCEEDED — this is not a failure, and must not be shown as
+  // one; it only means the media library may label a file wrongly until a refresh.
+  // Announced by a mounted component, same as listingAnchorMoved.
+  mediaUsageStale: null,
+  // Saving is off until this editing session ends, because retrying cannot work:
+  // the language this editor is in no longer exists. Stopping the timer once is not
+  // enough — the autosave tick reschedules itself, and every edit re-arms it, so a
+  // stopped timer came straight back and hammered the server with doomed saves.
+  // Cleared when the editor loads a page (a new session) or on reset().
+  savingSuspended: false,
   modifiedWidgets: new Set(),
   structureModified: false,
   themeSettingsModified: false,
@@ -208,6 +219,11 @@ const useAutoSave = create((set, get) => ({
       return followUp.promise;
     }
 
+    // Nothing can be saved in a language that is gone; the curtain has already
+    // explained that. Refusing here keeps a retry from re-issuing a doomed request
+    // and keeps the failure counter and backoff out of it entirely.
+    if (get().savingSuspended) return { status: "suspended" };
+
     if (!get().hasUnsavedChanges()) return { status: "clean" };
 
     // Captured now so a reset() that fires while this save is in flight can
@@ -258,12 +274,21 @@ const useAutoSave = create((set, get) => ({
             ? !isEqual(globalWidgets.footer, pageStore.originalGlobalWidgets.footer)
             : false;
 
+        // Kept so their responses can be read: a header-only save carries its
+        // "saved, but image tracking is behind" warning here and nowhere else.
+        // Discarding these results lost that warning entirely for globals.
+        const globalSaves = [];
+
         if (globalWidgets.header && (modifiedWidgets.has("header") || hasHeaderDiff)) {
-          guardedPromises.push(saveGlobalWidget("header", globalWidgets.header, page?.language));
+          const headerSave = saveGlobalWidget("header", globalWidgets.header, page?.language);
+          globalSaves.push(headerSave);
+          guardedPromises.push(headerSave);
         }
 
         if (globalWidgets.footer && (modifiedWidgets.has("footer") || hasFooterDiff)) {
-          guardedPromises.push(saveGlobalWidget("footer", globalWidgets.footer, page?.language));
+          const footerSave = saveGlobalWidget("footer", globalWidgets.footer, page?.language);
+          globalSaves.push(footerSave);
+          guardedPromises.push(footerSave);
         }
 
         const hasPageWidgetChanges = [...modifiedWidgets].some((id) => id !== "header" && id !== "footer");
@@ -281,11 +306,14 @@ const useAutoSave = create((set, get) => ({
         // awaiting a settled promise still yields, and a reset landing in that
         // gap would slip past the guard it is supposed to be caught by.
         const pageSaveResult = pageSave ? await pageSave : null;
+        // Settled above by the same Promise.all, so these are already resolved.
+        const globalSaveResults = await Promise.all(globalSaves);
 
         // Phase 2: theme settings via themeStore's canonical save path.
         // This handles warning/correction reloads from the server automatically.
         const hasThemeDrift = themeStore.hasUnsavedThemeChanges();
         let themeCorrection = null;
+        let themeUsageStale = false;
         if ((themeSettingsModified || hasThemeDrift) && themeSettings && activeProject) {
           const sentTheme = useThemeStore.getState().settings;
           const themeResult = await useThemeStore.getState().saveSettings(activeProject.id);
@@ -310,7 +338,16 @@ const useAutoSave = create((set, get) => ({
               if (serverTheme) usePageStore.getState().applyThemeCorrections(discardedDraft, serverTheme);
             }
           } else if (themeResult?.warnings?.length && useThemeStore.getState().loadedProjectId === activeProject.id) {
-            themeCorrection = { sent: sentTheme, saved: useThemeStore.getState().originalSettings };
+            // Theme warnings are not all the same kind. A sanitization warning means
+            // the server changed what it stored, so undo history has to be rewritten
+            // to match. "Image tracking is behind" changed nothing about the settings
+            // — treating it as a correction would rewrite history over a save the
+            // server took verbatim.
+            const corrections = themeResult.warnings.filter((w) => w?.code !== "MEDIA_USAGE_STALE");
+            themeUsageStale = themeResult.warnings.some((w) => w?.code === "MEDIA_USAGE_STALE");
+            if (corrections.length) {
+              themeCorrection = { sent: sentTheme, saved: useThemeStore.getState().originalSettings };
+            }
           }
         }
 
@@ -348,6 +385,13 @@ const useAutoSave = create((set, get) => ({
             listingAnchorMoved: pageSaveResult?.listingAnchorMovedFrom?.length
               ? { pages: pageSaveResult.listingAnchorMovedFrom }
               : state.listingAnchorMoved,
+            // Any of the three can carry it: a header-only save reports it on the
+            // global response, and theme settings on theirs.
+            mediaUsageStale: [pageSaveResult, ...globalSaveResults].some((result) =>
+              result?.warnings?.some((w) => w?.code === "MEDIA_USAGE_STALE"),
+            ) || themeUsageStale
+              ? { at: Date.now() }
+              : state.mediaUsageStale,
           };
         });
 
@@ -386,6 +430,18 @@ const useAutoSave = create((set, get) => ({
           useStaleProjectStore.getState().markStale();
           get().stopAutoSave();
           return { status: "mismatch" };
+        }
+        if (err.code === "LANGUAGE_REMOVED") {
+          // The language this editor is working in was removed from the site, so
+          // the server refused and wrote nothing. Same handling as the mismatch
+          // above and for the same reason: retrying cannot succeed, and the edits
+          // must not be discarded — nothing below this branch clears them. The
+          // curtain explains the one thing that differs, which is that there is
+          // nowhere left to save this work.
+          useStaleProjectStore.getState().markLanguageRemoved(err.data?.language ?? null);
+          set({ savingSuspended: true });
+          get().stopAutoSave();
+          return { status: "language-removed" };
         }
         // Manual saves rethrow so the caller can react to the failure —
         // EditorTopBar's two manual-save callsites `.catch` the rejection and
@@ -447,6 +503,11 @@ const useAutoSave = create((set, get) => ({
   },
 
   resetAutoSaveTimer: () => {
+    // One gate for all of them: markWidgetModified, setStructureModified,
+    // setThemeSettingsModified and the tick's own reschedule all arrive here, and
+    // each of them used to restart a timer that had deliberately been stopped.
+    if (get().savingSuspended) return;
+
     const { autoSaveInterval, autoSaveFailureCount } = get();
 
     if (autoSaveInterval) {
@@ -478,7 +539,12 @@ const useAutoSave = create((set, get) => ({
           set((s) => ({ autoSaveFailureCount: s.autoSaveFailureCount + 1 }));
         } else if (result.status === "success") {
           set({ autoSaveFailureCount: 0 });
-        } else if (result.status === "mismatch" || result.status === "abandoned") {
+        } else if (
+          result.status === "mismatch" ||
+          result.status === "abandoned" ||
+          result.status === "language-removed" ||
+          result.status === "suspended"
+        ) {
           // An intentional stop happened during this attempt (PROJECT_MISMATCH's
           // own stopAutoSave(), or a reset() from discard-and-leave) — do not
           // reschedule, that would defeat it.
@@ -506,9 +572,25 @@ const useAutoSave = create((set, get) => ({
 
   clearListingAnchorMoved: () => set({ listingAnchorMoved: null }),
 
+  clearMediaUsageStale: () => set({ mediaUsageStale: null }),
+
+  /**
+   * A new editing session: the editor has loaded a page, so saving applies again —
+   * and the banner saying it does not must go with it. The two are one fact, so
+   * they are cleared together; leaving the banner up over a page that saves fine is
+   * its own bug. A project-mismatch warning is deliberately untouched: that is about
+   * the tab, not this session.
+   */
+  resumeSaving: () => {
+    if (get().savingSuspended) set({ savingSuspended: false });
+    useStaleProjectStore.getState().clearLanguageRemoved();
+  },
+
   reset: () => {
     const { stopAutoSave, saveGeneration } = get();
     stopAutoSave();
+    // Discard-and-leave ends the session too, so the language banner goes with it.
+    useStaleProjectStore.getState().clearLanguageRemoved();
     // Put the theme draft back. Clearing the flags alone left the edited
     // settings in the store, and a page load deliberately keeps a theme draft
     // alive across navigations — so a discarded change came straight back the
@@ -526,6 +608,8 @@ const useAutoSave = create((set, get) => ({
       saveGeneration: saveGeneration + 1,
       lastSaved: null,
       listingAnchorMoved: null,
+      mediaUsageStale: null,
+      savingSuspended: false,
       modifiedWidgets: new Set(),
       structureModified: false,
       themeSettingsModified: false,

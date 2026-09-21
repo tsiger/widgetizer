@@ -60,14 +60,29 @@ Load the project's theme settings, edit through the canonical theme store, valid
 ## Check and apply a project update
 
 1. Check installed versus available version and expose the project's update preference.
-2. Apply updatable theme paths: layout, assets, widgets, snippets, locales, screenshot and collection-type definitions.
-3. Add missing root menus and template-derived pages while preserving existing user files.
-4. Merge new theme schema/settings structure while preserving matching customized values.
-5. Update project version metadata and refresh media usage.
+2. **Prepare the whole update off to the side.** Copy the updatable theme paths — layout, assets, widgets, snippets, locales, screenshot and collection-type definitions — into a staging directory, work out which root menus and template-derived pages are missing, and compute the merged theme settings. Nothing the project uses has been touched yet.
+3. **Swap it in.** Move each existing path aside into a backup directory, move the staged copy into place, write the merged settings, then add the new menus and pages.
+4. Update project version metadata and refresh media usage.
 
-User collection item data is separate from replaced collection schemas. Removed fields can become archived values; new required fields can make existing items invalid until edited. Shared schema changes affect content in every language, even when starter additions are only at the root.
+Updatable paths are replaced wholesale, which is how a theme deletes a file: it is absent from the new copy. Existing user menus and pages are never overwritten. User collection item data is separate from replaced collection schemas. Removed fields can become archived values; new required fields can make existing items invalid until edited. Shared schema changes affect content in every language, even when starter additions are only at the root.
 
-**Failure boundary:** file-copy/menu/template/settings-merge errors can be logged and processing can continue. Project version metadata is subsequently updated. Review whether a structured partial-update result would be clearer than relying on logs; no rollback guarantee is implied here.
+**Failure boundary: all of the update, or none of it.** A failure while preparing has changed nothing. A failure during the swap removes what was placed and moves the displaced files back, including anything the update had added. Half an update is its own kind of broken — the new theme's assets beside the old theme's widgets is a project that renders wrongly rather than one that failed to update — so the unit of rollback is the whole update, not the file.
+
+**The new version is recorded only after the update succeeds,** which is what keeps a failed update available to try again instead of reading as one that already happened.
+
+**Recovery is automatic.** Before the swap begins, a plan is written into the backup directory naming what the update will add and which paths it will create where the project had none. A run interrupted partway leaves that plan behind, and the next update undoes it first — removing the additions and restoring the displaced files. A backup with no plan belonged to a run that had already finished and is simply discarded. Nothing asks the user to look at or repair files.
+
+One update runs at a time per project. Two at once would each read the other's working directories as their own, and the second would take the first's backup for an abandoned run.
+
+Exercised against a real 0.9.9 → 0.9.10 delta on an imported pre-multilingual project that had since been edited and given a second language: 60 theme files changed and 4 added, none of the author's pages, menus or collection items touched in either language, every preset default preserved, and no working directories left behind. See [the legacy-upgrade check](../coverage.md#the-legacy-upgrade-check).
+
+### Verified limitations
+
+| Limitation | Why it stands |
+| --- | --- |
+| The version write is not covered by the rollback | If recording the new version fails after the files have been swapped, the project holds the new theme files while still reporting the old version. The next update re-applies the same files over themselves — wasteful, not damaging, since updatable paths are replaced wholesale either way. Holding the backup across a database write is more machinery than that outcome warrants. |
+| An interrupted update is undone by the *next* update, not on startup | The recovery runs as part of applying an update, and only when one is available. A project whose update was interrupted and which is never updated again keeps its backup directory. It is inert and excluded from backups. |
+| A failure whose rollback also fails reports only that it failed | At that point what the project holds is not known, so the message says the update could not be completed and to try again, rather than claiming anything about the files. The recovery copies are kept for the next attempt. |
 
 ## Scope limits
 
@@ -75,4 +90,4 @@ There is no generic “switch this existing project to any other theme and migra
 
 Implementation: [themeController](../../../packages/builder-server/src/controllers/themeController.js), [themeUpdateService](../../../packages/builder-server/src/services/themeUpdateService.js), [themeStore](../../../packages/editor-ui/src/stores/themeStore.js).
 
-Tests: [themes](../../../packages/builder-server/src/tests/themes.test.js), [themeUpdateService](../../../packages/builder-server/src/tests/themeUpdateService.test.js), [themeUpdateApplyToDir](../../../packages/builder-server/src/tests/themeUpdateApplyToDir.test.js), [themeUpdateCopies](../../../packages/builder-server/src/tests/themeUpdateCopies.test.js), [themeStore](../../../packages/editor-ui/src/stores/__tests__/themeStore.test.js).
+Tests: [structuralFailureRecovery](../../../packages/builder-server/src/tests/structuralFailureRecovery.test.js), [themes](../../../packages/builder-server/src/tests/themes.test.js), [themeUpdateService](../../../packages/builder-server/src/tests/themeUpdateService.test.js), [themeUpdateApplyToDir](../../../packages/builder-server/src/tests/themeUpdateApplyToDir.test.js), [themeUpdateCopies](../../../packages/builder-server/src/tests/themeUpdateCopies.test.js), [themeStore](../../../packages/editor-ui/src/stores/__tests__/themeStore.test.js).

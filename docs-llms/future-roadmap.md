@@ -2,7 +2,7 @@
 
 > **Status 2026-09-19: the series is built.** Order decided 2026-09-09, revised 2026-09-15 so stages 5–7 went before multilang and multilang started from a clean slate. Each stage was finished before the next began, and each landed groundwork the later ones used. All of it is on branch `0.9.10`.
 >
-> **What comes next is not a stage.** The domain review (`domain/review-questions.md`) raised eight questions about rules that may be incomplete or inconsistent between two paths that ought to agree — stale media usage after a half-failed save, a language removed while another window writes to it, a backup that has to come back whole, an operation reporting success it did not have. Two independent reviews concluded the architecture is sound and needs no multilang refactor, so these are contracts and tests on top of it, worked one at a time. **Multilang's last step, the docs, deliberately comes after them**, so it writes down decisions rather than guesses.
+> **What came after was not a stage.** The domain review raised eight questions (R1–R8) about rules that may be incomplete or inconsistent between two paths that ought to agree — stale media usage after a half-failed save, a language removed while another window writes to it, a backup that has to come back whole, an operation reporting success it did not have. Two independent reviews concluded the architecture is sound and needs no multilang refactor, so they were worked as contracts and tests on top of it and settled on 2026-09-20 (`domain/coverage.md`). **Multilang's last step, the docs, deliberately came after them**, so it writes down decisions rather than guesses.
 
 | # | stage | shipped | design doc |
 |---|---|---|---|
@@ -10,7 +10,7 @@
 | 1 | **Breadcrumbs** — one trail per page from explicit associations only; themes draw it with a core snippet or their own markup | 2026-09-12 | `future-breadcrumbs-design.md` |
 | 2 | **Collection pagination** — paginated copies of the page hosting a listing widget (`blog.html`, `blog/page/2.html`), switched on per widget | 2026-09-14 | `future-pagination-design.md` |
 | 3 | **Structured data** — automatic JSON-LD through the existing SEO tag; project-owned site identity and business details | 2026-09-15 | `future-structured-data-design.md` |
-| 4 | **Multilang** — per-language pages in one project, language folders, translation groups, hreflang, switcher | steps 0–24 by 2026-09-19 (`d0442659`); step 25 (docs) held until the review questions are settled | `future-multilang-design.md` |
+| 4 | **Multilang** — per-language pages in one project, language folders, translation groups, hreflang, switcher | steps 0–24 by 2026-09-19 (`d0442659`); step 25 (docs) is what remains, now that the review questions are settled | `future-multilang-design.md` |
 | 5 | **Undo history** — undo survives saves, rapid edits coalesce, limit 150 / 500 ms window | 2026-09-15 (`e4379a50`) | `core-page-editor.md`, Undo/Redo System |
 | 6 | **Rename to "Widgetizer Desktop"** — visible text only | 2026-09-15 (`8fae65c5`) | §Stage 6 below |
 | 7 | **Upload file names** — uploaded media keep their words | 2026-09-16 | §Stage 7 below |

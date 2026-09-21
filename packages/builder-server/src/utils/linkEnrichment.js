@@ -215,61 +215,85 @@ async function listAllPageKeys(storage, scope, defaultLanguage) {
   return keys;
 }
 
-async function updatePageWidgetsViaStorage(storage, scope, widgetProcessor, defaultLanguage) {
+/**
+ * One pass over every page: clear references inside widgets, and drop a
+ * `parentPageUuid` naming any of the deleted pages.
+ *
+ * Both in the same walk, and the parent check takes the whole SET. Scanning once
+ * per deleted uuid meant ten deleted pages read every surviving page eleven times.
+ *
+ * A file that cannot be read or written is recorded in `failed` and the walk
+ * continues: one unwritable page must not stop the menus and items after it from
+ * being cleaned, and the caller needs to know what was left behind.
+ */
+async function updatePagesViaStorage(storage, scope, widgetProcessor, deletedPageUuids, defaultLanguage, failed) {
   for (const key of await listAllPageKeys(storage, scope, defaultLanguage)) {
-    const buf = await storage.read(scope, key);
-    if (buf == null) continue;
-    const page = JSON.parse(buf.toString("utf8"));
-    if (page.type === "header" || page.type === "footer") continue;
+    try {
+      const buf = await storage.read(scope, key);
+      if (buf == null) continue;
+      const page = JSON.parse(buf.toString("utf8"));
+      if (page.type === "header" || page.type === "footer") continue;
 
-    let modified = false;
-    const processedWidgets = {};
-    for (const [widgetId, widget] of Object.entries(page.widgets || {})) {
-      const processed = widgetProcessor(widget);
-      processedWidgets[widgetId] = processed;
-      if (JSON.stringify(processed) !== JSON.stringify(widget)) modified = true;
-    }
-    if (modified) {
-      page.widgets = processedWidgets;
-      await storage.write(scope, key, JSON.stringify(page, null, 2));
+      let modified = false;
+      const processedWidgets = {};
+      for (const [widgetId, widget] of Object.entries(page.widgets || {})) {
+        const processed = widgetProcessor(widget);
+        processedWidgets[widgetId] = processed;
+        if (JSON.stringify(processed) !== JSON.stringify(widget)) modified = true;
+      }
+
+      // A child left pointing at a deleted parent still renders (the breadcrumb
+      // builder falls back), but the page picker would show a dangling selection.
+      if (page.parentPageUuid && deletedPageUuids.has(page.parentPageUuid)) {
+        delete page.parentPageUuid;
+        modified = true;
+      }
+
+      if (modified) {
+        page.widgets = processedWidgets;
+        await storage.write(scope, key, JSON.stringify(page, null, 2));
+      }
+    } catch (error) {
+      failed.push({ key, reason: error.message });
     }
   }
 }
 
-/** Drop `parentPageUuid` from any page whose parent was just deleted. */
-async function clearDeletedParentRefsViaStorage(storage, scope, deletedPageUuid, defaultLanguage) {
-  for (const key of await listAllPageKeys(storage, scope, defaultLanguage)) {
-    const buf = await storage.read(scope, key);
-    if (buf == null) continue;
-    const page = JSON.parse(buf.toString("utf8"));
-    if (page.parentPageUuid !== deletedPageUuid) continue;
-    delete page.parentPageUuid;
-    await storage.write(scope, key, JSON.stringify(page, null, 2));
-  }
-}
-
-async function updateGlobalWidgetsViaStorage(storage, scope, widgetProcessor, defaultLanguage) {
+async function updateGlobalWidgetsViaStorage(storage, scope, widgetProcessor, defaultLanguage, failed) {
   for (const language of ["", ...(await languageFoldersIn(storage, scope, "pages"))]) {
     for (const widgetType of ["header", "footer"]) {
       const key = globalKey(widgetType, { language, defaultLanguage });
-      const buf = await storage.read(scope, key);
-      if (buf == null) continue;
-      const widget = JSON.parse(buf.toString("utf8"));
-      const processed = widgetProcessor(widget);
-      if (JSON.stringify(processed) !== JSON.stringify(widget)) {
-        await storage.write(scope, key, JSON.stringify(processed, null, 2));
+      try {
+        const buf = await storage.read(scope, key);
+        if (buf == null) continue;
+        const widget = JSON.parse(buf.toString("utf8"));
+        const processed = widgetProcessor(widget);
+        if (JSON.stringify(processed) !== JSON.stringify(widget)) {
+          await storage.write(scope, key, JSON.stringify(processed, null, 2));
+        }
+      } catch (error) {
+        if (failed) failed.push({ key, reason: error.message });
       }
     }
   }
 }
 
-async function updateCollectionItemsViaStorage(storage, scope, itemTransformer, defaultLanguage) {
+async function updateCollectionItemsViaStorage(storage, scope, itemTransformer, defaultLanguage, failed) {
   const touched = [];
   // storage.list returns flat entry names with no file/dir discrimination;
   // collection type directories are the extensionless entries. Listing a
   // non-directory that slips through is tolerated the same way the fs walker
   // tolerates an unreadable type dir: skip it.
-  const typeEntries = (await storage.list(scope, "collections")).filter((name) => !name.includes("."));
+  let typeEntries = [];
+  try {
+    typeEntries = (await storage.list(scope, "collections")).filter((name) => !name.includes("."));
+  } catch (error) {
+    // Nothing under collections/ could be listed, so nothing in it was cleaned.
+    // Silently skipping made an unreadable collection indistinguishable from a
+    // project that has none.
+    if (failed) failed.push({ key: "collections", reason: error.message });
+    return touched;
+  }
   for (const type of typeEntries) {
     const files = [];
     try {
@@ -280,7 +304,10 @@ async function updateCollectionItemsViaStorage(storage, scope, itemTransformer, 
         );
         files.push(...names.map((name) => ({ name, lang })));
       }
-    } catch {
+    } catch (error) {
+      // A collection whose folder cannot be listed keeps every reference it holds.
+      // Reported, not skipped: the caller is about to tell someone the sweep is done.
+      if (failed) failed.push({ key: itemsDir(type), reason: error.message });
       continue;
     }
     for (const { name, lang } of files) {
@@ -297,13 +324,14 @@ async function updateCollectionItemsViaStorage(storage, scope, itemTransformer, 
         }
       } catch (error) {
         console.warn(`[linkEnrichment] Failed to process collection item ${type}/${name}: ${error.message}`);
+        if (failed) failed.push({ key, reason: error.message });
       }
     }
   }
   return touched;
 }
 
-async function cleanupMenusViaStorage(storage, scope, itemTransformer, defaultLanguage) {
+async function cleanupMenusViaStorage(storage, scope, itemTransformer, defaultLanguage, failed) {
   const keys = [];
   for (const language of ["", ...(await languageFoldersIn(storage, scope, "menus"))]) {
     const lang = { language, defaultLanguage };
@@ -311,13 +339,17 @@ async function cleanupMenusViaStorage(storage, scope, itemTransformer, defaultLa
     keys.push(...names.map((name) => menuKey(name.replace(/\.json$/, ""), lang)));
   }
   for (const key of keys) {
-    const buf = await storage.read(scope, key);
-    if (buf == null) continue;
-    const menu = JSON.parse(buf.toString("utf8"));
-    const cleanedItems = processMenuItems(menu.items, itemTransformer);
-    if (JSON.stringify(cleanedItems) !== JSON.stringify(menu.items)) {
-      menu.items = cleanedItems;
-      await storage.write(scope, key, JSON.stringify(menu, null, 2));
+    try {
+      const buf = await storage.read(scope, key);
+      if (buf == null) continue;
+      const menu = JSON.parse(buf.toString("utf8"));
+      const cleanedItems = processMenuItems(menu.items, itemTransformer);
+      if (JSON.stringify(cleanedItems) !== JSON.stringify(menu.items)) {
+        menu.items = cleanedItems;
+        await storage.write(scope, key, JSON.stringify(menu, null, 2));
+      }
+    } catch (error) {
+      if (failed) failed.push({ key, reason: error.message });
     }
   }
 }
@@ -325,6 +357,84 @@ async function cleanupMenusViaStorage(storage, scope, itemTransformer, defaultLa
 // ---------------------------------------------------------------------------
 // Public API
 // ---------------------------------------------------------------------------
+
+
+/**
+ * Apply per-type handlers to every reference-bearing theme setting in a project's
+ * own theme.json.
+ *
+ * Dispatch by the DECLARED type, never by the shape of the value. These handlers
+ * recognise a menu selection by its bare string, so a single generic transformer
+ * applied to everything rewrote prose: a text setting reading "main-menu" became
+ * that menu's uuid, and then — once text was excluded but richtext was not — a
+ * richtext default merely CONTAINING those words was replaced wholesale by it.
+ * A menu setting gets menu handling, a link setting gets link handling, and
+ * richtext gets HTML-anchor handling. Nothing else is touched.
+ *
+ * Theme settings are `settings.global.<group>` — an array of `{ type, id, default,
+ * value? }`. The project's copy is its own file, so BOTH the chosen `value` and the
+ * `default` it started from are transformed: after a duplication, a default still
+ * holding the source project's page uuid would be a reference into another project,
+ * which is exactly what the rest of that pass exists to prevent.
+ *
+ * @param {object} themeData parsed theme.json, mutated in place
+ * @param {{ link?: Function, menu?: Function, richtext?: Function }} handlers
+ * @returns {boolean} whether anything changed
+ */
+function transformThemeSettings(themeData, handlers) {
+  const groups = themeData?.settings?.global;
+  if (!groups || typeof groups !== "object") return false;
+
+  let changed = false;
+  for (const items of Object.values(groups)) {
+    if (!Array.isArray(items)) continue;
+    for (const item of items) {
+      if (!item || typeof item !== "object") continue;
+      const handler = handlers?.[item.type];
+      if (typeof handler !== "function") continue;
+      for (const key of ["value", "default"]) {
+        if (item[key] === undefined) continue;
+        const next = handler(item[key]);
+        if (JSON.stringify(next) !== JSON.stringify(item[key])) {
+          item[key] = next;
+          changed = true;
+        }
+      }
+    }
+  }
+  return changed;
+}
+
+/**
+ * fs variant, for the seeding and duplication passes.
+ *
+ * Absent is ordinary and returns quietly. Anything else throws: a duplication
+ * whose site-wide link or menu was not re-pointed still names the ORIGINAL
+ * project's content, and swallowing that here turned a failed remap into a
+ * copy that looked finished.
+ */
+async function updateThemeSettingsFile(themeJsonPath, handlers) {
+  if (!(await fs.pathExists(themeJsonPath))) return;
+  const themeData = JSON.parse(await fs.readFile(themeJsonPath, "utf8"));
+  if (transformThemeSettings(themeData, handlers)) {
+    await fs.outputFile(themeJsonPath, JSON.stringify(themeData, null, 2));
+  }
+}
+
+/** Adapter variant, for the deletion sweep. Records its own failure like the rest. */
+async function updateThemeSettingsViaStorage(storage, scope, handlers, failed) {
+  const key = "theme.json";
+  try {
+    const buf = await storage.read(scope, key);
+    if (buf == null) return;
+    const themeData = JSON.parse(buf.toString("utf8"));
+    if (transformThemeSettings(themeData, handlers)) {
+      await storage.write(scope, key, JSON.stringify(themeData, null, 2));
+    }
+  } catch (error) {
+    if (failed) failed.push({ key, reason: error.message });
+  }
+}
 
 /**
  * Enrich a newly created project's references.
@@ -448,6 +558,14 @@ export async function enrichNewProjectReferences(pagesDir, menusDir) {
   try {
     await updatePageWidgets(pagesDir, widgetProcessor);
     await updateGlobalWidgets(pagesDir, widgetProcessor);
+    // A theme may ship a site-wide link or menu selection in its defaults; give it
+    // the same stable references the widget settings just got.
+    await updateThemeSettingsFile(path.join(pagesDir, "..", "theme.json"), {
+      link: (value) => (isLinkObject(value) ? enrichValue(value) : value),
+      menu: (value) => (typeof value === "string" && menuSlugToUuid.has(value) ? menuSlugToUuid.get(value) : value),
+      richtext: (value) =>
+        typeof value === "string" ? enrichRichtextLinkRefs(value, { pageSlugToUuid }) : value,
+    });
   } catch (error) {
     console.warn(`[linkEnrichment] Failed to enrich widget links: ${error.message}`);
   }
@@ -592,6 +710,16 @@ export async function remapDuplicatedProjectUuids(projectFolderName) {
 
   await updatePageWidgets(pagesDir, widgetProcessor);
   await updateGlobalWidgets(pagesDir, widgetProcessor);
+  // Theme settings too: a duplicate whose site-wide link still names the source
+  // project's page uuid is a reference into another project.
+  await updateThemeSettingsFile(path.join(pagesDir, "..", "theme.json"), {
+    link: (value) => (isLinkObject(value) ? remapValue(value) : value),
+    menu: (value) => (typeof value === "string" && oldToNewMenuUuid.has(value) ? oldToNewMenuUuid.get(value) : value),
+    richtext: (value) =>
+      typeof value === "string"
+        ? remapRichtextLinkRefs(value, { pageMap: oldToNewUuid, itemMap: oldToNewItemUuid })
+        : value,
+  });
 
   // Step 5: Remap link references inside collection item settings (item uuids
   // were already regenerated in Step 1; this only fixes pageUuid/menu/item refs)
@@ -606,40 +734,117 @@ export async function remapDuplicatedProjectUuids(projectFolderName) {
 }
 
 /**
- * Blank every reference to a deleted page — widget link objects, richtext
- * hrefs, menu items — across pages, global widgets, menus and collection
- * items. All IO goes through the storage adapter so an embedding shell
- * observes each write.
+ * Clear every reference to content that has been CONFIRMED deleted — pages,
+ * collection items and menus — across all surviving content in every language,
+ * the default one included.
+ *
+ * One walk for all three kinds. Cleanup after a language removal would otherwise
+ * be one full walk of the project per deleted page and item, which for a language
+ * of any size is the whole project read and rewritten dozens of times.
+ *
+ * ## What is cleared, and what is left alone
+ *
+ * Only EXPLICIT references to Widgetizer-managed content are touched:
+ * `pageUuid` / `collectionItemUuid` on link settings and menu items, the matching
+ * `data-…-uuid` attributes in richtext, `parentPageUuid`, and a `menu` setting
+ * holding a deleted menu's uuid. A hand-typed URL is not a reference to managed
+ * content and is never rewritten, even when it happens to point at a page that
+ * was just deleted — the author wrote it and it is theirs to fix.
+ *
+ * The destination goes; the surrounding content stays. A link keeps its text and
+ * target and loses only its href and ref, a menu item keeps its label, and
+ * richtext keeps the words and loses only the anchor around them. Nothing is
+ * substituted: no nearest page, no other menu, no guessing.
+ *
+ * ## Confirmed, not assumed
+ *
+ * Callers pass only what they know is gone. A partial language removal clears
+ * references to the content it did delete and leaves the rest alone, because the
+ * targets that survived are still there and the ones it could not read may be —
+ * and the removal is retryable, so guessing would destroy live references.
+ *
+ * Takes no lock: it writes content, so callers run it inside the content-write
+ * section they already hold (see services/contentCoordination).
+ *
+ * Never throws for one unwritable file. A single page that cannot be written must
+ * not stop the menus and items behind it from being cleaned, and the caller must
+ * not be told the whole sweep succeeded — so the files it could not clean come back
+ * in `incomplete` for the caller to report.
+ *
+ * @param {object} storage
+ * @param {object} scope
+ * @param {{ pageUuids?: Iterable<string>, itemUuids?: Iterable<string>,
+ *           menuUuids?: Iterable<string>, defaultLanguage?: string }} targets
+ * @returns {Promise<{ incomplete: Array<{ key: string, reason: string }> }>}
  */
-export async function cleanupDeletedPageReferences(storage, scope, { deletedPageUuid, defaultLanguage }) {
-  const deletedPageUuids = new Set([deletedPageUuid]);
+export async function clearDeletedReferencesInSection(storage, scope, { pageUuids, itemUuids, menuUuids, defaultLanguage }) {
+  const pages = new Set(pageUuids || []);
+  const items = new Set(itemUuids || []);
+  const menus = new Set(menuUuids || []);
+  if (pages.size === 0 && items.size === 0 && menus.size === 0) return { incomplete: [] };
+
+  const failed = [];
+
   const cleanValue = (value) => {
-    if (isLinkObject(value) && value.pageUuid === deletedPageUuid) {
-      return { href: "", text: "", target: "_self" };
+    if (isLinkObject(value)) {
+      const hitsPage = value.pageUuid && pages.has(value.pageUuid);
+      const hitsItem = value.collectionItemUuid && items.has(value.collectionItemUuid);
+      if (!hitsPage && !hitsItem) return value;
+      // Keep what the author wrote — the label and where it opens. Only the
+      // destination and the now-dead reference go.
+      const { pageUuid, collectionItemUuid, collectionType, ...rest } = value;
+      void pageUuid;
+      void collectionItemUuid;
+      void collectionType;
+      return { ...rest, href: "" };
     }
     if (typeof value === "string") {
-      return cleanupRichtextLinkRefs(value, { pageUuids: deletedPageUuids });
+      // A menu setting stores the menu's uuid as a bare string. Matched by exact
+      // equality against a deleted uuid rather than by consulting each widget's
+      // schema: a uuid is unique enough that nothing else can hold that exact
+      // value, and reading every schema here would cost a second walk.
+      if (menus.size && menus.has(value)) return "";
+      return cleanupRichtextLinkRefs(value, { pageUuids: pages, itemUuids: items });
     }
     return value;
   };
   const widgetProcessor = (widget) => transformWidgetSettings(widget, cleanValue);
 
-  await updatePageWidgetsViaStorage(storage, scope, widgetProcessor, defaultLanguage);
-  await updateGlobalWidgetsViaStorage(storage, scope, widgetProcessor, defaultLanguage);
-  // A child left pointing at a deleted parent still renders (the breadcrumb
-  // builder falls back), but the page picker would show a dangling selection.
-  await clearDeletedParentRefsViaStorage(storage, scope, deletedPageUuid, defaultLanguage);
+  // Widgets and parent refs in one pass over the pages, with the whole deleted set.
+  await updatePagesViaStorage(storage, scope, widgetProcessor, pages, defaultLanguage, failed);
+  await updateGlobalWidgetsViaStorage(storage, scope, widgetProcessor, defaultLanguage, failed);
+
   await cleanupMenusViaStorage(
     storage,
     scope,
     (item) => {
-      if (item.pageUuid === deletedPageUuid) {
+      // The label is the author's; only the destination is ours to clear.
+      if (item.pageUuid && pages.has(item.pageUuid)) {
         item.link = "";
         delete item.pageUuid;
+      }
+      if (item.collectionItemUuid && items.has(item.collectionItemUuid)) {
+        item.link = "";
+        delete item.collectionItemUuid;
+        delete item.collectionType;
       }
       return item;
     },
     defaultLanguage,
+    failed,
+  );
+
+  // Theme settings carry the same link and menu references widget settings do.
+  await updateThemeSettingsViaStorage(
+    storage,
+    scope,
+    {
+      link: (value) => (isLinkObject(value) ? cleanValue(value) : value),
+      menu: (value) => (typeof value === "string" && menus.has(value) ? "" : value),
+      richtext: (value) =>
+        typeof value === "string" ? cleanupRichtextLinkRefs(value, { pageUuids: pages, itemUuids: items }) : value,
+    },
+    failed,
   );
 
   const touched = await updateCollectionItemsViaStorage(
@@ -647,6 +852,7 @@ export async function cleanupDeletedPageReferences(storage, scope, { deletedPage
     scope,
     (item) => transformItemSettings(item, cleanValue),
     defaultLanguage,
+    failed,
   );
   if (scope.projectId) {
     for (const { type, slug, item, lang } of touched) {
@@ -657,52 +863,44 @@ export async function cleanupDeletedPageReferences(storage, scope, { deletedPage
       }
     }
   }
+
+  return { incomplete: failed };
 }
 
 /**
- * Blank every reference to deleted collection items across pages, global
- * widgets, collection items and menus. Accepts a Set, array, or single uuid.
- * Adapter-only IO, same as cleanupDeletedPageReferences.
+ * The response shape for "the delete worked, the tidy-up after it did not".
+ * Carries a count for the UI to phrase and the paths for a log — the message a
+ * person reads must never contain a storage key.
  */
+export function referenceCleanupWarnings(incomplete) {
+  if (!incomplete?.length) return undefined;
+  return [
+    {
+      code: "REFERENCE_CLEANUP_INCOMPLETE",
+      count: incomplete.length,
+      paths: incomplete.map((entry) => entry.key),
+    },
+  ];
+}
+
+/** One deleted page. Thin wrapper over the batch walk. */
+export async function cleanupDeletedPageReferences(storage, scope, { deletedPageUuid, defaultLanguage }) {
+  return clearDeletedReferencesInSection(storage, scope, { pageUuids: [deletedPageUuid], defaultLanguage });
+}
+
+/** One or more deleted collection items. Accepts a Set, an array, or a single uuid. */
 export async function cleanupDeletedCollectionItemReferences(storage, scope, { deletedItemUuids, defaultLanguage }) {
   const uuids =
     deletedItemUuids instanceof Set
       ? deletedItemUuids
       : new Set(Array.isArray(deletedItemUuids) ? deletedItemUuids : [deletedItemUuids]);
-  if (uuids.size === 0) return;
+  return clearDeletedReferencesInSection(storage, scope, { itemUuids: uuids, defaultLanguage });
+}
 
-  const cleanValue = (value) => {
-    if (isLinkObject(value) && value.collectionItemUuid && uuids.has(value.collectionItemUuid)) {
-      return { href: "", text: "", target: "_self" };
-    }
-    if (typeof value === "string") {
-      return cleanupRichtextLinkRefs(value, { itemUuids: uuids });
-    }
-    return value;
-  };
-  const widgetProcessor = (widget) => transformWidgetSettings(widget, cleanValue);
-
-  await updatePageWidgetsViaStorage(storage, scope, widgetProcessor, defaultLanguage);
-  await updateGlobalWidgetsViaStorage(storage, scope, widgetProcessor, defaultLanguage);
-  await updateCollectionItemsViaStorage(
-    storage,
-    scope,
-    (item) => transformItemSettings(item, cleanValue),
-    defaultLanguage,
-  );
-  await cleanupMenusViaStorage(
-    storage,
-    scope,
-    (item) => {
-      if (item.collectionItemUuid && uuids.has(item.collectionItemUuid)) {
-        item.link = "";
-        delete item.collectionItemUuid;
-        delete item.collectionType;
-      }
-      return item;
-    },
-    defaultLanguage,
-  );
+/** One deleted menu: every widget or collection item that selected it loses the selection. */
+export async function cleanupDeletedMenuReferences(storage, scope, { deletedMenuUuid, defaultLanguage }) {
+  if (!deletedMenuUuid) return;
+  return clearDeletedReferencesInSection(storage, scope, { menuUuids: [deletedMenuUuid], defaultLanguage });
 }
 
 /**
@@ -765,6 +963,14 @@ export async function remapCollectionItemLinkRefs(projectFolderName, oldToNewIte
   const widgetProcessor = (widget) => transformWidgetSettings(widget, remapValue);
   await updatePageWidgets(pagesDir, widgetProcessor);
   await updateGlobalWidgets(pagesDir, widgetProcessor);
+  // Items get fresh identities on seed, so a site-wide link to one has to follow
+  // them exactly as a widget link does. Missing this left a theme setting pointing
+  // at the preset's original article.
+  await updateThemeSettingsFile(path.join(pagesDir, "..", "theme.json"), {
+    link: (value) => (isLinkObject(value) ? remapValue(value) : value),
+    richtext: (value) =>
+      typeof value === "string" ? remapRichtextLinkRefs(value, { itemMap: oldToNewItemUuid }) : value,
+  });
   await updateCollectionItems(collectionsDirFor(projectFolderName), (item) => transformItemSettings(item, remapValue));
 }
 
@@ -838,6 +1044,11 @@ export async function enrichSeededRichtextLinksFromDir({ projectDir }) {
 
   await updatePageWidgets(pagesDir, widgetProcessor);
   await updateGlobalWidgets(pagesDir, widgetProcessor);
+  // Theme richtext runs the same pass. This is the step that stamps ITEM refs,
+  // which cannot happen during the main seed because the collection items do not
+  // exist yet — so a theme's shipped article link would otherwise be the one
+  // reference in the project that never became stable.
+  await updateThemeSettingsFile(path.join(projectDir, "theme.json"), { richtext: enrichString });
   await updateCollectionItems(collectionsDir, (item) => transformItemSettings(item, enrichString));
 }
 

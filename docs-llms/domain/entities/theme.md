@@ -35,7 +35,7 @@ An update can change the appearance or available controls across the website. It
 
 The shared definitions and theme settings affect every language. Existing English and Greek content remain separate; an update does not translate either version.
 
-The rendering system already supplies destinations for a visitor language selector: a related page when available, otherwise that language's homepage. A theme must draw the selector for visitors to use it. At this handbook's step-21 baseline, adding that control to Arch and extracting its remaining hardcoded visitor text are still pending. Localized month names are a separate pending core change. See [remaining work](../operations/output.md#remaining-phase-5).
+The rendering system supplies language-selector destinations: a related page when available, otherwise that language's homepage. Arch 0.9.10 draws the selector when enabled in its header settings. Visitor text uses theme locale strings; date formatting localizes month names without changing the chosen date order. Existing project themes change when their update is applied. See [output rules](../operations/output.md#multilingual-boundary-at-this-snapshot).
 
 ### Saving and example
 

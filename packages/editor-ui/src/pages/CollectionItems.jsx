@@ -20,6 +20,7 @@ import {
   reorderCollectionItems,
   createItemLanguageVersion,
 } from "../queries/collectionManager";
+import { hasIncompleteReferenceCleanup } from "../lib/referenceCleanupWarning";
 import useCollections from "../hooks/useCollections";
 import useCollectionItems from "../hooks/useCollectionItems";
 import { invalidateMediaCache } from "../queries/mediaManager";
@@ -141,16 +142,26 @@ export default function CollectionItems() {
   const handleDelete = async (data) => {
     try {
       if (data.isBulkDelete) {
-        await bulkDeleteCollectionItems(type, data.slugs, data.language);
+        const result = await bulkDeleteCollectionItems(type, data.slugs, data.language);
         const deletedSlugs = new Set(data.slugs);
         setSelectedSlugs((prev) => prev.filter((slug) => !deletedSlugs.has(slug)));
-        showToast(t("collections.toasts.deleteBulkSuccess", { count: data.slugs.length }), "success");
+        showToast(
+          hasIncompleteReferenceCleanup(result)
+            ? t("collections.toasts.deleteBulkLinksIncomplete", { count: data.slugs.length })
+            : t("collections.toasts.deleteBulkSuccess", { count: data.slugs.length }),
+          hasIncompleteReferenceCleanup(result) ? "warning" : "success",
+        );
       } else {
-        await deleteCollectionItem(type, data.slug, data.language);
+        const result = await deleteCollectionItem(type, data.slug, data.language);
         // The deleted item may also be checkbox-selected; drop it so the
         // selection count and bulk actions don't keep referencing a gone slug.
         setSelectedSlugs((prev) => prev.filter((s) => s !== data.slug));
-        showToast(t("collections.toasts.deleteSuccess"), "success");
+        showToast(
+          hasIncompleteReferenceCleanup(result)
+            ? t("collections.toasts.deleteLinksIncomplete")
+            : t("collections.toasts.deleteSuccess"),
+          hasIncompleteReferenceCleanup(result) ? "warning" : "success",
+        );
       }
       afterMutation();
     } catch (error) {

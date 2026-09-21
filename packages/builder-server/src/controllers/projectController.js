@@ -28,7 +28,12 @@ import {
   isValidLanguageCode,
   normalizeLanguageCode,
 } from "@widgetizer/core/languages";
-import { refreshMediaUsageAfterStructuralChange, updateSiteIdentityMediaUsage } from "../services/mediaUsageService.js";
+import {
+  refreshMediaUsageAfterStructuralChange,
+  updateSiteIdentityMediaUsage,
+  extractMediaPathsFromSiteIdentity,
+} from "../services/mediaUsageService.js";
+import { withContentWriteLock, assertIntroducedMediaExists } from "../services/contentCoordination.js";
 import { generateUniqueSlug, sanitizeSlug } from "../utils/slugHelpers.js";
 
 import { generateCopyName } from "../utils/namingHelpers.js";
@@ -322,6 +327,28 @@ export async function seedPresetMedia(folderName, projectId, presetMediaDir) {
  * @param {string} [desiredFolder] - Optional folder slug; if absent, derived from name
  * @returns {Promise<{ name: string, folder: string }>}
  */
+/**
+ * Undo a project that was only partly made. Both halves are best-effort: the
+ * caller is already failing, and a leftover row or directory must not replace
+ * the reason it failed.
+ */
+async function discardHalfMadeProject(projectId, projectDir) {
+  if (projectId) {
+    try {
+      projectRepo.deleteProject(projectId);
+    } catch (error) {
+      console.warn(`[ProjectController] Could not remove the half-made project row: ${error.message}`);
+    }
+  }
+  if (projectDir) {
+    try {
+      await fs.remove(projectDir);
+    } catch (error) {
+      console.warn(`[ProjectController] Could not remove the half-made project directory: ${error.message}`);
+    }
+  }
+}
+
 async function resolveProjectIdentity(desiredName, desiredFolder) {
   const existingNames = projectRepo.getAllProjects().map((p) => p.name);
   const collides = existingNames.some((existing) => existing.toLowerCase() === desiredName.toLowerCase());
@@ -492,13 +519,30 @@ export async function createProject(req, res) {
     // the theme via copyThemeToProject — never the preset).
     // Collection items are fs-only so they seed before the DB row; media files
     // register against the project_id, so that runs after createProject below.
-    const { collectionsDir: presetCollectionsDir, mediaDir: presetMediaDir } =
-      await themeController.resolvePresetPaths(theme, preset);
+    let presetCollectionsDir;
+    let presetMediaDir;
+    try {
+      ({ collectionsDir: presetCollectionsDir, mediaDir: presetMediaDir } = await themeController.resolvePresetPaths(
+        theme,
+        preset,
+      ));
+    } catch (error) {
+      await discardHalfMadeProject(null, projectDir);
+      console.error(`[ProjectController] Reading the preset failed: ${error.message}`);
+      throw new Error("The project could not be created from this preset, so nothing was created.");
+    }
+    // A preset the user picked and did not get is a failed creation, not a
+    // warning: the project would claim that preset while missing its content,
+    // and nothing afterwards would say so. An absent component is fine — the
+    // guard above is what distinguishes "this preset has no collections" from
+    // "this preset's collections could not be applied".
     if (presetCollectionsDir) {
       try {
         await seedPresetCollections(folderName, presetCollectionsDir);
       } catch (error) {
-        console.warn(`[ProjectController] Failed to seed preset collections: ${error.message}`);
+        await discardHalfMadeProject(null, projectDir);
+        console.error(`[ProjectController] Seeding preset collections failed: ${error.message}`);
+        throw new Error("The project could not be created from this preset, so nothing was created.");
       }
     }
 
@@ -534,7 +578,10 @@ export async function createProject(req, res) {
       try {
         await seedPresetMedia(folderName, newProject.id, presetMediaDir);
       } catch (error) {
-        console.warn(`[ProjectController] Failed to seed preset media: ${error.message}`);
+        // The row exists by now, so both halves have to go.
+        await discardHalfMadeProject(newProject.id, projectDir);
+        console.error(`[ProjectController] Seeding preset media failed: ${error.message}`);
+        throw new Error("The project could not be created from this preset, so nothing was created.");
       }
     }
 
@@ -644,8 +691,11 @@ export async function updateProject(req, res) {
     const sanitizedSiteTitle = sanitizeOptionalText(updates.siteTitle);
     const sanitizedSiteUrl = sanitizeOptionalText(updates.siteUrl);
 
-    // Everything that can reject or throw must run above: the rename below moves
-    // the directory before the row is written, so a failure after it strands the project.
+    // Only VALIDATED here; the move itself happens inside the media section below,
+    // after every check that can refuse this request. Moving first is what stranded
+    // a project whose logo was then rejected: directory renamed, row still naming
+    // the old folder.
+    let folderRename = null;
     if (updates.folderName && updates.folderName.trim() !== currentFolderName) {
       const newFolderName = updates.folderName.trim();
 
@@ -662,51 +712,91 @@ export async function updateProject(req, res) {
         });
       }
 
-      // Rename the project directory
-      const oldDir = getProjectDir(currentFolderName);
-      const newDir = getProjectDir(newFolderName);
-
-      try {
-        // Use copy + remove instead of rename for better Windows compatibility
-        await fs.copy(oldDir, newDir);
-        await new Promise((resolve) => setTimeout(resolve, 100));
-        await fs.remove(oldDir);
-      } catch (renameError) {
-        // If copy succeeded but remove failed, try to clean up the new directory
-        try {
-          if (await fs.pathExists(newDir)) {
-            await fs.remove(newDir);
-          }
-        } catch (cleanupError) {
-          console.warn(`Failed to cleanup new directory after error: ${cleanupError.message}`);
-        }
-        throw new Error(`Failed to rename project directory: ${renameError.message}`);
-      }
+      folderRename = { from: currentFolderName, to: newFolderName };
     }
 
-    const updatedProject = projectRepo.updateProject(id, {
-      folderName: updates.folderName || currentFolderName,
-      name: updates.name,
-      description: updates.description,
-      siteTitle: sanitizedSiteTitle,
-      siteUrl: sanitizedSiteUrl,
-      cleanUrls: updates.cleanUrls,
-      siteIdentity,
-      defaultLanguage: languageFields.defaultLanguage,
-      languages: languageFields.languages,
-      receiveThemeUpdates: updates.receiveThemeUpdates,
+    // The logo is a media reference like any other, so the row write and its usage
+    // sync are one media section. This route is actor-scoped (it edits a project by
+    // id, not the resolved one), so the scope for the asset check is built here.
+    //
+    // The folder rename happens INSIDE this section and AFTER the media check, not
+    // before it: a rejected logo used to leave the directory already moved while the
+    // row still named the old one, which strands the project. Everything that can
+    // refuse this request now refuses before anything on disk has moved.
+    const { updatedProject, usageStale } = await withContentWriteLock(id, async () => {
+      if (siteIdentity !== undefined) {
+        // Re-read the row HERE rather than comparing against the copy loaded before
+        // the lock. A baseline read earlier can still show a logo that another save
+        // has since removed and a delete has since acted on, which classifies the
+        // path as "already present" and skips the check — the same race that was
+        // fixed for pages and collection items.
+        const baseline = projectRepo.getProjectById(id);
+        // Checked against the folder the assets are STILL in — the rename below
+        // has not run yet.
+        await assertIntroducedMediaExists({
+          assetStorage: req.adapters.assetStorage,
+          scope: { projectId: id, folderName: currentFolderName },
+          previousPaths: extractMediaPathsFromSiteIdentity(baseline?.siteIdentity),
+          nextPaths: extractMediaPathsFromSiteIdentity(siteIdentity),
+        });
+      }
+
+      if (folderRename) {
+        const oldDir = getProjectDir(folderRename.from);
+        const newDir = getProjectDir(folderRename.to);
+
+        try {
+          // Use copy + remove instead of rename for better Windows compatibility
+          await fs.copy(oldDir, newDir);
+          await new Promise((resolve) => setTimeout(resolve, 100));
+          await fs.remove(oldDir);
+        } catch (renameError) {
+          // If copy succeeded but remove failed, try to clean up the new directory
+          try {
+            if (await fs.pathExists(newDir)) {
+              await fs.remove(newDir);
+            }
+          } catch (cleanupError) {
+            console.warn(`Failed to cleanup new directory after error: ${cleanupError.message}`);
+          }
+          throw new Error(`Failed to rename project directory: ${renameError.message}`);
+        }
+      }
+
+      const saved = projectRepo.updateProject(id, {
+        folderName: updates.folderName || currentFolderName,
+        name: updates.name,
+        description: updates.description,
+        siteTitle: sanitizedSiteTitle,
+        siteUrl: sanitizedSiteUrl,
+        cleanUrls: updates.cleanUrls,
+        siteIdentity,
+        defaultLanguage: languageFields.defaultLanguage,
+        languages: languageFields.languages,
+        receiveThemeUpdates: updates.receiveThemeUpdates,
+      });
+
+      if (siteIdentity === undefined) return { updatedProject: saved, usageStale: false };
+
+      try {
+        await updateSiteIdentityMediaUsage(id, saved.siteIdentity);
+        return { updatedProject: saved, usageStale: false };
+      } catch (error) {
+        // The details ARE saved; only the derived usage rows are behind.
+        console.warn(`[ProjectController] Failed to update business details media usage: ${error.message}`);
+        return { updatedProject: saved, usageStale: true };
+      }
     });
 
-    if (siteIdentity !== undefined) {
-      try {
-        await updateSiteIdentityMediaUsage(id, updatedProject.siteIdentity);
-      } catch (error) {
-        console.warn(`[ProjectController] Failed to update business details media usage: ${error.message}`);
-      }
-    }
-
-    res.json(updatedProject);
+    res.json(
+      usageStale
+        ? { ...updatedProject, warnings: [{ code: "MEDIA_USAGE_STALE", path: "site-identity" }] }
+        : updatedProject,
+    );
   } catch (error) {
+    if (error?.code === "MEDIA_REFERENCE_MISSING") {
+      return res.status(error.statusCode).json({ error: "Missing media", message: error.message, code: error.code });
+    }
     console.error("Error updating project:", error);
     res.status(500).json({ error: error.message || "Failed to update project" });
   }
@@ -782,11 +872,14 @@ export async function duplicateProject(req, res) {
     try {
       await fs.copy(originalDir, newDir);
 
-      try {
-        await remapDuplicatedProjectUuids(newFolderName);
-      } catch (uuidUpdateError) {
-        console.warn(`[ProjectController] Failed to update UUIDs in cloned project: ${uuidUpdateError.message}`);
-      }
+      // Not a warning. The copy regenerates every page, item and menu identity
+      // and then re-points the links, menus, parents and translation groups that
+      // named the old ones; a failure between those two halves leaves a project
+      // whose references all name the ORIGINAL project's content, which renders
+      // as a site that has lost its internal links. Nothing of the user's is
+      // lost by removing a copy that was made seconds ago, so the copy goes and
+      // they can try again.
+      await remapDuplicatedProjectUuids(newFolderName);
     } catch (copyError) {
       try {
         await fs.remove(newDir);
@@ -795,13 +888,16 @@ export async function duplicateProject(req, res) {
           `[ProjectController] Failed to clean up new directory after copy failure: ${cleanupError.message}`,
         );
       }
-      throw new Error(`Failed to copy project files: ${copyError.message}`);
+      console.error(`[ProjectController] Duplication failed: ${copyError.message}`);
+      throw new Error("The project could not be duplicated, so no copy was made.");
     }
 
     // Save new project to DB
     projectRepo.createProject(newProject);
 
-    // Copy media metadata from original project to the duplicate in SQLite
+    // Copy media metadata from original project to the duplicate in SQLite. The
+    // library is part of the project: a copy that silently has none would show
+    // an empty Media page beside pages that still display the images.
     try {
       const originalMedia = mediaRepo.getMediaFiles(originalProjectId);
       if (originalMedia.files && originalMedia.files.length > 0) {
@@ -812,7 +908,9 @@ export async function duplicateProject(req, res) {
         mediaRepo.writeMediaData(newProject.id, originalMedia);
       }
     } catch (mediaError) {
-      console.warn("Could not duplicate media metadata:", mediaError.message);
+      await discardHalfMadeProject(newProject.id, newDir);
+      console.error(`[ProjectController] Duplicating the media library failed: ${mediaError.message}`);
+      throw new Error("The project could not be duplicated, so no copy was made.");
     }
 
     await refreshMediaUsageAfterStructuralChange(newProject.id, "project duplication");
@@ -1074,10 +1172,28 @@ export async function exportProject(req, res) {
         siteIdentity: project.siteIdentity || {},
         defaultLanguage: project.defaultLanguage || DEFAULT_LANGUAGE,
         languages: project.languages || [],
+        // Optional provenance: when the theme was last updated, and to what.
+        // A backup written before these were carried simply has neither, and
+        // imports without them.
+        lastThemeUpdateAt: project.lastThemeUpdateAt || null,
+        lastThemeUpdateVersion: project.lastThemeUpdateVersion || null,
         created: project.created,
         updated: project.updated,
       },
     };
+
+    // Media metadata is read BEFORE the response starts streaming. It is part of
+    // the backup, not a nicety, so a read failure has to be answerable with a
+    // status code — once `archive.pipe(res)` runs, the only thing left to send
+    // is a truncated ZIP that looks like a complete one.
+    let mediaData;
+    try {
+      mediaData = mediaRepo.getMediaFiles(project.id);
+    } catch (mediaError) {
+      return res.status(500).json({
+        error: `Could not read the media library for this project, so the backup would be incomplete: ${mediaError.message}`,
+      });
+    }
 
     // Generate filename. sanitizeSlug transliterates non-Latin names (e.g. Greek) instead of
     // rewriting every character to a dash the way a raw [^a-z0-9] strip would.
@@ -1111,8 +1227,17 @@ export async function exportProject(req, res) {
     // Add all project files recursively
     // Exclude system files and directories
     const excludePatterns = [/^\./, /node_modules/, /\.git/];
+    // `uploads/media.json` is never taken from disk. Metadata lives in SQLite
+    // and is appended below under this exact name; archiving the file too would
+    // put two entries with one name in the ZIP, and an extractor keeps the
+    // first — so a leftover file (a project older than the move to SQLite, or a
+    // restore that failed and left its copy behind) would silently become the
+    // restored library. Excluded even when the live library is empty, so
+    // "this project has no media" restores as no media.
+    const MEDIA_METADATA_ENTRY = "uploads/media.json";
     const shouldExclude = (filePath) => {
       const relativePath = path.relative(projectDir, filePath);
+      if (relativePath.split(path.sep).join("/") === MEDIA_METADATA_ENTRY) return true;
       return excludePatterns.some((pattern) => pattern.test(relativePath));
     };
 
@@ -1133,16 +1258,10 @@ export async function exportProject(req, res) {
 
     await addDirectory(projectDir);
 
-    // Serialize media metadata from SQLite into the ZIP
-    // (media metadata moved from uploads/media.json to SQLite, so it must be explicitly included)
-    try {
-      const mediaData = mediaRepo.getMediaFiles(project.id);
-      if (mediaData.files && mediaData.files.length > 0) {
-        archive.append(JSON.stringify(mediaData, null, 2), { name: "uploads/media.json" });
-      }
-    } catch (mediaError) {
-      console.warn("Could not export media metadata:", mediaError.message);
-    }
+    // Serialize media metadata from SQLite into the ZIP. Written even when the
+    // library is empty: the entry's presence is what tells a restore that this
+    // backup describes the library, rather than leaving it to guess.
+    archive.append(JSON.stringify({ files: mediaData.files || [] }, null, 2), { name: MEDIA_METADATA_ENTRY });
 
     // Finalize the archive
     await archive.finalize();
@@ -1252,6 +1371,18 @@ export async function importProject(req, res) {
       return res.status(400).json({ error: "Uploaded ZIP file is empty" });
     }
 
+    // A backup made before media metadata became SQLite-only can carry two
+    // entries named `uploads/media.json` — the file that was on disk and the
+    // serialized library. They describe different libraries and nothing says
+    // which is current, so the import refuses rather than picking one.
+    const mediaMetadataEntries = zipEntries.filter((entry) => entry.entryName === "uploads/media.json");
+    if (mediaMetadataEntries.length > 1) {
+      return res.status(400).json({
+        error:
+          "This backup contains more than one media library (two copies of uploads/media.json), and there is no way to tell which one is current. Re-export the project with this version and import that backup instead.",
+      });
+    }
+
     // Find and validate manifest
     const manifestEntry = zipEntries.find((entry) => entry.entryName === "project-export.json");
     if (!manifestEntry) {
@@ -1269,6 +1400,20 @@ export async function importProject(req, res) {
     // Validate manifest structure
     if (!manifest.project || !manifest.project.name || !manifest.project.theme) {
       return res.status(400).json({ error: "Invalid project export: incomplete manifest" });
+    }
+
+    // Language metadata is validated before a name, a folder or a row exists.
+    // A backup whose languages this version cannot read describes a site it
+    // cannot hold: importing it anyway would put the project's other-language
+    // pages, menus and items on disk with nothing listing them, which reads as
+    // a successful restore of a site that has quietly lost part of itself.
+    // A backup with no language fields at all is a single-language project from
+    // before languages existed, and imports on the ordinary defaults.
+    const languageCheck = readLanguages(manifest.project, null, { seeded: true });
+    if (languageCheck.error) {
+      return res.status(400).json({
+        error: `This backup uses a language this version of Widgetizer cannot work with: ${languageCheck.error} The project was not imported, so nothing has changed and your backup file is untouched. Open it with a newer version of Widgetizer.`,
+      });
     }
 
     // Check if theme exists
@@ -1315,7 +1460,7 @@ export async function importProject(req, res) {
         }
       }
 
-      const importedLanguages = readLanguages(manifest.project, null, { seeded: true }).value ?? {};
+      const importedLanguages = languageCheck.value ?? {};
 
       // Create new project object (DB insert happens later, after directory setup)
       newProject = {
@@ -1335,6 +1480,8 @@ export async function importProject(req, res) {
         // single-language project rather than importing an unusable code.
         defaultLanguage: importedLanguages.defaultLanguage ?? DEFAULT_LANGUAGE,
         languages: importedLanguages.languages ?? [],
+        lastThemeUpdateAt: manifest.project.lastThemeUpdateAt || null,
+        lastThemeUpdateVersion: manifest.project.lastThemeUpdateVersion || null,
         created: new Date().toISOString(),
         updated: new Date().toISOString(),
       };
@@ -1367,11 +1514,29 @@ export async function importProject(req, res) {
       projectRepo.createProject(newProject);
 
       // Restore media metadata from the exported media.json into SQLite
+      // The media library is part of the project, so a restore that cannot read
+      // or write it fails the import rather than reporting a success that has
+      // quietly lost the library. The outer handler removes the row and the
+      // directory, so a refusal leaves nothing behind to clean up by hand.
       const mediaJsonPath = path.join(projectDir, "uploads", "media.json");
-      try {
-        if (await fs.pathExists(mediaJsonPath)) {
-          const mediaData = await fs.readJson(mediaJsonPath);
-          if (mediaData.files && mediaData.files.length > 0) {
+      if (await fs.pathExists(mediaJsonPath)) {
+        let mediaData;
+        try {
+          mediaData = await fs.readJson(mediaJsonPath);
+        } catch (mediaError) {
+          throw new Error(`This backup's media library could not be read (uploads/media.json): ${mediaError.message}`);
+        }
+        // A library with no files is a project that has none, and restores as
+        // none. A file that parses but is not a library at all — `{}`, or a
+        // `files` that is not a list — is not that: reading it as empty would
+        // report a restored project whose media the backup may well have held.
+        if (!mediaData || typeof mediaData !== "object" || !Array.isArray(mediaData.files)) {
+          throw new Error(
+            "This backup's media library is not in a form this version can read (uploads/media.json has no list of files). The project was not imported.",
+          );
+        }
+        try {
+          if (mediaData.files.length > 0) {
             // Regenerate media file IDs to avoid UNIQUE constraint conflicts
             // (the original project may still exist in the database)
             for (const file of mediaData.files) {
@@ -1379,19 +1544,19 @@ export async function importProject(req, res) {
             }
             mediaRepo.writeMediaData(newProject.id, mediaData);
           }
-          // Remove the media.json file after importing its metadata into SQLite.
-          await fs.remove(mediaJsonPath);
+        } catch (mediaError) {
+          throw new Error(`This backup's media library could not be restored: ${mediaError.message}`);
         }
-      } catch (mediaError) {
-        console.warn("Could not restore media metadata from export:", mediaError.message);
-        // Non-fatal: project is still usable, media files exist on disk
+        // Only now: the file is the restore's input, and deleting it after a
+        // failure would turn a recoverable one into a silent loss.
+        await fs.remove(mediaJsonPath);
       }
 
       await refreshMediaUsageAfterStructuralChange(newProject.id, "project import");
 
-      // Clean up temporary files (extraction dir + uploaded ZIP)
+      // Clean up the extraction directory; the uploaded ZIP is removed in the
+      // `finally` below, which every exit passes through.
       await fs.remove(tempDir);
-      if (uploadedFilePath) await fs.remove(uploadedFilePath).catch(() => {});
 
       res.status(201).json({
         ...newProject,
@@ -1422,10 +1587,14 @@ export async function importProject(req, res) {
       throw error;
     }
   } catch (error) {
-    // Always clean up the uploaded temp file
-    if (uploadedFilePath) await fs.remove(uploadedFilePath).catch(() => {});
     console.error("Error importing project:", error);
     res.status(500).json({ error: error.message || "Failed to import project" });
+  } finally {
+    // The server's own copy of the upload, not the user's backup file. Every
+    // refusal above returns early, so removing it anywhere but here leaves one
+    // behind for each rejected import — and this handler has several reasons to
+    // refuse before it reaches the work.
+    if (uploadedFilePath) await fs.remove(uploadedFilePath).catch(() => {});
   }
 }
 

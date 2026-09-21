@@ -209,6 +209,311 @@ describe("saveStore (useAutoSave)", () => {
   });
 
   // --------------------------------------------------------------------------
+  // The language being edited was removed
+  // --------------------------------------------------------------------------
+
+  describe("a save refused because the language was removed", () => {
+    function rejectWithLanguageRemoved(code = "el") {
+      const err = new Error(`The language "${code}" was removed from this site`);
+      err.code = "LANGUAGE_REMOVED";
+      err.status = 409;
+      err.data = { code: "LANGUAGE_REMOVED", language: code };
+      savePageContent.mockRejectedValueOnce(err);
+    }
+
+    it("stops autosave and raises the curtain, without throwing at the caller", async () => {
+      // Same handling as PROJECT_MISMATCH and for the same reason: retrying cannot
+      // succeed, so hammering the server helps nobody, and an exception thrown at a
+      // manual save would surface as a generic failure toast instead of the
+      // explanation the curtain gives.
+      seedPageStore();
+      useAutoSave.getState().markWidgetModified("w-1");
+      expect(useAutoSave.getState().autoSaveInterval).not.toBe(null);
+      rejectWithLanguageRemoved();
+
+      const result = await useAutoSave.getState().save(false);
+
+      expect(result).toEqual({ status: "language-removed" });
+      expect(useAutoSave.getState().autoSaveInterval).toBe(null);
+      expect(useStaleProjectStore.getState().isStale).toBe(true);
+      expect(useStaleProjectStore.getState().reason).toBe("language");
+      expect(useStaleProjectStore.getState().removedLanguage).toBe("el");
+    });
+
+    it("keeps every edit and stays dirty, because reloading is the only way out", async () => {
+      // The curtain tells the user that reloading discards this work. That is only
+      // honest if the work is in fact still here until they choose to.
+      seedPageStore();
+      usePageStore.setState({
+        page: {
+          ...usePageStore.getState().page,
+          widgets: { "w-1": { type: "rich-text", settings: { text: "Written in Greek" } } },
+        },
+      });
+      useAutoSave.getState().markWidgetModified("w-1");
+      rejectWithLanguageRemoved();
+
+      await useAutoSave.getState().save(false);
+
+      expect(useAutoSave.getState().modifiedWidgets.has("w-1")).toBe(true);
+      expect(useAutoSave.getState().hasUnsavedChanges()).toBe(true);
+      expect(usePageStore.getState().page.widgets["w-1"].settings.text).toBe("Written in Greek");
+      expect(useAutoSave.getState().lastSaved).toBe(null);
+    });
+  });
+
+  describe("after a language-removal refusal, saving stays off", () => {
+    function rejectWithLanguageRemoved(code = "el") {
+      const err = new Error(`The language "${code}" was removed from this site`);
+      err.code = "LANGUAGE_REMOVED";
+      err.status = 409;
+      err.data = { code: "LANGUAGE_REMOVED", language: code };
+      savePageContent.mockRejectedValueOnce(err);
+    }
+
+    async function refuseOnce() {
+      seedPageStore();
+      useAutoSave.getState().markWidgetModified("w-1");
+      rejectWithLanguageRemoved();
+      await useAutoSave.getState().save(false);
+    }
+
+    it("does not re-arm the timer when the retained draft is edited further", async () => {
+      // Stopping the timer once was not enough: every edit runs through
+      // resetAutoSaveTimer, so typing into the draft the user was told to keep
+      // restarted the doomed saves immediately.
+      await refuseOnce();
+      expect(useAutoSave.getState().autoSaveInterval).toBe(null);
+
+      useAutoSave.getState().markWidgetModified("w-2");
+      expect(useAutoSave.getState().autoSaveInterval).toBe(null);
+
+      useAutoSave.getState().setStructureModified(true);
+      useAutoSave.getState().setThemeSettingsModified(true);
+      expect(useAutoSave.getState().autoSaveInterval).toBe(null);
+    });
+
+    it("refuses further saves outright instead of re-issuing a doomed request", async () => {
+      await refuseOnce();
+      savePageContent.mockClear();
+
+      const result = await useAutoSave.getState().save(false);
+
+      expect(result).toEqual({ status: "suspended" });
+      expect(savePageContent).not.toHaveBeenCalled();
+    });
+
+    it("keeps the draft while suspended", async () => {
+      await refuseOnce();
+      expect(useAutoSave.getState().hasUnsavedChanges()).toBe(true);
+      expect(useAutoSave.getState().modifiedWidgets.has("w-1")).toBe(true);
+    });
+
+    it("saves again once the editor starts a new session", async () => {
+      // A suspension that outlived its session would silently stop saving a page
+      // that is perfectly fine. PageEditor calls this when it loads a page.
+      await refuseOnce();
+      useAutoSave.getState().resumeSaving();
+
+      useAutoSave.getState().markWidgetModified("w-1");
+      expect(useAutoSave.getState().autoSaveInterval).not.toBe(null);
+
+      const result = await useAutoSave.getState().save(false);
+      expect(result).toEqual({ status: "success" });
+    });
+
+    it("also lifts on reset, the discard-and-leave path", async () => {
+      await refuseOnce();
+      useAutoSave.getState().reset();
+      expect(useAutoSave.getState().savingSuspended).toBe(false);
+    });
+
+    it("takes the banner down with it, so a fresh page does not inherit the warning", async () => {
+      // Saving resuming and the banner saying it cannot are one fact. Leaving the
+      // banner up over a page that saves perfectly well is its own bug.
+      await refuseOnce();
+      expect(useStaleProjectStore.getState().reason).toBe("language");
+
+      useAutoSave.getState().resumeSaving();
+
+      expect(useStaleProjectStore.getState().isStale).toBe(false);
+      expect(useStaleProjectStore.getState().reason).toBe(null);
+      expect(useStaleProjectStore.getState().removedLanguage).toBe(null);
+    });
+
+    it("leaves a project-mismatch warning alone, which is about the tab, not the session", async () => {
+      // Clearing it here would drop a warning nothing re-raises until the next focus
+      // probe, leaving the tab quietly editing the wrong project.
+      useStaleProjectStore.getState().markStale("Marketing Site");
+
+      useAutoSave.getState().resumeSaving();
+      useAutoSave.getState().reset();
+
+      expect(useStaleProjectStore.getState().isStale).toBe(true);
+      expect(useStaleProjectStore.getState().reason).toBe("project");
+      expect(useStaleProjectStore.getState().incomingName).toBe("Marketing Site");
+    });
+
+    it("refusal → discard and navigate away → open a valid page → saves, with no old banner", async () => {
+      // The whole lifecycle in one, because each step restored something the
+      // previous one had switched off and any of them could regress alone.
+      await refuseOnce();
+      expect(useStaleProjectStore.getState().isStale).toBe(true);
+      expect(useAutoSave.getState().savingSuspended).toBe(true);
+
+      // Discarding through ordinary navigation: the guard calls reset(), then lets
+      // the route change through.
+      useAutoSave.getState().reset();
+
+      // The editor opens a page in a language that is fine.
+      useAutoSave.getState().resumeSaving();
+      seedPageStore();
+      useAutoSave.getState().markWidgetModified("w-1");
+
+      const result = await useAutoSave.getState().save(false);
+
+      expect(result).toEqual({ status: "success" });
+      expect(useStaleProjectStore.getState().isStale).toBe(false);
+      expect(useAutoSave.getState().savingSuspended).toBe(false);
+      expect(useAutoSave.getState().hasUnsavedChanges()).toBe(false);
+    });
+  });
+
+  // --------------------------------------------------------------------------
+  // A save the server refused
+  // --------------------------------------------------------------------------
+
+  describe("a rejected save", () => {
+    /** The server refusing a page that references an image that has been deleted. */
+    function rejectWithMissingMedia() {
+      const err = new Error("This content refers to a file that is no longer in the media library");
+      err.code = "MEDIA_REFERENCE_MISSING";
+      err.status = 409;
+      savePageContent.mockRejectedValueOnce(err);
+      return err;
+    }
+
+    it("keeps the edit and stays dirty, so nothing the user typed is lost", async () => {
+      seedPageStore();
+      // An edit the server is about to refuse.
+      usePageStore.setState({
+        page: {
+          ...usePageStore.getState().page,
+          widgets: { "w-1": { type: "rich-text", settings: { text: "Edited, and refused" } } },
+        },
+      });
+      useAutoSave.getState().markWidgetModified("w-1");
+      rejectWithMissingMedia();
+
+      await expect(useAutoSave.getState().save(false)).rejects.toThrow(/no longer in the media library/);
+
+      // The whole point: a refusal writes nothing, so the editor must still hold
+      // the work and still know it is unsaved. A cleared flag here would let the
+      // user navigate away believing the page was saved.
+      expect(useAutoSave.getState().modifiedWidgets.has("w-1")).toBe(true);
+      expect(useAutoSave.getState().hasUnsavedChanges()).toBe(true);
+      expect(usePageStore.getState().page.widgets["w-1"].settings.text).toBe("Edited, and refused");
+      expect(useAutoSave.getState().lastSaved).toBe(null);
+    });
+
+    it("rethrows with its code, so the editor can name the reason", async () => {
+      seedPageStore();
+      useAutoSave.getState().markWidgetModified("w-1");
+      rejectWithMissingMedia();
+
+      // EditorTopBar distinguishes this from a generic failure on `code` alone.
+      await expect(useAutoSave.getState().save(false)).rejects.toMatchObject({
+        code: "MEDIA_REFERENCE_MISSING",
+      });
+    });
+
+    it("leaves the baseline alone, so the next save still sends the refused edit", async () => {
+      const page = seedPageStore();
+      useAutoSave.getState().markWidgetModified("w-1");
+      rejectWithMissingMedia();
+      await expect(useAutoSave.getState().save(false)).rejects.toThrow();
+
+      // Rebaselining on a failure would make the refused change invisible to the
+      // next save — it would look clean and never be sent again.
+      expect(usePageStore.getState().originalPage).toEqual(page);
+
+      savePageContent.mockResolvedValueOnce({});
+      const second = await useAutoSave.getState().save(false);
+      expect(second).toEqual({ status: "success" });
+      expect(savePageContent).toHaveBeenCalledTimes(2);
+    });
+  });
+
+  // --------------------------------------------------------------------------
+  // "Saved, but image tracking is behind"
+  // --------------------------------------------------------------------------
+
+  describe("a save whose media-usage sync failed server-side", () => {
+    it("is a success that records a warning, not a failure", async () => {
+      seedPageStore();
+      useAutoSave.getState().markWidgetModified("w-1");
+      savePageContent.mockResolvedValueOnce({ warnings: [{ code: "MEDIA_USAGE_STALE", path: "page-1" }] });
+
+      const result = await useAutoSave.getState().save(false);
+
+      // The content IS saved; only the derived usage rows are behind. Showing this
+      // as a failed save would be false, and would push the user to re-save work
+      // that is already stored.
+      expect(result).toEqual({ status: "success" });
+      expect(useAutoSave.getState().hasUnsavedChanges()).toBe(false);
+      expect(useAutoSave.getState().mediaUsageStale).not.toBe(null);
+    });
+
+    it("records nothing when the save carries no such warning", async () => {
+      seedPageStore();
+      useAutoSave.getState().markWidgetModified("w-1");
+
+      await useAutoSave.getState().save(false);
+
+      expect(useAutoSave.getState().mediaUsageStale).toBe(null);
+    });
+
+    it("notices it on a header-only save, whose response used to be discarded", async () => {
+      // Globals were fired into the fan-out and their results thrown away, so a
+      // save that touched only the header lost its warning entirely.
+      seedPageStore();
+      usePageStore.setState({
+        globalWidgets: { header: { type: "header", settings: { logo: "/uploads/images/a.png" } }, footer: null },
+        originalGlobalWidgets: { header: { type: "header", settings: { logo: "" } }, footer: null },
+      });
+      useAutoSave.getState().markWidgetModified("header");
+      saveGlobalWidget.mockResolvedValueOnce({ warnings: [{ code: "MEDIA_USAGE_STALE", path: "global:header" }] });
+
+      const result = await useAutoSave.getState().save(false);
+
+      expect(result).toEqual({ status: "success" });
+      expect(saveGlobalWidget).toHaveBeenCalled(); // not vacuous: the header really was saved
+      expect(useAutoSave.getState().mediaUsageStale).not.toBe(null);
+    });
+
+    it("notices it on a theme save without mistaking it for a settings correction", async () => {
+      // Theme warnings are not all one kind. A sanitization warning means the server
+      // stored something different and undo history must be rewritten; this one
+      // changed no setting, so treating it as a correction would rewrite history
+      // over a save the server took verbatim.
+      seedPageStore();
+      makeThemeStoreLive({ colors: { primary: "#fff" } }, { colors: { primary: "#000" } });
+      useAutoSave.getState().setThemeSettingsModified(true);
+      mockThemeStoreState.saveSettings.mockResolvedValueOnce({
+        warnings: [{ code: "MEDIA_USAGE_STALE", path: "theme.json" }],
+      });
+      const applyThemeCorrections = vi.spyOn(usePageStore.getState(), "applyThemeCorrections");
+
+      const result = await useAutoSave.getState().save(false);
+
+      expect(result).toEqual({ status: "success" });
+      expect(mockThemeStoreState.saveSettings).toHaveBeenCalled(); // not vacuous
+      expect(useAutoSave.getState().mediaUsageStale).not.toBe(null);
+      expect(applyThemeCorrections).not.toHaveBeenCalled();
+    });
+  });
+
+  // --------------------------------------------------------------------------
   // Initial state
   // --------------------------------------------------------------------------
 

@@ -26,10 +26,24 @@ export function requestLanguage(req, res) {
   const requested = normalizeLanguageCode(req.query?.language ?? req.body?.language ?? "");
   const language = resolveLanguage(requested, defaultLanguage);
   const lang = { language, defaultLanguage, languages };
-  if ((requested && !LANGUAGE_CODE_RE.test(requested)) || (languageFolder(lang) && !languages.includes(language))) {
+
+  // Malformed first and on its own: `languageFolder` refuses to build a path from a
+  // code like "not-a-language", so asking it about one throws. The original `||`
+  // short-circuited past it; keep that order.
+  const malformed = Boolean(requested) && !LANGUAGE_CODE_RE.test(requested);
+  const notEnabled = !malformed && Boolean(languageFolder(lang)) && !languages.includes(language);
+  if (malformed || notEnabled) {
     res.status(400).json({
       error: "Unknown language",
       message: `Language "${requested || language}" is not enabled for this project.`,
+      // A well-formed language the project does not have is, from an editor's point
+      // of view, the same event as one removed mid-edit: this work cannot be saved
+      // anywhere. It carries the same code so the editor reacts the same way —
+      // stop retrying, keep the edits, explain — whether the request validated
+      // against a stale project row (caught inside the write section) or a fresh
+      // one (caught here). Without the code this path answered a bare 400 and the
+      // recovery never ran, which is the far more common ordering of the two.
+      ...(malformed ? {} : { code: "LANGUAGE_REMOVED", language }),
     });
     return null;
   }

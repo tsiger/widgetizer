@@ -72,6 +72,14 @@ Detailed shapes belong in the existing [setting types reference](../../theming-s
 
 Renaming a referenced object should preserve its stable identity. Deletion cleanup and render-time missing-target behavior are separate safeguards. Custom string URLs do not automatically acquire the same rename behavior as UUID-backed links.
 
+## Reference traversal boundaries
+
+Theme-wide `link`, `menu` and `richtext` settings use declared-type handlers during seeding, duplication and deletion, and resolve at render. Both stored values and schema defaults are transformed where applicable. Ordinary text is not inferred to be a reference. Theme richtext uses the same internal-link picker and sanitizer-preserved reference attributes as widget richtext.
+
+Current reference transformers visit setting values and block settings, not arbitrary nested structures inside a value. Media collection does recurse into arrays/objects. The current table setting has text-only cells, so it does not create nested managed links.
+
+Widget menu cleanup matches a selected UUID by equality rather than loading every widget schema; unrelated bare UUID values are not a supported ambiguous reference shape. Custom typed URLs remain authored, including under Clean URLs; themes can use `page_url` and `item_url` for maintained address construction.
+
 ## Output rules
 
 Liquid autoescapes ordinary values. Richtext is sanitized before intentional raw output. Code fields are not sanitized as richtext; explicit raw/script/CSS sinks matter. Use the [security reference](../../core-security.md) for the complete trust model.

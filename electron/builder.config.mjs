@@ -57,6 +57,14 @@ export default {
     entitlementsInherit: "electron/entitlements.mac.plist",
   },
   afterSign: "electron/notarize.cjs",
+  linux: {
+    maintainer: "Widgetizer <hello@widgetizer.org>",
+    target: [{ target: "deb", arch: ["x64"] }],
+    artifactName: "Widgetizer-${version}-${arch}.${ext}",
+    category: "Development",
+    icon: "electron/resources/icon.icns",
+    desktop: { entry: { Name: "Widgetizer Desktop" } },
+  },
   publish: {
     provider: "github",
     owner: "tsiger",

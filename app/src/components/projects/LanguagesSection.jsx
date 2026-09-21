@@ -63,7 +63,15 @@ export default function LanguagesSection({
         { fallbackMessage: t("forms.project.languages.removeError") },
       );
       recordProject(updated);
-      showToast(t("forms.project.languages.removeSuccess", { name: nameOf(code) }), "success");
+      // The language IS gone either way. When some content could not be rewritten
+      // it still points at what went, so say so plainly — without the storage keys,
+      // which mean nothing to the person reading this.
+      const cleanupIncomplete = updated?.warnings?.some((w) => w?.code === "REFERENCE_CLEANUP_INCOMPLETE");
+      if (cleanupIncomplete) {
+        showToast(t("forms.project.languages.removedLinksIncomplete", { name: nameOf(code) }), "warning");
+      } else {
+        showToast(t("forms.project.languages.removeSuccess", { name: nameOf(code) }), "success");
+      }
     } catch (error) {
       showToast(error.message || t("forms.project.languages.removeError"), "error");
     } finally {

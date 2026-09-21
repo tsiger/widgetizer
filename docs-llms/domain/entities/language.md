@@ -65,7 +65,7 @@ A group is a relationship encoded in page/item documents, not a separate owned m
 - Documents without a stable identity must be saved before creating versions.
 - Menus, globals, widgets, blocks, and media do not join page/item translation groups.
 
-The creation handlers serialize check-and-create operations per project. Language add/remove uses another per-project serializer. Coordination between those two workflows is a [review question](../review-questions.md#r3-language-lifecycle-and-content-writes).
+Version creation and language lifecycle operations use their respective outer serializers and share the innermost per-project content-write section. Language-enabled checks are repeated inside that section, preventing a participating late write from recreating removed content within one process. See [coordination boundaries](../operations/languages.md#coordination-with-content-writes).
 
 Implementation: [languages](../../../packages/core/src/utils/languages.js), [contentAddress](../../../packages/core/src/utils/contentAddress.js), [contentLanguage](../../../packages/builder-server/src/utils/contentLanguage.js), [translationService](../../../packages/builder-server/src/services/translationService.js).
 

@@ -37,6 +37,7 @@ import {
   resolveLanguage,
 } from "@widgetizer/core/contentAddress";
 import { validateCollectionStructuredData } from "@widgetizer/core/structuredData";
+import { translationSibling } from "@widgetizer/core/translations";
 import {
   sanitizeCollectionItemData,
   sanitizeDateValue,
@@ -965,7 +966,16 @@ export async function deleteCollectionItem(storage, scope, collectionType, itemS
   const itemPathKey = itemKey(collectionType, itemSlug, lang);
   const existed = await storage.exists(scope, itemPathKey);
   await storage.delete(scope, itemPathKey);
-  await rewriteOrder(storage, scope, collectionType, (order) => order.filter((slug) => slug !== itemSlug), lang);
+  // The item file is already gone; the order file is bookkeeping that follows it.
+  // If that fails, the caller still has to know WHAT was deleted — otherwise the
+  // references to it are never cleared, and a retry cannot help because the item
+  // is no longer there to be found and deleted again.
+  try {
+    await rewriteOrder(storage, scope, collectionType, (order) => order.filter((slug) => slug !== itemSlug), lang);
+  } catch (orderError) {
+    orderError.deletedSlugs = existed ? [itemSlug] : [];
+    throw orderError;
+  }
   return { deleted: existed };
 }
 
@@ -997,7 +1007,14 @@ export async function bulkDeleteCollectionItems(storage, scope, collectionType, 
 
   if (deleted.length > 0) {
     const removed = new Set(deleted);
-    await rewriteOrder(storage, scope, collectionType, (order) => order.filter((slug) => !removed.has(slug)), lang);
+    // As in deleteCollectionItem: the files are gone whether or not the order
+    // file can be rewritten, so a failure here carries the list with it.
+    try {
+      await rewriteOrder(storage, scope, collectionType, (order) => order.filter((slug) => !removed.has(slug)), lang);
+    } catch (orderError) {
+      orderError.deletedSlugs = deleted;
+      throw orderError;
+    }
   }
 
   return { deleted, notFound, errors };
@@ -1307,14 +1324,16 @@ export async function loadCollectionItemsByUuid(storage, scope, reader = null, l
           // uuid and group id come along because this map is also how a render
           // finds an item's siblings — matching a translation group needs the
           // identity, not just where the item ended up.
-          map.set(item.uuid, {
-            uuid: item.uuid,
-            translationGroupId: item.translationGroupId,
-            collectionType: schema.type,
-            slugPrefix: schema.slugPrefix,
-            slug: item.slug,
-            language: item.language,
-          });
+          // Built through the shared sibling shape rather than field by field:
+          // this map is how a render sees an item's hreflang siblings, and the
+          // SEO builders see the whole item record, so anything the two must
+          // agree on has to be defined once. `slugPrefix` comes from the
+          // schema, not the item, and `collectionType` is for this map's other
+          // readers.
+          map.set(
+            item.uuid,
+            translationSibling(item, { collectionType: schema.type, slugPrefix: schema.slugPrefix }),
+          );
         }
       }
     }

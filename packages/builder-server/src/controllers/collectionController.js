@@ -19,9 +19,16 @@ import {
   syncCollectionItemMediaUsageOnWrite,
   updateCollectionItemMediaUsage,
   removeCollectionItemFromMediaUsage,
+  extractMediaPathsFromCollectionItem,
 } from "../services/mediaUsageService.js";
-import { cleanupDeletedCollectionItemReferences } from "../utils/linkEnrichment.js";
+import {
+  withContentWriteLock,
+  assertIntroducedMediaExists,
+  assertLanguageStillEnabled,
+} from "../services/contentCoordination.js";
+import { clearDeletedReferencesInSection, referenceCleanupWarnings } from "../utils/linkEnrichment.js";
 import { requestLanguage, projectLanguageContexts } from "../utils/contentLanguage.js";
+
 import {
   assertHasIdentity,
   assertLanguageFree,
@@ -32,9 +39,111 @@ import {
 } from "../services/translationService.js";
 
 /** Map a service error to an HTTP response, or 500 for the unexpected. */
+/**
+ * Write an item and sync its media usage as one media section, so media deletion
+ * (which verifies and deletes in the same section) cannot run between the two.
+ * Refuses first if the item introduces a reference to a file that is already gone —
+ * the save queued behind a delete, which ordering alone cannot make safe.
+ *
+ * @returns {Promise<boolean>} true when the item was written but its usage rows are
+ *   behind. The item IS saved in that case; reporting a failed save would be false.
+ */
+async function writeItemInMediaSection({
+  storage,
+  scope,
+  assetStorage,
+  collectionType,
+  item,
+  baselineSlug = null,
+  previousSlug,
+  lang,
+}) {
+  return withContentWriteLock(scope.projectId, async () => {
+    // The language this item is addressed to may have been removed while this write
+    // waited for the section. Writing anyway recreates content in a language the
+    // project no longer has.
+    assertLanguageStillEnabled(scope.projectId, lang);
+
+    // Re-read the comparison baseline HERE, not from a snapshot taken before the
+    // lock. A snapshot read earlier can still show a reference that another save
+    // has since removed and a delete has since acted on — which classified the
+    // image as "already present", skipped the check, and restored a broken
+    // reference. The baseline has to be what is on disk inside this section.
+    let previousItem = null;
+    if (baselineSlug) {
+      try {
+        previousItem = await collectionService.readRawCollectionItem(
+          storage,
+          scope,
+          collectionType,
+          baselineSlug,
+          lang,
+        );
+      } catch {
+        // Unreadable: nothing is known to be pre-existing, so every path in the
+        // incoming item counts as introduced. That is the cautious direction.
+      }
+    }
+
+    await assertIntroducedMediaExists({
+      assetStorage,
+      scope,
+      previousPaths: previousItem ? extractMediaPathsFromCollectionItem(previousItem) : [],
+      nextPaths: extractMediaPathsFromCollectionItem(item),
+    });
+
+    await collectionService.writeCollectionItem(storage, scope, collectionType, item, previousSlug, lang);
+
+    try {
+      await syncCollectionItemMediaUsageOnWrite(scope.projectId, item, collectionType, lang);
+      return false;
+    } catch (usageError) {
+      // Previously this propagated and answered 500 — after the item had already
+      // been written. Saying the save failed when it did not is the worse lie.
+      console.warn(`Failed to update media usage tracking for item ${item?.slug}:`, usageError.message);
+      return true;
+    }
+  });
+}
+
+/**
+ * Clear references to items this request has deleted — one walk for the whole set,
+ * rather than a full project walk per item. Call inside the section holding the
+ * deletes. A failure is logged, not thrown: the items ARE deleted, and a dangling
+ * reference renders as a dead link rather than a wrong one.
+ */
+async function clearRefsToDeletedItems(storage, scope, uuids, lang) {
+  const itemUuids = uuids.filter(Boolean);
+  if (itemUuids.length === 0) return [];
+  try {
+    const { incomplete } = await clearDeletedReferencesInSection(storage, scope, {
+      itemUuids,
+      defaultLanguage: lang.defaultLanguage,
+    });
+    return incomplete;
+  } catch (cleanupError) {
+    console.warn(`Failed to clear references for deleted items ${itemUuids.join(", ")}:`, cleanupError.message);
+    return [{ key: "*", reason: cleanupError.message }];
+  }
+}
+
+/** Attach the "saved, but image tracking is behind" signal without changing the body's shape. */
+function withUsageWarning(body, usageStale, slug) {
+  if (!usageStale) return body;
+  return { ...body, warnings: [{ code: "MEDIA_USAGE_STALE", path: slug }] };
+}
+
 function respondError(res, err) {
   if (err?.name === "TranslationError") {
     return res.status(err.status).json({ error: "Version not created", message: err.message });
+  }
+  // The language this write was addressed to is gone; nothing was written.
+  if (err?.code === "LANGUAGE_REMOVED") {
+    return res.status(err.statusCode).json({ error: "Language removed", message: err.message, code: err.code, language: err.language });
+  }
+  // Nothing was written: the item refers to a file that is no longer there.
+  if (err?.code === "MEDIA_REFERENCE_MISSING") {
+    return res.status(err.statusCode).json({ error: "Missing media", message: err.message, code: err.code });
   }
   if (err?.code === "VALIDATION") {
     return res.status(400).json({ error: "Validation failed", validationErrors: err.validationErrors });
@@ -148,9 +257,19 @@ export async function createItem(req, res) {
     }
 
     const { item } = collectionService.buildCollectionItemData(schema, req.body, null);
-    await collectionService.writeCollectionItem(storage, scope, collectionType, item, null, lang);
-    await syncCollectionItemMediaUsageOnWrite(scope.projectId, item, collectionType, lang);
-    noStore(res).status(201).json(collectionService.normalizeCollectionItem(item, schema, lang));
+    const usageStale = await writeItemInMediaSection({
+      storage,
+      scope,
+      assetStorage: req.adapters.assetStorage,
+      collectionType,
+      item,
+      baselineSlug: null,
+      previousSlug: null,
+      lang,
+    });
+    noStore(res)
+      .status(201)
+      .json(withUsageWarning(collectionService.normalizeCollectionItem(item, schema, lang), usageStale, item.slug));
   } catch (err) {
     respondError(res, err);
   }
@@ -170,9 +289,19 @@ export async function updateItem(req, res) {
     if (!existing) return res.status(404).json({ error: "Item not found" });
 
     const { item, previousSlug } = collectionService.buildCollectionItemData(schema, req.body, existing);
-    await collectionService.writeCollectionItem(storage, scope, collectionType, item, previousSlug, lang);
-    await syncCollectionItemMediaUsageOnWrite(scope.projectId, item, collectionType, lang);
-    noStore(res).json(collectionService.normalizeCollectionItem(item, schema, lang));
+    const usageStale = await writeItemInMediaSection({
+      storage,
+      scope,
+      assetStorage: req.adapters.assetStorage,
+      collectionType,
+      item,
+      baselineSlug: itemSlug,
+      previousSlug,
+      lang,
+    });
+    noStore(res).json(
+      withUsageWarning(collectionService.normalizeCollectionItem(item, schema, lang), usageStale, item.slug),
+    );
   } catch (err) {
     respondError(res, err);
   }
@@ -193,20 +322,37 @@ export async function deleteItem(req, res) {
     } catch {
       existing = null;
     }
-    const result = await collectionService.deleteCollectionItem(storage, scope, collectionType, itemSlug, lang);
-    if (!result.deleted) return noStore(res).status(404).json({ error: "Item not found" });
-    await removeCollectionItemFromMediaUsage(scope.projectId, { uuid: existing?.uuid, slug: itemSlug }, collectionType, lang);
-    if (existing?.uuid) {
+    // In the section: deleting prunes the collection's order file, which is a WRITE.
+    // Outside it, a delete aimed at a language that had just been removed answered
+    // 404 while putting _order.json back into the emptied folder.
+    let incomplete = [];
+    const result = await withContentWriteLock(scope.projectId, async () => {
+      assertLanguageStillEnabled(scope.projectId, lang);
       try {
-        await cleanupDeletedCollectionItemReferences(storage, scope, {
-          deletedItemUuids: existing.uuid,
-          defaultLanguage: lang.defaultLanguage,
-        });
-      } catch (cleanupError) {
-        console.warn(`Failed to clean up references for deleted item ${itemSlug} (${existing.uuid}):`, cleanupError.message);
+        const deleted = await collectionService.deleteCollectionItem(storage, scope, collectionType, itemSlug, lang);
+        if (deleted.deleted) {
+          await removeCollectionItemFromMediaUsage(
+            scope.projectId,
+            { uuid: existing?.uuid, slug: itemSlug },
+            collectionType,
+            lang,
+          );
+          incomplete = await clearRefsToDeletedItems(storage, scope, [existing?.uuid], lang);
+        }
+        return deleted;
+      } catch (err) {
+        // The file went and the bookkeeping after it did not. The deletion is real
+        // and cannot be retried — the item is no longer there to find — so its
+        // references must be cleared now or never.
+        if (err?.deletedSlugs?.length) {
+          await clearRefsToDeletedItems(storage, scope, [existing?.uuid], lang);
+        }
+        throw err;
       }
-    }
-    noStore(res).json({ success: true, slug: itemSlug });
+    });
+    if (!result.deleted) return noStore(res).status(404).json({ error: "Item not found" });
+    const warnings = referenceCleanupWarnings(incomplete);
+    noStore(res).json({ success: true, slug: itemSlug, ...(warnings ? { warnings } : {}) });
   } catch (err) {
     respondError(res, err);
   }
@@ -230,31 +376,55 @@ export async function bulkDeleteItems(req, res) {
         // skip cleanup for this slug; deletion still proceeds below
       }
     }
-    const result = await collectionService.bulkDeleteCollectionItems(
-      storage,
-      scope,
-      collectionType,
-      req.body.itemSlugs,
-      lang,
-    );
-    for (const slug of result.deleted) {
-      await removeCollectionItemFromMediaUsage(scope.projectId, { uuid: uuidBySlug.get(slug), slug }, collectionType, lang);
-    }
-    const deletedUuids = result.deleted.map((slug) => uuidBySlug.get(slug)).filter(Boolean);
-    if (deletedUuids.length > 0) {
+    // Same as the single delete: pruning the order file is a write, so it belongs
+    // in the section and must not outlive the language it is addressed to.
+    let incomplete = [];
+    const result = await withContentWriteLock(scope.projectId, async () => {
+      assertLanguageStillEnabled(scope.projectId, lang);
       try {
-        await cleanupDeletedCollectionItemReferences(storage, scope, {
-          deletedItemUuids: deletedUuids,
-          defaultLanguage: lang.defaultLanguage,
-        });
-      } catch (cleanupError) {
-        console.warn(`Failed to clean up references for deleted items ${deletedUuids.join(", ")}:`, cleanupError.message);
+        const deleted = await collectionService.bulkDeleteCollectionItems(
+          storage,
+          scope,
+          collectionType,
+          req.body.itemSlugs,
+          lang,
+        );
+        for (const slug of deleted.deleted) {
+          await removeCollectionItemFromMediaUsage(
+            scope.projectId,
+            { uuid: uuidBySlug.get(slug), slug },
+            collectionType,
+            lang,
+          );
+        }
+        // Only what the service reports as deleted: on a partial bulk, the items
+        // that were not removed keep their references, because they are still there.
+        incomplete = await clearRefsToDeletedItems(
+          storage,
+          scope,
+          deleted.deleted.map((slug) => uuidBySlug.get(slug)),
+          lang,
+        );
+        return deleted;
+      } catch (err) {
+        // Same as the single delete: files gone, bookkeeping failed. Clear the
+        // references to what did go before the error leaves here.
+        if (err?.deletedSlugs?.length) {
+          await clearRefsToDeletedItems(
+            storage,
+            scope,
+            err.deletedSlugs.map((slug) => uuidBySlug.get(slug)),
+            lang,
+          );
+        }
+        throw err;
       }
-    }
+    });
     const partial = result.notFound.length > 0 || result.errors.length > 0;
+    const warnings = referenceCleanupWarnings(incomplete);
     noStore(res)
       .status(partial ? 207 : 200)
-      .json(result);
+      .json({ ...result, ...(warnings ? { warnings } : {}) });
   } catch (err) {
     respondError(res, err);
   }
@@ -270,9 +440,30 @@ export async function duplicateItem(req, res) {
 
     const lang = requestLanguage(req, res);
     if (!lang) return;
-    const dup = await collectionService.duplicateCollectionItem(storage, scope, collectionType, itemSlug, lang);
+
+    // A copy is another item, counted like any other. Without this the cap
+    // applies to New item and to Create version but not to Duplicate, and the
+    // limit disappears for whoever presses the third button.
+    const cap = await req.adapters?.limits?.getLimit?.(scope, LIMIT_KEYS.MAX_COLLECTION_ITEMS);
+    const maxItems = typeof cap === "number" && cap > 0 ? cap : Infinity;
+    if (Number.isFinite(maxItems)) {
+      let existing = 0;
+      for (const each of projectLanguageContexts(req.activeProject)) {
+        existing += (await collectionService.listCollectionItems(storage, scope, collectionType, {}, each)).length;
+      }
+      if (existing >= maxItems) {
+        return res.status(422).json({ error: `This collection has reached its item limit (${maxItems}).` });
+      }
+    }
+
+    const dup = await withContentWriteLock(scope.projectId, async () => {
+      assertLanguageStillEnabled(scope.projectId, lang);
+      const copy = await collectionService.duplicateCollectionItem(storage, scope, collectionType, itemSlug, lang);
+      if (!copy) return null;
+      await updateCollectionItemMediaUsage(scope.projectId, copy, collectionType, lang);
+      return copy;
+    });
     if (!dup) return res.status(404).json({ error: "Item not found" });
-    await updateCollectionItemMediaUsage(scope.projectId, dup, collectionType, lang);
     noStore(res).status(201).json(collectionService.normalizeCollectionItem(dup, schema, lang));
   } catch (err) {
     respondError(res, err);
@@ -289,10 +480,21 @@ export async function discardArchivedItem(req, res) {
 
     const lang = requestLanguage(req, res);
     if (!lang) return;
-    const item = await collectionService.discardArchivedCollectionItem(storage, scope, collectionType, itemSlug, lang);
+    const item = await withContentWriteLock(scope.projectId, async () => {
+      assertLanguageStillEnabled(scope.projectId, lang);
+      const discarded = await collectionService.discardArchivedCollectionItem(
+        storage,
+        scope,
+        collectionType,
+        itemSlug,
+        lang,
+      );
+      if (!discarded) return null;
+      // Media usage may shrink if an archived field held a media reference.
+      await syncCollectionItemMediaUsageOnWrite(scope.projectId, discarded, collectionType, lang);
+      return discarded;
+    });
     if (!item) return res.status(404).json({ error: "Item not found" });
-    // Media usage may shrink if an archived field held a media reference.
-    await syncCollectionItemMediaUsageOnWrite(scope.projectId, item, collectionType, lang);
     noStore(res).json(item);
   } catch (err) {
     respondError(res, err);
@@ -306,7 +508,12 @@ export async function reorderItems(req, res) {
     const { collectionType } = req.params;
     const lang = requestLanguage(req, res);
     if (!lang) return;
-    const result = await collectionService.reorderCollectionItems(storage, scope, collectionType, req.body.order, lang);
+    // Reordering writes _order.json, which is content in a language folder like any
+    // other — a removed language must not get its order file back.
+    const result = await withContentWriteLock(scope.projectId, async () => {
+      assertLanguageStillEnabled(scope.projectId, lang);
+      return collectionService.reorderCollectionItems(storage, scope, collectionType, req.body.order, lang);
+    });
     noStore(res).json({ success: true, ...result });
   } catch (err) {
     respondError(res, err);
@@ -355,13 +562,21 @@ export async function createItemLanguageVersion(req, res) {
         if (existing >= maxItems) return { overLimit: maxItems };
       }
 
-      const created = await collectionService.createItemLanguageVersion(storage, scope, collectionType, itemSlug, {
-        fromLang: sourceLang,
-        toLang: target,
-        slug: req.body?.slug,
+      // The whole creation, not just the usage sync: the version IS the content
+      // write, so checking the target language after writing it would be too late.
+      // Translation section outside, content section inside — the one permitted order.
+      const created = await withContentWriteLock(scope.projectId, async () => {
+        assertLanguageStillEnabled(scope.projectId, target);
+        const version = await collectionService.createItemLanguageVersion(storage, scope, collectionType, itemSlug, {
+          fromLang: sourceLang,
+          toLang: target,
+          slug: req.body?.slug,
+        });
+        if (!version) return null;
+        await syncCollectionItemMediaUsageOnWrite(scope.projectId, version.item, collectionType, target);
+        return version;
       });
       if (!created) return { notFound: true };
-      await syncCollectionItemMediaUsageOnWrite(scope.projectId, created.item, collectionType, target);
       return { item: created.item };
     });
 
