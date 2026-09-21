@@ -444,6 +444,18 @@ This document serves as a comprehensive index to all documentation in the Widget
 
 ---
 
+### **[future-drafts-and-trash.md](future-drafts-and-trash.md)** - Drafts and trash
+
+**Purpose**: Early concept for Draft and Published pages and collection items, with a separate trash area for recoverable deletion. **When to use**:
+
+- Discussing unfinished content and temporary removal from the website
+- Planning restoration, permanent deletion and affected links
+- Considering language versions, homepages and project storage
+
+**Key topics**: Export inclusion, ordinary editing versus separate draft revisions, collection lists, saved relationships, restoration choices, media preservation, backups and open decisions
+
+---
+
 ## ✅ Project Tracking
 
 - **[user-test-checklist.md](user-test-checklist.md)** — Standalone manual user-test checklist (no codebase knowledge assumed): IDs/actions/expected results, test pack/setup, and run waves for confirming create/edit/preview/export/backup/import/update/delete flows.
