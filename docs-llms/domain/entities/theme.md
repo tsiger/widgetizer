@@ -21,7 +21,7 @@ A project starts with its own installed copy of a theme. Your written content be
 | Preset | A coordinated starting look and set of example content within a theme. |
 | Theme settings | Shared choices such as colors, fonts and branding where the theme provides them. |
 | Theme assets | Supporting pictures, icons, fonts and other design resources supplied with the theme. |
-| Theme translations | Translations of theme-provided editor labels; these do not translate your own page text. |
+| Theme translations | Editor labels and a separate dictionary of visitor text, such as Next and Pause; neither translates your authored page content. |
 
 ### What can you do?
 
@@ -58,10 +58,18 @@ These are definitions and starting content from which projects are built. Keep t
 | Collection template | Renders an item page from current item data |
 | Preset | Chooses initial templates/menus/settings and optional collection/media seed data during creation |
 | Theme settings | Project-wide values stored with the project's theme data; shared across languages |
-| Theme/core locales | Editor labels and schema strings; distinct from authored visitor-facing content |
+| Theme/core locales | Editor labels/schema strings; project theme locales also have a separate `site` dictionary for visitor text |
 | Icon/font assets | Definition/rendering resources; not automatically media-library records |
 
 A project retains its installed version and update preference. Updating the library snapshot is separate from applying an update to an existing project. Applying an update merges settings while preserving matching customized values, replaces updatable definition/assets paths, and adds missing starter pages/menus without overwriting existing content. This is not an arbitrary theme-switch migration.
+
+## Visitor strings and Arch
+
+`locales/<language>.json` in the installed project theme keeps visitor strings under `site`, separate from `tTheme:` editor labels. [siteStringsService](../../../packages/builder-server/src/services/siteStringsService.js) loads the project's own copy through an injected reader, merges it over app-owned core strings in each language, and merges English under each requested language. The render engine consumes optional `deps.loadSiteStrings()` and caches the dictionaries in render globals. The Liquid `t` filter resolves the current language, default language, then English; unknown keys render a readable final key segment. Ordinary Liquid output remains escaped.
+
+Schema `defaultKey` values supply language-dependent widget/block defaults. Values remain runtime suggestions unless accompanied by a literal `default`, which tells the editor to store the resolved initial value; starter blocks can also name their initial words through `defaultKeys`. Arch uses these for editable UI copy, and passes strings to browser scripts through markup `data-t-*` attributes. See [settings](settings.md#localized-defaults-and-dates). Arch's base and `updates/0.9.10` files carry its theme changes. Core widgets carry separate app-owned English/Greek dictionaries (`22a93fa5`) beneath the theme's values, so core forms also work without Arch locales.
+
+The locale validator checks literal visitor `t`, `defaultKey` and starter-block `defaultKeys` references for presence in English, and reports missing/extra translated keys. It does not currently enforce string-leaf types or placeholder parity. Passing it does not prove that every hardcoded phrase was extracted or that every language is translated. Theme reference validation now also recognizes keys defined by core, and theme overrides of keys used by core are not reported as unused. Independent probes verified inherited references, override-only dictionaries and rejection of a genuinely missing key. Evidence: [siteStrings](../../../packages/builder-server/src/tests/siteStrings.test.js), [script strings](../../../packages/builder-server/src/tests/themeScriptStrings.test.js), [Arch switcher](../../../packages/builder-server/src/tests/archLanguageSwitcher.test.js), [validator](../../../scripts/validate-theme-locales.js).
 
 Implementation: [themeController](../../../packages/builder-server/src/controllers/themeController.js), [themeUpdateService](../../../packages/builder-server/src/services/themeUpdateService.js), [projectScaffold](../../../packages/builder-server/src/utils/projectScaffold.js), [themeStore](../../../packages/editor-ui/src/stores/themeStore.js).
 

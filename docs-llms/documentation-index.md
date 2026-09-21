@@ -16,7 +16,7 @@ This document serves as a comprehensive index to all documentation in the Widget
 - Every entity and workflow page begins with a plain-language guide covering everyday examples, available actions, shared effects, languages and saving; implementation references follow under Technical details.
 - Follow operation walkthroughs for project creation/import, content editing, language lifecycle, media, themes, preview, and export.
 - Use the multilingual shared-versus-local matrix and coverage evidence to understand current behaviour and its verification limits. The handbook contains no task queue.
-- Updated through the completed R1–R8 review and both real-project checks recorded at `f10e20ce` (2026-09-20). Includes theme language controls, date formatting, integration contracts and current limitations.
+- Updated through the completed R1–R8 review and both real-project checks recorded at `f10e20ce` (2026-09-20). Includes theme language controls, date formatting, integration contracts and current limitations. [Built-in widgets](domain/entities/core-widget.md) and [forms](domain/operations/forms.md) have their own guides, including core form localization (`22a93fa5`).
 
 ---
 

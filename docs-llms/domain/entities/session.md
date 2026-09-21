@@ -28,6 +28,12 @@ Choose a project, open a page or language version, select content, undo or redo 
 
 Switching projects resets project-specific editing state, including the widget clipboard. Do not use that clipboard as a lasting content backup.
 
+### What does discarding do?
+
+Leaving with Discard now restores unsaved shared theme settings to their saved baseline too. The marker beside the page name reflects page/header/footer changes; theme-only edits still enable Save and trigger the leave guard without marking the page name.
+
+A save already sent can still reach the server after Discard. The editor then reconciles theme state with the server, preserving any newer edit or project switch. Discard cannot reverse an already stored change.
+
 ### What if another window changes the active project?
 
 Widgetizer checks that a save still belongs to the project you loaded. If another window makes the workspace stale, saving can stop rather than send your changes to the wrong website. Follow the app's recovery prompt to return to the intended project.
@@ -56,6 +62,8 @@ Some important state belongs to the application or browser rather than the websi
 | UI locale | Language of the application interface; independent of page-editing language |
 
 Application settings updates merge and validate the submitted fields before storing them. Project switches remount the workspace and reset project-scoped stores. Stale project detection prevents an older tab from treating another tab's active-project selection as permission to save into it.
+
+Since `90d1c6ef`, `hasUnsavedPageChanges` excludes theme-only changes, while `hasUnsavedChanges` includes them. Reset restores the theme draft and advances save generation. A late theme-save result can trigger `reconcileFromServer`: refresh the saved baseline, replace the draft only if untouched, and correct undo snapshots without adding a history step. Project/load guards prevent stale reconciliation.
 
 Extension registries, route contributions, commands, and slots are integration definitions, not project content entities; their contracts remain in [package architecture](../../core-packages.md). Electron installer/update state is outside this web-app domain map; see [Electron](../../core-electron.md).
 

@@ -113,7 +113,7 @@ Current behaviour includes multilingual export selection, language-specific coll
 
 Arch 0.9.10 draws the language selector from `page.translations` when the header setting is enabled. Visitor-facing strings come from the theme's site locale dictionary. Existing projects keep their installed templates until a theme update is applied.
 
-`dateFormat` obtains month names through `Intl.DateTimeFormat` and retains the chosen token order and separators. Date-only handling avoids shifting the day across time zones. The published date filter passes the page language.
+`dateFormat` obtains month names through `Intl.DateTimeFormat` and retains the chosen token order and separators. Date-only handling avoids shifting the day across time zones. The published date filter passes the page language. Core form wording follows the page language too (`22a93fa5`); see the [form guide](../entities/form.md).
 
 A real legacy project retained its root addresses, saved edits, backup contents and English content after adding Greek. The [legacy check](../coverage.md#the-legacy-upgrade-check) records the evidence and its limits.
 

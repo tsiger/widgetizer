@@ -30,6 +30,7 @@ Each walkthrough begins with a plain-language guide. It tells you what you start
 | Globals | Load/edit/save header or footer in a language | [Editing](editing.md#save-and-autosave) |
 | Settings | Edit values, choose media/menu/link targets, save shared theme settings | [Editing](editing.md), [media](media.md), [themes](themes.md) |
 | Menus | List/read, create, rename/edit tree, reorder/nest nodes, duplicate, delete | [Content](content.md#menus) |
+| Built-in widgets and forms | Add/edit/copy Spacer, Divider and Form; form fields, identities, translation and export validation | [Built-ins](../entities/core-widget.md), [forms](forms.md) |
 | Collections | Read schemas, list/read items, create, edit/rename, duplicate, delete/bulk delete, reorder, discard archived values | [Content](content.md#collections) |
 | Media | List/filter/select, upload/process, edit base/translated metadata, inspect usage, refresh usage, delete/bulk delete, serve/download/range reads | [Media](media.md) |
 | Themes | Browse/read versions/widgets/templates/presets, upload/delete library theme, rebuild latest snapshot, check/apply project update, toggle updates, load locales/icons | [Themes](themes.md) |
@@ -38,7 +39,7 @@ Each walkthrough begins with a plain-language guide. It tells you what you start
 | Editor session | Undo/redo, autosave/manual save, leave/stay prompt for unsaved changes, project reset, stale-project recovery, language navigation | [Editing](editing.md#navigation-and-session-changes) |
 | Application | Read/update app settings, change UI locale | [Editing](editing.md#application-settings) |
 
-Not separate content operations: filtering a list, hovering a widget, and opening a drawer only change session state. Form widgets are widget/block content; generated forms metadata is part of export. This repository's listed built-in routes do not define a persistent form-submission domain. Extension-provided operations must be mapped when such an extension is in scope.
+Not separate content operations: filtering a list, hovering a widget, and opening a drawer only change session state. Form widgets are widget/block content; generated forms metadata is part of export, with a dedicated [workflow](forms.md). This repository's listed built-in routes do not define a persistent form-submission domain. Extension-provided operations must be mapped when such an extension is in scope.
 
 ## Operation boundaries
 

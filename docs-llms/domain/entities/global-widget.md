@@ -14,6 +14,8 @@ You may edit them while looking at one page, but they belong to the website's sh
 
 You can select the header or footer, change its available content and appearance controls, choose a menu or image, and add or arrange blocks where the theme allows it. The theme defines which controls are available.
 
+Arch's header also offers a language switcher and editable navigation/accessibility labels. These controls belong to that language's header; the switcher uses related pages or language homepages and hides when fewer than two destinations exist. Its logo link returns to the homepage in the language being read. See [theme behavior](theme.md#visitor-strings-and-arch).
+
 These shared sections are not ordinary page widgets that you duplicate to make another header on the same page.
 
 ### How far do changes reach?

@@ -10,9 +10,11 @@ The list helps us notice when a new operation has been added without being descr
 
 ## Technical details
 
-Inventory of literal routes declared on 2026-09-18. Paths below use the local web app's `/api` mount; other shells can mount these routers elsewhere. Routes and middleware, not this table, remain authoritative for validation and authorization. Project content handlers generally resolve a requested language from query/body; a language argument is not a different endpoint.
+Inventory of literal routes declared on 2026-09-18, rechecked against changes through `ff2d4456` on 2026-09-19 (no added route declarations). Paths below use the local web app's `/api` mount; other shells can mount these routers elsewhere. Routes and middleware, not this table, remain authoritative for validation and authorization. Project content handlers generally resolve a requested language from query/body; a language argument is not a different endpoint.
 
 This index cross-checks the operation directory against the backend surface. It is not a test-coverage report. Read the linked walkthrough for ownership and side effects. Editor-only widget/block changes, undo/redo, clipboard, guards and autosave are covered in [Editing](editing.md).
+
+`GET /api/widgets?language=<code>` now returns language-resolved `resolvedDefault` values where a widget/block schema uses `defaultKey`, plus `resolvedDefaults` for starter-block `defaultKeys`. A literal `default` alongside `defaultKey` makes the editor store the localized initial value; without it the value remains a display/render suggestion. Form authoring uses page endpoints; `POST /__widgetizer/forms/<key>` in exported HTML is a hosting integration target, not a route supplied by this backend. See [forms](forms.md).
 
 ## appSettings
 

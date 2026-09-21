@@ -40,7 +40,7 @@ While the project has only one language, you can change its default language des
 
 Editor language controls select content for you to edit. A visitor-facing language selector is supplied by the theme. The current rendering support can point to a related version, or to that language's homepage when the specific version is missing. A language without a homepage is left out of that selector's available destinations.
 
-That fallback does not create or translate a missing page, and it does not silently retarget every ordinary link on the site. Arch 0.9.10 has an optional header selector in desktop and mobile navigation; another theme must provide its own control.
+That fallback does not create or translate a missing page, and it does not silently retarget every ordinary link on the site. Arch 0.9.10 has an optional header selector in desktop and mobile navigation; another theme must provide its own control. Theme-generated home/item links also stay in the page's language; explicit authored links keep their selected target.
 
 ### Including the language in an export
 

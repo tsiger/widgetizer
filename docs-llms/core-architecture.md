@@ -101,6 +101,14 @@ The actual LiquidJS rendering lives in the scope-free `@widgetizer/render-engine
 
 ---
 
+## Content language and theme visitor text
+
+A project keeps its default-language content at the existing root paths. Additional languages use `pages/<code>/`, `pages/<code>/global/`, `menus/<code>/`, and `collections/<type>/<code>/`; uploads, theme definitions/settings and site identity remain shared. A page/item UUID identifies one version, while `translationGroupId` relates versions. `@widgetizer/core/contentAddress` builds storage, preview and output addresses; builder-server's `utils/contentLanguage.js` validates the requested language against project configuration. This language selection is inside the resolved project scope, not another project/adapter boundary.
+
+The render shell supplies language-specific content and optional `loadSiteStrings()` to the scope-free engine. The latter reads visitor `site` dictionaries through `siteStringsService`: core words come from app-owned widget locales, with the installed project's `locales/<code>.json` layered above them in each language. Scoped callers use the storage adapter for theme words, while working-directory callers supply a filesystem reader. Missing translated keys fall back to merged English. The engine exposes page language/translations, resolves dictionary-backed widget defaults, and passes the language to date and theme-link filters. Arch consumes these contracts in its header, templates and browser labels.
+
+See [multilingual domain rules](domain/multilingual.md), [theme strings](domain/entities/theme.md#visitor-strings-and-arch), and [output behavior](domain/operations/output.md#multilingual-boundary-at-this-snapshot). The existing project-local ownership model remains unchanged.
+
 ## Shared Utilities
 
 ### Backend (`packages/builder-server/src/`)

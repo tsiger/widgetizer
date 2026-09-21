@@ -14,7 +14,7 @@ This map records evidence and its limits. It does not assign work or turn an une
 
 ## Technical details
 
-This is a **traceability map**, not a numerical coverage report. The entity and operation pages were grounded in source reads. Selected test assertions were inspected; other suites were located by their declarations. The initial documentation passes did not execute tests. The update through `1775a245` ran the focused suites recorded under [Latest validation](#latest-validation); no row claims all cases are covered.
+This is a **traceability map**, not a numerical coverage report. The entity and operation pages were grounded in source reads. Selected test assertions were inspected; other suites were located by their declarations. The initial documentation passes did not execute tests. Updates through `1775a245` and `30304f3a` ran the focused suites recorded under [Latest validation](#latest-validation); no row claims all cases are covered.
 
 ## Evidence levels
 
@@ -63,6 +63,17 @@ The implementation column links to the relevant walkthrough. Evidence levels des
 | C8 Listing anchors/pagination | [Page rules](entities/page.md#listing-and-pagination) | [pages](../../packages/builder-server/src/tests/pages.test.js), [paginationExport](../../packages/builder-server/src/tests/paginationExport.test.js), [planPagination](../../packages/render-engine/src/planPagination.test.js) | Located |
 | C9 Application settings | [Settings](operations/editing.md#application-settings) | [appSettings](../../packages/builder-server/src/tests/appSettings.test.js) | Located |
 | C10 Listing language and generated copies | [Collection rendering](entities/collection.md#listings-and-multilingual-output) | [collectionFilter](../../packages/builder-server/src/tests/collectionFilter.test.js): language isolation, empty-language result, translated item URL and menu selection; [paginationExport](../../packages/builder-server/src/tests/paginationExport.test.js): unequal language totals, pager destinations, sitemap and widget update; [previewLanguages](../../packages/builder-server/src/tests/previewLanguages.test.js): item-template listing and translated breadcrumbs during widget update | Inspected |
+| C11 Discard and page/site dirty indicators | [Save](operations/editing.md#save-and-autosave) | [saveStore](../../packages/editor-ui/src/stores/__tests__/saveStore.test.js), [themeStore](../../packages/editor-ui/src/stores/__tests__/themeStore.test.js): draft restoration, late-save reconciliation, newer edits/project/load guards | Inspected |
+| C12 Localized schema suggestions | [Settings](entities/settings.md#localized-defaults-and-dates) | [widgets](../../packages/builder-server/src/tests/widgets.test.js), [widgetStore](../../packages/editor-ui/src/stores/__tests__/widgetStore.test.js): language-aware suggestions, intentional stored initial values versus runtime defaults, and stale-load protection | Inspected |
+
+## Built-in widgets and forms
+
+| ID / expectation | Implementation traced | Existing test evidence | Level |
+| --- | --- | --- | --- |
+| F1 Complete core catalog and ownership | [Built-ins](entities/core-widget.md) | [coreWidgets](../../packages/builder-server/src/tests/coreWidgets.test.js), [widgets](../../packages/builder-server/src/tests/widgets.test.js): built-in definitions/catalog/rendering; source inventory has Spacer, Divider and Form | Located |
+| F2 Form keys, copies and configuration errors | [Form](entities/form.md#exported-definition-and-validation) | [formsManifest](../../packages/builder-server/src/tests/formsManifest.test.js): first-path deduplication, different-field rejection, duplicate labels, changed choice values versus reordered equivalent options; cap/fallback cases also run | Inspected |
+| F3 HTML/manifest and language parity | [Form workflow](operations/forms.md) | [formsManifest](../../packages/builder-server/src/tests/formsManifest.test.js): field/action/option parity, honeypot, accessibility markup and Greek/CJK fallback; [multilangExport](../../packages/builder-server/src/tests/multilangExport.test.js): translated key/path parity | Inspected |
+| F4 Core form localization | [Defaults and boundaries](entities/form.md#localized-defaults-and-stored-field-content) | [coreWidgetStrings](../../packages/builder-server/src/tests/coreWidgetStrings.test.js), [previewLanguages](../../packages/builder-server/src/tests/previewLanguages.test.js), [widgets](../../packages/builder-server/src/tests/widgets.test.js), [widgetStoreHelpers](../../packages/editor-ui/src/stores/__tests__/widgetStoreHelpers.test.js), [SettingsRendererDefaults](../../packages/editor-ui/src/components/settings/__tests__/SettingsRendererDefaults.test.jsx): core wording, theme/owner overrides, stored defaults, preview and output; blank required note and inherited theme references (both fixed before `22a93fa5`) | Inspected |
 
 ## Media and references
 
@@ -86,9 +97,50 @@ The implementation column links to the relevant walkthrough. Evidence levels des
 | O3 Multilingual export eligibility and artifacts | [Export rules](operations/output.md#multilingual-boundary-at-this-snapshot) | [multilangExport](../../packages/builder-server/src/tests/multilangExport.test.js): skipped language, mandatory default home, sitemap/alternates, translated robots path, form key/HTML parity, invalid translated item, empty collection, absent header, page/item canonicals, explicit override, single-language output, links into a skipped language cleared in widgets/richtext, per-language manifest counts, and noindex siblings excluded from HTML and sitemap alternates for pages, items and homepage fallbacks; [translations](../../packages/core/src/utils/__tests__/translations.test.js): the `noindex` flag's source and one answer from both sibling input shapes; [publishedUrls](../../packages/core/src/utils/__tests__/publishedUrls.test.js): item URLs with Site URL subfolder and Clean URLs | Inspected |
 | O4 Skipped-language result in the UI | [Export result](operations/output.md#which-languages-are-included) | [ExportSite](../../packages/editor-ui/src/pages/__tests__/ExportSite.test.jsx): warning survives the first export's empty-to-history layout change | Inspected |
 | O5 Related SEO, forms and media combinations | [Output](operations/output.md) | [seoArtifacts](../../packages/builder-server/src/tests/seoArtifacts.test.js), [structuredDataExport](../../packages/builder-server/src/tests/structuredDataExport.test.js), [formsManifest](../../packages/builder-server/src/tests/formsManifest.test.js), [imageTagLanguages](../../packages/core/src/tags/__tests__/imageTagLanguages.test.js) | Located |
-| O6 Theme language controls and date formatting | [Output](operations/output.md#theme-controls-and-dates) | Arch header schema/template and language-switcher snippet; [dateFormat](../../packages/core/src/utils/__tests__/dateFormat.test.js) suite located; two-language selector exercised in the recorded walkthrough | Source inspected; test suite located |
+| O6 Arch switcher and visitor strings | [Theme](entities/theme.md#visitor-strings-and-arch) | [archLanguageSwitcher](../../packages/builder-server/src/tests/archLanguageSwitcher.test.js): native labels, active state, homepage fallback, hide/off and settings overrides; [siteStrings](../../packages/builder-server/src/tests/siteStrings.test.js): Greek output, English fallback, partial dictionaries, owner overrides, empty states and script-state labels; two-language selector exercised in the recorded walkthrough | Inspected |
+| O7 Language-aware dates and theme links | [Output](operations/output.md#theme-controls-and-dates) | [dateFormat](../../packages/core/src/utils/__tests__/dateFormat.test.js), [pageUrlFilter](../../packages/core/src/filters/__tests__/pageUrlFilter.test.js); real Arch exports assert Greek dates and Greek logo-home links | Inspected |
 
 ## Latest validation
+
+On **2026-09-20**, during the R4, R6, R7 and R8 reviews, the full suites were run: **1,932 backend tests** and **1,565 frontend tests** passed at the end of R4. Full lint still reports the pre-existing parse errors in the theme's deletion markers. The R7 export cases were driven through real exports rather than the artifact builders alone, and the R8 cases through the real project controllers; each new regression was verified to fail against its reintroduced defect. Neither review is an exhaustive audit of its area — R8 in particular did not examine every way an archive can be malformed. Both hands-on checks below were completed: the two-language walkthrough and the legacy-upgrade check, including a real theme update. These results are historical reports; the documentation cleanup did not rerun those suites.
+
+### Core form localization
+
+On **2026-09-19**, before it was committed as `22a93fa5`, the core-widget localization patch was independently reviewed with:
+
+```powershell
+node --test --test-reporter=dot packages/builder-server/src/tests/coreWidgetStrings.test.js packages/builder-server/src/tests/widgets.test.js packages/builder-server/src/tests/previewLanguages.test.js packages/builder-server/src/tests/formsManifest.test.js packages/builder-server/src/tests/siteStrings.test.js packages/builder-server/src/tests/multilangExport.test.js
+npm run test:frontend -- packages/editor-ui/src/stores/__tests__/widgetStoreHelpers.test.js packages/editor-ui/src/components/settings/__tests__/SettingsRendererDefaults.test.jsx packages/editor-ui/src/stores/__tests__/widgetStore.test.js
+npm run validate:theme-locales
+```
+
+All six backend files passed; **95 frontend tests in three files** passed; locale validation and ESLint on the changed JavaScript/JSX passed. The reviewer also used an isolated export harness to fetch the real English/Greek catalogs, build new forms including choices/consent, and export: localized field values were stored, display-only defaults remained absent, every submitted field/option/action matched its manifest, and `contact` / `el:contact` stayed separate.
+
+The review reproduced two defects: an explicitly blank required note rendered default wording, and a valid inherited `site.core_form.submit` reference caused the theme validator to exit 1. Both were fixed before the commit and rechecked with:
+
+```powershell
+node --test --test-reporter=dot packages/builder-server/src/tests/coreWidgetStrings.test.js packages/builder-server/src/tests/formsManifest.test.js packages/builder-server/src/tests/previewLanguages.test.js
+npm run validate:theme-locales
+npx eslint scripts/validate-theme-locales.js packages/builder-server/src/tests/coreWidgetStrings.test.js
+```
+
+All three backend files passed, including the new English/Greek cleared-note/placeholder regression. Independent temporary-theme probes also passed: inherited core reference exits 0; an override-only dictionary exits 0 without an unused-key warning; a genuinely missing key exits 1. No frontend code changed in the two fixes, so the frontend checks were not repeated.
+
+The implementing agent reported five existing Windows file-rename failures and two existing lint parse errors from full runs. The review did not rerun full suites, hit the running development server, or test hosted submission delivery.
+
+### Committed-source validation at `30304f3a`
+
+On **2026-09-19**, against **`30304f3a`** with documentation edits, the following completed successfully:
+
+```powershell
+node --test --test-reporter=dot packages/builder-server/src/tests/coreWidgets.test.js packages/builder-server/src/tests/formsManifest.test.js packages/builder-server/src/tests/multilangExport.test.js packages/builder-server/src/tests/archLanguageSwitcher.test.js packages/builder-server/src/tests/siteStrings.test.js packages/builder-server/src/tests/themeScriptStrings.test.js packages/builder-server/src/tests/widgets.test.js packages/builder-server/src/tests/cleanUrlsExport.test.js
+npm run test:frontend -- packages/editor-ui/src/stores/__tests__/saveStore.test.js packages/editor-ui/src/stores/__tests__/themeStore.test.js packages/editor-ui/src/stores/__tests__/widgetStore.test.js packages/core/src/utils/__tests__/dateFormat.test.js packages/core/src/filters/__tests__/pageUrlFilter.test.js app/src/components/projects/__tests__/ProjectForm.test.jsx
+npm run validate:theme-locales
+```
+
+Eight backend files passed. Vitest passed **248 tests in six files**; its intentional network-failure case logs an error while passing. Theme locale validation passed, including 49 Arch visitor strings in each English/Greek dictionary; it reports ignored shared editor keys. This is focused regression evidence, not a full suite, visual/browser walkthrough, deployed submission test, or a rerun of the earlier upgrade comparison. No application code changed in this handbook pass. The subsequent `ff2d4456` documentation cleanup was also inspected; it changes no application code and requires no test rerun.
+
+### Previous validation
 
 On **2026-09-18**, at **`1775a245`**, both commands completed successfully:
 
@@ -98,9 +150,6 @@ npm run test:frontend -- packages/core/src/utils/__tests__/publishedUrls.test.js
 ```
 
 The backend run passed across four test files. Vitest passed **21 tests across three files**. Its pagination tests logged `deps.getProjectData is not a function` diagnostics from the minimal test dependency setup while passing; this run does not certify that setup as warning-free. This was a focused check of the new export/listing behavior, not a full regression run, browser walkthrough or completed upgrade verification.
-
-On **2026-09-20**, during the R4, R6, R7 and R8 reviews, the full suites were run: **1,932 backend tests** and **1,565 frontend tests** passed at the end of R4. Full lint still reports the pre-existing parse errors in the theme's deletion markers. The R7 export cases were driven through real exports rather than the artifact builders alone, and the R8 cases through the real project controllers; each new regression was verified to fail against its reintroduced defect. Neither review is an exhaustive audit of its area — R8 in particular did not examine every way an archive can be malformed. Both hands-on checks below were completed: the two-language walkthrough and the legacy-upgrade check, including a real theme update. These results are historical reports; the documentation cleanup did not rerun those suites.
-
 
 ## Completed review record
 
