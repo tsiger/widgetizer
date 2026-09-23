@@ -27,6 +27,22 @@ document.addEventListener("DOMContentLoaded", () => {
   const menuToggle = widgetElement.querySelector(".menu-toggle");
   const navCloseBtn = widgetElement.querySelector(".nav-close-btn");
   const headerNav = widgetElement.querySelector(".header-nav");
+  const languageDropdown = widgetElement.querySelector(".header-language-dropdown");
+  if (languageDropdown) {
+    document.addEventListener("click", (event) => {
+      if (!languageDropdown.contains(event.target)) languageDropdown.open = false;
+    });
+    languageDropdown.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && languageDropdown.open) {
+        event.stopPropagation();
+        languageDropdown.open = false;
+        languageDropdown.querySelector("summary").focus();
+      }
+    });
+    languageDropdown.addEventListener("focusout", (event) => {
+      if (!languageDropdown.contains(event.relatedTarget)) languageDropdown.open = false;
+    });
+  }
   // Select links within has-submenu items as toggles
   const submenuItems = widgetElement.querySelectorAll(".has-submenu");
 
