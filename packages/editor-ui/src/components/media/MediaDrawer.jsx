@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/incompatible-library */
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useForm } from "react-hook-form";
@@ -30,17 +29,13 @@ export default function MediaDrawer({ visible, onClose, selectedFile, onSave, lo
     handleSubmit: rhfHandleSubmit,
     formState: { errors },
     reset,
-    watch,
   } = useForm({
     defaultValues: {
       alt: "",
       title: "",
       caption: "",
-      altBlank: false,
     },
   });
-
-  const altBlank = watch("altBlank");
 
   // Track previous selectedFile so the populate-form effect only resets on a real file
   // change (not every render). Initialize to a sentinel — NOT the initial selectedFile —
@@ -61,13 +56,12 @@ export default function MediaDrawer({ visible, onClose, selectedFile, onSave, lo
           alt: source?.alt || "",
           title: source?.title || "",
           caption: source?.caption || "",
-          altBlank: source?.alt === "",
         });
         prevSelectedFileRef.current = currentSelectedFileStr;
       }
     } else if (!visible) {
       // Reset form when drawer is closed
-      reset({ alt: "", title: "", caption: "", altBlank: false });
+      reset({ alt: "", title: "", caption: "" });
       prevSelectedFileRef.current = JSON.stringify(null);
     }
   }, [visible, selectedFile, language, defaultLanguage, reset]);
@@ -94,12 +88,9 @@ export default function MediaDrawer({ visible, onClose, selectedFile, onSave, lo
       return;
     }
 
-    // A field left out is stored as "inherit"; only an explicit blank is sent as
-    // "". Alt is the one that needs saying out loud — a decorative image wants
-    // no description at all, not the default language's.
+    // Omitted translated fields inherit the default-language metadata.
     const written = {};
-    if (data.altBlank) written.alt = "";
-    else if (data.alt.trim()) written.alt = data.alt;
+    if (data.alt.trim()) written.alt = data.alt;
     if (data.title.trim()) written.title = data.title;
     if (data.caption.trim()) written.caption = data.caption;
     onSave(selectedFile.id, written, language);
@@ -211,7 +202,7 @@ export default function MediaDrawer({ visible, onClose, selectedFile, onSave, lo
           {/* Alt Text (required) + Title */}
           <div className="form-field">
             <label htmlFor="alt" className={isTranslation ? "form-label-optional" : "form-label"}>
-              {t("forms.media.altLabel")}
+              {t(isTranslation ? "forms.media.altTranslationLabel" : "forms.media.altLabel")}
             </label>
             <input
               type="text"
@@ -223,7 +214,6 @@ export default function MediaDrawer({ visible, onClose, selectedFile, onSave, lo
               })}
               className="form-input"
               placeholder={isTranslation ? inherited.alt || "" : undefined}
-              disabled={isTranslation && altBlank}
               aria-required={isTranslation ? undefined : "true"}
             />
             {errors.alt && <p className="form-error">{errors.alt.message}</p>}
@@ -232,17 +222,6 @@ export default function MediaDrawer({ visible, onClose, selectedFile, onSave, lo
                 ? t("forms.media.inheritsHelp", { name: defaultName })
                 : t("forms.media.altHelp", { type: t("forms.media.types.image").toLowerCase() })}
             </p>
-            {isTranslation && (
-              <label htmlFor="altBlank" className="mt-2 flex items-start gap-2 text-sm text-slate-700">
-                <input type="checkbox" id="altBlank" {...register("altBlank")} className="mt-0.5" />
-                <span>
-                  {t("forms.media.altEmptyOnPurpose")}
-                  <span className="block text-xs text-slate-500">
-                    {t("forms.media.altEmptyOnPurposeHelp", { name: defaultName })}
-                  </span>
-                </span>
-              </label>
-            )}
           </div>
 
           <div className="form-field">

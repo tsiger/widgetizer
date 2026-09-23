@@ -3,10 +3,7 @@
  * The metadata drawer on a multilingual site (§6). The grid, the uploads and the
  * binaries are shared — only alt/title/caption are per language.
  *
- * The distinction this pins is inherit vs deliberately blank: a field left empty
- * in a translated language is not sent at all, so it keeps following the default
- * language, while "empty on purpose" is sent as "" so a decorative image is not
- * described with the default language's text.
+ * Empty translated fields are omitted so they inherit the default language.
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
@@ -69,7 +66,7 @@ describe("media metadata per language", () => {
     renderDrawer();
     selectLanguage("el");
 
-    expect(screen.getByLabelText("forms.media.altLabel").value).toBe("Ένας σκύλος");
+    expect(screen.getByLabelText("forms.media.altTranslationLabel").value).toBe("Ένας σκύλος");
     const title = screen.getByLabelText("forms.media.titleLabel");
     expect(title.value).toBe("");
     expect(title.getAttribute("placeholder")).toBe("Our dog");
@@ -84,14 +81,15 @@ describe("media metadata per language", () => {
     expect(onSave).toHaveBeenCalledWith("file-1", { alt: "Ένας σκύλος" }, "el");
   });
 
-  it("sends an explicit blank alt when it is empty on purpose", async () => {
+  it("clearing translated alt restores inheritance without a checkbox", async () => {
     renderDrawer();
     selectLanguage("el");
-    fireEvent.click(screen.getByLabelText(/forms\.media\.altEmptyOnPurpose/));
+    fireEvent.change(screen.getByLabelText("forms.media.altTranslationLabel"), { target: { value: "" } });
+    expect(screen.queryByRole("checkbox")).toBeNull();
     save();
 
     await waitFor(() => expect(onSave).toHaveBeenCalled());
-    expect(onSave).toHaveBeenCalledWith("file-1", { alt: "" }, "el");
+    expect(onSave).toHaveBeenCalledWith("file-1", {}, "el");
   });
 
   it("does not require alt in a translated language", async () => {
@@ -121,6 +119,6 @@ describe("media metadata per language", () => {
     projectState = { activeProject: { id: "p1", defaultLanguage: "en", languages: [] } };
     renderDrawer();
     expect(screen.queryByRole("combobox")).toBeNull();
-    expect(screen.queryByLabelText(/forms\.media\.altEmptyOnPurpose/)).toBeNull();
+    expect(screen.queryByRole("checkbox")).toBeNull();
   });
 });

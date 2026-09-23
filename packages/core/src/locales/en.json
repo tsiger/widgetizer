@@ -388,6 +388,7 @@
     "media": {
       "editTitle": "Edit {{type}} Metadata",
       "altLabel": "Alt Text (Required)",
+      "altTranslationLabel": "Alt Text",
       "altRequired": "Alt text is required",
       "altNotEmpty": "Alt text cannot be empty",
       "altHelp": "Describes the {{type}} for screen readers.",
@@ -397,8 +398,6 @@
       "captionHelp": "Optional caption for this image. Shown where a theme displays it.",
       "languagesLabel": "Language",
       "inheritsHelp": "Leave empty to use the {{name}} text.",
-      "altEmptyOnPurpose": "Leave empty on purpose (decorative)",
-      "altEmptyOnPurposeHelp": "A screen reader skips it instead of reading the {{name}} description.",
       "save": "Save Changes",
       "saving": "Saving...",
       "types": {
