@@ -50,7 +50,7 @@ const renderDrawer = (selectedFile = FILE) =>
     />,
   );
 
-const tab = (name) => screen.getByRole("tab", { name: new RegExp(name) });
+const selectLanguage = (code) => fireEvent.change(screen.getByRole("combobox", { name: "forms.media.languagesLabel" }), { target: { value: code } });
 const save = () => fireEvent.click(screen.getByRole("button", { name: "forms.media.save" }));
 
 beforeEach(() => {
@@ -67,7 +67,7 @@ describe("media metadata per language", () => {
 
   it("shows what a language has translated, and what it inherits as a placeholder", () => {
     renderDrawer();
-    fireEvent.click(tab("Ελληνικά"));
+    selectLanguage("el");
 
     expect(screen.getByLabelText("forms.media.altLabel").value).toBe("Ένας σκύλος");
     const title = screen.getByLabelText("forms.media.titleLabel");
@@ -77,7 +77,7 @@ describe("media metadata per language", () => {
 
   it("sends only what was written, so an empty field keeps inheriting", async () => {
     renderDrawer();
-    fireEvent.click(tab("Ελληνικά"));
+    selectLanguage("el");
     save();
 
     await waitFor(() => expect(onSave).toHaveBeenCalled());
@@ -86,7 +86,7 @@ describe("media metadata per language", () => {
 
   it("sends an explicit blank alt when it is empty on purpose", async () => {
     renderDrawer();
-    fireEvent.click(tab("Ελληνικά"));
+    selectLanguage("el");
     fireEvent.click(screen.getByLabelText(/forms\.media\.altEmptyOnPurpose/));
     save();
 
@@ -96,7 +96,7 @@ describe("media metadata per language", () => {
 
   it("does not require alt in a translated language", async () => {
     renderDrawer({ ...FILE, translations: {} });
-    fireEvent.click(tab("Ελληνικά"));
+    selectLanguage("el");
     save();
 
     await waitFor(() => expect(onSave).toHaveBeenCalledWith("file-1", {}, "el"));
@@ -117,10 +117,10 @@ describe("media metadata per language", () => {
     );
   });
 
-  it("shows no language tabs while the site has one language", () => {
+  it("shows no language selector while the site has one language", () => {
     projectState = { activeProject: { id: "p1", defaultLanguage: "en", languages: [] } };
     renderDrawer();
-    expect(screen.queryByRole("tablist")).toBeNull();
+    expect(screen.queryByRole("combobox")).toBeNull();
     expect(screen.queryByLabelText(/forms\.media\.altEmptyOnPurpose/)).toBeNull();
   });
 });

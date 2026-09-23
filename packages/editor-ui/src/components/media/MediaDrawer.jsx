@@ -4,16 +4,16 @@ import { createPortal } from "react-dom";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { X, FileText } from "lucide-react";
-import { nativeLanguageName } from "@widgetizer/core/languages";
+import { nativeLanguageName, hreflangCase } from "@widgetizer/core/languages";
 import Button from "../ui/Button";
-import LanguageTabs from "../content/LanguageTabs";
-import { useDefaultLanguage, useIsMultilang } from "../../stores/projectStore";
+import { useDefaultLanguage, useExtraLanguages, useIsMultilang } from "../../stores/projectStore";
 import { API_URL } from "../../lib/config";
 
 export default function MediaDrawer({ visible, onClose, selectedFile, onSave, loading, activeProject }) {
   const { t } = useTranslation();
   const isMultilang = useIsMultilang();
   const defaultLanguage = useDefaultLanguage();
+  const extraLanguages = useExtraLanguages();
   // The binaries and the grid are shared; only these three fields are per
   // language, and only where someone has written them. The drawer stays mounted
   // between openings, so the chosen language is tied to the file it was chosen
@@ -188,7 +188,25 @@ export default function MediaDrawer({ visible, onClose, selectedFile, onSave, lo
             </div>
           )}
 
-          <LanguageTabs value={language} onChange={setLanguage} label={t("forms.media.languagesLabel")} />
+          {isMultilang && (
+            <div className="flex items-center gap-3">
+              <label htmlFor="media-metadata-language" className="shrink-0 text-sm font-medium text-slate-600">
+                {t("forms.media.languagesLabel")}
+              </label>
+              <select
+                id="media-metadata-language"
+                value={language}
+                onChange={(event) => setLanguage(event.target.value)}
+                className="form-select min-w-0 flex-1"
+              >
+                {[defaultLanguage, ...extraLanguages].map((code) => (
+                  <option key={code} value={code}>
+                    {nativeLanguageName(code)} ({hreflangCase(code)})
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
 
           {/* Alt Text (required) + Title */}
           <div className="form-field">
