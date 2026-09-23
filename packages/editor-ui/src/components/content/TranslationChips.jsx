@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { nativeLanguageName } from "@widgetizer/core/languages";
+import { nativeLanguageName, hreflangCase } from "@widgetizer/core/languages";
 import { useDefaultLanguage, useExtraLanguages, useIsMultilang } from "../../stores/projectStore";
 
 /**
@@ -38,7 +38,7 @@ export default function TranslationChips({ entry, siblings, hrefOf, onCreate, pe
                 aria-label={t("common.languages.open", { name })}
                 className="rounded border border-pink-500 bg-pink-500 px-1.5 py-0.5 text-xs font-medium text-white transition-colors hover:bg-pink-600"
               >
-                {code}
+                {hreflangCase(code)}
               </Link>
             );
           }
@@ -56,7 +56,7 @@ export default function TranslationChips({ entry, siblings, hrefOf, onCreate, pe
               }
               className="rounded border border-dashed border-slate-300 px-1.5 py-0.5 text-xs font-medium text-slate-400 transition-colors hover:border-pink-400 hover:text-pink-600 disabled:opacity-50"
             >
-              {code}
+              {hreflangCase(code)}
             </button>
           );
         })}

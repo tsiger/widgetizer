@@ -8,7 +8,7 @@ import Button from "@widgetizer/editor-ui/components/ui/Button.jsx";
 import { formatSlug } from "@widgetizer/editor-ui/utils/slugUtils";
 import { isValidSiteUrl, siteUrlHasQueryOrFragment } from "@widgetizer/core/urlSafety";
 import { identityKind } from "@widgetizer/core/siteIdentity";
-import { DEFAULT_LANGUAGE, SUPPORTED_LANGUAGES, nativeLanguageName } from "@widgetizer/core/languages";
+import { DEFAULT_LANGUAGE, SUPPORTED_LANGUAGES, nativeLanguageName, hreflangCase } from "@widgetizer/core/languages";
 import useToastStore from "@widgetizer/editor-ui/stores/toastStore";
 import { getThemePresets, getPresetScreenshotUrl } from "@widgetizer/editor-ui/queries/themeManager";
 import SiteIdentityFields from "./SiteIdentityFields.jsx";
@@ -417,7 +417,7 @@ export default function ProjectForm({
       >
         {languageOptions.map(({ code }) => (
           <option key={code} value={code}>
-            {nativeLanguageName(code)} ({code})
+            {nativeLanguageName(code)} ({hreflangCase(code)})
           </option>
         ))}
       </select>
