@@ -44,9 +44,9 @@ export default function LanguageMenu({ entry, language, siblings, onOpen, onCrea
         onClick={() => setIsOpen(!isOpen)}
         title={label}
         aria-label={label}
-        className="flex items-center gap-2 rounded-md border border-slate-200 px-3 py-2 text-sm font-medium uppercase hover:bg-slate-100"
+        className="flex items-center gap-2 rounded-md border border-slate-200 px-3 py-2 text-sm font-medium hover:bg-slate-100"
       >
-        {current}
+        {nativeLanguageName(current)}
         <ChevronDown size={16} className={`transform transition-transform ${isOpen ? "rotate-180" : ""}`} />
       </button>
       {isOpen && (
