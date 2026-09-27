@@ -456,6 +456,29 @@ This document serves as a comprehensive index to all documentation in the Widget
 
 ---
 
+### **[future-skills-theme.md](future-skills-theme.md)** - Future: Widgetizer Theme Skill
+
+**Purpose**: Proposal and build notes for a distributable, tool-neutral Agent Skill that lets desktop-app users' AI agents create and update Widgetizer themes **When to use**:
+
+- Building or scoping the theme-creation skill
+- Deciding how the skill is distributed to Claude and OpenAI users
+- Checking the desktop data-folder paths, theme copy model and dev-loop gotchas an agent must handle
+
+**Key topics**: SKILL.md format and progressive disclosure, master copy in repo + small public repo, Claude plugin marketplace / app upload / directory, OpenAI ChatGPT + Codex, desktop `<userData>/data/` paths, seed/runtime/project theme copies, `latest/` precedence, theme ZIP upload requirements, update folders, knowledge sources, open questions
+
+---
+
+### **[future-skills-site.md](future-skills-site.md)** - Future: Widgetizer Site Skill
+
+**Purpose**: Early notes for a skill that lets a desktop-app user's AI agent build a website with a theme/preset (pages, header/footer, menus, collections, images); shared skill/distribution facts live in future-skills-theme.md **When to use**:
+
+- Scoping the site-building skill
+- Checking what an agent can do through project files versus what needs the app's database or local API
+
+**Key topics**: Files vs SQLite (projects, media), open-editor overwrite risk, no schema validator, three routes (files only / local API / MCP server), creating a project from a prompt via `POST /api/projects`, proposed `server.json` port file, active-project switch behaviour, page and menu JSON shape, knowledge sources, open questions
+
+---
+
 ## ✅ Project Tracking
 
 - **[user-test-checklist.md](user-test-checklist.md)** — Standalone manual user-test checklist (no codebase knowledge assumed): IDs/actions/expected results, test pack/setup, and run waves for confirming create/edit/preview/export/backup/import/update/delete flows.
