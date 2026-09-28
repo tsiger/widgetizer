@@ -2,7 +2,7 @@
 /**
  * The link picker on a multilingual site (§4a): every language is offered, because
  * a page may exist in only one of them, but the list opens on the language being
- * edited. A target in another language is labelled, not hidden.
+ * edited. Every target with a language is labelled.
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { cleanup, render, screen, fireEvent, within } from "@testing-library/react";
@@ -55,18 +55,17 @@ describe("link picker language filter", () => {
     fireEvent.click(chip("All"));
     expect(screen.getByText("About")).toBeTruthy();
     expect(screen.getByText("Sxetika")).toBeTruthy();
-    expect(screen.getByText("Pages · English")).toBeTruthy();
-    expect(screen.getByText("Pages · Ελληνικά")).toBeTruthy();
+    expect(screen.getByText((_, element) => element.tagName === "LI" && element.textContent === "Pages · English")).toBeTruthy();
+    expect(screen.getByText((_, element) => element.tagName === "LI" && element.textContent === "Pages · Ελληνικά")).toBeTruthy();
   });
 
-  it("tags a target that lives in another language", () => {
+  it("tags targets in both the editing language and other languages", () => {
     const list = renderOpen({ editing: "en" });
     fireEvent.click(chip("All"));
 
     const greek = screen.getByText("Sxetika").closest("li");
     expect(within(greek).getByTitle("Ελληνικά").textContent).toBe("el");
-    // The language being edited is the norm, so it carries no tag.
-    expect(within(screen.getByText("About").closest("li")).queryByTitle("English")).toBeNull();
+    expect(within(screen.getByText("About").closest("li")).getByTitle("English").textContent).toBe("en");
     expect(list).toBeTruthy();
   });
 

@@ -2197,6 +2197,7 @@ b {
 
   & .header-languages-list {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     gap: var(--space-xs);
     list-style: none;
@@ -2204,8 +2205,75 @@ b {
     padding: 0;
   }
 
+  & .header-language-dropdown {
+    position: relative;
+  }
+
+  & .header-language-trigger {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    padding: var(--space-xs) var(--space-sm);
+    border: var(--border-width-thin) solid var(--border-color);
+    border-radius: var(--radius-md);
+    color: var(--text-content);
+    font-size: var(--font-size-sm);
+    cursor: pointer;
+    list-style: none;
+
+    &::-webkit-details-marker { display: none; }
+    & svg { flex-shrink: 0; transition: transform var(--transition-speed-fast); }
+    &:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
+  }
+
+  & .header-language-dropdown[open] .header-language-trigger svg {
+    transform: rotate(180deg);
+  }
+
+  & .header-language-dropdown > .header-languages-list {
+    position: absolute;
+    inset-inline-end: 0;
+    inset-block-start: calc(100% + var(--space-xs));
+    z-index: 10;
+    min-width: 18rem;
+    max-width: calc(100vw - 2 * var(--space-md));
+    max-height: 60vh;
+    overflow-y: auto;
+    display: block;
+    padding: var(--space-xs);
+    border: var(--border-width-thin) solid var(--border-color);
+    border-radius: var(--radius-md);
+    background: var(--bg-primary);
+    box-shadow: 0 8px 24px rgb(0 0 0 / 10%);
+  }
+
+  & .header-language-dropdown .header-languages-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-md);
+    padding: var(--space-sm);
+    border-radius: var(--radius-sm);
+
+    &:hover, &:focus-visible, &.is-active {
+      background: color-mix(in srgb, var(--text-content) 6%, var(--bg-primary));
+    }
+  }
+
+  & .header-languages-link.is-active::after {
+    content: "";
+    width: 0.5em;
+    height: 0.8em;
+    flex-shrink: 0;
+    margin-inline-start: var(--space-xs);
+    border: solid currentColor;
+    border-width: 0 1.5px 1.5px 0;
+    transform: rotate(45deg) translateY(-0.1em);
+  }
+
   & .header-languages-link {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
     padding: var(--space-xs);
     color: var(--text-muted);
     text-decoration: none;
@@ -2515,6 +2583,10 @@ b {
   /* Desktop styles */
   @media (min-width: 990px) {
     padding-inline: var(--space-xl);
+
+    & .header-nav > .header-languages-list {
+      display: none;
+    }
 
     & .header-actions {
       flex: 1;

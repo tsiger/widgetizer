@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { ChevronDown, Plus } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { nativeLanguageName } from "@widgetizer/core/languages";
+import { nativeLanguageName, hreflangCase } from "@widgetizer/core/languages";
 import { useDefaultLanguage, useExtraLanguages, useIsMultilang } from "../../stores/projectStore";
 
 /**
@@ -44,9 +44,9 @@ export default function LanguageMenu({ entry, language, siblings, onOpen, onCrea
         onClick={() => setIsOpen(!isOpen)}
         title={label}
         aria-label={label}
-        className="flex items-center gap-2 rounded-md border border-slate-200 px-3 py-2 text-sm font-medium uppercase hover:bg-slate-100"
+        className="flex items-center gap-2 rounded-md border border-slate-200 px-3 py-2 text-sm font-medium hover:bg-slate-100"
       >
-        {current}
+        {nativeLanguageName(current)}
         <ChevronDown size={16} className={`transform transition-transform ${isOpen ? "rotate-180" : ""}`} />
       </button>
       {isOpen && (
@@ -70,7 +70,7 @@ export default function LanguageMenu({ entry, language, siblings, onOpen, onCrea
                   }`}
                 >
                   <span>{name}</span>
-                  <span className="text-xs uppercase opacity-70">{code}</span>
+                  <span className="text-xs opacity-70">{hreflangCase(code)}</span>
                 </button>
               );
             }
@@ -93,7 +93,7 @@ export default function LanguageMenu({ entry, language, siblings, onOpen, onCrea
                 <span className="flex items-center gap-2">
                   <Plus size={14} /> {name}
                 </span>
-                <span className="text-xs uppercase opacity-70">{code}</span>
+                <span className="text-xs opacity-70">{hreflangCase(code)}</span>
               </button>
             );
           })}

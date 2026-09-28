@@ -8,7 +8,7 @@ import Button from "@widgetizer/editor-ui/components/ui/Button.jsx";
 import ConfirmationModal from "@widgetizer/editor-ui/components/ui/ConfirmationModal.jsx";
 import useConfirmationModal from "@widgetizer/editor-ui/hooks/useConfirmationModal";
 import useToastStore from "@widgetizer/editor-ui/stores/toastStore";
-import { SUPPORTED_LANGUAGES, nativeLanguageName } from "@widgetizer/core/languages";
+import { SUPPORTED_LANGUAGES, nativeLanguageName, hreflangCase } from "@widgetizer/core/languages";
 
 /**
  * The site's languages.
@@ -152,7 +152,7 @@ export default function LanguagesSection({
           {languages.map((code) => (
             <li key={code} className="flex items-center justify-between gap-3 px-3 py-2">
               <span className="text-sm text-gray-800 dark:text-gray-200">
-                {nameOf(code)} <span className="text-gray-400">({code})</span>
+                {nameOf(code)} <span className="text-gray-400">({hreflangCase(code)})</span>
               </span>
               <Button
                 type="button"
@@ -184,7 +184,7 @@ export default function LanguagesSection({
             <option value="">{t("forms.project.languages.addPlaceholder")}</option>
             {available.map(({ code }) => (
               <option key={code} value={code}>
-                {nativeLanguageName(code)} ({code})
+                {nativeLanguageName(code)} ({hreflangCase(code)})
               </option>
             ))}
           </select>

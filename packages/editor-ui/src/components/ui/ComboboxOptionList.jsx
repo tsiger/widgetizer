@@ -1,5 +1,5 @@
 import { Fragment, useState } from "react";
-import { nativeLanguageName } from "@widgetizer/core/languages";
+import { nativeLanguageName, hreflangCase } from "@widgetizer/core/languages";
 import { useDefaultLanguage, useExtraLanguages, useIsMultilang } from "../../stores/projectStore";
 import { useEditingLanguage } from "../../lib/editingLanguage.jsx";
 
@@ -15,8 +15,8 @@ import { useEditingLanguage } from "../../lib/editingLanguage.jsx";
  *
  * On a multilingual site it also owns the language filter: every language is
  * offered, because a page may exist in only one of them, but the view opens on the
- * language being edited so the common case stays one click. A target in another
- * language is labelled rather than hidden — a tag, not a warning.
+ * language being edited so the common case stays one click. Every target with a
+ * language carries a badge, regardless of the language being edited.
  *
  * @param {object[]} options    Already-filtered options ({ value, label, group?, language? }).
  * @param {(option: object) => void} onSelect  Called with the clicked option.
@@ -62,13 +62,13 @@ export default function ComboboxOptionList({ options, onSelect, emptyText, class
               type="button"
               aria-pressed={language === code}
               onClick={() => setLanguage(code)}
-              className={`rounded px-1.5 py-0.5 text-xs font-medium uppercase transition-colors ${
+              className={`rounded px-1.5 py-0.5 text-xs font-medium transition-colors ${
                 language === code
                   ? "bg-pink-600 text-white"
                   : "bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-slate-700"
               }`}
             >
-              {code === ALL_LANGUAGES ? "All" : code}
+              {code === ALL_LANGUAGES ? "All" : hreflangCase(code)}
             </button>
           ))}
         </li>
@@ -78,25 +78,27 @@ export default function ComboboxOptionList({ options, onSelect, emptyText, class
           // Header whenever the group changes between consecutive options.
           const header = headerOf(option);
           const showHeader = header && (idx === 0 || headerOf(visible[idx - 1]) !== header);
-          const elsewhere = isMultilang && option.language && option.language !== editingLanguage;
           return (
             <Fragment key={option.value}>
               {showHeader && (
                 <li className="select-none px-3 pb-1 pt-2 text-xs font-semibold uppercase tracking-wide text-slate-400">
-                  {header}
+                  {option.group}
+                  {header !== option.group && (
+                    <span className="normal-case"> · {nativeLanguageName(option.language)}</span>
+                  )}
                 </li>
               )}
               <li
                 onClick={() => onSelect(option)}
-                className="relative flex cursor-default select-none items-center justify-between gap-2 py-2 pl-3 pr-9 text-slate-900 hover:bg-slate-100"
+                className="relative flex cursor-default select-none items-center gap-2 px-3 py-2 text-slate-900 hover:bg-slate-100"
               >
-                <span className="block truncate">{option.label}</span>
-                {elsewhere && (
+                <span className="min-w-0 flex-1 truncate text-[13px]" title={option.label}>{option.label}</span>
+                {isMultilang && option.language && (
                   <span
                     title={nativeLanguageName(option.language)}
-                    className="shrink-0 rounded border border-slate-200 px-1 text-xs uppercase text-slate-500"
+                    className="ml-auto shrink-0 rounded border border-slate-200 px-1 text-xs text-slate-500"
                   >
-                    {option.language}
+                    {hreflangCase(option.language)}
                   </span>
                 )}
               </li>

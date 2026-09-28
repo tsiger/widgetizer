@@ -1,3 +1,4 @@
+import { hreflangCase } from "@widgetizer/core/languages";
 import { useState, useEffect, useMemo } from "react";
 import { getAllMenus } from "../../../queries/menuManager";
 import { useDefaultLanguage, useIsMultilang } from "../../../stores/projectStore";
@@ -87,7 +88,7 @@ export default function MenuSelectInput({ id, value = "", onChange }) {
       ))}
       {chosenElsewhere && (
         <option key={chosenElsewhere.uuid} value={chosenElsewhere.uuid}>
-          {`${chosenElsewhere.name} (${chosenElsewhere.language})`}
+          {`${chosenElsewhere.name} (${hreflangCase(chosenElsewhere.language)})`}
         </option>
       )}
     </select>
