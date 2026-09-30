@@ -1040,6 +1040,9 @@ async function createBaseRenderContext(deps, rawThemeSettings, renderMode = "pre
   // stamped by `renderWidget` on first use when absent.
   if (globals.outputPathPrefix === undefined) globals.outputPathPrefix = outputPathPrefix;
   if (globals.currentCanonicalPath === undefined) globals.currentCanonicalPath = "";
+  // A `{% render %}`'d snippet sees only the globals, and `{% image %}` / `media_meta` need both.
+  globals.mediaFiles = mediaFiles;
+  globals.imagePath = imageBasePath;
   // Published date format (theme-owned, set via the `date_format` theme setting).
   // Consumed by the `format_date` filter; when a theme defines no such setting the
   // filter falls back to its own default, so we only set this when present.

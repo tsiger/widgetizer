@@ -7,7 +7,7 @@
  * Reads the language of the page being rendered, exactly as `{% image %}` does:
  * the library is shared, only alt/title/caption vary.
  */
-import { resolveMediaMetadata } from "../utils/mediaMetadata.js";
+import { renderedLanguage, resolveMediaMetadata } from "../utils/mediaMetadata.js";
 
 export function registerMediaMetaFilter(engine) {
   engine.registerFilter("media_meta", function (path, property) {
@@ -49,7 +49,7 @@ export function registerMediaMetaFilter(engine) {
 
     let language;
     try {
-      language = context.get(["page", "language"]);
+      language = renderedLanguage(context);
     } catch {
       // No page in scope (a standalone render) — the default language it is.
     }

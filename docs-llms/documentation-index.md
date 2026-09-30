@@ -56,6 +56,7 @@ This document serves as a comprehensive index to all documentation in the Widget
 - Building new themes from scratch
 - Understanding theme structure and file organization
 - Working with Liquid templates, tags, and global components (header/footer)
+- Writing snippets: what a `{% render %}`'d snippet can see, and the engine's reserved variable names
 - Managing theme assets, CSS variables, and locales (i18n)
 - Implementing scroll reveal animations
 

@@ -11,6 +11,11 @@
  */
 export const MEDIA_METADATA_FIELDS = ["alt", "title", "caption"];
 
+// `page` is not in scope inside a `{% render %}`'d snippet; the page being rendered is also on the globals.
+export function renderedLanguage(context) {
+  return context.get(["page", "language"]) ?? context.get(["currentPageData", "language"]);
+}
+
 export function resolveMediaMetadata(file, language) {
   const base = file?.metadata || {};
   const translated = language ? file?.translations?.[language] : null;

@@ -469,6 +469,28 @@ The same setting is on the render globals as `globals.cleanUrls`, next to `globa
 
 Widgetizer provides powerful Liquid tags to simplify common tasks in your templates.
 
+### Snippets and reserved names
+
+A snippet pulled in with `{% render 'card', item: item %}` sees two things only: the arguments you pass and the render globals. It does not see the calling template's `page`, `widget`, `theme`, `project` or `item`, so pass it what it needs. Liquid's older `{% include %}` shares the caller's variables in both directions; the bundled themes use `render` only.
+
+The following tags and filters work the same inside a snippet as at the top level, because what they read is on the globals: `{% image %}` and `media_meta` (the media library, the image base path and the page's language), `page_url` / `item_url`, `collection`, `format_date` and `t`. Other core tags depend on the calling template. `{% seo %}` reads `page` and `project`, so a snippet needs both passed in. The asset and enqueue tags (`{% asset %}`, `{% enqueue_style %}`, `{% enqueue_script %}`, `{% enqueue_preload %}`) work in a snippet but load from the theme `assets/` folder, never from a widget's own folder (see [Widget Styles & Scripts](#widget-styles--scripts)).
+
+**Globals a theme may read**, by name, in any template or snippet. A widget, layout or item template can also reach them as `globals.<name>`; a snippet cannot.
+
+| Name | What it holds |
+| :--- | :--- |
+| `breadcrumbs` | The current page's trail, as drawn by the core `breadcrumbs` snippet |
+| `cleanUrls` | The project's Clean URLs setting |
+| `outputPathPrefix` | The current page's depth: `""` at the root, `../` one level deep |
+| `renderMode` | `"preview"` in the editor, `"publish"` on export |
+| `icons` | The theme's icon set, by name (Arch's `icon` snippet) |
+
+**Engine internals.** The globals also carry the engine's own working data. Liquid can see it, but it is not a contract and can change without notice, so don't build on it: `mediaFiles`, `imagePath`, `currentPageData`, `getCollectionItems`, `collectionCache`, `collectionSlice`, `paginationPlan`, `pagesByUuid`, `collectionItemsByUuid`, `listingPages`, `menuMaps`, `siteStrings`, `translations`, `languageSettings`, `defaultLanguage`, `dateFormat`, `iconPrefix`, `siteIcons`, `enqueuedStyles`, `enqueuedScripts`, `enqueuedPreloads`, `themeSettingsRaw`, `assetVersion`, `currentCanonicalPath`, `apiUrl`, `projectId`, `formSubmitUrl`, `turnstileSiteKey`. What a theme needs about the page comes through `page` (for example `page.translations` for a language switcher), not through these.
+
+**Names not to reuse.** Core's tags and filters look up these names through Liquid while they render: `page`, `project`, `widget`, `globals`, `currentPageData`, `mediaFiles` and `imagePath`. Core snippets read some globals by name too: `menu` reads `currentCanonicalPath` to mark the active page, and `breadcrumbs` reads `breadcrumbs`. A variable you create, or a snippet argument you pass, under one of these names hides the engine's value for the rest of that template or snippet: `{% assign imagePath = block.settings.image %}` breaks every `{% image %}` after it, and passing `currentCanonicalPath` to the `menu` snippet removes its active-page marking. Passing the engine's own value under its own name, as in `{% render 'x', page: page %}`, is fine. An internal name that nothing reads through Liquid, such as `translations` as a language-switcher argument, is safe to reuse; before reusing any other global's name, check that no tag, filter or snippet you rely on reads it.
+
+Adding a name to the render globals means adding it to the table or the internals list above, and to the names not to reuse when a tag, filter or core snippet looks it up through Liquid.
+
 ### Liquid filters
 
 LiquidJS runs with autoescape enabled globally (`outputEscape: "escape"`), so every `{{ ... }}` is HTML-escaped by default. Append `| raw` when the value is already trusted HTML: layout variables (`{{ header | raw }}`, `{{ main_content | raw }}`, `{{ footer | raw }}`), SVG icons, embed code, and **richtext** output.
@@ -543,6 +565,8 @@ For an item trail to work at all, the listing widget's schema must declare what 
 ### Image tag
 
 The `{% image %}` tag is the recommended way to render images in your theme. It automatically handles generating the correct `src` for different image sizes, adds important attributes like `width`, `height`, and `alt`, and enables lazy loading by default.
+
+The tag works the same inside a `{% render %}`'d snippet; pass the image path as an argument (see [Snippets and reserved names](#snippets-and-reserved-names)).
 
 **SVG behavior:** SVGs always render from the original file (no size variants). The `size` parameter is ignored for SVGs, and `width`/`height` attributes are omitted. In path-only mode, SVGs always return the original file path.
 
