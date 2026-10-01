@@ -12,6 +12,23 @@ import { isHomeSlug } from "@widgetizer/core/internalHref";
 import { isReservedPageSlug } from "@widgetizer/core/contentAddress";
 import { getAllPages } from "../../queries/pageManager";
 
+function toFormValues(initialData) {
+  return {
+    name: initialData.name || "",
+    slug: initialData.slug || "",
+    seo: {
+      description: initialData.seo?.description || "",
+      og_title: initialData.seo?.og_title || "",
+      og_image: initialData.seo?.og_image || "",
+      og_type: initialData.seo?.og_type || "website",
+      twitter_card: initialData.seo?.twitter_card || "summary",
+      canonical_url: initialData.seo?.canonical_url || "",
+      robots: initialData.seo?.robots || "index,follow",
+    },
+    parentPageUuid: initialData.parentPageUuid || "",
+  };
+}
+
 export default function PageForm({
   initialData = { name: "", slug: "" },
   onSubmit,
@@ -38,20 +55,7 @@ export default function PageForm({
     watch,
     setValue,
   } = useForm({
-    defaultValues: {
-      name: initialData.name || "",
-      slug: initialData.slug || "",
-      seo: {
-        description: initialData.seo?.description || "",
-        og_title: initialData.seo?.og_title || "",
-        og_image: initialData.seo?.og_image || "",
-        og_type: initialData.seo?.og_type || "website",
-        twitter_card: initialData.seo?.twitter_card || "summary",
-        canonical_url: initialData.seo?.canonical_url || "",
-        robots: initialData.seo?.robots || "index,follow",
-      },
-      parentPageUuid: initialData.parentPageUuid || "",
-    },
+    defaultValues: toFormValues(initialData),
   });
 
   // Watch fields for auto-slug and media display
@@ -116,19 +120,7 @@ export default function PageForm({
   useEffect(() => {
     const currentInitialDataStr = JSON.stringify(initialData);
     if (prevInitialDataRef.current !== currentInitialDataStr) {
-      reset({
-        name: initialData.name || "",
-        slug: initialData.slug || "",
-        seo: {
-          description: initialData.seo?.description || "",
-          og_title: initialData.seo?.og_title || "",
-          og_image: initialData.seo?.og_image || "",
-          og_type: initialData.seo?.og_type || "website",
-          twitter_card: initialData.seo?.twitter_card || "summary",
-          canonical_url: initialData.seo?.canonical_url || "",
-          robots: initialData.seo?.robots || "index,follow",
-        },
-      });
+      reset(toFormValues(initialData));
       prevInitialDataRef.current = currentInitialDataStr;
     }
   });

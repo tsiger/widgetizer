@@ -308,3 +308,18 @@ describe("site languages", () => {
     expect(onSubmit.mock.calls[0][0].languages).toBeUndefined();
   });
 });
+
+describe("after a save", () => {
+  it("is clean once the saved project comes back", async () => {
+    const onDirtyChange = vi.fn();
+    const props = { onSubmit: vi.fn(async () => false), isSubmitting: false, submitLabel: "Save", onDirtyChange };
+    const { rerender } = render(<ProjectForm initialData={PROJECT} {...props} />);
+    await screen.findByRole("tablist");
+    fireEvent.change(screen.getByLabelText(/forms\.project\.titleLabel/), { target: { value: "Crumbly 2" } });
+    await waitFor(() => expect(onDirtyChange).toHaveBeenLastCalledWith(true));
+
+    rerender(<ProjectForm initialData={{ ...PROJECT, name: "Crumbly 2" }} {...props} />);
+
+    await waitFor(() => expect(onDirtyChange).toHaveBeenLastCalledWith(false));
+  });
+});
