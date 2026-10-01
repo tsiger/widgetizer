@@ -10,11 +10,11 @@ All setting types share the following common properties:
 - `label` (string, required): Usually a `tTheme:` prefixed key that references a translation in the theme's locale files (e.g., `"tTheme:carousel.settings.title.label"`). The frontend resolves `tTheme:` values to human-readable strings at runtime. Direct strings like `"Title"` also work for small one-off themes, but `tTheme:` remains the recommended authoring convention.
 - `description` (string, optional): Usually a `tTheme:` prefixed key for help text displayed below the input (e.g., `"tTheme:carousel.settings.title.description"`). Direct strings are also supported.
 - `default` (any, optional): The default value for the setting if none is provided.
-- `outputAsCssVar` (boolean, optional): If set to `true`, the setting's value will be output as a CSS custom property (variable) in the page's `<head>`. This is the primary way to link theme settings to your theme's CSS.
+- `outputAsCssVar` (boolean, optional): For a **global theme setting**, `true` makes `{% theme_settings %}` output its value as a CSS custom property. This flag does not automatically generate variables for widget/block settings; render those explicitly in the widget's scoped styling.
 
 ---
 
-> **Practical note:** Even if a theme uses direct strings instead of `tTheme:` keys, it should still include a minimal `locales/en.json` because projects now treat `locales/` as part of the copied theme package.
+> **Practical note:** Include `locales/en.json` as an authoring convention and for repository locale validation, even with direct control labels. Global setting groups need `global.<group>.name` entries. ZIP upload itself does not require locales.
 
 ---
 

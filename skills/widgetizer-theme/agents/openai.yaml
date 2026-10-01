@@ -1,0 +1,3 @@
+interface:
+  display_name: "Widgetizer Theme"
+  short_description: "Create and validate Widgetizer theme packages"

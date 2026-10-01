@@ -1,6 +1,6 @@
 # Future: Widgetizer Theme Skill
 
-> **Status: Proposal.** Recorded on 2026-09-27. Nothing is built yet. This file collects what an agent needs to build a distributable "create / update a Widgetizer theme" Agent Skill: what a skill is, where it lives, how it ships, and the Widgetizer facts it must encode. Facts about third-party platforms (Claude, OpenAI) were checked on 2026-09-27 and change quickly — re-verify them before building.
+> **Status: Distribution proposal; technical draft now exists.** The repository-maintained [Widgetizer Theme skill](../skills/widgetizer-theme/SKILL.md) was drafted on 2026-10-01 with technical authoring references. It is not installed or published. The distribution, desktop integration, and packaging ideas below remain proposals recorded on 2026-09-27. Third-party platform facts were checked then and must be re-verified before distribution work.
 
 ---
 

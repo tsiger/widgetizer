@@ -49,6 +49,8 @@ This document serves as a comprehensive index to all documentation in the Widget
 
 ## 📚 Theme Development & Authoring
 
+The draft [Widgetizer Theme skill](../skills/widgetizer-theme/SKILL.md) provides a task-oriented technical authoring workflow and seven focused references. It distinguishes importer checks, runtime contracts, and design conventions; it is maintained in the repository and has not been installed or published.
+
 ### **[theming.md](theming.md)** - Theme Development & Structure
 
 **Purpose**: Canonical theme-authoring entry point — theme structure, `theme.json` manifest/global settings, `layout.liquid`, Liquid tags, widgets/blocks/templates/menus/assets/locales/presets, and advanced features, tightened to defer deep detail to the dedicated docs **When to use**:

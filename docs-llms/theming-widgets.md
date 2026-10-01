@@ -4,6 +4,8 @@
 
 This document is the canonical reference for creating widgets: the `widget.liquid` skeleton, JavaScript isolation and editor lifecycle events, the enqueue asset system, schema conventions, standardized block types, accessibility, and an authoring checklist.
 
+The layout, typography, colors, spacing, reveal effects, and standardized block recipes below describe **Arch's design system**. New themes can define their own. Preserve the platform contracts (schema/value shapes, editor targeting attributes, Liquid context, asset loading, and lifecycle behavior) without treating Arch's class names or block catalog as importer requirements. The [theme skill](../skills/widgetizer-theme/SKILL.md) separates those categories.
+
 For the foundational concepts of theming (theme structure, global settings, layout templates), see the main [Theming Guide](theming.md). Design tokens (spacing, typography, color, width, and border scales) live in [Design System](arch-design-system.md). Every setting-type's JSON shape (`background`, `color`, `link`, `richtext`, `gallery`, `table`, …) lives in [Setting Types Reference](theming-setting-types.md).
 
 ---
@@ -821,7 +823,7 @@ Use the `--reveal-delay` CSS variable to stagger animations in loops. Each incre
 
 User-facing strings in the schema (`displayName`, `label`, `description`, and option labels) should use `tTheme:`-prefixed keys that reference entries in the theme's locale files (`locales/*.json`). This keeps schemas language-independent and enables translation.
 
-For small one-off themes, direct strings also work at runtime (e.g. `"displayName": "Hero"`), but the theme should still ship a minimal `locales/en.json` because projects copy `locales/` as part of the theme package.
+For small one-off themes, direct strings also work at runtime (e.g. `"displayName": "Hero"`). Ship `locales/en.json` as an authoring convention and for the repository locale validator; its presence is not enforced by ZIP upload. Include group-name keys if the theme declares global setting groups.
 
 ```json
 {

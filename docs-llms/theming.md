@@ -4,6 +4,8 @@ This document provides a comprehensive guide to creating and customizing themes 
 
 This is the canonical theme-authoring entry point. It covers theme structure, the `theme.json` manifest, `layout.liquid`, the Liquid tag set, and the widgets/blocks/templates/menus/assets/locales/presets model. Deep references are split out: see [Setting Types Reference](theming-setting-types.md), the [Widget Authoring Guide](theming-widgets.md), [Theme Presets](theme-presets.md), and [Export](core-export.md).
 
+For a task-oriented authoring workflow with explicit distinctions between enforced checks, runtime contracts, and design conventions, see the draft [Widgetizer Theme skill](../skills/widgetizer-theme/SKILL.md).
+
 ## 1. Introduction & Core Concepts
 
 ### What is a Theme?
@@ -86,15 +88,14 @@ A theme is organized as a directory with the following structure:
     └── icons.json          # Icon definitions (optional)
 ```
 
-> [!IMPORTANT] **Absolute Minimum Requirements:** For a theme to be recognized and functional, it MUST contain:
+> [!IMPORTANT] **Package acceptance and authoring requirements are different.** ZIP upload requires:
 >
-> - `theme.json`: Manifest with `name`, `version`, and `author`.
+> - `theme.json`: Parseable manifest with `name`, `version`, and `author`. The current version parser accepts three numeric components (`1.0.0`), not prerelease/build suffixes.
 > - `layout.liquid`: The main layout wrapper.
-> - `screenshot.png`: A 1280x720 preview image.
-> - `widgets/`: Directory containing at least one widget.
-> - `templates/`: Directory containing page templates.
-> - `assets/`: Directory for theme assets.
-> - `locales/`: Directory with at least one locale file (e.g., `en.json`). If the theme uses `tTheme:` keys, this file provides their translations. Even small themes that use direct strings in schemas should still include a minimal `locales/en.json`, because projects now copy and expect a `locales/` directory as part of the theme package.
+> - `screenshot.png`: Present in the archive; the importer does not check its dimensions.
+> - Entries under `widgets/`, `templates/`, and `assets/`. These prefix checks do not prove the entries contain valid widgets, pages, or assets.
+>
+> Supply a functioning widget, starter pages, referenced assets, and a real 1280x720 screenshot as the authoring baseline. Include `locales/en.json` for labels/visitor words and repository locale validation; ZIP upload itself does not require locales. Global setting groups need `global.<group>.name` locale entries for that validator, even when control labels are direct strings. Successful import is not a complete render/editor/export check.
 
 > **Note:** Each widget lives in its own subdirectory containing a `schema.json` (widget configuration) and `widget.liquid` (template). For comprehensive widget authoring guidance, see the [Widget Authoring Guide](theming-widgets.md).
 
@@ -315,7 +316,7 @@ The `layout.liquid` file defines the main HTML structure that wraps all page con
 
 ```liquid
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ page.language | default: 'en' }}" dir="{{ page.dir | default: 'ltr' }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -1579,28 +1580,21 @@ Page templates define widget arrangements and default content for different type
 ```json
 {
   "name": "Basic Page",
-  "description": "A simple page layout",
-  "widgets": [
-    {
-      "type": "header",
-      "settings": {
-        "headerTitle": "My Site"
-      }
-    },
-    {
+  "slug": "index",
+  "widgets": {
+    "introduction": {
       "type": "basic-text",
       "settings": {
         "title": "Welcome",
         "content": "Welcome to my website!"
       }
-    },
-    {
-      "type": "footer",
-      "settings": {}
     }
-  ]
+  },
+  "widgetsOrder": ["introduction"]
 }
 ```
+
+This example assumes a supplied `basic-text` widget with `title` and `content` settings. Page widgets are an object keyed by instance ID, and `widgetsOrder` determines rendering order. Global header/footer instances belong in `templates/global/`, not in this page's widget list. Scaffolding creates project identities; templates are starting content, not live parents of existing pages.
 
 ### Global Templates (`templates/global/*.json`)
 
@@ -1634,7 +1628,7 @@ Global templates can also include default blocks (when the widget schema defines
 
 ## 9. Navigation Menus
 
-Menus are defined as JSON files in the `/menus/` directory and support nested navigation up to 4 levels deep.
+Menus are defined as JSON files in the `/menus/` directory. The theme's menu renderer determines how much nesting is displayed; the current core snippet renders three levels, separately from backend menu depth/item limits.
 
 ### Menu Structure (`menus/main-nav.json`)
 
@@ -1680,7 +1674,7 @@ Use the `{% render 'menu' %}` tag with custom CSS classes to render navigation m
 ```liquid
 {% render 'menu',
     menu: widget.settings.headerNavigation,
-    class_menu: 'site-header__nav',
+    class_nav: 'site-header__nav',
     class_list: 'site-header__nav-list',
     class_item: 'site-header__nav-item',
     class_link: 'site-header__nav-link',
@@ -1692,7 +1686,9 @@ Use the `{% render 'menu' %}` tag with custom CSS classes to render navigation m
 ### Menu Snippet Parameters
 
 - `menu`: The menu object containing the items array
-- `class_menu`: CSS classes for the `<nav>` element
+- `class_nav`: CSS classes for the `<nav>` element
+- `aria_label`: Accessible label for the navigation
+- `skip_nav`: Set to `true` when the caller already supplies the `<nav>` wrapper
 - `class_list`: CSS classes for `<ul>` elements
 - `class_item`: CSS classes for `<li>` elements
 - `class_link`: CSS classes for `<a>` elements
@@ -1700,6 +1696,8 @@ Use the `{% render 'menu' %}` tag with custom CSS classes to render navigation m
 - `class_has_submenu`: CSS classes for items that have child items, allowing you to style dropdown indicators and submenu behaviors.
 
 The menu snippet automatically adds the `class_has_submenu` class to items that have child items, allowing you to style dropdown indicators and submenu behaviors.
+
+The core snippet currently renders three item levels. Supporting deeper menu data requires a theme-specific renderer; backend menu limits are a separate constraint.
 
 ### Link settings
 
@@ -1883,7 +1881,7 @@ Widget types with hyphens are converted to underscores in keys: `bento-grid` bec
 - Runtime behavior is permissive: schema values that do **not** start with `tTheme:` are returned as-is.
 - This means a small client theme can use direct strings like `"label": "Title"` instead of locale keys.
 - The recommended authoring standard is still `tTheme:` + `locales/en.json`, especially for reusable or versioned themes.
-- Even direct-string themes should include a minimal `locales/en.json`, because the project's copied theme package expects a `locales/` directory to exist.
+- Even direct-string themes should include `locales/en.json` for the authoring baseline and repository locale checks, including `global.<group>.name` for each global setting group. ZIP upload does not enforce this file's presence.
 
 ### Project Ownership and Updates
 
