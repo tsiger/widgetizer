@@ -192,6 +192,18 @@ Distinguish display name from storage folder. Preserve existing project paths an
 
 **Start:** [projects](../app/src/components/projects). **Source:** GitHub #139. [GitHub #139](https://github.com/tsiger/widgetizer/issues/139)
 
+## Planned features
+
+### MEDIA-MP4 · Support uploaded MP4 videos on site pages
+
+**Open · Unrated · Shared**
+
+Needed for the Widgetizer marketing site. Planned follow-up: **2026-10-02**. Support uploading MP4 (`video/mp4`), selecting it in page widgets and playing it in preview and published/exported pages. First check the existing media/file path and theme controls to identify the missing pieces; keep the initial scope to MP4 playback.
+
+**Done when:** A real MP4 can be uploaded, selected, saved and played in preview and exported output, with correct asset URLs and media-usage tracking; existing image/file workflows still work.
+
+**Start:** [Media system](core-media.md), [MIME types](../packages/core/src/utils/mimeTypes.js), [upload validation](../packages/editor-ui/src/utils/uploadValidation.js), [file input](../packages/editor-ui/src/components/settings/inputs/FileInput.jsx) and [export controller](../packages/builder-server/src/controllers/exportController.js). **Source:** User request, 2026-10-01.
+
 ## Fixes and investigations
 
 ### R-THEME-SAVE · Keep theme-settings saves in order

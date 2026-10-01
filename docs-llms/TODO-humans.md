@@ -10,7 +10,7 @@
 
 **Areas:** OSS = the standalone app; Shared = code used by both apps; Embedding = an app reusing Widgetizer. Names on GitHub tasks are their recorded assignees.
 
-**Jump to:** [Reviews](#ready-to-review) · [Decisions](#decisions-to-make) · [Fixes/checks](#fixes-and-investigations) · [Later](#later--only-when-the-stated-need-arises) · [Embedding apps](#embedding-apps)
+**Jump to:** [Reviews](#ready-to-review) · [Decisions](#decisions-to-make) · [Planned features](#planned-features) · [Fixes/checks](#fixes-and-investigations) · [Later](#later--only-when-the-stated-need-arises) · [Embedding apps](#embedding-apps)
 
 These local files own task status. GitHub is updated only when requested; its board may lag.
 The same IDs appear in [the agent version](TODO-agents.md). Technical detail and evidence live there.
@@ -154,6 +154,16 @@ You may want to edit a project’s details without opening it first.
 The folder-name field may expose a technical detail users do not need.
 
 **Next:** Decide whether to hide it, explain it or make it advanced. [GitHub #139](https://github.com/tsiger/widgetizer/issues/139)
+
+## Planned features
+
+### MEDIA-MP4 · Support uploaded MP4 videos on site pages
+
+**Open · Unrated · Shared**
+
+The Widgetizer marketing site needs MP4 videos on some pages. We should be able to upload a video, choose it in a page widget and play it in both the preview and the published/exported site.
+
+**Next:** Pick this up on **2026-10-02**. Check what the current media tools already support, add the missing pieces and verify the complete workflow with a real MP4, including saved references and export.
 
 ## Fixes and investigations
 
