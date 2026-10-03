@@ -2065,7 +2065,7 @@ Automatic font loading and optimization:
 
 - `{% fonts %}`: Single tag that outputs both font preconnect links and stylesheet. Handles all font loading automatically.
 - Support for Google Fonts and Bunny Fonts (GDPR-compliant alternative)
-- Privacy-friendly font delivery can be enabled via theme settings (`use_bunny_fonts` checkbox in the `privacy` settings group)
+- Privacy-friendly font delivery can be enabled via theme settings (a `use_bunny_fonts` checkbox; `{% fonts %}` finds it by id in whichever settings group the theme puts it — Arch keeps it under `advanced`)
 - Automatically generates optimized font URLs with only the weights being used
 - **Smart Bold Loading**: When body font weight is 400 (normal), automatically loads an appropriate bold weight (700/600/500) to prevent browser faux-bold rendering for `<strong>`, `<b>`, and bold UI elements. This also generates a CSS variable `--typography-body_font_bold-weight` that you can use in your CSS.
 
