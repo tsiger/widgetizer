@@ -74,7 +74,15 @@ The heading rule above is an example appropriate for an opening section, not a g
 
 **Contract:** emit one targetable outer element per widget with `data-widget-id="{{ widget.id }}"`; use `data-widget-type` for identification and a unique `id` for instance targeting. Mark each block's element with its actual instance key as `data-block-id`. Mark editable output with the matching `data-setting` ID in the correct widget/block scope. These attributes support preview selection, highlighting, and targeted updates; do not replace them with theme-specific names.
 
-**Convention:** retain a `widget` base class and a type-specific class. The extra `.widget-<instance-id>` class, native CSS nesting, `.widget-container`, `.w-*`, `.t-*`, and `.color-scheme-*` are Arch conventions. New themes may scope styles with their own selectors. CSS and element IDs must remain correct with two copies of the same widget on a page.
+While the author types, the editor writes the new value straight into every element carrying that `data-setting`, replacing the element's whole content:
+
+- On most elements it sets the text (or the HTML, for `richtext` and `code` settings).
+- On an `<a>` with a `link` setting it sets `href` and the link's text.
+- On an `<img>` it sets `src`.
+
+So put `data-setting` on the innermost element that holds only that value. If a button also contains an icon, wrap the label in its own `<span data-setting="...">`; otherwise the icon disappears while typing. Leave `data-setting` off anything whose markup depends on the value in more than a text swap (a class, a count, a formatted date); the editor re-renders the widget shortly after anyway.
+
+**Convention:** retain a `widget` base class and a type-specific class. The extra `.widget-<instance-id>` class, native CSS nesting, `.widget-container`, `.w-*`, `.t-*`, and `.color-scheme-*` are conventions of Arch, the theme bundled with Widgetizer, not platform rules. New themes may scope styles with their own selectors. CSS and element IDs must remain correct with two copies of the same widget on a page.
 
 `maxBlocks` is an editor addition/duplication limit. Omitted or zero means unlimited; lowering the limit does not truncate existing blocks. Do not present it as server validation or a content migration.
 
@@ -85,6 +93,8 @@ Use only declared block types and settings. Widget data is not comprehensively s
 ## Supported setting types and value shapes
 
 Every value-bearing definition has a stable `id`, supported `type`, and human-readable `label` (direct or `tTheme:`). Optional `description` supplies help text; optional `default` must have the same shape as saved values. `header` groups controls and does not store a content value.
+
+This table is the complete list. There is no `toggle`, `boolean`, `url`, `html`, `video`, `image_picker`, `repeater` or `list` type, and no conditional-visibility property; a definition with an unknown type or property is not an extension point.
 
 | Type | Stored value | Type-specific authoring rules |
 | --- | --- | --- |
@@ -102,7 +112,7 @@ Every value-bearing definition has a stable `id`, supported `type`, and human-re
 | `font_picker` | `{ "stack": "...", "weight": 400 }` | Choose actual catalog stacks/available weights. Global font loading has the `typography` group contract. |
 | `icon` | Icon-name string | Theme icon catalog; optional `options`/`allow_patterns` narrow selection. An icon name is not SVG markup. Supply the icon data and a renderer/snippet. |
 | `image` | `/uploads/images/<filename>` string, or empty | `size` controls input width (`narrow`/`full`); `compact` is the older fallback; `layout: 'row'`/`'stacked'` controls editor presentation. Use the image tag, not a fabricated image object. |
-| `gallery` | Ordered array of image-path strings, empty `[]` | Loop entries with the image tag. Metadata is on media records. This is a supported setting type, even though many Arch widgets instead use image blocks. |
+| `gallery` | Ordered array of image-path strings, empty `[]` | Loop entries with the image tag. Metadata is on media records. A supported alternative to one image block per picture. |
 | `file` | `/uploads/files/<filename>` string, or empty | Current picker allows PDF/MP3. Render with prepared `filePath` plus basename, or supported resolved links. See assets reference. |
 | `youtube` | Embed object, or cleared empty value | Picker uses video identity/URL/options; optional schema `embedOptions`. Pass to the youtube tag; do not assume this is an image path. Tag arguments/defaults determine final embed options. |
 | `date` | `YYYY-MM-DD` string, or empty | Calendar date, not datetime/timezone. Render with `format_date`. |
@@ -142,5 +152,3 @@ Settings omitted from widget/block instances fall back to their schema default; 
 ```
 
 Read link objects through `.href`, `.text`, and `.target`. Guard empty destinations before rendering a button/link. For `_blank`, supply an appropriate `rel` such as `noopener noreferrer`. Do not bake UUIDs from a sample project into templates. Localization's `defaultKey`, `resolvedDefault`, and `defaultBlocks[].defaultKeys` have different roles; follow the localization reference instead of storing unresolved keys as user content.
-
-Evidence: [supported type catalog](../../../packages/core/src/config/settingTypes.js), [editor controls](../../../packages/editor-ui/src/components/settings/SettingsRenderer.jsx), [render/default resolution](../../../packages/render-engine/src/renderEngine.js), [preview targeting](../../../packages/core/src/runtime/previewRuntime.js), [field authoring reference](../../../docs-llms/theming-setting-types.md).

@@ -10,7 +10,7 @@
 
 **Contract:** English is the fallback dictionary. Theme locales are part of the installed project's theme copy; changing the library's locale file does not immediately change existing projects. Core widget locale data is app-owned and merged beneath theme values.
 
-**Convention:** supply English labels and visitor words, then the languages promised by the theme. Additional translations are not required for the ZIP to import. Literal editor labels also work. The repository locale check requires `locales/en.json` and verifies theme setting group names as `global.<group>.name`, even when the individual controls use direct labels.
+**Convention:** supply English labels and visitor words, then the languages promised by the theme. Additional translations are not required for the ZIP to import. Literal editor labels also work, and are the simpler choice for a theme whose editor only needs English; the starter theme uses them. Even then, `locales/en.json` needs a `global.<group>.name` entry for each theme settings group, because the editor titles the group from it.
 
 For the sample `intro` widget and `colors` global group:
 
@@ -102,8 +102,6 @@ If moved into a snippet, pass `page` or the translations array explicitly. `seo`
 
 ## Locale verification
 
-Inside this repository, `node scripts/validate-theme-locales.js <theme-id>` checks a selected theme plus core widget locales. It resolves known theme roots; it is not a generic arbitrary-folder validator. Review its resolved source in the output so a symlink or additional root does not validate the wrong copy.
+The app's theme validator checks, against `locales/en.json`: every `tTheme:` label in a schema, every `global.<group>.name`, every literal key passed to `t`, and every `defaultKey`/`defaultKeys` reference (core's own visitor strings count as present).
 
-It checks schema references, global group-name keys, literal visitor `t` uses and `defaultKey`/`defaultKeys` references against English, including inherited core visitor keys. Additional-language missing/extra keys and unused keys can be warnings. It does not prove dynamic keys exist, all literal text was extracted, string leaves have the correct types, or interpolation placeholders agree across languages. Check those explicitly when relevant.
-
-Evidence: [dictionary service](../../../packages/builder-server/src/services/siteStringsService.js), [translation filter](../../../packages/core/src/filters/siteStringFilter.js), [widget default persistence](../../../packages/editor-ui/src/stores/widgetStoreHelpers.js), [locale check](../../../scripts/validate-theme-locales.js), [multilingual behavior](../../../docs-llms/domain/multilingual.md).
+It does not check keys built at runtime, whether other languages are complete, or whether `{{ placeholder }}` names agree across languages. Check those by hand when the theme ships more than English.

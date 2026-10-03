@@ -21,6 +21,7 @@ import assert from "node:assert/strict";
 import fs from "fs-extra";
 import path from "path";
 import os from "os";
+import { fileURLToPath } from "node:url";
 
 // ============================================================================
 // Isolated test environment
@@ -32,6 +33,7 @@ const TEST_THEMES_DIR = path.join(TEST_ROOT, "themes");
 
 process.env.DATA_ROOT = TEST_DATA_DIR;
 process.env.THEMES_ROOT = TEST_THEMES_DIR;
+process.env.CORE_WIDGETS_DIR = path.join(TEST_ROOT, "core-widgets");
 process.env.NODE_ENV = "test";
 
 // Silence noisy console output from production code during tests.
@@ -93,11 +95,6 @@ after(async () => {
   await fs.remove(TEST_ROOT);
   // Also clean up any publish dirs we created
   // (PUBLISH_DIR is under TEST_DATA_DIR which is under TEST_ROOT, so already handled)
-
-  // Remove the test-only core-link widget that gets written into the real
-  // CORE_WIDGETS_DIR. export.test.js doesn't override CORE_WIDGETS_DIR, so
-  // without this cleanup the widget pollutes @widgetizer/core's widgets dir.
-  await fs.remove(path.join(CORE_WIDGETS_DIR, "core-link"));
 });
 
 // ============================================================================
@@ -185,6 +182,8 @@ function getLatestExportDir() {
 // ============================================================================
 
 before(async () => {
+  // Keep test-only widgets out of the catalog read by concurrent theme checks.
+  await fs.copy(fileURLToPath(new URL("../../../core/src/widgets/", import.meta.url)), CORE_WIDGETS_DIR);
   // -----------------------------------------------------------
   // 1. Seed test project in the DB
   // -----------------------------------------------------------

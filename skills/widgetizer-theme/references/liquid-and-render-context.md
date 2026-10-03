@@ -16,13 +16,13 @@ Use normal LiquidJS control flow, assignments, captures, loops, and `render` for
 
 `widget.index` is one-based on ordinary pages and can be null for global or isolated renders. Guard optional context. Page-aware values include language, direction, translations and breadcrumbs. Do not treat a missing page during an isolated widget render as a fatal error.
 
-Supported public globals include `renderMode` (`preview` or `publish`), `outputPathPrefix`, `cleanUrls`, `breadcrumbs`, and `icons`. Within top-level contexts they are also reachable through `globals`; inside a `render` snippet the global names survive but the `globals` variable itself is not inherited. Leave internal caches, loaders, project resolution, and asset queues to the engine.
+Supported public globals include `renderMode` (`preview` or `publish`), `outputPathPrefix`, `cleanUrls`, `breadcrumbs`, and `icons`. `icons` holds every icon from the theme's `assets/icons.json` keyed by name, each with a `body` of SVG markup (see the assets reference). Within top-level contexts they are also reachable through `globals`; inside a `render` snippet the global names survive but the `globals` variable itself is not inherited. Leave internal caches, loaders, project resolution, and asset queues to the engine.
 
 Do not shadow `page`, `project`, `widget`, `globals`, `currentPageData`, `mediaFiles`, `imagePath`, `breadcrumbs`, or `currentCanonicalPath` with unrelated local data. Tags and core snippets read these names through Liquid. Passing the real value under its own name is fine. Choose local names such as `hero_image` instead of `imagePath`.
 
 ## Layout example
 
-This example assumes `assets/base.css` exists. It enables core layout hooks without imposing Arch's design system:
+This example assumes `assets/base.css` exists. It enables every core layout hook and imposes no design system (the starter theme's `layout.liquid` is the same idea, plus site icons and a shared script):
 
 ```liquid
 <!doctype html>
@@ -48,7 +48,9 @@ This example assumes `assets/base.css` exists. It enables core layout hooks with
 </html>
 ```
 
-**Contract:** emit main content; retain the asset queue hooks when using enqueued assets; emit configured globals; preserve `body_class` when depending on app-provided page/state classes. Add site-icon markup when offering that feature. The custom-code and font hooks may output nothing when unconfigured.
+**Contract:** emit main content; retain the asset queue hooks when using enqueued assets; emit configured globals; preserve `body_class` when depending on app-provided page/state classes. The custom-code and font hooks may output nothing when unconfigured.
+
+Site icons are not printed by a tag. The layout receives a `site_icons` object with `primaryIconHref`, `primaryIconType`, `primaryIconSizes`, `legacyIconHref`, `serpIconHref`, `appleTouchIconHref` and `manifestHref` (each may be blank) and writes the `<link>` elements itself. Copy the starter's `snippets/site-icons.liquid` rather than rewriting it.
 
 ## Registered custom tags
 
@@ -131,4 +133,8 @@ Rich text is sanitized according to its declared schema at the server boundary. 
 
 `breadcrumbs` takes `class_nav`, `class_list`, `class_item`, `class_link`, `class_current`, `separator`, `home_label`, `page_label`, `aria_label`, `show_home`. It reads the trail from globals and emits nothing for an empty trail. Supply translated labels where needed. Override a core snippet by shipping a theme snippet of the same name only when intentionally taking responsibility for its behavior.
 
-Evidence: [engine configuration and contexts](../../../packages/render-engine/src/renderEngine.js), [tags](../../../packages/core/src/tags), [filters](../../../packages/core/src/filters), [core snippets](../../../packages/core/src/snippets). Use the assets and localization references for their specialized contracts.
+## What does not exist
+
+LiquidJS's standard tags and filters work (`if`, `for`, `assign`, `capture`, `case`, `render`, `append`, `default`, `split`, `where`, `date`, and so on). Beyond those, the tables above are the complete list of Widgetizer's own tags and filters. In particular there is no `{% schema %}`, `{% section %}`, `{% form %}`, `{% paginate %}`, `{% style %}` or `{% javascript %}`; no `asset_url`, `img_url`, `image_url`, `stylesheet_tag`, `script_tag`, `money` or `link_to`; and no `section`, `shop`, `settings` or `routes` object. LiquidJS skips an unknown filter without an error, so a made-up filter fails silently: the value passes through unchanged. For example `| min: 4` does nothing; the real filter is `| at_most: 4`.
+
+`references/contract.json` lists tag/filter names and custom tag argument names for the recorded app/LiquidJS versions. It is an authoring catalog; the app checker reads the current app source.

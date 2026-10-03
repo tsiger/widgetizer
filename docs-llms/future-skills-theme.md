@@ -1,6 +1,6 @@
 # Future: Widgetizer Theme Skill
 
-> **Status: Distribution proposal; technical draft now exists.** The repository-maintained [Widgetizer Theme skill](../skills/widgetizer-theme/SKILL.md) was drafted on 2026-10-01 with technical authoring references. It is not installed or published. The distribution, desktop integration, and packaging ideas below remain proposals recorded on 2026-09-27. Third-party platform facts were checked then and must be re-verified before distribution work.
+> **Status: Technical authoring foundation implemented; distribution remains a proposal.** The repository-maintained [Widgetizer Theme skill](../skills/widgetizer-theme/SKILL.md) contains references, a starter theme and a generated capability catalog. Validation is owned by the app: `npm run validate:theme -- <theme-folder>` uses the app's configured LiquidJS engine and Widgetizer-specific static checks. `themeSkill.test.js` checks catalog freshness, validator behavior and the starter's real import/project/export flow. See [skills/README.md](../skills/README.md) for coverage and limitations. The skill is not published. The design layer, desktop validation UI, distribution and packaging remain open; the proposals below were recorded on 2026-09-27. Third-party platform facts must be re-verified before distribution work.
 
 ---
 

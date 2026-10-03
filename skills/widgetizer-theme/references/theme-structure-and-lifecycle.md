@@ -1,6 +1,6 @@
 # Theme structure and lifecycle
 
-Rule labels are defined in `SKILL.md`. This reference covers package acceptance, source ownership, manifest settings, and updates.
+Rule labels (Enforced, Contract, Convention) are defined in `SKILL.md`. This reference covers package acceptance, source ownership, manifest settings, and updates. The starter theme in `assets/starter-theme/` is a working example of everything in the first three sections.
 
 ## Package acceptance versus a functioning theme
 
@@ -12,7 +12,7 @@ Version syntax is `digits.digits.digits`, for example `1.0.0`. The current parse
 
 **Contract:** a usable theme also needs valid widget schemas/templates, renderable starter pages, all referenced assets/snippets, and a layout that emits its content. Every advertised feature must work in the editor and export. Import acceptance alone proves none of these.
 
-**Convention:** provide a real 1280 x 720 PNG screenshot and `locales/en.json` (at least `{}` for a theme with direct labels, no global setting groups, and no theme-owned visitor words). ZIP upload checks the screenshot's presence, not its dimensions, and does not require locales. The repository locale validator does require the locale directory, English file, and `global.<group>.name` entries for any global setting groups. See localization for a matching example.
+**Convention:** provide a real 1280 x 720 PNG screenshot and `locales/en.json` (at least `{}` for a theme with direct labels, no global setting groups, and no theme-owned visitor words). ZIP upload checks the screenshot's presence, not its dimensions, and does not require locales. The editor titles each global settings group from `global.<group>.name` in the locale file, so add that entry for every group. See localization for a matching example. The starter's screenshot is a placeholder; replace it with a real capture of the finished theme, or tell the author it still needs one.
 
 ## Authored files
 
@@ -80,18 +80,21 @@ Keep setting IDs unique within their scope. **Convention:** make global IDs uniq
 `{% theme_settings %}` emits `--<group>-<id>` only for settings with `outputAsCssVar: true`, plus automatic font-picker variables. It processes global theme settings, not arbitrary widget settings. It does not turn an image path into `url(...)` or load a font merely because a CSS value names one.
 
 - A numeric `range` with `unit` receives that unit in the generated CSS value.
-- A `font_picker` emits `--<group>-<id>-family` and `--<group>-<id>-weight` without `outputAsCssVar`. Use its `{ "stack": "...", "weight": 400 }` value shape.
-- `{% fonts %}` reads font pickers specifically from `settings.global.typography`. Its Bunny Fonts switch is specifically `settings.global.privacy` / `use_bunny_fonts`; moving this setting into another group does not configure that tag.
+- A `font_picker` emits `--<group>-<id>-family` and `--<group>-<id>-weight` without `outputAsCssVar`. Use its `{ "stack": "...", "weight": 400 }` value shape. The stack must be copied exactly from the font catalog (`"fonts"` in `references/contract.json`, which also lists each font's available weights); a font that is not in the catalog cannot be picked or loaded.
+- A font picker with the id `body_font` also emits `--<group>-body_font_bold-weight`, the weight to use for bold body text.
+- `{% fonts %}` reads font pickers specifically from `settings.global.typography`. Its Bunny Fonts switch is a `checkbox` with the exact id `use_bunny_fonts`, found by that id in whichever group holds it.
 - Custom code tags look specifically in `settings.global.advanced` for `custom_css`, `custom_head_scripts`, and `custom_footer_scripts`.
+- Site icons come specifically from an `image` setting with the id `favicon` in `settings.global.general`. The app turns it into the `site_icons` object the layout prints (see the starter's `snippets/site-icons.liquid`).
+- The `format_date` filter's default format comes specifically from `settings.global.general` / `date_format`.
 - Optional `settings.imageSizes` replaces the app image-size configuration rather than extending it. Use size-name keys with `width`, `enabled`, and optional `quality`; the media system still generates its library thumbnail. Check the media pipeline before depending on a custom derivative.
 
-These special group names are feature contracts; Arch's other group names and token system are not required.
+These special group names and ids are feature contracts: put the setting anywhere else and the feature silently stops working. All other group names are yours to choose. The starter theme's `theme.json` shows every one of them in place.
 
 ## Core and global widgets
 
 Core currently supplies `core-spacer`, `core-divider`, and `core-form`. They are included unless `useCoreWidgets` is explicitly `false`. `core-` is a reserved resolution path, not a theme override mechanism. If opting out, implement whatever replacements the theme actually needs; copying a core filename into the theme does not override core rendering.
 
-The types `header` and `footer` resolve under `widgets/global/<type>/`. Their starter instances belong under `templates/global/`. They are not ordinary page widget directories. A theme can omit global content, but if it supplies it, the layout must emit it. A theme with a header/footer is not required to reproduce Arch's controls or block types.
+The types `header` and `footer` resolve under `widgets/global/<type>/`. Their starter instances belong under `templates/global/`. They are not ordinary page widget directories. A theme can omit global content, but if it supplies it, the layout must emit it. What settings and blocks a header or footer offers is the theme's choice; the starter's are a minimal example.
 
 ## Three copies and the authoring loop
 
@@ -119,5 +122,3 @@ At project update:
 Deletion markers under `updates/<version>/deleted/` mirror target paths. A placeholder file deletes that file; an empty marker directory deletes the corresponding directory; nonempty directories are path containers. Do not delete a widget/block definition still used by existing content unless the requested migration handles those instances.
 
 An unrelated theme switch is a separate migration problem. Matching widget names or roles does not prove content compatibility.
-
-Evidence: [upload/copy/preset implementation](../../../packages/builder-server/src/controllers/themeController.js), [numeric version parser](../../../packages/builder-server/src/utils/semver.js), [project scaffolding](../../../packages/builder-server/src/utils/projectScaffold.js), [project update behavior](../../../packages/builder-server/src/services/themeUpdateService.js), [permanent lifecycle reference](../../../docs-llms/theme-updates.md).

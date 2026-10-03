@@ -55,9 +55,33 @@ For preloading an uploaded hero, capture the actual image-tag path:
 
 A relative script/style preload follows widget/theme origin rules; fonts resolve from theme assets. Preload only a resource the page actually requests, using matching size/source options.
 
+## Icons
+
+**Contract:** a theme's icon set is one file, `assets/icons.json`. The `icon` setting type's picker lists what is in it, and templates receive it as the `icons` global. Two shapes are accepted:
+
+```json
+{ "prefix": "my-set", "icons": { "arrow-right": { "body": "<svg ...>...</svg>" } } }
+```
+
+```json
+{ "prefix": "my-set", "groups": { "Arrows": { "arrow-right": { "body": "<svg ...>...</svg>" } } } }
+```
+
+`groups` only organises the picker; in templates every icon is reachable as `icons['arrow-right']` either way. Each `body` is a complete `<svg>` element. Draw icons with `stroke="currentColor"` or `fill="currentColor"` so CSS can color them.
+
+An `icon` setting stores only the name. There is no icon tag: render through a snippet such as the starter's `snippets/icon.liquid`, which looks the name up and prints the SVG with `| raw`. `icons` is a global, so the snippet does not need it passed in.
+
+```liquid
+{% render 'icon', icon: block.settings.icon, class: 'feature__icon' %}
+```
+
+Only use icon names that are in the theme's `icons.json`, in schema defaults, starter pages and templates alike. To offer more icons, add them to the file. `icons.json` is read at render time and is not copied into the export.
+
 ## Widget lifetime in the editor
 
 **Contract:** widgets can be added, duplicated, removed, and have their DOM replaced without a full navigation. Initialization only on `DOMContentLoaded` is insufficient for an enqueued script that stays loaded after a widget is replaced.
+
+The starter's `widgets/accordion/accordion.js` is a complete, commented example of the pattern described here; start from it for any widget that needs JavaScript.
 
 Design the initializer to accept a widget element, bind once per actual element, and work for multiple instances. A `WeakSet`/`WeakMap` is useful for tracking live elements; avoid a boolean keyed only by widget ID because replacement keeps the ID but changes the element. Avoid a `data-initialized` flag as your own state: the preview runtime uses it too.
 
@@ -86,5 +110,3 @@ Use `window.Widgetizer?.designMode` to gate editor-specific behavior. It is not 
 Check two instances, a duplicate, settings changes, reorder, delete, and re-add. Confirm each instance responds independently and interactive state is reinitialized correctly. Check keyboard access, visible focus, image alternative text, and reduced-motion behavior when the feature uses motion. These are authoring quality requirements; the ZIP importer does not test them.
 
 Core widgets own their markup and assets. If using `core-form`, style its actual contract and verify it separately. Do not create a parallel theme-specific submission system merely to achieve a different appearance.
-
-Evidence: [asset URL resolver](../../../packages/core/src/utils/assetUrl.js), [enqueue tags](../../../packages/core/src/tags), [export asset copying](../../../packages/builder-server/src/controllers/exportController.js), [preview replacement/events](../../../packages/core/src/runtime/previewRuntime.js), [core form contract](../../../docs-llms/core-form-widget.md).

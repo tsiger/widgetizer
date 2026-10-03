@@ -19,6 +19,7 @@ npm run electron:build:mac         # Build Mac installer (signed)
 npm run electron:build:win         # Build Windows installer (signed, run on Windows)
 npm run theme:sync                 # Mirror themes/ → runtime copy (one-shot); -- --project <folder> also syncs a project + watches
 npm run preset:sync                # Sync theme presets
+npm run validate:theme -- themes/arch   # App-owned static theme checks (LiquidJS + Widgetizer rules)
 ```
 
 ## Architecture
@@ -173,5 +174,7 @@ Output goes to `dist-electron/`.
 - Vite dev server on port 3000, Express API on port 3001
 - `data/` directory is gitignored except for the `projects/` directory structure
 - Theme widgets define their schema in `schema.json` and template in `widget.liquid`; collection types in `themes/<theme>/collection-types/<type>/`
+- **Premium theme design:** For Common and new themes in the Widgetizer premium collection, read and follow `skills/theme-collections/widgetizer-premium.json`. These collection-specific design rules accompany the design and technical skills; they do not apply to unrelated themes or change platform validation.
+- **Theme tooling must match the app.** The app-owned checker is `scripts/validate-theme.js`; the authoring skill is `skills/widgetizer-theme/`. When Liquid tags/filters, setting types, core widgets/snippets, fonts or collection rules change, update the corresponding skill reference and regenerate its catalog with `node scripts/build-theme-skill-contract.js`. `npm test` checks catalog freshness and the starter's import/export. See `skills/README.md`.
 - **Comments must earn their place** — document non-obvious logic, caveats, gotchas, and important relationships; don't restate the code or comment for its own sake. Never cite ephemeral planning docs from code (no `TODO.md` `§`-section refs or plan-file citations in comments) — put the reason inline instead.
 - **`docs-llms/TODO.md` is ephemeral — write *to* it, never point *at* it.** Read its "How this file works" header before editing. A TODO item may cite code, docs and commits freely; **nothing outside the file may cite the file** — no path reference, no `§`-section citation, in code comments or docs — because items get rewritten, closed and deleted and nothing catches the dangling pointer. **Reference scope: this repo only** — a TODO item here must never cite `widgetizer-hosted/` or the umbrella repo, since the OSS builder ships standalone and must not document anything downstream of it. Completed items are deleted from the body and recorded as a reference-table row carrying the fix commit plus the last commit where the full write-up is readable.

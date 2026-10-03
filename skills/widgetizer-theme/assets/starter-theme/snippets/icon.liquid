@@ -1,0 +1,17 @@
+{%- comment -%}
+  Renders one icon from assets/icons.json as inline SVG.
+  Usage: {% render 'icon', icon: 'arrow-right' %}
+         {% render 'icon', icon: block.settings.icon, class: 'feature-icon' %}
+
+  `icons` is a render global holding every icon keyed by name, so it does not
+  need to be passed in. An unknown or empty name renders nothing.
+{%- endcomment -%}
+{%- assign current_icon = icons[icon] -%}
+{%- if current_icon -%}
+  {%- assign class_attr = 'icon' -%}
+  {%- if class != blank -%}
+    {%- assign class_attr = class_attr | append: ' ' | append: class -%}
+  {%- endif -%}
+  {%- capture svg_open -%}<svg class="{{ class_attr }}" aria-hidden="true" {%- endcapture -%}
+  {{ current_icon.body | replace_first: '<svg', svg_open | raw }}
+{%- endif -%}

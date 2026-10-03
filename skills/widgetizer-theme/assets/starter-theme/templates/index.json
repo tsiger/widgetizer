@@ -1,0 +1,37 @@
+{
+  "name": "Home",
+  "slug": "index",
+  "widgets": {
+    "hero": {
+      "type": "hero",
+      "settings": {
+        "heading": "A clear headline for this page",
+        "text": "<p>One or two sentences that say what you offer and who it is for.</p>"
+      }
+    },
+    "faq": {
+      "type": "accordion",
+      "settings": {
+        "heading": "Frequently asked questions"
+      },
+      "blocks": {
+        "faq-1": {
+          "type": "item",
+          "settings": {
+            "question": "What do you offer?",
+            "answer": "<p>A short, direct answer.</p>"
+          }
+        },
+        "faq-2": {
+          "type": "item",
+          "settings": {
+            "question": "How do I get started?",
+            "answer": "<p>A short, direct answer.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["faq-1", "faq-2"]
+    }
+  },
+  "widgetsOrder": ["hero", "faq"]
+}

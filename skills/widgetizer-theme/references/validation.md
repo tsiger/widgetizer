@@ -1,32 +1,64 @@
-# Validation and evidence
+# Validation
 
 ## What validity means
 
 Treat these as separate claims:
 
-1. **Package accepted:** archive/manifest/version/collection checks pass.
-2. **Render contract satisfied:** schemas, Liquid, defaults, assets, and links render correctly.
-3. **Editor integration verified:** settings, selection, blocks, duplication, replacement, and interactive behavior work.
-4. **Export verified:** real output includes the necessary files and works at its output depths.
-5. **Update compatibility verified:** an existing customized project survives the intended update.
+1. **Rules followed:** the validator reports no errors.
+2. **Package accepted:** the app imports the theme (archive, manifest, version and collection checks pass).
+3. **Renders correctly:** schemas, Liquid, defaults, assets and links produce the intended page.
+4. **Works in the editor:** settings, selection, blocks, duplication, replacement and interactive behavior work.
+5. **Exports correctly:** the real output includes the necessary files and works at its output depths.
+6. **Updates safely:** an existing customized project survives the intended update.
 
-A theme may satisfy the first and fail every later claim. Report actual evidence and remaining checks. A screenshot alone does not verify links, editing, or export.
+A theme may satisfy the first two and fail every later claim. Report which of these you actually checked. A screenshot alone does not verify links, editing or export.
 
-## Static review for every affected surface
+## Run the validator
 
-- Parse changed JSON and match widget/block/setting IDs, types, value shapes, and order arrays. Check every referenced widget/snippet/asset exists with matching filename case.
-- Check source definitions are separate from runtime page/item data; no stale sample project UUIDs or user-specific values.
-- Confirm required archive paths and numeric theme version. Check screenshot content/dimensions independently of the importer.
-- Check widget targeting attributes and block/setting scopes. Confirm all supported setting options have corresponding rendering behavior.
+```
+npm run validate:theme -- <theme-folder>
+```
+
+Run from a Widgetizer source checkout with its dependencies installed (Node >=20.19.5). The theme path can be absolute or relative to that checkout. Add `--json` for machine-readable output, or `--strict` to make warnings fail too. Exit codes are 0 for no errors, 1 for findings that fail the check, and 2 for invalid command usage. No running web server is needed, and the checker does not modify the theme or create a project.
+
+Each finding names the file, severity, rule and explanation. Review findings against the intended behavior; reproduce suspected checker defects instead of changing theme or app rules blindly. The skill's contract file is an authoring reference. Validation reads the current app source, uses the same configured LiquidJS engine with strict filter checking, and reuses the app's collection-schema validation.
+
+What it checks:
+
+- **Package:** required files and folders, JSON object shapes, manifest fields and numeric version, PNG header/dimensions (1280 x 720 for the theme, 1024 x 1024 for presets), warnings for build tooling inside the theme. Image content and screenshot accuracy require visual inspection.
+- **Settings everywhere** (theme, widgets, blocks, collections): only real setting types and properties, unique ids, labels, option lists, and defaults whose shape matches the type, including font stacks and weights from the font catalog and icon names from `icons.json`.
+- **Reserved names:** settings the app reads from one specific group (`favicon`, `date_format`, custom code, font pickers) are in that group.
+- **Liquid:** LiquidJS parses the templates, including nested blocks and `{% liquid %}`, and rejects unknown tags/filters. Additional checks cover custom argument names, required arguments, literal snippets/assets, and foreign objects that were not assigned locally. Author-defined local variables are valid.
+- **Settings used in templates:** direct `widget.settings.x` and `theme.group.x` references, including literal bracket keys, are compared with the theme's own definitions. Direct plain-text output through `raw` is flagged; rich text without `raw` receives a warning.
+- **Editor contract:** `data-widget-id`, block order and `data-block-id`.
+- **Layout:** main content, header and footer, asset hooks, and the tags that theme settings depend on.
+- **Assets:** enqueued files exist, and no two CSS/JS files share a name across widgets and `assets/`.
+- **Starter pages and menus:** page shape, every widget and block type exists, every stored setting is declared and has the right shape, order arrays match, internal links and menu ids point at something.
+- **Locales:** schema `tTheme:` labels, group names, literal `t` keys and default-key references are checked against English, including core visitor strings.
+- **Collections and presets:** the app's collection-schema rules, item-template presence, preset overrides and starter widget/block data. Core widget values use their complete app schemas.
+- **Updates:** version folder and manifest checks. These do not certify an assembled update or preservation of existing project content.
+
+The checker does not render or export the supplied theme. Computed setting keys, aliases whose values depend on runtime data, dynamic snippet/translation names, preset image binaries, assembled updates, browser behavior, accessibility and visual quality need additional checks. A successful run is a static-check result, not certification of every theme behavior.
+
+If a source checkout is unavailable, use the manual review below and report automated validation as pending. There is currently no standalone validator in the distributed skill or validation button in the desktop app.
+
+## Checking by hand
+
+Use this when the app checker is unavailable, and for what it cannot see. Manual review is not equivalent to an automated pass.
+
+- Parse changed JSON and match widget/block/setting IDs, types, value shapes and order arrays. Check every referenced widget, snippet and asset exists with matching filename case.
+- Check source definitions are separate from runtime page/item data; no sample-project UUIDs or user-specific values.
+- Confirm required archive paths and numeric theme version. Check the screenshot shows the real theme.
+- Check widget targeting attributes and block/setting scopes. Confirm every option a setting offers has matching rendering behavior.
 - Compare asset basenames across widgets and shared assets; ensure widget CSS/JS is enqueued and static binaries are in an exportable location.
-- Review `raw` uses, plain URL output, rich-text handling, and missing/empty/default cases. Do not use render sanitization as a substitute for correct source values.
-- Check translations and source examples using the relevant locale validation plus manual coverage of dynamic labels.
-- For collections, validate definitions and the effective update snapshot, not just each individual delta; verify item templates, required fields, output prefixes, listing declarations, and pagination.
+- Review `raw` uses, plain URL output, rich-text handling, and missing/empty/default cases.
+- Check translations, including labels created by JavaScript and keys built at runtime.
+- For collections, check the definitions and the effective result after updates, not just each delta; verify item templates, required fields, output prefixes, listing declarations and pagination.
 - For presets, check the chosen template/menu directories are complete because fallback is directory-level. Match image references with manifest entries and actual binaries/variants.
 
-## Exercise behavior in an isolated target
+## Exercise behavior in the running app
 
-For a new theme, use a disposable project and a clean install of the package. For a narrow change, test the affected feature plus any output/lifecycle boundary it crosses.
+For a new theme, use a disposable project created from a clean install of the theme. For a narrow change, test the affected feature plus any output or lifecycle boundary it crosses. Never test against a project that holds real content.
 
 | Surface | Useful exercise |
 | --- | --- |
@@ -39,51 +71,15 @@ For a new theme, use a disposable project and a clean install of the package. Fo
 | Export | Inspect actual output files and rendered HTML, then open/serve the export and check stylesheet/script/media requests and navigation. Preview success is insufficient. |
 | Updates | Start from the old package, customize a setting/page/item/menu, apply the update, verify retained content and new defaults/definitions. |
 
-Assess visible focus, semantic controls, accessible names, responsive overflow, and motion preferences for affected UI. These are authoring checks, not importer checks. If no running app/browser is available, do the possible static/render checks and name the unverified editor/export interactions.
+Assess visible focus, semantic controls, accessible names, responsive overflow, and motion preferences for affected UI. If no running app or browser is available, do the possible static checks and name the editor/export checks that are still open.
 
-## Existing repository checks
+## Known limits of the platform
 
-These commands apply when working in the Widgetizer repository with its dependencies installed. They are not prerequisites that every external theme consumer already has.
+- Import checks do not validate widget schemas, screenshots, Liquid output, locale coverage, or item-template existence.
+- Widget settings and block data have no complete save-time schema validation. `maxBlocks` is an editor limit, not a server rule.
+- An unknown filter is skipped without an error, and an unknown tag argument is ignored. The app will not tell you; the validator will.
+- Asset queues and exported widget file names can collide; asset origin inside an isolated snippet differs from a widget's top-level template.
+- The core menu snippet emits three nesting levels. The app accepting deeper data does not mean a theme renders it.
+- Theme updates preserve authored data but do not supply theme switching, schema migrations, or content translation.
 
-- `node scripts/validate-theme-locales.js <theme-id>`: selected theme and core locale checks. Inspect the reported theme source; see localization for limitations.
-- `node --test packages/builder-server/src/tests/themes.test.js`: importer, library, preset-resolution, and locale-serving regression tests.
-- `node --test packages/builder-server/src/tests/themeWidgets.test.js`: bundled Arch widgets; passing does **not** certify a new theme.
-- `node --test packages/builder-server/src/tests/rendering.test.js`: core rendering/default/link behavior.
-- `node --test packages/builder-server/src/tests/collectionService.test.js`: collection validation/data behavior.
-- `node --test packages/builder-server/src/tests/themeUpdateApplyToDir.test.js`: update application contract.
-
-Run checks relevant to the change, not every suite for every theme edit. Existing tests check implementation behavior; a new theme still needs its own rendered-artifact checks. Test helpers must keep their data under a disposable root; do not probe updates against a real project.
-
-There is no single shipped command that certifies every theme schema, interaction, translation, and export. Do not invent `theme:validate` or imply that locale validation covers all those dimensions. The skill-format validator likewise verifies the skill's naming/frontmatter/scaffold shape, not Widgetizer theme correctness.
-
-## Maintainer source map
-
-Audit baseline: repository commit `6b010847644b7d9f2e116406afbf8f3e3ca5b997`, app version `0.9.10`, reviewed 2026-10-01. This records what was inspected, not a minimum-version declaration or promise of compatibility with every other release.
-
-The working guidance lives in the bundled references. The links below are repository-maintainer evidence; external users should not need to fetch them to follow the skill. Permanent domain docs describe application behavior. Update the skill's concise authoring guidance when those contracts change, rather than copying whole manuals into the skill.
-
-| Contract | Implementation | Related evidence/reference |
-| --- | --- | --- |
-| ZIP/manifest, effective source, preset selection | [themeController](../../../packages/builder-server/src/controllers/themeController.js), [semver parser](../../../packages/builder-server/src/utils/semver.js) | [theme tests](../../../packages/builder-server/src/tests/themes.test.js), [theme guide](../../../docs-llms/theming.md) |
-| Project copy and source-to-page instantiation | [projectScaffold](../../../packages/builder-server/src/utils/projectScaffold.js), [templateHelpers](../../../packages/builder-server/src/utils/templateHelpers.js) | [theme domain](../../../docs-llms/domain/entities/theme.md) |
-| Update preservation | [themeUpdateService](../../../packages/builder-server/src/services/themeUpdateService.js) | [update tests](../../../packages/builder-server/src/tests/themeUpdateApplyToDir.test.js), [update reference](../../../docs-llms/theme-updates.md) |
-| Registered Liquid surface and context | [renderEngine](../../../packages/render-engine/src/renderEngine.js), [tags](../../../packages/core/src/tags), [filters](../../../packages/core/src/filters) | [rendering tests](../../../packages/builder-server/src/tests/rendering.test.js), [item rendering tests](../../../packages/builder-server/src/tests/renderCollectionItemPage.test.js) |
-| Settings and widgets | [supported types](../../../packages/core/src/config/settingTypes.js), [SettingsRenderer](../../../packages/editor-ui/src/components/settings/SettingsRenderer.jsx), [widget defaults](../../../packages/editor-ui/src/stores/widgetStoreHelpers.js) | [field reference](../../../docs-llms/theming-setting-types.md), [widget guide](../../../docs-llms/theming-widgets.md) |
-| Editor targeting and lifecycle | [previewRuntime](../../../packages/core/src/runtime/previewRuntime.js) | [Arch widget tests](../../../packages/builder-server/src/tests/themeWidgets.test.js) |
-| Asset origin, queuing, export | [assetUrl](../../../packages/core/src/utils/assetUrl.js), [exportController](../../../packages/builder-server/src/controllers/exportController.js) | [tag path tests](../../../packages/core/src/tags/__tests__/pathPrefixing.test.js), [export reference](../../../docs-llms/core-export.md) |
-| Collections and structured data | [collectionService](../../../packages/builder-server/src/services/collectionService.js), [mapping validation](../../../packages/core/src/structuredData/collectionTypes.js) | [collection tests](../../../packages/builder-server/src/tests/collectionService.test.js), [collection reference](../../../docs-llms/core-collections.md) |
-| Starter images/items | [projectController](../../../packages/builder-server/src/controllers/projectController.js) | [media seeding tests](../../../packages/builder-server/src/tests/presetMediaSeeding.test.js), [item seeding tests](../../../packages/builder-server/src/tests/collectionPresetSeeding.test.js) |
-| Visitor strings, defaults, languages | [siteStringsService](../../../packages/builder-server/src/services/siteStringsService.js), [t filter](../../../packages/core/src/filters/siteStringFilter.js) | [site-string tests](../../../packages/builder-server/src/tests/siteStrings.test.js), [locale validator](../../../scripts/validate-theme-locales.js), [language domain](../../../docs-llms/domain/multilingual.md) |
-
-## Known limits to retain in the guidance
-
-- Import checks do not validate all widget schemas, screenshots, Liquid output, locale coverage, or item-template existence.
-- Locale checking requires an English file and group labels but does not check every dynamic string, placeholder, or translated leaf type.
-- Widget settings/block data do not have complete save-time schema validation. `maxBlocks` is an editor limit.
-- Asset queues and exported widget basenames can collide; origin inside an isolated snippet differs from a widget's top-level template.
-- Gallery/table fields are supported; Arch's choice to use repeated image blocks is not a platform prohibition.
-- Plain theme CSS/classes, default preset IDs, standard block types, and reveal effects from Arch are design conventions.
-- The core menu snippet currently emits three nesting levels. Backend acceptance of deeper data is not evidence that a particular theme renders it.
-- Theme updates preserve authored data but do not supply arbitrary theme switching, schema migrations, or content translation.
-
-Keep unresolved or newly discovered runtime defects separate from authoring requirements. Describe the current limitation and test it; do not silently change application code during a theme-only task.
+If you find what looks like a defect in the app itself, describe it and work within the current behavior. Do not change application code during a theme task.

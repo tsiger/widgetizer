@@ -1,0 +1,59 @@
+{
+  "collection": "Widgetizer premium themes",
+  "scope": "Common (themes/common) and future themes explicitly created for this collection. These are the collection author's design rules, not Widgetizer platform requirements or defaults for other authors.",
+  "rules": [
+    {
+      "id": "language-aware-subtitles",
+      "instruction": "Use uppercase subtitles, eyebrows and small labels only in languages whose casing has been checked. Keep Greek in natural case with its accents; do not apply automatic uppercase or strip accents from stored text. Preserve natural case for unverified languages.",
+      "implementation": "Store natural-case text. Scope any CSS uppercase treatment to verified languages using the element's inherited language; account for regional language codes and nested language overrides."
+    },
+    {
+      "id": "no-decorative-subtitle-markers",
+      "instruction": "Never decorate subtitles or eyebrows with bullets, dots, numbers, dashes, em dashes or ornamental separators. Use plain text. This applies to authored content, CSS pseudo-elements and generated counters.",
+      "examplesToRemove": ["A leading dot before a subtitle", "01 / Find your flow", "02 / Work your way"]
+    },
+    {
+      "id": "real-button-icons",
+      "instruction": "When a button or action link has an icon, use an actual SVG from a suitable open-source icon set. Do not substitute Unicode characters, text glyphs or CSS-drawn approximations. Keep the icons visually consistent and retain their source and license. Tabler is an example, not a required dependency. Icons are optional, not mandatory for every button."
+    },
+    {
+      "id": "purposeful-action-icons",
+      "instruction": "Choose text-only or icon-assisted buttons and action links deliberately. Actively consider icons where they clarify the action or destination; restraint should not lead to avoiding useful iconography altogether. Do not automatically append the same arrows to actions across themes, or rotate through unrelated icons merely for variety. Arrows remain appropriate when their directional meaning helps. Keep related actions consistent within a theme, and review the collection for repeated habits in icon use.",
+      "example": "Margin's book enquiries and reading-club invitation work as text-only actions. The mobile menu controls and back-to-top arrow retain their clear functional purpose."
+    },
+    {
+      "id": "no-decorative-numbering",
+      "instruction": "Never use numbers merely to decorate sections, cards, captions or other theme elements. Remove decorative number controls as well as their output and demo values. Numbers that communicate real information, such as prices, quantities or meaningful ordered steps, remain appropriate."
+    },
+    {
+      "id": "purposeful-heading-emphasis",
+      "instruction": "Default to one consistent color and typographic treatment within a heading. Do not routinely highlight selected words or a second line with another color, italics, font or weight as a decorative flourish. Mixed treatments are allowed only when they make a specific, meaningful contribution to the content or design; be able to explain that contribution. Visual variety alone is not a sufficient reason.",
+      "example": "Kiln's 'Made slowly. Lived with.' expresses one thought. Both lines use the same upright type and color; the line break provides enough structure."
+    },
+    {
+      "id": "minimum-readable-type",
+      "instruction": "Use a minimum of 16px for body text, navigation, buttons and form text. Reserve 14px for short secondary labels, captions and metadata; no visible theme text should fall below 14px. These are minimums, not target sizes: increase them when the chosen typeface needs more room to read comfortably. Keep these floors on mobile; adapt spacing and layout instead of shrinking text to fit.",
+      "implementation": "Express the sizes in relative units that respect the visitor's font preferences: at a default 16px root, use at least 1rem for primary text and 0.875rem for secondary text. Do not reduce the root font size to evade the minimums. Check computed sizes and visual readability in desktop and mobile previews, including fluid type and responsive overrides. This collection preference addresses type size only; the later accessibility review must also assess contrast, zoom, spacing and interaction.",
+      "rollout": "Apply from the next theme preview onward. Review Common, Kiln, Margin and Afterhours against these minimums when each moves into full theme development; do not revise the existing previews solely for this rule now."
+    },
+    {
+      "id": "purposeful-content-icons",
+      "instruction": "Use a restrained, consistent set of real open-source icons more often where they help visitors scan practical information: location, opening hours, contact methods, service details or ingredient labels. Keep meaningful text beside them, and make sure the symbol matches the content. Do not attach icons to every heading or use them as ornamental eyebrow markers. Match stroke weight, size and alignment across the theme."
+    },
+    {
+      "id": "premium-level-of-finish",
+      "instruction": "Premium themes must show a clear increase in design care and detail, even for a small business. Develop the whole page beyond a pleasing palette, fonts and hero: compose each section deliberately, give photographs and useful information appropriate emphasis, refine spacing and alignment, and finish interaction states. Keep layouts calm while making the content relationships and individual character apparent."
+    },
+    {
+      "id": "purposeful-separators",
+      "instruction": "Use lines and borders when they clarify a specific relationship or contribute intentional character. Prefer spacing, alignment and grouping when these already separate the content clearly. Avoid stacking the last item border, a section border and a pricing border around the same transition. Review adjacent sections together, not only each widget in isolation."
+    },
+    {
+      "id": "clear-information-and-interactions",
+      "instruction": "Give practical visitor information such as location, opening hours and pricing a clear hierarchy with meaningful headings and tightly grouped related values. Keep day/time and label/value pairs close enough to read together. Tie actions to the information they serve. Design normal, hover and keyboard-focus states as one coherent treatment; avoid accidental doubled underlines, layout jumps or lost contrast."
+    }
+  ],
+  "heroVariations": "Develop transparent headers over hero imagery and text-on-image heroes as useful options for the collection, starting with the Panna preview. Treat them as independent choices: text on an image can also sit beneath a solid header. Overlay navigation only when the opening widget supports it; other pages need a readable solid header. Compose and review the image, text contrast, navigation contrast and mobile crop together. Carry these options into full theme development where suitable.",
+  "boundary": "These rules do not prohibit ordinary punctuation in sentences or markers in genuine content lists.",
+  "review": "Review the entire page and its source: composition and level of finish, practical information hierarchy, adjacent separators, purposeful content and action icons, hover and focus states, CSS-generated decoration, captions, language-specific casing, meaningful heading treatments, and type sizes and readability at desktop and mobile widths. Structural theme validation alone does not check these design rules."
+}

@@ -1,0 +1,13 @@
+{
+  "type": "footer",
+  "displayName": "Footer",
+  "settings": [
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Text",
+      "default": "<p>© Site name. All rights reserved.</p>"
+    },
+    { "type": "menu", "id": "navigation", "label": "Footer menu", "default": "" }
+  ]
+}

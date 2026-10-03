@@ -16,6 +16,8 @@ export default [
     files: [
       "packages/builder-server/src/**/*.js",
       "packages/adapters-local/src/**/*.js",
+      "scripts/validate-theme.js",
+      "scripts/build-theme-skill-contract.js",
     ],
     languageOptions: {
       globals: globals.node,

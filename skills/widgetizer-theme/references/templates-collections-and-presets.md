@@ -164,7 +164,7 @@ Register variants in `presets/presets.json`:
 | Menus | Use the preset's entire `menus/` directory when present, otherwise root menus. No per-menu merge. |
 | Settings | Apply supplied ID overrides to matching global defaults. Missing file means no overrides; malformed JSON causes creation to fail. |
 | Collection item data | Seed optional `presets/<id>/collections/`; collection definitions remain theme-owned. |
-| Screenshot | Preset image when present, otherwise theme screenshot. A distinct preview is recommended. |
+| Screenshot | `presets/<id>/screenshot.png` when present, otherwise the theme screenshot. A distinct preview is recommended. A square 1024 x 1024 PNG (unlike the theme's own 1280 x 720 screenshot); the app shows preset previews square and crops anything else. |
 | Starter images | `presets/<id>/media/`, then matching seed-root `preset-media/<id>/`, then effective theme-root `preset-media/<id>/`. |
 
 Presets do not replace widgets, layout, CSS, snippets, locales, or collection definitions. Use settings and content to express variants. A full multipage preset and a particular number of variants are product choices, not package validity requirements.
@@ -186,5 +186,3 @@ Leave out runtime IDs/timestamps. Use filename-matching slugs and satisfy collec
 Supply actual image binaries under `media/images/` and `media/manifest.json` under the selected preset-media location. Its top-level `files` array describes each original image's `filename`, `originalName`, MIME `type`, byte `size`, upload `path`, `width`, `height`, `alt`, `title`, `caption`, and `sizes` map for pre-generated variants. Each size entry names its upload `path`, `width`, and `height`. Paths/filenames must agree with the binaries and content references.
 
 This seed route copies originals/variants and registers metadata; it does not manufacture missing derivative files. A manifest is not a substitute for the binaries, and copying binaries alone is not a complete seed. For a shared `preset-media/` library across releases, keep filenames stable and preserve files still referenced by older presets.
-
-Evidence: [preset resolution](../../../packages/builder-server/src/controllers/themeController.js), [scaffolding](../../../packages/builder-server/src/utils/projectScaffold.js), [media/item seeding](../../../packages/builder-server/src/controllers/projectController.js), [collection validation](../../../packages/builder-server/src/services/collectionService.js), [collection domain reference](../../../docs-llms/core-collections.md), [structured-data rules](../../../packages/core/src/structuredData/collectionTypes.js).

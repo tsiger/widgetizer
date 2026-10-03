@@ -1,0 +1,8 @@
+{
+  "id": "main-menu",
+  "name": "Main menu",
+  "description": "",
+  "items": [
+    { "label": "Home", "link": "index.html", "items": [] }
+  ]
+}

@@ -6,6 +6,14 @@ This is the canonical theme-authoring entry point. It covers theme structure, th
 
 For a task-oriented authoring workflow with explicit distinctions between enforced checks, runtime contracts, and design conventions, see the draft [Widgetizer Theme skill](../skills/widgetizer-theme/SKILL.md).
 
+From a source checkout with dependencies installed, validate a theme folder with:
+
+```bash
+npm run validate:theme -- themes/my-theme
+```
+
+The app-owned checker uses the runtime's LiquidJS configuration and current app definitions to check syntax, schemas, references, starter content and presets. Add `--json` for structured findings or `--strict` to fail on warnings too. It does not start the app or modify the theme. A clean result still needs editor, browser and export checks for the particular theme; see the skill's [validation reference](../skills/widgetizer-theme/references/validation.md) for coverage and limits.
+
 ## 1. Introduction & Core Concepts
 
 ### What is a Theme?
