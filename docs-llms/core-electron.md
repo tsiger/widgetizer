@@ -371,7 +371,7 @@ The workspace packages are bundled into the asar by their presence in the OSS `p
 
 Quick reference for what `electron/builder.config.mjs` unpacks (`asarUnpack`):
 
-- `themes/**` (excluding `themes/widgetizer/**`) and `dist/**`
+- `themes/**` and `dist/**`. Two theme paths are excluded, both here and from the packed `files`: `themes/widgetizer/**`, and `themes/__*/**` — local scratch themes, which git also ignores, so one left on the build machine never ships in an installer.
 - `node_modules/@widgetizer/core/src/assets/**` — placeholder SVGs served via `res.sendFile`
 - `node_modules/@widgetizer/core/src/runtime/*.js` — `previewRuntime.js` + its sibling `standalonePreviewTarget.js`, served raw via `express.static`
 - native modules: `sharp`, `@img/sharp-*`, `better-sqlite3`
