@@ -205,7 +205,9 @@ themes/arch/presets/<preset-id>/screenshot.png
    `/themes/arch/presets/<preset-id>/screenshot.png`.
 
 The UI displays these with `aspect-square object-cover` in both the Themes page
-and the project creation form. Until a real preview exists, the blank theme-root
+and the project creation form, so an image of any other shape is cropped to a
+square around its centre. A theme's own root `screenshot.png` is different:
+landscape, 1280x720. Until a real preview exists, the blank theme-root
 screenshot (`themes/arch/screenshot.png`) may be used as a placeholder — see
 the screenshot exception in [theme-preset-file-format.md](theme-preset-file-format.md).
 

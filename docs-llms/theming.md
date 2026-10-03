@@ -66,7 +66,7 @@ A theme is organized as a directory with the following structure:
 │   ├── presets.json        # Preset registry (names, descriptions, default)
 │   ├── financial/
 │   │   ├── preset.json     # Settings overrides (colors, fonts, etc.)
-│   │   ├── screenshot.png  # Preset preview image
+│   │   ├── screenshot.png  # Preset preview image (1024x1024, square)
 │   │   ├── templates/      # Custom page templates
 │   │   │   ├── index.json
 │   │   │   └── global/
@@ -2222,7 +2222,7 @@ presets/
   presets.json              # Registry: default + [{ id, name, description }]
   financial/
     preset.json             # Settings overrides (colors, fonts)
-    screenshot.png          # Preview shown in the preset selector
+    screenshot.png          # Preview shown in the preset selector (1024x1024, square)
     templates/              # Full custom page templates (+ global/)
     menus/                  # Custom navigation
 ```

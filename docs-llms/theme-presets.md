@@ -27,7 +27,7 @@ For any preset, resolution falls back to the theme root when the preset omits a 
 - **Settings**: `presets/<id>/preset.json` overrides → `theme.json` defaults
 - **Collections**: `presets/<id>/collections/` (item data only — schemas stay theme-only) → none
 - **Media**: `presets/<id>/media/` (starter image binaries + `manifest.json`) → none
-- **Screenshot**: `presets/<id>/screenshot.png` → root `screenshot.png`
+- **Screenshot**: `presets/<id>/screenshot.png` → root `screenshot.png` (a preset's is 1024x1024 and shown square; the theme's root one is 1280x720)
 
 Themes with no `presets/` directory behave exactly as before — presets are fully opt-in, and the `preset` param defaults to none.
 

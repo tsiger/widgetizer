@@ -16,7 +16,7 @@ For Arch preset generation, every non-default preset should include:
 ```
 themes/arch/presets/{preset-id}/
   preset.json                  # Theme settings overrides
-  screenshot.png               # Preset preview image
+  screenshot.png               # Preset preview image, 1024x1024
   templates/
     index.json                 # Homepage
     about.json                 # One file per page
