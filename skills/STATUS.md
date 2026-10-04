@@ -1,8 +1,12 @@
 # Theme skills: working status
 
-Updated 2026-10-04 after Mova's refined hero was accepted. All fourteen visual directions are accepted. This is a maintainer handoff, outside the portable skill folders.
+Updated 2026-10-04 after the owner moved the premium themes to the sibling folder and confirmed discovery works. All fourteen visual directions are accepted. This is a maintainer handoff, outside the portable skill folders.
 
 ## Resume here
+
+**Current source location:** all fourteen premium theme folders are now in `C:/widgetizer-app/premium-themes/`, beside the Widgetizer checkout. The local `.env` sets `THEMES_EXTRA_ROOTS=C:/widgetizer-app/premium-themes`; the owner confirmed it works. Keep premium sources outside this public repository. For the collection themes, historical `themes/<name>/` source paths below now mean `../premium-themes/<name>/`; Arch remains in Widgetizer's `themes/` folder. Do not recreate duplicate premium sources in the app repository.
+
+**Next-session housekeeping:** the app discovers the external folder, but development sync scripts and ignored preview helpers still need their source-path assumptions reviewed and adapted before rebuilding or syncing. Existing preview servers may continue serving their exported copies; an open preview does not prove its rebuild helper uses the new source location. The root collection notebook is no longer in this checkout. Its Google Drive destination/access has not yet been supplied; ask for the link when the notebook needs updating, without blocking independent theme work.
 
 Mova is accepted after hero refinement: "Good. We keep it." Its preview is at `http://127.0.0.1:4191/`; the styleguide remains at `/styleguide.html`. Preserve the approved palette/fonts and photographic studio invitation with its practical first-class panel. The original hero was rejected as repetitive; distinct, visually coherent heroes are now an explicit requirement in the collection rules. Proposed cooking-school and art-school presets remain future work. Nerea is accepted: "Good. We keep it." Its preview remains at `http://127.0.0.1:4190/`, with additional presets unselected. All fourteen directions are accepted.
 
@@ -10,7 +14,7 @@ Molto is accepted ("We keep it"). Its preview is at `http://127.0.0.1:4189/`, wi
 
 The current exercise is to explore different niches up to a working homepage/styleguide preview, learn the author's preferences, and carry confirmed preferences into the collection rules. Full theme development comes later. A liked preview is not a completed reusable theme.
 
-An owner-facing collection notebook was created as `WIDGETIZER-PREMIUM-THEMES.md` in the repository root on 2026-10-04. It now records all fourteen explorations, their review status, shared decisions, preset candidates and the guesthouse plan. The owner will handle moving the notebook to Google Drive and provide folder access later; record its supplied destination when available rather than assuming the root copy remains current. The owner will also manage any Drive copies of the themes. Keep the local theme folders available for continued work and uncommitted; do not move, upload or commit them on the owner's behalf.
+An owner-facing collection notebook was created as `WIDGETIZER-PREMIUM-THEMES.md` in the repository root on 2026-10-04. It records all fourteen explorations, their review status, shared decisions, preset candidates and the guesthouse plan. The owner has removed the root copy and will provide Google Drive folder access later; record the supplied destination when available. Premium themes now live in the sibling folder described above, which the owner may manage as a private Git repository. Do not move, upload or commit those themes on the owner's behalf without instruction.
 
 Each retained exploration will become a theme with 2–3 presets showing different uses. The author clarified that related professions are welcome: Parla could serve both a foreign-language teacher and a piano teacher. Guesthouse presets could instead vary strongly by location and atmosphere. The shared theme should support these content and visual differences through its widgets and settings. Build one initial direction before expanding the presets. Collection rules record this strategy alongside layout variety, gentle reveals and Arch-style CSS organization.
 
@@ -23,7 +27,7 @@ The author also agreed to separate individual teachers from schools offering mul
 - The design skill develops the brief, uses selective questions and references (including screenshots), proposes a direction, and builds a responsive preview with a styleguide and representative layouts.
 - Keep editing simple for owners who find other systems too complex. Content and branding should be easy to change; responsive layout and detailed spacing should mostly be handled by the theme.
 - The author intends a collection of roughly 30–40 premium themes, with 2–3 presets per theme. Presets can span related professions with shared website needs, or very different settings within one industry; they need not stay in one exact niche. Each theme should have its own identity rather than resemble Arch.
-- Keep the explored themes in `themes/` for now. The author will move them out when appropriate; do not relocate or publish them on their behalf.
+- Keep the explored premium themes in the owner's sibling `premium-themes/` folder, connected through `THEMES_EXTRA_ROOTS`. They are excluded from Widgetizer commits; do not relocate or publish them on the owner's behalf.
 - Add no new Core widgets for this collection. A shared pool of reusable theme widgets can grow from actual theme work; its packaging is not decided or implemented yet.
 - Generate only the key images needed for an initial preview. The author will choose whether to supply or request the full image set when a theme develops further.
 
@@ -217,6 +221,6 @@ Before the checkpoint, 204 targeted tests passed across theme-skill validation, 
 
 The skill checkpoint was committed as `3bebc423bdf097576f9b9f4021beb4193d29fb36` (`Add theme authoring and design skills with app validation`); it was not pushed.
 
-On 2026-10-04 the owner authorized a follow-up progress commit containing only `skills/STATUS.md` and `skills/theme-collections/widgetizer-premium.json`. This records all fourteen accepted directions and the accumulated collection rules. The root notebook, theme folders and ignored preview evidence are excluded. No push was requested.
+On 2026-10-04 the owner authorized a follow-up progress commit containing only `skills/STATUS.md` and `skills/theme-collections/widgetizer-premium.json`. Commit `c25c2219` records all fourteen accepted directions and the accumulated collection rules. The root notebook, theme folders and ignored preview evidence were excluded. The owner subsequently authorized committing the sibling-folder handoff update and pushing the current branch, including the earlier skill checkpoints.
 
-Next step: choose the next exploration with the author. All fourteen directions are accepted; Cabinet remains a strong match for the author's taste. Defer complete preset sets and full lifecycle checks until theme development.
+Next step: choose the next exploration with the author, adapting the relevant development/preview paths to the sibling folder before use. All fourteen directions are accepted; Cabinet remains a strong match for the author's taste. Defer complete preset sets and full lifecycle checks until theme development.
