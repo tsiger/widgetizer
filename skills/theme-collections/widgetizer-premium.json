@@ -17,6 +17,11 @@
       "instruction": "When a button or action link has an icon, use an actual SVG from a suitable open-source icon set. Do not substitute Unicode characters, text glyphs or CSS-drawn approximations. Keep the icons visually consistent and retain their source and license. Tabler is an example, not a required dependency. Icons are optional, not mandatory for every button."
     },
     {
+      "id": "consistent-button-shape",
+      "instruction": "Choose one button shape for each theme: rounded or square. Apply it consistently to primary, secondary and icon-only buttons, including navigation and disclosure controls. Do not mix rounded and square button treatments within the same theme.",
+      "implementation": "Define the chosen corner treatment through a shared token and use it across widgets and interaction states. Review the full page and styleguide together, including small controls, rather than checking only the main calls to action."
+    },
+    {
       "id": "purposeful-action-icons",
       "instruction": "Choose text-only or icon-assisted buttons and action links deliberately. Actively consider icons where they clarify the action or destination; restraint should not lead to avoiding useful iconography altogether. Do not automatically append the same arrows to actions across themes, or rotate through unrelated icons merely for variety. Arrows remain appropriate when their directional meaning helps. Keep related actions consistent within a theme, and review the collection for repeated habits in icon use.",
       "example": "Margin's book enquiries and reading-club invitation work as text-only actions. The mobile menu controls and back-to-top arrow retain their clear functional purpose."
@@ -37,6 +42,18 @@
       "rollout": "Apply from the next theme preview onward. Review Common, Kiln, Margin and Afterhours against these minimums when each moves into full theme development; do not revise the existing previews solely for this rule now."
     },
     {
+      "id": "balanced-text-wrapping",
+      "instruction": "Judge typography by the shape and rhythm of the rendered text as well as font choice and size. Avoid awkward isolated words, markedly uneven heading lines and cramped wrapping on desktop and mobile. Coordinate text width, type size and layout proportions; do not rely on hard-coded English line breaks or nonbreaking phrases to make a reusable theme work.",
+      "review": "Inspect actual line breaks at desktop, intermediate and phone widths, including longer edited copy and representative translations. CSS text balancing and a no-overflow result are aids, not evidence that the text looks good.",
+      "example": "Alder's initial hero isolated 'worth' between 'Somewhere' and 'slowing down.' despite fitting within the viewport. That composition needed correction."
+    },
+    {
+      "id": "coherent-content-grids",
+      "instruction": "Build beautiful, balanced layouts around clear content relationships, a logical reading order, shared alignment edges, deliberate column proportions and consistent gaps. Complexity, staggered placement and asymmetry must serve the content. Do not scatter items around a photograph or create arbitrary empty areas merely to make a layout different. Using CSS Grid alone does not establish a coherent composition.",
+      "implementation": "Keep an explanation, its action and supporting note visibly grouped. Let columns and rows grow with content; review longer headings, paragraphs and translated button labels. Assess whitespace and alignment across the whole section, including its right edge and adjacent sections. Check whether labels, headings, imagery and body copy form an immediately understandable group; matching column edges alone is not enough. Preserve meaningful layout variety without adding complexity for its own sake.",
+      "example": "Accord's initial engagement section aligned its columns but left two small labels isolated above a photograph while the main heading occupied the opposite column. The empty area and detached introduction made the composition unclear. Recompose the section around one clear introduction and a balanced relationship between the image and story; do not preserve the arrangement merely because it uses a grid."
+    },
+    {
       "id": "purposeful-content-icons",
       "instruction": "Use a restrained, consistent set of real open-source icons more often where they help visitors scan practical information: location, opening hours, contact methods, service details or ingredient labels. Keep meaningful text beside them, and make sure the symbol matches the content. Do not attach icons to every heading or use them as ornamental eyebrow markers. Match stroke weight, size and alignment across the theme."
     },
@@ -45,15 +62,48 @@
       "instruction": "Premium themes must show a clear increase in design care and detail, even for a small business. Develop the whole page beyond a pleasing palette, fonts and hero: compose each section deliberately, give photographs and useful information appropriate emphasis, refine spacing and alignment, and finish interaction states. Keep layouts calm while making the content relationships and individual character apparent."
     },
     {
+      "id": "explore-layout-variety",
+      "instruction": "Use new explorations to test meaningfully different page compositions and widget layouts as well as colors and typography. Avoid repeating the same large headline, photograph and alternating split sections across the collection. Choose layouts that help the niche's content, interaction and visitor goals; keep them calm and easy to edit.",
+      "rollout": "Keep the accepted Common, Kiln, Margin, Afterhours, Cove, Panna, Sill and Parla directions. Continue exploring stronger layout variety. Each retained theme will later have 2–3 presets demonstrating different uses of its design system; follow the preset strategy below."
+    },
+    {
+      "id": "distinct-hero-per-exploration",
+      "instruction": "Every new theme exploration must make a deliberate attempt at a distinct hero composition. This is a requirement, not an optional refinement. Compare the proposed opening with the collection's existing heroes before building it; changing only colors, fonts, copy or imagery does not establish a new composition. Aim for as much meaningful uniqueness as the niche and content allow.",
+      "implementation": "Record the closest existing hero and explain the new opening's different content hierarchy, image/text relationship or useful interaction in the working brief. Build around the niche's visitor needs. Novelty must still make visual sense: clear grouping, balanced grid proportions, legible type, considered crops and a logical mobile reading order. Do not introduce arbitrary shapes, staggered elements or complexity simply to look different.",
+      "review": "Review the hero beside relevant earlier explorations, then inspect desktop, intermediate, phone and longer/translated text. If the composition still repeats an earlier hero without a content-led reason, revise it before presenting the theme. Retain accepted palettes and typography when feedback concerns composition only.",
+      "example": "Mova's first large-heading-above-wide-photo opening repeated a familiar collection composition. Its revision pairs a photographic dance-studio invitation with a practical first-class panel."
+    },
+    {
       "id": "purposeful-separators",
       "instruction": "Use lines and borders when they clarify a specific relationship or contribute intentional character. Prefer spacing, alignment and grouping when these already separate the content clearly. Avoid stacking the last item border, a section border and a pricing border around the same transition. Review adjacent sections together, not only each widget in isolation."
     },
     {
       "id": "clear-information-and-interactions",
       "instruction": "Give practical visitor information such as location, opening hours and pricing a clear hierarchy with meaningful headings and tightly grouped related values. Keep day/time and label/value pairs close enough to read together. Tie actions to the information they serve. Design normal, hover and keyboard-focus states as one coherent treatment; avoid accidental doubled underlines, layout jumps or lost contrast."
+    },
+    {
+      "id": "gentle-reveal-effects",
+      "instruction": "Introduce gentle reveal effects that suit each theme's calm character. Use restrained fades or small movements with short, considered timing; avoid making visitors wait for content or animating every element independently.",
+      "implementation": "Respect reduced-motion preferences, keep content available when animation or JavaScript is disabled, and support widgets added or re-rendered in the editor. Arch's assets/reveal.js and related styles are an implementation reference; adapt the treatment to each theme.",
+      "rollout": "Consider in subsequent previews and carry into full theme development. This note does not request changes to the existing previews before review."
+    },
+    {
+      "id": "arch-style-css-organization",
+      "instruction": "When developing these previews into complete themes, use a CSS system similar to Arch: shared CSS tokens for recurring design decisions, a common foundation for reusable elements, and scoped CSS per widget for its specific layout and appearance. Each theme defines its own token values and visual identity.",
+      "implementation": "Inspect the current themes/arch/assets/base.css, layout.liquid and widget styles before implementation. Keep widget-specific styles with their widget and load them through the app's supported asset mechanism, as illustrated by themes/arch/widgets/video-popup/. Avoid accumulating the whole theme's widget styling in one global stylesheet.",
+      "rollout": "Apply during full theme development; the current visual previews do not need a CSS refactor before their design review."
     }
   ],
   "heroVariations": "Develop transparent headers over hero imagery and text-on-image heroes as useful options for the collection, starting with the Panna preview. Treat them as independent choices: text on an image can also sit beneath a solid header. Overlay navigation only when the opening widget supports it; other pages need a readable solid header. Compose and review the image, text contrast, navigation contrast and mobile crop together. Carry these options into full theme development where suitable.",
+  "presetStrategy": {
+    "intent": "Each retained theme will have 2–3 distinct presets showing its range. Presets may span related businesses with compatible content and editing needs, or very different locations and moods within one business type. They are not restricted to one exact niche.",
+    "design": "Give each preset a coherent combination of imagery, palette, typography, content and available layout choices. Vary section selection, order and emphasis where useful. Plan enough flexibility in the shared theme widgets and settings to support these differences while keeping owner editing simple.",
+    "examples": [
+      { "theme": "Parla", "uses": ["Foreign-language teacher", "Piano teacher"], "sharedNeeds": "Personal introduction, lesson options, teaching approach and enquiries" },
+      { "theme": "Alder: boutique guesthouse", "proposedSettings": ["A remote, beautiful Alpine village", "California", "A remote Greek island"], "sharedNeeds": "Rooms, the property, local experiences, practical stay information and enquiries" }
+    ],
+    "scope": "Explore one direction first. Develop the full preset set later; these examples guide the theme's flexibility and do not require building all variants during the initial preview."
+  },
   "boundary": "These rules do not prohibit ordinary punctuation in sentences or markers in genuine content lists.",
-  "review": "Review the entire page and its source: composition and level of finish, practical information hierarchy, adjacent separators, purposeful content and action icons, hover and focus states, CSS-generated decoration, captions, language-specific casing, meaningful heading treatments, and type sizes and readability at desktop and mobile widths. Structural theme validation alone does not check these design rules."
+  "review": "Review the entire page and its source: composition and level of finish, practical information hierarchy, adjacent separators, purposeful content and action icons, consistent button shape, hover and focus states, CSS-generated decoration, captions, language-specific casing, meaningful heading treatments, and type sizes and readability at desktop and mobile widths. Review reveal timing and reduced-motion behavior when motion is introduced; check token use and widget CSS organization during full theme development. Structural theme validation alone does not check these collection rules."
 }
