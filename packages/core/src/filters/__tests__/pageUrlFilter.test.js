@@ -41,7 +41,7 @@ describe("page_url", () => {
 
   it("renders the home page as index.html with Clean URLs off", () => {
     expect(render("{{ 'index' | page_url }}", OFF)).toBe("index.html");
-    expect(render("{{ 'home' | page_url }}", OFF)).toBe("home.html");
+    expect(render("{{ 'home' | page_url }}", OFF)).toBe("index.html");
   });
 
   it("renders the clean home link as ./ at the export root", () => {

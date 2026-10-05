@@ -14,7 +14,7 @@ import { stripHtmlToText } from "../services/sanitizationService.js";
 import { LIMIT_KEYS, MAX_WIDGETS_PER_PAGE } from "@widgetizer/core/adapters";
 import { sanitizeSlug, generateUniqueSlug } from "../utils/slugHelpers.js";
 import { generateCopyName } from "../utils/namingHelpers.js";
-import { isReservedPageSlug, pageKey, pagesDir } from "@widgetizer/core/contentAddress";
+import { isHomeSlug, isReservedPageSlug, pageKey, pagesDir } from "@widgetizer/core/contentAddress";
 import { requestLanguage, projectLanguageContexts, withoutLanguage } from "../utils/contentLanguage.js";
 import {
   assertHasIdentity,
@@ -25,8 +25,19 @@ import {
   serializeTranslationOps,
 } from "../services/translationService.js";
 
-const pageSlugTaken = (storage, scope, lang) => (slug) =>
-  isReservedPageSlug(slug, lang) || storage.exists(scope, pageKey(slug, lang));
+// `index` and `home` both publish as the language's index.html, so a language
+// may hold only one of them. `ownSlug` is the page being renamed, which does not
+// clash with itself.
+async function homeSlugClash(storage, scope, slug, lang, ownSlug) {
+  if (!isHomeSlug(slug)) return false;
+  const other = slug === "index" ? "home" : "index";
+  return other !== ownSlug && storage.exists(scope, pageKey(other, lang));
+}
+
+const pageSlugTaken = (storage, scope, lang, ownSlug) => async (slug) =>
+  isReservedPageSlug(slug, lang) ||
+  (await storage.exists(scope, pageKey(slug, lang))) ||
+  homeSlugClash(storage, scope, slug, lang, ownSlug);
 
 async function listPageFiles(storage, scope, lang) {
   return (await storage.list(scope, pagesDir(lang))).filter((name) => name.endsWith(".json"));
@@ -36,6 +47,13 @@ function reservedPageSlug(res, slug) {
   return res.status(400).json({
     error: "Reserved slug",
     message: `"${slug}" is reserved and cannot be used as a page filename.`,
+  });
+}
+
+function secondHomepage(res, slug) {
+  return res.status(409).json({
+    error: "Slug already exists",
+    message: `"${slug}" would be a second homepage: this language already has one. Please choose a different slug.`,
   });
 }
 
@@ -282,7 +300,7 @@ export async function updatePage(req, res) {
       console.warn(
         `Missing/empty slug in update request for oldSlug '${oldSlug}', generating from name: '${pageData.name}'`,
       );
-      desiredNewSlug = await generateUniqueSlug(pageData.name, pageSlugTaken(storage, scope, lang));
+      desiredNewSlug = await generateUniqueSlug(pageData.name, pageSlugTaken(storage, scope, lang, oldSlug));
     } else {
       // Sanitize the provided slug through the shared helper
       desiredNewSlug = sanitizeSlug(desiredNewSlug);
@@ -306,6 +324,7 @@ export async function updatePage(req, res) {
             message: `A page with the slug "${desiredNewSlug}" already exists. Please choose a different slug.`,
           });
         }
+        if (await homeSlugClash(storage, scope, desiredNewSlug, lang, oldSlug)) return secondHomepage(res, desiredNewSlug);
         finalNewSlug = desiredNewSlug;
       } else {
         finalNewSlug = desiredNewSlug; // Already unique from generateUniqueSlug fallback
@@ -683,6 +702,15 @@ export async function savePageContent(req, res) {
       return res.status(400).json({ error: "Missing required page data (slug, name, widgets)." });
     }
     if (pageData.slug !== id && isReservedPageSlug(pageData.slug, lang)) return reservedPageSlug(res, pageData.slug);
+    if (pageData.slug !== id && (await storage.exists(scope, pageKey(pageData.slug, lang)))) {
+      return res.status(409).json({
+        error: "Slug already exists",
+        message: `A page with the slug "${pageData.slug}" already exists. Please choose a different slug.`,
+      });
+    }
+    if (pageData.slug !== id && (await homeSlugClash(storage, scope, pageData.slug, lang, id))) {
+      return secondHomepage(res, pageData.slug);
+    }
 
     // Cap the per-page widget count before persisting. Without this an
     // authenticated owner could store tens of thousands of widgets in one page,

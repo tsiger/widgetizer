@@ -303,13 +303,29 @@ export async function exportProjectToDir(projectId, options = {}, collectionDeps
     const allPages = await listPagesFromDir(projectDir, { defaultLanguage });
     const rootPages = allPages.filter((pageData) => !languageFolder(pageLang(pageData)));
 
-    // Validate that at least one page has the "index" slug (required for homepage)
-    // Note: page.id is derived from filename, which is the authoritative slug
-    const hasIndexPage = rootPages.some((page) => page.id === "index");
+    // The default language needs a homepage: a page slugged "index" or "home",
+    // both of which publish as index.html. page.id is the filename, the
+    // authoritative slug.
+    const hasIndexPage = rootPages.some((page) => isHomeSlug(page.id));
     if (!hasIndexPage) {
       const err = new Error('Your project must have a page with the slug "index" to serve as the homepage. Please create or rename a page to have the slug "index" before exporting.');
       err.statusCode = 400;
       err.errorTitle = "Export failed: No homepage found";
+      throw err;
+    }
+
+    // `index` and `home` both publish as the language's index.html, so a language
+    // holding both would publish one over the other. The editor refuses the pair,
+    // but older projects, imports and theme updates can still carry one.
+    for (const language of new Set(allPages.map((pageData) => pageData.language))) {
+      const homes = allPages.filter((pageData) => pageData.language === language && isHomeSlug(pageData.id));
+      if (homes.length < 2) continue;
+      const folder = languageFolder(pageLang(homes[0]));
+      const err = new Error(
+        `The ${folder ? `"${folder}" ` : ""}pages include both "index" and "home". Both are published as the homepage (${folder ? `${folder}/` : ""}index.html), so one would replace the other. Rename one of them and export again.`,
+      );
+      err.statusCode = 400;
+      err.errorTitle = "Export failed: two homepages";
       throw err;
     }
 

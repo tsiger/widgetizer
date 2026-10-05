@@ -1436,3 +1436,67 @@ describe("pages in another language", () => {
     assert.equal(menu.items[0].link, "");
   });
 });
+
+// `index` and `home` both publish as the language's index.html, so one language
+// may hold only one of them.
+describe("one homepage per language", () => {
+  beforeEach(async () => {
+    await resetPages();
+    await createTestPage("Welcome", { slug: "index" });
+  });
+
+  it("a new page named Home does not take the home slug beside index", async () => {
+    const page = await createTestPage("Home");
+    assert.equal(page.slug, "home-1");
+  });
+
+  it("a new page asking for slug index does not take it beside home", async () => {
+    await resetPages();
+    await createTestPage("Home", { slug: "home" });
+    const page = await createTestPage("Start", { slug: "index" });
+    assert.equal(page.slug, "index-1");
+  });
+
+  it("renaming a page to home is refused while index exists", async () => {
+    const page = await createTestPage("About");
+    const res = await callController(updatePage, {
+      params: { id: page.slug },
+      body: { name: "About", slug: "home" },
+    });
+    assert.equal(res._status, 409);
+    assert.equal(await fs.pathExists(getPagePath(activeProject.folderName, "home")), false);
+  });
+
+  it("the homepage itself may switch between index and home", async () => {
+    const res = await callController(updatePage, {
+      params: { id: "index" },
+      body: { name: "Welcome", slug: "home" },
+    });
+    assert.equal(res._status, 200);
+    assert.equal(await fs.pathExists(getPagePath(activeProject.folderName, "home")), true);
+    assert.equal(await fs.pathExists(getPagePath(activeProject.folderName, "index")), false);
+  });
+
+  it("an editor save that renames a page onto another existing page is refused", async () => {
+    await resetPages();
+    await createTestPage("Home", { slug: "home" });
+    const page = await createTestPage("Contact");
+    const res = await callController(savePageContent, {
+      params: { id: page.slug },
+      body: { name: "Contact", slug: "home", widgets: {} },
+    });
+    assert.equal(res._status, 409);
+    assert.equal((await fs.readJson(getPagePath(activeProject.folderName, "home"))).name, "Home");
+    assert.equal(await fs.pathExists(getPagePath(activeProject.folderName, page.slug)), true);
+  });
+
+  it("an editor save that renames a page to home is refused while index exists", async () => {
+    const page = await createTestPage("Contact");
+    const res = await callController(savePageContent, {
+      params: { id: page.slug },
+      body: { name: "Contact", slug: "home", widgets: {} },
+    });
+    assert.equal(res._status, 409);
+    assert.equal(await fs.pathExists(getPagePath(activeProject.folderName, "home")), false);
+  });
+});

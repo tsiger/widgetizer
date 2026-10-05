@@ -11,6 +11,7 @@ import { groupNavItems } from "../../extension/builtinNav.js";
 import useCollections from "../../hooks/useCollections";
 import { resolveLucideIcon } from "../../utils/lucideIcon";
 import { openPagePreview } from "../../lib/openSitePreview";
+import { isHomeSlug } from "@widgetizer/core/contentAddress";
 
 export default function Sidebar() {
   const { t } = useTranslation();
@@ -105,10 +106,10 @@ export default function Sidebar() {
   const openSitePreview = async () => {
     try {
       const pages = await getAllPages();
-      // Every language has an "index"; the standalone preview is the default
-      // language's site, so pick that one's homepage (step 18 namespaces the rest).
+      // The standalone preview is the default language's site, so pick that
+      // language's homepage, slugged "index" or "home".
       const inDefault = pages.filter((p) => (p.language || defaultLanguage) === defaultLanguage);
-      const homepage = inDefault.find((p) => p.slug === "index") || inDefault[0];
+      const homepage = inDefault.find((p) => isHomeSlug(p.slug)) || inDefault[0];
       if (!homepage) return;
       // Resolve the homepage's standalone preview route and dispatch it (Electron
       // preview window in the desktop app, shared browser tab on the web). The route
