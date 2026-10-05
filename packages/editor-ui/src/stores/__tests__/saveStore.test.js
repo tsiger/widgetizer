@@ -671,6 +671,16 @@ describe("saveStore (useAutoSave)", () => {
       expect(useAutoSave.getState().autoSaveInterval).not.toBeNull();
     });
 
+    it("leaves a widget clean, and the timer unarmed, when it differs only by a key holding undefined", () => {
+      const page = seedPageStore();
+      usePageStore.setState({
+        page: { ...page, widgets: { ...page.widgets, "w-1": { ...page.widgets["w-1"], extra: undefined } } },
+      });
+      useAutoSave.getState().reconcileModifiedWidgets();
+      expect(useAutoSave.getState().modifiedWidgets.size).toBe(0);
+      expect(useAutoSave.getState().autoSaveInterval).toBeNull();
+    });
+
     it("reconciles header/footer against originalGlobalWidgets", () => {
       const header = { type: "header", settings: { text: "v1" }, blocks: {}, blocksOrder: [] };
       usePageStore.setState({
@@ -774,12 +784,31 @@ describe("saveStore (useAutoSave)", () => {
       expect(useAutoSave.getState().hasUnsavedChanges()).toBe(false);
     });
 
-    it("detects a page diff even when the only change is an undefined-valued key (JSON.stringify would silently drop it)", () => {
+    // The saved copy is a JSON round trip, which drops a key holding undefined.
+    // Counting that key as a change would leave the editor dirty after every save.
+    it("does not count a key holding undefined, which the saved copy cannot carry, as a change", () => {
       const page = seedPageStore();
       usePageStore.setState({
         page: { ...page, widgets: { ...page.widgets, "w-1": { ...page.widgets["w-1"], extra: undefined } } },
       });
+      expect(useAutoSave.getState().hasUnsavedChanges()).toBe(false);
+    });
+
+    it("still detects a saved value cleared to undefined", () => {
+      const page = seedPageStore();
+      usePageStore.setState({
+        page: { ...page, widgets: { ...page.widgets, "w-1": { ...page.widgets["w-1"], settings: { text: undefined } } } },
+      });
       expect(useAutoSave.getState().hasUnsavedChanges()).toBe(true);
+    });
+
+    it("does not count a header key holding undefined as a change", () => {
+      const header = { type: "header", settings: { text: "v1" }, blocks: {}, blocksOrder: [] };
+      usePageStore.setState({
+        globalWidgets: { header: { ...header, settings: { ...header.settings, link: undefined } }, footer: null },
+        originalGlobalWidgets: { header: JSON.parse(JSON.stringify(header)), footer: null },
+      });
+      expect(useAutoSave.getState().hasUnsavedChanges()).toBe(false);
     });
 
     it("does not report a diff when header/footer are rebuilt with the same values in a different key order", () => {
@@ -1170,6 +1199,44 @@ describe("saveStore (useAutoSave)", () => {
   // --------------------------------------------------------------------------
 
   describe("save", () => {
+    // A link value carrying undefined refs, as the link picker once wrote it.
+    const pickedLink = {
+      href: "about.html",
+      text: "About",
+      target: "_self",
+      pageUuid: "p-about",
+      collectionType: undefined,
+      collectionItemUuid: undefined,
+    };
+
+    it("leaves the editor clean after saving a value that carries undefined keys", async () => {
+      const page = seedPageStore();
+      usePageStore.setState({
+        page: { ...page, widgets: { ...page.widgets, "w-1": { type: "rich-text", settings: { link: pickedLink } } } },
+      });
+      useAutoSave.getState().markWidgetModified("w-1");
+
+      expect(await useAutoSave.getState().save(false)).toEqual({ status: "success" });
+      expect(useAutoSave.getState().hasUnsavedChanges()).toBe(false);
+      expect(await useAutoSave.getState().save(true)).toEqual({ status: "clean" });
+      expect(savePageContent).toHaveBeenCalledTimes(1);
+    });
+
+    it("leaves the editor clean after saving a header value that carries undefined keys", async () => {
+      seedPageStore();
+      const header = { type: "header", settings: { text: "v1" }, blocks: {}, blocksOrder: [] };
+      usePageStore.setState({
+        globalWidgets: { header: { ...header, settings: { link: pickedLink } }, footer: null },
+        originalGlobalWidgets: { header: JSON.parse(JSON.stringify(header)), footer: null },
+      });
+      useAutoSave.getState().markWidgetModified("header");
+
+      expect(await useAutoSave.getState().save(false)).toEqual({ status: "success" });
+      expect(useAutoSave.getState().hasUnsavedChanges()).toBe(false);
+      expect(await useAutoSave.getState().save(true)).toEqual({ status: "clean" });
+      expect(saveGlobalWidget).toHaveBeenCalledTimes(1);
+    });
+
     it("sets isSaving during a manual save", async () => {
       seedPageStore();
       useAutoSave.getState().markWidgetModified("w-1");

@@ -97,7 +97,7 @@ The editor provides a way to see a true, live preview of the page, exactly as an
 The editor is designed to save changes automatically, providing a seamless user experience.
 
 1.  Most actions that alter page data—such as editing a setting, adding a widget, or reordering the list—also call a corresponding function on the `useAutoSave` store (e.g., `markWidgetModified`, `setStructureModified`).
-2.  These functions set internal dirty flags and also rely on deep comparison between current and original page/theme state so the `EditorTopBar` reflects the real save state after undo/redo operations.
+2.  These functions set internal dirty flags and also rely on deep comparison between current and original page/theme state so the `EditorTopBar` reflects the real save state after undo/redo operations. The saved copy is a JSON round trip, the form a save sends, and the current page and header/footer are compared in that same form, so a key holding `undefined` (which no save can store) never keeps the page dirty after a save or an undo/redo reconcile.
 3.  The `useAutoSave` store implements a **debounced auto-save** strategy. Instead of a fixed interval, a 60-second timer is reset on every modification. This ensures that auto-saving only occurs after a period of inactivity, providing a smoother experience.
 4.  For immediate persistence, the user can also click the "Save" button in the `EditorTopBar` (or use the `Ctrl+S` / `Cmd+S` shortcut), which directly invokes the `save()` action.
 

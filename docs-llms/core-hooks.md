@@ -372,6 +372,7 @@ Powers the link picker in `LinkInput.jsx` and the menu editor (`MenuEditor`). Ea
 
 - Per-project module-level cache (1-minute TTL) shared across all `LinkInput` instances, so the many link inputs a page can host don't each refetch.
 - Single in-flight promise per project deduplicates concurrent loads.
+- A load that was in flight when the cache was invalidated still answers the picker that started it, but doesn't refill the cache, so the next picker loads afresh.
 
 #### Used In
 

@@ -21,6 +21,13 @@ function autosaveDelay(failureCount) {
   return Math.min(BASE_AUTOSAVE_DELAY_MS * 2 ** failureCount, MAX_AUTOSAVE_DELAY_MS);
 }
 
+// The saved baselines (pageStore's originalPage / originalGlobalWidgets) are JSON
+// round trips, the same form a save sends. The live value is compared in that form
+// too: a key holding `undefined` is gone once saved, and lodash's isEqual would
+// otherwise count it as a difference that no save can ever clear.
+const asSaved = (value) => (value === undefined ? undefined : JSON.parse(JSON.stringify(value)));
+const matchesSaved = (current, saved) => isEqual(asSaved(current), saved);
+
 const useAutoSave = create((set, get) => ({
   // State
   isSaving: false,
@@ -69,7 +76,7 @@ const useAutoSave = create((set, get) => ({
     const pageStore = usePageStore.getState();
     const { page, originalPage, globalWidgets, originalGlobalWidgets } = pageStore;
 
-    if (page && originalPage && !isEqual(page, originalPage)) {
+    if (page && originalPage && !matchesSaved(page, originalPage)) {
       return true;
     }
 
@@ -81,14 +88,14 @@ const useAutoSave = create((set, get) => ({
     if (
       globalWidgets.header &&
       originalGlobalWidgets.header &&
-      !isEqual(globalWidgets.header, originalGlobalWidgets.header)
+      !matchesSaved(globalWidgets.header, originalGlobalWidgets.header)
     ) {
       return true;
     }
     if (
       globalWidgets.footer &&
       originalGlobalWidgets.footer &&
-      !isEqual(globalWidgets.footer, originalGlobalWidgets.footer)
+      !matchesSaved(globalWidgets.footer, originalGlobalWidgets.footer)
     ) {
       return true;
     }
@@ -134,10 +141,11 @@ const useAutoSave = create((set, get) => ({
     // which would rebuild the Set and re-arm the autosave timer).
     const next = new Set(get().modifiedWidgets);
 
-    if (page && originalPage) {
-      const ids = new Set([...Object.keys(page.widgets ?? {}), ...Object.keys(originalPage.widgets ?? {})]);
+    const savedFormPage = page ? asSaved(page) : null;
+    if (savedFormPage && originalPage) {
+      const ids = new Set([...Object.keys(savedFormPage.widgets ?? {}), ...Object.keys(originalPage.widgets ?? {})]);
       for (const id of ids) {
-        if (!isEqual(page.widgets?.[id], originalPage.widgets?.[id])) {
+        if (!isEqual(savedFormPage.widgets?.[id], originalPage.widgets?.[id])) {
           next.add(id);
         } else {
           next.delete(id);
@@ -146,7 +154,7 @@ const useAutoSave = create((set, get) => ({
     }
 
     for (const key of ["header", "footer"]) {
-      if (!isEqual(globalWidgets[key], originalGlobalWidgets[key])) {
+      if (!matchesSaved(globalWidgets[key], originalGlobalWidgets[key])) {
         next.add(key);
       } else {
         next.delete(key);
@@ -164,7 +172,7 @@ const useAutoSave = create((set, get) => ({
     // through syncThemeStoreFromSnapshot). Without those, an undone/redone
     // reorder or theme edit sits unsaved until the next content edit happens
     // to re-arm the timer — save() persists both (hasPageDiff / hasThemeDrift).
-    const hasPageDiff = page && originalPage && !isEqual(page, originalPage);
+    const hasPageDiff = savedFormPage && originalPage && !isEqual(savedFormPage, originalPage);
     if (next.size > 0 || hasPageDiff || useThemeStore.getState().hasUnsavedThemeChanges()) {
       set({ autoSaveFailureCount: 0 });
       get().resetAutoSaveTimer();
@@ -267,11 +275,11 @@ const useAutoSave = create((set, get) => ({
         // or that re-edit would silently never get sent.
         const hasHeaderDiff =
           globalWidgets.header && pageStore.originalGlobalWidgets.header
-            ? !isEqual(globalWidgets.header, pageStore.originalGlobalWidgets.header)
+            ? !matchesSaved(globalWidgets.header, pageStore.originalGlobalWidgets.header)
             : false;
         const hasFooterDiff =
           globalWidgets.footer && pageStore.originalGlobalWidgets.footer
-            ? !isEqual(globalWidgets.footer, pageStore.originalGlobalWidgets.footer)
+            ? !matchesSaved(globalWidgets.footer, pageStore.originalGlobalWidgets.footer)
             : false;
 
         // Kept so their responses can be read: a header-only save carries its
@@ -292,7 +300,7 @@ const useAutoSave = create((set, get) => ({
         }
 
         const hasPageWidgetChanges = [...modifiedWidgets].some((id) => id !== "header" && id !== "footer");
-        const hasPageDiff = page && pageStore.originalPage ? !isEqual(page, pageStore.originalPage) : false;
+        const hasPageDiff = page && pageStore.originalPage ? !matchesSaved(page, pageStore.originalPage) : false;
         // Kept separately from the fan-out so its response can be read: the
         // server reports which page it took a listing anchor from, if any.
         let pageSave = null;

@@ -21,6 +21,10 @@ import useProjectStore, { useDefaultLanguage, useExtraLanguages } from "../store
 const CACHE_DURATION = 60000; // 1 minute
 const cache = new Map(); // cacheKey -> { data, time }
 const inflight = new Map(); // cacheKey -> Promise
+// Bumped by every invalidation. A load started before one may have read the old
+// pages and items, so it must not refill the cache, or the change it missed stays
+// out of the pickers until the TTL runs out.
+let generation = 0;
 
 // The languages are part of the identity, not just the project: adding or removing
 // one, or changing the default, keeps the same project id while changing every
@@ -35,6 +39,7 @@ const cacheKey = (projectId, languageKey) => `${projectId}${KEY_SEPARATOR}${lang
  * @param {string} [projectId] - Clear only this project, or all when omitted.
  */
 export function invalidateLinkTargetsCache(projectId) {
+  generation += 1;
   if (projectId) {
     const prefix = `${projectId}${KEY_SEPARATOR}`;
     for (const map of [cache, inflight]) {
@@ -140,17 +145,20 @@ export default function useLinkTargets() {
     setLoading(true);
     let promise = inflight.get(key);
     if (!promise) {
-      promise = (async () => {
+      const startedIn = generation;
+      const load = (async () => {
         try {
           const languages = languageKey.split(",");
           const data = await loadTargets(languages, languages[0]);
-          cache.set(key, { data, time: Date.now() });
+          if (generation === startedIn) cache.set(key, { data, time: Date.now() });
           return data;
         } finally {
-          inflight.delete(key);
+          // An invalidation may have dropped this load and a newer one taken its key.
+          if (inflight.get(key) === load) inflight.delete(key);
         }
       })();
-      inflight.set(key, promise);
+      inflight.set(key, load);
+      promise = load;
     }
 
     promise
