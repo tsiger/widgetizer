@@ -105,6 +105,18 @@ async function getDirectorySize(dirPath) {
 const serializeExportOps = createKeyedSerializer();
 
 /**
+ * Where a tracked media path's file is, when it lies inside the project's
+ * `uploads/<folder>`; null otherwise. The media library can arrive from a backup
+ * made elsewhere, and a path such as `/uploads/images/../../../etc/passwd` would
+ * otherwise copy a file from outside the project into the published site.
+ */
+function uploadSourcePath(projectDir, mediaPath, folder) {
+  if (typeof mediaPath !== "string") return null;
+  const resolved = path.resolve(projectDir, mediaPath.replace(/^\//, ""));
+  return isWithinDirectory(resolved, path.resolve(projectDir, "uploads", folder)) ? resolved : null;
+}
+
+/**
  * Run fn under the per-project export lock, serialized with every export
  * operation (export, delete, cleanup). For callers outside this module whose
  * work must not interleave with exports — project deletion holds it across
@@ -1090,7 +1102,7 @@ Per aspera ad astra
         let skippedCount = 0;
 
         for (const imageFile of usedImages) {
-          const sourceImagePath = path.join(projectDir, imageFile.path.replace(/^\//, ""));
+          const sourceImagePath = uploadSourcePath(projectDir, imageFile.path, "images");
           // Export images under the public assets/images/ directory.
           const targetImagePath = path.join(outputDir, "assets", "images", path.basename(imageFile.path));
           const hasLargeVariant = Boolean(imageFile.sizes?.large?.path);
@@ -1101,7 +1113,7 @@ Per aspera ad astra
 
           if (shouldCopyOriginal) {
             try {
-              if (await fs.pathExists(sourceImagePath)) {
+              if (sourceImagePath && (await fs.pathExists(sourceImagePath))) {
                 await fs.ensureDir(path.dirname(targetImagePath));
                 await fs.copy(sourceImagePath, targetImagePath);
                 copiedCount++;
@@ -1116,7 +1128,11 @@ Per aspera ad astra
             for (const [sizeName, sizeInfo] of Object.entries(imageFile.sizes)) {
               // Skip thumb variants — only used for the media library UI
               if (sizeName === "thumb") continue;
-              const sourceSizePath = path.join(projectDir, sizeInfo.path.replace(/^\//, ""));
+              const sourceSizePath = uploadSourcePath(projectDir, sizeInfo?.path, "images");
+              if (!sourceSizePath) {
+                console.warn(`Skipped the ${sizeName} size of ${imageFile.filename}: its path is outside the project's images.`);
+                continue;
+              }
               // Export generated image sizes under the public assets/images/ directory.
               const targetSizePath = path.join(outputDir, "assets", "images", path.basename(sizeInfo.path));
 
@@ -1170,11 +1186,11 @@ Per aspera ad astra
         let fileCopiedCount = 0;
 
         for (const fileAsset of usedFiles) {
-          const sourceFilePath = path.join(projectDir, fileAsset.path.replace(/^\//, ""));
+          const sourceFilePath = uploadSourcePath(projectDir, fileAsset.path, "files");
           const targetFilePath = path.join(outputDir, "assets", "files", path.basename(fileAsset.path));
 
           try {
-            if (await fs.pathExists(sourceFilePath)) {
+            if (sourceFilePath && (await fs.pathExists(sourceFilePath))) {
               await fs.ensureDir(path.dirname(targetFilePath));
               await fs.copy(sourceFilePath, targetFilePath);
               fileCopiedCount++;

@@ -18,6 +18,7 @@ import { getAllProjects, getProjectById } from "../db/repositories/projectReposi
 import { handleProjectResolutionError } from "../utils/projectErrors.js";
 import { sortVersions, getLatestVersion, isValidVersion, isNewerVersion } from "../utils/semver.js";
 import { hasAvailableUpdate } from "../utils/updateStatus.js";
+import { isSafePathSegment } from "../utils/pathSecurity.js";
 import { ZIP_MIME_TYPES } from "../utils/mimeTypes.js";
 import { updateThemeSettingsMediaUsage, extractMediaPathsFromThemeSettings } from "../services/mediaUsageService.js";
 import { withContentWriteLock, assertIntroducedMediaExists } from "../services/contentCoordination.js";
@@ -652,11 +653,21 @@ async function buildLatestSnapshotSerial(themeId) {
 /**
  * Resolve template, menu, and settings override paths for a preset.
  * If no presetId or preset directory doesn't exist, falls back to root.
+ * Throws when either name is not a single folder name.
  * @param {string} themeId - Theme identifier
  * @param {string|null} presetId - Preset identifier (null = use root defaults)
  * @returns {Promise<{templatesDir: string, menusDir: string|null, settingsOverrides: object|null, collectionsDir: string|null, mediaDir: string|null}>}
  */
 export async function resolvePresetPaths(themeId, presetId) {
+  // Checked here as well as on the create route, because embedding apps call
+  // this directly: a name with a separator or `..` would read another folder.
+  if (!isSafePathSegment(themeId)) {
+    throw new Error(`Invalid theme name: ${JSON.stringify(themeId)}`);
+  }
+  if (presetId && !isSafePathSegment(presetId)) {
+    throw new Error(`Invalid preset name: ${JSON.stringify(presetId)}`);
+  }
+
   // Use the theme source directory (latest/ if it exists, root otherwise)
   const sourceDir = await getThemeSourceDir(themeId);
   const rootTemplatesDir = path.join(sourceDir, "templates");

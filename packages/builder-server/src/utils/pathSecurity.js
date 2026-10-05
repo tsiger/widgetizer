@@ -17,3 +17,21 @@ import { isWithinDirectory as coreIsWithin } from "@widgetizer/core/pathSecurity
 export function isWithinDirectory(filePath, allowedBase) {
   return coreIsWithin(allowedBase, filePath, { allowEqual: false });
 }
+
+/**
+ * Whether `value` can name exactly one folder: a non-empty string with no path
+ * separator, no NUL and not `.` or `..`. For names taken from a request or a file
+ * (a theme or preset folder) that are joined onto a base directory.
+ *
+ * @param {unknown} value
+ * @returns {boolean}
+ */
+export function isSafePathSegment(value) {
+  return (
+    typeof value === "string" &&
+    value !== "" &&
+    value !== "." &&
+    value !== ".." &&
+    !/[/\\\0]/.test(value)
+  );
+}

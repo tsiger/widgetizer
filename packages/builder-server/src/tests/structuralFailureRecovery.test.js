@@ -268,6 +268,30 @@ describe("a theme update that cannot be applied", () => {
     assert.equal(await fs.pathExists(path.join(dir, "layout.liquid")), true, "and the displaced file is back");
   });
 
+  // The plan is a file in the project folder, and a project can come from a
+  // backup made elsewhere: a planted entry must not reach outside the project.
+  it("removes nothing outside the project, whatever an interrupted run's plan names", async () => {
+    const project = await projectOnOldTheme();
+    const dir = getProjectDir(project.folderName);
+    const sibling = path.join(path.dirname(dir), "neighbour-project");
+    await fs.outputFile(path.join(sibling, "keep.txt"), "not this project's");
+    await fs.outputJson(path.join(dir, "pages", "new-page.json"), { slug: "new-page", name: "New" });
+    await leaveInterruptedUpdate(dir, {
+      added: ["../neighbour-project", path.join("pages", "new-page.json")],
+      placedWhereAbsent: [sibling, "", "."],
+    });
+
+    await writeTheme("2.0.0");
+    const res = mockRes();
+    await applyProjectThemeUpdate(mockReq({ params: { id: project.id } }), res);
+
+    assert.equal(res._status, 200, JSON.stringify(res._json));
+    assert.equal(await fs.pathExists(path.join(sibling, "keep.txt")), true, "the neighbouring project");
+    assert.equal(await fs.pathExists(path.join(dir, "layout.liquid")), true, "the project itself");
+    assert.equal(await fs.pathExists(path.join(dir, "pages", "new-page.json")), false, "a real added page still goes");
+    await fs.remove(sibling);
+  });
+
   // The plan is written atomically, so this should not occur — but guessing is
   // the one thing recovery must not do.
   it("stops rather than guessing when an interrupted run's plan cannot be read", async () => {
@@ -590,5 +614,62 @@ describe("a preset that cannot be applied", () => {
 
     assert.equal(res._status, 201, JSON.stringify(res._json));
     assert.equal(projectRepo.getProjectById(res._json.id).preset, "plain");
+  });
+});
+
+// The theme and preset are folder names taken from the request, joined onto the
+// themes folder and the theme's presets folder.
+describe("a theme or preset name that steps outside its folder", () => {
+  it("is refused before anything is created", async () => {
+    const before = projectRepo.getAllProjects().length;
+    for (const body of [
+      { theme: "../themes-elsewhere" },
+      { theme: ".." },
+      { theme: `${THEME}/../${THEME}` },
+      { preset: "../../somewhere" },
+      { preset: "a/b" },
+    ]) {
+      const res = await create("Escaping Names", body);
+      assert.equal(res._status, 400, `${JSON.stringify(body)} -> ${JSON.stringify(res._json)}`);
+    }
+    assert.equal(projectRepo.getAllProjects().length, before);
+  });
+
+  it("is refused by resolvePresetPaths and the scaffold, for embedding apps that call them directly", async () => {
+    const { resolvePresetPaths } = await import("../controllers/themeController.js");
+    const { scaffoldProjectContent } = await import("../utils/projectScaffold.js");
+    await assert.rejects(() => resolvePresetPaths(THEME, "../.."), /Invalid preset name/);
+    await assert.rejects(() => resolvePresetPaths("../projects", null), /Invalid theme name/);
+    const target = path.join(TEST_ROOT, "scaffold-target");
+    await assert.rejects(() => scaffoldProjectContent({ projectDir: target, theme: "../themes-elsewhere" }), /Invalid theme name/);
+    assert.equal(await fs.pathExists(target), false);
+  });
+
+  // A theme can come from anywhere; its templates' stored slugs name the page
+  // files a new project (and a theme update) writes.
+  it("keeps a theme template whose stored slug steps outside inside the project's pages", async () => {
+    const template = path.join(getThemeDir(THEME), "templates", "about.json");
+    await fs.writeJson(template, { name: "About", slug: "../../../escaped-template", widgets: {} });
+    invalidateThemeSourceCache(THEME);
+    try {
+      const res = await create("Escaping Template");
+      assert.equal(res._status, 201, JSON.stringify(res._json));
+      const dir = getProjectDir(res._json.folderName);
+      assert.equal(await fs.pathExists(path.join(dir, "pages", "about.json")), true, "written under its file name");
+      // pages/../../../ is two folders above the project.
+      for (const outside of [dir, path.dirname(dir), path.dirname(path.dirname(dir))].map((d) => path.join(d, "escaped-template.json"))) {
+        assert.equal(await fs.pathExists(outside), false, outside);
+      }
+    } finally {
+      await fs.remove(template);
+      invalidateThemeSourceCache(THEME);
+    }
+  });
+
+  it("still creates a project from a real preset", async () => {
+    await writePreset("ordinary");
+    const res = await create("Ordinary Preset", { preset: "ordinary" });
+    assert.equal(res._status, 201, JSON.stringify(res._json));
+    assert.equal(projectRepo.getProjectById(res._json.id).preset, "ordinary");
   });
 });

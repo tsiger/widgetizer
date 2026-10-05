@@ -1,4 +1,5 @@
 import fs from "fs-extra";
+import { isSafePathSegment } from "../utils/pathSecurity.js";
 import path from "path";
 import * as themeController from "./themeController.js";
 import archiver from "archiver";
@@ -484,6 +485,15 @@ export async function createProject(req, res) {
 
     if (!isOptionalBoolean(cleanUrls)) {
       return res.status(400).json({ error: "cleanUrls must be a boolean." });
+    }
+
+    // Both name a folder the new project is built from, under the themes folder
+    // and the theme's presets folder, so neither may step outside it.
+    if (!isSafePathSegment(theme)) {
+      return res.status(400).json({ error: "This theme is not installed." });
+    }
+    if (preset && !isSafePathSegment(preset)) {
+      return res.status(400).json({ error: "This theme has no such preset." });
     }
 
     const { value: languageFields, error: languageError } = readLanguages(req.body);

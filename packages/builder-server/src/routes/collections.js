@@ -1,29 +1,15 @@
 import express from "express";
-import { body, param } from "express-validator";
+import { body } from "express-validator";
 
 import * as collectionController from "../controllers/collectionController.js";
 import { resolveActiveProject } from "../middleware/resolveActiveProject.js";
 import { validateRequest } from "../middleware/validateRequest.js";
 import { editorJsonParser } from "../middleware/jsonParser.js";
+import { slugParam, slugBody } from "../middleware/slugValidators.js";
 
 const router = express.Router();
 router.use(editorJsonParser);
 router.use(resolveActiveProject);
-
-const slugParam = (name) =>
-  param(name)
-    .matches(/^[a-z0-9-]+$/)
-    .withMessage(`${name} must contain lowercase letters, numbers, and hyphens only.`);
-
-// Validates each element of a body array (e.g. `itemSlugs.*`, `order.*`) as a
-// safe slug, so a crafted value like "../../pages/index" can never reach a path
-// helper. Mirrors `slugParam` for body-array inputs.
-const slugBody = (name) =>
-  body(name)
-    .isString()
-    .bail()
-    .matches(/^[a-z0-9-]+$/)
-    .withMessage(`${name} must contain lowercase letters, numbers, and hyphens only.`);
 
 // Schema endpoints
 router.get("/schemas", collectionController.getCollectionSchemas);

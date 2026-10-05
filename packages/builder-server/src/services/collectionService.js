@@ -633,7 +633,17 @@ export async function readCollectionItems(storage, scope, collectionType, lang) 
   for (const name of itemFileNames) {
     try {
       const raw = await readJson(storage, scope, `${collectionDirKey(collectionType, lang)}/${name}`);
-      if (raw != null) rawEntries.push({ name, raw });
+      if (raw == null) continue;
+      // The embedded slug names the item's page in every output path, so one that
+      // is not a plain slug (`../../elsewhere`, from a hand-edited file or a crafted
+      // backup) would publish outside the collection's folder; a missing one would
+      // publish as `undefined.html`. Writes only ever produce plain slugs.
+      const slug = raw.slug ?? raw.id;
+      if (typeof slug !== "string" || !SLUG_RE.test(slug)) {
+        console.warn(`[collections] Skipping item "${collectionType}/${name}": its slug is not a valid slug.`);
+        continue;
+      }
+      rawEntries.push({ name, raw });
     } catch (err) {
       console.warn(
         `[collections] Skipping unreadable item "${collectionType}/${name}": ${err.message}`,

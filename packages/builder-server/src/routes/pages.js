@@ -1,8 +1,9 @@
 import express from "express";
-import { body, param } from "express-validator";
+import { body } from "express-validator";
 import * as pageController from "../controllers/pageController.js";
 import { stripHtmlToText } from "../services/sanitizationService.js";
 import { resolveActiveProject } from "../middleware/resolveActiveProject.js";
+import { segmentParam, segmentBody } from "../middleware/slugValidators.js";
 import { validateRequest } from "../middleware/validateRequest.js";
 
 import { standardJsonParser, editorJsonParser } from "../middleware/jsonParser.js";
@@ -17,7 +18,7 @@ router.use(resolveActiveProject);
 router.get("/", pageController.getAllPages);
 
 // Get a specific page
-router.get("/:id", [param("id").notEmpty().withMessage("Page ID is required.")], validateRequest, pageController.getPage);
+router.get("/:id", [segmentParam("id")], validateRequest, pageController.getPage);
 
 // Create a new page
 router.post(
@@ -38,7 +39,7 @@ router.put(
   "/:id",
   standardJsonParser,
   [
-    param("id").notEmpty().withMessage("Page ID is required."),
+    segmentParam("id"),
     body("name").trim().customSanitizer(stripHtmlToText).notEmpty().withMessage("Page name is required.").isLength({ max: 200 }).withMessage(`Page name must be at most ${200} characters.`),
     body("seo.description").optional().trim().customSanitizer(stripHtmlToText),
     body("seo.og_title").optional().trim().customSanitizer(stripHtmlToText),
@@ -49,13 +50,13 @@ router.put(
 );
 
 // Delete a page
-router.delete("/:id", [param("id").notEmpty().withMessage("Page ID is required.")], validateRequest, pageController.deletePage);
+router.delete("/:id", [segmentParam("id")], validateRequest, pageController.deletePage);
 
 // Bulk delete pages
 router.post(
   "/bulk-delete",
   standardJsonParser,
-  [body("pageIds").isArray({ min: 1 }).withMessage("At least one page ID is required.")],
+  [body("pageIds").isArray({ min: 1 }).withMessage("At least one page ID is required."), segmentBody("pageIds.*")],
   validateRequest,
   pageController.bulkDeletePages,
 );
@@ -64,7 +65,7 @@ router.post(
 router.post(
   "/:id/duplicate",
   standardJsonParser,
-  [param("id").notEmpty().withMessage("Page ID is required.")],
+  [segmentParam("id")],
   validateRequest,
   pageController.duplicatePage,
 );
@@ -74,7 +75,7 @@ router.post(
   "/:id/translations",
   standardJsonParser,
   [
-    param("id").notEmpty().withMessage("Page ID is required."),
+    segmentParam("id"),
     body("targetLanguage").isString().withMessage("A target language is required."),
   ],
   validateRequest,
@@ -86,7 +87,9 @@ router.post(
   "/:id/content",
   editorJsonParser,
   [
-    param("id").notEmpty().withMessage("Page ID is required."),
+    segmentParam("id"),
+    // The save can rename the page to this slug, so it is held to the same rule.
+    segmentBody("slug"),
     body("seo.description").optional().trim().customSanitizer(stripHtmlToText),
     body("seo.og_title").optional().trim().customSanitizer(stripHtmlToText),
     body("seo.canonical_url").optional().trim().customSanitizer(stripHtmlToText),

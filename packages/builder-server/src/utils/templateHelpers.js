@@ -1,5 +1,6 @@
 import fs from "fs-extra";
 import path from "path";
+import { isSafePathSegment } from "./pathSecurity.js";
 
 /**
  * Recursively walk a theme templates directory, read each JSON template,
@@ -24,7 +25,12 @@ export async function processTemplatesRecursive(sourceDir, targetDir, processor)
       await processTemplatesRecursive(sourcePath, targetSubDir, processor);
     } else if (entry.isFile() && entry.name.endsWith(".json")) {
       const templateContent = await fs.readJson(sourcePath);
-      const templateSlug = templateContent.slug || path.basename(entry.name, ".json");
+      // The slug names the page file this writes, in a new project and on a theme
+      // update. A theme can come from anywhere, so a stored slug that is not a
+      // single name (`../../elsewhere/theme`) gives way to the file's own name.
+      const templateSlug = isSafePathSegment(templateContent.slug)
+        ? templateContent.slug
+        : path.basename(entry.name, ".json");
       const targetPath = path.join(targetDir, `${templateSlug}.json`);
 
       await processor(templateContent, templateSlug, targetPath);
