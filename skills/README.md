@@ -2,7 +2,7 @@
 
 Agent Skills for people who build with Widgetizer. Each skill folder contains portable authoring guidance and assets. Executable theme validation belongs to the app checkout; the skill explains when that validation is available and when it remains pending. These maintainer notes are not part of a distributed skill.
 
-For the current design exploration and next-session handoff, see [STATUS.md](STATUS.md).
+For skill/tooling progress and remaining work, see [STATUS.md](STATUS.md). Premium theme planning and development progress live with the private theme sources in `WIDGETIZER-PREMIUM-THEMES.md`; keep the collection notebook there rather than in this skill folder or Google Drive.
 
 ## widgetizer-theme-design
 
@@ -10,7 +10,7 @@ The [design skill](widgetizer-theme-design/SKILL.md) covers the theme brief, sel
 
 The Widgetizer premium collection's standing design rules live in [theme-collections/widgetizer-premium.json](theme-collections/widgetizer-premium.json). Read them for Common and new themes in that collection. This repository-specific brief stays outside the portable skills, so other theme authors keep their own preferences.
 
-Curated design examples and quality criteria for the completed theme are still to develop. The preview guidance includes an initial desktop/mobile visual review. The shared widget pool will grow from actual theme work. Themes are created under `themes/`; this skill does not relocate them.
+Curated design examples and quality criteria for the completed theme are still to develop. The preview guidance includes an initial desktop/mobile visual review. The shared widget pool will grow from actual theme work. Repository themes normally live under `themes/`; the premium collection uses a separate private source repository connected through `THEMES_EXTRA_ROOTS`. The skill does not relocate existing themes. App discovery of external sources does not make the development sync scripts use those roots; see [STATUS.md](STATUS.md).
 
 ## widgetizer-theme
 
