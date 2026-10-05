@@ -247,16 +247,6 @@ Fix at both ends: validate/strip on import (drop `.theme-update-*`, validate ite
 
 **Start:** [projectController.js](../packages/builder-server/src/controllers/projectController.js), [themeUpdateService.js](../packages/builder-server/src/services/themeUpdateService.js), [exportController.js](../packages/builder-server/src/controllers/exportController.js), [mediaRepository.js](../packages/builder-server/src/db/repositories/mediaRepository.js). **Source:** 2026-10-05 code review of `48eef6f4..9e98dad7`.
 
-### LOGO-NOTES · Adding a logo while creating a project erases its notes
-
-**Open · High · Shared**
-
-`ProjectsAdd.jsx` `addLogo` (~19) follows `createProject` with a partial `updateProject(id, { name, siteIdentity })`. The PUT route runs `body("description").trim()…` without `.optional()` (`routes/projects.js` ~58), and express-validator writes `""` into `req.body` for the missing field; `projectRepository.updateProject` (~91) keeps a value only when it is `undefined`, so it stores `""`. Confirmed with a scratch `body("description").trim().run(req)`. Any other partial PUT caller has the same exposure.
-
-**Done when:** A partial project update leaves omitted fields untouched (route marks optional fields `.optional()`, or the client sends the full record), and a test covers create-with-logo keeping the notes.
-
-**Start:** [ProjectsAdd.jsx](../app/src/pages/ProjectsAdd.jsx), [projects.js routes](../packages/builder-server/src/routes/projects.js), [projectRepository.js](../packages/builder-server/src/db/repositories/projectRepository.js). **Source:** 2026-10-05 code review of `48eef6f4..9e98dad7`.
-
 ### R-THEME-SAVE · Keep theme-settings saves in order
 
 **Open · Medium · Shared**
@@ -305,28 +295,6 @@ Related to T76 (product rule) and R1-COORD (scope of coordination), but both cas
 **Done when:** A response for a previous type/project/language set is discarded, and a test covers out-of-order responses.
 
 **Start:** [useCollectionItems.js](../packages/editor-ui/src/hooks/useCollectionItems.js), [CollectionItems.jsx](../packages/editor-ui/src/pages/CollectionItems.jsx). **Source:** 2026-10-05 code review of `48eef6f4..9e98dad7`.
-
-### HOME-SLUG-LINKS · Links to a page slugged "home" break when Clean URLs is off
-
-**Open · Medium · Shared**
-
-`isHomeSlug` accepts `index` and `home`, and `pageOutputPath` writes both to `index.html`, but `pageHref` (`internalHref.js` ~29) only special-cases the homepage when Clean URLs is on; otherwise it emits `home.html`. Menus, link fields and the breadcrumb Home crumb (`breadcrumbs.js` ~180) then point at a missing file. Export accepts a non-default language whose homepage is slugged `home`, so `el/index.html` is linked as `el/home.html`. Standalone preview still navigates (it maps to `/preview/page/el/home`), so preview and export disagree. Reproduced with a script. Same mismatch existed for a root `home` page.
-
-**Done when:** Every href to a home-slugged page matches its output file in both URL modes and languages, with a test.
-
-**Start:** [internalHref.js](../packages/core/src/utils/internalHref.js), [contentAddress.js](../packages/core/src/utils/contentAddress.js), [breadcrumbs.js](../packages/core/src/utils/breadcrumbs.js). **Source:** 2026-10-05 code review of `48eef6f4..9e98dad7`.
-
-### SEO-LANG · Fix multilingual search-engine output gaps
-
-**Open · Medium · Shared**
-
-- **Breadcrumb JSON-LD Home** (`structuredData/breadcrumbNode.js` ~20) always maps `crumb.home` to `absoluteSiteUrl(siteUrl, "")`, ignoring the crumb's `canonicalPath`: on `/el/about.html` the visible trail links the Greek home but JSON-LD says `https://site/`. Reproduced with a script. Medium.
-- **Numbered copies emit page-1 hreflang** (`tags/SeoTag.js` ~64): `blog/page/2.html` has canonical `…/blog/page/2.html` but hreflang en→`blog.html`, el→`el/blog.html`, x-default→`blog.html`, with no self-reference. `seoArtifacts.js` deliberately leaves alternates off numbered copies, so HTML and sitemap disagree. Reproduced with `SeoTag.render`. Low.
-- **New language versions copy a custom canonical URL** (`pageController.createPageLanguageVersion` `...source`; `collectionService.createItemLanguageVersion` keeps `canonical_url`): the Greek page declares the English URL canonical while marked as the Greek alternate. Low; may be accepted "copy then edit".
-
-**Done when:** Breadcrumb JSON-LD uses the language's home, numbered copies emit no (or self-consistent) alternates matching the sitemap, and the canonical-copy rule is decided and tested.
-
-**Start:** [breadcrumbNode.js](../packages/core/src/structuredData/breadcrumbNode.js), [SeoTag.js](../packages/core/src/tags/SeoTag.js), [seoArtifacts.js](../packages/builder-server/src/services/seoArtifacts.js). **Source:** 2026-10-05 code review of `48eef6f4..9e98dad7`.
 
 ### PARENT-TRANSLATION · Deleting a parent page detaches its translated children
 

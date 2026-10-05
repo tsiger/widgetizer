@@ -191,14 +191,6 @@ Restoring a backup trusts too much of what is inside it. A deliberately crafted 
 
 **Next:** Check and clean every part of a backup on restore, and also make theme updates and exports refuse paths outside their own folder. Add a test for each crafted case.
 
-### LOGO-NOTES · Adding a logo while creating a project erases its notes
-
-**Open · High · Shared**
-
-If you fill in Notes and choose a logo on the New project form, the project is created with the notes and then the logo step wipes them.
-
-**Next:** Make a partial project update leave fields it didn't send untouched, and test that create-with-logo keeps the notes.
-
 ### R-THEME-SAVE · Keep theme-settings saves in order
 
 **Open · Medium · Shared**
@@ -230,22 +222,6 @@ If one tab adds a language at the same moment another tab changes the main langu
 Switching quickly between two collections can leave the second one's screen showing the first one's items. Deleting from that screen can then delete the wrong item.
 
 **Next:** Ignore list results that arrive for a collection you have already left, and test it.
-
-### HOME-SLUG-LINKS · Links to a page slugged "home" break when Clean URLs is off
-
-**Open · Medium · Shared**
-
-A homepage whose address is "home" is published as index.html, but links and breadcrumbs point to home.html, which doesn't exist. Translated homepages make this easy to hit. Preview works, so it only shows up in the exported site.
-
-**Next:** Make links to a "home" page match the file it is published as, in every language and URL mode.
-
-### SEO-LANG · Fix multilingual search-engine output gaps
-
-**Open · Medium · Shared**
-
-On translated pages, the hidden breadcrumb information for search engines names the main language's homepage as "Home". Page 2 and later of a split page tell search engines about the wrong alternate-language pages. A new translation also copies a custom canonical address from the original, so the translation points search engines at the original page.
-
-**Next:** Fix the breadcrumb Home address and the page-2 alternates, and decide whether a custom canonical address should be copied into translations.
 
 ### PARENT-TRANSLATION · Deleting a parent page detaches its translated children
 

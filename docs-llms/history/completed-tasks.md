@@ -77,6 +77,36 @@ The owner chose flat widget assets as the supported contract instead of adding n
 
 **Body at:** `33cc699a:docs-llms/TODO-agents.md` (the original nested-export proposal). Resolution is recorded in the documentation changes accompanying this entry.
 
+### LOGO-NOTES · Adding a logo while creating a project erased its notes
+
+**Done · High · Shared · 2026-10-05**
+
+The project update route ran `description` through `trim()` without `optional()`, so express-validator wrote `""` for a missing field and the repository stored it. The new-project form saves a picked logo with a partial update right after creating the project, which wiped the notes just entered.
+
+**Resolution:** the update route marks `description` optional, so an update that leaves it out keeps the stored value; sending it (including empty) behaves as before. A route-level test in `projects.test.js` covers the partial update. Fix `5e413aa5`.
+
+**Body at:** `df3aa2f4:docs-llms/TODO-agents.md`.
+
+### HOME-SLUG-LINKS · Links to a page slugged "home" broke when Clean URLs was off
+
+**Done · Medium · Shared · 2026-10-05**
+
+`isHomeSlug` treats `index` and `home` as the homepage and both publish as the language's `index.html`, but `pageHref` only special-cased them with Clean URLs on, so links to a `home` page pointed at a missing `home.html`. Export also required a literal `index` at the root, standalone preview and the sidebar preview button looked only for `index`, and nothing stopped a language holding both slugs (one overwrote the other on export).
+
+**Resolution:** the owner chose to keep `home` as a homepage alias and make it consistent. `pageHref` routes either home slug through `homeHref` in both URL modes; export accepts either slug as the default-language homepage and refuses a language holding both ("Export failed: two homepages"); page create gives the next free slug, renames onto the other home slug get 409 (the homepage may switch between them), and the editor save path refuses a rename onto any existing page; standalone preview falls back to `home` on a 404 for `index`; the sidebar preview button uses `isHomeSlug`. Creating a page with a taken slug keeps auto-suffixing (owner's choice). Not covered: concurrent creates (R1-COORD) and an embedding app's own publish pipeline. Fix `68e13846`.
+
+**Body at:** `df3aa2f4:docs-llms/TODO-agents.md`.
+
+### SEO-LANG · Fix multilingual search-engine output gaps
+
+**Done · Medium · Shared · 2026-10-05**
+
+Three gaps: the BreadcrumbList home crumb always named the Site URL root, so translated pages pointed search engines at the default homepage; numbered pagination copies emitted hreflang alternates pointing at page 1 with no self-reference, disagreeing with the sitemap; and a new language version copied a custom canonical URL, declaring the source's address canonical.
+
+**Resolution:** the home crumb uses the folder of its own homepage (`el/`, or the root), matching the canonical and sitemap; page 2+ emits no alternates (owner chose omission over per-language page-N links); creating a page or item language version clears a custom canonical (owner's choice; other SEO fields still copy, duplicates unchanged). The same commit documents the one-homepage-per-language rule and the two-homepages export refusal from `68e13846`. User-facing messages keep naming only `index` (owner's choice). Fix `edb7c1df`.
+
+**Body at:** `df3aa2f4:docs-llms/TODO-agents.md`.
+
 ## Reconciliation decisions
 
 - GitHub #115, #122, #126, #133, #134 and #135 have implementation evidence. Their remaining local entries are review/documentation/integration work, not instructions to rebuild the features. GitHub statuses were left unchanged.
