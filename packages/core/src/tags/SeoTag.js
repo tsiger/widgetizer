@@ -61,8 +61,13 @@ export const SeoTag = {
       // a crawler will honour), and no sibling advertises it. Search engines
       // drop such annotations anyway, so emitting them only puts a page's
       // robots directive at odds with its own markup.
+      //
+      // A numbered copy (page 2+) publishes none either. Its translations point
+      // at the base pages, which would list alternates without the copy itself,
+      // and the other language may have a different number of copies; the
+      // sitemap leaves copies without alternates for the same reason.
       const translations = Array.isArray(page.translations) ? page.translations : [];
-      if (translations.length > 1 && !robots.includes("noindex")) {
+      if (translations.length > 1 && !robots.includes("noindex") && !(pageNumber > 1)) {
         for (const entry of translations) {
           if (entry.fallback || entry.noindex || !entry.seoUrl) continue;
           metaTags.push(

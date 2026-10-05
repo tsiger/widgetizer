@@ -17,8 +17,11 @@ export function breadcrumbItems({ page, project } = {}) {
   const items = [];
   for (const crumb of trail) {
     if (!crumb || typeof crumb.canonicalPath !== "string" || !crumb.canonicalPath) continue;
+    // A homepage is its directory whatever the Clean URLs value, so the home
+    // crumb is the folder of its own language's homepage: the Site URL itself,
+    // or `el/` under it.
     const url = crumb.home
-      ? absoluteSiteUrl(project?.siteUrl, "")
+      ? absoluteSiteUrl(project?.siteUrl, crumb.canonicalPath.replace(/index\.html$/, ""))
       : absoluteSiteUrl(project?.siteUrl, publicPath(crumb.canonicalPath, { cleanUrls: project?.cleanUrls }));
     const label = typeof crumb.label === "string" ? crumb.label.trim() : "";
     const name = crumb.pageNumber ? `Page ${crumb.pageNumber}` : label;

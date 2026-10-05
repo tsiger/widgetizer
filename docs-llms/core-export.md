@@ -62,14 +62,14 @@ Rendering is delegated through `renderingService.js`, which wires capability (co
 
 ### Fail-Fast Ordering: Validation Before Any Write
 
-`exportProjectToDir` is structured so **all read-only setup and validation happen before the first disk write**. A blocked export (missing homepage, invalid collection items, missing collection template) therefore leaves **no** output directory, favicon, manifest, or partial HTML behind. Nothing touches disk until the "validation passed" marker.
+`exportProjectToDir` is structured so **all read-only setup and validation happen before the first disk write**. A blocked export (missing homepage, two homepages in one language, invalid collection items, missing collection template) therefore leaves **no** output directory, favicon, manifest, or partial HTML behind. Nothing touches disk until the "validation passed" marker.
 
 Read-only setup + validation phase:
 
 1. **Resolve project** — `projectRepo.getProjectById(projectId)` yields `folderName`, `siteUrl`, theme, etc. Missing project throws.
 2. **Compute version + output path** — `exportRepo.getNextVersion(projectId)` (auto-incrementing v1, v2, …); the output dir is `<publishDir>/<folderName>-v<version>`.
 3. **Load theme + pages** — `readProjectThemeData` (then `preprocessThemeSettings`), `listProjectPagesData`.
-4. **Homepage validation** — at least one page must have the slug `index` (page `id` is derived from filename). Otherwise throws `statusCode 400` / "Export failed: No homepage found".
+4. **Homepage validation** — the default language must have a homepage: a page slugged `index` or `home` (page `id` is derived from filename), both of which publish as `index.html`. Otherwise throws `statusCode 400` / "Export failed: No homepage found". A language holding both an `index` and a `home` page throws `statusCode 400` / "Export failed: two homepages", since both would write that language's `index.html`; the editor refuses the pair, but older projects, imports and theme updates can carry one.
 5. **Two-pass collection validation** (only when `collectionDeps` supplies storage + scope) — see [§3](#3-collection-item-page-export).
    Then **pagination plans**: `planPagination` runs per page, and the totals (`pageCounts`) feed the sitemap and the page loop. If the homepage paginates while a `hasItemPages` collection uses `slugPrefix: "page"`, the export throws `statusCode 400` / "Export failed: homepage pages clash with a collection" — both would write into `page/`.
 
@@ -114,9 +114,9 @@ After pages: collection item pages ([§3](#3-collection-item-page-export)), the 
 | Other page, homepage page 2+, numbered copy | `WebPage`, plus `BreadcrumbList` when the trail has two or more entries |
 | Collection item page | `WebPage`, `BreadcrumbList`, and the type's node when its schema declares a `structuredData` block (News → `BlogPosting`, [Collections §5c](core-collections.md)) |
 
-- **Ids and `url` use the page's own published address** (`pageSelfUrl` in `publishedUrls.js`, shared with the canonical): `<address>#webpage`, `#breadcrumb`, `#article`. An explicit `seo.canonical_url` does not move them. Clean URLs shapes them like every other address, and the homepage is the Site URL root.
+- **Ids and `url` use the page's own published address** (`pageSelfUrl` in `publishedUrls.js`, shared with the canonical): `<address>#webpage`, `#breadcrumb`, `#article`. An explicit `seo.canonical_url` does not move them. Clean URLs shapes them like every other address, and a homepage is its language's directory: the Site URL root, or `el/` under it.
 - **Identity node** (`siteNodes.js`), from `project.siteIdentity` via `resolveSiteIdentity`: `name` (public name, else Site Title), `description`, `url`, `email`, `telephone`, `sameAs` (project profiles only). An organization gets `logo`, a person `image`, and a local business both, plus `priceRange`, `address` (`PostalAddress` from the primary location) and `openingHoursSpecification` (one entry per day and range; a closed day is `00:00`–`00:00`). VeterinaryCare is typed `["VeterinaryCare", "LocalBusiness"]`. `WebSite.publisher` and the homepage `WebPage.about` point at it.
-- **`BreadcrumbList`** comes from `page.breadcrumbs`, the same trail the visible breadcrumb draws: the home crumb is the Site URL root, other crumbs are absolute `canonicalPath` addresses, and a numbered copy's last crumb is named `Page N`. A theme that passes its own `page_label` / `home_label` to the breadcrumbs snippet will show different words than the JSON-LD.
+- **`BreadcrumbList`** comes from `page.breadcrumbs`, the same trail the visible breadcrumb draws: the home crumb is its language's homepage as a directory (the Site URL root, or `el/` under it, whatever the Clean URLs value), other crumbs are absolute `canonicalPath` addresses, and a numbered copy's last crumb is named `Page N`. A theme that passes its own `page_label` / `home_label` to the breadcrumbs snippet will show different words than the JSON-LD.
 - **Images** use the og:image rules (`publishedImageUrl`): `<site>/assets/images/<file>`, the `large` variant for rasters that have one. The identity logo is tracked as media usage `global:site-identity` ([Media Library](core-media.md)), so the used-images copy in [§4](#4-asset-copying) ships it.
 
 **Readiness.** `exportProjectToDir` returns `structuredData: { readiness }` and `POST /api/export` passes it through. `readiness` is `identityReadiness(siteIdentity, project)`: one `{ item, ok }` for `siteUrl` and `name`, `logo` unless the identity is a person, and `address` for a local business (street, city and country all set). Project details computes the same list for its readiness line.

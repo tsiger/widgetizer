@@ -127,7 +127,7 @@ Do not generalize media metadata fallback into a whole-site fallback policy. [bu
 
 What `buildTranslations` reads off a sibling is defined once, as `translationSibling`. The SEO builders hold whole page and item records while a render holds the uuid reference map, and both are narrowed through that projection before anything is read. Both paths now use one definition of the sibling fields, preventing the missing-field mismatch found in the R7 review.
 
-Additional languages without homepages are omitted. The default destination assumes the required root homepage; export fails when that homepage is missing. For a listing's generated copies, language destinations point to the related base page or homepage, not the same page number in another language: the two lists may have different lengths. See the [builder](../../packages/core/src/utils/translations.js) and the [theme language-switcher contract](../theming.md#the-language-switcher-pagetranslations).
+Additional languages without homepages are omitted. The default destination assumes the required root homepage; export fails when that homepage is missing. For a listing's generated copies, language destinations point to the related base page or homepage, not the same page number in another language: the two lists may have different lengths. That is what the visitor switcher shows; the copies publish no `hreflang` alternates, since a set pointing at the base pages would leave the copy itself out. See the [builder](../../packages/core/src/utils/translations.js) and the [theme language-switcher contract](../theming.md#the-language-switcher-pagetranslations).
 
 ## Theme words, authored words and dates
 
@@ -139,7 +139,7 @@ Dates retain the chosen format but use the rendered language's month names. Them
 
 1. Create a project with one default language.
 2. Add another language: seed its menus and globals, not every page/item.
-3. Create a page/item version: copy content once, create a fresh UUID, join the same group, then edit independently.
+3. Create a page/item version: copy content once (except a custom canonical URL), create a fresh UUID, join the same group, then edit independently.
 4. Duplicate content: create unrelated content with a new group, even if the source has translations.
 5. Remove a language: delete that partition and its usage/metadata overrides; retain shared assets and other versions.
 6. Change the default code only while no additional languages exist. Root content stays in place and is relabeled.

@@ -142,3 +142,39 @@ describe("BreadcrumbList", () => {
     expect(graphFor(pageWithTrail("alice"), { siteUrl: "" })).toEqual([]);
   });
 });
+
+// The visible trail links each language's own homepage; the JSON-LD names the
+// same one, a directory whatever the Clean URLs value.
+describe("BreadcrumbList — in another language", () => {
+  const GREEK = [
+    pageRow("index", "Home", { language: "en" }),
+    pageRow("index", "Αρχική", { uuid: "p-el-index", language: "el" }),
+    pageRow("sxetika", "Σχετικά", { uuid: "p-el-sxetika", language: "el" }),
+  ];
+  const greekPage = (project) => {
+    const page = GREEK.find((candidate) => candidate.slug === "sxetika");
+    const breadcrumbs = buildBreadcrumbs({
+      page,
+      pagesByUuid: pagesByUuid(GREEK),
+      cleanUrls: !!project.cleanUrls,
+      defaultLanguage: "en",
+    });
+    return { ...page, breadcrumbs };
+  };
+
+  it("names the Greek homepage as Home, with Clean URLs off", () => {
+    const project = { defaultLanguage: "en" };
+    expect(trail(listOf(greekPage(project), project))).toEqual([
+      [1, "Αρχική", `${SITE}/el/`],
+      [2, "Σχετικά", `${SITE}/el/sxetika.html`],
+    ]);
+  });
+
+  it("names the Greek homepage as Home, with Clean URLs on", () => {
+    const project = { defaultLanguage: "en", cleanUrls: true };
+    expect(trail(listOf(greekPage(project), project))).toEqual([
+      [1, "Αρχική", `${SITE}/el/`],
+      [2, "Σχετικά", `${SITE}/el/sxetika`],
+    ]);
+  });
+});

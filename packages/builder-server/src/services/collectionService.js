@@ -1116,7 +1116,9 @@ export async function createItemLanguageVersion(storage, scope, collectionType, 
     schemaVersion: schema.schemaVersion,
     created: now,
     updated: now,
-    ...(schema.hasItemPages ? { seo: shapeItemSeo(source.seo) } : {}),
+    // A custom canonical names the source's address; the new version starts
+    // with its own automatic one instead.
+    ...(schema.hasItemPages ? { seo: { ...shapeItemSeo(source.seo), canonical_url: "" } } : {}),
     settings: { ...(source.settings || {}) },
   };
 

@@ -110,3 +110,27 @@ describe("hreflang", () => {
     expect(html).toContain('hreflang="pt-BR"');
   });
 });
+
+// A numbered copy's translations point at the base pages, so alternates there
+// would leave the copy out of its own set; the sitemap omits them likewise.
+describe("hreflang on a numbered copy", () => {
+  const translations = [entry("en", { active: true, seoUrl: "https://example.com/about.html" }), entry("el")];
+
+  it("is left out on page 2", () => {
+    const html = render({
+      page: { ...pageWith(translations), pagination: { current: 2, total: 3 } },
+      project: PROJECT,
+    });
+    expect(html).not.toContain('rel="alternate" hreflang');
+    expect(html).toContain('<link rel="canonical" href="https://example.com/about/page/2.html">');
+  });
+
+  it("stays on page 1 of a split page", () => {
+    const html = render({
+      page: { ...pageWith(translations), pagination: { current: 1, total: 3 } },
+      project: PROJECT,
+    });
+    expect(html).toContain('hreflang="el"');
+    expect(html).toContain('hreflang="x-default"');
+  });
+});

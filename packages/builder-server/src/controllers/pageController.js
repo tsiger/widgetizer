@@ -998,6 +998,10 @@ export async function createPageLanguageVersion(req, res) {
 
       const created = {
         ...source,
+        // A custom canonical names the source's address; copied, it would point
+        // the new version at the other language. The new version starts with its
+        // own automatic address instead.
+        ...(source.seo ? { seo: { ...source.seo, canonical_url: "" } } : {}),
         uuid: randomUUID(),
         translationGroupId: groupId,
         language: target.language,
