@@ -61,7 +61,7 @@ The code input had an unwanted gap at the bottom.
 
 **Review · Unrated · OSS · tsiger**
 
-Undo history now survives saves, so autosave should not prevent undoing an edit.
+Undo history now survives saves, so autosave should not prevent undoing an edit. Turning on "Split into pages" currently takes three undo steps to fully reverse.
 
 **Next:** Check the shipped behaviour against the intended experience. [GitHub #134](https://github.com/tsiger/widgetizer/issues/134)
 
@@ -155,6 +155,14 @@ The folder-name field may expose a technical detail users do not need.
 
 **Next:** Decide whether to hide it, explain it or make it advanced. [GitHub #139](https://github.com/tsiger/widgetizer/issues/139)
 
+### MEDIA-BLANK-ALT · Decide whether translated media text can be deliberately blank
+
+**Decision needed · Low · Shared**
+
+The server understands "deliberately blank" alt text for one language (useful for decorative images), but the media panel has no way to set it, and saving the panel quietly turns an existing blank back into "use the main language's text".
+
+**Next:** Either bring back a control for it, or drop the idea from the server and docs so they match the screen.
+
 ## Planned features
 
 ### MEDIA-MP4 · Support uploaded MP4 videos on site pages
@@ -167,13 +175,85 @@ The Widgetizer marketing site needs MP4 videos on some pages. We should be able 
 
 ## Fixes and investigations
 
+### LINK-DIRTY · Choosing a page in a link picker leaves the editor permanently "unsaved"
+
+**Open · High · Shared**
+
+After you pick a page for a button or link and save, the editor keeps saying there are unsaved changes: Save stays active, autosave keeps re-saving, and leaving the page warns you. Your work is saved; the editor just can't tell. Reloading clears it until the next time you pick a page. An app embedding the editor that checks for unsaved changes before an action (such as publishing) gets stuck.
+
+**Next:** Make the "unsaved changes" check ignore empty values the save itself drops, and stop the link field adding them. Add a test that picking a page and saving leaves the editor clean.
+
+### BACKUP-TRUST · Validate everything a restored backup brings in
+
+**Open · High · Shared**
+
+Restoring a backup trusts too much of what is inside it. A deliberately crafted backup can make a later theme update delete another project's folder, make an export copy files from elsewhere on the computer into the published site, or make an export write outside its own folder. A tiny zip can also expand until the disk fills, and some project details and media translations are accepted without checks. Normal backups made by the app are not affected.
+
+**Next:** Check and clean every part of a backup on restore, and also make theme updates and exports refuse paths outside their own folder. Add a test for each crafted case.
+
+### LOGO-NOTES · Adding a logo while creating a project erases its notes
+
+**Open · High · Shared**
+
+If you fill in Notes and choose a logo on the New project form, the project is created with the notes and then the logo step wipes them.
+
+**Next:** Make a partial project update leave fields it didn't send untouched, and test that create-with-logo keeps the notes.
+
 ### R-THEME-SAVE · Keep theme-settings saves in order
 
 **Open · Medium · Shared**
 
 Confirmed with delayed save responses: save a red color, then blue, and an older response can make the app remember red as the saved value. Reset then brings back red even though blue is actually saved. The settings screen allows these saves to overlap.
 
-**Next:** Coordinate theme-settings saves from both the settings screen and page editor. Verify that delayed responses cannot bring back old values, Reset reflects what was saved, and changes made while saving are preserved.
+**Next:** Coordinate theme-settings saves from both the settings screen and page editor. Verify that delayed responses cannot bring back old values, Reset reflects what was saved, and changes made while saving are preserved. Also cover two smaller timing gaps: a theme draft saved after you discarded and left, and the Settings screen getting stuck on its spinner.
+
+### GH147 · A stale tab's theme-settings save reverts a theme update
+
+**Open · Medium · Shared**
+
+If an editor or Site settings screen was open before a theme update and you then save a theme setting there, it puts the old theme settings back. The project still says it is on the new version, so the update is never offered again and its new settings (such as Show breadcrumbs) never appear. Nothing warns the user.
+
+**Next:** Make the server refuse a theme-settings save based on an older copy and ask the user to reload, without losing unsaved edits. Then consider telling open tabs about an update as soon as it happens. Plan it together with R-THEME-SAVE. [GitHub #147](https://github.com/tsiger/widgetizer/issues/147)
+
+### LANG-LOCK-CHECKS · Re-check language rules inside the write lock
+
+**Open · Medium · Shared**
+
+If one tab adds a language at the same moment another tab changes the main language, the project can end up in a state where project settings can no longer be saved and the language can't be removed. A similar timing can let a new page take a language code (such as "el") as its address.
+
+**Next:** Re-check both rules at the moment of writing, and add tests for the two timings.
+
+### COLLECTION-LIST-RACE · A slow collection list can show another collection's items
+
+**Open · Medium · Shared**
+
+Switching quickly between two collections can leave the second one's screen showing the first one's items. Deleting from that screen can then delete the wrong item.
+
+**Next:** Ignore list results that arrive for a collection you have already left, and test it.
+
+### HOME-SLUG-LINKS · Links to a page slugged "home" break when Clean URLs is off
+
+**Open · Medium · Shared**
+
+A homepage whose address is "home" is published as index.html, but links and breadcrumbs point to home.html, which doesn't exist. Translated homepages make this easy to hit. Preview works, so it only shows up in the exported site.
+
+**Next:** Make links to a "home" page match the file it is published as, in every language and URL mode.
+
+### SEO-LANG · Fix multilingual search-engine output gaps
+
+**Open · Medium · Shared**
+
+On translated pages, the hidden breadcrumb information for search engines names the main language's homepage as "Home". Page 2 and later of a split page tell search engines about the wrong alternate-language pages. A new translation also copies a custom canonical address from the original, so the translation points search engines at the original page.
+
+**Next:** Fix the breadcrumb Home address and the page-2 alternates, and decide whether a custom canonical address should be copied into translations.
+
+### PARENT-TRANSLATION · Deleting a parent page detaches its translated children
+
+**Open · Medium · Shared**
+
+Deleting a parent page in one language also removes the parent link from its child pages in other languages, even though the parent's translation still exists. Their breadcrumbs lose a level.
+
+**Next:** Only clear the parent when no translation of it survives, and test it.
 
 ### T32 · Check theme-upload validation cleanup
 
@@ -230,6 +310,125 @@ One backend test once received a web page where it expected data, but passed by 
 Some failures may look like an empty list or disappear with a brief notification.
 
 **Next:** Recheck the reported screens, then fix one coherent group at a time.
+
+### UI-LIST-REPLY · A bad list reply crashes or silently empties editor screens
+
+**Open · Low · Shared**
+
+During one Firefox session after upgrading, some of the editor's data requests came back empty, even though the server had sent everything; a browser restart made it stop. The editor handled those empty replies badly:
+
+- the Pages screen showed "Error 500 / Unexpected error"
+- the page editor showed widgets without names or settings, and "Add widget" listed nothing
+- Media's "Used in" showed codes like `page:abc…` instead of page names
+- the theme-update count failed quietly
+
+None of these told the user that something had failed to load.
+
+**Next:** When a reply isn't what's expected, show a clear "couldn't load" message instead of crashing or showing empty content (not an empty list, which would look like deleted pages). Fix the four cases above and the other screens that use the same language-version code (collection items list, collection item form, editor top bar). Then check the other list screens (menus, media, collections and similar) once: fix crashes and silent failures here, and pass any that show an empty list instead of an error to T64. Also decide whether the server should tell browsers not to keep copies of editor data.
+
+### PAGE-SLUG-INPUT · Validate the slug sent with a page save
+
+**Open · Low · Shared**
+
+A hand-made request can give a page an address like "../theme" and overwrite the project's theme settings file, or write a page into another language's folder. The app itself never sends this.
+
+**Next:** Check page and menu addresses on the server before saving, with tests.
+
+### EXPORT-CLASH-LANG · Catch output-path clashes inside language folders
+
+**Open · Low · Shared**
+
+Export refuses some address clashes only for the main language. In a translated language, a collection can silently overwrite pages: after a theme update adds a collection named like a language code, or with a split homepage and a collection item called "2".
+
+**Next:** Detect these clashes in every language and refuse the export with a clear message.
+
+### THEME-STRINGS · Translate the remaining built-in breadcrumb and business-details text
+
+**Open · Low · Shared**
+
+Translated pages still show some English: "Page 2" and the hidden "Breadcrumb" label in breadcrumbs, and "Mon"–"Sun" and "Closed" in opening hours.
+
+**Next:** Take these words from the theme's language files.
+
+### RENDER-LANG · Make site-wide links and single-widget re-renders follow the page language
+
+**Investigate · Low · Shared**
+
+Links and menus chosen in site-wide theme settings always point to the same language, so translated pages show the original targets. Arch has no such settings, so this only affects other themes. A small preview-only case can also show the wrong language in a breadcrumb.
+
+**Next:** Decide whether theme settings should follow the page language, and fix the preview lookup.
+
+### THEME-UPDATE-RESUME · Recover an interrupted theme update without needing another update
+
+**Open · Low · Shared**
+
+If the app stops in the middle of a theme update, the project can be missing theme files until another update runs, and that may never happen.
+
+**Next:** Recover or report an interrupted update the next time the project is opened or exported.
+
+### DUPLICATE-FOLDER · Duplicating into an existing folder can merge into it and later delete it
+
+**Open · Low · Shared**
+
+If a stray folder already has the name a duplicate would use, the copy is merged into it, and if the duplicate fails the cleanup deletes that folder.
+
+**Next:** Choose a folder name that is free on disk, and only clean up what the duplicate created.
+
+### MENU-MEDIA-USAGE · Count upload links in menus as media usage
+
+**Investigate · Low · Shared**
+
+A file linked from a menu isn't counted as "used", so the media library may let you delete it.
+
+**Next:** First check whether menus can link uploaded files at all; if they can, count those links.
+
+### MEDIA-USAGE-LABELS · Show readable "Used in" labels for other-language content
+
+**Open · Low · Shared**
+
+In the media library, a translated header shows as "El:header (Global)" and translated collection items show a raw code instead of their title.
+
+**Next:** Show a readable title with its language for every language.
+
+### EDITOR-LANG-UX · Smooth the editor's language rough edges
+
+**Open · Low · Shared**
+
+While the page list is still loading, the language menu can offer to create the language you are already in. The parent-page list mixes pages from all languages without saying which is which. Creating a Greek page takes you back to the English tab, so the new page looks missing.
+
+**Next:** Fix each of the three in a two-language project.
+
+### STALE-BANNER · A project warning can hide a language-removed warning while saves stay suspended
+
+**Open · Low · Shared**
+
+After an unlikely sequence (a language is removed, another tab switches project, then you switch back), the warning disappears but the editor quietly stops saving.
+
+**Next:** Keep the language warning, or always show that saving is paused.
+
+### LINK-CACHE · Keep link-picker targets fresh after a change mid-load
+
+**Open · Low · Shared**
+
+A page created while the link picker is loading can be missing from it for up to a minute.
+
+**Next:** Discard picker data that was loading when content changed.
+
+### PRESET-ID-INPUT · Validate the preset name when creating a project
+
+**Open · Low · Shared**
+
+A hand-made request to create a project can name a "preset" outside the theme, and the new project then copies pages, menus and images from that other folder. The app itself never sends this.
+
+**Next:** Accept only presets the theme actually declares, and test it.
+
+### THEME-CHECKER · Close gaps in the theme checker
+
+**Open · Low · OSS**
+
+The new theme checker passes some things that break in an export (thumbnail-size images, image files placed inside a widget folder, image sizes without a width). It crashes on one valid template tag, and it reports wrong results for themes that use linked folders or odd preset names.
+
+**Next:** Fix each case so the checker gives the right answer, with a test for each.
 
 ### T66 · Explain form errors beside the right field
 
@@ -405,7 +604,7 @@ Current controls do not create nested links inside a setting value, but a future
 
 **Deferred · Medium · OSS**
 
-Real backups restore correctly; some unusual or damaged archive shapes have not been examined.
+Real backups restore correctly; some unusual or damaged archive shapes have not been examined. Deliberately crafted backups are BACKUP-TRUST.
 
 **Next:** Take a bounded case when reported or when changing the backup format.
 
@@ -511,6 +710,6 @@ An embedding app’s update must not leave half of the old theme and half of the
 
 **Open · High · Embedding**
 
-A host can configure a page limit, but page-creation paths currently ignore it. OSS is unlimited.
+A host can configure a page limit, but page-creation paths currently ignore it. The collection-item limit can be exceeded when two items are created at once. OSS is unlimited.
 
 **Next:** Fix before relying on a finite page allowance.
