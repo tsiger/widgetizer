@@ -109,6 +109,7 @@ Both project import and theme upload accept ZIP files from external sources. Imp
 - `multer` with **disk storage** (`data/temp/`) — no in-memory buffering
 - Configurable size limit via `export.maxImportSizeMB` app setting (default 500MB), shared by both flows
 - MIME type + extension validation (`.zip` only)
+- ZIP bomb guard: both flows unpack through `utils/zipSafety.js`, which refuses a ZIP once the bytes it actually unpacks to pass 100 times its size on disk (`MAX_COMPRESSION_RATIO`); recorded entry sizes are only a first filter, since a ZIP can misstate them. Each entry is streamed to disk and checked against its recorded length and CRC; an entry name must be the plain path itself (no `.`/`..`/empty segments, `\` read as `/`) and no two entries may write the same file, so one name cannot stand in for another. Real backups and themes unpack to little more than their size. There is no fixed ceiling on size or file count beyond the upload limit.
 
 **Path traversal protection:**
 
@@ -121,7 +122,8 @@ Both project import and theme upload accept ZIP files from external sources. Imp
 
 - Extract to isolated temp directory first, validate before copying
 - Generate new UUID and slugified `folderName` on every import
-- Validate manifest (`project-export.json`), JSON structure, and theme existence
+- Validate manifest (`project-export.json`), JSON structure, project details (theme/preset as single folder names, text fields as text), and theme existence
+- Leave out top-level dot entries (theme-update working folders) and refuse media paths outside `uploads/images` or `uploads/files`, media translations for languages the project lacks, and collection item slugs that are not plain slugs — a backup made by the app never holds these
 - Atomic behavior: full success or full cleanup on failure
 
 **Temp file cleanup:**

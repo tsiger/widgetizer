@@ -19,6 +19,7 @@ import { handleProjectResolutionError } from "../utils/projectErrors.js";
 import { sortVersions, getLatestVersion, isValidVersion, isNewerVersion } from "../utils/semver.js";
 import { hasAvailableUpdate } from "../utils/updateStatus.js";
 import { isSafePathSegment } from "../utils/pathSecurity.js";
+import { extractZipSafely, openZip, readZipEntry, UnsafeZipError } from "../utils/zipSafety.js";
 import { ZIP_MIME_TYPES } from "../utils/mimeTypes.js";
 import { updateThemeSettingsMediaUsage, extractMediaPathsFromThemeSettings } from "../services/mediaUsageService.js";
 import { withContentWriteLock, assertIntroducedMediaExists } from "../services/contentCoordination.js";
@@ -1299,8 +1300,14 @@ export async function uploadTheme(req, res) {
       return res.status(400).json({ message: "No theme zip file uploaded." });
     }
 
-    const AdmZip = await import("adm-zip");
-    const zip = new AdmZip.default(uploadedFilePath);
+    let zip;
+    try {
+      zip = await openZip(uploadedFilePath);
+    } catch (error) {
+      return res.status(400).json({ message: error.message });
+    }
+    // The unpacking budget is measured against the file as it is on disk.
+    const zipSize = (await fs.stat(uploadedFilePath)).size;
 
     // Safety: validate ZIP paths (prevent path traversal)
     for (const entry of zip.getEntries()) {
@@ -1403,7 +1410,7 @@ export async function uploadTheme(req, res) {
   // Validate theme.json metadata and extract version info
   let uploadedThemeJson;
   try {
-    const themeJsonContent = themeJsonEntry.getData().toString("utf8");
+    const themeJsonContent = (await readZipEntry(themeJsonEntry, zipSize)).toString("utf8");
     uploadedThemeJson = JSON.parse(themeJsonContent);
 
     // Enforce required metadata fields for theme identification and display
@@ -1423,6 +1430,7 @@ export async function uploadTheme(req, res) {
       });
     }
   } catch (error) {
+    if (error instanceof UnsafeZipError) return res.status(400).json({ message: error.message });
     if (error instanceof SyntaxError) {
       return res.status(400).json({ message: "Invalid theme.json: Failed to parse JSON." });
     }
@@ -1474,9 +1482,10 @@ export async function uploadTheme(req, res) {
     // Parse and validate theme.json
     let updateThemeJson;
     try {
-      const content = updateThemeJsonEntry.getData().toString("utf8");
+      const content = (await readZipEntry(updateThemeJsonEntry, zipSize)).toString("utf8");
       updateThemeJson = JSON.parse(content);
-    } catch {
+    } catch (error) {
+      if (error instanceof UnsafeZipError) return res.status(400).json({ message: error.message });
       return res.status(400).json({
         message: `Update folder '${versionFolder}' has invalid theme.json: Failed to parse JSON`,
       });
@@ -1576,7 +1585,7 @@ export async function uploadTheme(req, res) {
       await fs.ensureDir(tempDir);
 
       try {
-        zip.extractAllTo(tempDir, /*overwrite*/ false);
+        await extractZipSafely(zip, zipSize, tempDir);
 
         const extractedThemeDir = path.join(tempDir, themeFolderName);
 
@@ -1634,7 +1643,7 @@ export async function uploadTheme(req, res) {
       await fs.ensureDir(tempDir);
 
       try {
-        zip.extractAllTo(tempDir, /*overwrite*/ false);
+        await extractZipSafely(zip, zipSize, tempDir);
 
         const extractedThemeDir = path.join(tempDir, themeFolderName);
         const extractedUpdatesDir = path.join(extractedThemeDir, "updates");
@@ -1756,7 +1765,6 @@ export async function uploadTheme(req, res) {
       theme: newThemeData,
     });
   } catch (error) {
-    console.error("Error extracting theme zip:", error);
     // Attempt cleanup if extraction failed partially for new themes
     if (isNewTheme) {
       try {
@@ -1765,6 +1773,8 @@ export async function uploadTheme(req, res) {
         console.error("Error cleaning up failed theme extraction:", cleanupError);
       }
     }
+    if (error instanceof UnsafeZipError) return res.status(400).json({ message: error.message });
+    console.error("Error extracting theme zip:", error);
     res.status(500).json({ message: "Failed to extract theme zip file." });
   }
   } finally {

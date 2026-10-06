@@ -560,9 +560,11 @@ describe("a project directory holding a stale uploads/media.json", () => {
     const { buffer } = await backup(source.id);
     const zip = new AdmZip.default(buffer);
     // A library this version cannot write: the restore must fail loudly rather
-    // than report a success that lost it.
+    // than report a success that lost it. The path is one the import accepts, so
+    // the failure comes from writing the library, not from the checks before it.
+    const unwritable = { id: "m1", filename: "a.jpg", path: "/uploads/images/a.jpg", width: { not: "a number" } };
     const broken = rebuildZip(zip, {
-      replace: { "uploads/media.json": Buffer.from(JSON.stringify({ files: ["not an object"] })) },
+      replace: { "uploads/media.json": Buffer.from(JSON.stringify({ files: [unwritable] })) },
     });
     const before = projectRepo.getAllProjects().length;
 
