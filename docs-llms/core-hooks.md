@@ -343,6 +343,8 @@ Loads the active project's collection schemas. Per-project module-level cache (1
 
 Loads the items of a single collection type. Unlike schemas, item lists are **not** cached across navigations — list pages mutate them frequently, so each mount fetches fresh.
 
+Only the newest load updates `items`, `loading` and `error`: a load still running when the type, project or language set changes (or the screen unmounts, or `refetch` starts another) is discarded. `refetch` keeps one identity and always loads for the current type, project and languages, so a caller holding it from an earlier render (an edit that finishes after the user moved on) cannot load what that render saw. After the hook unmounts, `refetch` does nothing. `CollectionItems` also renders one screen per collection (keyed by type), so a pending refresh or an open delete confirmation from one collection cannot act on the next; an edit already sent still finishes on the collection it was made in. The language tab being viewed is held above that key and carries over between collections.
+
 **Parameters:** `type` (collection type slug), `params` (optional query params: sort, invalid, limit, offset).
 
 **Returns:** `{ items, loading, error, refetch }`.

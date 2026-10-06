@@ -42,7 +42,24 @@ import LoadingSpinner from "../components/ui/LoadingSpinner";
 import { openCollectionItemPreview } from "../lib/openSitePreview";
 import { useEditorPath } from "../lib/routeBase.jsx";
 
+/**
+ * One screen per collection. The route stays mounted when the user switches
+ * collection, so without the key the screen for A carried on under B: a refresh
+ * due after an edit on A loaded A's items into B's list, and a delete
+ * confirmation opened on A deleted from B by A's slug once confirmed there.
+ * The language being looked at is held here, above the key, so it carries over
+ * from one collection to the next as it always has.
+ */
 export default function CollectionItems() {
+  const { type } = useParams();
+  const defaultLanguage = useDefaultLanguage();
+  const [activeLanguage, setActiveLanguage] = useState(defaultLanguage);
+  return (
+    <CollectionItemsScreen key={type} activeLanguage={activeLanguage} setActiveLanguage={setActiveLanguage} />
+  );
+}
+
+function CollectionItemsScreen({ activeLanguage, setActiveLanguage }) {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { type } = useParams();
@@ -56,7 +73,6 @@ export default function CollectionItems() {
   const isMultilang = useIsMultilang();
   const defaultLanguage = useDefaultLanguage();
 
-  const [activeLanguage, setActiveLanguage] = useState(defaultLanguage);
   const [searchTerm, setSearchTerm] = useState("");
   const [showInvalidOnly, setShowInvalidOnly] = useState(false);
   const [openMenuId, setOpenMenuId] = useState(null);
@@ -72,13 +88,6 @@ export default function CollectionItems() {
   const displayNamePlural = schema?.displayNamePlural || displayName;
 
   // Reset transient UI state when switching collection types.
-  useEffect(() => {
-    setSearchTerm("");
-    setShowInvalidOnly(false);
-    setOpenMenuId(null);
-    setSelectedSlugs([]);
-  }, [type]);
-
   // Keep the local (drag-mutable) order in sync with fetched items.
   useEffect(() => {
     setOrderedItems(items);
