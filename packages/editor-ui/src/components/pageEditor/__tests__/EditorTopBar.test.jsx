@@ -227,3 +227,89 @@ describe("EditorTopBar language menu", () => {
     expect(screen.queryByRole("button", { name: "pageEditor.languages.menuLabel" })).toBeNull();
   });
 });
+
+// Until the page list has arrived, the menu cannot know which versions exist.
+// It used to offer every language for creation meanwhile, the page's own
+// included, and both offers were refused by the server.
+describe("EditorTopBar language menu before it knows the versions", () => {
+  const EN_ABOUT = { id: "about", slug: "about", uuid: "u-about", name: "About", language: "en" };
+
+  const renderFor = (page) => {
+    usePageStore.setState({ page });
+    return render(
+      <MemoryRouter>
+        <PluginProvider>
+          <EditorTopBar pageName={page.name} pageId={page.id} pageLanguage={page.language} />
+        </PluginProvider>
+      </MemoryRouter>,
+    );
+  };
+  const openMenu = () => fireEvent.click(screen.getByRole("button", { name: "pageEditor.languages.menuLabel" }));
+
+  beforeEach(() => {
+    navigate.mockReset();
+    createPageLanguageVersion.mockReset();
+    setSiteLanguages(["el"]);
+  });
+
+  it("shows the page's own language as the current one, never as something to create", () => {
+    getAllPages.mockReset().mockReturnValue(new Promise(() => {})); // still loading
+    renderFor(EN_ABOUT);
+    openMenu();
+
+    expect(document.querySelector('[aria-current="true"]').textContent).toContain("English");
+    expect(screen.queryByRole("button", { name: "common.languages.create" })).toBeNull();
+  });
+
+  it("does not offer to create another language while the list is loading", () => {
+    getAllPages.mockReset().mockReturnValue(new Promise(() => {}));
+    renderFor(EN_ABOUT);
+    openMenu();
+
+    expect(screen.getByRole("button", { name: "common.languages.checking" }).disabled).toBe(true);
+  });
+
+  it("keeps not offering it when the list could not be loaded", async () => {
+    getAllPages.mockReset().mockRejectedValue(new Error("offline"));
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    renderFor(EN_ABOUT);
+    openMenu();
+
+    const unknown = await screen.findByRole("button", { name: "common.languages.unknown" });
+    expect(unknown.disabled).toBe(true);
+    fireEvent.click(unknown);
+    expect(createPageLanguageVersion).not.toHaveBeenCalled();
+  });
+});
+
+// The pages list keeps its language tab in the URL; going back from the editor
+// names the page's language so the list opens on the tab the user came from.
+describe("EditorTopBar back to pages", () => {
+  const renderFor = (pageLanguage) =>
+    render(
+      <MemoryRouter>
+        <PluginProvider>
+          <EditorTopBar pageName="Sxetika" pageId="sxetika" pageLanguage={pageLanguage} />
+        </PluginProvider>
+      </MemoryRouter>,
+    );
+
+  beforeEach(() => {
+    navigate.mockReset();
+    getAllPages.mockReset().mockResolvedValue([]);
+  });
+
+  it("returns to the list on the page's language tab", () => {
+    setSiteLanguages(["el"]);
+    renderFor("el");
+    fireEvent.click(screen.getByTitle("pageEditor.toolbar.backToPages"));
+    expect(navigate).toHaveBeenCalledWith("/pages?language=el");
+  });
+
+  it("returns to the bare list on a single-language site", () => {
+    setSiteLanguages([]);
+    renderFor(undefined);
+    fireEvent.click(screen.getByTitle("pageEditor.toolbar.backToPages"));
+    expect(navigate).toHaveBeenCalledWith("/pages");
+  });
+});

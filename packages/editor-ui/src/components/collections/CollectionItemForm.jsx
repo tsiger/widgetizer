@@ -121,12 +121,16 @@ export default function CollectionItemForm({
   // that has never been saved has no group to read.
   const groupId = initialData.translationGroupId || initialData.uuid || null;
   const [groupMembers, setGroupMembers] = useState([]);
+  // Whether `groupMembers` is the whole group yet. An item with no identity has
+  // no group to read, so whether it has other versions cannot be told.
+  const [groupState, setGroupState] = useState("loading");
   useEffect(() => {
     if (!isMultilang || !groupId) return undefined;
     let cancelled = false;
     getTranslationGroup(groupId)
       .then(({ members }) => {
         if (cancelled) return;
+        setGroupState("ready");
         setGroupMembers(
           (members || [])
             .filter((member) => member.kind === "item" && member.collectionType === schema?.type)
@@ -134,8 +138,9 @@ export default function CollectionItemForm({
         );
       })
       .catch(() => {
-        // The menu simply offers to create what it cannot see; a failed read
-        // must not block editing the item that is already open.
+        // The menu offers nothing to create while it cannot see the group; a
+        // failed read must not block editing the item that is already open.
+        if (!cancelled) setGroupState("unknown");
       });
     return () => {
       cancelled = true;
@@ -332,6 +337,7 @@ export default function CollectionItemForm({
           onOpen={(sibling) => navigate(editorPath(itemEditHref(schema.type, sibling, true)))}
           onCreate={createIn}
           pendingKey={pendingKey}
+          siblingsState={groupId ? groupState : "unknown"}
           label={t("collections.languages.menuLabel")}
         />
       )}

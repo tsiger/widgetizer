@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Link, useNavigate, useLocation, useNavigationType } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { ListTree, Trash2, Pencil, CirclePlus, Copy, MoreVertical } from "lucide-react";
 
@@ -17,6 +17,7 @@ import { sortItemsByCopyName } from "../utils/copyNameSort";
 import useToastStore from "../stores/toastStore";
 import useProjectStore, { useDefaultLanguage, useIsMultilang } from "../stores/projectStore";
 import LanguageTabs from "../components/content/LanguageTabs";
+import useListLanguage from "../hooks/useListLanguage";
 import { menuStructureHref, menuSettingsHref, menuAddHref } from "../lib/contentRoutes";
 import { useEditorPath } from "../lib/routeBase.jsx";
 
@@ -34,10 +35,15 @@ export default function Menus() {
   const activeProject = useProjectStore((state) => state.activeProject);
   const isMultilang = useIsMultilang();
   const defaultLanguage = useDefaultLanguage();
-  const [activeLanguage, setActiveLanguage] = useState(defaultLanguage);
+  const [activeLanguage, setActiveLanguage] = useListLanguage();
 
-  // Reload menus when navigating to this page or when active project changes
+  // Reload menus when navigating to this page or when active project changes.
+  // Choosing a language tab replaces the URL in place, which is not a new visit.
+  const navigationType = useNavigationType();
+  const loadedFor = useRef(null);
   useEffect(() => {
+    if (navigationType === "REPLACE" && loadedFor.current === activeProject?.id) return;
+    loadedFor.current = activeProject?.id;
     loadMenus();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.key, activeProject?.id]);

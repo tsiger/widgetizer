@@ -5,7 +5,8 @@ import { useEditingLanguage } from "../../lib/editingLanguage.jsx";
 
 /**
  * Shared dropdown list body for the combobox components (`ui/Combobox` and
- * `menus/MenuEditor/MenuCombobox`). Both pickers differ only in their open-state
+ * `menus/MenuEditor/MenuCombobox`) and the pick-only parent-page field
+ * (`pages/ParentPagePicker`). The comboboxes differ only in their open-state
  * strategy (self-owned vs externally controlled) — the rendered `<ul>` of options,
  * group headers, and empty state is identical, so it lives here once.
  *
@@ -22,21 +23,37 @@ import { useEditingLanguage } from "../../lib/editingLanguage.jsx";
  * @param {(option: object) => void} onSelect  Called with the clicked option.
  * @param {string} emptyText    Shown when `options` is empty.
  * @param {string} [className]  Extra classes for the `<ul>` (e.g. the z-index hook).
+ * @param {string} [initialLanguage] The language filter to open on instead of the
+ *   language being edited, e.g. a selection's own language so it is in view.
+ * @param {string} [selectedValue] The current selection's value, marked in the list.
+ *   Given, the options are also reachable with Tab and chosen with Enter or Space,
+ *   for a pick-only field whose focus is not held by a text box.
  */
 const ALL_LANGUAGES = "*";
 
-export default function ComboboxOptionList({ options, onSelect, emptyText, className = "" }) {
+export default function ComboboxOptionList({
+  options,
+  onSelect,
+  emptyText,
+  className = "",
+  initialLanguage,
+  selectedValue,
+}) {
   const isMultilang = useIsMultilang();
   const defaultLanguage = useDefaultLanguage();
   const extraLanguages = useExtraLanguages();
   const editingLanguage = useEditingLanguage();
 
   const siteLanguages = [defaultLanguage, ...extraLanguages];
+  // A pick-only field (it passes its selection) is a listbox of options; the
+  // link pickers keep their text box and plain list.
+  const pickOnly = selectedValue !== undefined;
   // Reopening the picker returns to the language being edited, which is the point
   // of the default — the filter is a detour, not a setting.
-  const [language, setLanguage] = useState(() =>
-    siteLanguages.includes(editingLanguage) ? editingLanguage : defaultLanguage,
-  );
+  const [language, setLanguage] = useState(() => {
+    if (siteLanguages.includes(initialLanguage)) return initialLanguage;
+    return siteLanguages.includes(editingLanguage) ? editingLanguage : defaultLanguage;
+  });
 
   // An option with no language at all (any non-link picker) is never filtered out.
   const visible =
@@ -52,6 +69,7 @@ export default function ComboboxOptionList({ options, onSelect, emptyText, class
 
   return (
     <ul
+      role={pickOnly ? "listbox" : undefined}
       className={`absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm ${className}`}
     >
       {isMultilang && (
@@ -81,7 +99,10 @@ export default function ComboboxOptionList({ options, onSelect, emptyText, class
           return (
             <Fragment key={option.value}>
               {showHeader && (
-                <li className="select-none px-3 pb-1 pt-2 text-xs font-semibold uppercase tracking-wide text-slate-400">
+                <li
+                  role={pickOnly ? "presentation" : undefined}
+                  className="select-none px-3 pb-1 pt-2 text-xs font-semibold uppercase tracking-wide text-slate-400"
+                >
                   {option.group}
                   {header !== option.group && (
                     <span className="normal-case"> · {nativeLanguageName(option.language)}</span>
@@ -89,8 +110,23 @@ export default function ComboboxOptionList({ options, onSelect, emptyText, class
                 </li>
               )}
               <li
+                role={pickOnly ? "option" : undefined}
                 onClick={() => onSelect(option)}
-                className="relative flex cursor-default select-none items-center gap-2 px-3 py-2 text-slate-900 hover:bg-slate-100"
+                aria-selected={pickOnly ? option.value === selectedValue : undefined}
+                tabIndex={pickOnly ? 0 : undefined}
+                onKeyDown={
+                  pickOnly
+                    ? (event) => {
+                        if (event.key === "Enter" || event.key === " ") {
+                          event.preventDefault();
+                          onSelect(option);
+                        }
+                      }
+                    : undefined
+                }
+                className={`relative flex cursor-default select-none items-center gap-2 px-3 py-2 text-slate-900 hover:bg-slate-100 focus:bg-slate-100 focus:outline-none ${
+                  pickOnly && option.value === selectedValue ? "bg-pink-50 font-medium" : ""
+                }`}
               >
                 <span className="min-w-0 flex-1 truncate text-[13px]" title={option.label}>{option.label}</span>
                 {isMultilang && option.language && (
@@ -106,7 +142,12 @@ export default function ComboboxOptionList({ options, onSelect, emptyText, class
           );
         })
       ) : (
-        <li className="relative cursor-default select-none py-2 pl-3 pr-9 text-slate-500">{emptyText}</li>
+        <li
+          role={pickOnly ? "presentation" : undefined}
+          className="relative cursor-default select-none py-2 pl-3 pr-9 text-slate-500"
+        >
+          {emptyText}
+        </li>
       )}
     </ul>
   );

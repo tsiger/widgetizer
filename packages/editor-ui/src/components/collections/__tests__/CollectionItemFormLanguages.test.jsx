@@ -129,13 +129,17 @@ describe("collection item language menu", () => {
     });
   });
 
-  it("still offers the menu when the group cannot be read", async () => {
+  // The menu still opens, but a version it cannot see may exist, so it is not
+  // offered for creation (the server would refuse a second one).
+  it("still opens the menu when the group cannot be read, without offering to create", async () => {
     getTranslationGroup.mockRejectedValue(new Error("boom"));
     renderForm();
     await waitFor(() => expect(getTranslationGroup).toHaveBeenCalled());
     openMenu();
 
-    expect(await screen.findByRole("button", { name: "common.languages.create" })).toBeTruthy();
+    const unknown = await screen.findByRole("button", { name: "common.languages.unknown" });
+    expect(unknown.disabled).toBe(true);
+    expect(screen.queryByRole("button", { name: "common.languages.create" })).toBeNull();
   });
 
   it("is absent on an item that has never been saved, and on a single-language site", async () => {

@@ -19,6 +19,7 @@ import useToastStore from "../stores/toastStore";
 import useProjectStore, { useDefaultLanguage, useIsMultilang } from "../stores/projectStore";
 import useTranslationVersions from "../hooks/useTranslationVersions";
 import LanguageTabs from "../components/content/LanguageTabs";
+import useListLanguage from "../hooks/useListLanguage";
 import TranslationChips from "../components/content/TranslationChips";
 import { pageEditorHref, pageSettingsHref, pageAddHref } from "../lib/contentRoutes";
 import usePageListStore from "../stores/pageListStore";
@@ -52,7 +53,7 @@ export default function Pages() {
   const activeProject = useProjectStore((state) => state.activeProject);
   const isMultilang = useIsMultilang();
   const defaultLanguage = useDefaultLanguage();
-  const [activeLanguage, setActiveLanguage] = useState(defaultLanguage);
+  const [activeLanguage, setActiveLanguage] = useListLanguage();
 
   // Handle page deletion with confirmation
   const handleDelete = async (data) => {

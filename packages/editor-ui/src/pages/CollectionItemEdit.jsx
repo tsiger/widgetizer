@@ -13,7 +13,7 @@ import { getCollectionSchema, getCollectionItem, updateCollectionItem } from "..
 import { invalidateMediaCache } from "../queries/mediaManager";
 import { invalidateLinkTargetsCache } from "../hooks/useLinkTargets";
 import useGuardedFormPage from "../hooks/useGuardedFormPage";
-import { itemEditHref } from "../lib/contentRoutes";
+import { itemEditHref, itemsListHref } from "../lib/contentRoutes";
 import { useEditorPath } from "../lib/routeBase.jsx";
 
 export default function CollectionItemEdit() {
@@ -105,7 +105,7 @@ export default function CollectionItemEdit() {
     <PageLayout title={getDirtyTitle(title)}>
       {showBackAction && (
         <div className="mb-4 flex flex-wrap gap-3">
-          <Button variant="secondary" onClick={() => navigate(editorPath(`/collections/${type}`))} icon={<ChevronLeft size={18} />}>
+          <Button variant="secondary" onClick={() => navigate(editorPath(itemsListHref(type, language)))} icon={<ChevronLeft size={18} />}>
             {t("collectionsForm.backToList")}
           </Button>
         </div>
@@ -118,7 +118,7 @@ export default function CollectionItemEdit() {
           onSubmit={handleSubmit}
           isSubmitting={isSubmitting}
           submitLabel={t("collectionsForm.saveChanges")}
-          onCancel={() => navigateSafely(editorPath(`/collections/${type}`))}
+          onCancel={() => navigateSafely(editorPath(itemsListHref(type, language)))}
           onDirtyChange={setIsDirty}
           isDirty={isDirty}
         />

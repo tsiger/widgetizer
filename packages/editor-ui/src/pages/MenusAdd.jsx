@@ -6,7 +6,7 @@ import PageLayout from "../components/layout/PageLayout";
 import MenuForm from "../components/menus/MenuForm";
 import useToastStore from "../stores/toastStore";
 import { createMenu } from "../queries/menuManager";
-import { menuStructureHref } from "../lib/contentRoutes";
+import { menuStructureHref, menusListHref } from "../lib/contentRoutes";
 import useGuardedFormPage from "../hooks/useGuardedFormPage";
 import { useEditorPath } from "../lib/routeBase.jsx";
 
@@ -46,7 +46,7 @@ export default function MenusAdd() {
         onSubmit={handleSubmit}
         isSubmitting={isSubmitting}
         submitLabel={t("menusAdd.create")}
-        onCancel={() => navigateSafely(editorPath("/menus"))}
+        onCancel={() => navigateSafely(editorPath(menusListHref(language)))}
         onDirtyChange={setIsDirty}
         isDirty={isDirty}
       />

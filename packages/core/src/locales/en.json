@@ -164,6 +164,7 @@
       "hierarchyTitle": "Page Hierarchy",
       "parentPageLabel": "Parent page",
       "parentPageNone": "None — this is a top-level page",
+      "parentPageMissing": "A page that no longer exists",
       "parentPageHelp": "Used by breadcrumbs to show where this page sits, e.g. Home › About › Our Team. Leave as None unless this page belongs under another one.",
       "seoTitle": "SEO Settings",
       "metaDescription": "Meta Description",
@@ -436,7 +437,9 @@
       "create": "Create the {{name}} version",
       "creating": "Creating the {{name}} version…",
       "created": "{{name}} version created.",
-      "createError": "The version could not be created."
+      "createError": "The version could not be created.",
+      "checking": "Checking for a {{name}} version…",
+      "unknown": "Could not check for a {{name}} version"
     }
   },
   "components": {

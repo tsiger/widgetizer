@@ -9,7 +9,7 @@ import usePageStore from "../../stores/pageStore";
 import { useDefaultLanguage, useIsMultilang } from "../../stores/projectStore";
 import useTranslationVersions from "../../hooks/useTranslationVersions";
 import LanguageMenu from "../content/LanguageMenu";
-import { pageEditorHref, pageAddHref } from "../../lib/contentRoutes";
+import { pageEditorHref, pageAddHref, pagesListHref } from "../../lib/contentRoutes";
 import { useEditorPath } from "../../lib/routeBase.jsx";
 import { openPagePreview } from "../../lib/openSitePreview.js";
 import { SlotOutlet } from "../../extension/PluginProvider.jsx";
@@ -38,6 +38,9 @@ export default function EditorTopBar({
     });
   }, [save, t]);
   const [allPages, setAllPages] = useState([]);
+  // Whether `allPages` is the real list yet: the language menu must not offer to
+  // create a version that may already exist.
+  const [allPagesState, setAllPagesState] = useState("loading");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isLanguageMenuOpen, setIsLanguageMenuOpen] = useState(false);
   const [previewMode, setPreviewMode] = useState(() => {
@@ -92,8 +95,10 @@ export default function EditorTopBar({
     const loadPages = async () => {
       try {
         setAllPages(await getAllPages());
+        setAllPagesState("ready");
       } catch (error) {
         console.error("Failed to load pages:", error);
+        setAllPagesState("unknown");
       }
     };
     loadPages();
@@ -207,6 +212,7 @@ export default function EditorTopBar({
       onOpen={openPage}
       onCreate={createIn}
       pendingKey={pendingKey}
+      siblingsState={allPagesState}
       label={t("pageEditor.languages.menuLabel")}
     />
   );
@@ -215,7 +221,7 @@ export default function EditorTopBar({
     <div className="bg-white text-slate-900 border-b border-slate-200 p-2 flex justify-between items-center">
       <div className="flex items-center gap-3">
         <button
-          onClick={() => navigate(editorPath("/pages"))}
+          onClick={() => navigate(editorPath(pagesListHref(isMultilang ? currentLanguage : undefined)))}
           className="flex items-center gap-2 px-3 h-9 rounded-sm text-sm bg-slate-200 hover:bg-slate-300 text-slate-800"
           title={t("pageEditor.toolbar.backToPages")}
         >

@@ -12,6 +12,7 @@ import useToastStore from "../stores/toastStore";
 import { getMenu, updateMenu } from "../queries/menuManager";
 import useGuardedFormPage from "../hooks/useGuardedFormPage";
 import { useEditorPath } from "../lib/routeBase.jsx";
+import { menusListHref } from "../lib/contentRoutes";
 
 export default function MenusEdit() {
   const { t } = useTranslation();
@@ -85,7 +86,7 @@ export default function MenusEdit() {
     <PageLayout title={getDirtyTitle(t("menusEdit.title"))}>
       {showSuccessActions && (
         <div className="mb-4 flex flex-wrap gap-3">
-          <Button variant="secondary" onClick={() => navigate(editorPath("/menus"))} icon={<ChevronLeft size={18} />}>
+          <Button variant="secondary" onClick={() => navigate(editorPath(menusListHref(language)))} icon={<ChevronLeft size={18} />}>
             {t("menusEdit.backToList")}
           </Button>
         </div>
@@ -97,7 +98,7 @@ export default function MenusEdit() {
           onSubmit={handleSubmit}
           isSubmitting={isSubmitting}
           submitLabel={t("menusEdit.saveChanges")}
-          onCancel={() => navigateSafely(editorPath("/menus"))}
+          onCancel={() => navigateSafely(editorPath(menusListHref(language)))}
           onDirtyChange={setIsDirty}
           isDirty={isDirty}
         />

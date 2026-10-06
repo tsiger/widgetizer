@@ -31,6 +31,7 @@ import useToastStore from "../stores/toastStore";
 import useProjectStore, { useDefaultLanguage, useIsMultilang } from "../stores/projectStore";
 import useTranslationVersions from "../hooks/useTranslationVersions";
 import LanguageTabs from "../components/content/LanguageTabs";
+import useListLanguage from "../hooks/useListLanguage";
 import TranslationChips from "../components/content/TranslationChips";
 import { itemEditHref, itemAddHref } from "../lib/contentRoutes";
 import { resolveLucideIcon } from "../utils/lucideIcon";
@@ -47,13 +48,17 @@ import { useEditorPath } from "../lib/routeBase.jsx";
  * collection, so without the key the screen for A carried on under B: a refresh
  * due after an edit on A loaded A's items into B's list, and a delete
  * confirmation opened on A deleted from B by A's slug once confirmed there.
- * The language being looked at is held here, above the key, so it carries over
- * from one collection to the next as it always has.
+ * The language being looked at lives in the URL, and the last one shown is held
+ * here, above the key: the sidebar's links to a collection carry no language,
+ * so it is what carries the tab over from one collection to the next.
  */
 export default function CollectionItems() {
   const { type } = useParams();
-  const defaultLanguage = useDefaultLanguage();
-  const [activeLanguage, setActiveLanguage] = useState(defaultLanguage);
+  const [lastLanguage, setLastLanguage] = useState();
+  const [activeLanguage, setActiveLanguage] = useListLanguage(lastLanguage);
+  // Remembered as it changes, during render (React's pattern for state that tracks
+  // a value), so the next collection's first render already has it.
+  if (activeLanguage !== lastLanguage) setLastLanguage(activeLanguage);
   return (
     <CollectionItemsScreen key={type} activeLanguage={activeLanguage} setActiveLanguage={setActiveLanguage} />
   );
