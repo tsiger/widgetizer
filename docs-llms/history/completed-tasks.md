@@ -77,6 +77,86 @@ The owner chose flat widget assets as the supported contract instead of adding n
 
 **Body at:** `33cc699a:docs-llms/TODO-agents.md` (the original nested-export proposal). Resolution is recorded in the documentation changes accompanying this entry.
 
+### LOGO-NOTES · Adding a logo while creating a project erased its notes
+
+**Done · High · Shared · 2026-10-05**
+
+The project update route ran `description` through `trim()` without `optional()`, so express-validator wrote `""` for a missing field and the repository stored it. The new-project form saves a picked logo with a partial update right after creating the project, which wiped the notes just entered.
+
+**Resolution:** the update route marks `description` optional, so an update that leaves it out keeps the stored value; sending it (including empty) behaves as before. A route-level test in `projects.test.js` covers the partial update. Fix `5e413aa5`.
+
+**Body at:** `df3aa2f4:docs-llms/TODO-agents.md`.
+
+### HOME-SLUG-LINKS · Links to a page slugged "home" broke when Clean URLs was off
+
+**Done · Medium · Shared · 2026-10-05**
+
+`isHomeSlug` treats `index` and `home` as the homepage and both publish as the language's `index.html`, but `pageHref` only special-cased them with Clean URLs on, so links to a `home` page pointed at a missing `home.html`. Export also required a literal `index` at the root, standalone preview and the sidebar preview button looked only for `index`, and nothing stopped a language holding both slugs (one overwrote the other on export).
+
+**Resolution:** the owner chose to keep `home` as a homepage alias and make it consistent. `pageHref` routes either home slug through `homeHref` in both URL modes; export accepts either slug as the default-language homepage and refuses a language holding both ("Export failed: two homepages"); page create gives the next free slug, renames onto the other home slug get 409 (the homepage may switch between them), and the editor save path refuses a rename onto any existing page; standalone preview falls back to `home` on a 404 for `index`; the sidebar preview button uses `isHomeSlug`. Creating a page with a taken slug keeps auto-suffixing (owner's choice). Not covered: concurrent creates (R1-COORD) and an embedding app's own publish pipeline. Fix `68e13846`.
+
+**Body at:** `df3aa2f4:docs-llms/TODO-agents.md`.
+
+### SEO-LANG · Fix multilingual search-engine output gaps
+
+**Done · Medium · Shared · 2026-10-05**
+
+Three gaps: the BreadcrumbList home crumb always named the Site URL root, so translated pages pointed search engines at the default homepage; numbered pagination copies emitted hreflang alternates pointing at page 1 with no self-reference, disagreeing with the sitemap; and a new language version copied a custom canonical URL, declaring the source's address canonical.
+
+**Resolution:** the home crumb uses the folder of its own homepage (`el/`, or the root), matching the canonical and sitemap; page 2+ emits no alternates (owner chose omission over per-language page-N links); creating a page or item language version clears a custom canonical (owner's choice; other SEO fields still copy, duplicates unchanged). The same commit documents the one-homepage-per-language rule and the two-homepages export refusal from `68e13846`. User-facing messages keep naming only `index` (owner's choice). Fix `edb7c1df`.
+
+**Body at:** `df3aa2f4:docs-llms/TODO-agents.md`.
+
+### LINK-DIRTY · Choosing a page in a link picker left the editor permanently "unsaved"
+
+**Done · High · Shared · 2026-10-06**
+
+Selecting a page or collection item in a link field stored the dropped refs as keys set to `undefined`. The saved baseline is a JSON round trip, which drops them, and the dirty check compared with lodash `isEqual`, which counts a present-undefined key as different from an absent one. After a save the page never matched its baseline: Save stayed enabled, autosave re-sent identical content and the leave prompt warned until a reload. The data itself was saved correctly.
+
+**Resolution:** every baseline comparison in `saveStore.js` (dirty checks, undo/redo reconcile, save gating) compares the live page and header/footer in saved (JSON) form, so a key holding `undefined` cannot keep the editor dirty; a value cleared from a saved one still counts. `LinkInput` removes the refs it drops instead of setting them to `undefined`. An older test asserting that an undefined-valued key is a change was reversed. Theme settings and menus already compared JSON forms. Fix `c1fb9844`.
+
+**Body at:** `df3aa2f4:docs-llms/TODO-agents.md`.
+
+### LINK-CACHE · Keep link-picker targets fresh after a change mid-load
+
+**Done · Low · Shared · 2026-10-06**
+
+In `useLinkTargets.js` a load in flight when `invalidateLinkTargetsCache` ran still wrote its older list into the cache afterwards, so a page created mid-load was missing from link pickers for up to 60 s, and its `finally` could delete a newer in-flight load for the same key.
+
+**Resolution:** every invalidation bumps a generation counter; a load started before an invalidation still answers the picker that started it but does not write the cache, and a load clears only its own in-flight entry. Other tabs still refresh only after the 60 s cache window (unchanged). Fix `c1fb9844`.
+
+**Body at:** `df3aa2f4:docs-llms/TODO-agents.md`.
+
+### PAGE-SLUG-INPUT · Validate page and menu slugs sent in requests
+
+**Done · Medium · Shared · 2026-10-06**
+
+Page and menu routes checked `:id` only with `notEmpty`, Express decodes `%2F` in params, and the controllers built storage keys unchecked: `DELETE /api/pages/..%2Ftheme`, bulk delete with `"../theme"` and `DELETE /api/menus/..%2Ftheme` deleted the project's `theme.json`, a menu update could overwrite it, and the page save's body `slug` could write a page into another language folder. The review of the fix found the same flaw on every `/api/themes/:id` route, where `DELETE /api/themes/..%2Fprojects` removed every project.
+
+**Resolution:** page and menu slugs (route params, the save's body `slug`, bulk-delete lists) and theme ids must be a single name (`segmentParam`/`segmentBody` over `isSafePathSegment`), not the strict collection form, so pages and menus a theme ships under other names (`About_Us.json`) stay manageable; collection routes keep `^[a-z0-9-]+$` through the same shared module. Route-level tests in `requestSlugs.test.js`. Fix `0fd5005a`.
+
+**Body at:** `df3aa2f4:docs-llms/TODO-agents.md` (first write-up; the delete, menu and theme findings are recorded here).
+
+### PRESET-ID-INPUT · Validate the theme and preset names when creating a project
+
+**Done · Low · Shared · 2026-10-06**
+
+`resolvePresetPaths` joined the request's `preset` straight into a path, and the `theme` field (checked only `notEmpty`) went through `getThemeDir` the same way, so a crafted create request scaffolded a project from folders outside the theme or the themes directory. The review found the same on the theme templates' stored `slug`, which named the page file written on creation and on theme update.
+
+**Resolution:** `createProject` refuses a theme or preset that is not a single name (400); `scaffoldProjectContent` and `resolvePresetPaths` re-check both for embedding apps calling them directly; a template slug that is not a single name gives way to the template's file name. A safe but missing preset still falls back to the theme's root files, and a missing theme still fails in `copyThemeToProject` with cleanup. The imported backup's `theme` is left to BACKUP-TRUST. Fix `0fd5005a`.
+
+**Body at:** `df3aa2f4:docs-llms/TODO-agents.md` (preset only; the theme and template findings are recorded here).
+
+### BACKUP-TRUST · Validate everything a restored backup brings in
+
+**Done · High · Shared · 2026-10-06**
+
+Import checked only that ZIP entry names did not start with `..` or were absolute, then trusted the content: a planted `.theme-update-backup/.in-progress` made the next theme update delete a folder beside the project, a crafted media path made export copy a file from outside the project into the site, a crafted item slug made export write outside its folder, a small ZIP could unpack until the disk filled, and manifest fields and media translation languages went unchecked (a default-language translation overrode the real alt text).
+
+**Resolution:** in two steps. `0fd5005a` keeps file-sourced paths inside their folder wherever they are used (recovery plan, export media copy, collection reader). `46119daa` checks the backup on the way in: import and theme upload unpack through `utils/zipSafety.js`, refusing a ZIP once its real unpacked bytes pass 100 times its size (owner's choice: a ratio only, no size or file-count ceilings), with per-entry length/CRC checks, plain entry names and no duplicate files; import drops top-level dot entries and refuses the whole backup (owner's choice) for media paths outside the upload folders, media text for the default or a missing language, non-slug item slugs, unsafe theme/preset names and wrongly-typed details. Real backups still import: the legacy `audios`/`videos` folders and an unchecked older Site Address are kept (owner's choice for the Site Address). Symlinks moved to SYMLINK-PATHS; a silently skipped item to SKIPPED-ITEM-NOTICE. Fixes `0fd5005a`, `46119daa`.
+
+**Body at:** `df3aa2f4:docs-llms/TODO-agents.md`.
+
 ## Reconciliation decisions
 
 - GitHub #115, #122, #126, #133, #134 and #135 have implementation evidence. Their remaining local entries are review/documentation/integration work, not instructions to rebuild the features. GitHub statuses were left unchanged.

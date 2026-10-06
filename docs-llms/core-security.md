@@ -109,6 +109,7 @@ Both project import and theme upload accept ZIP files from external sources. Imp
 - `multer` with **disk storage** (`data/temp/`) — no in-memory buffering
 - Configurable size limit via `export.maxImportSizeMB` app setting (default 500MB), shared by both flows
 - MIME type + extension validation (`.zip` only)
+- ZIP bomb guard: both flows unpack through `utils/zipSafety.js`, which refuses a ZIP once the bytes it actually unpacks to pass 100 times its size on disk (`MAX_COMPRESSION_RATIO`); recorded entry sizes are only a first filter, since a ZIP can misstate them. Each entry is streamed to disk and checked against its recorded length and CRC; an entry name must be the plain path itself (no `.`/`..`/empty segments, `\` read as `/`) and no two entries may write the same file, so one name cannot stand in for another. Real backups and themes unpack to little more than their size. There is no fixed ceiling on size or file count beyond the upload limit.
 
 **Path traversal protection:**
 
@@ -121,7 +122,8 @@ Both project import and theme upload accept ZIP files from external sources. Imp
 
 - Extract to isolated temp directory first, validate before copying
 - Generate new UUID and slugified `folderName` on every import
-- Validate manifest (`project-export.json`), JSON structure, and theme existence
+- Validate manifest (`project-export.json`), JSON structure, project details (theme/preset as single folder names, text fields as text), and theme existence
+- Leave out top-level dot entries (theme-update working folders) and refuse media paths outside `uploads/images` or `uploads/files`, media translations for languages the project lacks, and collection item slugs that are not plain slugs — a backup made by the app never holds these
 - Atomic behavior: full success or full cleanup on failure
 
 **Temp file cleanup:**
@@ -142,6 +144,9 @@ See [Site Exporting](core-export.md) for the export/import flow detail.
 - **`serveAsset`** (`previewController.js`) allow-lists the folder segment to `{ assets, widgets }` — anything else is `400` (SA-01) — then `path.normalize`s the subpath, strips leading `..`, and re-checks `isWithinDirectory(filePath, baseDir)`.
 - **Media-metadata route** owner-checks the inner `:projectId` before returning metadata (TI-03).
 - **Export serve** binds to `req.scope.folderName` via `exportDirBelongsToScope()` (`exportController.js`): it rejects `/`, `\`, and `..`, then anchors the directory to `<folderName>` or `<folderName>-v<digits>` (an anchored allowlist, not a prefix match) (TI-02/SA-13). See [Site Exporting](core-export.md).
+- **Slugs and ids from a request** become storage keys or folders before they are used (`middleware/slugValidators.js`); Express decodes `%2F` in params, so `..%2Ftheme` would otherwise reach the project's `theme.json`. Collection slugs and types must match `^[a-z0-9-]+$`; page and menu slugs (route params, the page save's body `slug`, bulk-delete lists) and theme ids on every `/api/themes/:id` route must be a single name (`isSafePathSegment`, `utils/pathSecurity.js`: no separator, NUL, `.` or `..`), because a theme's own page files and uploaded theme folders keep names outside the strict form.
+- **Theme and preset names on project creation** must each be a single name; `scaffoldProjectContent` and `resolvePresetPaths` re-check them for callers that skip the route.
+- **Paths read from theme and project files** are kept inside their folder: a theme template's stored `slug` that is not a single name gives way to the template's file name (creation and theme update), a theme-update recovery plan only removes paths inside the project, export copies media only from the project's `uploads/images` or `uploads/files`, and the collection reader skips an item whose stored slug is not a plain slug, so no item page is written outside its collection folder. These checks compare resolved paths; they do not follow symlinks, which project import does not create.
 
 **DoS limit keys** (enforced via the `LimitsAdapter` over `scope`; OSS `LocalLimitsAdapter` returns the App Settings upload cap for `MAX_UPLOAD_SIZE_BYTES` and `Infinity` for the count/quota keys, while hosted `CloudLimitsAdapter` returns finite tenant ceilings — see [Packages & Adapter Architecture](core-packages.md)):
 

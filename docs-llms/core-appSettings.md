@@ -36,7 +36,7 @@ When the active project's theme defines its own `imageSizes` in `theme.json`, th
 ### Export Management Settings
 
 - **Maximum Export Versions to Keep** (`export.maxVersionsToKeep`, default **10**, range 1–50): export versions retained per project; older exports are pruned when exceeded.
-- **Maximum Project Import Size** (`export.maxImportSizeMB`, default **500**, range 10–2000): max size for project import ZIPs, enforced on both client and server.
+- **Maximum Project Import Size** (`export.maxImportSizeMB`, default **500**, range 1–2000): max size for project import ZIPs, enforced on both client and server.
 
 Export versioning and import sizing are documented in [core-export.md](core-export.md).
 

@@ -1729,17 +1729,15 @@ describe("home page slug mapping", () => {
     await projectRepo.writeProjectsData(data);
   });
 
-  it("'home' slug produces index.html (same as 'index')", async () => {
+  // Both slugs publish as index.html, so the pair is refused rather than one
+  // page silently replacing the other.
+  it("refuses a project holding both an 'index' and a 'home' page", async () => {
     const res = await callController(exportProject, {
       params: { projectId: HOME_SLUG_ID },
     });
-    assert.equal(res._status, 200);
-
-    const exportDir = res._json.outputDir;
-    // "home" page should produce index.html too (the controller maps both to index.html)
-    // This means there could be a conflict — let's document what happens
-    const indexExists = await fs.pathExists(path.join(exportDir, "index.html"));
-    assert.ok(indexExists, "index.html should exist from either index or home page");
+    assert.equal(res._status, 400);
+    assert.equal(res._json.error, "Export failed: two homepages");
+    assert.match(res._json.message, /The pages include both "index" and "home"/);
   });
 });
 

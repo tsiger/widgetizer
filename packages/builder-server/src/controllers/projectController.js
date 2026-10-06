@@ -1,4 +1,7 @@
 import fs from "fs-extra";
+import { isSafePathSegment } from "../utils/pathSecurity.js";
+import { extractZipSafely, openZip, readZipEntry, UnsafeZipError } from "../utils/zipSafety.js";
+import { mediaLibraryProblem, collectionItemsProblem } from "../utils/backupContentChecks.js";
 import path from "path";
 import * as themeController from "./themeController.js";
 import archiver from "archiver";
@@ -484,6 +487,15 @@ export async function createProject(req, res) {
 
     if (!isOptionalBoolean(cleanUrls)) {
       return res.status(400).json({ error: "cleanUrls must be a boolean." });
+    }
+
+    // Both name a folder the new project is built from, under the themes folder
+    // and the theme's presets folder, so neither may step outside it.
+    if (!isSafePathSegment(theme)) {
+      return res.status(400).json({ error: "This theme is not installed." });
+    }
+    if (preset && !isSafePathSegment(preset)) {
+      return res.status(400).json({ error: "This theme has no such preset." });
     }
 
     const { value: languageFields, error: languageError } = readLanguages(req.body);
@@ -1330,6 +1342,72 @@ export async function handleImportUpload(req, res, next) {
   }
 }
 
+/** A backup refused for what it contains, after it was unpacked. */
+class BackupRefusedError extends Error {
+  constructor(message) {
+    super(message);
+    this.statusCode = 400;
+  }
+}
+
+function refusedBackupMessage(problem) {
+  return `This backup cannot be imported: ${problem} A backup made by Widgetizer never contains this, so the file may have been changed. The project was not imported.`;
+}
+
+/**
+ * A yes/no setting from a backup: a boolean, or the 0/1 a database column holds
+ * when a writer passes it through unconverted. Null for anything else.
+ */
+function importedFlag(value) {
+  if (typeof value === "boolean") return value;
+  if (value === 0 || value === 1) return value === 1;
+  return null;
+}
+
+/**
+ * Why a backup's project details cannot be imported, or null.
+ * @param {object} project - `manifest.project`
+ * @returns {string|null}
+ */
+function importManifestProblem(project) {
+  if (!isSafePathSegment(project.theme)) return `its theme name ${JSON.stringify(project.theme)} is not a valid theme folder name.`;
+  if (project.preset != null && project.preset !== "" && !isSafePathSegment(project.preset)) {
+    return `its preset name ${JSON.stringify(project.preset)} is not a valid preset folder name.`;
+  }
+  if (typeof project.name !== "string") return "its project name is not text.";
+  for (const field of ["description", "siteTitle", "siteUrl"]) {
+    if (!isOptionalString(project[field])) return `its ${field} is not text.`;
+  }
+  // An unusable Site Address is not refused: projects saved before the address
+  // was checked can still hold one, and every use of it already ignores a value
+  // it cannot parse (no full URLs, no sitemap) while export warns about it.
+  for (const field of ["receiveThemeUpdates", "cleanUrls"]) {
+    if (project[field] != null && importedFlag(project[field]) === null) return `its ${field} setting is not true or false.`;
+  }
+  return null;
+}
+
+/**
+ * Why an unpacked backup's content cannot be imported, or null: its media
+ * library's paths and translation languages, and its collection item slugs.
+ * @param {string} dir - the unpacked backup
+ * @param {string[]} languages - the project's languages other than the default
+ */
+async function backupContentProblem(dir, languages) {
+  const mediaJsonPath = path.join(dir, "uploads", "media.json");
+  if (await fs.pathExists(mediaJsonPath)) {
+    let mediaData = null;
+    try {
+      mediaData = await fs.readJson(mediaJsonPath);
+    } catch {
+      // An unreadable library is refused further on, with its own message.
+    }
+    const problem = mediaLibraryProblem(mediaData, languages);
+    if (problem) return problem;
+  }
+  return collectionItemsProblem(dir);
+}
+
 /**
  * Imports a project from an uploaded ZIP archive.
  * Validates the archive structure and theme compatibility before import.
@@ -1354,8 +1432,14 @@ export async function importProject(req, res) {
       });
     }
 
-    const AdmZip = await import("adm-zip");
-    const zip = new AdmZip.default(uploadedFilePath);
+    let zip;
+    try {
+      zip = await openZip(uploadedFilePath);
+    } catch (error) {
+      return res.status(400).json({ error: error.message });
+    }
+    // The unpacking budget is measured against the file as it is on disk.
+    const zipSize = (await fs.stat(uploadedFilePath)).size;
 
     // Safety: validate ZIP paths (prevent path traversal)
     for (const entry of zip.getEntries()) {
@@ -1391,9 +1475,10 @@ export async function importProject(req, res) {
 
     let manifest;
     try {
-      const manifestContent = manifestEntry.getData().toString("utf8");
+      const manifestContent = (await readZipEntry(manifestEntry, zipSize)).toString("utf8");
       manifest = JSON.parse(manifestContent);
-    } catch {
+    } catch (error) {
+      if (error instanceof UnsafeZipError) return res.status(400).json({ error: error.message });
       return res.status(400).json({ error: "Invalid project export: corrupted manifest file" });
     }
 
@@ -1416,6 +1501,11 @@ export async function importProject(req, res) {
       });
     }
 
+    // The project details a backup carries are held to what the app itself
+    // writes. The theme and preset name folders; the rest becomes the project row.
+    const manifestProblem = importManifestProblem(manifest.project);
+    if (manifestProblem) return res.status(400).json({ error: refusedBackupMessage(manifestProblem) });
+
     // Check if theme exists
     const themeDir = getThemeDir(manifest.project.theme);
     if (!(await fs.pathExists(themeDir))) {
@@ -1427,7 +1517,10 @@ export async function importProject(req, res) {
     // Resolve a unique name + folder pair using the same scheme as createProject.
     // If a project with the same name already exists, the imported one becomes
     // "X (Copy)" / "X (Copy N)" so the project switcher stays unambiguous.
-    const { name: resolvedName, folder: folderName } = await resolveProjectIdentity(manifest.project.name);
+    // Stripped of markup as the create form's name is.
+    const importedName = stripHtmlToText(manifest.project.name.trim());
+    if (!importedName) return res.status(400).json({ error: refusedBackupMessage("its project name is empty.") });
+    const { name: resolvedName, folder: folderName } = await resolveProjectIdentity(importedName);
     const projectDir = getProjectDir(folderName);
 
     // Create temporary extraction directory
@@ -1436,8 +1529,13 @@ export async function importProject(req, res) {
 
     let newProject = null;
     try {
-      // Extract ZIP to temporary directory
-      zip.extractAllTo(tempDir, true);
+      // Extract ZIP to temporary directory. Top-level dot entries are working
+      // files (a theme update's `.theme-update-backup`, its staging folder) that
+      // a backup never contains — export leaves every one of them out — and a
+      // planted one would be acted on by the next theme update.
+      await extractZipSafely(zip, zipSize, tempDir, {
+        skip: (entryName) => entryName.split("/")[0].startsWith("."),
+      });
 
       // Validate extracted structure
       const extractedManifestPath = path.join(tempDir, "project-export.json");
@@ -1467,14 +1565,14 @@ export async function importProject(req, res) {
         id: randomUUID(),
         folderName,
         name: resolvedName,
-        description: manifest.project.description || "",
-        siteTitle: manifest.project.siteTitle || "",
+        description: sanitizeOptionalText(manifest.project.description) || "",
+        siteTitle: sanitizeOptionalText(manifest.project.siteTitle) || "",
         theme: manifest.project.theme,
         themeVersion,
-        receiveThemeUpdates: manifest.project.receiveThemeUpdates || false,
+        receiveThemeUpdates: importedFlag(manifest.project.receiveThemeUpdates) ?? false,
         preset: manifest.project.preset || null,
         siteUrl: manifest.project.siteUrl || "",
-        cleanUrls: manifest.project.cleanUrls || false,
+        cleanUrls: importedFlag(manifest.project.cleanUrls) ?? false,
         siteIdentity: readSiteIdentity(manifest.project.siteIdentity).value,
         // An export from another install can carry anything; fall back to a
         // single-language project rather than importing an unusable code.
@@ -1485,6 +1583,11 @@ export async function importProject(req, res) {
         created: new Date().toISOString(),
         updated: new Date().toISOString(),
       };
+
+      // What the backup names inside its files, checked before any of it is
+      // copied into the new project.
+      const contentProblem = await backupContentProblem(tempDir, importedLanguages.languages ?? []);
+      if (contentProblem) throw new BackupRefusedError(refusedBackupMessage(contentProblem));
 
       // Create project directory
       await fs.ensureDir(projectDir);
@@ -1587,6 +1690,8 @@ export async function importProject(req, res) {
       throw error;
     }
   } catch (error) {
+    // A refused backup is the file's problem, not the server's.
+    if (error.statusCode === 400) return res.status(400).json({ error: error.message });
     console.error("Error importing project:", error);
     res.status(500).json({ error: error.message || "Failed to import project" });
   } finally {

@@ -70,7 +70,7 @@ If seeding fails, the language is not recorded as enabled. Retrying is safe by c
 
 Within the translation-operation queue: read the source, check group occupancy, allocate a unique target slug, copy content with a new UUID and the same effective group ID, write into the target folder, then update usage. Item versions also enter the target language's manual ordering. The source document is not rewritten. Page listing/pagination flags are kept when copying to another language.
 
-The content is copied as a starting point; no automatic text translation or ongoing synchronization occurs. Inherited explicit references remain references to the copied targets. Editing sibling pages can change their structures independently.
+The content is copied as a starting point; no automatic text translation or ongoing synchronization occurs. A custom canonical URL is the one field not copied: it names the source's address, so the new version starts with its own automatic one. Inherited explicit references remain references to the copied targets. Editing sibling pages can change their structures independently.
 
 Repeated or concurrent attempts to create the same group's target version produce a conflict rather than two members. Missing/unknown/same-language requests are rejected. Unreadable possible group members prevent a safe occupancy decision and cause failure.
 

@@ -15,11 +15,16 @@ describe("pageHref — flag OFF (byte-identical to today)", () => {
   it("emits <slug>.html at the root", () => {
     expect(pageHref("about")).toBe("about.html");
     expect(pageHref("index")).toBe("index.html");
-    expect(pageHref("home")).toBe("home.html");
   });
   it("depth-prefixes one level deep", () => {
     expect(pageHref("about", { outputPathPrefix: "../" })).toBe("../about.html");
     expect(pageHref("index", { outputPathPrefix: "../" })).toBe("../index.html");
+  });
+  it("links a page slugged home to index.html, the file it publishes as", () => {
+    expect(pageHref("home")).toBe("index.html");
+    expect(pageHref("home", { outputPathPrefix: "../" })).toBe("../index.html");
+    expect(pageHref("home", { language: "el", defaultLanguage: "en" })).toBe("el/index.html");
+    expect(pageHref("home", { outputPathPrefix: "../", language: "el", defaultLanguage: "en" })).toBe("../el/index.html");
   });
 });
 

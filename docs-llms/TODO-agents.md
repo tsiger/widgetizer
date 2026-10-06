@@ -74,7 +74,7 @@ Board says To Be Reviewed; issue is title-only. Establish the affected input/sta
 
 **Review · Unrated · OSS · tsiger**
 
-Implemented in e4379a50: history survives save, 150 steps, 500 ms same-setting grouping. Verify manual/autosave, in-flight save and theme correction; do not add a toggle without a decision.
+Implemented in e4379a50: history survives save, 150 steps, 500 ms same-setting grouping. Verify manual/autosave, in-flight save and theme correction; do not add a toggle without a decision. Found 2026-10-05: turning on "paginate" makes up to three `updateWidgetSettings` calls (`listing_anchor`, per-page count, `paginate`; `SettingsPanel.jsx` ~86-108) that are different settings and so not grouped; one Ctrl+Z turns paginate off but leaves the other two.
 
 **Done when:** Normal editing/undo workflow matches the agreed behaviour.
 
@@ -192,7 +192,27 @@ Distinguish display name from storage folder. Preserve existing project paths an
 
 **Start:** [projects](../app/src/components/projects). **Source:** GitHub #139. [GitHub #139](https://github.com/tsiger/widgetizer/issues/139)
 
+### MEDIA-BLANK-ALT · Decide whether translated media text can be deliberately blank
+
+**Decision needed · Low · Shared**
+
+The data model treats `""` in `media_file_translations` as "deliberately blank" (e.g. a decorative image in one language) and NULL as "inherit", but `MediaDrawer.jsx` (~91-96) sends only non-empty fields, so the UI can't set a blank, and saving any other field turns an imported or API-set `""` back into NULL (the default-language text reappears). The tests ("clearing restores inheritance") show the UI behaviour is intended; the control was removed in 66ae2e20. Decide: restore a control, or drop the `""` meaning from backend/docs so the two agree.
+
+**Done when:** UI, server and multilingual docs describe and implement the same rule, with a test.
+
+**Start:** [MediaDrawer.jsx](../packages/editor-ui/src/components/media/MediaDrawer.jsx), [mediaController.js](../packages/builder-server/src/controllers/mediaController.js), [mediaRepository.js](../packages/builder-server/src/db/repositories/mediaRepository.js). **Source:** 2026-10-05 code review of `48eef6f4..9e98dad7`.
+
 ## Planned features
+
+### SYMLINK-PATHS · Decide whether path checks should follow symlinks
+
+**Decision · Low · Shared**
+
+The containment checks that keep file-sourced paths inside their folder compare resolved path strings and do not follow symlinks: the theme-update recovery plan (`themeUpdateService.js` `removeInsideProject`) and export's media copy (`exportController.js` `uploadSourcePath`). A symlink already inside `uploads/images` that points outside would still be copied on export, and a plan entry through a symlinked folder would still be removed. Neither import nor theme upload can create one (`utils/zipSafety.js` writes every entry as a plain file), so this needs a local actor or an embedding app whose storage preserves symlinks. Options: `lstat`/`realpath` these paths and refuse symlinks, or document the assumption that project folders hold no symlinks.
+
+**Done when:** The decision is made and either implemented with a test or documented.
+
+**Start:** [themeUpdateService.js](../packages/builder-server/src/services/themeUpdateService.js), [exportController.js](../packages/builder-server/src/controllers/exportController.js), [pathSecurity.js](../packages/builder-server/src/utils/pathSecurity.js). **Source:** 2026-10-06 reviews of the BACKUP-TRUST fixes.
 
 ### MEDIA-MP4 · Support uploaded MP4 videos on site pages
 
@@ -212,11 +232,78 @@ Needed for the Widgetizer marketing site. Planned follow-up: **2026-10-02**. Sup
 
 Confirmed 2026-09-21 at `8846ab29` with a controlled delayed-response test against the real theme store. Settings permits repeated saves while a request is pending; `themeStore.saveSettings()` has no shared queue. Save red, then blue; let the server store both in order but deliver blue's response before red's. The late red response replaces `originalSettings`, reports the blue draft dirty, and Reset restores red while declaring it clean although the server holds blue. The 17 existing theme-store tests passed; the temporary diagnostic reproduced the gap and was removed.
 
-Coordinate saves at the shared theme-store boundary used by Settings and the page editor. Preserve newer edits, warning corrections, project/load isolation and manual failure reporting. Do not redo the completed page-save redesign or expand into unrelated cross-window/backend coordination.
+Coordinate saves at the shared theme-store boundary used by Settings and the page editor. Preserve newer edits, warning corrections, project/load isolation and manual failure reporting. Do not redo the completed page-save redesign or expand into unrelated cross-window/backend coordination. Also check two related gaps found 2026-10-05 (read only): `saveStore.save` has no generation check between Phase 1 (page/globals) and Phase 2 (theme, ~312-319), so after discard-and-leave during Phase 1 the theme draft live at that moment is sent; and `themeStore.reconcileFromServer` (~179) bumps `activeLoadId`, so an in-flight `loadSettings` drops its result and neither sets `loading:false` (Settings can stay on a spinner).
 
 **Done when:** A retained regression test covers the demonstrated response ordering and Reset agrees with saved content. Shared callers cannot race theme writes or saved baselines; edits during a save remain dirty, and failures/corrections do not overwrite newer work. Check the Settings controls and page-editor caller together.
 
 **Start:** [themeStore.js](../packages/editor-ui/src/stores/themeStore.js), [Settings.jsx](../packages/editor-ui/src/pages/Settings.jsx), [saveStore.js](../packages/editor-ui/src/stores/saveStore.js), [theme-store tests](../packages/editor-ui/src/stores/__tests__/themeStore.test.js). **Source:** 2026-09-21 follow-up check; the retired redesign is retrievable with `git show 8846ab29:docs-llms/plan-savestore-concurrency-redesign.md`.
+
+### GH147 · A stale tab's theme-settings save reverts a theme update
+
+**Open · Medium · Shared**
+
+Reproduced 2026-10-03 at `9e98dad7` on duplicates of a 0.9.9 Arch project. Open the page editor (or Site settings), apply the 0.9.10 update from another tab, then change any theme setting in the first tab without reloading and save. `theme.json` goes back to `"version": "0.9.9"` and loses `show_breadcrumbs`, while the project row keeps `theme_version` 0.9.10, so no update is offered again and the new settings never appear. A screen opened after the update saves correctly. Cause: `saveProjectThemeSettings` (`themeController.js`) writes the whole `theme.json` from the request body, and `themeStore` holds the copy it loaded until the screen reloads. The whole-file write predates 0.9.10. Distinct from R-THEME-SAVE (response ordering within one tab), though both sit at the same boundary. Embedding apps with their own theme-settings save route have the same exposure and need the same guard.
+
+Recommended: optimistic concurrency at the save boundary. The load returns a revision of `theme.json`, the save sends it back, and the server answers 409 when the file has changed; the screen then shows a reload prompt that warns about unsaved edits. Optionally also merge only the changed setting values into the current file. Follow-up: detect an applied update in open tabs before they save, reusing the stale-active-project pattern (`resolveActiveProject` 409, `activeProjectChannel`, focus re-check, `useStaleActiveProjectDetection`). Coordinate with R-THEME-SAVE rather than building two mechanisms.
+
+**Done when:** A theme-settings save from a screen loaded before a theme update (or before any other change to `theme.json`) cannot overwrite the newer file, the user is told to reload without silently losing edits, and a regression test covers the reproduced sequence.
+
+**Start:** [themeController.js](../packages/builder-server/src/controllers/themeController.js), [themeStore.js](../packages/editor-ui/src/stores/themeStore.js), [themeUpdateService.js](../packages/builder-server/src/services/themeUpdateService.js), [useStaleActiveProjectDetection.js](../packages/editor-ui/src/hooks/useStaleActiveProjectDetection.js). **Source:** 2026-10-03 walkthrough. [GitHub #147](https://github.com/tsiger/widgetizer/issues/147)
+
+### LANG-LOCK-CHECKS · Re-check language rules inside the write lock
+
+**Open · Medium · Shared**
+
+Two rules are checked against the project as read before the content-write lock and never re-checked inside it:
+
+- **Default language.** `updateProject` validates "the default can only change while the site has one language" via `readLanguages(updates, currentProject)` (`projectController.js` ~688) before `withContentWriteLock` (~726). Tab A adds `el` while tab B changes the default to `el`: the row becomes `{defaultLanguage:"el", languages:["el"]}`. Every later project save is refused ("already the site's default language"), `DELETE /languages/el` is refused, changing back is refused, `pages/el/` is orphaned and `projectLanguageContexts` yields `[el, el]` (pages listed twice). With another code (`de`) the default changes on a multilingual site. Reproduced with a scratch script delaying the seed. The UI's `blocked` flag only covers one screen.
+- **Page slug vs language code.** `createPage`/`updatePage` reserve slugs against `req.activeProject` before the lock; `addLanguage("el")` can run in between and the queued write then creates `pages/el.json`, colliding with the Greek homepage (`el.html` vs `el/`). Narrow window; read only.
+
+Related to T76 (product rule) and R1-COORD (scope of coordination), but both cases already take the lock and only need to re-read.
+
+**Done when:** Both rules are re-checked against the project row read inside the lock, and tests cover the two interleavings.
+
+**Start:** [projectController.js](../packages/builder-server/src/controllers/projectController.js), [pageController.js](../packages/builder-server/src/controllers/pageController.js), [languageService.js](../packages/builder-server/src/services/languageService.js). **Source:** 2026-10-05 code review of `48eef6f4..9e98dad7`.
+
+### COLLECTION-LIST-RACE · A slow collection list can show another collection's items
+
+**Open · Medium · Shared**
+
+`useCollectionItems.fetchItems` (~31-61) has no stale-response guard and now fetches one language after another. The `collections/:type` route has no `key` (`EditorShell.jsx` ~135), so switching collections reuses the component: open A, quickly open B, and if A's requests finish last B's screen lists A's items. Delete, Duplicate and Reorder then call the API with type B and A's slugs; Delete removes a B item that shares a slug. Pattern predates 0.9.10; the per-language loop widens the window.
+
+**Done when:** A response for a previous type/project/language set is discarded, and a test covers out-of-order responses.
+
+**Start:** [useCollectionItems.js](../packages/editor-ui/src/hooks/useCollectionItems.js), [CollectionItems.jsx](../packages/editor-ui/src/pages/CollectionItems.jsx). **Source:** 2026-10-05 code review of `48eef6f4..9e98dad7`.
+
+### PARENT-TRANSLATION · Deleting a parent page detaches its translated children
+
+**Open · Medium · Shared**
+
+A language version keeps the source's `parentPageUuid` (by design; breadcrumbs map it to the same-language sibling through the translation group). After a delete, `updatePagesViaStorage` (`linkEnrichment.js` ~247) removes any `parentPageUuid` naming a deleted page in every language without checking for a surviving sibling. Delete English `about` and Greek `team` loses its parent even though Greek `about` exists. Reproduced with a script.
+
+**Done when:** A child keeps (or is retargeted to) a surviving same-group parent, and only children with no surviving parent are cleared, with a test.
+
+**Start:** [linkEnrichment.js](../packages/builder-server/src/utils/linkEnrichment.js), [breadcrumbs.js](../packages/core/src/utils/breadcrumbs.js). **Source:** 2026-10-05 code review of `48eef6f4..9e98dad7`.
+
+### SKIPPED-ITEM-NOTICE · Say when a collection item is skipped for a bad slug
+
+**Open · Low · Shared**
+
+Since `0fd5005a`, `readCollectionItems` (`collectionService.js`) skips an item whose stored slug (`raw.slug ?? raw.id`) is missing or not `^[a-z0-9-]+$`, with a server-side `console.warn` only. The editor list, link pickers and export then simply lack the item, with nothing on screen to explain it. Such files come only from a hand-edited project or a crafted backup (writes always produce plain slugs), so this is about not losing content silently, not about frequency. Likely shapes: report skipped items on the collection screen (as the invalid-item notice does), or repair the slug from the file name.
+
+**Done when:** A skipped item is visible to the user (or repaired), with a test.
+
+**Start:** [collectionService.js](../packages/builder-server/src/services/collectionService.js), [CollectionItems.jsx](../packages/editor-ui/src/pages/CollectionItems.jsx). **Source:** 2026-10-06 review of the containment fix.
+
+### THEME-UPLOAD-CLEANUP · A failed theme update upload can leave its new versions installed
+
+**Open · Low · OSS**
+
+When an upload adds update versions to an installed theme, `uploadTheme` (`themeController.js`) copies each new `updates/<version>/` folder into the theme and then rebuilds `latest/`. If a step after the copy fails (the rebuild, or reading the final theme data), the catch removes `themeDir` only for a new theme, so the copied version folders stay while the response reports a failure. Predates the 2026-10-06 ZIP changes.
+
+**Done when:** A failed update upload leaves the installed theme as it was, with a test.
+
+**Start:** [themeController.js](../packages/builder-server/src/controllers/themeController.js). **Source:** 2026-10-06 review of the import checks.
 
 ### T32 · Check theme-upload validation cleanup
 
@@ -287,6 +374,137 @@ Revalidate load-vs-empty states, blank edit forms, failed delete dialogs/uploads
 **Done when:** Each confirmed case shows the actual outcome and a useful next action.
 
 **Start:** [Pages.jsx](../packages/editor-ui/src/pages/Pages.jsx). **Source:** Original §64.
+
+### UI-LIST-REPLY · A bad list reply crashes or silently empties editor screens
+
+**Open · Low · Shared**
+
+Seen on 2026-10-02 at `9e98dad7`, after upgrading a pre-0.9.10 data folder, in one Firefox session. Some editor requests made during a screen load intermittently resolved to an empty 2xx body, which `parseJsonResponse` (`apiFetch.js`) turns into `null`. The server was not the source: the same requests sent directly (curl, and four concurrent `fetch` calls from the console) always returned full bodies, and `getAllPages` responds with an array or a 500. It happened only with the HTTP cache enabled, never in a private window or Firefox Troubleshoot Mode, and stopped after a browser restart, so the trigger is unconfirmed (an extension or the session's cache state). The four affected reads and what each did with `null`:
+
+- `GET /pages` on Pages: `loadPages` stores it unchecked (`Pages.jsx:152`); `useTranslationVersions` runs for every project, single-language too, and `entries.map` threw, so the error boundary replaced the screen.
+- `GET /widgets` in the page editor: `loadSchemas` (`widgetStore.js`) catches the failure and keeps `schemas: {}` with `error` set, but nothing shows the error. Widgets displayed their raw type names, had no settings and the inserter was empty.
+- `GET /pages` and `GET /collections/:type` feeding Media's usage labels (`Media.jsx` `loadUsageTitles`): `buildUsageTitleMap` threw on `null` (its defaults only cover `undefined`), the bare `catch` fell back to the global titles, and "Used in" showed raw `page:<uuid>` / `collection:<uuid>` sources.
+- `GET /themes/update-count` (`themeUpdateStore.js`): `result.count` threw and was logged; the badge silently stayed at its previous value.
+
+Any non-array or non-object 2xx body (e.g. an HTML string) fails the same way. Other callers to check: `CollectionItems.jsx` (`items`) and `EditorTopBar.jsx` (`allPages`) feed `useTranslationVersions` from server lists, and `CollectionItemForm.jsx` builds its entries from the item's translation group. Other editor list screens (menus, media, collections and similar) have not been swept. Embedding apps mount these screens and inherit the behaviour.
+
+Treat a reply of the wrong shape as a load failure, and show it: the existing load-error toast for lists, and a visible "couldn't load widgets" state in the editor. Not an empty list, which would read as deleted content. Then sweep the remaining list screens once: fix crashes and silent failures here, and hand cases that show an empty list instead of an error to T64. Separately consider `Cache-Control: no-store` on editor API JSON replies: they are per-request data, and Express currently sends ETags with no cache directive, so browsers revalidate and reuse stored copies.
+
+**Done when:** Each read above, and each list query feeding `useTranslationVersions`, shows a visible load error on a bad reply, the screen stays usable, and tests cover it. The sweep of other list screens is done, with any empty-instead-of-error cases recorded under T64. The API caching decision is made.
+
+**Start:** [Pages.jsx](../packages/editor-ui/src/pages/Pages.jsx), [useTranslationVersions.js](../packages/editor-ui/src/hooks/useTranslationVersions.js), [widgetStore.js](../packages/editor-ui/src/stores/widgetStore.js), [Media.jsx](../packages/editor-ui/src/pages/Media.jsx), [mediaUsageDisplay.js](../packages/editor-ui/src/utils/mediaUsageDisplay.js), [themeUpdateStore.js](../packages/editor-ui/src/stores/themeUpdateStore.js), [apiFetch.js](../packages/editor-ui/src/lib/apiFetch.js). **Source:** 2026-10-02 upgrade walkthrough.
+
+### EXPORT-CLASH-LANG · Catch output-path clashes inside language folders
+
+**Open · Low · Shared**
+
+- A theme update can add a collection whose `slugPrefix` equals an enabled language code: `isReservedSlugPrefix(slugPrefix)` is called without `languages` (`collectionService.js` ~214) and theme updates do no check, while adding a language does (`assertCodeIsFree`). Items then publish over that language's pages (`it/foo.html`).
+- The paginated-homepage vs `page`-prefix clash check uses `rootPages` only (`exportController.js` ~457): a Greek paginated homepage writes `el/page/2.html`, which a Greek item slugged `2` silently overwrites.
+
+**Done when:** Export (and ideally theme update) refuses both clashes in every language with a clear message, with tests.
+
+**Start:** [exportController.js](../packages/builder-server/src/controllers/exportController.js), [collectionService.js](../packages/builder-server/src/services/collectionService.js), [contentAddress.js](../packages/core/src/utils/contentAddress.js). **Source:** 2026-10-05 code review of `48eef6f4..9e98dad7`.
+
+### THEME-STRINGS · Translate the remaining built-in breadcrumb and business-details text
+
+**Open · Low · Shared**
+
+`core/src/snippets/breadcrumbs.liquid` defaults `aria_label` to "Breadcrumb" and `page_label` to "Page"; Arch's `layout.liquid` passes neither and Arch locales have no breadcrumb keys (Greek page 2 shows "Page 2"). `themes/arch/snippets/business-details.liquid` shows weekdays sliced from English day ids ("Mon"–"Sun") and a literal "Closed". Breadcrumb JSON-LD also names numbered crumbs `Page N` (`breadcrumbNode.js`).
+
+**Done when:** These strings come from theme locales or site strings in each language.
+
+**Start:** [breadcrumbs.liquid](../packages/core/src/snippets/breadcrumbs.liquid), [business-details.liquid](../themes/arch/snippets/business-details.liquid). **Source:** 2026-10-05 code review of `48eef6f4..9e98dad7`.
+
+### RENDER-LANG · Make site-wide links and single-widget re-renders follow the page language
+
+**Investigate · Low · Shared**
+
+- `resolveThemeSettingReferences` (`renderEngine.js` ~760-860): a theme-setting `link` resolves to the target's own language and a uuid menu to that exact menu; `theme.json` is one file for all languages, so Greek pages show English targets (the leak d0442659 fixed for `page_url`). On item pages theme settings resolve before `currentPageData` is set, so a slug menu resolves to the root-language menu. Arch declares no such settings, so third-party themes only.
+- `resolveItemFromPath` (`renderEngine.js` ~561-598) strips the language folder but reads `collections/<type>/<slug>.json` without it, so a header re-rendered alone for a Greek item page shows an empty or English breadcrumb. Preview only; reachability unconfirmed.
+
+**Done when:** Theme-setting references resolve per rendering language (or the limitation is documented in the theme contract), and the single-widget item lookup uses the language folder.
+
+**Start:** [renderEngine.js](../packages/render-engine/src/renderEngine.js). **Source:** 2026-10-05 code review of `48eef6f4..9e98dad7`.
+
+### THEME-UPDATE-RESUME · Undo an interrupted theme update at startup instead of waiting for the next update
+
+**Open · Low · Shared**
+
+Recovery (`recoverInterruptedUpdate`, `themeUpdateService.js`) runs only at the start of the next `applyThemeUpdateToDir`. Checked 2026-10-06 at `46119daa`: after a crash mid-swap the update is still offered, because `checkForUpdates` compares the project row's `themeVersion` with the theme source, and the row is written only after `applyThemeUpdateToDir` returns. With notifications on (they must be, for the update to have been started), pressing "Apply update" again undoes the half-finished swap and applies the update cleanly. A crash after the plan file is removed but before the row write leaves new files under the old version; re-applying is harmless (noted in `applyThemeUpdateExclusively`). The remaining gap is the time until the user presses update again: folders such as `assets`/`widgets` sit inside `.theme-update-backup`, so pages render without them, a site export or backup made meanwhile omits them (dot-folders are excluded), and nothing tells the user the broken site and the update notice are connected. The same state follows an undo that itself failed ("The theme update could not be completed. Please try again."). Only a theme removed or downgraded meanwhile would leave nothing to trigger recovery.
+
+Recommended: on server start, check each project for a leftover `.theme-update-backup/` and run the recovery under the per-project update lock (a crash always means a restart), and export that as a function embedding apps can call per project. Optional: before a site export or backup, refuse with a clear message if an interrupted update could not be undone. Owner's alternative: close as covered by retrying the update.
+
+**Done when:** A leftover interrupted update is undone at startup (or the task is closed with that reasoning), with a test.
+
+**Start:** [themeUpdateService.js](../packages/builder-server/src/services/themeUpdateService.js), [server-common.js](../app/server-common.js). **Source:** 2026-10-05 code review of `48eef6f4..9e98dad7`; narrowed 2026-10-06.
+
+### DUPLICATE-FOLDER · Duplicating into an existing folder can merge into it and later delete it
+
+**Open · Low · Shared**
+
+Duplicate checks the new folder name against the database only (`projectController.js` ~851), unlike `resolveProjectIdentity`. A leftover folder with that name (e.g. from R6-DELETE) gets merged into by `fs.copy`, and if the duplicate then fails, the cleanup (`fs.remove(newDir)` / `discardHalfMadeProject`, ~879-893) deletes that pre-existing folder. Read only.
+
+**Done when:** Duplicate picks a folder name free on disk and in the DB, and cleanup only removes what it created.
+
+**Start:** [projectController.js](../packages/builder-server/src/controllers/projectController.js). **Source:** 2026-10-05 code review of `48eef6f4..9e98dad7`.
+
+### MENU-MEDIA-USAGE · Count upload links in menus as media usage
+
+**Investigate · Low · Shared**
+
+`mediaUsageService.js` (~536-732) scans pages, globals, theme settings, site identity and collection items in every language, but not `menus/**`, and there is no per-menu sync. A menu link typed as `/uploads/files/brochure.pdf` doesn't block deletion, while the same link in a widget does. Predates 0.9.10. First confirm the menu link UI accepts typed upload paths.
+
+**Done when:** Either menus are scanned (full and targeted) with a test, or menu links are shown not to carry upload paths.
+
+**Start:** [mediaUsageService.js](../packages/builder-server/src/services/mediaUsageService.js), [menuController.js](../packages/builder-server/src/controllers/menuController.js). **Source:** 2026-10-05 code review of `48eef6f4..9e98dad7`.
+
+### MEDIA-USAGE-LABELS · Show readable "Used in" labels for other-language content
+
+**Open · Low · Shared**
+
+`resolveUsageTitle` (`mediaUsageDisplay.js` ~79) strips only `global:` / `global:root:`, so `global:el:header` shows "El:header (Global)". `Media.jsx` (~121-123) fetches only the default language's collection items, so other-language items show raw `collection:<uuid>`. Distinct from UI-LIST-REPLY (null replies).
+
+**Done when:** Every language's globals, pages and items show a readable, language-tagged label, with a test.
+
+**Start:** [mediaUsageDisplay.js](../packages/editor-ui/src/utils/mediaUsageDisplay.js), [Media.jsx](../packages/editor-ui/src/pages/Media.jsx). **Source:** 2026-10-05 code review of `48eef6f4..9e98dad7`.
+
+### EDITOR-LANG-UX · Smooth the editor's language rough edges
+
+**Open · Low · Shared**
+
+- `LanguageMenu.jsx` (~55-97) shows every language without a sibling as "create", including the current one; until `EditorTopBar`'s `allPages` loads (or if it fails) it offers "create English" on the English page (400) and existing siblings (409). `CollectionItemForm` does the same for an item without uuid/group. `TranslationChips` filters the own language; this menu doesn't.
+- The parent-page picker (`PageForm.jsx` ~66-102) lists pages from every language with no language label.
+- `activeLanguage` starts on the default language (`Pages.jsx` ~55, `CollectionItems.jsx` ~59, `Menus.jsx` ~37) and create returns to the bare list URL (`PagesAdd.jsx` ~42, `CollectionItemAdd.jsx` ~60), so a new Greek page lands you on the English tab.
+
+**Done when:** Each of the three behaves as expected in a two-language project.
+
+**Start:** [LanguageMenu.jsx](../packages/editor-ui/src/components/content/LanguageMenu.jsx), [PageForm.jsx](../packages/editor-ui/src/components/pages/PageForm.jsx), [Pages.jsx](../packages/editor-ui/src/pages/Pages.jsx). **Source:** 2026-10-05 code review of `48eef6f4..9e98dad7`.
+
+### STALE-BANNER · A project warning can hide a language-removed warning while saves stay suspended
+
+**Open · Low · Shared**
+
+`staleProjectStore.markStale` (~24) overwrites a `reason: "language"` warning with `"project"`; the next focus check then calls `clearStale()` (`useStaleActiveProjectDetection.js` ~37-44), hiding the banner while `saveStore.savingSuspended` stays true. Every save returns `{status:"suspended"}` and `saveAndReport` reacts only to rejections, so nothing tells the user. Needs: language removed, then another tab switches project, then this project re-activated. Read only.
+
+**Done when:** A language warning survives a project warning being raised and cleared, or suspended saves are always visible, with a test.
+
+**Start:** [staleProjectStore.js](../packages/editor-ui/src/stores/staleProjectStore.js), [useStaleActiveProjectDetection.js](../packages/editor-ui/src/hooks/useStaleActiveProjectDetection.js). **Source:** 2026-10-05 code review of `48eef6f4..9e98dad7`.
+
+### THEME-CHECKER · Close gaps in the theme checker
+
+**Open · Low · OSS**
+
+`scripts/validate-theme.js` (and the catalog from `scripts/build-theme-skill-contract.js`):
+
+- **Accepts `size: 'thumb'`.** `thumb` is added to the known sizes (~1085) and the catalog takes it from the default sizes (~67), but export skips thumb renditions, so `{% image size: 'thumb' %}` passes and the exported image is missing.
+- **Crashes on a bare `{% echo %}`.** `checkOutput` (~960) reads `output.node.value.initial`; an argument-less echo (valid Liquid) has no `value`, and `main()` replaces the whole report with one `[validation-failed]` TypeError. Reproduced on a scratch copy of the starter theme.
+- **Trusts preset IDs and skips symlinks.** IDs from `presets.json` go straight into `path.join` (~1739-1803): `../templates` re-validates the root templates (duplicate findings), `../../x` reads JSON outside the theme. `listDirs`/`listFiles` (~194-207) use `Dirent.isFile`/`isDirectory`, so symlinked widgets, templates and snippets are skipped and produce false `unknown-widget-type` / `missing-snippet` errors. Reproduced. Read-only CLI, not a security issue.
+- **Doesn't check widget-local non-CSS/JS assets.** A widget's `{% asset %}` for e.g. `badge.svg` (~854) is neither checked for existence nor flagged as non-exported, though it works in preview. Likely, not reproduced.
+- **Accepts `imageSizes` entries without `width`.** Any key under `settings.imageSizes` becomes a known size (~1084) without checking `width`/`enabled`/`quality`; a widthless size can't be generated and rendering falls back to the original. Likely, not reproduced.
+
+**Done when:** Each case gives a correct finding (or none) instead of a false pass, false error or crash, with a test per case in the theme-skill tests.
+
+**Start:** [validate-theme.js](../scripts/validate-theme.js), [build-theme-skill-contract.js](../scripts/build-theme-skill-contract.js), [themeSkill.test.js](../packages/builder-server/src/tests/themeSkill.test.js). **Source:** 2026-10-05 code review of `9e98dad7..e2f61b21`.
 
 ### T66 · Explain form errors beside the right field
 
@@ -504,7 +722,7 @@ Media traversal recurses; reference transformers visit settings/block values. Un
 
 **Deferred · Medium · OSS**
 
-Candidates: truncated ZIP, future formatVersion, valid JSON with invalid content shape. Existing media-library and language refusals are already covered. No instructions to edit archive files.
+Candidates: truncated ZIP, future formatVersion, valid JSON with invalid content shape. Existing media-library and language refusals are already covered. No instructions to edit archive files. Crafted (malicious) content in an otherwise valid backup is refused since `46119daa` (BACKUP-TRUST, completed); a truncated or damaged ZIP is now a 400 from `utils/zipSafety.js`.
 
 **Done when:** Chosen case either restores completely or refuses clearly with cleanup.
 
@@ -636,7 +854,7 @@ Prepare whole update, record version after success, preserve recovery data when 
 
 **Open · High · Embedding**
 
-MAX_PAGES_PER_PROJECT is declared/answered but unread by page create/duplicate/version. Decide counting policy and enforce every creation path consistently.
+MAX_PAGES_PER_PROJECT is declared/answered but unread by page create/duplicate/version. Decide counting policy and enforce every creation path consistently. The collection-item allowance has a related gap (2026-10-05): `createCollectionItem` counts items before the content-write lock (`collectionController.js` ~246-260), so concurrent creates at 99/100 both pass. Count inside the lock for both.
 
 **Done when:** Configured caps refuse excess creation without writes; OSS remains unbounded.
 

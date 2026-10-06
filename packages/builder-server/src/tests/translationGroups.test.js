@@ -220,6 +220,20 @@ describe("create a page's version in another language", () => {
     const res = await createPageVersion("blog", { targetLanguage: "el" });
     assert.equal(res._json.widgets.w1.settings.listing_anchor, true);
   });
+
+  // A custom canonical names the source's address; the new version gets its
+  // own automatic one. The rest of the SEO copy is a starting point to translate.
+  it("does not copy a custom canonical URL, but keeps the other SEO fields", async () => {
+    await seedPage("about", {
+      seo: { description: "About us", canonical_url: "https://example.com/about.html" },
+    });
+    const res = await createPageVersion("about", { targetLanguage: "el" });
+    assert.equal(res._status, 201);
+    const onDisk = await readPage("about", "el");
+    assert.equal(onDisk.seo.canonical_url, "");
+    assert.equal(onDisk.seo.description, "About us");
+    assert.equal((await readPage("about")).seo.canonical_url, "https://example.com/about.html");
+  });
 });
 
 describe("create an item's version in another language", () => {
@@ -253,6 +267,17 @@ describe("create an item's version in another language", () => {
     assert.equal((await createItemVersion("story", { targetLanguage: "en" }))._status, 400);
     assert.equal((await createItemVersion("story", { targetLanguage: "fr" }))._status, 400);
     assert.equal((await createItemVersion("ghost", { targetLanguage: "el" }))._status, 404);
+  });
+
+  it("does not copy a custom canonical URL, but keeps the other SEO fields", async () => {
+    await seedItem("story", {
+      seo: { description: "A story", canonical_url: "https://example.com/news/story.html" },
+    });
+    const res = await createItemVersion("story", { targetLanguage: "el" });
+    assert.equal(res._status, 201);
+    const onDisk = await readItem("story", "el");
+    assert.equal(onDisk.seo.canonical_url, "");
+    assert.equal(onDisk.seo.description, "A story");
   });
 });
 

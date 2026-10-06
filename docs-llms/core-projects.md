@@ -127,15 +127,16 @@ Projects can be imported from ZIP files previously exported from Widgetizer.
 3.  **Upload**: The user clicks "Import Project" to upload the ZIP file via `POST /api/projects/import`.
 4.  **Server-Side Validation**: The backend validates:
     - ZIP structure contains `project-export.json` manifest
-    - Manifest contains required fields (name, theme)
+    - Manifest contains required fields (name, theme), and its project details are the kind the app writes: the theme and preset are single folder names, the name, title, notes and Site Address are text (a Site Address that is not a valid address is kept as it was, since older projects can hold one; output ignores it and export warns), and `receiveThemeUpdates`/`cleanUrls` are true or false. Markup is stripped from the name, title and notes, as on the create form.
     - Referenced theme exists in the installation
-5.  **Isolation**: Files are extracted to a temporary directory first for validation before any permanent changes.
+5.  **Isolation**: Files are extracted to a temporary directory first for validation before any permanent changes. Extraction refuses a ZIP that unpacks to more than 100 times its own size (a ZIP bomb), counting the bytes actually produced rather than the sizes the ZIP records (`utils/zipSafety.js`), and leaves out top-level dot entries such as a theme update's `.theme-update-backup`, which a backup never contains. Before anything is copied, the unpacked content is checked (`utils/backupContentChecks.js`): every media path is `/uploads/images/<name>` or `/uploads/files/<name>` (sizes under `images`), media translations name only the project's additional languages, and every collection item's stored slug matches `^[a-z0-9-]+$`.
+    - Any of these refuses the whole import with a 400 that names the problem; nothing is created and the unpacked copy is removed.
 6.  **Project Creation**:
     - A new UUID is generated for the imported project
     - A unique `folderName` is generated (checking existing project metadata in SQLite and existing directories)
     - Files are copied from the temp directory to the new project directory
     - Project metadata is written to SQLite only after successful file copy
-    - The imported manifest restores `siteTitle`, `receiveThemeUpdates`, `preset`, `siteUrl`, `cleanUrls`, `siteIdentity` and the site languages in addition to the core project fields. An imported identity is never refused: only its valid part is kept, and a language code this version cannot use falls back to a single English site.
+    - The imported manifest restores `siteTitle`, `receiveThemeUpdates`, `preset`, `siteUrl`, `cleanUrls`, `siteIdentity` and the site languages in addition to the core project fields. An imported identity is never refused: only its valid part is kept. A language code this version cannot use refuses the import with a 400 telling the user to open the backup with a newer version.
 7.  **Cleanup**: Temporary files are removed on both success and failure.
 8.  **Feedback + Navigation**: A success toast is shown, the modal closes, and the imported project is immediately opened as the active project inside the site workspace.
 

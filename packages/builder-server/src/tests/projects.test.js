@@ -1183,6 +1183,35 @@ describe("updateProject", () => {
     assert.equal(res._status, 400);
     assert.match(res._json.error, /name.*required/i);
   });
+
+  // Through the real route, because the route's input checks run before the
+  // controller: a check that fills in a field the request left out turns
+  // "not sent" into "set to empty". The new-project form saves a picked logo
+  // this way, after the project is created with its notes.
+  it("keeps the description when a partial update through the route leaves it out", async () => {
+    const { default: express } = await import("express");
+    const { default: projectsRouter } = await import("../routes/projects.js");
+    const app = express();
+    app.use((req, _res, next) => {
+      req.adapters = mockReq().adapters;
+      next();
+    });
+    app.use("/api/projects", projectsRouter);
+    const server = await new Promise((resolve) => {
+      const s = app.listen(0, () => resolve(s));
+    });
+    try {
+      const response = await fetch(`http://127.0.0.1:${server.address().port}/api/projects/${project.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: "Original Name", siteUrl: "https://example.com" }),
+      });
+      assert.equal(response.status, 200);
+      assert.equal(projectRepo.getProjectById(project.id).description, "A test project");
+    } finally {
+      await new Promise((resolve) => server.close(resolve));
+    }
+  });
 });
 
 // ---------------------------------------------------------------------------

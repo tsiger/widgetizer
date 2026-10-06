@@ -53,7 +53,7 @@ A page is a complete document in one project language. It owns its widget instan
 | `parentPageUuid` | Reference to another page, not ownership; direct self-parenting is rejected |
 | `seo` | Version-specific metadata; can reference media |
 
-The default path is `pages/<slug>.json`; an additional-language path is `pages/<code>/<slug>.json`. Slug `page` is reserved for pagination; enabled language codes are reserved as root-page slugs. Export currently requires a root `index` page.
+The default path is `pages/<slug>.json`; an additional-language path is `pages/<code>/<slug>.json`. Slug `page` is reserved for pagination; enabled language codes are reserved as root-page slugs. `index` and `home` both make a page its language's homepage, published as `index.html`, so a language holds at most one of them: a new page gets the next free slug instead, and a rename onto the other one is refused. Export requires a default-language homepage and refuses a language holding both.
 
 ## What a page does not own
 

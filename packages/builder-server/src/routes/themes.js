@@ -2,9 +2,15 @@ import express from "express";
 import * as themeController from "../controllers/themeController.js";
 import { standardJsonParser } from "../middleware/jsonParser.js";
 import { resolveActiveProject } from "../middleware/resolveActiveProject.js";
+import { segmentParam } from "../middleware/slugValidators.js";
+import { validateRequest } from "../middleware/validateRequest.js";
 
 const router = express.Router();
 router.use(standardJsonParser);
+
+// A theme id names its folder under the themes directory (`getThemeDir`), and
+// deleting a theme removes that folder recursively.
+const themeId = [segmentParam("id"), validateRequest];
 
 // GET /api/themes - Get all themes
 router.get("/", themeController.getAllThemes);
@@ -13,22 +19,22 @@ router.get("/", themeController.getAllThemes);
 router.get("/update-count", themeController.getThemeUpdateCount);
 
 // GET /api/themes/:id - Get a specific theme
-router.get("/:id", themeController.getTheme);
+router.get("/:id", themeId, themeController.getTheme);
 
 // GET /api/themes/:id/widgets - Get theme widgets
-router.get("/:id/widgets", themeController.getThemeWidgets);
+router.get("/:id/widgets", themeId, themeController.getThemeWidgets);
 
 // GET /api/themes/:id/templates - Get theme templates
-router.get("/:id/templates", themeController.getThemeTemplates);
+router.get("/:id/templates", themeId, themeController.getThemeTemplates);
 
 // GET /api/themes/:id/versions - Get theme versions
-router.get("/:id/versions", themeController.getThemeVersionsHandler);
+router.get("/:id/versions", themeId, themeController.getThemeVersionsHandler);
 
 // GET /api/themes/:id/presets - Get theme presets
-router.get("/:id/presets", themeController.getThemePresets);
+router.get("/:id/presets", themeId, themeController.getThemePresets);
 
 // POST /api/themes/:id/update - Update a single theme (build latest/)
-router.post("/:id/update", themeController.updateTheme);
+router.post("/:id/update", themeId, themeController.updateTheme);
 
 // GET /api/themes/project/:projectId - Get project theme settings
 router.get("/project/:projectId", resolveActiveProject, themeController.getProjectThemeSettings);
@@ -43,6 +49,6 @@ router.get("/project/:projectId/locales/:lang", resolveActiveProject, themeContr
 router.post("/upload", themeController.handleThemeUpload, themeController.uploadTheme);
 
 // DELETE /api/themes/:id - Delete a theme if not in use
-router.delete("/:id", themeController.deleteTheme);
+router.delete("/:id", themeId, themeController.deleteTheme);
 
 export default router;

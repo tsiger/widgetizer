@@ -27,7 +27,8 @@ export { isHomeSlug };
  * @returns {string}
  */
 export function pageHref(slug, { cleanUrls = false, outputPathPrefix = "", language, defaultLanguage } = {}) {
-  if (cleanUrls && isHomeSlug(slug)) return homeHref({ cleanUrls, outputPathPrefix, language, defaultLanguage });
+  // Both home slugs publish as the language's index.html, so neither may link to <slug>.html.
+  if (isHomeSlug(slug)) return homeHref({ cleanUrls, outputPathPrefix, language, defaultLanguage });
   const folder = languageFolder({ language, defaultLanguage });
   const file = `${slug}${cleanUrls ? "" : ".html"}`;
   return prefixInternalHref(folder ? `${folder}/${file}` : file, outputPathPrefix);
