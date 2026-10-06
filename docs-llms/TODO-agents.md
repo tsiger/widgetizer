@@ -204,6 +204,16 @@ The data model treats `""` in `media_file_translations` as "deliberately blank" 
 
 ## Planned features
 
+### SYMLINK-PATHS · Decide whether path checks should follow symlinks
+
+**Decision · Low · Shared**
+
+The containment checks that keep file-sourced paths inside their folder compare resolved path strings and do not follow symlinks: the theme-update recovery plan (`themeUpdateService.js` `removeInsideProject`) and export's media copy (`exportController.js` `uploadSourcePath`). A symlink already inside `uploads/images` that points outside would still be copied on export, and a plan entry through a symlinked folder would still be removed. Neither import nor theme upload can create one (`utils/zipSafety.js` writes every entry as a plain file), so this needs a local actor or an embedding app whose storage preserves symlinks. Options: `lstat`/`realpath` these paths and refuse symlinks, or document the assumption that project folders hold no symlinks.
+
+**Done when:** The decision is made and either implemented with a test or documented.
+
+**Start:** [themeUpdateService.js](../packages/builder-server/src/services/themeUpdateService.js), [exportController.js](../packages/builder-server/src/controllers/exportController.js), [pathSecurity.js](../packages/builder-server/src/utils/pathSecurity.js). **Source:** 2026-10-06 reviews of the BACKUP-TRUST fixes.
+
 ### MEDIA-MP4 · Support uploaded MP4 videos on site pages
 
 **Open · Unrated · Shared**
@@ -215,37 +225,6 @@ Needed for the Widgetizer marketing site. Planned follow-up: **2026-10-02**. Sup
 **Start:** [Media system](core-media.md), [MIME types](../packages/core/src/utils/mimeTypes.js), [upload validation](../packages/editor-ui/src/utils/uploadValidation.js), [file input](../packages/editor-ui/src/components/settings/inputs/FileInput.jsx) and [export controller](../packages/builder-server/src/controllers/exportController.js). **Source:** User request, 2026-10-01.
 
 ## Fixes and investigations
-
-### LINK-DIRTY · Choosing a page in a link picker leaves the editor permanently "unsaved"
-
-**Open · High · Shared**
-
-Found 2026-10-03 at `9e98dad7`; both halves already exist at `48eef6f4`, so it predates 0.9.10. Selecting a page in a link field stores the value with `collectionType: undefined, collectionItemUuid: undefined` (`LinkInput.jsx` `handleLinkChange`; the item branch likewise sets `pageUuid: undefined`). After a successful save the baseline is a JSON round trip (`pageStore.js`, `originalPage: JSON.parse(JSON.stringify(page))`), which drops undefined keys. `hasUnsavedPageChanges` compares with lodash `isEqual`, which treats a present-but-undefined key as different from an absent one, so the page never equals its baseline again. Observed in a live tab: `modifiedWidgets` empty, `structureModified` false, a JSON comparison of `page` and `originalPage` empty, `hasUnsavedChanges()` true, and the only difference the two undefined keys on the edited link. Effects until reload: the Save button stays enabled, autosave re-sends identical content (six consecutive 200 saves seen), and the leave-page prompt warns about changes that don't exist. Any embedding app that gates an action on `hasUnsavedChanges()` after saving (e.g. save-then-publish) is blocked until the editor reloads. The data itself is saved correctly.
-
-Fix at the comparison so no input can trip it: compare page and baseline in the same normalized form the baseline is made in (or normalize undefined away on write), and also stop `LinkInput` writing undefined keys. Check `globalWidgets`/`originalGlobalWidgets` and the other `isEqual` call sites in `saveStore.js` (`reconcile…`, `save`) for the same mismatch.
-
-**Done when:** Choosing a page or collection item in a link picker, saving, and doing nothing else leaves the editor clean (Save disabled, no further autosaves, no leave prompt), for page content and global widgets; a regression test covers a value carrying undefined keys.
-
-**Start:** [saveStore.js](../packages/editor-ui/src/stores/saveStore.js), [pageStore.js](../packages/editor-ui/src/stores/pageStore.js), [LinkInput.jsx](../packages/editor-ui/src/components/settings/inputs/LinkInput.jsx). **Source:** 2026-10-03 walkthrough.
-
-### BACKUP-TRUST · Validate everything a restored backup brings in
-
-**Open · High · Shared**
-
-Import (`projectController.js` ~1347-1545) checks only that zip entry names don't start with `..` or are absolute, then trusts the extracted content. Confirmed paths:
-
-- **Theme-update recovery file.** `.theme-update-backup/.in-progress` survives import (export skips dot-folders, import doesn't strip them). On the next "Apply theme update", `recoverInterruptedUpdate` → `undoSwap` (`themeUpdateService.js` ~196-251) runs `fs.remove(path.join(projectDir, rel))` for every `added`/`placedWhereAbsent` entry with no containment check: `{"added":["../other-project"]}` deletes a sibling project. Reproduced with a scratch script on temp folders.
-- **Media rendition paths.** `uploads/media.json` is written to the DB with only IDs regenerated (~1533). Export copies each `sizes[*].path` via `path.join(projectDir, sizeInfo.path…)` (`exportController.js` ~1102-1110), so `/uploads/images/../../../../etc/passwd` is copied into the published output. Pre-existing.
-- **Collection item slugs.** The item's embedded `slug` wins over its filename (`collectionService.js` ~515) and export writes ``path.join(collectionOutputDir, `${item.slug}.html`)`` (`exportController.js` ~911), so `../../other-v1/index` writes outside the export folder. Pre-existing.
-- **Size.** `extractAllTo` has no cap on expanded bytes or entry count; the upload limit bounds only the compressed file (zip bomb fills `data/temp`). Pre-existing.
-- **Manifest fields.** `siteUrl` skips `isValidSiteUrl`; `name`, `siteTitle`, `description` are not type-checked or tag-stripped (a non-string `name` makes `resolveProjectIdentity` throw a 500); `theme` is used as a folder name unchecked. Only `siteIdentity` and languages are validated.
-- **Media translations.** `insertMediaFileStatements` (`mediaRepository.js` ~334-349) inserts any language key, including the default language and languages the project lacks, and inserts all-NULL rows. A row keyed by the default language overrides the default metadata at render.
-
-Fix at both ends: validate/strip on import (drop `.theme-update-*`, validate item slugs, media paths, manifest fields and translation languages, bound extraction), and add containment checks where the paths are used (theme recovery, export copy/write), since content can also arrive by other routes. Embedding apps with their own import or export pipeline need the same checks. R8-ARCHIVE stays about damaged/newer formats.
-
-**Done when:** Each case above is refused or neutralised on import with cleanup, the theme-recovery and export paths refuse anything outside their folder regardless of source, and tests cover each crafted input.
-
-**Start:** [projectController.js](../packages/builder-server/src/controllers/projectController.js), [themeUpdateService.js](../packages/builder-server/src/services/themeUpdateService.js), [exportController.js](../packages/builder-server/src/controllers/exportController.js), [mediaRepository.js](../packages/builder-server/src/db/repositories/mediaRepository.js). **Source:** 2026-10-05 code review of `48eef6f4..9e98dad7`.
 
 ### R-THEME-SAVE · Keep theme-settings saves in order
 
@@ -305,6 +284,26 @@ A language version keeps the source's `parentPageUuid` (by design; breadcrumbs m
 **Done when:** A child keeps (or is retargeted to) a surviving same-group parent, and only children with no surviving parent are cleared, with a test.
 
 **Start:** [linkEnrichment.js](../packages/builder-server/src/utils/linkEnrichment.js), [breadcrumbs.js](../packages/core/src/utils/breadcrumbs.js). **Source:** 2026-10-05 code review of `48eef6f4..9e98dad7`.
+
+### SKIPPED-ITEM-NOTICE · Say when a collection item is skipped for a bad slug
+
+**Open · Low · Shared**
+
+Since `0fd5005a`, `readCollectionItems` (`collectionService.js`) skips an item whose stored slug (`raw.slug ?? raw.id`) is missing or not `^[a-z0-9-]+$`, with a server-side `console.warn` only. The editor list, link pickers and export then simply lack the item, with nothing on screen to explain it. Such files come only from a hand-edited project or a crafted backup (writes always produce plain slugs), so this is about not losing content silently, not about frequency. Likely shapes: report skipped items on the collection screen (as the invalid-item notice does), or repair the slug from the file name.
+
+**Done when:** A skipped item is visible to the user (or repaired), with a test.
+
+**Start:** [collectionService.js](../packages/builder-server/src/services/collectionService.js), [CollectionItems.jsx](../packages/editor-ui/src/pages/CollectionItems.jsx). **Source:** 2026-10-06 review of the containment fix.
+
+### THEME-UPLOAD-CLEANUP · A failed theme update upload can leave its new versions installed
+
+**Open · Low · OSS**
+
+When an upload adds update versions to an installed theme, `uploadTheme` (`themeController.js`) copies each new `updates/<version>/` folder into the theme and then rebuilds `latest/`. If a step after the copy fails (the rebuild, or reading the final theme data), the catch removes `themeDir` only for a new theme, so the copied version folders stay while the response reports a failure. Predates the 2026-10-06 ZIP changes.
+
+**Done when:** A failed update upload leaves the installed theme as it was, with a test.
+
+**Start:** [themeController.js](../packages/builder-server/src/controllers/themeController.js). **Source:** 2026-10-06 review of the import checks.
 
 ### T32 · Check theme-upload validation cleanup
 
@@ -395,16 +394,6 @@ Treat a reply of the wrong shape as a load failure, and show it: the existing lo
 
 **Start:** [Pages.jsx](../packages/editor-ui/src/pages/Pages.jsx), [useTranslationVersions.js](../packages/editor-ui/src/hooks/useTranslationVersions.js), [widgetStore.js](../packages/editor-ui/src/stores/widgetStore.js), [Media.jsx](../packages/editor-ui/src/pages/Media.jsx), [mediaUsageDisplay.js](../packages/editor-ui/src/utils/mediaUsageDisplay.js), [themeUpdateStore.js](../packages/editor-ui/src/stores/themeUpdateStore.js), [apiFetch.js](../packages/editor-ui/src/lib/apiFetch.js). **Source:** 2026-10-02 upgrade walkthrough.
 
-### PAGE-SLUG-INPUT · Validate the slug sent with a page save
-
-**Open · Low · Shared**
-
-`savePageContent` (`pageController.js` ~681) uses `pageData.slug` from the body without `sanitizeSlug`, and `pageKey` builds `pages/<lang>/${slug}.json`; route params are only `notEmpty` (Express decodes `%2F`). A body slug of `../theme` writes page JSON over `theme.json` and the rename path then deletes the original page; `el/foo` writes into a language folder (even a removed one), bypassing `requestLanguage` and `assertLanguageStillEnabled`. The storage adapter keeps it inside the project, and it needs a hand-crafted request. Predates 0.9.10; language folders make it matter more. Check bulk delete IDs and menu IDs the same way.
-
-**Done when:** Page/menu slugs and IDs from requests are validated before building storage keys, with tests for `../` and `/` input.
-
-**Start:** [pageController.js](../packages/builder-server/src/controllers/pageController.js), [contentAddress.js](../packages/core/src/utils/contentAddress.js), [pages routes](../packages/builder-server/src/routes/pages.js). **Source:** 2026-10-05 code review of `48eef6f4..9e98dad7`.
-
 ### EXPORT-CLASH-LANG · Catch output-path clashes inside language folders
 
 **Open · Low · Shared**
@@ -437,15 +426,17 @@ Treat a reply of the wrong shape as a load failure, and show it: the existing lo
 
 **Start:** [renderEngine.js](../packages/render-engine/src/renderEngine.js). **Source:** 2026-10-05 code review of `48eef6f4..9e98dad7`.
 
-### THEME-UPDATE-RESUME · Recover an interrupted theme update without needing another update
+### THEME-UPDATE-RESUME · Undo an interrupted theme update at startup instead of waiting for the next update
 
 **Open · Low · Shared**
 
-Recovery runs only at the start of the next `applyThemeUpdateToDir` (`themeUpdateService.js` ~221, ~288). After a crash mid-swap, folders such as `assets`/`widgets` sit inside `.theme-update-backup`, so the project renders without them and a backup exported then omits them (dot-folders excluded). If theme updates are switched off or no newer version exists, nothing triggers recovery. Read only.
+Recovery (`recoverInterruptedUpdate`, `themeUpdateService.js`) runs only at the start of the next `applyThemeUpdateToDir`. Checked 2026-10-06 at `46119daa`: after a crash mid-swap the update is still offered, because `checkForUpdates` compares the project row's `themeVersion` with the theme source, and the row is written only after `applyThemeUpdateToDir` returns. With notifications on (they must be, for the update to have been started), pressing "Apply update" again undoes the half-finished swap and applies the update cleanly. A crash after the plan file is removed but before the row write leaves new files under the old version; re-applying is harmless (noted in `applyThemeUpdateExclusively`). The remaining gap is the time until the user presses update again: folders such as `assets`/`widgets` sit inside `.theme-update-backup`, so pages render without them, a site export or backup made meanwhile omits them (dot-folders are excluded), and nothing tells the user the broken site and the update notice are connected. The same state follows an undo that itself failed ("The theme update could not be completed. Please try again."). Only a theme removed or downgraded meanwhile would leave nothing to trigger recovery.
 
-**Done when:** An interrupted update is recovered (or clearly reported) when the project is next opened or exported, with a test.
+Recommended: on server start, check each project for a leftover `.theme-update-backup/` and run the recovery under the per-project update lock (a crash always means a restart), and export that as a function embedding apps can call per project. Optional: before a site export or backup, refuse with a clear message if an interrupted update could not be undone. Owner's alternative: close as covered by retrying the update.
 
-**Start:** [themeUpdateService.js](../packages/builder-server/src/services/themeUpdateService.js). **Source:** 2026-10-05 code review of `48eef6f4..9e98dad7`.
+**Done when:** A leftover interrupted update is undone at startup (or the task is closed with that reasoning), with a test.
+
+**Start:** [themeUpdateService.js](../packages/builder-server/src/services/themeUpdateService.js), [server-common.js](../app/server-common.js). **Source:** 2026-10-05 code review of `48eef6f4..9e98dad7`; narrowed 2026-10-06.
 
 ### DUPLICATE-FOLDER · Duplicating into an existing folder can merge into it and later delete it
 
@@ -498,26 +489,6 @@ Duplicate checks the new folder name against the database only (`projectControll
 **Done when:** A language warning survives a project warning being raised and cleared, or suspended saves are always visible, with a test.
 
 **Start:** [staleProjectStore.js](../packages/editor-ui/src/stores/staleProjectStore.js), [useStaleActiveProjectDetection.js](../packages/editor-ui/src/hooks/useStaleActiveProjectDetection.js). **Source:** 2026-10-05 code review of `48eef6f4..9e98dad7`.
-
-### LINK-CACHE · Keep link-picker targets fresh after a change mid-load
-
-**Open · Low · Shared**
-
-In `useLinkTargets.js` (~141-153) a load in flight when `invalidateLinkTargetsCache` runs still writes its older data into the cache afterwards, and its `finally` can delete a newer in-flight entry for the same key. A page created mid-load is missing from link pickers for up to 60 s. Predates 0.9.10; the load is now per language × collection and sequential, so the window is longer.
-
-**Done when:** An invalidation discards results of loads started before it, with a test.
-
-**Start:** [useLinkTargets.js](../packages/editor-ui/src/hooks/useLinkTargets.js). **Source:** 2026-10-05 code review of `48eef6f4..9e98dad7`.
-
-### PRESET-ID-INPUT · Validate the preset name when creating a project
-
-**Open · Low · Shared**
-
-`POST /api/projects` accepts `preset` as any string (`routes/projects.js` ~37, `body("preset").optional().isString().trim()`), and `resolvePresetPaths` joins it straight into a path (`themeController.js` ~672, `path.join(sourceDir, "presets", presetId)`). A preset of `../../somewhere` makes the new project copy templates, menus, collections, settings and media from outside the theme. Needs a hand-crafted request; predates 0.9.10. Same family as PAGE-SLUG-INPUT and BACKUP-TRUST. Embedding apps with their own create flow should apply the same rule.
-
-**Done when:** A preset ID must name a preset the theme declares (or match a strict pattern and stay inside `presets/`), anything else is refused before scaffolding, with a test.
-
-**Start:** [themeController.js](../packages/builder-server/src/controllers/themeController.js), [projectController.js](../packages/builder-server/src/controllers/projectController.js), [projects.js routes](../packages/builder-server/src/routes/projects.js). **Source:** 2026-10-05 code review of `9e98dad7..e2f61b21`.
 
 ### THEME-CHECKER · Close gaps in the theme checker
 
@@ -751,7 +722,7 @@ Media traversal recurses; reference transformers visit settings/block values. Un
 
 **Deferred · Medium · OSS**
 
-Candidates: truncated ZIP, future formatVersion, valid JSON with invalid content shape. Existing media-library and language refusals are already covered. No instructions to edit archive files. Crafted (malicious) content in an otherwise valid backup is BACKUP-TRUST.
+Candidates: truncated ZIP, future formatVersion, valid JSON with invalid content shape. Existing media-library and language refusals are already covered. No instructions to edit archive files. Crafted (malicious) content in an otherwise valid backup is refused since `46119daa` (BACKUP-TRUST, completed); a truncated or damaged ZIP is now a 400 from `utils/zipSafety.js`.
 
 **Done when:** Chosen case either restores completely or refuses clearly with cleanup.
 

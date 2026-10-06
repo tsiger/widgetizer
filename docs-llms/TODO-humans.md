@@ -165,6 +165,14 @@ The server understands "deliberately blank" alt text for one language (useful fo
 
 ## Planned features
 
+### SYMLINK-PATHS · Decide whether path checks should follow symlinks
+
+**Decision · Low · Shared**
+
+The checks that keep theme updates and exports inside their own folders look at file paths, not at shortcuts (symlinks) inside them. A shortcut placed inside a project by hand could still lead outside it. Importing a backup or uploading a theme cannot create one.
+
+**Next:** Decide whether to refuse such shortcuts or to document that project folders must not contain them.
+
 ### MEDIA-MP4 · Support uploaded MP4 videos on site pages
 
 **Open · Unrated · Shared**
@@ -174,22 +182,6 @@ The Widgetizer marketing site needs MP4 videos on some pages. We should be able 
 **Next:** Pick this up on **2026-10-02**. Check what the current media tools already support, add the missing pieces and verify the complete workflow with a real MP4, including saved references and export.
 
 ## Fixes and investigations
-
-### LINK-DIRTY · Choosing a page in a link picker leaves the editor permanently "unsaved"
-
-**Open · High · Shared**
-
-After you pick a page for a button or link and save, the editor keeps saying there are unsaved changes: Save stays active, autosave keeps re-saving, and leaving the page warns you. Your work is saved; the editor just can't tell. Reloading clears it until the next time you pick a page. An app embedding the editor that checks for unsaved changes before an action (such as publishing) gets stuck.
-
-**Next:** Make the "unsaved changes" check ignore empty values the save itself drops, and stop the link field adding them. Add a test that picking a page and saving leaves the editor clean.
-
-### BACKUP-TRUST · Validate everything a restored backup brings in
-
-**Open · High · Shared**
-
-Restoring a backup trusts too much of what is inside it. A deliberately crafted backup can make a later theme update delete another project's folder, make an export copy files from elsewhere on the computer into the published site, or make an export write outside its own folder. A tiny zip can also expand until the disk fills, and some project details and media translations are accepted without checks. Normal backups made by the app are not affected.
-
-**Next:** Check and clean every part of a backup on restore, and also make theme updates and exports refuse paths outside their own folder. Add a test for each crafted case.
 
 ### R-THEME-SAVE · Keep theme-settings saves in order
 
@@ -230,6 +222,22 @@ Switching quickly between two collections can leave the second one's screen show
 Deleting a parent page in one language also removes the parent link from its child pages in other languages, even though the parent's translation still exists. Their breadcrumbs lose a level.
 
 **Next:** Only clear the parent when no translation of it survives, and test it.
+
+### SKIPPED-ITEM-NOTICE · Say when a collection item is skipped for a bad slug
+
+**Open · Low · Shared**
+
+A collection item whose stored address is broken (only possible from a hand-edited project or a crafted backup) is now left out of the editor, link pickers and export, with nothing on screen to say so.
+
+**Next:** Show such items on the collection screen, or repair their address, and test it.
+
+### THEME-UPLOAD-CLEANUP · A failed theme update upload can leave its new versions installed
+
+**Open · Low · OSS**
+
+If uploading new versions for an installed theme fails near the end, the new versions can stay installed even though the upload reported a failure.
+
+**Next:** Put the theme back as it was when the upload fails, and test it.
 
 ### T32 · Check theme-upload validation cleanup
 
@@ -302,14 +310,6 @@ None of these told the user that something had failed to load.
 
 **Next:** When a reply isn't what's expected, show a clear "couldn't load" message instead of crashing or showing empty content (not an empty list, which would look like deleted pages). Fix the four cases above and the other screens that use the same language-version code (collection items list, collection item form, editor top bar). Then check the other list screens (menus, media, collections and similar) once: fix crashes and silent failures here, and pass any that show an empty list instead of an error to T64. Also decide whether the server should tell browsers not to keep copies of editor data.
 
-### PAGE-SLUG-INPUT · Validate the slug sent with a page save
-
-**Open · Low · Shared**
-
-A hand-made request can give a page an address like "../theme" and overwrite the project's theme settings file, or write a page into another language's folder. The app itself never sends this.
-
-**Next:** Check page and menu addresses on the server before saving, with tests.
-
 ### EXPORT-CLASH-LANG · Catch output-path clashes inside language folders
 
 **Open · Low · Shared**
@@ -334,13 +334,13 @@ Links and menus chosen in site-wide theme settings always point to the same lang
 
 **Next:** Decide whether theme settings should follow the page language, and fix the preview lookup.
 
-### THEME-UPDATE-RESUME · Recover an interrupted theme update without needing another update
+### THEME-UPDATE-RESUME · Undo an interrupted theme update at startup instead of waiting for the next update
 
 **Open · Low · Shared**
 
-If the app stops in the middle of a theme update, the project can be missing theme files until another update runs, and that may never happen.
+If the app crashes in the middle of a theme update, the project is left half-updated: some theme files are tucked away, so pages show without styles or widgets, and a backup made then leaves them out. The update is still offered when the app reopens, and pressing it again repairs the project and updates it. Until then, nothing tells the user why the site looks broken.
 
-**Next:** Recover or report an interrupted update the next time the project is opened or exported.
+**Next:** Undo a half-finished update automatically when the app starts, or close this as covered by retrying the update.
 
 ### DUPLICATE-FOLDER · Duplicating into an existing folder can merge into it and later delete it
 
@@ -381,22 +381,6 @@ While the page list is still loading, the language menu can offer to create the 
 After an unlikely sequence (a language is removed, another tab switches project, then you switch back), the warning disappears but the editor quietly stops saving.
 
 **Next:** Keep the language warning, or always show that saving is paused.
-
-### LINK-CACHE · Keep link-picker targets fresh after a change mid-load
-
-**Open · Low · Shared**
-
-A page created while the link picker is loading can be missing from it for up to a minute.
-
-**Next:** Discard picker data that was loading when content changed.
-
-### PRESET-ID-INPUT · Validate the preset name when creating a project
-
-**Open · Low · Shared**
-
-A hand-made request to create a project can name a "preset" outside the theme, and the new project then copies pages, menus and images from that other folder. The app itself never sends this.
-
-**Next:** Accept only presets the theme actually declares, and test it.
 
 ### THEME-CHECKER · Close gaps in the theme checker
 
@@ -580,7 +564,7 @@ Current controls do not create nested links inside a setting value, but a future
 
 **Deferred · Medium · OSS**
 
-Real backups restore correctly; some unusual or damaged archive shapes have not been examined. Deliberately crafted backups are BACKUP-TRUST.
+Real backups restore correctly; some unusual or damaged archive shapes have not been examined. Deliberately crafted backups are now refused (BACKUP-TRUST, completed).
 
 **Next:** Take a bounded case when reported or when changing the backup format.
 
