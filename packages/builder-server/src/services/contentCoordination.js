@@ -197,6 +197,21 @@ export function assertLanguageStillEnabled(projectId, lang) {
   throw error;
 }
 
+/**
+ * `lang` with the project's languages as they are NOW, for a check made inside
+ * the section. A request carries the row it loaded when it arrived; a language
+ * added while it waited reserves its code as a page slug at the root (`el.html`
+ * and the Greek folder `el/` would publish over each other), which that row does
+ * not show yet.
+ *
+ * @param {string} projectId
+ * @param {{ language?: string, defaultLanguage?: string }} lang
+ */
+export function withCurrentLanguages(projectId, lang) {
+  const { languages } = projectLanguages(projectRepo.getProjectById(projectId));
+  return { ...lang, languages };
+}
+
 /** The adapter key for a tracked upload path: `/uploads/images/a.jpg` -> `images/a.jpg`. */
 const assetKeyOf = (mediaPath) => String(mediaPath).replace(/^\/uploads\//, "");
 

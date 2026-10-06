@@ -1,4 +1,5 @@
 import { randomUUID } from "crypto";
+import { ConflictError } from "@widgetizer/core/errors";
 import {
   syncPageMediaUsageOnDelete,
   syncPageMediaUsageOnWrite,
@@ -8,6 +9,7 @@ import {
   withContentWriteLock,
   assertIntroducedMediaExists,
   assertLanguageStillEnabled,
+  withCurrentLanguages,
 } from "../services/contentCoordination.js";
 import { clearDeletedReferencesInSection, referenceCleanupWarnings } from "../utils/linkEnrichment.js";
 import { stripHtmlToText } from "../services/sanitizationService.js";
@@ -96,13 +98,25 @@ async function enforcePaginationRules({ scope, storage, widgets }) {
 // scope-aware storage adapter. No folderName-based fs readers live here anymore.
 
 /**
- * A write refused because it would introduce a reference to a media file that has
- * been deleted. Nothing was written, so the editor keeps the work and can name the
- * image — which a generic 500 cannot. Every caller of the persist helper needs this,
- * or the specific reason is lost behind "Failed to ...".
+ * A write refused inside the section: it would introduce a reference to a media
+ * file that has been deleted, its language was removed, or a language added
+ * meanwhile reserved its slug. Nothing was written, so the editor keeps the work
+ * and can name the reason — which a generic 500 cannot. Every caller of the
+ * persist helper needs this, or the specific reason is lost behind "Failed to ...".
  * @returns {boolean} true when it answered
  */
+const SLUG_REFUSALS = {
+  RESERVED_SLUG: "Reserved slug",
+  SLUG_TAKEN: "Slug already exists",
+  SECOND_HOMEPAGE: "Slug already exists",
+};
+
 function respondMissingMedia(res, error) {
+  if (SLUG_REFUSALS[error?.code]) {
+    // Another write took the slug while this one waited. Nothing was written.
+    res.status(error.statusCode).json({ error: SLUG_REFUSALS[error.code], message: error.message, code: error.code });
+    return true;
+  }
   if (error?.code === "LANGUAGE_REMOVED") {
     // Nothing was written. The editor keeps the work and stops retrying; it cannot
     // be saved anywhere, because the language it belongs to is gone.
@@ -112,6 +126,73 @@ function respondMissingMedia(res, error) {
   if (error?.code !== "MEDIA_REFERENCE_MISSING") return false;
   res.status(error.statusCode).json({ error: "Missing media", message: error.message, code: error.code });
   return true;
+}
+
+/**
+ * The slug this write may use, decided inside the section.
+ *
+ * A request picks its slug before it waits for the section, so two requests can
+ * pick the same free slug and the second would write over the first, or a
+ * language added meanwhile can reserve it. Both requests would report success
+ * and a page would be gone. So the slug is checked again here, against the files
+ * and the project row as they are now:
+ *
+ * - a new page (no `previousPageId`) moves on to a free slug, numbered from the
+ *   one it picked (`about-1` taken meanwhile becomes `about-1-1`).
+ *   `pageData.id`/`slug` are updated to match, so the caller's response names
+ *   the slug that was written;
+ * - a rename, or a save to a page whose file is gone, is refused if the slug was
+ *   taken: the user chose that slug, so it is not swapped for another;
+ * - a save to the page's own existing file keeps its slug.
+ *
+ * @returns {Promise<string>} the slug to write
+ * @throws {ConflictError} RESERVED_SLUG, SLUG_TAKEN or SECOND_HOMEPAGE
+ */
+async function claimPageSlug({ scope, storage, pageId, pageData, previousPageId, lang }) {
+  if (previousPageId === pageId) {
+    const buf = await storage.read(scope, pageKey(pageId, lang));
+    if (buf != null) {
+      // The file is this page's own unless it carries another page's uuid: a save
+      // that found no file when it started (and so made up a uuid) must not write
+      // over a page created under that slug since. An unreadable file, or one
+      // from before pages had uuids, is treated as the page's own, as before.
+      let onDisk = null;
+      try {
+        onDisk = JSON.parse(buf.toString("utf8")).uuid;
+      } catch {
+        // Unreadable: nothing says it belongs to another page.
+      }
+      if (onDisk && pageData.uuid && onDisk !== pageData.uuid) {
+        throw new ConflictError(`A page with the slug "${pageId}" already exists. Please choose a different slug.`, {
+          code: "SLUG_TAKEN",
+        });
+      }
+      return pageId;
+    }
+  }
+
+  const current = withCurrentLanguages(scope.projectId, lang);
+  if (!previousPageId) {
+    const slug = await generateUniqueSlug(pageId, pageSlugTaken(storage, scope, current), { fallback: "page" });
+    if (slug !== pageId) Object.assign(pageData, { id: slug, slug });
+    return slug;
+  }
+
+  if (isReservedPageSlug(pageId, current)) {
+    throw new ConflictError(`"${pageId}" is reserved and cannot be used as a page filename.`, { code: "RESERVED_SLUG" });
+  }
+  if (await storage.exists(scope, pageKey(pageId, lang))) {
+    throw new ConflictError(`A page with the slug "${pageId}" already exists. Please choose a different slug.`, {
+      code: "SLUG_TAKEN",
+    });
+  }
+  if (await homeSlugClash(storage, scope, pageId, lang, previousPageId)) {
+    throw new ConflictError(
+      `"${pageId}" would be a second homepage: this language already has one. Please choose a different slug.`,
+      { code: "SECOND_HOMEPAGE" },
+    );
+  }
+  return pageId;
 }
 
 // The write and its usage sync are one media section: media deletion verifies and
@@ -141,6 +222,7 @@ async function persistPageInSection({ scope, storage, pageId, pageData, previous
     // project no longer has — invisible to the editor and to export, but visible to
     // the media usage rebuild, where it can hold an image hostage.
     assertLanguageStillEnabled(scope.projectId, lang);
+    pageId = await claimPageSlug({ scope, storage, pageId, pageData, previousPageId, lang });
 
     // Refuse to introduce a reference to a file that is gone — the save queued
     // behind a delete, which the lock orders but cannot make safe on its own.

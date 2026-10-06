@@ -43,11 +43,12 @@ console.error = () => {};
 
 const { getProjectDir, getProjectPagesDir } = await import("../config.js");
 const projectRepo = await import("../db/repositories/projectRepository.js");
-const { savePageContent, createPageLanguageVersion } = await import("../controllers/pageController.js");
+const { savePageContent, createPageLanguageVersion, createPage } = await import("../controllers/pageController.js");
+const { updateProject } = await import("../controllers/projectController.js");
 const { saveGlobalWidget } = await import("../controllers/previewController.js");
 const { updateMenu, getAllMenus } = await import("../controllers/menuController.js");
 const collectionController = await import("../controllers/collectionController.js");
-const { deleteLanguage } = await import("../controllers/languageController.js");
+const { createLanguage, deleteLanguage } = await import("../controllers/languageController.js");
 const { withContentWriteLock } = await import("../services/contentCoordination.js");
 const { closeDb } = await import("../db/index.js");
 const { LocalAssetStorageAdapter, LocalStorageAdapter } = await import("@widgetizer/adapters-local");
@@ -646,5 +647,174 @@ describe("a save that starts after the removal, with a fresh project row", () =>
 
     assert.equal(res._status, 400);
     assert.equal(res._json.code, undefined, "no recovery code: nothing was removed");
+  });
+});
+
+// ============================================================================
+// Adding a language holds the section while it seeds, and records the code only
+// at the end. A request that validated against the row from before the add, and
+// then waited for the section, must be checked again against the row it finds.
+// ============================================================================
+
+describe("a write queued behind a language being added", () => {
+  let singleRow;
+  let releaseAdd;
+  let addReachedSeed;
+
+  beforeEach(async () => {
+    await fs.remove(path.join(getProjectPagesDir(PROJECT_FOLDER), "el"));
+    await fs.remove(path.join(getProjectDir(PROJECT_FOLDER), "menus", "el"));
+    projectRepo.updateProject(PROJECT_ID, { defaultLanguage: "en", languages: [] });
+    singleRow = projectRepo.getProjectById(PROJECT_ID);
+  });
+
+  /** Start adding `el`, paused inside the section at its first storage check. */
+  function startAddingGreek() {
+    const gate = new Promise((resolve) => {
+      releaseAdd = resolve;
+    });
+    let reached;
+    addReachedSeed = new Promise((resolve) => {
+      reached = resolve;
+    });
+    let paused = false;
+    const gated = storageWith({
+      exists: async (_scope, key) => {
+        if (!paused) {
+          paused = true;
+          reached();
+          await gate;
+        }
+        return storage.exists(scope, key);
+      },
+    });
+    return callWith(gated, createLanguage, { body: { code: "el" }, activeProject: singleRow });
+  }
+
+  /**
+   * Let a page request finish its checks from before the section, so it is
+   * waiting on the section when the add is released. The add holds the section
+   * throughout, so waiting longer cannot let the write in early; releasing at once
+   * would let the add finish first and prove nothing about the in-section check.
+   */
+  const pastItsEarlyChecks = () => new Promise((resolve) => setTimeout(resolve, 50));
+
+  it("refuses changing the default to the language being added", async () => {
+    const adding = startAddingGreek();
+    await addReachedSeed;
+
+    // Validated now, against a row that still shows a single-language site.
+    const saving = call(updateProject, { params: { id: PROJECT_ID }, body: { name: "Language Lifecycle", defaultLanguage: "el" } });
+    releaseAdd();
+
+    assert.equal((await adding)._status, 201);
+    const saved = await saving;
+    assert.equal(saved._status, 400, "the save must be refused, not written");
+    const row = projectRepo.getProjectById(PROJECT_ID);
+    assert.equal(row.defaultLanguage, "en");
+    assert.deepEqual(row.languages, ["el"]);
+  });
+
+  it("refuses changing the default to another language once the site has two", async () => {
+    const adding = startAddingGreek();
+    await addReachedSeed;
+
+    const saving = call(updateProject, { params: { id: PROJECT_ID }, body: { name: "Language Lifecycle", defaultLanguage: "de" } });
+    releaseAdd();
+
+    assert.equal((await adding)._status, 201);
+    assert.equal((await saving)._status, 400);
+    assert.equal(projectRepo.getProjectById(PROJECT_ID).defaultLanguage, "en");
+  });
+
+  it("does not let a stale languages list drop the language just added", async () => {
+    const adding = startAddingGreek();
+    await addReachedSeed;
+
+    const saving = call(updateProject, {
+      params: { id: PROJECT_ID },
+      body: { name: "Language Lifecycle", defaultLanguage: "en", languages: [] },
+    });
+    releaseAdd();
+
+    assert.equal((await adding)._status, 201);
+    assert.equal((await saving)._status, 400);
+    assert.deepEqual(projectRepo.getProjectById(PROJECT_ID).languages, ["el"]);
+  });
+
+  it("still saves the project details when nothing about the languages changes", async () => {
+    const adding = startAddingGreek();
+    await addReachedSeed;
+
+    const saving = call(updateProject, {
+      params: { id: PROJECT_ID },
+      body: { name: "Renamed While Adding", defaultLanguage: "en" },
+    });
+    releaseAdd();
+
+    assert.equal((await adding)._status, 201);
+    assert.equal((await saving)._status, 200);
+    const row = projectRepo.getProjectById(PROJECT_ID);
+    assert.equal(row.name, "Renamed While Adding");
+    assert.deepEqual(row.languages, ["el"]);
+    projectRepo.updateProject(PROJECT_ID, { name: "Language Lifecycle" });
+  });
+
+  it("gives a new page the next free slug when the language code was taken", async () => {
+    const adding = startAddingGreek();
+    await addReachedSeed;
+
+    // The slug is free against the row this request sees.
+    const creating = call(createPage, { body: { name: "Greek", slug: "el" }, activeProject: singleRow });
+    await pastItsEarlyChecks();
+    releaseAdd();
+
+    assert.equal((await adding)._status, 201);
+    const created = await creating;
+    assert.equal(created._status, 201);
+    assert.equal(created._json.slug, "el-1", "as if the request had arrived after the add");
+    assert.equal(await fs.pathExists(path.join(getProjectPagesDir(PROJECT_FOLDER), "el.json")), false);
+    assert.equal(await fs.pathExists(path.join(getProjectPagesDir(PROJECT_FOLDER), "el-1.json")), true);
+  });
+
+  it("refuses renaming a page to the language code", async () => {
+    await fs.outputJson(
+      path.join(getProjectPagesDir(PROJECT_FOLDER), "greek.json"),
+      { uuid: "u-greek", slug: "greek", name: "Greek", widgets: {} },
+      { spaces: 2 },
+    );
+    const adding = startAddingGreek();
+    await addReachedSeed;
+
+    const renaming = call(savePageContent, {
+      params: { id: "greek" },
+      activeProject: singleRow,
+      body: { uuid: "u-greek", slug: "el", name: "Greek", widgets: {}, widgetsOrder: [] },
+    });
+    await pastItsEarlyChecks();
+    releaseAdd();
+
+    assert.equal((await adding)._status, 201);
+    const renamed = await renaming;
+    assert.equal(renamed._status, 409);
+    assert.equal(renamed._json.code, "RESERVED_SLUG");
+    assert.equal(await fs.pathExists(path.join(getProjectPagesDir(PROJECT_FOLDER), "el.json")), false);
+    assert.equal(await fs.pathExists(path.join(getProjectPagesDir(PROJECT_FOLDER), "greek.json")), true);
+  });
+
+  it("still saves a page already stored under its slug", async () => {
+    const adding = startAddingGreek();
+    await addReachedSeed;
+
+    const saving = call(savePageContent, {
+      params: { id: "index" },
+      activeProject: singleRow,
+      body: { uuid: "u-en-index", slug: "index", name: "Index", widgets: {}, widgetsOrder: [] },
+    });
+    await pastItsEarlyChecks();
+    releaseAdd();
+
+    assert.equal((await adding)._status, 201);
+    assert.equal((await saving)._status, 200);
   });
 });

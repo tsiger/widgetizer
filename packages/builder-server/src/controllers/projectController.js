@@ -697,7 +697,8 @@ export async function updateProject(req, res) {
       return res.status(400).json({ error: "cleanUrls must be a boolean." });
     }
 
-    const { value: languageFields, error: languageError } = readLanguages(updates, currentProject);
+    // Checked here to refuse early, and again inside the write section below.
+    const { error: languageError } = readLanguages(updates, currentProject);
     if (languageError) return res.status(400).json({ error: languageError });
 
     const sanitizedSiteTitle = sanitizeOptionalText(updates.siteTitle);
@@ -735,7 +736,16 @@ export async function updateProject(req, res) {
     // before it: a rejected logo used to leave the directory already moved while the
     // row still named the old one, which strands the project. Everything that can
     // refuse this request now refuses before anything on disk has moved.
-    const { updatedProject, usageStale } = await withContentWriteLock(id, async () => {
+    const { updatedProject, usageStale, languageRefusal } = await withContentWriteLock(id, async () => {
+      // Checked again against the row as it is NOW. Adding a language takes this
+      // section and records the code at its end, so the copy loaded before it can
+      // still show a single-language site: changing the default then would leave
+      // the new code as both the default and an additional language — a row no
+      // save, removal or default change can get out of again.
+      const languageCheck = readLanguages(updates, projectRepo.getProjectById(id));
+      if (languageCheck.error) return { languageRefusal: languageCheck.error };
+      const languageFields = languageCheck.value;
+
       if (siteIdentity !== undefined) {
         // Re-read the row HERE rather than comparing against the copy loaded before
         // the lock. A baseline read earlier can still show a logo that another save
@@ -799,6 +809,8 @@ export async function updateProject(req, res) {
         return { updatedProject: saved, usageStale: true };
       }
     });
+
+    if (languageRefusal) return res.status(400).json({ error: languageRefusal });
 
     res.json(
       usageStale

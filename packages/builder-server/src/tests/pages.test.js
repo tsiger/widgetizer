@@ -44,6 +44,7 @@ const {
 } = await import("../controllers/pageController.js");
 
 const projectRepo = await import("../db/repositories/projectRepository.js");
+const { withContentWriteLock } = await import("../services/contentCoordination.js");
 const { closeDb, getDb } = await import("../db/index.js");
 const { LocalStorageAdapter, LocalScopeResolver, LocalAssetStorageAdapter } = await import("@widgetizer/adapters-local");
 const { writeMediaFile } = await import("../controllers/mediaController.js");
@@ -1498,5 +1499,164 @@ describe("one homepage per language", () => {
     });
     assert.equal(res._status, 409);
     assert.equal(await fs.pathExists(getPagePath(activeProject.folderName, "home")), false);
+  });
+});
+
+// Each request picks its slug before it waits for the content-write section, so
+// two of them can pick the same free slug while the section is busy (an
+// autosave, say). Whichever wrote second used to replace the first page, and
+// both requests reported success.
+describe("two writes that pick the same slug while the section is busy", () => {
+  beforeEach(resetPages);
+
+  /** Run `start` while another write holds the section, then let it go. */
+  async function whileSectionBusy(start) {
+    let release;
+    const busy = withContentWriteLock(PROJECT_ID, () => new Promise((resolve) => (release = resolve)));
+    const pending = start();
+    // Long enough for every request to finish its early checks and queue.
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    release();
+    await busy;
+    return pending;
+  }
+
+  const pageFile = (slug) => getPagePath(activeProject.folderName, slug);
+
+  it("keeps both new pages, the second under the next free slug", async () => {
+    const [first, second] = await whileSectionBusy(() =>
+      Promise.all([
+        callController(createPage, { body: { name: "About", slug: "about" } }),
+        callController(createPage, { body: { name: "About us", slug: "about" } }),
+      ]),
+    );
+
+    assert.equal(first._status, 201);
+    assert.equal(second._status, 201);
+    assert.deepEqual([first._json.slug, second._json.slug].sort(), ["about", "about-1"]);
+    for (const res of [first, second]) {
+      assert.equal((await fs.readJson(pageFile(res._json.slug))).uuid, res._json.uuid);
+    }
+  });
+
+  it("keeps a duplicate and a new page that pick the same slug", async () => {
+    await createTestPage("Team");
+    const [created, duplicated] = await whileSectionBusy(() =>
+      Promise.all([
+        callController(createPage, { body: { name: "Team (Copy)" } }),
+        callController(duplicatePage, { params: { id: "team" } }),
+      ]),
+    );
+
+    assert.equal(created._status, 201);
+    assert.equal(duplicated._status, 201);
+    assert.notEqual(created._json.slug, duplicated._json.slug);
+    assert.equal((await fs.readJson(pageFile(created._json.slug))).uuid, created._json.uuid);
+    assert.equal((await fs.readJson(pageFile(duplicated._json.slug))).uuid, duplicated._json.uuid);
+  });
+
+  it("refuses a rename onto a page created meanwhile, and keeps both pages", async () => {
+    await createTestPage("Team");
+    const team = await fs.readJson(pageFile("team"));
+    const [created, renamed] = await whileSectionBusy(() =>
+      Promise.all([
+        callController(createPage, { body: { name: "Contact", slug: "contact" } }),
+        callController(savePageContent, {
+          params: { id: "team" },
+          body: { ...team, slug: "contact", widgets: {}, widgetsOrder: [] },
+        }),
+      ]),
+    );
+
+    assert.equal(created._status, 201);
+    assert.equal(renamed._status, 409);
+    assert.equal(renamed._json.code, "SLUG_TAKEN");
+    assert.equal((await fs.readJson(pageFile("contact"))).uuid, created._json.uuid);
+    assert.equal((await fs.readJson(pageFile("team"))).uuid, team.uuid);
+  });
+
+  it("refuses a page-details rename onto a page created meanwhile", async () => {
+    await createTestPage("Team");
+    const [created, renamed] = await whileSectionBusy(() =>
+      Promise.all([
+        callController(createPage, { body: { name: "Contact", slug: "contact" } }),
+        callController(updatePage, { params: { id: "team" }, body: { name: "Team", slug: "contact" } }),
+      ]),
+    );
+
+    assert.equal(created._status, 201);
+    assert.equal(renamed._status, 409);
+    assert.equal((await fs.readJson(pageFile("contact"))).uuid, created._json.uuid);
+    assert.equal(await fs.pathExists(pageFile("team")), true);
+  });
+
+  it("does not create a second homepage when index and home are created together", async () => {
+    const [index, home] = await whileSectionBusy(() =>
+      Promise.all([
+        callController(createPage, { body: { name: "Welcome", slug: "index" } }),
+        callController(createPage, { body: { name: "Home", slug: "home" } }),
+      ]),
+    );
+
+    // Whichever queued first keeps its slug; the other moves on, as if it had arrived later.
+    const slugs = [index._json.slug, home._json.slug].sort();
+    assert.ok(
+      JSON.stringify(slugs) === JSON.stringify(["home-1", "index"]) ||
+        JSON.stringify(slugs) === JSON.stringify(["home", "index-1"]),
+      `one homepage only, got ${slugs}`,
+    );
+    assert.equal((await fs.pathExists(pageFile("home"))) && (await fs.pathExists(pageFile("index"))), false);
+  });
+
+  it("refuses renaming to home when index was created meanwhile", async () => {
+    await createTestPage("About");
+    const [, renamed] = await whileSectionBusy(() =>
+      Promise.all([
+        callController(createPage, { body: { name: "Welcome", slug: "index" } }),
+        callController(updatePage, { params: { id: "about" }, body: { name: "About", slug: "home" } }),
+      ]),
+    );
+
+    assert.equal(renamed._status, 409);
+    assert.equal(renamed._json.code, "SECOND_HOMEPAGE");
+    assert.equal(await fs.pathExists(pageFile("home")), false);
+    assert.equal(await fs.pathExists(pageFile("about")), true);
+  });
+
+  it("does not let a save for a page that was gone write over a page created meanwhile", async () => {
+    // The editor still has "Team" open after it was deleted elsewhere; its save
+    // finds no file and would recreate the page, but a new page took the slug.
+    const [created, stale] = await whileSectionBusy(() =>
+      Promise.all([
+        callController(createPage, { body: { name: "Team", slug: "team" } }),
+        callController(savePageContent, {
+          params: { id: "team" },
+          body: { name: "Team", slug: "team", widgets: {}, widgetsOrder: [] },
+        }),
+      ]),
+    );
+
+    // Either order is fine as long as neither page replaces the other: the save
+    // queued first recreates "team" and the new page moves on, or the new page
+    // queued first and the save is refused.
+    assert.equal(created._status, 201);
+    assert.equal((await fs.readJson(pageFile(created._json.slug))).uuid, created._json.uuid);
+    if (stale._status === 200) assert.notEqual(created._json.slug, "team");
+    else assert.equal(stale._json.code, "SLUG_TAKEN");
+  });
+
+  it("still saves a page in place, and saves an ordinary rename", async () => {
+    await createTestPage("Team");
+    const team = await fs.readJson(pageFile("team"));
+    const [inPlace, renamed] = await whileSectionBusy(() =>
+      Promise.all([
+        callController(savePageContent, { params: { id: "team" }, body: { ...team, widgets: {}, widgetsOrder: [] } }),
+        callController(updatePage, { params: { id: "team" }, body: { name: "Crew", slug: "crew" } }),
+      ]),
+    );
+
+    assert.equal(inPlace._status, 200);
+    assert.equal(renamed._status, 200);
+    assert.equal(await fs.pathExists(pageFile("crew")), true);
   });
 });
