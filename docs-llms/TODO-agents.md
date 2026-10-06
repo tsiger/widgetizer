@@ -250,41 +250,6 @@ Recommended: optimistic concurrency at the save boundary. The load returns a rev
 
 **Start:** [themeController.js](../packages/builder-server/src/controllers/themeController.js), [themeStore.js](../packages/editor-ui/src/stores/themeStore.js), [themeUpdateService.js](../packages/builder-server/src/services/themeUpdateService.js), [useStaleActiveProjectDetection.js](../packages/editor-ui/src/hooks/useStaleActiveProjectDetection.js). **Source:** 2026-10-03 walkthrough. [GitHub #147](https://github.com/tsiger/widgetizer/issues/147)
 
-### LANG-LOCK-CHECKS · Re-check language rules inside the write lock
-
-**Open · Medium · Shared**
-
-Two rules are checked against the project as read before the content-write lock and never re-checked inside it:
-
-- **Default language.** `updateProject` validates "the default can only change while the site has one language" via `readLanguages(updates, currentProject)` (`projectController.js` ~688) before `withContentWriteLock` (~726). Tab A adds `el` while tab B changes the default to `el`: the row becomes `{defaultLanguage:"el", languages:["el"]}`. Every later project save is refused ("already the site's default language"), `DELETE /languages/el` is refused, changing back is refused, `pages/el/` is orphaned and `projectLanguageContexts` yields `[el, el]` (pages listed twice). With another code (`de`) the default changes on a multilingual site. Reproduced with a scratch script delaying the seed. The UI's `blocked` flag only covers one screen.
-- **Page slug vs language code.** `createPage`/`updatePage` reserve slugs against `req.activeProject` before the lock; `addLanguage("el")` can run in between and the queued write then creates `pages/el.json`, colliding with the Greek homepage (`el.html` vs `el/`). Narrow window; read only.
-
-Related to T76 (product rule) and R1-COORD (scope of coordination), but both cases already take the lock and only need to re-read.
-
-**Done when:** Both rules are re-checked against the project row read inside the lock, and tests cover the two interleavings.
-
-**Start:** [projectController.js](../packages/builder-server/src/controllers/projectController.js), [pageController.js](../packages/builder-server/src/controllers/pageController.js), [languageService.js](../packages/builder-server/src/services/languageService.js). **Source:** 2026-10-05 code review of `48eef6f4..9e98dad7`.
-
-### COLLECTION-LIST-RACE · A slow collection list can show another collection's items
-
-**Open · Medium · Shared**
-
-`useCollectionItems.fetchItems` (~31-61) has no stale-response guard and now fetches one language after another. The `collections/:type` route has no `key` (`EditorShell.jsx` ~135), so switching collections reuses the component: open A, quickly open B, and if A's requests finish last B's screen lists A's items. Delete, Duplicate and Reorder then call the API with type B and A's slugs; Delete removes a B item that shares a slug. Pattern predates 0.9.10; the per-language loop widens the window.
-
-**Done when:** A response for a previous type/project/language set is discarded, and a test covers out-of-order responses.
-
-**Start:** [useCollectionItems.js](../packages/editor-ui/src/hooks/useCollectionItems.js), [CollectionItems.jsx](../packages/editor-ui/src/pages/CollectionItems.jsx). **Source:** 2026-10-05 code review of `48eef6f4..9e98dad7`.
-
-### PARENT-TRANSLATION · Deleting a parent page detaches its translated children
-
-**Open · Medium · Shared**
-
-A language version keeps the source's `parentPageUuid` (by design; breadcrumbs map it to the same-language sibling through the translation group). After a delete, `updatePagesViaStorage` (`linkEnrichment.js` ~247) removes any `parentPageUuid` naming a deleted page in every language without checking for a surviving sibling. Delete English `about` and Greek `team` loses its parent even though Greek `about` exists. Reproduced with a script.
-
-**Done when:** A child keeps (or is retargeted to) a surviving same-group parent, and only children with no surviving parent are cleared, with a test.
-
-**Start:** [linkEnrichment.js](../packages/builder-server/src/utils/linkEnrichment.js), [breadcrumbs.js](../packages/core/src/utils/breadcrumbs.js). **Source:** 2026-10-05 code review of `48eef6f4..9e98dad7`.
-
 ### SKIPPED-ITEM-NOTICE · Say when a collection item is skipped for a bad slug
 
 **Open · Low · Shared**
@@ -294,6 +259,16 @@ Since `0fd5005a`, `readCollectionItems` (`collectionService.js`) skips an item w
 **Done when:** A skipped item is visible to the user (or repaired), with a test.
 
 **Start:** [collectionService.js](../packages/builder-server/src/services/collectionService.js), [CollectionItems.jsx](../packages/editor-ui/src/pages/CollectionItems.jsx). **Source:** 2026-10-06 review of the containment fix.
+
+### TRANSLATION-CREATE-NAV · A translation created just before leaving a list pulls the user back
+
+**Open · Low · Shared**
+
+`useTranslationVersions.createIn` awaits the create request, then calls `setCreated`, shows a toast and calls the screen's `onCreated`, which navigates to the new version's editor (`CollectionItems.jsx` `navigate(itemEditPath(created))`, built from the type of the render that started it; `Pages.jsx` `navigate(pageEditorPath(created))`). Nothing checks that the user is still on that screen: start creating a missing translation, switch to another collection or section before the request returns, and the user is pulled into the created item's (or page's) editor. The version is created correctly; only the navigation is unwanted. Found by reading the code in the 2026-10-06 review of `87e96448`.
+
+**Done when:** A creation that finishes after its screen has gone still creates the version but neither navigates nor updates the departed screen (a toast may remain), with a test for both callers.
+
+**Start:** [useTranslationVersions.js](../packages/editor-ui/src/hooks/useTranslationVersions.js), [CollectionItems.jsx](../packages/editor-ui/src/pages/CollectionItems.jsx), [Pages.jsx](../packages/editor-ui/src/pages/Pages.jsx). **Source:** 2026-10-06 review of the collection list fix.
 
 ### THEME-UPLOAD-CLEANUP · A failed theme update upload can leave its new versions installed
 
@@ -467,18 +442,6 @@ Duplicate checks the new folder name against the database only (`projectControll
 **Done when:** Every language's globals, pages and items show a readable, language-tagged label, with a test.
 
 **Start:** [mediaUsageDisplay.js](../packages/editor-ui/src/utils/mediaUsageDisplay.js), [Media.jsx](../packages/editor-ui/src/pages/Media.jsx). **Source:** 2026-10-05 code review of `48eef6f4..9e98dad7`.
-
-### EDITOR-LANG-UX · Smooth the editor's language rough edges
-
-**Open · Low · Shared**
-
-- `LanguageMenu.jsx` (~55-97) shows every language without a sibling as "create", including the current one; until `EditorTopBar`'s `allPages` loads (or if it fails) it offers "create English" on the English page (400) and existing siblings (409). `CollectionItemForm` does the same for an item without uuid/group. `TranslationChips` filters the own language; this menu doesn't.
-- The parent-page picker (`PageForm.jsx` ~66-102) lists pages from every language with no language label.
-- `activeLanguage` starts on the default language (`Pages.jsx` ~55, `CollectionItems.jsx` ~59, `Menus.jsx` ~37) and create returns to the bare list URL (`PagesAdd.jsx` ~42, `CollectionItemAdd.jsx` ~60), so a new Greek page lands you on the English tab.
-
-**Done when:** Each of the three behaves as expected in a two-language project.
-
-**Start:** [LanguageMenu.jsx](../packages/editor-ui/src/components/content/LanguageMenu.jsx), [PageForm.jsx](../packages/editor-ui/src/components/pages/PageForm.jsx), [Pages.jsx](../packages/editor-ui/src/pages/Pages.jsx). **Source:** 2026-10-05 code review of `48eef6f4..9e98dad7`.
 
 ### STALE-BANNER · A project warning can hide a language-removed warning while saves stay suspended
 

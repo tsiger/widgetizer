@@ -157,6 +157,46 @@ Import checked only that ZIP entry names did not start with `..` or were absolut
 
 **Body at:** `df3aa2f4:docs-llms/TODO-agents.md`.
 
+### COLLECTION-LIST-RACE · A slow collection list could show another collection's items
+
+**Done · Medium · Shared · 2026-10-06**
+
+`useCollectionItems.fetchItems` had no stale-response guard and loads one language after another, and the `collections/:type` route stays mounted across collections: open A, quickly open B, and if A's requests finished last B's screen listed A's items, with Delete, Duplicate and Reorder calling the API with type B and A's slugs (Delete could remove a B item sharing a slug). Review of the first fix found two more paths through the reused screen: a refresh due after an edit on A loading A's items into B, and a delete confirmation opened on A deleting from B after back/forward navigation.
+
+**Resolution:** only the newest load sets items, errors or loading (a load ticket, bumped on type/project/language change, unmount or a newer refetch); `refetch` always loads for the current collection and does nothing after unmount; `CollectionItems` renders one screen per collection (keyed by type), holding the viewed language tab above the key so it still carries over. The separate translation-creation navigation went to TRANSLATION-CREATE-NAV. Fix `87e96448`.
+
+**Body at:** `df3aa2f4:docs-llms/TODO-agents.md`.
+
+### LANG-LOCK-CHECKS · Re-check language rules inside the write lock
+
+**Done · Medium · Shared · 2026-10-06**
+
+`updateProject` checked `readLanguages` against the row read before `withContentWriteLock`, and `createLanguage` records the new code only after seeding its menu and header/footer copies under that lock. A save changing the default to the code being added left `{defaultLanguage:"el", languages:["el"]}`: every later save, removing `el` and changing back were refused, pages were listed twice, and the seeded `menus/el/` and `pages/el/global/` were left unread with their media-usage rows. A stale `languages` list dropped the added language instead. Page writes also reserved slugs before the lock, so a write queued behind the add could create `pages/el.json`. Verification found the wider form: two page writes picking the same free slug before the lock, the second overwriting the first with both reporting success (create, duplicate, language version, rename, and `index`/`home`).
+
+**Resolution:** `updateProject` re-runs `readLanguages` against the row read inside the section. `persistPageInSection` claims the slug inside the section (`claimPageSlug`) against current files and languages: a new page moves on to a free slug, a rename or a save whose file is gone is refused (`RESERVED_SLUG`, `SLUG_TAKEN`, `SECOND_HOMEPAGE`, 409), and a save keeps its own file only when the uuid matches. Fix `87fbf741`.
+
+**Body at:** `87e96448:docs-llms/TODO-agents.md`.
+
+### PARENT-TRANSLATION · Deleting a parent page detached its translated children
+
+**Done · Medium · Shared · 2026-10-06**
+
+A language version keeps the source's `parentPageUuid`, and breadcrumbs map it to the same-language sibling through the translation group. After a delete, `updatePagesViaStorage` (`linkEnrichment.js`) removed any `parentPageUuid` naming a deleted page in every language without checking for a surviving sibling: delete English `about` and Greek `team` lost its parent although Greek `about` existed. Language removal had the same gap.
+
+**Resolution:** the sweep moves a child to the deleted parent's surviving version in the child's language, else in the default language, else clears it (owner decision: never a third language). A candidate that would make the child its own ancestor is skipped, counting only parent changes already written; while any page is unreadable, affected parents are left and reported as incomplete. Delete, bulk delete and `removeLanguage` pass the deleted pages' translation groups; the sweep indexes every page first, then rewrites one at a time. Fix `a7f32fe9`.
+
+**Body at:** `a7f32fe9:docs-llms/TODO-agents.md`.
+
+### EDITOR-LANG-UX · Smooth the editor's language rough edges
+
+**Done · Low · Shared · 2026-10-07**
+
+Three rough edges on multilingual sites. `LanguageMenu` offered every language without a sibling for creation, the page's own included, until `EditorTopBar`'s `allPages` loaded (or for good if it failed), and `CollectionItemForm` likewise for an unread group. The parent-page picker (`PageForm`) listed every language's pages unlabelled. The pages, collection and menus lists kept their language tab in component state, so every way back to a list (browser back, editor back, settings back/Cancel, after-create redirect) showed the default tab; widened from the original "create returns to the bare list" bullet.
+
+**Resolution:** `useListLanguage` keeps a list's tab in `?language=` (replace), and back/Cancel/create links carry the content's language (`pagesListHref`, `itemsListHref`, `menusListHref`); collections carry the tab across collections; the sidebar links stay bare (owner decision). `ParentPagePicker` opens `ComboboxOptionList` (language filter opening on the selected parent's language, All, badges; pick-only mode is keyboard operable) and the page's own translations are not offered. The current language is always current in `LanguageMenu`, and creation is disabled until the versions are known (`siblingsState`). Fix `e4355fd9`.
+
+**Body at:** `e4355fd9:docs-llms/TODO-agents.md`.
+
 ## Reconciliation decisions
 
 - GitHub #115, #122, #126, #133, #134 and #135 have implementation evidence. Their remaining local entries are review/documentation/integration work, not instructions to rebuild the features. GitHub statuses were left unchanged.

@@ -199,30 +199,6 @@ If an editor or Site settings screen was open before a theme update and you then
 
 **Next:** Make the server refuse a theme-settings save based on an older copy and ask the user to reload, without losing unsaved edits. Then consider telling open tabs about an update as soon as it happens. Plan it together with R-THEME-SAVE. [GitHub #147](https://github.com/tsiger/widgetizer/issues/147)
 
-### LANG-LOCK-CHECKS · Re-check language rules inside the write lock
-
-**Open · Medium · Shared**
-
-If one tab adds a language at the same moment another tab changes the main language, the project can end up in a state where project settings can no longer be saved and the language can't be removed. A similar timing can let a new page take a language code (such as "el") as its address.
-
-**Next:** Re-check both rules at the moment of writing, and add tests for the two timings.
-
-### COLLECTION-LIST-RACE · A slow collection list can show another collection's items
-
-**Open · Medium · Shared**
-
-Switching quickly between two collections can leave the second one's screen showing the first one's items. Deleting from that screen can then delete the wrong item.
-
-**Next:** Ignore list results that arrive for a collection you have already left, and test it.
-
-### PARENT-TRANSLATION · Deleting a parent page detaches its translated children
-
-**Open · Medium · Shared**
-
-Deleting a parent page in one language also removes the parent link from its child pages in other languages, even though the parent's translation still exists. Their breadcrumbs lose a level.
-
-**Next:** Only clear the parent when no translation of it survives, and test it.
-
 ### SKIPPED-ITEM-NOTICE · Say when a collection item is skipped for a bad slug
 
 **Open · Low · Shared**
@@ -230,6 +206,14 @@ Deleting a parent page in one language also removes the parent link from its chi
 A collection item whose stored address is broken (only possible from a hand-edited project or a crafted backup) is now left out of the editor, link pickers and export, with nothing on screen to say so.
 
 **Next:** Show such items on the collection screen, or repair their address, and test it.
+
+### TRANSLATION-CREATE-NAV · A translation created just before leaving a list pulls the user back
+
+**Open · Low · Shared**
+
+If you click to create a missing translation on the pages or collection list and move to another screen before it finishes, the app jumps you into the new translation's editor anyway. The translation itself is created correctly.
+
+**Next:** Skip the jump when you have already left the screen, and test it.
 
 ### THEME-UPLOAD-CLEANUP · A failed theme update upload can leave its new versions installed
 
@@ -365,14 +349,6 @@ A file linked from a menu isn't counted as "used", so the media library may let 
 In the media library, a translated header shows as "El:header (Global)" and translated collection items show a raw code instead of their title.
 
 **Next:** Show a readable title with its language for every language.
-
-### EDITOR-LANG-UX · Smooth the editor's language rough edges
-
-**Open · Low · Shared**
-
-While the page list is still loading, the language menu can offer to create the language you are already in. The parent-page list mixes pages from all languages without saying which is which. Creating a Greek page takes you back to the English tab, so the new page looks missing.
-
-**Next:** Fix each of the three in a two-language project.
 
 ### STALE-BANNER · A project warning can hide a language-removed warning while saves stay suspended
 
