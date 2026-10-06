@@ -28,6 +28,8 @@ Missing `src` silently produces no asset. Style location defaults to header and 
 
 Theme assets are copied as a directory. Put static fonts/images and supporting asset trees there. Do not assume arbitrary images or other files placed beside a widget template will be exported. Use enqueue tags for widget CSS/JS; a direct `asset` reference does not register a file in the export queue.
 
+For catalog fonts, use `font_picker` settings in `settings.global.typography` and the layout's `fonts` tag. Instrument Sans and STIX Two Text are available at weights 400, 500, 600 and 700; use the exact stacks in `contract.json`. A bundled font file does not register a family in the shared picker or participate in the Google/Bunny loading preference.
+
 The engine supplies depth-aware asset URLs and CSS/JS cache-busting. Do not construct `/api/preview/...`, hardcode project IDs or localhost, or manually append `?v=`. Hardcoded `/assets/...` breaks subdirectory deployment, and `assets/...` without the correct depth can break item, translated, and paginated pages.
 
 Media must be registered as well as present on disk. A raw file copied to uploads can appear in one preview while missing from media-dependent export behavior. Preset media requires the binary files and its manifest; see the content reference.

@@ -911,6 +911,12 @@
     "\"Indie Flower\", handwriting": [
       400
     ],
+    "\"Instrument Sans\", sans-serif": [
+      400,
+      500,
+      600,
+      700
+    ],
     "\"Inter\", sans-serif": [
       100,
       200,
@@ -1657,6 +1663,12 @@
     ],
     "\"Staatliches\", display": [
       400
+    ],
+    "\"STIX Two Text\", serif": [
+      400,
+      500,
+      600,
+      700
     ],
     "\"Suez One\", serif": [
       400
