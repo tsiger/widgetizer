@@ -45,6 +45,7 @@ const {
 
 const projectRepo = await import("../db/repositories/projectRepository.js");
 const { withContentWriteLock } = await import("../services/contentCoordination.js");
+const { removeLanguage } = await import("../services/languageService.js");
 const { closeDb, getDb } = await import("../db/index.js");
 const { LocalStorageAdapter, LocalScopeResolver, LocalAssetStorageAdapter } = await import("@widgetizer/adapters-local");
 const { writeMediaFile } = await import("../controllers/mediaController.js");
@@ -1658,5 +1659,212 @@ describe("two writes that pick the same slug while the section is busy", () => {
     assert.equal(inPlace._status, 200);
     assert.equal(renamed._status, 200);
     assert.equal(await fs.pathExists(pageFile("crew")), true);
+  });
+});
+
+// A language version keeps its source's parent, and the breadcrumb shows that
+// parent's version in the page's own language. Deleting one version of a parent
+// used to drop the parent from every child in every language, even where the
+// child's own language still had a version of it.
+describe("deleting a parent page that has translations", () => {
+  const pagesRoot = () => getProjectPagesDir(activeProject.folderName);
+  const fileOf = (language, slug) =>
+    language === "en" ? path.join(pagesRoot(), `${slug}.json`) : path.join(pagesRoot(), language, `${slug}.json`);
+  const write = (language, page) => fs.outputJson(fileOf(language, page.slug), { widgets: {}, ...page }, { spaces: 2 });
+  const parentOf = async (language, slug) => (await fs.readJson(fileOf(language, slug))).parentPageUuid;
+
+  before(() => {
+    activeProject.defaultLanguage = "en";
+    activeProject.languages = ["el", "de"];
+    projectRepo.updateProject(activeProject.id, { defaultLanguage: "en", languages: ["el", "de"] });
+  });
+
+  after(() => {
+    delete activeProject.defaultLanguage;
+    delete activeProject.languages;
+    projectRepo.updateProject(activeProject.id, { defaultLanguage: "en", languages: [] });
+  });
+
+  beforeEach(async () => {
+    await resetPages();
+    await fs.remove(path.join(pagesRoot(), "el"));
+    await fs.remove(path.join(pagesRoot(), "de"));
+    await fs.remove(path.join(pagesRoot(), "fr"));
+    // "About" in English heads the group; Team's versions all keep the English parent.
+    await write("en", { uuid: "about-en", slug: "about", name: "About" });
+    await write("en", { uuid: "team-en", slug: "team", name: "Team", parentPageUuid: "about-en" });
+    await write("el", { uuid: "team-el", slug: "team", name: "Omada", translationGroupId: "team-en", parentPageUuid: "about-en" });
+  });
+
+  const deleteIn = (language, slug) =>
+    callController(deletePage, { params: { id: slug }, query: language === "en" ? {} : { language } });
+
+  it("moves a child to its own language's version of the deleted parent", async () => {
+    await write("el", { uuid: "about-el", slug: "about", name: "Sxetika", translationGroupId: "about-en" });
+
+    assert.equal((await deleteIn("en", "about"))._status, 200);
+
+    assert.equal(await parentOf("el", "team"), "about-el");
+    assert.equal(await parentOf("en", "team"), undefined, "English has no version left");
+  });
+
+  it("falls back to the default language's version when the child's language has none", async () => {
+    // Greek Team's parent was picked in the Greek editor, as the Greek About.
+    await write("el", { uuid: "about-el", slug: "about", name: "Sxetika", translationGroupId: "about-en" });
+    await write("el", { uuid: "team-el", slug: "team", name: "Omada", translationGroupId: "team-en", parentPageUuid: "about-el" });
+
+    assert.equal((await deleteIn("el", "about"))._status, 200);
+
+    assert.equal(await parentOf("el", "team"), "about-en");
+    assert.equal(await parentOf("en", "team"), "about-en", "the English child never pointed at the Greek page");
+  });
+
+  it("does not move a child to a version in a third language", async () => {
+    await write("de", { uuid: "about-de", slug: "about", name: "Uber uns", translationGroupId: "about-en" });
+
+    assert.equal((await deleteIn("en", "about"))._status, 200);
+
+    assert.equal(await parentOf("el", "team"), undefined, "a Greek breadcrumb never shows a German page");
+  });
+
+  it("clears the parent once every version is deleted", async () => {
+    await write("el", { uuid: "about-el", slug: "about", name: "Sxetika", translationGroupId: "about-en" });
+    await deleteIn("el", "about");
+    await deleteIn("en", "about");
+
+    assert.equal(await parentOf("el", "team"), undefined);
+    assert.equal(await parentOf("en", "team"), undefined);
+  });
+
+  it("moves children when the parent goes in a bulk delete", async () => {
+    await write("el", { uuid: "about-el", slug: "about", name: "Sxetika", translationGroupId: "about-en" });
+
+    const res = await callController(bulkDeletePages, { body: { pageIds: ["about"] } });
+    assert.equal(res._status, 200, JSON.stringify(res._json));
+
+    assert.equal(await parentOf("el", "team"), "about-el");
+  });
+
+  it("does not move a child to a version that would make it its own ancestor", async () => {
+    // Greek Team sits under Greek About, while English About was put under Greek Team.
+    await write("en", { uuid: "about-en", slug: "about", name: "About", parentPageUuid: "team-el" });
+    await write("el", { uuid: "about-el", slug: "about", name: "Sxetika", translationGroupId: "about-en" });
+    await write("el", { uuid: "team-el", slug: "team", name: "Omada", translationGroupId: "team-en", parentPageUuid: "about-el" });
+
+    assert.equal((await deleteIn("el", "about"))._status, 200);
+
+    assert.equal(await parentOf("el", "team"), undefined, "English About is below Greek Team, so it cannot be above it");
+    assert.equal(await parentOf("en", "about"), "team-el");
+  });
+
+  it("leaves the parent alone while a page that may be its translation cannot be read", async () => {
+    await fs.outputFile(fileOf("el", "about"), "{ not json");
+
+    const res = await deleteIn("en", "about");
+    assert.equal(res._status, 200);
+    assert.equal(res._json.warnings?.[0]?.code, "REFERENCE_CLEANUP_INCOMPLETE");
+
+    assert.equal(await parentOf("el", "team"), "about-en", "a wrong clear could not be undone");
+  });
+
+  it("moves a default-language child off a deleted version in another language", async () => {
+    // English Team was put under the Greek About in the Greek editor's picker.
+    await write("el", { uuid: "about-el", slug: "about", name: "Sxetika", translationGroupId: "about-en" });
+    await write("en", { uuid: "team-en", slug: "team", name: "Team", parentPageUuid: "about-el" });
+
+    assert.equal((await deleteIn("el", "about"))._status, 200);
+
+    assert.equal(await parentOf("en", "team"), "about-en");
+  });
+
+  it("fixes both the parent and the links of the same page", async () => {
+    await write("el", { uuid: "about-el", slug: "about", name: "Sxetika", translationGroupId: "about-en" });
+    await write("el", {
+      uuid: "team-el",
+      slug: "team",
+      name: "Omada",
+      translationGroupId: "team-en",
+      parentPageUuid: "about-en",
+      widgets: { w1: { type: "cta", settings: { link: { href: "/about.html", pageUuid: "about-en" } } } },
+    });
+
+    assert.equal((await deleteIn("en", "about"))._status, 200);
+
+    const team = await fs.readJson(fileOf("el", "team"));
+    assert.equal(team.parentPageUuid, "about-el");
+    assert.equal("pageUuid" in team.widgets.w1.settings.link, false, "the link to the deleted page is cleared");
+  });
+
+  it("leaves the parent alone when the unreadable page is in a folder read after the child", async () => {
+    // Folders are read in name order, so Greek comes before French: when Greek
+    // Team is reached, nothing is wrong yet, and with no Greek About it would
+    // otherwise be cleared.
+    await fs.outputFile(path.join(pagesRoot(), "fr", "broken.json"), "{ not json");
+
+    const res = await deleteIn("en", "about");
+    assert.equal(res._status, 200);
+    assert.equal(res._json.warnings?.[0]?.code, "REFERENCE_CLEANUP_INCOMPLETE");
+
+    assert.equal(await parentOf("el", "team"), "about-en");
+  });
+
+  it("does not let two children's new parents form a loop together", async () => {
+    // X and Y head groups whose English versions are deleted together. Greek X's
+    // parent is English Y, Greek Y's parent is English X. Switching both to the
+    // Greek versions would put each under the other.
+    await write("en", { uuid: "x-en", slug: "x", name: "X" });
+    await write("en", { uuid: "y-en", slug: "y", name: "Y" });
+    await write("el", { uuid: "x-el", slug: "x", name: "X", translationGroupId: "x-en", parentPageUuid: "y-en" });
+    await write("el", { uuid: "y-el", slug: "y", name: "Y", translationGroupId: "y-en", parentPageUuid: "x-en" });
+
+    const res = await callController(bulkDeletePages, { body: { pageIds: ["x", "y"] } });
+    assert.equal(res._status, 200, JSON.stringify(res._json));
+
+    // Whichever is reached first moves; the other would close the loop, so it is cleared.
+    const parents = [await parentOf("el", "x"), await parentOf("el", "y")];
+    assert.ok(
+      JSON.stringify(parents) === JSON.stringify(["y-el", undefined]) ||
+        JSON.stringify(parents) === JSON.stringify([undefined, "x-el"]),
+      `one moves to the Greek version and the other is cleared, got ${parents}`,
+    );
+  });
+
+  it("does not move a child to a known version while another page cannot be read", async () => {
+    // The unreadable German page could be anything, including an ancestor that
+    // would make English About loop back to Greek Team.
+    await fs.outputFile(fileOf("de", "broken"), "{ not json");
+    await write("el", { uuid: "about-el", slug: "about", name: "Sxetika", translationGroupId: "about-en" });
+    await write("el", { uuid: "team-el", slug: "team", name: "Omada", translationGroupId: "team-en", parentPageUuid: "about-el" });
+
+    const res = await deleteIn("el", "about");
+    assert.equal(res._json.warnings?.[0]?.code, "REFERENCE_CLEANUP_INCOMPLETE");
+    assert.equal(await parentOf("el", "team"), "about-el", "left as it is, not moved to English About");
+  });
+
+  it("moves a child that has no uuid of its own", async () => {
+    await write("el", { uuid: "about-el", slug: "about", name: "Sxetika", translationGroupId: "about-en" });
+    await write("el", { slug: "team", name: "Omada", parentPageUuid: "about-en" });
+
+    assert.equal((await deleteIn("en", "about"))._status, 200);
+
+    assert.equal(await parentOf("el", "team"), "about-el");
+  });
+
+  it("moves children when the parent's language is removed", async () => {
+    // German Team was created from the Greek one, and kept its Greek parent.
+    await write("el", { uuid: "about-el", slug: "about", name: "Sxetika", translationGroupId: "about-en" });
+    await write("de", { uuid: "about-de", slug: "about", name: "Uber uns", translationGroupId: "about-en" });
+    await write("de", { uuid: "team-de", slug: "team", name: "Team", translationGroupId: "team-en", parentPageUuid: "about-el" });
+
+    await withContentWriteLock(activeProject.id, () =>
+      removeLanguage({
+        storage: pageStorage,
+        scope: mockReq().scope,
+        project: projectRepo.getProjectById(activeProject.id),
+        code: "el",
+      }),
+    );
+
+    assert.equal(await parentOf("de", "team"), "about-de");
   });
 });

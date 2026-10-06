@@ -10,6 +10,7 @@ import {
   pageKey,
   pagesDir,
   isReservedSlugPrefix,
+  translationGroupIdOf,
 } from "@widgetizer/core/contentAddress";
 import { projectLanguages } from "../utils/contentLanguage.js";
 import { listCollectionSchemas } from "./collectionService.js";
@@ -51,7 +52,7 @@ async function readIdentity(storage, scope, key) {
   } catch (error) {
     throw new LanguageError(`"${key}" could not be read, so its media usage cannot be cleared: ${error.message}`, 500);
   }
-  return { uuid: content?.uuid };
+  return { uuid: content?.uuid, group: translationGroupIdOf(content) };
 }
 
 /**
@@ -395,7 +396,7 @@ export async function removeLanguage({ storage, scope, project, code }) {
   const pages = [];
   for (const slug of slugsIn(await jsonNames(storage, scope, pagesDir(lang)))) {
     const key = pageKey(slug, lang);
-    pages.push({ slug, key, uuid: (await readIdentity(storage, scope, key)).uuid });
+    pages.push({ slug, key, ...(await readIdentity(storage, scope, key)) });
   }
 
   const globalTypes = (await jsonNames(storage, scope, globalsDir(lang))).map((name) =>
@@ -420,6 +421,7 @@ export async function removeLanguage({ storage, scope, project, code }) {
   // and one whose delete threw may be — and removal is retryable, so clearing
   // references to it would destroy links to content that is coming back.
   const deletedPageUuids = [];
+  const deletedPageGroups = [];
   const deletedItemUuids = [];
   const deletedMenuUuids = [];
 
@@ -437,6 +439,7 @@ export async function removeLanguage({ storage, scope, project, code }) {
     try {
       const { incomplete } = await clearDeletedReferencesInSection(storage, scope, {
         pageUuids: deletedPageUuids,
+        pageGroups: deletedPageGroups,
         itemUuids: deletedItemUuids,
         menuUuids: deletedMenuUuids,
         defaultLanguage,
@@ -458,10 +461,13 @@ export async function removeLanguage({ storage, scope, project, code }) {
       await storage.delete(scope, `${itemsDir(type, lang)}/_order.json`);
     }
 
-    for (const { slug, key, uuid } of pages) {
+    for (const { slug, key, uuid, group } of pages) {
       await removePageFromMediaUsage(scope.projectId, { uuid, slug }, lang);
       await storage.delete(scope, key);
-      if (uuid) deletedPageUuids.push(uuid);
+      if (uuid) {
+        deletedPageUuids.push(uuid);
+        deletedPageGroups.push([uuid, group]);
+      }
     }
 
     for (const type of globalTypes) {

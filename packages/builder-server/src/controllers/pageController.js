@@ -308,12 +308,14 @@ async function deletePageInSection({ scope, storage, pageId, lang }) {
  * thrown — the pages ARE deleted, and a dangling reference renders as a dead link
  * rather than a wrong one.
  */
-async function clearRefsToDeletedPages(storage, scope, uuids, lang) {
-  const pageUuids = uuids.filter(Boolean);
-  if (pageUuids.length === 0) return [];
+async function clearRefsToDeletedPages(storage, scope, deleted, lang) {
+  const known = deleted.filter((page) => page?.uuid);
+  if (known.length === 0) return [];
+  const pageUuids = known.map((page) => page.uuid);
   try {
     const { incomplete } = await clearDeletedReferencesInSection(storage, scope, {
       pageUuids,
+      pageGroups: known.map((page) => [page.uuid, groupIdOf(page)]),
       defaultLanguage: lang.defaultLanguage,
     });
     return incomplete;
@@ -575,15 +577,15 @@ export async function deletePage(req, res) {
       const pageBuf = await storage.read(scope, pageKey(pageId, lang));
       if (pageBuf == null) return null;
 
-      let deletedPageUuid = null;
+      let deletedPage = null;
       try {
-        deletedPageUuid = JSON.parse(pageBuf.toString("utf8")).uuid || null;
+        deletedPage = JSON.parse(pageBuf.toString("utf8"));
       } catch (readError) {
         console.warn(`Could not read page UUID before deletion for ${pageId}:`, readError.message);
       }
 
       await deletePageInSection({ scope, storage, pageId, lang });
-      return { incomplete: await clearRefsToDeletedPages(storage, scope, [deletedPageUuid], lang) };
+      return { incomplete: await clearRefsToDeletedPages(storage, scope, [deletedPage], lang) };
     });
 
     if (!found) return res.status(404).json({ error: "Page not found" });
@@ -616,7 +618,7 @@ export async function bulkDeletePages(req, res) {
     errors: [],
   };
 
-  const deletedUuids = [];
+  const deletedPages = [];
   let incompleteCleanup = [];
 
   // One section for the whole batch, so a save cannot slip a new reference to any
@@ -634,16 +636,16 @@ export async function bulkDeletePages(req, res) {
         // Read the uuid before deleting (the file is about to go) but record it
         // as deleted only after the delete returns — a page whose delete threw may
         // still be there, and clearing references to it would break live links.
-        let uuid = null;
+        let page = null;
         try {
-          uuid = JSON.parse(pageBuf.toString("utf8")).uuid ?? null;
+          page = JSON.parse(pageBuf.toString("utf8"));
         } catch (readError) {
           console.warn(`Could not read page UUID before deletion for ${pageId}:`, readError.message);
         }
 
         await deletePageInSection({ scope, storage, pageId, lang });
 
-        if (uuid) deletedUuids.push(uuid);
+        if (page?.uuid) deletedPages.push(page);
         results.deleted.push(pageId);
       } catch (error) {
         console.error(`Error deleting page ${pageId}:`, error);
@@ -652,7 +654,7 @@ export async function bulkDeletePages(req, res) {
     }
 
     // Confirmed deletions only, in one walk.
-    incompleteCleanup = await clearRefsToDeletedPages(storage, scope, deletedUuids, lang);
+    incompleteCleanup = await clearRefsToDeletedPages(storage, scope, deletedPages, lang);
   });
 
   // Determine response status based on results

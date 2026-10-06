@@ -530,10 +530,12 @@ describe("a sweep that cannot finish", () => {
 });
 
 describe("the sweep is actually batched", () => {
-  it("reads a surviving page once, however many identities were deleted", async () => {
+  it("reads a surviving page a fixed number of times, however many identities were deleted", async () => {
     // The parent-reference scan used to run once per deleted page, on top of the
-    // widget walk: ten deleted pages read every surviving page eleven times. Both
-    // now happen in one pass, with the whole deleted set.
+    // widget walk: ten deleted pages read every surviving page eleven times. The
+    // sweep now takes the whole deleted set at once, and reads each page twice by
+    // design: once to learn every page's translation group and parent (a child's
+    // new parent can be any page), once to rewrite it.
     for (let i = 0; i < 10; i++) {
       await fs.outputJson(
         path.join(getProjectPagesDir(PROJECT_FOLDER), "el", `p${i}.json`),
@@ -558,7 +560,7 @@ describe("the sweep is actually batched", () => {
     const surviving = reads.filter((key) => key === "pages/index.json").length;
     assert.ok(
       surviving <= 2,
-      `a surviving page should be read about once by the sweep, not once per deleted page (was ${surviving})`,
+      `a surviving page should be read twice by the sweep, not once per deleted page (was ${surviving})`,
     );
   });
 });
