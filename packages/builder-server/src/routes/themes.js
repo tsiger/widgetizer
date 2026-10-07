@@ -42,6 +42,9 @@ router.get("/project/:projectId", resolveActiveProject, themeController.getProje
 // POST /api/themes/project/:projectId - Save project theme settings
 router.post("/project/:projectId", resolveActiveProject, themeController.saveProjectThemeSettings);
 
+// PATCH /api/themes/project/:projectId - Save only the changed theme settings
+router.patch("/project/:projectId", resolveActiveProject, themeController.saveProjectThemeSettingChanges);
+
 // GET /api/themes/project/:projectId/locales/:lang - Get theme locale for a project
 router.get("/project/:projectId/locales/:lang", resolveActiveProject, themeController.getProjectThemeLocale);
 

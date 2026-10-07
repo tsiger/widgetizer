@@ -55,7 +55,11 @@ The library's latest snapshot is assembled from its base and update folders. [bu
 
 ## Save shared theme settings
 
-Load the project's theme settings, edit through the canonical theme store, validate/persist through the theme controller, and update theme-setting media usage. Server corrections/warnings can cause a settings reload; editor undo snapshots must not reintroduce rejected values. These settings apply across all languages.
+Load the project's theme settings, edit through the canonical theme store, validate/persist through the theme controller, and update theme-setting media usage. These settings apply across all languages.
+
+A save sends only the settings that changed, each with the value it started from (`@widgetizer/core/themeSettingChanges`). The server merges them into the file it holds now, sanitizes only those settings, and answers with the saved file. Structure, version and untouched settings always come from the stored file, so a screen holding an older copy — loaded before a theme update, or before another screen saved — cannot put them back. Changes to different settings from different screens all apply. A setting that no longer holds the value a change started from was changed elsewhere: the whole save is refused, and the editor fetches the current settings, keeps the user's edits on top as unsaved, and says so (the page editor's autosave then sends them). A change for a setting the theme no longer has is skipped with a warning.
+
+The theme store runs one save at a time; a save requested meanwhile sends whatever is still unsaved once the first lands, so responses cannot arrive out of order. The editor's undo history follows every server copy the store takes: a correction or another screen's change is rewritten into history, and a different theme version clears it. Applying a theme update drops the settings the editor has loaded, so the next screen loads the updated ones. The whole-file `POST` remains for servers and callers without the change-only route, and refuses a file from an older theme version.
 
 ## Check and apply a project update
 
@@ -63,6 +67,8 @@ Load the project's theme settings, edit through the canonical theme store, valid
 2. **Prepare the whole update off to the side.** Copy the updatable theme paths — layout, assets, widgets, snippets, locales, screenshot and collection-type definitions — into a staging directory, work out which root menus and template-derived pages are missing, and compute the merged theme settings. Nothing the project uses has been touched yet.
 3. **Swap it in.** Move each existing path aside into a backup directory, move the staged copy into place, write the merged settings, then add the new menus and pages.
 4. Update project version metadata and refresh media usage.
+
+The whole run holds the project's content-write section (inside the update's own per-project serializer), so a theme-settings save waits for the update and applies on top of what it left rather than being overwritten by the swap or rolled back by a failed one.
 
 Updatable paths are replaced wholesale, which is how a theme deletes a file: it is absent from the new copy. Existing user menus and pages are never overwritten. User collection item data is separate from replaced collection schemas. Removed fields can become archived values; new required fields can make existing items invalid until edited. Shared schema changes affect content in every language, even when starter additions are only at the root.
 

@@ -21,7 +21,7 @@ The Express API is almost a 1:1 map to what MCP tools would look like:
 | `save_page_content` | `POST /api/pages/:id/content` |
 | `create_menu` | `POST /api/menus` |
 | `update_menu` | `PUT /api/menus/:id` |
-| `update_theme_settings` | `POST /api/themes/project/:projectId` |
+| `update_theme_settings` | `PATCH /api/themes/project/:projectId` (changed settings only, each with its starting value) |
 | `export_site` | `POST /api/export/:projectId` |
 | `list_widgets` | `GET /api/projects/:projectId/widgets` |
 

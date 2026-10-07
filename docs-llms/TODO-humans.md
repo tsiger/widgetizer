@@ -195,9 +195,9 @@ Confirmed with delayed save responses: save a red color, then blue, and an older
 
 **Open · Medium · Shared**
 
-If an editor or Site settings screen was open before a theme update and you then save a theme setting there, it puts the old theme settings back. The project still says it is on the new version, so the update is never offered again and its new settings (such as Show breadcrumbs) never appear. Nothing warns the user.
+If an editor or Site settings screen was open before a theme update and you then save a theme setting there, it puts the old theme settings back. The project still says it is on the new version, so the update is never offered again and its new settings (such as Show breadcrumbs) never appear. Nothing warns the user. It happens in a single tab too: open Site settings, apply the update from Project details, go back to Site settings, change anything and save. The app keeps the copy it loaded before the update.
 
-**Next:** Make the server refuse a theme-settings save based on an older copy and ask the user to reload, without losing unsaved edits. Then consider telling open tabs about an update as soon as it happens. Plan it together with R-THEME-SAVE. [GitHub #147](https://github.com/tsiger/widgetizer/issues/147)
+**Next:** Make the server refuse a theme-settings save based on an older copy and ask the user to reload, without losing unsaved edits, and make applying an update refresh the settings the app has loaded. Then consider telling open tabs about an update as soon as it happens. Plan it together with R-THEME-SAVE. [GitHub #147](https://github.com/tsiger/widgetizer/issues/147)
 
 ### SKIPPED-ITEM-NOTICE · Say when a collection item is skipped for a bad slug
 

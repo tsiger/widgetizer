@@ -10,7 +10,7 @@ vi.mock("../../queries/previewManager", () => ({
 }));
 vi.mock("../../queries/themeManager", () => ({
   getThemeSettings: vi.fn(),
-  saveThemeSettings: vi.fn(),
+  saveThemeSettingChanges: vi.fn(),
 }));
 vi.mock("../../queries/mediaManager", () => ({
   invalidateMediaCache: vi.fn(),
@@ -25,12 +25,13 @@ vi.mock("../../lib/activeProjectId", () => ({
 const { default: useAutoSave } = await import("../saveStore");
 const { default: usePageStore } = await import("../pageStore");
 const { default: useThemeStore } = await import("../themeStore");
-const { getThemeSettings, saveThemeSettings } = await import("../../queries/themeManager");
+const { getThemeSettings, saveThemeSettingChanges } = await import("../../queries/themeManager");
 
 const clone = (value) => JSON.parse(JSON.stringify(value));
 
-function themeWith({ color = "#ff0000", width = 1200 } = {}) {
+function themeWith({ color = "#ff0000", width = 1200, version } = {}) {
   return {
+    ...(version ? { version } : {}),
     settings: {
       global: {
         colors: [{ id: "primary", type: "color", value: color }],
@@ -96,8 +97,10 @@ describe("undo after a save the server corrected", () => {
     });
     useAutoSave.getState().markWidgetModified("w-1");
 
-    saveThemeSettings.mockResolvedValue({ warnings: ["max_width was out of range"] });
-    getThemeSettings.mockResolvedValue(themeWith({ color: "#00ff00", width: 1600 }));
+    saveThemeSettingChanges.mockResolvedValue({
+      theme: themeWith({ color: "#00ff00", width: 1600 }),
+      warnings: [{ code: "VALUE_CORRECTED", id: "max_width" }],
+    });
 
     await useAutoSave.getState().save(false);
 
@@ -120,7 +123,7 @@ describe("undo after a save the server corrected", () => {
   it("leaves history alone when the server accepted the theme as sent", async () => {
     editTheme("layout", "max_width", 1400);
     const entryBefore = temporal().pastStates[0];
-    saveThemeSettings.mockResolvedValue({});
+    saveThemeSettingChanges.mockResolvedValue({ theme: themeWith({ width: 1400 }), warnings: [] });
 
     await useAutoSave.getState().save(false);
 
@@ -130,5 +133,40 @@ describe("undo after a save the server corrected", () => {
 
     undo();
     expect(liveTheme().layout[0].value).toBe(1200);
+  });
+
+  // Another screen changed the accent while this editor held the old one; the
+  // conflict refetch takes it. Undoing an unrelated edit must not bring back the
+  // accent this editor last saw.
+  it("rebases history on another screen's change after a conflict", async () => {
+    editTheme("layout", "max_width", 1400);
+    saveThemeSettingChanges.mockRejectedValue(
+      Object.assign(new Error("changed"), { status: 409, code: "THEME_SETTINGS_CHANGED", data: { conflicts: [] } }),
+    );
+    getThemeSettings.mockResolvedValue(themeWith({ color: "#0000ff" }));
+
+    expect((await useAutoSave.getState().save(false)).status).toBe("conflict");
+    expect(liveTheme().colors[0].value).toBe("#0000ff");
+    expect(liveTheme().layout[0].value).toBe(1400);
+    expect(useAutoSave.getState().themeConflict).not.toBeNull();
+
+    undo();
+    expect(liveTheme().layout[0].value).toBe(1200);
+    expect(liveTheme().colors[0].value).toBe("#0000ff");
+  });
+
+  // Snapshots of an older theme structure must not come back through undo.
+  it("clears history when the saved theme has a different version", async () => {
+    useThemeStore.setState({ settings: themeWith({ version: "1.0.0" }), originalSettings: themeWith({ version: "1.0.0" }) });
+    usePageStore.setState({ themeSettingsSnapshot: themeWith({ version: "1.0.0" }) });
+    temporal().clear();
+    editTheme("layout", "max_width", 1400);
+    const saved = themeWith({ width: 1400, version: "1.1.0" });
+    saveThemeSettingChanges.mockResolvedValue({ theme: saved, warnings: [] });
+
+    await useAutoSave.getState().save(false);
+
+    expect(temporal().pastStates).toHaveLength(0);
+    expect(usePageStore.getState().themeSettingsSnapshot).toEqual(saved);
   });
 });

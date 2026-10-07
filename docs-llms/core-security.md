@@ -216,7 +216,7 @@ Prevents data from one project being shown, saved, previewed, or exported agains
 **Client-side (stale-response guards):**
 
 - `pageStore` uses an `activeLoadId` counter to discard late async responses from superseded loads
-- `themeStore` owns theme-settings load protection via `activeLoadId`; its `resetForProjectChange()` action is triggered centrally by `projectSwitchCoordinator`, while `Settings.jsx` still guards save completion against project switches
+- `themeStore` owns theme-settings load protection via `activeLoadId`; its `resetForProjectChange()` action is triggered centrally by `projectSwitchCoordinator`, and its `invalidate()` after a theme update is applied, while `Settings.jsx` still guards save completion against project switches
 - `widgetStore` and `saveStore` are also reset centrally by `projectSwitchCoordinator` so singleton store state cannot leak across project switches
 - `useExportState` and `ExportCreator` guard `loadExportHistory` and export completion against project changes mid-flight
 
