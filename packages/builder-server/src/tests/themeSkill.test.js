@@ -234,6 +234,29 @@ describe("theme skill validator catches invented theme features", () => {
     assert.ok(hasError(findings, "unknown-setting-type"), JSON.stringify(findings));
   });
 
+  it("a video setting whose default is not an uploaded MP4", async () => {
+    const accepted = await findingsAfter("video-ok", (dir) =>
+      editJson(widget(dir, "hero", "schema.json"), (schema) => {
+        schema.settings.push({ type: "video", id: "clip", label: "Clip", default: "" });
+      }),
+    );
+    assert.ok(!hasError(accepted, "unknown-setting-type"), JSON.stringify(accepted));
+    assert.ok(!hasError(accepted, "setting-default"), JSON.stringify(accepted));
+
+    for (const [name, value] of [
+      ["video-url", "https://www.youtube.com/watch?v=x"],
+      ["video-mp3", "/uploads/files/song.mp3"],
+      ["video-object", { src: "/uploads/files/clip.mp4" }],
+    ]) {
+      const findings = await findingsAfter(name, (dir) =>
+        editJson(widget(dir, "hero", "schema.json"), (schema) => {
+          schema.settings.push({ type: "video", id: "clip", label: "Clip", default: value });
+        }),
+      );
+      assert.ok(hasError(findings, "setting-default"), `${name}: ${JSON.stringify(findings)}`);
+    }
+  });
+
   it("a tag argument the tag does not read", async () => {
     const findings = await findingsAfter("image-width", (dir) =>
       edit(widget(dir, "hero", "widget.liquid"), (source) =>

@@ -94,7 +94,7 @@ Use only declared block types and settings. Widget data is not comprehensively s
 
 Every value-bearing definition has a stable `id`, supported `type`, and human-readable `label` (direct or `tTheme:`). Optional `description` supplies help text; optional `default` must have the same shape as saved values. `header` groups controls and does not store a content value.
 
-This table is the complete list. There is no `toggle`, `boolean`, `url`, `html`, `video`, `image_picker`, `repeater` or `list` type, and no conditional-visibility property; a definition with an unknown type or property is not an extension point.
+This table is the complete list. There is no `toggle`, `boolean`, `url`, `html`, `image_picker`, `repeater` or `list` type, and no conditional-visibility property; a definition with an unknown type or property is not an extension point.
 
 | Type | Stored value | Type-specific authoring rules |
 | --- | --- | --- |
@@ -113,7 +113,8 @@ This table is the complete list. There is no `toggle`, `boolean`, `url`, `html`,
 | `icon` | Icon-name string | Theme icon catalog; optional `options`/`allow_patterns` narrow selection. An icon name is not SVG markup. Supply the icon data and a renderer/snippet. |
 | `image` | `/uploads/images/<filename>` string, or empty | `size` controls input width (`narrow`/`full`); `compact` is the older fallback; `layout: 'row'`/`'stacked'` controls editor presentation. Use the image tag, not a fabricated image object. |
 | `gallery` | Ordered array of image-path strings, empty `[]` | Loop entries with the image tag. Metadata is on media records. A supported alternative to one image block per picture. |
-| `file` | `/uploads/files/<filename>` string, or empty | Current picker allows PDF/MP3. Render with prepared `filePath` plus basename, or supported resolved links. See assets reference. |
+| `file` | `/uploads/files/<filename>` string, or empty | Picker allows PDF/MP3/MP4. Render with prepared `filePath` plus basename, or supported resolved links. See assets reference. |
+| `video` | `/uploads/files/<filename>.mp4` string, or empty | Uploaded MP4 only, picked from the media library; not an external/YouTube URL (use `youtube` or a text URL for those). Render a native `<video>` from `filePath` plus basename; see assets reference. Playback depends on the visitor's browser decoding the file; there is no transcoding or generated poster. |
 | `youtube` | Embed object, or cleared empty value | Picker uses video identity/URL/options; optional schema `embedOptions`. Pass to the youtube tag; do not assume this is an image path. Tag arguments/defaults determine final embed options. |
 | `date` | `YYYY-MM-DD` string, or empty | Calendar date, not datetime/timezone. Render with `format_date`. |
 | `menu` | Menu ID/UUID string | Renderer resolves this to a menu object with `items`; do not treat its rendered value as the stored ID. |

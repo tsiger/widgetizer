@@ -325,6 +325,7 @@ describe("content a backup made by the app never holds", () => {
     const files = [
       { ...photo },
       { id: "f", filename: "guide.pdf", path: "/uploads/files/guide.pdf", type: "application/pdf" },
+      { id: "m4", filename: "tour.mp4", path: "/uploads/files/tour.mp4", type: "video/mp4" },
       { id: "v", filename: "clip.mp4", path: "/uploads/videos/clip.mp4", type: "video/mp4" },
       { id: "a", filename: "song.mp3", path: "/uploads/audios/song.mp3", type: "audio/mpeg" },
     ];

@@ -175,11 +175,11 @@ The checks that keep theme updates and exports inside their own folders look at 
 
 ### MEDIA-MP4 · Support uploaded MP4 videos on site pages
 
-**Open · Unrated · Shared**
+**Done · Unrated · Shared · 2026-10-07**
 
 The Widgetizer marketing site needs MP4 videos on some pages. We should be able to upload a video, choose it in a page widget and play it in both the preview and the published/exported site.
 
-**Next:** Pick this up on **2026-10-02**. Check what the current media tools already support, add the missing pieces and verify the complete workflow with a real MP4, including saved references and export.
+**Done:** MP4 videos can be uploaded, chosen in Arch's Video widget (formerly "YouTube/Vimeo") and played in the editor, the preview and exported sites. Removing the video brings back the YouTube or Vimeo link, and a video the browser can't play shows a message instead of a blank player. Existing projects get the widget through the 0.9.10 theme update.
 
 ## Fixes and investigations
 

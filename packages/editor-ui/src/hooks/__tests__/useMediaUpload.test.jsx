@@ -66,3 +66,25 @@ describe("useMediaUpload — order of freshly uploaded files", () => {
     expect(ids(files)).toEqual(["u6", "u1", "u2", "u3", "u4", "u5", "existing"]);
   });
 });
+
+describe("useMediaUpload — client-side size limit", () => {
+  it("rejects a file over the media size setting without sending it", async () => {
+    vi.resetModules();
+    const { uploadFormData } = await import("../../lib/uploadRequest");
+    const { default: useMediaUpload } = await import("../useMediaUpload.js");
+    uploadFormData.mockReset();
+
+    const big = new File(["x"], "clip.mp4", { type: "video/mp4" });
+    Object.defineProperty(big, "size", { value: 51 * 1024 * 1024 });
+    const showToast = vi.fn();
+
+    const { result } = renderHook(() =>
+      useMediaUpload({ activeProject: { id: "project-1" }, showToast, setFiles: vi.fn() }),
+    );
+
+    await result.current.handleUpload([big]);
+
+    expect(uploadFormData).not.toHaveBeenCalled();
+    expect(showToast.mock.calls.flat().join(" ")).toMatch(/too large/i);
+  });
+});

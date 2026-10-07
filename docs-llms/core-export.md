@@ -159,7 +159,7 @@ All copying happens **after** HTML generation, into the export's `assets/` tree:
 - **Used images only** — media metadata is read (`readMediaFile` from `mediaService.js`) and only images with a non-empty `usedIn` whose `path` starts with `/uploads/images/` are copied to `assets/images/`. For each, all generated public sizes except `thumb` are copied; raster originals are copied only when there is no public `large` variant; SVG originals are always copied. The count copied vs. skipped is logged. If media tracking fails, it falls back to copying the entire `uploads/images/` tree.
 - **Used file assets only** — the same usage-based approach copies non-image file assets (PDFs): media files with non-empty `usedIn` whose `path` starts with `/uploads/files/` are copied to `assets/files/`. Files have no size variants. If tracking fails, it falls back to copying the entire `uploads/files/` tree.
 
-The file-asset path (copy to `assets/files/`, `/uploads/files/` → `assets/files/` rewrite, and the `filePath` render variable supplied to widget templates) is what makes referenced PDFs downloadable from the exported static site. See [Media Library](core-media.md) for the shared image/file media model and usage tracking, and [Setting Types](theming-setting-types.md) for the `file` setting type that themes use to reference a file asset.
+The file-asset path (copy to `assets/files/`, `/uploads/files/` → `assets/files/` rewrite, and the `filePath` render variable supplied to widget templates) is what makes referenced PDFs downloadable and MP4/MP3 files playable from the exported static site. See [Media Library](core-media.md) for the shared image/file media model and usage tracking, and [Setting Types](theming-setting-types.md) for the `file` and `video` setting types that themes use to reference a file asset.
 
 ### Asset cache busting
 
@@ -257,7 +257,7 @@ See [Packages & Adapter Architecture](core-packages.md) and [Platform Security](
 
 - [App Settings](core-appSettings.md) — Export retention limit and developer mode
 - [Media Library](core-media.md) — Image/file media model and usage tracking that drive selective copying
-- [Setting Types](theming-setting-types.md) — The `file` setting type for referencing file assets
+- [Setting Types](theming-setting-types.md) — The `file` and `video` setting types for referencing file assets
 - [Collections](core-collections.md) — Collection model and item-template rendering
 - [Form Widget](core-form-widget.md) — The `core-form` widget and the forms manifest
 - [Platform Security](core-security.md) — Path-traversal and cross-tenant export-serving safeguards

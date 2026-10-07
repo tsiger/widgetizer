@@ -272,6 +272,29 @@ describe("create + read items", () => {
     );
   });
 
+  it("accepts a video field and keeps its upload path through save and reload", async () => {
+    const schema = {
+      ...NEWS_SCHEMA,
+      settings: [...NEWS_SCHEMA.settings, { id: "clip", type: "video", required: true }],
+    };
+    assert.equal(svc.validateCollectionSchema(schema, "news").valid, true);
+    await seedSchema("news", schema);
+
+    const item = await createItem({ settings: { title: "Launch", clip: "/uploads/files/launch.mp4" } });
+    const raw = await svc.readRawCollectionItem(storage, scope, "news", item.slug);
+    assert.equal(raw.settings.clip, "/uploads/files/launch.mp4");
+    assert.equal((await svc.readCollectionItem(storage, scope, "news", item.slug)).invalid, false);
+
+    const saved = await svc.getCollectionSchema(storage, scope, "news");
+    for (const clip of ["", "/uploads/files/brochure.pdf", "https://cdn.example/launch.mp4"]) {
+      assert.throws(
+        () => svc.buildCollectionItemData(saved, { settings: { title: "No clip", clip } }, null),
+        (e) => e.code === "VALIDATION" && e.validationErrors.some((v) => v.fieldId === "clip"),
+        JSON.stringify(clip),
+      );
+    }
+  });
+
   it("returns null reading a missing item", async () => {
     assert.equal(await svc.readCollectionItem(storage, scope, "news", "ghost"), null);
   });

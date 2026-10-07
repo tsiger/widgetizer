@@ -1,3 +1,10 @@
+{%- assign video_src = '' -%}
+{%- if widget.settings.video_file != blank -%}
+  {%- assign video_name = widget.settings.video_file | split: '/' | last -%}
+  {%- assign video_src = filePath | append: '/' | append: video_name -%}
+  {% enqueue_script src: "video-embed.js", priority: 30, defer: true %}
+{%- endif -%}
+
 <section
   id="{{ widget.id }}"
   class="widget widget-type-video-embed widget-{{ widget.id }} color-scheme-{{ widget.settings.color_scheme }}{% if widget.settings.top_spacing != 'auto' %} spacing-top-{{ widget.settings.top_spacing }}{% endif %}{% if widget.settings.bottom_spacing != 'auto' %} spacing-bottom-{{ widget.settings.bottom_spacing }}{% endif %}"
@@ -48,7 +55,8 @@
         height: 0;
         overflow: hidden;
 
-        & iframe {
+        & iframe,
+        & video {
           position: absolute;
           inset-block-start: 0;
           inset-inline-start: 0;
@@ -57,6 +65,16 @@
           border: var(--border-width-thin) solid var(--border-color);
           border-radius: var(--radius-md);
         }
+
+        & video {
+          background-color: #000;
+          object-fit: contain;
+        }
+      }
+
+      & .video-embed-error {
+        margin-block-start: var(--space-sm);
+        text-align: center;
       }
 
       & .video-embed-placeholder {
@@ -90,7 +108,22 @@
 
     <div class="widget-content">
       <div class="video-embed-container reveal reveal-fade">
-        {% if embed_url != blank %}
+        {% if video_src != blank %}
+          {%- assign poster_url = '' -%}
+          {%- if widget.settings.poster != blank -%}
+            {%- capture poster_url -%}{% image src: widget.settings.poster, size: 'large', output: 'url' %}{%- endcapture -%}
+            {%- assign poster_url = poster_url | strip -%}
+          {%- endif -%}
+          <video
+            class="video-embed-player"
+            src="{{ video_src }}"
+            {% if poster_url != blank %}poster="{{ poster_url }}"{% endif %}
+            aria-label="{{ widget.settings.video_title | default: 'Video' }}"
+            controls
+            playsinline
+            preload="metadata"
+          ></video>
+        {% elsif embed_url != blank %}
           <iframe
             src="{{ embed_url }}"
             title="{{ widget.settings.video_title | default: 'Video' }}"
@@ -105,6 +138,9 @@
           </p>
         {% endif %}
       </div>
+      {% if video_src != blank %}
+        <p class="video-embed-error w-body t-muted" role="alert" hidden>{{ 'site.video_embed.playback_error' | t }}</p>
+      {% endif %}
     </div>
   </div>
 </section>

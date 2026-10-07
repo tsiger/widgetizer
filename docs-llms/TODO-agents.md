@@ -216,13 +216,15 @@ The containment checks that keep file-sourced paths inside their folder compare 
 
 ### MEDIA-MP4 · Support uploaded MP4 videos on site pages
 
-**Open · Unrated · Shared**
+**Done · Unrated · Shared · 2026-10-07**
 
-Needed for the Widgetizer marketing site. Planned follow-up: **2026-10-02**. Support uploading MP4 (`video/mp4`), selecting it in page widgets and playing it in preview and published/exported pages. First check the existing media/file path and theme controls to identify the missing pieces; keep the initial scope to MP4 playback.
+Needed for the Widgetizer marketing site. Support uploading MP4 (`video/mp4`), selecting it in page widgets and playing it in preview and published/exported pages. Audit and [implementation plan](plan-mp4-support.md) prepared **2026-10-07** against `f14cd33b`; work branch: `feature/mp4-support`, integration target: `0.9.10`.
+
+**Resolution:** MP4 is an ordinary `file` upload (MIME/extension allowlists, shared MIME map, client accept lists); `useMediaUpload` now passes `maxSizeMB`. New `video` setting type (`FileInput` video mode, Videos filter) with `sanitizeVideoPath` on widget/block/collection/theme values and in `validate-theme.js`. Arch `video-embed` (renamed "Video") gained `video_file` and `poster`, native playback, and a translated decode-error message (`video-embed.js`), shipped in `updates/0.9.10`. Review fixes: the preview runtime lets media clicks through and de-duplicates enqueued assets by resolved URL. No MediaDrawer video preview (the drawer opens for images only). Tested by the owner; Electron not separately checked.
 
 **Done when:** A real MP4 can be uploaded, selected, saved and played in preview and exported output, with correct asset URLs and media-usage tracking; existing image/file workflows still work.
 
-**Start:** [Media system](core-media.md), [MIME types](../packages/core/src/utils/mimeTypes.js), [upload validation](../packages/editor-ui/src/utils/uploadValidation.js), [file input](../packages/editor-ui/src/components/settings/inputs/FileInput.jsx) and [export controller](../packages/builder-server/src/controllers/exportController.js). **Source:** User request, 2026-10-01.
+**Next:** Follow the [implementation sequence](plan-mp4-support.md#implementation-sequence): upload/MIME support and the upload-hook size option, a video setting reusing the file picker, Arch native playback, then range/usage/export verification and authoring docs. Existing storage and usage/export paths can be reused; preserve the pulled export containment checks. **Source:** User request, 2026-10-01; implementation-planning request, 2026-10-07.
 
 ## Fixes and investigations
 
