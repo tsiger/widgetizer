@@ -1984,8 +1984,10 @@ describe("saveStore (useAutoSave)", () => {
     it("resets the autosave backoff after a conflict and keeps autosaving the kept edits", async () => {
       seedPageStore();
       makeThemeStoreLive({ colors: { primary: "#fff" } }, { colors: { primary: "#000" } });
-      useAutoSave.setState({ autoSaveFailureCount: 3 });
+      // Armed first: setThemeSettingsModified resets the count itself, so the
+      // count has to be set after it for the tick's own reset to be what clears it.
       useAutoSave.getState().setThemeSettingsModified(true);
+      useAutoSave.setState({ autoSaveFailureCount: 3 });
       mockThemeStoreState.saveSettings.mockResolvedValueOnce({ warnings: [], conflict: true, adopted: true });
 
       await vi.advanceTimersByTimeAsync(120000);

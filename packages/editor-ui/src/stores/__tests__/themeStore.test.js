@@ -254,6 +254,48 @@ describe("themeStore", () => {
       expect(useThemeStore.getState().saving).toBe(false);
     });
 
+    // A caller reacting to the first save settling runs before the queued
+    // follow-up starts; a save it requests there must join the follow-up, not
+    // start a second save beside it.
+    it("never has two saves in flight, even when one is requested as the first settles", async () => {
+      seedSettings();
+      let inFlightNow = 0;
+      let maxInFlight = 0;
+      const pending = [];
+      saveThemeSettingChanges.mockImplementation(
+        () =>
+          new Promise((resolve) => {
+            inFlightNow += 1;
+            maxInFlight = Math.max(maxInFlight, inFlightNow);
+            pending.push(() => {
+              inFlightNow -= 1;
+              resolve({ theme: useThemeStore.getState().settings, warnings: [] });
+            });
+          }),
+      );
+
+      useThemeStore.getState().updateThemeSetting("colors", "primary_color", "#a");
+      const first = useThemeStore.getState().saveSettings("project-a");
+      const chained = first.then(() => {
+        useThemeStore.getState().updateThemeSetting("colors", "primary_color", "#c");
+        return useThemeStore.getState().saveSettings("project-a");
+      });
+      useThemeStore.getState().updateThemeSetting("colors", "primary_color", "#b");
+      const queued = useThemeStore.getState().saveSettings("project-a");
+
+      pending.shift()();
+      await vi.waitFor(() => expect(pending).toHaveLength(1));
+      await Promise.resolve();
+      await Promise.resolve();
+      expect(inFlightNow).toBe(1);
+      while (pending.length) {
+        pending.shift()();
+        await new Promise((resolve) => setTimeout(resolve, 0));
+      }
+      await Promise.all([first, chained, queued]);
+      expect(maxInFlight).toBe(1);
+    });
+
     it("skips the request when nothing differs, including a key-order-only difference", async () => {
       useThemeStore.setState({
         settings: { settings: { global: { g: [{ id: "link", type: "link", value: { href: "/a", text: "A" } }] } } },
@@ -394,6 +436,22 @@ describe("themeStore", () => {
 
         expect(result.adopted).toBe(false);
         expect(getThemeSettings).not.toHaveBeenCalled();
+        expect(useThemeStore.getState().hasUnsavedThemeChanges()).toBe(false);
+      });
+
+      it("takes the corrected copy as it is when the draft was discarded during the save", async () => {
+        seedSettings();
+        useThemeStore.getState().updateThemeSetting("colors", "primary_color", "bad");
+        const response = deferred();
+        saveThemeSettingChanges.mockReturnValueOnce(response.promise);
+        getThemeSettings.mockResolvedValueOnce(withValues({ primary: "#corrected" }));
+
+        const saving = useThemeStore.getState().saveSettings("project-a");
+        useThemeStore.getState().discardDraft();
+        response.resolve({ theme: null, warnings: [{ code: "VALUE_CORRECTED" }] });
+        await saving;
+
+        expect(valueOf(useThemeStore.getState().settings, "primary_color")).toBe("#corrected");
         expect(useThemeStore.getState().hasUnsavedThemeChanges()).toBe(false);
       });
 

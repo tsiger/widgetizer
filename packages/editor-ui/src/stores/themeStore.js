@@ -104,7 +104,9 @@ const useThemeStore = create((set, get) => {
       // The whole-file fallback returns no file; read back what it corrected.
       const fresh = await getThemeSettings(projectId);
       if (moved(projectId, generation)) return { warnings: result.warnings, stale: true };
-      adoptServerTheme(fresh, diffThemeSettings(sent, get().settings), sent);
+      const live = get().settings;
+      const discardedNow = isDraftDiscarded();
+      adoptServerTheme(fresh, discardedNow ? [] : diffThemeSettings(sent, live), discardedNow ? live : sent);
     } else {
       set({ originalSettings: clone(sent) });
       adopted = false;
@@ -225,19 +227,20 @@ const useThemeStore = create((set, get) => {
     saveSettings: (projectId) => {
       const resolvedProjectId = projectId || getActiveProjectId();
       if (!resolvedProjectId || !get().settings) return Promise.resolve(null);
+      // The follow-up first: between a run settling and its follow-up starting,
+      // `inFlight` is already null, and starting another run there would put two
+      // saves in flight at once.
+      if (followUp) return followUp;
       if (!inFlight) return startRun(resolvedProjectId);
-      if (!followUp) {
-        const epoch = queueEpoch;
-        const waiting = inFlight
-          .catch(() => {})
-          .then(() => {
-            // The store was reset while this waited: what it would send is gone.
-            if (epoch !== queueEpoch) return { warnings: [], stale: true };
-            followUp = null;
-            return startRun(resolvedProjectId);
-          });
-        followUp = waiting;
-      }
+      const epoch = queueEpoch;
+      followUp = inFlight
+        .catch(() => {})
+        .then(() => {
+          // The store was reset while this waited: what it would send is gone.
+          if (epoch !== queueEpoch) return { warnings: [], stale: true };
+          followUp = null;
+          return startRun(resolvedProjectId);
+        });
       return followUp;
     },
 

@@ -824,6 +824,7 @@ describe("applyThemeUpdate and concurrent content writes", () => {
     for (let i = 0; i < 500 && !(await fs.pathExists(stageDir)); i++) {
       await new Promise((resolve) => setImmediate(resolve));
     }
+    assert.ok(await fs.pathExists(stageDir), "the update had not started preparing; the test would prove nothing");
     let sawUpdateInProgress = null;
     const save = withContentWriteLock(PROJECT_ID, async () => {
       sawUpdateInProgress = await fs.pathExists(stageDir);
