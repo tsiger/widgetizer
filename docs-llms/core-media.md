@@ -11,7 +11,7 @@ The library is a single **asset system** spanning two categories — `image` and
 Uploaded binaries are stored through the **`AssetStorageAdapter`** (local FS in OSS, cloud object storage in hosted), scoped per project. The OSS adapter maps adapter keys to on-disk paths:
 
 - **Images**: `data/projects/{folderName}/uploads/images/`
-- **Files** (PDFs, audio): `data/projects/{folderName}/uploads/files/`
+- **Files** (PDFs, audio, video): `data/projects/{folderName}/uploads/files/`
 
 The controller chooses the subdir inline from `getMediaCategory(file.mimetype)` (`packages/builder-server/src/utils/mimeTypes.js`): `"image"` MIME types go to `images/`, everything else (PDF, audio) to `files/`. The adapter key is `${subdir}/${filename}` (originals) or `images/${variantFilename}` (generated sizes) — the historical disk layout minus the `/uploads/` URL prefix. There is no `getMediaDir` path-builder; the backend never constructs absolute paths from user input — all binary I/O routes through the adapter over `req.scope`. See [Packages & Adapter Architecture](core-packages.md).
 
@@ -112,7 +112,7 @@ API responses assemble a `files` array from these rows:
 }
 ```
 
-Non-image records (PDFs, audio) carry `width: null`, `height: null`, and `sizes: {}` — no resizing, no dimension extraction.
+Non-image records (PDFs, audio, video) carry `width: null`, `height: null`, and `sizes: {}` — no resizing, no dimension extraction.
 
 ### Media Type Configuration
 
