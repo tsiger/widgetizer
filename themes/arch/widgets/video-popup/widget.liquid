@@ -1,20 +1,43 @@
-{%- comment -%} Convert YouTube/Vimeo URL to embed URL {%- endcomment -%}
-{%- assign video_url = widget.settings.video_url -%}
-{%- assign embed_url = '' -%}
-
+{%- comment -%}
+  Turn a YouTube/Vimeo link into an embed address. The address is always built
+  on the provider's embed path from the video's ID, never copied from what was
+  typed, so the frame can only show that provider's player. An ID that could
+  leave the embed path ("..", encoded characters), or a link with nothing
+  after the marker (split then returns the part before it, hence ":"), gives no player.
+{%- endcomment -%}
+{%- assign video_url = widget.settings.video_url | split: '#' | first -%}
+{%- assign video_base = '' -%}
+{%- assign video_id = '' -%}
+{%- assign video_query = '' -%}
 {%- if video_url contains 'youtube.com/watch' -%}
+  {%- assign video_base = 'https://www.youtube.com/embed/' -%}
   {%- assign video_id = video_url | split: 'v=' | last | split: '&' | first -%}
-  {%- assign embed_url = 'https://www.youtube.com/embed/' | append: video_id -%}
 {%- elsif video_url contains 'youtu.be/' -%}
+  {%- assign video_base = 'https://www.youtube.com/embed/' -%}
   {%- assign video_id = video_url | split: 'youtu.be/' | last | split: '?' | first -%}
-  {%- assign embed_url = 'https://www.youtube.com/embed/' | append: video_id -%}
 {%- elsif video_url contains 'youtube.com/embed/' -%}
-  {%- assign embed_url = video_url -%}
+  {%- assign video_base = 'https://www.youtube.com/embed/' -%}
+  {%- assign video_id = video_url | split: 'youtube.com/embed/' | last -%}
+{%- elsif video_url contains 'player.vimeo.com/video/' -%}
+  {%- assign video_base = 'https://player.vimeo.com/video/' -%}
+  {%- assign video_id = video_url | split: 'player.vimeo.com/video/' | last -%}
 {%- elsif video_url contains 'vimeo.com/' -%}
+  {%- assign video_base = 'https://player.vimeo.com/video/' -%}
   {%- assign video_id = video_url | split: 'vimeo.com/' | last | split: '?' | first -%}
-  {%- assign embed_url = 'https://player.vimeo.com/video/' | append: video_id -%}
-{%- elsif video_url contains 'player.vimeo.com' -%}
-  {%- assign embed_url = video_url -%}
+{%- endif -%}
+{%- comment -%} Embed and player links keep their options (?start=, Vimeo's ?h= for unlisted videos) {%- endcomment -%}
+{%- if video_id contains '?' -%}
+  {%- assign video_head = video_id | split: '?' | first | append: '?' -%}
+  {%- assign video_query = video_id | remove_first: video_head -%}
+  {%- assign video_id = video_head | remove: '?' -%}
+{%- endif -%}
+{%- assign video_id = video_id | split: '/' | first -%}
+{%- assign embed_url = '' -%}
+{%- if video_base != blank and video_id != blank -%}
+  {%- unless video_id contains '.' or video_id contains '%' or video_id contains ':' -%}
+    {%- assign embed_url = video_base | append: video_id -%}
+    {%- if video_query != blank -%}{%- assign embed_url = embed_url | append: '?' | append: video_query -%}{%- endif -%}
+  {%- endunless -%}
 {%- endif -%}
 
 {% enqueue_style src: "video-popup.css", priority: 30 %}

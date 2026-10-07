@@ -197,6 +197,16 @@ Three rough edges on multilingual sites. `LanguageMenu` offered every language w
 
 **Body at:** `e4355fd9:docs-llms/TODO-agents.md`.
 
+### MEDIA-MP4 · Support uploaded MP4 videos on site pages
+
+**Done · Unrated · Shared · 2026-10-07**
+
+Needed for the Widgetizer marketing site: upload an MP4, choose it in a page widget and play it in preview and exported pages. MP4 was rejected on upload and no setting or widget could play an uploaded video; the upload hook also passed `maxImageMB` to a validator expecting `maxSizeMB`, so client-side size rejection never ran.
+
+**Resolution:** MP4 is an ordinary `file` upload under `/uploads/files/`. A `video` setting type (`FileInput` video mode) stores an MP4 path checked by `sanitizeVideoPath` everywhere values are sanitized and in `validate-theme.js`. Arch `video-embed` (renamed "Video") plays it natively ahead of the YouTube/Vimeo URL, with a poster and a decode-error message, shipped in `updates/0.9.10`. Review fixes in the preview runtime: media clicks keep their default action, and re-rendered widgets' assets are de-duplicated by resolved URL. Fix `b9c9fc13`.
+
+**Body at:** `b9c9fc13:docs-llms/TODO-agents.md` (plan: `b9c9fc13:docs-llms/plan-mp4-support.md`).
+
 ## Reconciliation decisions
 
 - GitHub #115, #122, #126, #133, #134 and #135 have implementation evidence. Their remaining local entries are review/documentation/integration work, not instructions to rebuild the features. GitHub statuses were left unchanged.

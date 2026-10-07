@@ -44,7 +44,7 @@ Before testing starts, the test owner should provide these. If something is not 
 - A valid newer-version theme ZIP for an installed theme.
 - A same-version theme ZIP that should be rejected.
 - A malformed or unsafe theme ZIP, if available.
-- Upload files: JPG, PNG, GIF, WebP, SVG, PDF, MP3, unsupported `.txt`, and one file larger than the upload limit.
+- Upload files: JPG, PNG, GIF, WebP, SVG, PDF, MP3, MP4 (H.264/AAC), a corrupt `.mp4`, unsupported `.txt`, and one file larger than the upload limit.
 - An SVG fixture containing unsafe script/event-handler content, if available.
 - A project with images used in pages, Header, Footer, Site settings, and collection items.
 - A project with at least one collection item marked "Needs attention."
@@ -1150,7 +1150,7 @@ Test each control type wherever it appears: widget settings, collection forms, S
 - [ ] MEDIA-001 - Open Media for a project with no files.
   Expected: Empty state and upload box appear.
 
-- [ ] MEDIA-002 - Upload JPG, PNG, GIF, WebP, SVG, PDF, and MP3 through the picker.
+- [ ] MEDIA-002 - Upload JPG, PNG, GIF, WebP, SVG, PDF, MP3, and MP4 through the picker.
   Expected: Each accepted file appears in the library.
 
 - [ ] MEDIA-003 - Drag and drop an image file.
@@ -1242,6 +1242,9 @@ Test each control type wherever it appears: widget settings, collection forms, S
 
 - [ ] MEDIA-030 - Open a missing/broken media fixture, if provided.
   Expected: The app gives useful recovery information rather than crashing.
+
+- [ ] MEDIA-031 - Choose an uploaded MP4 in the Video widget, save, reopen the editor, play and seek; then remove it.
+  Expected: The video plays and seeks in the editor and standalone preview; removing it brings back the YouTube/Vimeo URL. A corrupt MP4 shows a "can't be played" message.
 
 ---
 
@@ -1476,7 +1479,7 @@ Test each control type wherever it appears: widget settings, collection forms, S
 - [ ] EXPZIP-010 - Open the exported site and navigate internal links and menus.
   Expected: Links work inside the exported site.
 
-- [ ] EXPZIP-011 - Open pages using images, PDFs, and MP3s.
+- [ ] EXPZIP-011 - Open pages using images, PDFs, MP3s, and MP4s.
   Expected: Used assets load/open correctly.
 
 - [ ] EXPZIP-012 - Confirm active-project isolation.

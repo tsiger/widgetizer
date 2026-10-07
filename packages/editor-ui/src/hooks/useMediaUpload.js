@@ -84,7 +84,7 @@ export default function useMediaUpload({ activeProject, showToast, setFiles }) {
     const preRejected = [];
     if (settings?.media) {
       const { valid, rejected } = validateFileSizes(acceptedFiles, {
-        maxImageMB: settings.media.maxFileSizeMB,
+        maxSizeMB: settings.media.maxFileSizeMB,
       });
       filesToProcess = valid;
       preRejected.push(...rejected);

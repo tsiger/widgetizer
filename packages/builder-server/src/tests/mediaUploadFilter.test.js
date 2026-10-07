@@ -53,10 +53,12 @@ describe("media upload file filter", () => {
     assertAccepted(filter("doc.pdf", "application/pdf"), "pdf");
     assertAccepted(filter("song.mp3", "audio/mpeg"), "mp3 audio/mpeg");
     assertAccepted(filter("song.mp3", "audio/mp3"), "mp3 audio/mp3");
+    assertAccepted(filter("clip.mp4", "video/mp4"), "mp4");
   });
 
   it("accepts uppercase extensions", () => {
     assertAccepted(filter("PHOTO.JPG", "image/jpeg"), "uppercase jpg");
+    assertAccepted(filter("CLIP.MP4", "video/mp4"), "uppercase mp4");
   });
 
   it("rejects a disallowed MIME type regardless of extension", () => {
@@ -80,5 +82,14 @@ describe("media upload file filter", () => {
     assertRejected(filter("photo.jpg", "image/svg+xml"), "jpeg declared as svg");
     assertRejected(filter("doc.pdf", "image/png"), "pdf declared as png");
     assertRejected(filter("song.mp3", "application/pdf"), "mp3 declared as pdf");
+    assertRejected(filter("clip.mp4", "audio/mpeg"), "mp4 declared as mp3");
+    assertRejected(filter("song.mp3", "video/mp4"), "mp3 declared as mp4");
+    assertRejected(filter("clip.html", "video/mp4"), "html declared as mp4");
+  });
+
+  it("rejects video containers other than MP4", () => {
+    assertRejected(filter("clip.mov", "video/quicktime"), "mov");
+    assertRejected(filter("clip.webm", "video/webm"), "webm");
+    assertRejected(filter("clip.m4v", "video/mp4"), "m4v declared as mp4");
   });
 });

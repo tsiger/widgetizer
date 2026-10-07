@@ -62,6 +62,7 @@ describe("media paths outside the project's uploads", () => {
     await fs.outputFile(path.join(projectDir(), "uploads", "images", "real.jpg"), "real-image");
     await fs.outputFile(path.join(projectDir(), "uploads", "images", "real-large.jpg"), "real-large");
     await fs.outputFile(path.join(projectDir(), "uploads", "files", "real.pdf"), "real-pdf");
+    await fs.outputFile(path.join(projectDir(), "uploads", "files", "real.mp4"), "real-mp4");
     await writeMediaFile(PROJECT_ID, {
       files: [
         {
@@ -88,6 +89,14 @@ describe("media paths outside the project's uploads", () => {
           sizes: { large: { path: "/uploads/images/../../../secret.txt", width: 1, height: 1 } },
         },
         { id: "real-file", filename: "real.pdf", path: "/uploads/files/real.pdf", type: "application/pdf", usedIn: ["page:index"] },
+        { id: "real-video", filename: "real.mp4", path: "/uploads/files/real.mp4", type: "video/mp4", usedIn: ["page:index"] },
+        {
+          id: "escaping-video",
+          filename: "secret.txt",
+          path: "/uploads/files/../../../secret.txt",
+          type: "video/mp4",
+          usedIn: ["page:index"],
+        },
         {
           id: "escaping-file",
           filename: "secret.txt",
@@ -111,6 +120,7 @@ describe("media paths outside the project's uploads", () => {
   it("still copies the project's own images, sizes and files", async () => {
     assert.equal(await fs.readFile(path.join(exportDir, "assets", "images", "real-large.jpg"), "utf8"), "real-large");
     assert.equal(await fs.readFile(path.join(exportDir, "assets", "files", "real.pdf"), "utf8"), "real-pdf");
+    assert.equal(await fs.readFile(path.join(exportDir, "assets", "files", "real.mp4"), "utf8"), "real-mp4");
   });
 });
 

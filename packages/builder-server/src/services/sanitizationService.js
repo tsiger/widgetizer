@@ -153,6 +153,21 @@ export function sanitizeImageSettingValue(value) {
   return isSafeImagePath(v) ? v : "";
 }
 
+const VIDEO_UPLOAD_PATH_RE = /^\/uploads\/files\/[A-Za-z0-9._-]+\.mp4$/i;
+
+/**
+ * Sanitize a `video` setting value: an MP4 in the project's file uploads, or "". Anything
+ * else (an external URL, another file type, a non-string, a resolved preview URL) is blanked,
+ * so templates can build the playable URL from the basename without re-checking it.
+ * @param {*} value
+ * @returns {string}
+ */
+export function sanitizeVideoPath(value) {
+  if (typeof value !== "string") return "";
+  const v = value.trim();
+  return VIDEO_UPLOAD_PATH_RE.test(v) && !v.includes("..") ? v : "";
+}
+
 /**
  * Sanitize a `gallery` value: an ordered array of upload-path strings. Each entry is
  * kept only if it is a safe upload image path; anything else (a non-string, a bad path)
@@ -247,6 +262,7 @@ function sanitizeSettingValue(value, setting) {
   // so an image setting is always a safe string ("" or a valid path) everywhere.
   if (type === "gallery") return sanitizeGalleryValue(value);
   if (type === "image") return sanitizeImageSettingValue(value);
+  if (type === "video") return sanitizeVideoPath(value);
   if (type === "date") return sanitizeDateValue(value);
   if (value == null) return value;
 
@@ -369,6 +385,15 @@ function sanitizeThemeSettingValue(value, schema) {
     else img = sanitizeImageSettingValue(schema.default);
     return { value: img, corrected: JSON.stringify(img) !== JSON.stringify(value) };
   }
+  // Same fallback rules as image: keep a valid path or an explicit clear, else use the default.
+  if (schema.type === "video") {
+    const cleaned = sanitizeVideoPath(value);
+    let video;
+    if (cleaned !== "") video = cleaned;
+    else if (typeof value === "string" && value.trim() === "") video = "";
+    else video = sanitizeVideoPath(schema.default);
+    return { value: video, corrected: JSON.stringify(video) !== JSON.stringify(value) };
+  }
   if (value === undefined || value === null) return { value, corrected: false };
 
   let sanitized;
@@ -413,7 +438,6 @@ function sanitizeThemeSettingValue(value, schema) {
     case "date":
       sanitized = sanitizeDateValue(value);
       break;
-    case "video":
     case "audio":
     case "icon":
     case "menu":

@@ -20,6 +20,7 @@ import { Hash, TokenKind, toValueSync } from "liquidjs";
 import { createLiquidEngine } from "@widgetizer/render-engine";
 import { splitAssetRef } from "@widgetizer/core/assetUrl";
 import { validateCollectionSchema } from "../packages/builder-server/src/services/collectionService.js";
+import { sanitizeVideoPath } from "../packages/builder-server/src/services/sanitizationService.js";
 import { buildContract } from "./build-theme-skill-contract.js";
 
 export function validateTheme(dir) {
@@ -54,7 +55,6 @@ export function validateTheme(dir) {
     image_picker: "image",
     img: "image",
     images: "gallery",
-    video: "youtube",
     video_url: "youtube",
     dropdown: "select",
     color_picker: "color",
@@ -367,6 +367,12 @@ export function validateTheme(dir) {
         if (typeof value !== "string") expect("a file path string");
         else if (value !== "" && !value.startsWith("/uploads/files/")) {
           problems.push(`"${value}" must be empty or start with /uploads/files/`);
+        }
+        break;
+      case "video":
+        if (typeof value !== "string") expect("an MP4 path string");
+        else if (value !== "" && sanitizeVideoPath(value) !== value) {
+          problems.push(`"${value}" must be empty or an /uploads/files/<name>.mp4 path`);
         }
         break;
       case "gallery":

@@ -1365,6 +1365,82 @@ describe("File asset usage tracking", () => {
   });
 });
 
+describe("MP4 video usage tracking", () => {
+  const TOUR = "video-tour";
+  const TEASER = "video-teaser";
+  const videoFiles = () => [
+    ...defaultMediaFiles(),
+    { id: TOUR, filename: "tour.mp4", path: "/uploads/files/tour.mp4", type: "video/mp4", usedIn: [] },
+    { id: TEASER, filename: "teaser.mp4", path: "/uploads/files/teaser.mp4", type: "video/mp4", usedIn: [] },
+  ];
+  const usedIn = async (id) => [...(await readMediaJson()).files.find((f) => f.id === id).usedIn].sort();
+  const pageWithVideo = (video, blockVideo) => ({
+    widgets: {
+      w1: {
+        type: "video-embed",
+        settings: { video_file: video, poster: "/uploads/images/hero.jpg" },
+        blocks: blockVideo ? { b1: { settings: { clip: blockVideo } } } : {},
+      },
+    },
+  });
+
+  beforeEach(async () => {
+    await seedMediaJson(videoFiles());
+  });
+
+  it("tracks a video in widget and block settings, then follows a replacement and removal", async () => {
+    await updatePageMediaUsage(PROJECT_ID, "uuid-home", pageWithVideo("/uploads/files/tour.mp4", "/uploads/files/teaser.mp4"));
+    assert.deepEqual(await usedIn(TOUR), ["page:uuid-home"]);
+    assert.deepEqual(await usedIn(TEASER), ["page:uuid-home"]);
+    assert.deepEqual(await usedIn(IMG1), ["page:uuid-home"]);
+
+    await updatePageMediaUsage(PROJECT_ID, "uuid-home", pageWithVideo("/uploads/files/teaser.mp4"));
+    assert.deepEqual(await usedIn(TOUR), []);
+    assert.deepEqual(await usedIn(TEASER), ["page:uuid-home"]);
+
+    await updatePageMediaUsage(PROJECT_ID, "uuid-home", pageWithVideo(""));
+    assert.deepEqual(await usedIn(TEASER), []);
+  });
+
+  it("keeps a shared video in use until its last page lets go", async () => {
+    await updatePageMediaUsage(PROJECT_ID, "uuid-home", pageWithVideo("/uploads/files/tour.mp4"));
+    await updatePageMediaUsage(PROJECT_ID, "uuid-about", pageWithVideo("/uploads/files/tour.mp4"));
+    assert.deepEqual(await usedIn(TOUR), ["page:uuid-about", "page:uuid-home"]);
+
+    await updatePageMediaUsage(PROJECT_ID, "uuid-home", pageWithVideo(""));
+    assert.deepEqual(await usedIn(TOUR), ["page:uuid-about"]);
+
+    await removePageFromMediaUsage(PROJECT_ID, "uuid-about");
+    assert.deepEqual(await usedIn(TOUR), []);
+  });
+
+  it("tracks videos in collection items and theme settings", async () => {
+    await updateCollectionItemMediaUsage(PROJECT_ID, { uuid: "item-1", settings: { clip: "/uploads/files/tour.mp4" } }, "news");
+    await updateThemeSettingsMediaUsage(PROJECT_ID, {
+      settings: { global: { media: [{ type: "video", id: "intro", value: "/uploads/files/teaser.mp4" }] } },
+    });
+    assert.deepEqual(await usedIn(TOUR), ["collection:item-1"]);
+    assert.deepEqual(await usedIn(TEASER), ["global:theme-settings"]);
+  });
+
+  it("rebuilds video usage from the saved files on a full refresh", async () => {
+    const pagesDir = getProjectPagesDir(PROJECT_FOLDER);
+    const before = await fs.readdir(pagesDir);
+    await fs.writeJson(path.join(pagesDir, "video-page.json"), { uuid: "uuid-video", ...pageWithVideo("/uploads/files/tour.mp4") });
+    const files = videoFiles();
+    files.find((f) => f.id === TEASER).usedIn = ["page:uuid-gone"];
+    await seedMediaJson(files);
+    try {
+      await refreshAllMediaUsage(PROJECT_ID);
+      assert.ok((await usedIn(TOUR)).includes("page:uuid-video"));
+      assert.deepEqual(await usedIn(TEASER), []);
+    } finally {
+      await fs.remove(path.join(pagesDir, "video-page.json"));
+      assert.deepEqual(await fs.readdir(pagesDir), before);
+    }
+  });
+});
+
 // ============================================================================
 // refreshAllMediaUsageFromDir — dir-explicit core
 // ============================================================================

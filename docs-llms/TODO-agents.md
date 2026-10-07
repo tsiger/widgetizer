@@ -214,16 +214,6 @@ The containment checks that keep file-sourced paths inside their folder compare 
 
 **Start:** [themeUpdateService.js](../packages/builder-server/src/services/themeUpdateService.js), [exportController.js](../packages/builder-server/src/controllers/exportController.js), [pathSecurity.js](../packages/builder-server/src/utils/pathSecurity.js). **Source:** 2026-10-06 reviews of the BACKUP-TRUST fixes.
 
-### MEDIA-MP4 · Support uploaded MP4 videos on site pages
-
-**Open · Unrated · Shared**
-
-Needed for the Widgetizer marketing site. Planned follow-up: **2026-10-02**. Support uploading MP4 (`video/mp4`), selecting it in page widgets and playing it in preview and published/exported pages. First check the existing media/file path and theme controls to identify the missing pieces; keep the initial scope to MP4 playback.
-
-**Done when:** A real MP4 can be uploaded, selected, saved and played in preview and exported output, with correct asset URLs and media-usage tracking; existing image/file workflows still work.
-
-**Start:** [Media system](core-media.md), [MIME types](../packages/core/src/utils/mimeTypes.js), [upload validation](../packages/editor-ui/src/utils/uploadValidation.js), [file input](../packages/editor-ui/src/components/settings/inputs/FileInput.jsx) and [export controller](../packages/builder-server/src/controllers/exportController.js). **Source:** User request, 2026-10-01.
-
 ## Fixes and investigations
 
 ### R-THEME-SAVE · Keep theme-settings saves in order
@@ -468,6 +458,28 @@ Duplicate checks the new folder name against the database only (`projectControll
 **Done when:** Each case gives a correct finding (or none) instead of a false pass, false error or crash, with a test per case in the theme-skill tests.
 
 **Start:** [validate-theme.js](../scripts/validate-theme.js), [build-theme-skill-contract.js](../scripts/build-theme-skill-contract.js), [themeSkill.test.js](../packages/builder-server/src/tests/themeSkill.test.js). **Source:** 2026-10-05 code review of `9e98dad7..e2f61b21`.
+
+### PREVIEW-SCRIPT-URL · A malformed theme script address stops a widget's live preview
+
+**Open · Low · Shared**
+
+`morphWidget` in `previewRuntime.js` (~1042) resolves each enqueued stylesheet/script address with `new URL(url, document.baseURI)` to de-duplicate it. A syntactically invalid address (e.g. `http://[cdn.example/x.js`, not merely a 404) throws there, the surrounding `try` (~1012-1069) returns false, and the widget's new markup is never applied: the editor posts `WIDGET_MORPH_FAILED`, which nothing handles, so that widget stops updating until the preview reloads. A full page load only loses the one script. Not reproduced; only a broken theme triggers it.
+
+**Done when:** An address that can't be resolved is skipped (or left to the browser) and the rest of the morph still applies, with a runtime test.
+
+**Start:** [previewRuntime.js](../packages/core/src/runtime/previewRuntime.js), [previewRuntimeMedia.test.js](../packages/core/src/runtime/__tests__/previewRuntimeMedia.test.js). **Source:** 2026-10-07 review of `b9c9fc13`.
+
+### VIDEO-EMBED-FILTER · Turn YouTube/Vimeo links into embed addresses in one core filter
+
+**Open · Low · Shared**
+
+Arch recognises video links in Liquid by substring (`contains 'youtube.com/watch'`, `'vimeo.com/'`…) and splits out the ID. Every branch now rebuilds the address on `youtube.com/embed/` or `player.vimeo.com/video/` and refuses an ID containing `.`, `%` or `:`, so a frame stays on the provider's embed path, but the ID's shape isn't checked (a wrong-length or misspelled ID gives a broken player, not none), the same ~40 lines are duplicated, `youtube.com/shorts/ID` and `vimeo.com/ID/<hash>` (unlisted share links) aren't recognised, and `youtu.be`/watch links drop options like `t=`. Core already parses YouTube links in `extractVideoId` (`youtubeHelpers.js`, used by the `youtube` setting type and `{% youtube %}`).
+
+Add a filter, e.g. `{{ url | video_embed_url }}`: parse with `URL`, accept exact hosts (`youtube.com`, `www.`/`m.youtube.com`, `youtu.be`, `youtube-nocookie.com`, `vimeo.com`, `www.vimeo.com`, `player.vimeo.com`), check the ID shape (YouTube 11 of `[A-Za-z0-9_-]`, Vimeo digits), keep only allowed options (start time, Vimeo `h`), return `https://www.youtube.com/embed/ID` / `https://player.vimeo.com/video/ID` or "". Use it in Arch at the URL-parsing block of `widgets/video-embed/widget.liquid` (feeds the iframe `src`) and `widgets/video-popup/widget.liquid` (feeds `data-video-url`, which `video-modal.js` opens with `autoplay=1`), and in their `updates/<version>/` copies. No other Arch template parses video links (profile-grid/team-highlight/social-icons only link to YouTube channels through `safe_url`).
+
+**Done when:** Both widgets use the filter; filter tests cover each accepted form, a look-alike host, a bad ID and kept/dropped options; the existing `videoEmbedWidget.test.js` address cases still pass; theming docs, `docs-website` theme-dev pages and the theme-skill references list it, and the skill contract is regenerated.
+
+**Start:** [youtubeHelpers.js](../packages/core/src/utils/youtubeHelpers.js), [safeUrlFilter.js](../packages/core/src/filters/safeUrlFilter.js) (registration pattern), [renderEngine.js](../packages/render-engine/src/renderEngine.js), [video-embed](../themes/arch/widgets/video-embed/widget.liquid), [video-popup](../themes/arch/widgets/video-popup/widget.liquid), [videoEmbedWidget.test.js](../packages/builder-server/src/tests/videoEmbedWidget.test.js), [build-theme-skill-contract.js](../scripts/build-theme-skill-contract.js). **Source:** 2026-10-07 review of `b9c9fc13`.
 
 ### T66 · Explain form errors beside the right field
 

@@ -2,7 +2,7 @@
 
 Canonical reference for the Media Library: per-project file storage and image resizing, the SQLite metadata model, usage tracking (pages, global widgets, theme settings, collection items), audio/range streaming, the Media page + hooks, and the media controller/routes/usage service.
 
-The library is a single **asset system** spanning two categories — `image` and `file` (PDFs, audio) — managed together and scoped per project. There is no separate "Files" page or parallel storage model; file assets are first-class media records that share usage tracking, deletion protection, and export participation with images. See [Export System](core-export.md) for how used file assets are copied into static exports.
+The library is a single **asset system** spanning two categories — `image` and `file` (PDFs, audio, video) — managed together and scoped per project. There is no separate "Files" page or parallel storage model; file assets are first-class media records that share usage tracking, deletion protection, and export participation with images. See [Export System](core-export.md) for how used file assets are copied into static exports.
 
 ## 1. Architecture & Data Storage
 
@@ -11,7 +11,7 @@ The library is a single **asset system** spanning two categories — `image` and
 Uploaded binaries are stored through the **`AssetStorageAdapter`** (local FS in OSS, cloud object storage in hosted), scoped per project. The OSS adapter maps adapter keys to on-disk paths:
 
 - **Images**: `data/projects/{folderName}/uploads/images/`
-- **Files** (PDFs, audio): `data/projects/{folderName}/uploads/files/`
+- **Files** (PDFs, audio, video): `data/projects/{folderName}/uploads/files/`
 
 The controller chooses the subdir inline from `getMediaCategory(file.mimetype)` (`packages/builder-server/src/utils/mimeTypes.js`): `"image"` MIME types go to `images/`, everything else (PDF, audio) to `files/`. The adapter key is `${subdir}/${filename}` (originals) or `images/${variantFilename}` (generated sizes) — the historical disk layout minus the `/uploads/` URL prefix. There is no `getMediaDir` path-builder; the backend never constructs absolute paths from user input — all binary I/O routes through the adapter over `req.scope`. See [Packages & Adapter Architecture](core-packages.md).
 
@@ -40,7 +40,7 @@ Upload size is enforced at **two** points:
 1. **Streaming gate (SA-02)** — `uploadWithLimit` builds a per-request `multer` whose `limits.fileSize` is sourced from the `LimitsAdapter` (`LIMIT_KEYS.MAX_UPLOAD_SIZE_BYTES`). An oversize part is rejected mid-stream **before** the whole file is buffered into memory; `errorHandler` maps multer's `LIMIT_FILE_SIZE` to `413`. OSS returns a finite cap from app settings (default fallback `10 MB` when no adapter is wired); hosted returns its tenant ceiling.
 2. **Post-buffer gate** — inside `uploadProjectMedia`, each buffered file is re-checked against `media.maxFileSizeMB` (App Settings); over-limit files are reported in `rejectedFiles` with a human-readable reason rather than throwing.
 
-The streaming gate is the DoS-safe floor; the post-buffer gate enforces the user-configurable per-file limit. File-type acceptance is enforced by multer's `fileFilter` (`mediaUploadFileFilter`): the declared MIME must be in `ALLOWED_MIME_TYPES`, the extension in `ALLOWED_UPLOAD_EXTENSIONS`, **and the two must agree** (the MIME must be the extension's canonical content type; `audio/mp3` alias accepted for `.mp3`). The declared MIME is client-controlled while the stored extension drives the served `Content-Type` and processing branches on MIME — so allowlisting each independently isn't enough (e.g. an SVG declared `image/jpeg` would skip SVG sanitization).
+The streaming gate is the DoS-safe floor; the post-buffer gate enforces the user-configurable per-file limit. File-type acceptance is enforced by multer's `fileFilter` (`mediaUploadFileFilter`): the declared MIME must be in `ALLOWED_MIME_TYPES`, the extension in `ALLOWED_UPLOAD_EXTENSIONS`, **and the two must agree** (the MIME must be the extension's canonical content type; `audio/mp3` alias accepted for `.mp3`; `.mp4` only as `video/mp4`). The declared MIME is client-controlled while the stored extension drives the served `Content-Type` and processing branches on MIME — so allowlisting each independently isn't enough (e.g. an SVG declared `image/jpeg` would skip SVG sanitization).
 
 ### Image Sizes (App Settings + Theme Overrides)
 
@@ -112,30 +112,39 @@ API responses assemble a `files` array from these rows:
 }
 ```
 
-Non-image records (PDFs, audio) carry `width: null`, `height: null`, and `sizes: {}` — no resizing, no dimension extraction.
+Non-image records (PDFs, audio, video) carry `width: null`, `height: null`, and `sizes: {}` — no resizing, no dimension extraction.
 
 ### Media Type Configuration
 
 MIME/accept definitions are centralized:
 
 - **Backend** (`packages/builder-server/src/utils/mimeTypes.js`):
-  - `ALLOWED_MIME_TYPES` — upload allowlist: `image/jpeg`, `image/png`, `image/gif`, `image/webp`, `image/svg+xml`, `application/pdf`, `audio/mpeg`, `audio/mp3`.
-  - `ALLOWED_UPLOAD_EXTENSIONS` — the extension half of upload acceptance (`.jpg .jpeg .png .gif .webp .svg .pdf .mp3`), mirroring `ALLOWED_MIME_TYPES`. Both must pass: the declared MIME alone is client-controlled, and serving derives the response `Content-Type` from the stored extension — a MIME-only check would let a crafted `x.html` upload in and back out as executable `text/html`.
+  - `ALLOWED_MIME_TYPES` — upload allowlist: `image/jpeg`, `image/png`, `image/gif`, `image/webp`, `image/svg+xml`, `application/pdf`, `audio/mpeg`, `audio/mp3`, `video/mp4`.
+  - `ALLOWED_UPLOAD_EXTENSIONS` — the extension half of upload acceptance (`.jpg .jpeg .png .gif .webp .svg .pdf .mp3 .mp4`), mirroring `ALLOWED_MIME_TYPES`. Both must pass: the declared MIME alone is client-controlled, and serving derives the response `Content-Type` from the stored extension — a MIME-only check would let a crafted `x.html` upload in and back out as executable `text/html`.
   - `ZIP_MIME_TYPES` — ZIP archive validation (project import / theme upload).
-  - `getMediaCategory(mimeType)` — `"image"` for image MIME types, `"file"` for everything else (PDF, audio); decides the upload subdir inline in the controller.
+  - `getMediaCategory(mimeType)` — `"image"` for image MIME types, `"file"` for everything else (PDF, audio, video); decides the upload subdir inline in the controller.
   - `getContentType(ext)` / `CONTENT_TYPES` — re-exported from `@widgetizer/core/mimeTypes` (single source of truth shared with the local asset adapter); resolves an extension to a MIME type for `Content-Type` headers.
 - **Frontend** (`packages/editor-ui/src/utils/uploadValidation.js`): a family of accept objects drives the upload UIs —
-  - `IMAGE_ACCEPT` (jpeg/jpg, png, gif, webp, svg), `FILE_ACCEPT` (pdf), `AUDIO_ACCEPT` (mp3).
-  - `NON_IMAGE_ACCEPT` = `{ ...FILE_ACCEPT, ...AUDIO_ACCEPT }` — what the `file` category covers; shared by every `filterType="file"` surface (the media drawer uploader, `FileInput`).
-  - `MEDIA_ACCEPT` = `{ ...IMAGE_ACCEPT, ...AUDIO_ACCEPT, ...FILE_ACCEPT }` — the main Media Library uploader.
+  - `IMAGE_ACCEPT` (jpeg/jpg, png, gif, webp, svg), `FILE_ACCEPT` (pdf), `AUDIO_ACCEPT` (mp3), `VIDEO_ACCEPT` (mp4).
+  - `NON_IMAGE_ACCEPT` = `{ ...FILE_ACCEPT, ...AUDIO_ACCEPT, ...VIDEO_ACCEPT }` — what the `file` category covers; shared by every `filterType="file"` surface (the media drawer uploader, `FileInput`).
+  - `MEDIA_ACCEPT` = `{ ...IMAGE_ACCEPT, ...AUDIO_ACCEPT, ...VIDEO_ACCEPT, ...FILE_ACCEPT }` — the main Media Library uploader.
   - Client-side helpers: `validateFileSizes`, `mapDropzoneRejections`, ZIP validation.
 
 ### Audio Files & Range Requests
 
-`.mp3` audio is an accepted upload type but **not** a separate storage category: `getMediaCategory` returns `"file"` for any non-image MIME, so audio binaries live under `uploads/files/` alongside PDFs, with `width/height: null` and `sizes: {}`. In the media UI the type filter groups audio under **file** (`all` / `image` / `file`; everything non-image is "file").
+`.mp3` audio is an accepted upload type but **not** a separate storage category: `getMediaCategory` returns `"file"` for any non-image MIME, so audio binaries live under `uploads/files/` alongside PDFs, with `width/height: null` and `sizes: {}`. In the media UI the type filter offers `all` / `image` / `audio` / `video` / `file`; `audio` and `video` are views by MIME, and `file` stays everything non-image.
 
 - Accepted MIME: `audio/mpeg` and `audio/mp3` are in `ALLOWED_MIME_TYPES`; the extension map resolves `.mp3 → audio/mpeg`. Front-end validation accepts `.mp3` via `AUDIO_ACCEPT`/`NON_IMAGE_ACCEPT`.
 - The Arch theme's `audio-player` widget points each `track` block's `file` setting at an uploaded `.mp3` (with an `image` cover); audio playback is theme-rendered — there is no core audio widget.
+
+### Video Files (MP4)
+
+`.mp4` uploads follow the same path as audio: a `file` record under `uploads/files/`, original bytes kept, served as `video/mp4`, no processing, no poster generation and no transcoding. The upload cap is the shared `media.maxFileSizeMB`; there is no separate video limit. Old backups' `/uploads/videos/` paths are still accepted on import but nothing writes there.
+
+- The `video` setting type stores an `/uploads/files/<name>.mp4` path or `""` (see [Setting Types](theming-setting-types.md#video)). `sanitizeVideoPath` blanks anything else — external URLs, other file types, resolved preview URLs — for widget, block, collection and theme values alike; collections count an invalid value on a required field as missing, and `scripts/validate-theme.js` applies the same rule to defaults.
+- Usage tracking, deletion protection and export need nothing video-specific: the path is an ordinary `/uploads/files/` string.
+- Playback is the visitor's browser decoding the file. H.264/AAC MP4 plays everywhere; other codecs inside an `.mp4` (HEVC, for one) may not, and a corrupt file uploads fine. The Arch `video-embed` widget shows a translated message when the `<video>` element reports an error.
+- In the editor preview a click on a `<video>`/`<audio>` keeps its default action (the native controls) while still selecting the widget, and a widget's enqueued scripts are de-duplicated by resolved URL when it is re-rendered.
 
 **Byte-range streaming (HTTP 206).** `serveProjectMedia` honours `Range` requests so an `<audio>`/`<video>` element can seek without downloading the whole file:
 
@@ -258,14 +267,14 @@ See [Custom Hooks](core-hooks.md) for hook-by-hook detail.
 - `MediaGrid` / `MediaGridItem` — thumbnail cards with usage badges; non-images show a `FileText` icon + extension badge.
 - `MediaList` / `MediaListItem` — table view with select-all and per-row detail.
 - `MediaDrawer` — slide-out metadata editor (alt, title, caption).
-- `MediaSelectorDrawer` — media browser used inside setting inputs to pick existing files. Supports an "Upload" button (OS file dialog), search, and a `filterType` (`image` / `audio` / `file` / `all`) that adjusts upload accept types; images show thumbnails, files show an icon + extension badge. With `showTypeFilter`, it also renders a type dropdown next to search (All / Images / Audio / Files) so the user can switch type in-drawer — used by the richtext "Link to file" picker, which opens on `all`.
+- `MediaSelectorDrawer` — media browser used inside setting inputs to pick existing files. Supports an "Upload" button (OS file dialog), search, and a `filterType` (`image` / `audio` / `video` / `file` / `all`) that adjusts upload accept types; images show thumbnails, files show an icon + extension badge. With `showTypeFilter`, it also renders a type dropdown next to search (All / Images / Audio / Videos / Files) so the user can switch type in-drawer — used by the richtext "Link to file" picker, which opens on `all`.
 
 The thumbnail/preview path falls back to the original image when a `thumb` variant is unavailable. Copy-URL is available on media items (copies the relative storage path) so a file URL can be pasted into generic link fields.
 
 ### Setting Inputs (`packages/editor-ui/src/components/settings/inputs/`)
 
 - `ImageInput` — image picker with **default** mode (wide preview, Upload + Browse below) and **compact** mode (`compact: true` — square preview with stacked actions and hover Edit/Remove; used for small assets like the Arch `favicon`). Opens `MediaSelectorDrawer` with `filterType="image"`.
-- `FileInput` — filename-oriented picker for file assets (`type: "file"` in `SettingsRenderer`). Upload accepts `NON_IMAGE_ACCEPT`; Browse opens `MediaSelectorDrawer` with `filterType="file"`. Shows filename + extension badge + clear; no thumbnail. `value` is the file path string (e.g. `/uploads/files/brochure.pdf`). See [Setting Types](theming-setting-types.md) for the `file` type.
+- `FileInput` — filename-oriented picker for file assets (`type: "file"` in `SettingsRenderer`; also `type: "video"` with `filterType="video"`). In file mode upload accepts `NON_IMAGE_ACCEPT` and Browse opens `MediaSelectorDrawer` with `filterType="file"`; in video mode both are MP4-only and a non-MP4 selection is refused. Shows filename + extension badge + clear; no thumbnail. `value` is the file path string (e.g. `/uploads/files/brochure.pdf`). See [Setting Types](theming-setting-types.md) for the `file` type.
 
 `MediaSelectorDrawer` is also used by `PageForm` (featured image). The Arch theme's `resource-list` widget uses the `file` setting type for download lists.
 
@@ -279,7 +288,7 @@ Upload validation (MIME allowlist, two-gate size enforcement, decompression-bomb
 
 - [App Settings](core-appSettings.md) — image-processing quality/sizes and the upload size limit.
 - [Export System](core-export.md) — used image and file assets copied into static exports with path rewriting.
-- [Setting Types](theming-setting-types.md) — the `image` and `file` setting types.
+- [Setting Types](theming-setting-types.md) — the `image`, `file` and `video` setting types.
 - [Collections](core-collections.md) — collection-item media usage tracking.
 - [Custom Hooks](core-hooks.md) — Media hook deep-dives.
 - [Packages & Adapter Architecture](core-packages.md) — `AssetStorageAdapter`, `LimitsAdapter`, `Scope`, `LIMIT_KEYS`.

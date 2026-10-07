@@ -42,6 +42,7 @@ import {
   sanitizeCollectionItemData,
   sanitizeDateValue,
   sanitizeImagePath,
+  sanitizeVideoPath,
   stripHtmlToText,
 } from "./sanitizationService.js";
 
@@ -418,6 +419,7 @@ function isMissingValue(value, type, columns) {
   if (type === "link") {
     return !value || typeof value.href !== "string" || value.href.trim() === "";
   }
+  if (type === "video") return sanitizeVideoPath(value) === "";
   if (value === undefined || value === null) return true;
   if (typeof value === "string") return value.trim() === "";
   return false; // numbers and booleans count as present (0 / false are valid)

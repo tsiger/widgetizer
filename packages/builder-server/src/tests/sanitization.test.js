@@ -24,6 +24,7 @@ import {
   sanitizeThemeSettings,
   sanitizeImagePath,
   sanitizeImageSettingValue,
+  sanitizeVideoPath,
 } from "../services/sanitizationService.js";
 
 // ============================================================================
@@ -1000,6 +1001,82 @@ describe("image setting sanitization (entry points)", () => {
     assert.equal(byId.bad, "/default-logo.png"); // reverted to default, not erased
     assert.equal(byId.cleared, ""); // explicit clear preserved
     assert.equal(byId.nulled, "/default-logo.png"); // null reverts, doesn't wipe the default
+  });
+});
+
+describe("video setting sanitization", () => {
+  it("keeps only an MP4 in the project's file uploads", () => {
+    assert.equal(sanitizeVideoPath("/uploads/files/tour.mp4"), "/uploads/files/tour.mp4");
+    assert.equal(sanitizeVideoPath("  /uploads/files/Legacy.MP4 "), "/uploads/files/Legacy.MP4");
+    for (const bad of [
+      "",
+      null,
+      undefined,
+      42,
+      { path: "/uploads/files/tour.mp4" },
+      "/uploads/files/song.mp3",
+      "/uploads/files/brochure.pdf",
+      "/uploads/images/tour.mp4",
+      "/uploads/videos/tour.mp4",
+      "uploads/files/tour.mp4",
+      "https://cdn.example/tour.mp4",
+      "//cdn.example/uploads/files/tour.mp4",
+      "/api/media/projects/p1/uploads/files/tour.mp4",
+      "/uploads/files/../secret.mp4",
+      "/uploads/files/sub/tour.mp4",
+      '/uploads/files/x" onerror="alert(1).mp4',
+      "/uploads/files/a b.mp4",
+      "javascript:alert(1)//.mp4",
+    ]) {
+      assert.equal(sanitizeVideoPath(bad), "", JSON.stringify(bad));
+    }
+  });
+
+  it("applies the same rule to widget, block and collection values, null included", () => {
+    const schema = {
+      settings: [{ id: "video", type: "video" }, { id: "other", type: "video" }, { id: "gone", type: "video" }],
+      blocks: [{ type: "clip", settings: [{ id: "video", type: "video" }] }],
+    };
+    const data = {
+      settings: { video: "/uploads/files/tour.mp4", other: "https://youtube.com/watch?v=x", gone: null },
+      blocks: { b1: { type: "clip", settings: { video: "/uploads/files/song.mp3" } } },
+    };
+    sanitizeWidgetData(data, schema);
+    assert.equal(data.settings.video, "/uploads/files/tour.mp4");
+    assert.equal(data.settings.other, "");
+    assert.equal(data.settings.gone, "");
+    assert.equal(data.blocks.b1.settings.video, "");
+
+    const item = { settings: { clip: { src: "/uploads/files/tour.mp4" }, ok: "/uploads/files/ok.mp4" } };
+    sanitizeCollectionItemData(item, { settings: [{ id: "clip", type: "video" }, { id: "ok", type: "video" }] });
+    assert.equal(item.settings.clip, "");
+    assert.equal(item.settings.ok, "/uploads/files/ok.mp4");
+  });
+
+  it("keeps a valid theme video or an explicit clear, and reverts anything else to a valid default", () => {
+    const themeData = {
+      settings: {
+        global: {
+          media: [
+            { type: "video", id: "ok", value: "/uploads/files/intro.mp4", default: "" },
+            { type: "video", id: "cleared", value: "", default: "/uploads/files/default.mp4" },
+            { type: "video", id: "bad", value: "/uploads/files/intro.mov", default: "/uploads/files/default.mp4" },
+            { type: "video", id: "nulled", value: null, default: "/uploads/files/default.mp4" },
+            { type: "video", id: "object", value: { url: "x" }, default: "" },
+            { type: "video", id: "badDefault", value: 7, default: "https://cdn.example/x.mp4" },
+          ],
+        },
+      },
+    };
+    const { data, warnings } = sanitizeThemeSettings(themeData);
+    const byId = Object.fromEntries(data.settings.global.media.map((s) => [s.id, s.value]));
+    assert.equal(byId.ok, "/uploads/files/intro.mp4");
+    assert.equal(byId.cleared, "");
+    assert.equal(byId.bad, "/uploads/files/default.mp4");
+    assert.equal(byId.nulled, "/uploads/files/default.mp4");
+    assert.equal(byId.object, "");
+    assert.equal(byId.badDefault, "");
+    assert.equal(warnings.length, 4);
   });
 });
 

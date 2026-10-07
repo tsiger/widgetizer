@@ -173,14 +173,6 @@ The checks that keep theme updates and exports inside their own folders look at 
 
 **Next:** Decide whether to refuse such shortcuts or to document that project folders must not contain them.
 
-### MEDIA-MP4 · Support uploaded MP4 videos on site pages
-
-**Open · Unrated · Shared**
-
-The Widgetizer marketing site needs MP4 videos on some pages. We should be able to upload a video, choose it in a page widget and play it in both the preview and the published/exported site.
-
-**Next:** Pick this up on **2026-10-02**. Check what the current media tools already support, add the missing pieces and verify the complete workflow with a real MP4, including saved references and export.
-
 ## Fixes and investigations
 
 ### R-THEME-SAVE · Keep theme-settings saves in order
@@ -365,6 +357,22 @@ After an unlikely sequence (a language is removed, another tab switches project,
 The new theme checker passes some things that break in an export (thumbnail-size images, image files placed inside a widget folder, image sizes without a width). It crashes on one valid template tag, and it reports wrong results for themes that use linked folders or odd preset names.
 
 **Next:** Fix each case so the checker gives the right answer, with a test for each.
+
+### PREVIEW-SCRIPT-URL · A malformed theme script address stops a widget's live preview
+
+**Open · Low · Shared**
+
+If a theme widget loads a script whose address is badly written (a typo that makes it not a valid address at all), the editor preview stops showing your edits to that widget until the preview reloads. The published site and the first page load are fine; only that one script fails there.
+
+**Next:** Skip an address that can't be read and still apply the widget's update, with a test.
+
+### VIDEO-EMBED-FILTER · Turn YouTube/Vimeo links into embed addresses in one core filter
+
+**Open · Low · Shared**
+
+Arch's Video and Video popup widgets each work out a YouTube or Vimeo link by looking for bits of text in it. They now always point the player at YouTube's or Vimeo's player, but a mistyped video ID still shows a broken player instead of none, don't understand YouTube Shorts or unlisted Vimeo share links, and repeat the same code twice.
+
+**Next:** Add one shared filter in the app that reads the link properly and returns a safe player address (or nothing), use it in both widgets, and document it for theme authors.
 
 ### T66 · Explain form errors beside the right field
 
