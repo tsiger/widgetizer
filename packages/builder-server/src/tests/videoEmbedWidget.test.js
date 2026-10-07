@@ -47,6 +47,7 @@ before(async () => {
   const projectDir = getProjectDir(PROJECT_FOLDER);
   await fs.ensureDir(getProjectPagesDir(PROJECT_FOLDER));
   await fs.copy(path.resolve("themes/arch/widgets/video-embed"), path.join(projectDir, "widgets", "video-embed"));
+  await fs.copy(path.resolve("themes/arch/widgets/video-popup"), path.join(projectDir, "widgets", "video-popup"));
   await fs.copy(path.resolve("themes/arch/locales"), path.join(projectDir, "locales"));
   await writeMediaFile(PROJECT_ID, {
     files: [
@@ -74,7 +75,7 @@ function markup(html) {
   return html.replace(/<style[\s\S]*?<\/style>/gi, "").replace(/<script[\s\S]*?<\/script>/gi, "");
 }
 
-async function render(settings, { mode = "preview", prefix = "" } = {}) {
+async function render(settings, { mode = "preview", prefix = "", type = "video-embed" } = {}) {
   const globals = {
     projectId: PROJECT_ID,
     apiUrl: "",
@@ -86,7 +87,7 @@ async function render(settings, { mode = "preview", prefix = "" } = {}) {
   const html = await renderWidget(
     PROJECT_ID,
     "video-1",
-    { type: "video-embed", settings: { video_url: YOUTUBE, ...settings } },
+    { type, settings: { video_url: YOUTUBE, ...settings } },
     THEME_SETTINGS,
     mode,
     globals,
@@ -162,4 +163,53 @@ describe("video-embed with an uploaded MP4", () => {
     assert.ok(nested.includes('src="../assets/files/tour.mp4"'), nested);
     assert.ok(nested.includes('poster="../assets/images/tour-poster-large.jpg"'), nested);
   });
+});
+
+// The embed address is always built from the video's ID, never copied from what
+// the owner typed, so a frame can only point at YouTube or Vimeo.
+describe("YouTube and Vimeo addresses", () => {
+  const embedFor = async (type, video_url) => {
+    const { html } = await render({ video_url }, { type });
+    const match = type === "video-popup" ? html.match(/data-video-url="([^"]*)"/) : html.match(/<iframe[^>]*\ssrc="([^"]*)"/);
+    return match?.[1] ?? "";
+  };
+
+  for (const type of ["video-embed", "video-popup"]) {
+    it(`${type}: turns each supported form into an embed address`, async () => {
+      const cases = {
+        "https://www.youtube.com/watch?v=c9OnQEHUpvI": "https://www.youtube.com/embed/c9OnQEHUpvI",
+        "https://youtu.be/c9OnQEHUpvI?si=abc": "https://www.youtube.com/embed/c9OnQEHUpvI",
+        "https://www.youtube.com/embed/c9OnQEHUpvI?start=30": "https://www.youtube.com/embed/c9OnQEHUpvI?start=30",
+        "https://vimeo.com/76979871": "https://player.vimeo.com/video/76979871",
+        "https://player.vimeo.com/video/76979871?h=8272103f6e": "https://player.vimeo.com/video/76979871?h=8272103f6e",
+        // A fragment would swallow the popup's "&autoplay=1"; a second "?" stays inside the options.
+        "https://www.youtube.com/embed/c9OnQEHUpvI?start=30#chapter": "https://www.youtube.com/embed/c9OnQEHUpvI?start=30",
+        "https://www.youtube.com/embed/c9OnQEHUpvI?ref=https://site.example/a?b=1":
+          "https://www.youtube.com/embed/c9OnQEHUpvI?ref=https://site.example/a?b=1",
+        "https://www.youtube.com/embed/c9OnQEHUpvI/": "https://www.youtube.com/embed/c9OnQEHUpvI",
+      };
+      const got = {};
+      for (const typed of Object.keys(cases)) got[typed] = await embedFor(type, typed);
+      assert.deepEqual(got, cases);
+    });
+
+    it(`${type}: never frames another site that merely mentions YouTube or Vimeo`, async () => {
+      for (const typed of ["https://any-site.example/?youtube.com/embed/x", "https://any-site.example/player.vimeo.com/video/1"]) {
+        const embed = await embedFor(type, typed);
+        assert.ok(!embed.includes("any-site.example"), `${typed} -> ${embed}`);
+        assert.match(embed, /^https:\/\/(www\.youtube\.com\/embed|player\.vimeo\.com\/video)\//, typed);
+      }
+    });
+
+    it(`${type}: gives no player for an ID that would leave the embed path`, async () => {
+      for (const typed of [
+        "https://www.youtube.com/embed/../../watch?v=c9OnQEHUpvI",
+        "https://youtu.be/%2e%2e/watch",
+        "https://player.vimeo.com/video/..",
+        "https://www.youtube.com/embed/",
+      ]) {
+        assert.equal(await embedFor(type, typed), "", typed);
+      }
+    });
+  }
 });

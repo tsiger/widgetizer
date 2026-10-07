@@ -366,6 +366,14 @@ If a theme widget loads a script whose address is badly written (a typo that mak
 
 **Next:** Skip an address that can't be read and still apply the widget's update, with a test.
 
+### VIDEO-EMBED-FILTER · Turn YouTube/Vimeo links into embed addresses in one core filter
+
+**Open · Low · Shared**
+
+Arch's Video and Video popup widgets each work out a YouTube or Vimeo link by looking for bits of text in it. They now always point the player at YouTube's or Vimeo's player, but a mistyped video ID still shows a broken player instead of none, don't understand YouTube Shorts or unlisted Vimeo share links, and repeat the same code twice.
+
+**Next:** Add one shared filter in the app that reads the link properly and returns a safe player address (or nothing), use it in both widgets, and document it for theme authors.
+
 ### T66 · Explain form errors beside the right field
 
 **Open · Medium · Shared**

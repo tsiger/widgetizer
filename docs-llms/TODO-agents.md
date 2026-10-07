@@ -469,6 +469,18 @@ Duplicate checks the new folder name against the database only (`projectControll
 
 **Start:** [previewRuntime.js](../packages/core/src/runtime/previewRuntime.js), [previewRuntimeMedia.test.js](../packages/core/src/runtime/__tests__/previewRuntimeMedia.test.js). **Source:** 2026-10-07 review of `b9c9fc13`.
 
+### VIDEO-EMBED-FILTER · Turn YouTube/Vimeo links into embed addresses in one core filter
+
+**Open · Low · Shared**
+
+Arch recognises video links in Liquid by substring (`contains 'youtube.com/watch'`, `'vimeo.com/'`…) and splits out the ID. Every branch now rebuilds the address on `youtube.com/embed/` or `player.vimeo.com/video/` and refuses an ID containing `.`, `%` or `:`, so a frame stays on the provider's embed path, but the ID's shape isn't checked (a wrong-length or misspelled ID gives a broken player, not none), the same ~40 lines are duplicated, `youtube.com/shorts/ID` and `vimeo.com/ID/<hash>` (unlisted share links) aren't recognised, and `youtu.be`/watch links drop options like `t=`. Core already parses YouTube links in `extractVideoId` (`youtubeHelpers.js`, used by the `youtube` setting type and `{% youtube %}`).
+
+Add a filter, e.g. `{{ url | video_embed_url }}`: parse with `URL`, accept exact hosts (`youtube.com`, `www.`/`m.youtube.com`, `youtu.be`, `youtube-nocookie.com`, `vimeo.com`, `www.vimeo.com`, `player.vimeo.com`), check the ID shape (YouTube 11 of `[A-Za-z0-9_-]`, Vimeo digits), keep only allowed options (start time, Vimeo `h`), return `https://www.youtube.com/embed/ID` / `https://player.vimeo.com/video/ID` or "". Use it in Arch at the URL-parsing block of `widgets/video-embed/widget.liquid` (feeds the iframe `src`) and `widgets/video-popup/widget.liquid` (feeds `data-video-url`, which `video-modal.js` opens with `autoplay=1`), and in their `updates/<version>/` copies. No other Arch template parses video links (profile-grid/team-highlight/social-icons only link to YouTube channels through `safe_url`).
+
+**Done when:** Both widgets use the filter; filter tests cover each accepted form, a look-alike host, a bad ID and kept/dropped options; the existing `videoEmbedWidget.test.js` address cases still pass; theming docs, `docs-website` theme-dev pages and the theme-skill references list it, and the skill contract is regenerated.
+
+**Start:** [youtubeHelpers.js](../packages/core/src/utils/youtubeHelpers.js), [safeUrlFilter.js](../packages/core/src/filters/safeUrlFilter.js) (registration pattern), [renderEngine.js](../packages/render-engine/src/renderEngine.js), [video-embed](../themes/arch/widgets/video-embed/widget.liquid), [video-popup](../themes/arch/widgets/video-popup/widget.liquid), [videoEmbedWidget.test.js](../packages/builder-server/src/tests/videoEmbedWidget.test.js), [build-theme-skill-contract.js](../scripts/build-theme-skill-contract.js). **Source:** 2026-10-07 review of `b9c9fc13`.
+
 ### T66 · Explain form errors beside the right field
 
 **Open · Medium · Shared**
