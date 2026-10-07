@@ -281,6 +281,15 @@ describe("POST theme settings (whole file)", () => {
     assert.equal(await fs.readFile(themePath(), "utf8"), before);
   });
 
+  // Reading past an unreadable file would skip the version check, so a stale
+  // whole file could replace whatever is there.
+  it("refuses to write when the stored file cannot be parsed", async () => {
+    await fs.outputFile(themePath(), "{ not json");
+    const res = await call(saveProjectThemeSettings, OLD_THEME);
+    assert.equal(res._status, 500);
+    assert.equal(await fs.readFile(themePath(), "utf8"), "{ not json");
+  });
+
   it("still saves a file of the same version, or one without a version, with the old response shape", async () => {
     const same = JSON.parse(JSON.stringify(OLD_THEME));
     item(same, "accent").value = "#0000ff";

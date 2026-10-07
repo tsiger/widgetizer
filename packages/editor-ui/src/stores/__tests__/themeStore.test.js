@@ -392,6 +392,24 @@ describe("themeStore", () => {
         expect(recorded.ids).toEqual(["primary_color"]);
       });
 
+      // A theme update removed one changed setting while another screen changed
+      // the other: the removed one cannot be kept, and the result says so.
+      it("reports an edit it could not keep because the setting is gone", async () => {
+        seedSettings();
+        useThemeStore.getState().updateThemeSetting("colors", "primary_color", "#mine");
+        useThemeStore.getState().updateThemeSetting("colors", "secondary_color", "#also-mine");
+        saveThemeSettingChanges.mockRejectedValueOnce(conflict());
+        getThemeSettings.mockResolvedValueOnce({
+          settings: { global: { colors: [{ id: "primary_color", type: "color", value: "#theirs" }] } },
+        });
+
+        const result = await useThemeStore.getState().saveSettings("project-a");
+
+        expect(result.conflict).toBe(true);
+        expect(result.warnings).toEqual([{ id: "secondary_color", code: "SETTING_REMOVED" }]);
+        expect(valueOf(useThemeStore.getState().settings, "primary_color")).toBe("#mine");
+      });
+
       it("treats a refused older theme version the same way", async () => {
         seedSettings();
         useThemeStore.getState().updateThemeSetting("colors", "primary_color", "#mine");

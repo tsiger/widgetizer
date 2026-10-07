@@ -329,6 +329,7 @@ const useAutoSave = create((set, get) => ({
         const hasThemeDrift = themeStore.hasUnsavedThemeChanges();
         let themeUsageStale = false;
         let themeConflict = false;
+        let themeEditsDropped = false;
         if ((themeSettingsModified || hasThemeDrift) && themeSettings && activeProject) {
           const themeResult = await useThemeStore.getState().saveSettings(activeProject.id);
           if (get().saveGeneration !== myGeneration) {
@@ -352,6 +353,9 @@ const useAutoSave = create((set, get) => ({
             // announced, not treated as a correction.
             themeUsageStale = !!themeResult?.warnings?.some((w) => w?.code === "MEDIA_USAGE_STALE");
             themeConflict = !!themeResult?.conflict;
+            themeEditsDropped = !!themeResult?.warnings?.some(
+              (w) => w?.code === "SETTING_REMOVED" || w?.code === "SETTING_AMBIGUOUS",
+            );
           }
         }
 
@@ -396,7 +400,7 @@ const useAutoSave = create((set, get) => ({
             ) || themeUsageStale
               ? { at: Date.now() }
               : state.mediaUsageStale,
-            themeConflict: themeConflict ? { at: Date.now() } : state.themeConflict,
+            themeConflict: themeConflict ? { at: Date.now(), editsDropped: themeEditsDropped } : state.themeConflict,
           };
         });
 

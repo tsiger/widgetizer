@@ -96,6 +96,8 @@ export default function PageEditor() {
   useEffect(() => {
     if (!themeConflict) return;
     useToastStore.getState().showToast(t("pageEditor.themeConflict"), "info");
+    // A setting a theme update removed cannot take the edit that was made to it.
+    if (themeConflict.editsDropped) useToastStore.getState().showToast(t("themeSettings.toasts.settingRemoved"), "warning");
     useAutoSave.getState().clearThemeConflict();
     useThemeStore.getState().clearConflict?.();
   }, [themeConflict, t]);

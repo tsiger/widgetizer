@@ -1976,9 +1976,24 @@ describe("saveStore (useAutoSave)", () => {
       const result = await useAutoSave.getState().save(false);
 
       expect(result).toEqual({ status: "conflict" });
-      expect(useAutoSave.getState().themeConflict).not.toBe(null);
+      expect(useAutoSave.getState().themeConflict).toMatchObject({ editsDropped: false });
       useAutoSave.getState().clearThemeConflict();
       expect(useAutoSave.getState().themeConflict).toBe(null);
+    });
+
+    it("records that a conflict dropped an edit to a setting the theme no longer has", async () => {
+      seedPageStore();
+      makeThemeStoreLive({ colors: { primary: "#fff" } }, { colors: { primary: "#000" } });
+      useAutoSave.getState().setThemeSettingsModified(true);
+      mockThemeStoreState.saveSettings.mockResolvedValueOnce({
+        warnings: [{ id: "old", code: "SETTING_REMOVED" }],
+        conflict: true,
+        adopted: true,
+      });
+
+      await useAutoSave.getState().save(false);
+
+      expect(useAutoSave.getState().themeConflict).toMatchObject({ editsDropped: true });
     });
 
     it("resets the autosave backoff after a conflict and keeps autosaving the kept edits", async () => {

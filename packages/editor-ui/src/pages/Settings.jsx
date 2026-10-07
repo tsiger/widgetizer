@@ -94,8 +94,10 @@ export default function Settings() {
 
       if (!result || result.skipped || result.stale) return;
       if (result.conflict) {
-        // The edits are kept on top of the current settings, still unsaved.
-        showToast(t("themeSettings.toasts.conflict"), "warning");
+        // The edits are kept on top of the current settings, still unsaved —
+        // except any for a setting the theme no longer has, which the warnings name.
+        const extra = (result.warnings ?? []).map((warning) => describeWarning(warning, t));
+        showToast([t("themeSettings.toasts.conflict"), ...extra].join(" "), "warning");
         clearConflict();
       } else if (result.warnings?.length) {
         showToast(result.warnings.map((warning) => describeWarning(warning, t)).join(" "), "warning");

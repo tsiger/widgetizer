@@ -1829,17 +1829,12 @@ export async function saveProjectThemeSettings(req, res) {
     const outcome = await withContentWriteLock(scope.projectId, async () => {
       // A favicon picked from the library just before it was deleted must not be
       // written in; references the settings already carried are left alone.
-      let previousPaths = [];
-      let current = null;
-      try {
-        const buf = await storage.read(scope, "theme.json");
-        if (buf != null) {
-          current = JSON.parse(buf.toString("utf8"));
-          previousPaths = extractMediaPathsFromThemeSettings(current);
-        }
-      } catch {
-        // No theme.json yet, or unreadable: nothing known to be pre-existing.
-      }
+      // No theme.json yet: nothing to compare against or known to be pre-existing.
+      // An unreadable or unparsable one is not "no file" — reading past it would
+      // skip the version check below — so it fails the save instead.
+      const buf = await storage.read(scope, "theme.json");
+      const current = buf == null ? null : JSON.parse(buf.toString("utf8"));
+      const previousPaths = current ? extractMediaPathsFromThemeSettings(current) : [];
       // A whole file from a screen that loaded the theme before an update would
       // put the old version and structure back while the project row keeps the
       // new version, so the update is never offered again. Refuse it.

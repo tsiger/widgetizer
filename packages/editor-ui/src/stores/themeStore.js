@@ -46,7 +46,8 @@ const useThemeStore = create((set, get) => {
    */
   const adoptServerTheme = (serverTheme, onTop, expected) => {
     const baseline = clone(serverTheme);
-    const draft = onTop.length > 0 ? applyThemeSettingChanges(serverTheme, onTop).theme : clone(serverTheme);
+    const { theme: draft, skipped } =
+      onTop.length > 0 ? applyThemeSettingChanges(serverTheme, onTop) : { theme: clone(serverTheme), skipped: [] };
     set({ originalSettings: baseline, settings: draft, conflict: null });
     if (adoptedListener) {
       try {
@@ -56,6 +57,9 @@ const useThemeStore = create((set, get) => {
         console.error("Failed to rebase editor history on the saved theme:", err);
       }
     }
+    // An edit kept on top for a setting the server's copy no longer has is
+    // dropped; say so rather than claim every edit was kept.
+    return skipped;
   };
 
   const isDraftDiscarded = () => {
@@ -69,9 +73,9 @@ const useThemeStore = create((set, get) => {
     const fresh = await getThemeSettings(projectId);
     if (moved(projectId, generation)) return { warnings: [], stale: true };
     const { originalSettings, settings } = get();
-    adoptServerTheme(fresh, diffThemeSettings(originalSettings, settings), originalSettings);
+    const dropped = adoptServerTheme(fresh, diffThemeSettings(originalSettings, settings), originalSettings);
     set({ conflict: { at: Date.now(), ids: error?.data?.conflicts ?? [] } });
-    return { warnings: [], conflict: true, adopted: true };
+    return { warnings: dropped, conflict: true, adopted: true };
   };
 
   const runSave = async (projectId) => {
@@ -97,16 +101,17 @@ const useThemeStore = create((set, get) => {
     // word — the saved values are. Keep nothing of it on top.
     const discarded = isDraftDiscarded();
     let adopted = true;
+    let dropped = [];
     if (result.theme) {
       const live = get().settings;
-      adoptServerTheme(result.theme, discarded ? [] : diffThemeSettings(sent, live), discarded ? live : sent);
+      dropped = adoptServerTheme(result.theme, discarded ? [] : diffThemeSettings(sent, live), discarded ? live : sent);
     } else if (result.warnings.some((warning) => warning.code === "VALUE_CORRECTED")) {
       // The whole-file fallback returns no file; read back what it corrected.
       const fresh = await getThemeSettings(projectId);
       if (moved(projectId, generation)) return { warnings: result.warnings, stale: true };
       const live = get().settings;
       const discardedNow = isDraftDiscarded();
-      adoptServerTheme(fresh, discardedNow ? [] : diffThemeSettings(sent, live), discardedNow ? live : sent);
+      dropped = adoptServerTheme(fresh, discardedNow ? [] : diffThemeSettings(sent, live), discardedNow ? live : sent);
     } else {
       set({ originalSettings: clone(sent) });
       adopted = false;
@@ -115,7 +120,7 @@ const useThemeStore = create((set, get) => {
     invalidateMediaCache(projectId);
     // `adopted`: the store now holds the server's copy (false only when the
     // whole-file fallback saved without returning or correcting anything).
-    return { warnings: result.warnings, adopted };
+    return { warnings: [...result.warnings, ...dropped], adopted };
   };
 
   const startRun = (projectId) => {
