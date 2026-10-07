@@ -127,6 +127,27 @@ describe("a setting whose default is one of those words", () => {
       await writePage("el", "index", "Arxiki", { uuid: "p-el-home" });
     }
   });
+
+  it("names a video player in the page's language until the owner names it", async () => {
+    const video = (settings) => ({
+      widgets: { video: { type: "video-embed", settings: { video_url: "https://youtu.be/2PuFyjAs7JA", ...settings } } },
+      widgetsOrder: ["video"],
+    });
+    await writePage("", "index", "Home", { uuid: "p-en-home", ...video({}) });
+    await writePage("el", "index", "Arxiki", { uuid: "p-el-home", ...video({ video_title: "" }) });
+    try {
+      let dir = await exportSite();
+      assert.ok((await read(dir, "index.html")).includes('title="Video"'));
+      assert.ok((await read(dir, "el", "index.html")).includes('title="Βίντεο"'));
+
+      await writePage("el", "index", "Arxiki", { uuid: "p-el-home", ...video({ video_title: "Ξενάγηση" }) });
+      dir = await exportSite();
+      assert.ok((await read(dir, "el", "index.html")).includes('title="Ξενάγηση"'));
+    } finally {
+      await writePage("", "index", "Home", { uuid: "p-en-home" });
+      await writePage("el", "index", "Arxiki", { uuid: "p-el-home" });
+    }
+  });
 });
 
 // A date is not a theme string — it comes from core — but it is read on the
@@ -196,7 +217,7 @@ describe("an empty widget", () => {
     });
     try {
       const html = await read(await exportSite(), "index.html");
-      assert.ok(!html.includes("Enter a YouTube or Vimeo URL"), html.slice(0, 600));
+      assert.ok(!html.includes("Choose an uploaded video or enter"), html.slice(0, 600));
     } finally {
       await writePage("", "index", "Home", { uuid: "p-en-home" });
     }

@@ -76,7 +76,7 @@
       "type": "text",
       "id": "video_title",
       "label": "tTheme:global.widgets.settings.video_title.label",
-      "default": "Video"
+      "defaultKey": "site.video_embed.default_title"
     },
     {
       "type": "header",

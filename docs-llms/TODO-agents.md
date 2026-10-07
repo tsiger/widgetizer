@@ -459,6 +459,16 @@ Duplicate checks the new folder name against the database only (`projectControll
 
 **Start:** [validate-theme.js](../scripts/validate-theme.js), [build-theme-skill-contract.js](../scripts/build-theme-skill-contract.js), [themeSkill.test.js](../packages/builder-server/src/tests/themeSkill.test.js). **Source:** 2026-10-05 code review of `9e98dad7..e2f61b21`.
 
+### PREVIEW-SCRIPT-URL · A malformed theme script address stops a widget's live preview
+
+**Open · Low · Shared**
+
+`morphWidget` in `previewRuntime.js` (~1042) resolves each enqueued stylesheet/script address with `new URL(url, document.baseURI)` to de-duplicate it. A syntactically invalid address (e.g. `http://[cdn.example/x.js`, not merely a 404) throws there, the surrounding `try` (~1012-1069) returns false, and the widget's new markup is never applied: the editor posts `WIDGET_MORPH_FAILED`, which nothing handles, so that widget stops updating until the preview reloads. A full page load only loses the one script. Not reproduced; only a broken theme triggers it.
+
+**Done when:** An address that can't be resolved is skipped (or left to the browser) and the rest of the morph still applies, with a runtime test.
+
+**Start:** [previewRuntime.js](../packages/core/src/runtime/previewRuntime.js), [previewRuntimeMedia.test.js](../packages/core/src/runtime/__tests__/previewRuntimeMedia.test.js). **Source:** 2026-10-07 review of `b9c9fc13`.
+
 ### T66 · Explain form errors beside the right field
 
 **Open · Medium · Shared**

@@ -90,6 +90,7 @@
       "go_to": "Go to testimonial {{ number }}"
     },
     "video_embed": {
+      "default_title": "Video",
       "playback_error": "This video can't be played in your browser."
     },
     "video_popup": {

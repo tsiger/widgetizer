@@ -16,7 +16,7 @@ Play a single uploaded MP4, or embed a YouTube or Vimeo video, with an optional 
 | `video_file` | MP4 from the media library (blank by default) | Native `<video controls>` player; takes precedence over `video_url` while set. Shows a translated message beside the player if the browser cannot play the file |
 | `video_url` | YouTube or Vimeo URL | Parsed into an embed iframe when no uploaded video is set; invalid URLs show a placeholder message instead |
 | `poster` | Image (blank by default) | Still frame shown before an uploaded video plays; ignored for YouTube/Vimeo |
-| `video_title` | Any text (default: "Video") | Accessible name of the iframe or video player |
+| `video_title` | Any text (blank by default; reads "Video", translated to the page language, until filled in) | Accessible name of the iframe or video player |
 | `aspect_ratio` | `16 / 9` (default), `4 / 3`, `21:9`, `1 / 1` | Changes the padding-based aspect box: 56.25%, 75%, 42.86%, or 100% respectively |
 | `color_scheme` | `standard-primary`, `standard-secondary`, `highlight-primary`, `highlight-secondary` | Swaps background/text color palette; non-standard schemes add container padding and set `--widget-bg-color` |
 | `top_spacing` | `auto` (default), `small`, `none` | `small` reduces spacing for tighter rhythm; `none` removes it entirely for flush stacking |

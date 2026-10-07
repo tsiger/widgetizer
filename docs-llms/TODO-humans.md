@@ -358,6 +358,14 @@ The new theme checker passes some things that break in an export (thumbnail-size
 
 **Next:** Fix each case so the checker gives the right answer, with a test for each.
 
+### PREVIEW-SCRIPT-URL · A malformed theme script address stops a widget's live preview
+
+**Open · Low · Shared**
+
+If a theme widget loads a script whose address is badly written (a typo that makes it not a valid address at all), the editor preview stops showing your edits to that widget until the preview reloads. The published site and the first page load are fine; only that one script fails there.
+
+**Next:** Skip an address that can't be read and still apply the widget's update, with a test.
+
 ### T66 · Explain form errors beside the right field
 
 **Open · Medium · Shared**

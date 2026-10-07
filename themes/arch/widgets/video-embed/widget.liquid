@@ -4,6 +4,10 @@
   {%- assign video_src = filePath | append: '/' | append: video_name -%}
   {% enqueue_script src: "video-embed.js", priority: 30, defer: true %}
 {%- endif -%}
+{%- assign video_label = widget.settings.video_title -%}
+{%- if video_label == blank -%}
+  {%- assign video_label = 'site.video_embed.default_title' | t -%}
+{%- endif -%}
 
 <section
   id="{{ widget.id }}"
@@ -118,7 +122,7 @@
             class="video-embed-player"
             src="{{ video_src }}"
             {% if poster_url != blank %}poster="{{ poster_url }}"{% endif %}
-            aria-label="{{ widget.settings.video_title | default: 'Video' }}"
+            aria-label="{{ video_label }}"
             controls
             playsinline
             preload="metadata"
@@ -126,7 +130,7 @@
         {% elsif embed_url != blank %}
           <iframe
             src="{{ embed_url }}"
-            title="{{ widget.settings.video_title | default: 'Video' }}"
+            title="{{ video_label }}"
             frameborder="0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowfullscreen
@@ -134,7 +138,7 @@
           ></iframe>
         {%- elsif renderMode == 'preview' -%}
           <p class="video-embed-placeholder w-body t-muted">
-            Enter a YouTube or Vimeo URL to embed a video
+            Choose an uploaded video or enter a YouTube or Vimeo URL
           </p>
         {% endif %}
       </div>
