@@ -1,3 +1,14 @@
+{%- assign video_src = '' -%}
+{%- if widget.settings.video_file != blank -%}
+  {%- assign video_name = widget.settings.video_file | split: '/' | last -%}
+  {%- assign video_src = filePath | append: '/' | append: video_name -%}
+  {% enqueue_script src: "video-embed.js", priority: 30, defer: true %}
+{%- endif -%}
+{%- assign video_label = widget.settings.video_title -%}
+{%- if video_label == blank -%}
+  {%- assign video_label = 'site.video_embed.default_title' | t -%}
+{%- endif -%}
+
 <section
   id="{{ widget.id }}"
   class="widget widget-type-video-embed widget-{{ widget.id }} color-scheme-{{ widget.settings.color_scheme }}{% if widget.settings.top_spacing != 'auto' %} spacing-top-{{ widget.settings.top_spacing }}{% endif %}{% if widget.settings.bottom_spacing != 'auto' %} spacing-bottom-{{ widget.settings.bottom_spacing }}{% endif %}"
@@ -8,25 +19,46 @@
   data-widget-type="video-embed"
   {% if widget.index != null %}data-widget-index="{{ widget.index }}"{% endif %}
 >
-  {%- comment -%} Convert YouTube/Vimeo URL to embed URL {%- endcomment -%}
-  {%- assign video_url = widget.settings.video_url -%}
-  {%- assign embed_url = '' -%}
-
+  {%- comment -%}
+    Turn a YouTube/Vimeo link into an embed address. The address is always built
+    on the provider's embed path from the video's ID, never copied from what was
+    typed, so the frame can only show that provider's player. An ID that could
+    leave the embed path ("..", encoded characters), or a link with nothing
+  after the marker (split then returns the part before it, hence ":"), gives no player.
+  {%- endcomment -%}
+  {%- assign video_url = widget.settings.video_url | split: '#' | first -%}
+  {%- assign video_base = '' -%}
+  {%- assign video_id = '' -%}
+  {%- assign video_query = '' -%}
   {%- if video_url contains 'youtube.com/watch' -%}
+    {%- assign video_base = 'https://www.youtube.com/embed/' -%}
     {%- assign video_id = video_url | split: 'v=' | last | split: '&' | first -%}
-    {%- assign embed_url = 'https://www.youtube.com/embed/' | append: video_id -%}
   {%- elsif video_url contains 'youtu.be/' -%}
+    {%- assign video_base = 'https://www.youtube.com/embed/' -%}
     {%- assign video_id = video_url | split: 'youtu.be/' | last | split: '?' | first -%}
-    {%- assign embed_url = 'https://www.youtube.com/embed/' | append: video_id -%}
   {%- elsif video_url contains 'youtube.com/embed/' -%}
-    {%- assign embed_url = video_url -%}
+    {%- assign video_base = 'https://www.youtube.com/embed/' -%}
+    {%- assign video_id = video_url | split: 'youtube.com/embed/' | last -%}
+  {%- elsif video_url contains 'player.vimeo.com/video/' -%}
+    {%- assign video_base = 'https://player.vimeo.com/video/' -%}
+    {%- assign video_id = video_url | split: 'player.vimeo.com/video/' | last -%}
   {%- elsif video_url contains 'vimeo.com/' -%}
+    {%- assign video_base = 'https://player.vimeo.com/video/' -%}
     {%- assign video_id = video_url | split: 'vimeo.com/' | last | split: '?' | first -%}
-    {%- assign embed_url = 'https://player.vimeo.com/video/' | append: video_id -%}
-  {%- elsif video_url contains 'player.vimeo.com' -%}
-    {%- assign embed_url = video_url -%}
-  {%- else -%}
-    {%- assign embed_url = '' -%}
+  {%- endif -%}
+  {%- comment -%} Embed and player links keep their options (?start=, Vimeo's ?h= for unlisted videos) {%- endcomment -%}
+  {%- if video_id contains '?' -%}
+    {%- assign video_head = video_id | split: '?' | first | append: '?' -%}
+    {%- assign video_query = video_id | remove_first: video_head -%}
+    {%- assign video_id = video_head | remove: '?' -%}
+  {%- endif -%}
+  {%- assign video_id = video_id | split: '/' | first -%}
+  {%- assign embed_url = '' -%}
+  {%- if video_base != blank and video_id != blank -%}
+    {%- unless video_id contains '.' or video_id contains '%' or video_id contains ':' -%}
+      {%- assign embed_url = video_base | append: video_id -%}
+      {%- if video_query != blank -%}{%- assign embed_url = embed_url | append: '?' | append: video_query -%}{%- endif -%}
+    {%- endunless -%}
   {%- endif -%}
 
   {%- comment -%} Calculate aspect ratio padding {%- endcomment -%}
@@ -48,7 +80,8 @@
         height: 0;
         overflow: hidden;
 
-        & iframe {
+        & iframe,
+        & video {
           position: absolute;
           inset-block-start: 0;
           inset-inline-start: 0;
@@ -57,6 +90,16 @@
           border: var(--border-width-thin) solid var(--border-color);
           border-radius: var(--radius-md);
         }
+
+        & video {
+          background-color: #000;
+          object-fit: contain;
+        }
+      }
+
+      & .video-embed-error {
+        margin-block-start: var(--space-sm);
+        text-align: center;
       }
 
       & .video-embed-placeholder {
@@ -90,10 +133,25 @@
 
     <div class="widget-content">
       <div class="video-embed-container reveal reveal-fade">
-        {% if embed_url != blank %}
+        {% if video_src != blank %}
+          {%- assign poster_url = '' -%}
+          {%- if widget.settings.poster != blank -%}
+            {%- capture poster_url -%}{% image src: widget.settings.poster, size: 'large', output: 'url' %}{%- endcapture -%}
+            {%- assign poster_url = poster_url | strip -%}
+          {%- endif -%}
+          <video
+            class="video-embed-player"
+            src="{{ video_src }}"
+            {% if poster_url != blank %}poster="{{ poster_url }}"{% endif %}
+            aria-label="{{ video_label }}"
+            controls
+            playsinline
+            preload="metadata"
+          ></video>
+        {% elsif embed_url != blank %}
           <iframe
             src="{{ embed_url }}"
-            title="{{ widget.settings.video_title | default: 'Video' }}"
+            title="{{ video_label }}"
             frameborder="0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowfullscreen
@@ -101,10 +159,13 @@
           ></iframe>
         {%- elsif renderMode == 'preview' -%}
           <p class="video-embed-placeholder w-body t-muted">
-            Enter a YouTube or Vimeo URL to embed a video
+            Choose an uploaded video or enter a YouTube or Vimeo URL
           </p>
         {% endif %}
       </div>
+      {% if video_src != blank %}
+        <p class="video-embed-error w-body t-muted" role="alert" hidden>{{ 'site.video_embed.playback_error' | t }}</p>
+      {% endif %}
     </div>
   </div>
 </section>

@@ -267,6 +267,7 @@ Each setting in a group (and each widget/block setting) declares a `type`. The f
 - `youtube` — YouTube video data, consumed by the `{% youtube %}` tag
 - `date` — date value (in collection-type schemas can be the sort key via `usedAsDate`)
 - `file` — file uploader returning a download path
+- `video` — uploaded MP4 picker returning an `/uploads/files/…mp4` path, for a native `<video>`
 - `table` — repeatable rows of typed columns (designed for collection-type schemas)
 - `menu` — dropdown of available navigation menus; value is a menu ID
 - `link` — link builder for internal pages, collection items, or custom URLs; value is an **object** (see [Link settings](#link-settings))

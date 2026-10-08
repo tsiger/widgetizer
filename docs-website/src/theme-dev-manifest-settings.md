@@ -125,6 +125,7 @@ Theme settings use the same types as widgets. Common types include:
 - `image`
 - `youtube`
 - `file`
+- `video`
 - `menu`
 - `link`
 - `icon`

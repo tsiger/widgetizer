@@ -612,7 +612,8 @@ function setupInteractionHandler() {
         return;
       }
 
-      const interactiveElement = event.target.closest('button, input, select, textarea, [role="button"]');
+      // Native media controls act in the element's default action, which a cancelled click never reaches.
+      const interactiveElement = event.target.closest('button, input, select, textarea, video, audio, [role="button"]');
       if (interactiveElement) {
         if (widgetEl) {
           postToParent({
@@ -1037,15 +1038,21 @@ function morphWidget(widgetId, newHtml) {
     }
 
     // Load enqueued styles/scripts that aren't already in the document
+    // Resolved against this document's <base>: the parsed fragment has none, so its own .src can point elsewhere.
+    const absolute = (url) => new URL(url, document.baseURI).href;
+    const loadedStyles = new Set([...document.querySelectorAll('link[rel="stylesheet"][href]')].map((l) => l.href));
+    const loadedScripts = new Set([...document.querySelectorAll("script[src]")].map((s) => s.src));
     for (const link of enqueuedLinks) {
-      if (!document.querySelector(`link[href="${link.getAttribute("href")}"]`)) {
+      if (!loadedStyles.has(absolute(link.getAttribute("href")))) {
         document.head.appendChild(link.cloneNode(true));
       }
     }
     for (const script of enqueuedScripts) {
-      if (!document.querySelector(`script[src="${script.getAttribute("src")}"]`)) {
+      const src = absolute(script.getAttribute("src"));
+      if (!loadedScripts.has(src)) {
+        loadedScripts.add(src);
         const s = document.createElement("script");
-        s.src = script.src;
+        s.src = src;
         if (script.defer) s.defer = true;
         if (script.async) s.async = true;
         document.body.appendChild(s);

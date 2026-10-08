@@ -45,6 +45,12 @@ describe("MediaListItem — non-image icon", () => {
     expect(container.querySelector(".lucide-file-text")).not.toBeNull();
     expect(container.querySelector(".lucide-music")).toBeNull();
   });
+
+  it("shows the Film icon for an MP4, without loading a player", () => {
+    const { container } = renderItem({ id: "v", type: "video/mp4", filename: "clip.mp4", size: 1024, uploaded: "2026-01-01" });
+    expect(container.querySelector(".lucide-film")).not.toBeNull();
+    expect(container.querySelector("video")).toBeNull();
+  });
 });
 
 describe("MediaListItem — name column", () => {

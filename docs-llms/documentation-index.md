@@ -81,14 +81,14 @@ The draft [Widgetizer Theme skill](../skills/widgetizer-theme/SKILL.md) provides
 
 ### **[theming-setting-types.md](theming-setting-types.md)** - Setting Types Reference
 
-**Purpose**: Authoritative author-facing catalog of all theme/widget setting types with schema properties, JSON examples, and Liquid usage — now also the home for the shipped `file` setting type **When to use**:
+**Purpose**: Authoritative author-facing catalog of all theme/widget setting types with schema properties, JSON examples, and Liquid usage — now also the home for the shipped `file` and `video` setting types **When to use**:
 
 - Defining settings in `theme.json` global configuration
 - Creating widget schemas with proper setting types
 - Understanding setting properties, CSS variable output, and i18n labels
-- Looking up the `file` setting type or richtext/link options
+- Looking up the `file`/`video` setting types or richtext/link options
 
-**Key topics**: Setting types (color, text, range, select, date, gallery, table, icon, youtube, richtext, code, `file`, etc.), common properties, CSS variable generation, i18n label resolution (tTheme: keys), collection field flags (`usedAsTitle`/`usedAsDate`), richtext `allow_headings`/`allow_images`/`min_height` + stable internal-link refs in richtext anchors (`data-page-uuid`/`data-collection-item-uuid`), structured link targets (`pageUuid`/`collectionType`/`collectionItemUuid`), icon `allow_patterns`, `rte_text`/`rte_blank`
+**Key topics**: Setting types (color, text, range, select, date, gallery, table, icon, youtube, richtext, code, `file`, `video`, etc.), common properties, CSS variable generation, i18n label resolution (tTheme: keys), collection field flags (`usedAsTitle`/`usedAsDate`), richtext `allow_headings`/`allow_images`/`min_height` + stable internal-link refs in richtext anchors (`data-page-uuid`/`data-collection-item-uuid`), structured link targets (`pageUuid`/`collectionType`/`collectionItemUuid`), icon `allow_patterns`, `rte_text`/`rte_blank`
 
 ---
 

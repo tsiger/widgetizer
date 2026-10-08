@@ -46,6 +46,15 @@ For a `file` field in a widget:
 
 Pass `filePath` explicitly if moving that code into an isolated snippet. Do not double-prefix a resolved URL.
 
+A `video` field resolves the same way. Leave `data-setting` off the `<video>`: the editor's live update would write the stored `/uploads/files/...` value into `src` unresolved, while a server re-render of the widget gets the URL right. Skip the element entirely when the field is empty so it never requests an empty `src`.
+
+```liquid
+{% if widget.settings.clip != blank %}
+  {% assign clip_name = widget.settings.clip | split: '/' | last %}
+  <video controls playsinline preload="metadata" src="{{ filePath | append: '/' | append: clip_name }}"></video>
+{% endif %}
+```
+
 For preloading an uploaded hero, capture the actual image-tag path:
 
 ```liquid

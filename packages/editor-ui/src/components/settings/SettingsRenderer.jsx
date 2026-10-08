@@ -140,6 +140,8 @@ export default function SettingsRenderer({
         return <TableInput {...inputProps} columns={setting.columns} />;
       case "file":
         return <FileInput {...inputProps} />;
+      case "video":
+        return <FileInput {...inputProps} filterType="video" />;
       case "link":
         return <LinkInput {...inputProps} setting={setting} />;
       case "youtube":

@@ -455,6 +455,7 @@
       "all": "All",
       "images": "Images",
       "audio": "Audio",
+      "videos": "Videos",
       "files": "Files"
     },
     "mediaUploader": {
@@ -463,8 +464,9 @@
       "selectFiles": "Select Files",
       "supportedImages": "Images: JPG, PNG, GIF, WebP, SVG",
       "supportedAudio": "Audio: MP3",
-      "supportedFiles": "Files: PDF, MP3",
-      "supportedFormats": "Images: JPG, PNG, GIF, WebP, SVG | Audio: MP3 | Files: PDF",
+      "supportedVideo": "Video: MP4",
+      "supportedFiles": "Files: PDF, MP3, MP4",
+      "supportedFormats": "Images: JPG, PNG, GIF, WebP, SVG | Audio: MP3 | Video: MP4 | Files: PDF",
       "uploading": "Uploading..."
     },
     "fileUploader": {
@@ -478,9 +480,13 @@
       "uploadSuccess": "File uploaded successfully.",
       "uploadFailed": "Upload failed.",
       "selectFileOnly": "Please select a file, not an image.",
+      "selectVideoOnly": "Please select an MP4 video.",
       "remove": "Remove file",
       "uploading": "Uploading...",
       "importNew": "Upload a file",
+      "importNewVideo": "Upload a video",
+      "fileFormats": "PDF, MP3, MP4",
+      "videoFormats": "MP4",
       "browseLibrary": "Choose from library"
     },
     "mediaSelector": {

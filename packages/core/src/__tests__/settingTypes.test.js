@@ -7,7 +7,7 @@ import {
 
 describe("setting type registry", () => {
   it("recognizes the canonical setting types", () => {
-    for (const type of ["text", "richtext", "image", "link", "menu", "date", "gallery", "table"]) {
+    for (const type of ["text", "richtext", "image", "link", "menu", "date", "gallery", "table", "file", "video"]) {
       expect(isSupportedSettingType(type)).toBe(true);
     }
   });

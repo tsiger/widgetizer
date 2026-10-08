@@ -23,6 +23,7 @@ export const ALLOWED_MIME_TYPES = [
   // Audio. `audio/mpeg` is the standard for .mp3; some browsers/OSes report `audio/mp3`.
   "audio/mpeg",
   "audio/mp3",
+  "video/mp4",
 ];
 
 /**
@@ -42,6 +43,7 @@ export const ALLOWED_UPLOAD_EXTENSIONS = [
   ".svg",
   ".pdf",
   ".mp3",
+  ".mp4",
 ];
 
 /** MIME types that indicate a ZIP archive (used for theme / project imports). */

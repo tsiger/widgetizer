@@ -477,13 +477,13 @@ An image uploader that includes a preview, the ability to replace the image, and
 
 ### File
 
-A file asset selector for downloadable documents and audio. The value is the storage path to the uploaded file (e.g. `/uploads/files/brochure.pdf`). Unlike the image input, this input is filename-oriented with no visual preview. Enabled file types in V1 are **PDF** and **MP3** (the shared "non-image" allowlist, `NON_IMAGE_ACCEPT` in `packages/editor-ui/src/utils/uploadValidation.js`); the model is allowlist-driven so more types can be added later via extension + MIME entries.
+A file asset selector for downloadable documents, audio and video. The value is the storage path to the uploaded file (e.g. `/uploads/files/brochure.pdf`). Unlike the image input, this input is filename-oriented with no visual preview. Enabled file types are **PDF**, **MP3** and **MP4** (the shared "non-image" allowlist, `NON_IMAGE_ACCEPT` in `packages/editor-ui/src/utils/uploadValidation.js`); the model is allowlist-driven so more types can be added later via extension + MIME entries.
 
 **Backed by the File Assets model:** files are first-class Media Library assets in the same project-scoped store as images (SQLite owns metadata/usage, the filesystem owns the binary). Uploads route to `uploads/files/` (no image processing), participate in usage tracking and deletion protection, and are copied into the static export (`assets/files/`). See [core-media.md](core-media.md) and [core-export.md](core-export.md).
 
 **Features:**
 
-- **Upload**: Direct file upload from the OS file picker (accepts PDF/MP3)
+- **Upload**: Direct file upload from the OS file picker (accepts PDF/MP3/MP4)
 - **Browse**: Opens `MediaSelectorDrawer` with `filterType="file"` to select from existing file assets
 - **Selected State**: Displays filename and extension badge with a clear button
 - **No Metadata Editing**: File assets do not have alt text or title metadata
@@ -532,6 +532,37 @@ File paths are resolved using the `filePath` context variable (set by the render
 ```
 
 Alternatively, users can copy a file URL from the Media Library and paste it into any generic link field (or use the **Link to file** button in a richtext field). The export controller rewrites `/uploads/files/` paths to `assets/files/` in the exported HTML.
+
+### Video
+
+An uploaded MP4 from the Media Library, for native playback. The value is the upload path (e.g. `/uploads/files/product-tour.mp4`) or `""`; it is never an external URL or a resolved preview URL. For YouTube/Vimeo use the [YouTube](#youtube) type or a text URL.
+
+**Features:**
+
+- `FileInput` in video mode: upload and Browse (`MediaSelectorDrawer` with `filterType="video"`) accept MP4 only; a PDF, MP3 or image selection is refused
+- Shares the `media.maxFileSizeMB` upload limit
+- Saved values are sanitized on render and on theme-settings save: anything but `/uploads/files/<name>.mp4` becomes `""` (a theme setting falls back to its default instead, unless explicitly cleared)
+
+```json
+{
+  "id": "video_file",
+  "type": "video",
+  "label": "Uploaded video (MP4)"
+}
+```
+
+**Template Usage:**
+
+Resolve the URL from `filePath` like a `file` setting. Leave `data-setting` off the `<video>`: the editor's live update would write the stored path into `src` unresolved, while the server re-render of the widget resolves it. Render nothing when the value is empty so the page never requests an empty `src`.
+
+```liquid
+{% if widget.settings.video_file != blank %}
+  {% assign video_name = widget.settings.video_file | split: '/' | last %}
+  <video src="{{ filePath | append: '/' | append: video_name }}" controls playsinline preload="metadata"></video>
+{% endif %}
+```
+
+Playback depends on the browser decoding the file (H.264/AAC is the safe choice); a `<video>` element's fallback content does not show on a decode error, so listen for the element's `error` event if the widget should explain a failure. Arch's `video-embed` does this.
 
 ### YouTube
 
