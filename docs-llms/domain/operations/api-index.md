@@ -179,6 +179,7 @@ This index cross-checks the operation directory against the backend surface. It 
 | POST | `/api/themes/:id/update` |
 | GET | `/api/themes/project/:projectId` |
 | POST | `/api/themes/project/:projectId` |
+| PATCH | `/api/themes/project/:projectId` |
 | GET | `/api/themes/project/:projectId/locales/:lang` |
 | POST | `/api/themes/upload` |
 | DELETE | `/api/themes/:id` |

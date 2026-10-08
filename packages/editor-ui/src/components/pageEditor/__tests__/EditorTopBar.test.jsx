@@ -7,6 +7,7 @@ import EditorTopBar from "../EditorTopBar.jsx";
 import useAutoSave from "../../../stores/saveStore.js";
 import usePageStore from "../../../stores/pageStore.js";
 import useProjectStore from "../../../stores/projectStore.js";
+import useToastStore from "../../../stores/toastStore.js";
 
 const getAllPages = vi.fn().mockResolvedValue([]);
 const createPageLanguageVersion = vi.fn();
@@ -85,6 +86,42 @@ describe("EditorTopBar manual-save failure handling", () => {
 
 // A slug is unique per language, so the switcher would otherwise list the same
 // name twice and open whichever the default language holds.
+describe("EditorTopBar manual save while saving is suspended", () => {
+  // save(false) resolves { status: "suspended" } rather than rejecting, so the
+  // failure branch never sees it; without a toast the click would do nothing.
+  it("tells the user when the Save button's save is refused because saving is off", async () => {
+    const save = vi.fn().mockResolvedValue({ status: "suspended" });
+    useAutoSave.setState({ save, hasUnsavedChanges: () => true, isSaving: false });
+    const showToast = vi.spyOn(useToastStore.getState(), "showToast");
+    renderTopBar();
+    fireEvent.click(screen.getByTitle("pageEditor.toolbar.save (Ctrl+S)"));
+    await vi.waitFor(() => expect(showToast).toHaveBeenCalledWith("pageEditor.toolbar.saveSuspended", "error"));
+    showToast.mockRestore();
+  });
+
+  it("tells the user when Ctrl+S's save is refused because saving is off", async () => {
+    const save = vi.fn().mockResolvedValue({ status: "suspended" });
+    useAutoSave.setState({ save, hasUnsavedChanges: () => true, isSaving: false });
+    const showToast = vi.spyOn(useToastStore.getState(), "showToast");
+    renderTopBar();
+    fireEvent.keyDown(window, { key: "s", ctrlKey: true });
+    await vi.waitFor(() => expect(showToast).toHaveBeenCalledWith("pageEditor.toolbar.saveSuspended", "error"));
+    showToast.mockRestore();
+  });
+
+  it("says nothing extra when the save succeeds", async () => {
+    const save = vi.fn().mockResolvedValue({ status: "success" });
+    useAutoSave.setState({ save, hasUnsavedChanges: () => true, isSaving: false });
+    const showToast = vi.spyOn(useToastStore.getState(), "showToast");
+    renderTopBar();
+    fireEvent.click(screen.getByTitle("pageEditor.toolbar.save (Ctrl+S)"));
+    await vi.waitFor(() => expect(save).toHaveBeenCalled());
+    await Promise.resolve();
+    expect(showToast).not.toHaveBeenCalled();
+    showToast.mockRestore();
+  });
+});
+
 describe("EditorTopBar page switcher across languages", () => {
   const PAGES = [
     { id: "about", slug: "about", name: "About", language: "en" },

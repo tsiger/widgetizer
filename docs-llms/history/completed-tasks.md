@@ -207,6 +207,36 @@ Needed for the Widgetizer marketing site: upload an MP4, choose it in a page wid
 
 **Body at:** `b9c9fc13:docs-llms/TODO-agents.md` (plan: `b9c9fc13:docs-llms/plan-mp4-support.md`).
 
+### R-THEME-SAVE · Keep theme-settings saves in order
+
+**Done · Medium · Shared · 2026-10-07**
+
+Settings allowed a save while another was pending and `themeStore.saveSettings()` had no queue: save red, then blue, with blue's response arriving first, and the late red response rebaselined `originalSettings` to red, so the blue draft read dirty and Reset restored red while the server held blue. Two smaller gaps: `saveStore.save` sent the theme draft live after a discard during Phase 1, and `reconcileFromServer` bumped `activeLoadId`, leaving a running `loadSettings` on `loading: true` (Settings stuck on its spinner).
+
+**Resolution:** the theme store runs one save at a time (a request made meanwhile joins a single follow-up that sends what is still unsaved), checks project and a never-decreasing generation before and after each request, and takes the server's returned copy with only the edits made after sending kept on top. Settings turns Save off while `saving`. `saveStore` checks its generation before Phase 2; a discard marks the draft (`discardDraft`) so a save landing on it takes the saved values as they are. `reconcileFromServer` reads the load counter without advancing it. Built together with GH147. Fixes `8958d183`, `119151a8`, `88c810cb`.
+
+**Body at:** `88c810cb:docs-llms/TODO-agents.md`.
+
+### GH147 · A stale tab's theme-settings save reverts a theme update
+
+**Done · Medium · Shared · 2026-10-07**
+
+`saveProjectThemeSettings` wrote the whole `theme.json` from the request body, and `themeStore` kept the copy it loaded until the project changed. A screen loaded before a theme update (another tab, or the same tab after Project details > Apply Update) saved its old copy back: `theme.json` returned to the old version and lost the update's new settings while the project row kept the new `theme_version`, so the update was never offered again.
+
+**Resolution:** the editor saves only changed settings, each with the value it started from (`PATCH /api/themes/project/:projectId`); the server merges them into the stored file under the content-write section (`mergeThemeSettingChanges`, rules shared through `@widgetizer/core/themeSettingChanges`), sanitizes only those settings, and answers `{ theme, warnings }`. A setting changed elsewhere refuses the save (409 `THEME_SETTINGS_CHANGED`, nothing written); the screen keeps the edits on top of the current settings and says so (owner decision: autosave carries on in the editor). The whole-file POST stays and refuses a file from an older theme version (409 `THEME_VERSION_CHANGED`); the editor falls back to it on a code-less 404 (owner decision, marked for removal). The theme update holds the content-write section for its whole run; Apply Update invalidates the loaded settings; editor undo history is cleared on a theme version change (owner decision). Warnings render as text. Fixes `8958d183`, `119151a8`, `88c810cb`. [GitHub #147](https://github.com/tsiger/widgetizer/issues/147)
+
+**Body at:** `88c810cb:docs-llms/TODO-agents.md`.
+
+### STALE-BANNER · A project warning can hide a language-removed warning while saves stay suspended
+
+**Done · Low · Shared · 2026-10-08**
+
+`staleProjectStore.markStale` overwrote a `reason: "language"` warning with `"project"`, and the focus check's next `clearStale()` hid both while `saveStore.savingSuspended` stayed true: no banner, no autosave, and a manual save resolved `{ status: "suspended" }`, which `saveAndReport` ignored. Reached by: language removed, another tab switches project, this project re-activated. The banner also floated (`fixed`, `z-[60]`) over the editor toolbar, Save and toasts.
+
+**Resolution:** the store tracks `languageRemoved` separately from the visible `reason`. The blocking project overlay takes the screen whichever warning arrives first (`markLanguageRemoved` keeps `"project"`), and the focus check's `clearProjectMismatch` restores the language banner instead of clearing it; `clearLanguageRemoved` drops a language hidden under a project warning when its session ends. A manual save resolving `"suspended"` shows a toast (`pageEditor.toolbar.saveSuspended`). The language banner is its own export, `StaleLanguageBanner`, mounted by the OSS shell in the editor Layout's `topbarBanner` slot, in the page flow. Fix `b10a6774`.
+
+**Body at:** `b10a6774:docs-llms/TODO-agents.md`.
+
 ## Reconciliation decisions
 
 - GitHub #115, #122, #126, #133, #134 and #135 have implementation evidence. Their remaining local entries are review/documentation/integration work, not instructions to rebuild the features. GitHub statuses were left unchanged.

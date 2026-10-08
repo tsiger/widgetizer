@@ -34,6 +34,7 @@
     "./translations": "./src/utils/translations.js",
     "./structuredData": "./src/structuredData/index.js",
     "./dateFormat": "./src/utils/dateFormat.js",
+    "./themeSettingChanges": "./src/utils/themeSettingChanges.js",
     "./config/settingTypes": "./src/config/settingTypes.js",
     "./config/fonts.json": "./src/config/fonts.json",
     "./locales/*": "./src/locales/*"

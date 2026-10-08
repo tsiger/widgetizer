@@ -127,7 +127,8 @@ The backend handles listing themes, processing uploads, deletion, and triggering
 | `GET` | `/api/themes/:id/presets` |  | `getThemePresets` | Gets all presets for a theme (names, descriptions, screenshots). |
 | `POST` | `/api/themes/:id/update` |  | `updateTheme` | Builds `latest/` snapshot for a single theme. |
 | `GET` | `/api/themes/project/:projectId` | `resolveActiveProject` | `getProjectThemeSettings` | Gets a project's `theme.json` settings. |
-| `POST` | `/api/themes/project/:projectId` | `resolveActiveProject` | `saveProjectThemeSettings` | Saves a project's `theme.json` settings. |
+| `POST` | `/api/themes/project/:projectId` | `resolveActiveProject` | `saveProjectThemeSettings` | Saves a whole `theme.json`. Refuses (409 `THEME_VERSION_CHANGED`, nothing written) a file whose `version` differs from the stored one. Responds `{ message, warnings? }`. |
+| `PATCH` | `/api/themes/project/:projectId` | `resolveActiveProject` | `saveProjectThemeSettingChanges` | Saves only changed settings: body `{ changes: [{ group, id, baseValue?, value? }] }`. Merges them into the stored file under the content-write section, responds `{ theme, warnings }`, and refuses the whole save (409 `THEME_SETTINGS_CHANGED`, nothing written) when a changed setting no longer holds its `baseValue`. A malformed body is a 400 `INVALID_CHANGES`; a missing file a 404 `THEME_SETTINGS_NOT_FOUND`. |
 | `GET` | `/api/themes/project/:projectId/locales/:lang` | `resolveActiveProject` | `getProjectThemeLocale` | Gets a project's theme locale strings for a language. |
 | `POST` | `/api/themes/upload` | `handleThemeUpload` | `uploadTheme` | Handles upload and extraction of a theme ZIP (new theme or updates). |
 | `DELETE` | `/api/themes/:id` |  | `deleteTheme` | Deletes a theme. Returns 409 if theme is used by any project. |

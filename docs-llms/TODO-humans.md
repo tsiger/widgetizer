@@ -175,22 +175,6 @@ The checks that keep theme updates and exports inside their own folders look at 
 
 ## Fixes and investigations
 
-### R-THEME-SAVE · Keep theme-settings saves in order
-
-**Open · Medium · Shared**
-
-Confirmed with delayed save responses: save a red color, then blue, and an older response can make the app remember red as the saved value. Reset then brings back red even though blue is actually saved. The settings screen allows these saves to overlap.
-
-**Next:** Coordinate theme-settings saves from both the settings screen and page editor. Verify that delayed responses cannot bring back old values, Reset reflects what was saved, and changes made while saving are preserved. Also cover two smaller timing gaps: a theme draft saved after you discarded and left, and the Settings screen getting stuck on its spinner.
-
-### GH147 · A stale tab's theme-settings save reverts a theme update
-
-**Open · Medium · Shared**
-
-If an editor or Site settings screen was open before a theme update and you then save a theme setting there, it puts the old theme settings back. The project still says it is on the new version, so the update is never offered again and its new settings (such as Show breadcrumbs) never appear. Nothing warns the user.
-
-**Next:** Make the server refuse a theme-settings save based on an older copy and ask the user to reload, without losing unsaved edits. Then consider telling open tabs about an update as soon as it happens. Plan it together with R-THEME-SAVE. [GitHub #147](https://github.com/tsiger/widgetizer/issues/147)
-
 ### SKIPPED-ITEM-NOTICE · Say when a collection item is skipped for a bad slug
 
 **Open · Low · Shared**
@@ -342,14 +326,6 @@ In the media library, a translated header shows as "El:header (Global)" and tran
 
 **Next:** Show a readable title with its language for every language.
 
-### STALE-BANNER · A project warning can hide a language-removed warning while saves stay suspended
-
-**Open · Low · Shared**
-
-After an unlikely sequence (a language is removed, another tab switches project, then you switch back), the warning disappears but the editor quietly stops saving.
-
-**Next:** Keep the language warning, or always show that saving is paused.
-
 ### THEME-CHECKER · Close gaps in the theme checker
 
 **Open · Low · OSS**
@@ -373,6 +349,62 @@ If a theme widget loads a script whose address is badly written (a typo that mak
 Arch's Video and Video popup widgets each work out a YouTube or Vimeo link by looking for bits of text in it. They now always point the player at YouTube's or Vimeo's player, but a mistyped video ID still shows a broken player instead of none, don't understand YouTube Shorts or unlisted Vimeo share links, and repeat the same code twice.
 
 **Next:** Add one shared filter in the app that reads the link properly and returns a safe player address (or nothing), use it in both widgets, and document it for theme authors.
+
+### THEME-WARNING-LABEL · Name the corrected setting in theme-save warnings
+
+**Open · Low · Shared**
+
+When a site setting is saved with an invalid value, the warning names it by an internal code such as "tTheme:global.colors.settings.standard_border_color.label" instead of its label.
+
+**Next:** Show the setting's label in the user's language.
+
+### SETTINGS-DISCARD · Site settings keeps a draft the user chose to discard
+
+**Open · Low · Shared**
+
+Leaving Site settings with unsaved changes and choosing "Discard changes" still shows those changes, unsaved, when you come back, even though the dialog says they will be lost.
+
+**Next:** Make "Discard changes" really drop the changes, or change what the dialog promises.
+
+### UNDO-CLEAN · Undoing back to the saved state leaves Save enabled
+
+**Open · Low · Shared**
+
+In the page editor, undoing a site-setting change or a widget delete or move back to exactly what was saved still leaves Save enabled. Saving then does nothing harmful.
+
+**Next:** Turn Save off when undo brings everything back to the saved state.
+
+### EDITOR-THEME-USAGE-NOTICE · The editor's image-tracking notice says "this page" for theme saves
+
+**Open · Low · Shared**
+
+When the editor saves site settings and image tracking falls behind, the notice talks about "this page" instead of the site settings.
+
+**Next:** Use wording about the site settings for that case.
+
+### SETTINGS-LOAD-RETRY · Site settings does not retry a failed load
+
+**Open · Low · Shared**
+
+If Site settings fails to load (for example the server was down), it shows "No theme settings available" with no error, and keeps showing it after the server is back until you open the editor or switch project.
+
+**Next:** Show the error and load again when you return to the page.
+
+### MISSING-IMAGE-MESSAGE · Say why a theme save with a deleted image failed
+
+**Open · Low · Shared**
+
+If an image picked for a site setting is deleted from the media library before you save, the save fails with "Please try again", which won't help.
+
+**Next:** Say that the image is gone and to choose another one.
+
+### THEME-LOCALE-STALE · Theme labels stay untranslated after a theme update
+
+**Open · Low · Shared**
+
+After applying a theme update, settings the update added show internal codes instead of their names until the page is reloaded.
+
+**Next:** Refresh the theme's labels when an update is applied.
 
 ### T66 · Explain form errors beside the right field
 

@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 
 vi.mock("../../queries/themeManager", () => ({
   getThemeSettings: vi.fn(),
-  saveThemeSettings: vi.fn(),
+  saveThemeSettingChanges: vi.fn(),
 }));
 vi.mock("../../queries/mediaManager", () => ({
   invalidateMediaCache: vi.fn(),
@@ -12,13 +12,14 @@ vi.mock("../../lib/activeProjectId", () => ({
 }));
 
 const { default: useThemeStore } = await import("../themeStore");
-const { getThemeSettings, saveThemeSettings } = await import("../../queries/themeManager");
+const { getThemeSettings, saveThemeSettingChanges } = await import("../../queries/themeManager");
 
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 
 function resetStore() {
+  useThemeStore.getState().reset();
   useThemeStore.setState({
     settings: null,
     originalSettings: null,
@@ -121,94 +122,406 @@ describe("themeStore", () => {
   // saveSettings — warning handling
   // --------------------------------------------------------------------------
 
-  describe("saveSettings — warning handling", () => {
-    it("reloads corrected values when server returns warnings", async () => {
-      seedSettings();
-
-      const correctedSettings = {
-        settings: {
-          global: {
-            colors: [
-              { id: "primary_color", type: "color", value: "#corrected" },
-              { id: "secondary_color", type: "color", value: "#00ff00" },
-            ],
-          },
+  describe("saveSettings", () => {
+    const valueOf = (theme, id) => theme.settings.global.colors.find((s) => s.id === id).value;
+    const withValues = (values) => ({
+      settings: {
+        global: {
+          colors: [
+            { id: "primary_color", type: "color", value: values.primary ?? "#ff0000" },
+            { id: "secondary_color", type: "color", value: values.secondary ?? "#00ff00" },
+          ],
         },
-      };
-
-      saveThemeSettings.mockResolvedValueOnce({
-        warnings: ["primary_color was out of range"],
-      });
-      getThemeSettings.mockResolvedValueOnce(correctedSettings);
-
-      const result = await useThemeStore.getState().saveSettings("project-a");
-
-      expect(result.warnings).toHaveLength(1);
-      // Store should now reflect the corrected values
-      expect(useThemeStore.getState().settings).toEqual(correctedSettings);
-      expect(useThemeStore.getState().originalSettings).toEqual(correctedSettings);
+      },
     });
-
-    it("preserves a mid-flight edit made while the warnings reload was in flight — live settings keep the edit, baseline is the server copy, still reported dirty", async () => {
-      seedSettings();
-
-      saveThemeSettings.mockResolvedValueOnce({
-        warnings: ["primary_color was out of range"],
+    const deferred = () => {
+      let resolve;
+      let reject;
+      const promise = new Promise((res, rej) => {
+        resolve = res;
+        reject = rej;
       });
-      const correctedSettings = {
-        settings: {
-          global: {
-            colors: [
-              { id: "primary_color", type: "color", value: "#corrected" },
-              { id: "secondary_color", type: "color", value: "#00ff00" },
-            ],
-          },
-        },
-      };
-      let resolveGet;
-      getThemeSettings.mockImplementationOnce(() => new Promise((resolve) => { resolveGet = resolve; }));
+      return { promise, resolve, reject };
+    };
 
-      const savePromise = useThemeStore.getState().saveSettings("project-a");
-
-      // Let saveThemeSettings' microtask resolve so getThemeSettings (and its
-      // resolveGet assignment) is actually reached before we edit mid-flight.
-      await Promise.resolve();
-      await Promise.resolve();
-
-      // An edit lands while the follow-up GET is still in flight.
-      useThemeStore.getState().updateThemeSetting("colors", "secondary_color", "#edited-mid-flight");
-      const midFlightSettings = useThemeStore.getState().settings;
-
-      resolveGet(correctedSettings);
-      await savePromise;
-
-      // The live draft must survive — not clobbered by the warnings reload.
-      expect(useThemeStore.getState().settings).toEqual(midFlightSettings);
-      const secondary = useThemeStore.getState().settings.settings.global.colors
-        .find((s) => s.id === "secondary_color");
-      expect(secondary.value).toBe("#edited-mid-flight");
-      // The baseline still rebaselines to the fresh server copy.
-      expect(useThemeStore.getState().originalSettings).toEqual(correctedSettings);
-      // Since settings != originalSettings now, the draft correctly reads dirty
-      // so the next save resends it.
-      expect(useThemeStore.getState().hasUnsavedThemeChanges()).toBe(true);
-    });
-
-    it("marks settings as saved without refetch when no warnings", async () => {
+    it("sends only the changed settings, each with the value it started from", async () => {
       seedSettings();
-
-      // Modify a setting
-      useThemeStore.getState().updateThemeSetting("colors", "primary_color", "#changed");
-      expect(useThemeStore.getState().hasUnsavedThemeChanges()).toBe(true);
-
-      saveThemeSettings.mockResolvedValueOnce({});
+      useThemeStore.getState().updateThemeSetting("colors", "primary_color", "#0000ff");
+      saveThemeSettingChanges.mockResolvedValueOnce({ theme: withValues({ primary: "#0000ff" }), warnings: [] });
 
       await useThemeStore.getState().saveSettings("project-a");
 
-      // Should not have refetched
-      expect(getThemeSettings).not.toHaveBeenCalled();
-      // Should be marked as saved
+      expect(saveThemeSettingChanges).toHaveBeenCalledWith(
+        "project-a",
+        [{ group: "colors", id: "primary_color", baseValue: "#ff0000", value: "#0000ff" }],
+        expect.any(Object),
+      );
       expect(useThemeStore.getState().hasUnsavedThemeChanges()).toBe(false);
+    });
+
+    it("takes the server's copy, including a value it corrected, without refetching", async () => {
+      seedSettings();
+      useThemeStore.getState().updateThemeSetting("colors", "primary_color", "bad");
+      const saved = withValues({ primary: "#corrected" });
+      saveThemeSettingChanges.mockResolvedValueOnce({
+        theme: saved,
+        warnings: [{ code: "VALUE_CORRECTED", id: "primary_color" }],
+      });
+
+      const result = await useThemeStore.getState().saveSettings("project-a");
+
+      expect(result.warnings).toEqual([{ code: "VALUE_CORRECTED", id: "primary_color" }]);
+      expect(getThemeSettings).not.toHaveBeenCalled();
+      expect(useThemeStore.getState().settings).toEqual(saved);
+      expect(useThemeStore.getState().originalSettings).toEqual(saved);
+    });
+
+    it("keeps an edit made during the save on top of the server's copy, even to the setting it sent", async () => {
+      seedSettings();
+      useThemeStore.getState().updateThemeSetting("colors", "primary_color", "#111111");
+      const response = deferred();
+      saveThemeSettingChanges.mockReturnValueOnce(response.promise);
+
+      const saving = useThemeStore.getState().saveSettings("project-a");
+      useThemeStore.getState().updateThemeSetting("colors", "primary_color", "#222222");
+      useThemeStore.getState().updateThemeSetting("colors", "secondary_color", "#333333");
+      response.resolve({ theme: withValues({ primary: "#111111" }), warnings: [] });
+      await saving;
+
+      const { settings, originalSettings } = useThemeStore.getState();
+      expect(valueOf(originalSettings, "primary_color")).toBe("#111111");
+      expect(valueOf(settings, "primary_color")).toBe("#222222");
+      expect(valueOf(settings, "secondary_color")).toBe("#333333");
+      expect(useThemeStore.getState().hasUnsavedThemeChanges()).toBe(true);
+    });
+
+    it("does not put a corrected value back when nothing edited it during the save", async () => {
+      seedSettings();
+      useThemeStore.getState().updateThemeSetting("colors", "primary_color", "bad");
+      saveThemeSettingChanges.mockResolvedValueOnce({ theme: withValues({ primary: "#000000" }), warnings: [] });
+
+      await useThemeStore.getState().saveSettings("project-a");
+
+      expect(valueOf(useThemeStore.getState().settings, "primary_color")).toBe("#000000");
+    });
+
+    // R-THEME-SAVE: save red, then blue while red is in flight.
+    it("runs saves one at a time, so Reset gives what the server holds", async () => {
+      seedSettings();
+      const red = deferred();
+      const blue = deferred();
+      saveThemeSettingChanges.mockReturnValueOnce(red.promise).mockReturnValueOnce(blue.promise);
+
+      useThemeStore.getState().updateThemeSetting("colors", "primary_color", "red");
+      const first = useThemeStore.getState().saveSettings("project-a");
+      useThemeStore.getState().updateThemeSetting("colors", "primary_color", "blue");
+      const second = useThemeStore.getState().saveSettings("project-a");
+
+      // Blue is not sent until red has landed.
+      expect(saveThemeSettingChanges).toHaveBeenCalledTimes(1);
+      red.resolve({ theme: withValues({ primary: "red" }), warnings: [] });
+      await first;
+      await vi.waitFor(() => expect(saveThemeSettingChanges).toHaveBeenCalledTimes(2));
+      expect(saveThemeSettingChanges.mock.calls[1][1]).toEqual([
+        { group: "colors", id: "primary_color", baseValue: "red", value: "blue" },
+      ]);
+      blue.resolve({ theme: withValues({ primary: "blue" }), warnings: [] });
+      await second;
+
+      expect(useThemeStore.getState().hasUnsavedThemeChanges()).toBe(false);
+      useThemeStore.getState().resetThemeSettings();
+      expect(valueOf(useThemeStore.getState().settings, "primary_color")).toBe("blue");
+    });
+
+    it("coalesces saves requested meanwhile into one follow-up that all of them await", async () => {
+      seedSettings();
+      const first = deferred();
+      saveThemeSettingChanges
+        .mockReturnValueOnce(first.promise)
+        .mockResolvedValueOnce({ theme: withValues({ primary: "#c" }), warnings: [] });
+
+      useThemeStore.getState().updateThemeSetting("colors", "primary_color", "#a");
+      const a = useThemeStore.getState().saveSettings("project-a");
+      useThemeStore.getState().updateThemeSetting("colors", "primary_color", "#c");
+      const b = useThemeStore.getState().saveSettings("project-a");
+      const c = useThemeStore.getState().saveSettings("project-a");
+      expect(b).toBe(c);
+      expect(useThemeStore.getState().saving).toBe(true);
+
+      first.resolve({ theme: withValues({ primary: "#a" }), warnings: [] });
+      await Promise.all([a, b, c]);
+      expect(saveThemeSettingChanges).toHaveBeenCalledTimes(2);
+      expect(useThemeStore.getState().saving).toBe(false);
+    });
+
+    // A caller reacting to the first save settling runs before the queued
+    // follow-up starts; a save it requests there must join the follow-up, not
+    // start a second save beside it.
+    it("never has two saves in flight, even when one is requested as the first settles", async () => {
+      seedSettings();
+      let inFlightNow = 0;
+      let maxInFlight = 0;
+      const pending = [];
+      saveThemeSettingChanges.mockImplementation(
+        () =>
+          new Promise((resolve) => {
+            inFlightNow += 1;
+            maxInFlight = Math.max(maxInFlight, inFlightNow);
+            pending.push(() => {
+              inFlightNow -= 1;
+              resolve({ theme: useThemeStore.getState().settings, warnings: [] });
+            });
+          }),
+      );
+
+      useThemeStore.getState().updateThemeSetting("colors", "primary_color", "#a");
+      const first = useThemeStore.getState().saveSettings("project-a");
+      const chained = first.then(() => {
+        useThemeStore.getState().updateThemeSetting("colors", "primary_color", "#c");
+        return useThemeStore.getState().saveSettings("project-a");
+      });
+      useThemeStore.getState().updateThemeSetting("colors", "primary_color", "#b");
+      const queued = useThemeStore.getState().saveSettings("project-a");
+
+      pending.shift()();
+      await vi.waitFor(() => expect(pending).toHaveLength(1));
+      await Promise.resolve();
+      await Promise.resolve();
+      expect(inFlightNow).toBe(1);
+      while (pending.length) {
+        pending.shift()();
+        await new Promise((resolve) => setTimeout(resolve, 0));
+      }
+      await Promise.all([first, chained, queued]);
+      expect(maxInFlight).toBe(1);
+    });
+
+    it("skips the request when nothing differs, including a key-order-only difference", async () => {
+      useThemeStore.setState({
+        settings: { settings: { global: { g: [{ id: "link", type: "link", value: { href: "/a", text: "A" } }] } } },
+        originalSettings: { settings: { global: { g: [{ id: "link", type: "link", value: { text: "A", href: "/a" } }] } } },
+        loadedProjectId: "project-a",
+      });
+
+      expect(useThemeStore.getState().hasUnsavedThemeChanges()).toBe(false);
+      const result = await useThemeStore.getState().saveSettings("project-a");
+      expect(result).toEqual({ warnings: [], skipped: true });
+      expect(saveThemeSettingChanges).not.toHaveBeenCalled();
+    });
+
+    it("writes nothing back when the store was reset or moved project during the save", async () => {
+      seedSettings();
+      useThemeStore.getState().updateThemeSetting("colors", "primary_color", "#0000ff");
+      const response = deferred();
+      saveThemeSettingChanges.mockReturnValueOnce(response.promise);
+
+      const saving = useThemeStore.getState().saveSettings("project-a");
+      useThemeStore.getState().resetForProjectChange();
+      useThemeStore.setState({ loadedProjectId: "project-b", settings: withValues({}), originalSettings: withValues({}) });
+      response.resolve({ theme: withValues({ primary: "#0000ff" }), warnings: [] });
+
+      expect(await saving).toMatchObject({ stale: true });
+      expect(valueOf(useThemeStore.getState().originalSettings, "primary_color")).toBe("#ff0000");
+    });
+
+    // Discard-and-leave during a save: the values DID reach the server, so the
+    // store takes them as they are rather than reverting them on top.
+    it("takes the saved values with nothing on top when the draft was discarded during the save", async () => {
+      seedSettings();
+      useThemeStore.getState().updateThemeSetting("colors", "primary_color", "#0000ff");
+      const response = deferred();
+      saveThemeSettingChanges.mockReturnValueOnce(response.promise);
+
+      const saving = useThemeStore.getState().saveSettings("project-a");
+      useThemeStore.getState().discardDraft();
+      expect(useThemeStore.getState().isDraftDiscarded()).toBe(true);
+      response.resolve({ theme: withValues({ primary: "#0000ff" }), warnings: [] });
+      const result = await saving;
+
+      expect(result.adopted).toBe(true);
+      expect(valueOf(useThemeStore.getState().settings, "primary_color")).toBe("#0000ff");
+      expect(useThemeStore.getState().hasUnsavedThemeChanges()).toBe(false);
+    });
+
+    it("forgets the discard once the user edits again", () => {
+      seedSettings();
+      useThemeStore.getState().discardDraft();
+      useThemeStore.getState().updateThemeSetting("colors", "primary_color", "#0000ff");
+      expect(useThemeStore.getState().isDraftDiscarded()).toBe(false);
+    });
+
+    it("never lowers the generation, so a save from before a reset still sees that it moved", () => {
+      const before = useThemeStore.getState().generation;
+      useThemeStore.getState().reset();
+      useThemeStore.getState().resetForProjectChange();
+      expect(useThemeStore.getState().generation).toBe(before + 2);
+    });
+
+    it("lets a save in flight land after the Reset button", async () => {
+      seedSettings();
+      useThemeStore.getState().updateThemeSetting("colors", "primary_color", "#0000ff");
+      const response = deferred();
+      saveThemeSettingChanges.mockReturnValueOnce(response.promise);
+
+      const saving = useThemeStore.getState().saveSettings("project-a");
+      useThemeStore.getState().resetThemeSettings();
+      response.resolve({ theme: withValues({ primary: "#0000ff" }), warnings: [] });
+      await saving;
+
+      expect(valueOf(useThemeStore.getState().originalSettings, "primary_color")).toBe("#0000ff");
+    });
+
+    describe("when the settings were changed elsewhere", () => {
+      const conflict = (code = "THEME_SETTINGS_CHANGED") =>
+        Object.assign(new Error("changed"), { status: 409, code, data: { code, conflicts: ["primary_color"] } });
+
+      it("keeps the user's edits on top of the server's copy, unsaved, and resolves without throwing", async () => {
+        seedSettings();
+        useThemeStore.getState().updateThemeSetting("colors", "primary_color", "#mine");
+        saveThemeSettingChanges.mockRejectedValueOnce(conflict());
+        getThemeSettings.mockResolvedValueOnce(withValues({ primary: "#theirs", secondary: "#their-other" }));
+
+        const result = await useThemeStore.getState().saveSettings("project-a");
+
+        expect(result).toMatchObject({ conflict: true });
+        const { settings, originalSettings, conflict: recorded } = useThemeStore.getState();
+        expect(valueOf(originalSettings, "primary_color")).toBe("#theirs");
+        expect(valueOf(settings, "primary_color")).toBe("#mine");
+        expect(valueOf(settings, "secondary_color")).toBe("#their-other");
+        expect(useThemeStore.getState().hasUnsavedThemeChanges()).toBe(true);
+        expect(recorded.ids).toEqual(["primary_color"]);
+      });
+
+      // A theme update removed one changed setting while another screen changed
+      // the other: the removed one cannot be kept, and the result says so.
+      it("reports an edit it could not keep because the setting is gone", async () => {
+        seedSettings();
+        useThemeStore.getState().updateThemeSetting("colors", "primary_color", "#mine");
+        useThemeStore.getState().updateThemeSetting("colors", "secondary_color", "#also-mine");
+        saveThemeSettingChanges.mockRejectedValueOnce(conflict());
+        getThemeSettings.mockResolvedValueOnce({
+          settings: { global: { colors: [{ id: "primary_color", type: "color", value: "#theirs" }] } },
+        });
+
+        const result = await useThemeStore.getState().saveSettings("project-a");
+
+        expect(result.conflict).toBe(true);
+        expect(result.warnings).toEqual([{ id: "secondary_color", code: "SETTING_REMOVED" }]);
+        expect(valueOf(useThemeStore.getState().settings, "primary_color")).toBe("#mine");
+      });
+
+      it("treats a refused older theme version the same way", async () => {
+        seedSettings();
+        useThemeStore.getState().updateThemeSetting("colors", "primary_color", "#mine");
+        saveThemeSettingChanges.mockRejectedValueOnce(conflict("THEME_VERSION_CHANGED"));
+        getThemeSettings.mockResolvedValueOnce(withValues({}));
+
+        expect(await useThemeStore.getState().saveSettings("project-a")).toMatchObject({ conflict: true });
+      });
+
+      it("rejects and keeps its state when the server copy cannot be read", async () => {
+        seedSettings();
+        useThemeStore.getState().updateThemeSetting("colors", "primary_color", "#mine");
+        const before = useThemeStore.getState();
+        saveThemeSettingChanges.mockRejectedValueOnce(conflict());
+        getThemeSettings.mockRejectedValueOnce(new Error("offline"));
+
+        await expect(useThemeStore.getState().saveSettings("project-a")).rejects.toThrow("offline");
+        expect(useThemeStore.getState().settings).toBe(before.settings);
+        expect(useThemeStore.getState().originalSettings).toBe(before.originalSettings);
+      });
+
+      it("still throws any other 409, such as the active-project guard", async () => {
+        seedSettings();
+        useThemeStore.getState().updateThemeSetting("colors", "primary_color", "#mine");
+        saveThemeSettingChanges.mockRejectedValueOnce(
+          Object.assign(new Error("mismatch"), { status: 409, code: "PROJECT_MISMATCH" }),
+        );
+
+        await expect(useThemeStore.getState().saveSettings("project-a")).rejects.toMatchObject({
+          code: "PROJECT_MISMATCH",
+        });
+      });
+    });
+
+    describe("against a server without the change-only route", () => {
+      it("rebaselines to what it sent when nothing was corrected", async () => {
+        seedSettings();
+        useThemeStore.getState().updateThemeSetting("colors", "primary_color", "#0000ff");
+        saveThemeSettingChanges.mockResolvedValueOnce({ theme: null, warnings: [] });
+
+        const result = await useThemeStore.getState().saveSettings("project-a");
+
+        expect(result.adopted).toBe(false);
+        expect(getThemeSettings).not.toHaveBeenCalled();
+        expect(useThemeStore.getState().hasUnsavedThemeChanges()).toBe(false);
+      });
+
+      it("takes the corrected copy as it is when the draft was discarded during the save", async () => {
+        seedSettings();
+        useThemeStore.getState().updateThemeSetting("colors", "primary_color", "bad");
+        const response = deferred();
+        saveThemeSettingChanges.mockReturnValueOnce(response.promise);
+        getThemeSettings.mockResolvedValueOnce(withValues({ primary: "#corrected" }));
+
+        const saving = useThemeStore.getState().saveSettings("project-a");
+        useThemeStore.getState().discardDraft();
+        response.resolve({ theme: null, warnings: [{ code: "VALUE_CORRECTED" }] });
+        await saving;
+
+        expect(valueOf(useThemeStore.getState().settings, "primary_color")).toBe("#corrected");
+        expect(useThemeStore.getState().hasUnsavedThemeChanges()).toBe(false);
+      });
+
+      it("reads back what it corrected, keeping an edit made meanwhile", async () => {
+        seedSettings();
+        useThemeStore.getState().updateThemeSetting("colors", "primary_color", "bad");
+        saveThemeSettingChanges.mockResolvedValueOnce({ theme: null, warnings: [{ code: "VALUE_CORRECTED" }] });
+        const read = deferred();
+        getThemeSettings.mockReturnValueOnce(read.promise);
+
+        const saving = useThemeStore.getState().saveSettings("project-a");
+        await vi.waitFor(() => expect(getThemeSettings).toHaveBeenCalled());
+        useThemeStore.getState().updateThemeSetting("colors", "secondary_color", "#edited");
+        read.resolve(withValues({ primary: "#corrected" }));
+        await saving;
+
+        const { settings, originalSettings } = useThemeStore.getState();
+        expect(valueOf(originalSettings, "primary_color")).toBe("#corrected");
+        expect(valueOf(settings, "primary_color")).toBe("#corrected");
+        expect(valueOf(settings, "secondary_color")).toBe("#edited");
+      });
+    });
+
+    it("tells the registered listener what it expected and what the server holds", async () => {
+      const listener = vi.fn();
+      useThemeStore.onServerThemeAdopted(listener);
+      try {
+        seedSettings();
+        useThemeStore.getState().updateThemeSetting("colors", "primary_color", "bad");
+        const sent = useThemeStore.getState().settings;
+        const saved = withValues({ primary: "#000000" });
+        saveThemeSettingChanges.mockResolvedValueOnce({ theme: saved, warnings: [] });
+
+        await useThemeStore.getState().saveSettings("project-a");
+
+        expect(listener).toHaveBeenCalledWith(sent, saved, saved);
+      } finally {
+        useThemeStore.onServerThemeAdopted(null);
+      }
+    });
+  });
+
+  describe("invalidate", () => {
+    it("drops the loaded copy so the next screen loads it fresh", () => {
+      seedSettings();
+      const before = useThemeStore.getState().generation;
+      useThemeStore.getState().invalidate();
+      const state = useThemeStore.getState();
+      expect(state.settings).toBeNull();
+      expect(state.loadedProjectId).toBeNull();
+      expect(state.loading).toBe(false);
+      expect(state.generation).toBe(before + 1);
     });
   });
 
@@ -296,6 +609,25 @@ describe("themeStore", () => {
 
       expect(fresh).toBeNull();
       expect(useThemeStore.getState().originalSettings).toEqual(expected);
+    });
+
+    // A reconcile used to bump the load counter, so a load already running
+    // dropped its own result and never cleared `loading` (Settings stuck on its spinner).
+    it("lets a load that is already running finish and clear its spinner", async () => {
+      seedSettings();
+      let resolveLoad;
+      getThemeSettings
+        .mockImplementationOnce(() => new Promise((resolve) => { resolveLoad = resolve; }))
+        .mockResolvedValueOnce(serverCopy());
+
+      const loading = useThemeStore.getState().loadSettings("project-a");
+      expect(useThemeStore.getState().loading).toBe(true);
+      await useThemeStore.getState().reconcileFromServer("project-a", useThemeStore.getState().settings);
+      resolveLoad(serverCopy());
+      await loading;
+
+      expect(useThemeStore.getState().loading).toBe(false);
+      expect(useThemeStore.getState().settings).toEqual(serverCopy());
     });
 
     it("leaves the store untouched when the read fails", async () => {

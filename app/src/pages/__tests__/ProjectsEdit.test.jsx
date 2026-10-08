@@ -1,17 +1,23 @@
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 
 const getAllProjects = vi.fn();
+const checkThemeUpdates = vi.fn();
+const applyThemeUpdate = vi.fn();
+const invalidateTheme = vi.fn();
 let storeState;
 
 vi.mock("@widgetizer/editor-ui/queries/projectManager", () => ({
   getAllProjects: (...args) => getAllProjects(...args),
-  checkThemeUpdates: async () => ({ hasUpdate: false }),
+  checkThemeUpdates: (...args) => checkThemeUpdates(...args),
   updateProject: vi.fn(),
   getActiveProject: vi.fn(),
-  applyThemeUpdate: vi.fn(),
+  applyThemeUpdate: (...args) => applyThemeUpdate(...args),
+}));
+vi.mock("@widgetizer/editor-ui/stores/themeStore", () => ({
+  default: { getState: () => ({ invalidate: invalidateTheme }) },
 }));
 vi.mock("@widgetizer/editor-ui/stores/projectStore", () => {
   const hook = (selector) => (selector ? selector(storeState) : storeState);
@@ -49,6 +55,9 @@ function openDetails(id) {
 
 beforeEach(() => {
   getAllProjects.mockReset();
+  checkThemeUpdates.mockReset().mockResolvedValue({ hasUpdate: false });
+  applyThemeUpdate.mockReset();
+  invalidateTheme.mockReset();
   getAllProjects.mockResolvedValue([
     { id: "p1", name: "Bakery" },
     { id: "p2", name: "Café" },
@@ -74,5 +83,32 @@ describe("ProjectsEdit — active project only", () => {
     openDetails("p1");
     expect(screen.queryByText("projects list")).toBeNull();
     expect(screen.queryByText("project form")).toBeNull();
+  });
+});
+
+// Site settings and the editor keep the theme settings they loaded until the
+// project changes; saving that copy after an update used to put the old theme back.
+describe("ProjectsEdit — applying a theme update", () => {
+  it("drops the loaded theme settings so the next screen loads the updated ones", async () => {
+    storeState = { activeProject: { id: "p1" }, loading: false, setActiveProject: vi.fn() };
+    checkThemeUpdates.mockResolvedValue({ hasUpdate: true, currentVersion: "0.9.9", latestVersion: "0.9.10" });
+    applyThemeUpdate.mockResolvedValue({ success: true, previousVersion: "0.9.9", newVersion: "0.9.10" });
+    openDetails("p1");
+
+    fireEvent.click(await screen.findByRole("button", { name: /apply update/i }));
+
+    await waitFor(() => expect(invalidateTheme).toHaveBeenCalledTimes(1));
+  });
+
+  it("leaves the loaded theme settings alone when nothing was applied", async () => {
+    storeState = { activeProject: { id: "p1" }, loading: false, setActiveProject: vi.fn() };
+    checkThemeUpdates.mockResolvedValue({ hasUpdate: true, currentVersion: "0.9.9", latestVersion: "0.9.10" });
+    applyThemeUpdate.mockResolvedValue({ success: false, message: "No update available" });
+    openDetails("p1");
+
+    fireEvent.click(await screen.findByRole("button", { name: /apply update/i }));
+
+    await waitFor(() => expect(applyThemeUpdate).toHaveBeenCalled());
+    expect(invalidateTheme).not.toHaveBeenCalled();
   });
 });

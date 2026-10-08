@@ -721,6 +721,7 @@
       "description": "Marks this page as the home of this collection. Its items show it in their breadcrumbs, e.g. Home › Blog › A post. Only one page per collection.",
       "moved": "This is now the main page for that collection — moved from {{pages}}. If that page was split into pages, it no longer is."
     },
+    "themeConflict": "Site settings were changed elsewhere since this editor opened. Your theme changes are kept on top of the current settings and will be saved.",
     "mediaUsage": {
       "stale": "Your page is saved. Widgetizer could not update its record of which images this page uses, so the media library may show one as unused until you press Refresh usage there.",
       "missing": "Your changes were not saved: this page uses an image that is no longer in the media library. Choose a different image, or upload it again, then save."
@@ -758,7 +759,8 @@
       "redo": "Redo",
       "saving": "Saving...",
       "save": "Save",
-      "saveFailed": "Your changes could not be saved. They are still here — try again."
+      "saveFailed": "Your changes could not be saved. They are still here — try again.",
+      "saveSuspended": "Saving is turned off for this page because its language was removed. Your changes are still here, but they cannot be saved."
     },
     "preview": {
       "loading": "Loading Preview...",
@@ -961,7 +963,11 @@
     "toasts": {
       "loadError": "Failed to load theme settings. Please try again.",
       "saveSuccess": "Theme settings saved successfully!",
-      "saveError": "Failed to save theme settings. Please try again."
+      "saveError": "Failed to save theme settings. Please try again.",
+      "conflict": "Some of these settings were changed elsewhere since this page opened. Your changes are kept on top of the current settings; review them and save again.",
+      "settingRemoved": "A setting you changed no longer exists in this theme, so that change was not saved.",
+      "valueCorrected": "\"{{label}}\" contained an invalid value and was reset.",
+      "mediaUsageStale": "Your settings are saved. Widgetizer could not update its record of which images they use, so the media library may show one as unused until you press Refresh usage there."
     }
   },
   "themes": {

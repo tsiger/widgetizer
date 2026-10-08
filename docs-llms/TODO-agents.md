@@ -216,30 +216,6 @@ The containment checks that keep file-sourced paths inside their folder compare 
 
 ## Fixes and investigations
 
-### R-THEME-SAVE · Keep theme-settings saves in order
-
-**Open · Medium · Shared**
-
-Confirmed 2026-09-21 at `8846ab29` with a controlled delayed-response test against the real theme store. Settings permits repeated saves while a request is pending; `themeStore.saveSettings()` has no shared queue. Save red, then blue; let the server store both in order but deliver blue's response before red's. The late red response replaces `originalSettings`, reports the blue draft dirty, and Reset restores red while declaring it clean although the server holds blue. The 17 existing theme-store tests passed; the temporary diagnostic reproduced the gap and was removed.
-
-Coordinate saves at the shared theme-store boundary used by Settings and the page editor. Preserve newer edits, warning corrections, project/load isolation and manual failure reporting. Do not redo the completed page-save redesign or expand into unrelated cross-window/backend coordination. Also check two related gaps found 2026-10-05 (read only): `saveStore.save` has no generation check between Phase 1 (page/globals) and Phase 2 (theme, ~312-319), so after discard-and-leave during Phase 1 the theme draft live at that moment is sent; and `themeStore.reconcileFromServer` (~179) bumps `activeLoadId`, so an in-flight `loadSettings` drops its result and neither sets `loading:false` (Settings can stay on a spinner).
-
-**Done when:** A retained regression test covers the demonstrated response ordering and Reset agrees with saved content. Shared callers cannot race theme writes or saved baselines; edits during a save remain dirty, and failures/corrections do not overwrite newer work. Check the Settings controls and page-editor caller together.
-
-**Start:** [themeStore.js](../packages/editor-ui/src/stores/themeStore.js), [Settings.jsx](../packages/editor-ui/src/pages/Settings.jsx), [saveStore.js](../packages/editor-ui/src/stores/saveStore.js), [theme-store tests](../packages/editor-ui/src/stores/__tests__/themeStore.test.js). **Source:** 2026-09-21 follow-up check; the retired redesign is retrievable with `git show 8846ab29:docs-llms/plan-savestore-concurrency-redesign.md`.
-
-### GH147 · A stale tab's theme-settings save reverts a theme update
-
-**Open · Medium · Shared**
-
-Reproduced 2026-10-03 at `9e98dad7` on duplicates of a 0.9.9 Arch project. Open the page editor (or Site settings), apply the 0.9.10 update from another tab, then change any theme setting in the first tab without reloading and save. `theme.json` goes back to `"version": "0.9.9"` and loses `show_breadcrumbs`, while the project row keeps `theme_version` 0.9.10, so no update is offered again and the new settings never appear. A screen opened after the update saves correctly. Cause: `saveProjectThemeSettings` (`themeController.js`) writes the whole `theme.json` from the request body, and `themeStore` holds the copy it loaded until the screen reloads. The whole-file write predates 0.9.10. Distinct from R-THEME-SAVE (response ordering within one tab), though both sit at the same boundary. Embedding apps with their own theme-settings save route have the same exposure and need the same guard.
-
-Recommended: optimistic concurrency at the save boundary. The load returns a revision of `theme.json`, the save sends it back, and the server answers 409 when the file has changed; the screen then shows a reload prompt that warns about unsaved edits. Optionally also merge only the changed setting values into the current file. Follow-up: detect an applied update in open tabs before they save, reusing the stale-active-project pattern (`resolveActiveProject` 409, `activeProjectChannel`, focus re-check, `useStaleActiveProjectDetection`). Coordinate with R-THEME-SAVE rather than building two mechanisms.
-
-**Done when:** A theme-settings save from a screen loaded before a theme update (or before any other change to `theme.json`) cannot overwrite the newer file, the user is told to reload without silently losing edits, and a regression test covers the reproduced sequence.
-
-**Start:** [themeController.js](../packages/builder-server/src/controllers/themeController.js), [themeStore.js](../packages/editor-ui/src/stores/themeStore.js), [themeUpdateService.js](../packages/builder-server/src/services/themeUpdateService.js), [useStaleActiveProjectDetection.js](../packages/editor-ui/src/hooks/useStaleActiveProjectDetection.js). **Source:** 2026-10-03 walkthrough. [GitHub #147](https://github.com/tsiger/widgetizer/issues/147)
-
 ### SKIPPED-ITEM-NOTICE · Say when a collection item is skipped for a bad slug
 
 **Open · Low · Shared**
@@ -433,16 +409,6 @@ Duplicate checks the new folder name against the database only (`projectControll
 
 **Start:** [mediaUsageDisplay.js](../packages/editor-ui/src/utils/mediaUsageDisplay.js), [Media.jsx](../packages/editor-ui/src/pages/Media.jsx). **Source:** 2026-10-05 code review of `48eef6f4..9e98dad7`.
 
-### STALE-BANNER · A project warning can hide a language-removed warning while saves stay suspended
-
-**Open · Low · Shared**
-
-`staleProjectStore.markStale` (~24) overwrites a `reason: "language"` warning with `"project"`; the next focus check then calls `clearStale()` (`useStaleActiveProjectDetection.js` ~37-44), hiding the banner while `saveStore.savingSuspended` stays true. Every save returns `{status:"suspended"}` and `saveAndReport` reacts only to rejections, so nothing tells the user. Needs: language removed, then another tab switches project, then this project re-activated. Read only.
-
-**Done when:** A language warning survives a project warning being raised and cleared, or suspended saves are always visible, with a test.
-
-**Start:** [staleProjectStore.js](../packages/editor-ui/src/stores/staleProjectStore.js), [useStaleActiveProjectDetection.js](../packages/editor-ui/src/hooks/useStaleActiveProjectDetection.js). **Source:** 2026-10-05 code review of `48eef6f4..9e98dad7`.
-
 ### THEME-CHECKER · Close gaps in the theme checker
 
 **Open · Low · OSS**
@@ -480,6 +446,76 @@ Add a filter, e.g. `{{ url | video_embed_url }}`: parse with `URL`, accept exact
 **Done when:** Both widgets use the filter; filter tests cover each accepted form, a look-alike host, a bad ID and kept/dropped options; the existing `videoEmbedWidget.test.js` address cases still pass; theming docs, `docs-website` theme-dev pages and the theme-skill references list it, and the skill contract is regenerated.
 
 **Start:** [youtubeHelpers.js](../packages/core/src/utils/youtubeHelpers.js), [safeUrlFilter.js](../packages/core/src/filters/safeUrlFilter.js) (registration pattern), [renderEngine.js](../packages/render-engine/src/renderEngine.js), [video-embed](../themes/arch/widgets/video-embed/widget.liquid), [video-popup](../themes/arch/widgets/video-popup/widget.liquid), [videoEmbedWidget.test.js](../packages/builder-server/src/tests/videoEmbedWidget.test.js), [build-theme-skill-contract.js](../scripts/build-theme-skill-contract.js). **Source:** 2026-10-07 review of `b9c9fc13`.
+
+### THEME-WARNING-LABEL · Name the corrected setting in theme-save warnings
+
+**Open · Low · Shared**
+
+A theme save whose value the server corrects warns `"tTheme:global.colors.settings.standard_border_color.label" contained an invalid value and was reset.` The label is the raw theme key: the server builds the warning from `item.label` (`mergeThemeSettingChanges`, and `sanitizeThemeSettings` ~455 for the whole-file POST), and Settings' `describeWarning` (`Settings.jsx` ~15-24) shows it untranslated. Seen 2026-10-07 in the browser; the same text appeared before `theme-save-concurrency`.
+
+**Done when:** The warning names the setting in the user's language (resolve the label through the theme locale on the client), with a test.
+
+**Start:** [Settings.jsx](../packages/editor-ui/src/pages/Settings.jsx), [useThemeLocale.js](../packages/editor-ui/src/hooks/useThemeLocale.js). **Source:** 2026-10-07 browser regression pass on `theme-save-concurrency`.
+
+### SETTINGS-DISCARD · Site settings keeps a draft the user chose to discard
+
+**Open · Low · Shared**
+
+On Site settings with unsaved changes, leaving shows "You have unsaved changes. If you leave this page, they will be lost." with "Discard changes". Choosing it leaves, but `useFormNavigationGuard` (~84-92) only proceeds; nothing resets `themeStore`, and Settings' mount effect (~44-50) keeps a draft for the same project, so returning shows the "discarded" edits, still unsaved. The page editor's discard does reset (`saveStore.reset` → `discardDraft`).
+
+**Done when:** Discarding on Site settings drops the theme draft (or the dialog stops promising it will), with a test.
+
+**Start:** [useFormNavigationGuard.js](../packages/editor-ui/src/hooks/useFormNavigationGuard.js), [Settings.jsx](../packages/editor-ui/src/pages/Settings.jsx). **Source:** 2026-10-07 browser regression pass on `theme-save-concurrency`.
+
+### UNDO-CLEAN · Undoing back to the saved state leaves Save enabled
+
+**Open · Low · Shared**
+
+In the page editor, undoing a theme edit or a structural change (delete, reorder) back to exactly the saved state leaves Save enabled. `reconcileModifiedWidgets` (`saveStore.js` ~136-180) re-derives per-widget dirtiness but never clears `themeSettingsModified` or `structureModified`, and `hasUnsavedChanges` reads both flags. Saving then sends nothing for the theme (empty change list) and clears the flags.
+
+**Done when:** After undo returns page, globals and theme to their saved state, Save is disabled and no unsaved marker shows, with a test.
+
+**Start:** [saveStore.js](../packages/editor-ui/src/stores/saveStore.js), [EditorTopBar.jsx](../packages/editor-ui/src/components/pageEditor/EditorTopBar.jsx). **Source:** 2026-10-07 browser regression pass on `theme-save-concurrency`.
+
+### EDITOR-THEME-USAGE-NOTICE · The editor's image-tracking notice says "this page" for theme saves
+
+**Open · Low · Shared**
+
+`saveStore` folds a theme save's `MEDIA_USAGE_STALE` into the same `mediaUsageStale` flag as page and header/footer saves, and `PageEditor.jsx` (~85-90) announces it with `pageEditor.mediaUsage.stale` ("Your page is saved… which images this page uses…"). For a theme-only save that names the wrong thing; Site settings has its own wording (`themeSettings.toasts.mediaUsageStale`).
+
+**Done when:** A theme-only save in the editor announces it with wording about the site settings, with a test.
+
+**Start:** [saveStore.js](../packages/editor-ui/src/stores/saveStore.js), [PageEditor.jsx](../packages/editor-ui/src/pages/PageEditor.jsx), [en.json](../packages/core/src/locales/en.json). **Source:** 2026-10-07 browser regression pass on `theme-save-concurrency`.
+
+### SETTINGS-LOAD-RETRY · Site settings does not retry a failed load
+
+**Open · Low · Shared**
+
+If the theme-settings load fails (API down), Site settings shows "No theme settings available" with no error message, and keeps showing it after the API is back until the editor is opened or the project changes. A failed `loadSettings` records `loadedProjectId` with `settings: null` (`themeStore.js` load catch), and Settings reloads only when `loadedProjectId` differs (~44-50). `pageStore.loadPage` already retries on `settings === null`.
+
+**Done when:** Site settings shows the load error and retries on return (or offers a retry), with a test.
+
+**Start:** [Settings.jsx](../packages/editor-ui/src/pages/Settings.jsx), [themeStore.js](../packages/editor-ui/src/stores/themeStore.js). **Source:** 2026-10-07 browser regression pass on `theme-save-concurrency`.
+
+### MISSING-IMAGE-MESSAGE · Say why a theme save with a deleted image failed
+
+**Open · Low · Shared**
+
+Choosing a library image in a theme setting and saving after that image was deleted is refused with `MEDIA_REFERENCE_MISSING`, but Site settings shows the generic "Failed to save theme settings. Please try again." (`Settings.jsx` ~107-111), which retrying cannot fix. The page editor has a specific message (`pageEditor.mediaUsage.missing`).
+
+**Done when:** Site settings says the chosen image is no longer in the media library and what to do, with a test.
+
+**Start:** [Settings.jsx](../packages/editor-ui/src/pages/Settings.jsx), [en.json](../packages/core/src/locales/en.json). **Source:** 2026-10-07 browser regression pass on `theme-save-concurrency`.
+
+### THEME-LOCALE-STALE · Theme labels stay untranslated after a theme update
+
+**Open · Low · Shared**
+
+After applying a theme update, a setting the update added (e.g. `show_breadcrumbs`) shows its raw key (`global.general.settings.show_breadcrumbs.label`) in Site settings and the editor until the page reloads. `useThemeLocale` keeps a module-level cache per project and language for 5 minutes (`useThemeLocale.js` ~6-8) with no invalidation, so the pre-update locale stays in use.
+
+**Done when:** Applying a theme update refreshes the theme locale for that project, so new settings show their labels without a reload, with a test.
+
+**Start:** [useThemeLocale.js](../packages/editor-ui/src/hooks/useThemeLocale.js), [ProjectsEdit.jsx](../app/src/pages/ProjectsEdit.jsx). **Source:** 2026-10-07 browser regression pass on `theme-save-concurrency`.
 
 ### T66 · Explain form errors beside the right field
 

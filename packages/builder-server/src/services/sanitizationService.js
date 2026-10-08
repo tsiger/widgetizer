@@ -366,7 +366,7 @@ function validateFontPicker(value) {
  * @param {object} schema - The full schema item (type, default, min, max, options, etc.)
  * @returns {{ value: *, corrected: boolean }} Validated/sanitized value and whether it was corrected
  */
-function sanitizeThemeSettingValue(value, schema) {
+export function sanitizeThemeSettingValue(value, schema) {
   // gallery is handled before the null guard so a null/undefined value still
   // normalizes to [] (parity with the widget/collection sanitizer).
   if (schema.type === "gallery") {

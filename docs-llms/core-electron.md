@@ -282,7 +282,7 @@ The full release procedure and the user-facing update flow are documented once i
 
 - **Main process** — `setupAutoUpdater()` and IPC handlers in `electron/main.js`; `autoUpdater.autoDownload = false` (user-initiated), `autoInstallOnAppQuit = true`. Provider is GitHub Releases (`publish` block in `electron/builder.config.mjs`).
 - **Preload** — `electron/preload.js` exposes `window.electronUpdater` via `contextBridge`.
-- **UI** — `app/src/components/layout/UpdateBanner.jsx` renders the "Version X.Y.Z is available" bar. It mounts in **`app/src/App.jsx`** (passed as the `topbarBanner` slot), **not** in `Layout.jsx`. The shared `Layout` itself lives in `packages/editor-ui/src/components/layout/Layout.jsx`.
+- **UI** — `app/src/components/layout/UpdateBanner.jsx` renders the "Version X.Y.Z is available" bar. It mounts in **`app/src/App.jsx`** at the app root, above the router, so it shows on every route (project picker, settings, editor) — **not** in `Layout.jsx` and not through an editor slot. The shared `Layout` itself lives in `packages/editor-ui/src/components/layout/Layout.jsx`.
 
 ### Local Windows Update Test
 

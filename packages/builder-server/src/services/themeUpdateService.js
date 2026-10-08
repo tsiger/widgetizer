@@ -13,6 +13,7 @@ import { getThemeSourceDir, readThemeSourceMetadata } from "../controllers/theme
 import { createKeyedSerializer } from "../utils/serializeByKey.js";
 import { isWithinDirectory } from "../utils/pathSecurity.js";
 import { refreshMediaUsageAfterStructuralChange } from "./mediaUsageService.js";
+import { withContentWriteLock } from "./contentCoordination.js";
 import { getUpdateStatus } from "../utils/updateStatus.js";
 import { processTemplatesRecursive } from "../utils/templateHelpers.js";
 
@@ -445,10 +446,19 @@ export async function applyThemeUpdateToDir({ themeSourceDir, projectDir }) {
 // their own — the second would take the first's backup for an interrupted
 // update and undo work that had just succeeded. Recovery, the swap and the
 // version write all have to be inside this.
+//
+// The content-write section goes inside it (that section is always innermost)
+// and covers the whole run, because an update rewrites theme.json across a long
+// interval: prep reads and merges the current file, the swap writes the merge,
+// and a failed swap restores the backup. A theme-settings save landing anywhere
+// in between would be overwritten or rolled back, so saves wait for the update
+// and then apply on top of what it left.
 const serializeThemeUpdates = createKeyedSerializer();
 
 export async function applyThemeUpdate(projectId) {
-  return serializeThemeUpdates(projectId, () => applyThemeUpdateExclusively(projectId));
+  return serializeThemeUpdates(projectId, () =>
+    withContentWriteLock(projectId, () => applyThemeUpdateExclusively(projectId)),
+  );
 }
 
 async function applyThemeUpdateExclusively(projectId) {
