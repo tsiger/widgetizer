@@ -753,7 +753,8 @@
       "redo": "Redo",
       "saving": "Saving...",
       "save": "Save",
-      "saveFailed": "Your changes could not be saved. They are still here — try again."
+      "saveFailed": "Your changes could not be saved. They are still here — try again.",
+      "saveSuspended": "Saving is turned off for this page because its language was removed. Your changes are still here, but they cannot be saved."
     },
     "preview": {
       "loading": "Loading Preview...",

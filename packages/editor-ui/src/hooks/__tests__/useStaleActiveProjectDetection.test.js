@@ -100,6 +100,25 @@ describe("useStaleActiveProjectDetection", () => {
     expect(useStaleProjectStore.getState().incomingName).toBe("Marketing");
   });
 
+  it("brings the removed-language warning back once a project switch is undone", async () => {
+    // The project curtain covers the language banner while another project is
+    // active. Clearing it on return must not clear the banner too: saving is still
+    // suspended, and without the banner nothing on screen would say so.
+    getActiveProjectId.mockReturnValue("a");
+    getActiveProject.mockResolvedValue({ id: "b", name: "Marketing" });
+    renderHook(() => useStaleActiveProjectDetection());
+    act(() => useStaleProjectStore.getState().markLanguageRemoved("el"));
+    await fireFocus();
+    expect(useStaleProjectStore.getState().reason).toBe("project");
+
+    getActiveProject.mockResolvedValue({ id: "a", name: "Home" });
+    await fireFocus();
+
+    expect(useStaleProjectStore.getState().isStale).toBe(true);
+    expect(useStaleProjectStore.getState().reason).toBe("language");
+    expect(useStaleProjectStore.getState().removedLanguage).toBe("el");
+  });
+
   it("re-checks immediately when a sibling tab announces an active-project change", async () => {
     let channelHandler;
     subscribeActiveProjectChange.mockImplementationOnce((cb) => {

@@ -28,14 +28,22 @@ export default function EditorTopBar({
   // holds every edit, so the one thing that must not happen is failing silently —
   // the refusal the user can act on is an image that has left the library.
   const saveAndReport = useCallback(() => {
-    save(false).catch((err) => {
-      if (err?.code === "MEDIA_REFERENCE_MISSING") {
-        useToastStore.getState().showToast(t("pageEditor.mediaUsage.missing"), "error");
-      } else {
-        useToastStore.getState().showToast(t("pageEditor.toolbar.saveFailed"), "error");
-      }
-      console.error("Failed to save:", err);
-    });
+    save(false)
+      .then((result) => {
+        // Saving was switched off (the language being edited was removed). The
+        // banner normally says so, but a click that does nothing must not rely on it.
+        if (result?.status === "suspended") {
+          useToastStore.getState().showToast(t("pageEditor.toolbar.saveSuspended"), "error");
+        }
+      })
+      .catch((err) => {
+        if (err?.code === "MEDIA_REFERENCE_MISSING") {
+          useToastStore.getState().showToast(t("pageEditor.mediaUsage.missing"), "error");
+        } else {
+          useToastStore.getState().showToast(t("pageEditor.toolbar.saveFailed"), "error");
+        }
+        console.error("Failed to save:", err);
+      });
   }, [save, t]);
   const [allPages, setAllPages] = useState([]);
   // Whether `allPages` is the real list yet: the language menu must not offer to
@@ -124,7 +132,8 @@ export default function EditorTopBar({
       // run instead and leave the field value stale). Ctrl/Cmd+S above still works.
       const el = e.target;
       const isEditableTarget =
-        !!el && (el.tagName === "INPUT" || el.tagName === "TEXTAREA" || el.tagName === "SELECT" || el.isContentEditable);
+        !!el &&
+        (el.tagName === "INPUT" || el.tagName === "TEXTAREA" || el.tagName === "SELECT" || el.isContentEditable);
       if (isEditableTarget) return;
 
       if ((e.ctrlKey || e.metaKey) && e.key === "z") {
@@ -238,10 +247,7 @@ export default function EditorTopBar({
             className="font-medium px-4 py-2 rounded-md border border-slate-200 hover:bg-slate-100 flex items-center gap-2"
           >
             {pageName} {hasUnsavedPageChanges() && <div className="w-2 h-2 bg-pink-500 rounded-full"></div>}
-            <ChevronDown
-              size={16}
-              className={`transform transition-transform ${isDropdownOpen ? "rotate-180" : ""}`}
-            />
+            <ChevronDown size={16} className={`transform transition-transform ${isDropdownOpen ? "rotate-180" : ""}`} />
           </button>
           {isDropdownOpen && (
             <div className="absolute top-full left-0 mt-1 w-64 max-h-96 overflow-y-auto bg-white border border-slate-200 rounded-md shadow-lg z-50">
@@ -262,8 +268,9 @@ export default function EditorTopBar({
                 </button>
               ))}
               <button
-              onClick={handleNewPage} 
-              className="w-full px-4 py-2 text-left flex items-center gap-2 border-t border-slate-100 text-slate-800 hover:bg-slate-100">
+                onClick={handleNewPage}
+                className="w-full px-4 py-2 text-left flex items-center gap-2 border-t border-slate-100 text-slate-800 hover:bg-slate-100"
+              >
                 <CirclePlus size={16} /> {t("pages.newPage")}
               </button>
             </div>

@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
-import StaleProjectCurtain from "../StaleProjectCurtain.jsx";
+import StaleProjectCurtain, { StaleLanguageBanner } from "../StaleProjectCurtain.jsx";
 import useStaleProjectStore from "../../../stores/staleProjectStore.js";
 import useProjectStore from "../../../stores/projectStore.js";
 
@@ -33,7 +33,7 @@ describe("StaleProjectCurtain", () => {
 
   it("explains a removed language in its own words, not the switched-project ones", () => {
     useStaleProjectStore.getState().markLanguageRemoved("el");
-    render(<StaleProjectCurtain />);
+    render(<StaleLanguageBanner />);
 
     expect(screen.getByText(/was removed/i)).toBeInTheDocument();
     // The project-switch copy would be actively misleading here: there is no other
@@ -45,7 +45,7 @@ describe("StaleProjectCurtain", () => {
     // "el" is an internal detail nobody chose, and it is the one word in this
     // message the reader most needs to recognise.
     useStaleProjectStore.getState().markLanguageRemoved("el");
-    render(<StaleProjectCurtain />);
+    render(<StaleLanguageBanner />);
 
     expect(screen.getByText(/Greek was removed/i)).toBeInTheDocument();
     expect(screen.queryByText(/\bel\b/)).not.toBeInTheDocument();
@@ -55,7 +55,7 @@ describe("StaleProjectCurtain", () => {
     // The OSS shell already sends this button to the Pages list; the label has to
     // say so, and say that the draft is discarded on the way.
     useStaleProjectStore.getState().markLanguageRemoved("el");
-    render(<StaleProjectCurtain />);
+    render(<StaleLanguageBanner />);
 
     expect(
       screen.getByRole("button", { name: /discard changes and return to pages/i }),
@@ -66,7 +66,7 @@ describe("StaleProjectCurtain", () => {
     // For a switched project a reload is recovery; here it is destruction, and the
     // button has to admit that rather than say "Reload to continue".
     useStaleProjectStore.getState().markLanguageRemoved("el");
-    render(<StaleProjectCurtain />);
+    render(<StaleLanguageBanner />);
 
     expect(screen.getByText(/Reloading discards them/i)).toBeInTheDocument();
   });
@@ -76,7 +76,7 @@ describe("StaleProjectCurtain", () => {
     // underneath is the last place it exists. A modal over it would make the one
     // available recovery impossible while appearing to help.
     useStaleProjectStore.getState().markLanguageRemoved("el");
-    render(<StaleProjectCurtain />);
+    render(<StaleLanguageBanner />);
 
     expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument();
     const banner = screen.getByRole("alert");
@@ -85,11 +85,31 @@ describe("StaleProjectCurtain", () => {
     expect(banner.className).not.toMatch(/inset-0/);
   });
 
+  it("sits in the page flow instead of floating over the toolbar and toasts", () => {
+    // Floating over the editor hid the Save button and every toast under it.
+    useStaleProjectStore.getState().markLanguageRemoved("el");
+    render(<StaleLanguageBanner />);
+
+    expect(screen.getByRole("alert").className).not.toMatch(/\b(fixed|absolute)\b/);
+  });
+
+  it("each warning renders only in its own component", () => {
+    useStaleProjectStore.getState().markLanguageRemoved("el");
+    const curtain = render(<StaleProjectCurtain />);
+    expect(curtain.container.firstChild).toBe(null);
+    curtain.unmount();
+
+    useStaleProjectStore.getState().clearStale();
+    useStaleProjectStore.getState().markStale("Marketing Site");
+    const banner = render(<StaleLanguageBanner />);
+    expect(banner.container.firstChild).toBe(null);
+  });
+
   it("offers no recovery it cannot deliver", () => {
     // Re-adding the language does not restore the pages deleted with it, and the
     // draft cannot be saved afterwards — so that advice must not be given.
     useStaleProjectStore.getState().markLanguageRemoved("el");
-    render(<StaleProjectCurtain />);
+    render(<StaleLanguageBanner />);
 
     expect(screen.queryByText(/add the language back/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/save as usual/i)).not.toBeInTheDocument();
