@@ -419,16 +419,6 @@ Duplicate checks the new folder name against the database only (`projectControll
 
 **Start:** [mediaUsageDisplay.js](../packages/editor-ui/src/utils/mediaUsageDisplay.js), [Media.jsx](../packages/editor-ui/src/pages/Media.jsx). **Source:** 2026-10-05 code review of `48eef6f4..9e98dad7`.
 
-### STALE-BANNER · A project warning can hide a language-removed warning while saves stay suspended
-
-**Open · Low · Shared**
-
-`staleProjectStore.markStale` (~24) overwrites a `reason: "language"` warning with `"project"`; the next focus check then calls `clearStale()` (`useStaleActiveProjectDetection.js` ~37-44), hiding the banner while `saveStore.savingSuspended` stays true. Every save returns `{status:"suspended"}` and `saveAndReport` reacts only to rejections, so nothing tells the user. Needs: language removed, then another tab switches project, then this project re-activated. Read only.
-
-**Done when:** A language warning survives a project warning being raised and cleared, or suspended saves are always visible, with a test.
-
-**Start:** [staleProjectStore.js](../packages/editor-ui/src/stores/staleProjectStore.js), [useStaleActiveProjectDetection.js](../packages/editor-ui/src/hooks/useStaleActiveProjectDetection.js). **Source:** 2026-10-05 code review of `48eef6f4..9e98dad7`.
-
 ### THEME-CHECKER · Close gaps in the theme checker
 
 **Open · Low · OSS**

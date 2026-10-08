@@ -334,14 +334,6 @@ In the media library, a translated header shows as "El:header (Global)" and tran
 
 **Next:** Show a readable title with its language for every language.
 
-### STALE-BANNER · A project warning can hide a language-removed warning while saves stay suspended
-
-**Open · Low · Shared**
-
-After an unlikely sequence (a language is removed, another tab switches project, then you switch back), the warning disappears but the editor quietly stops saving.
-
-**Next:** Keep the language warning, or always show that saving is paused.
-
 ### THEME-CHECKER · Close gaps in the theme checker
 
 **Open · Low · OSS**

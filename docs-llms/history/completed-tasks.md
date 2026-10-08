@@ -217,6 +217,16 @@ Settings allowed a save while another was pending and `themeStore.saveSettings()
 
 **Body at:** `88c810cb:docs-llms/TODO-agents.md`.
 
+### STALE-BANNER · A project warning can hide a language-removed warning while saves stay suspended
+
+**Done · Low · Shared · 2026-10-08**
+
+`staleProjectStore.markStale` overwrote a `reason: "language"` warning with `"project"`, and the focus check's next `clearStale()` hid both while `saveStore.savingSuspended` stayed true: no banner, no autosave, and a manual save resolved `{ status: "suspended" }`, which `saveAndReport` ignored. Reached by: language removed, another tab switches project, this project re-activated. The banner also floated (`fixed`, `z-[60]`) over the editor toolbar, Save and toasts.
+
+**Resolution:** the store tracks `languageRemoved` separately from the visible `reason`. The blocking project overlay takes the screen whichever warning arrives first (`markLanguageRemoved` keeps `"project"`), and the focus check's `clearProjectMismatch` restores the language banner instead of clearing it; `clearLanguageRemoved` drops a language hidden under a project warning when its session ends. A manual save resolving `"suspended"` shows a toast (`pageEditor.toolbar.saveSuspended`). The language banner is its own export, `StaleLanguageBanner`, mounted by the OSS shell in the editor Layout's `topbarBanner` slot, in the page flow. Fix `b10a6774`.
+
+**Body at:** `b10a6774:docs-llms/TODO-agents.md`.
+
 ## Reconciliation decisions
 
 - GitHub #115, #122, #126, #133, #134 and #135 have implementation evidence. Their remaining local entries are review/documentation/integration work, not instructions to rebuild the features. GitHub statuses were left unchanged.
