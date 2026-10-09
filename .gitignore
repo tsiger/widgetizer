@@ -29,5 +29,5 @@ themes/widgetizer/
 temp/
 tmp/
 temp-webp/
-docs-entities/.obsidian/
+.obsidian/
 docs-entities/.trash/
