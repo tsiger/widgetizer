@@ -27,8 +27,12 @@ vi.mock("../../stores/toastStore", () => {
   hook.getState = () => state;
   return { default: hook };
 });
+const guard = vi.hoisted(() => ({ options: null }));
 vi.mock("../../hooks/useGuardedFormPage", () => ({
-  default: () => ({ getDirtyTitle: (title) => title }),
+  default: (_dirty, options) => {
+    guard.options = options;
+    return { getDirtyTitle: (title) => title };
+  },
 }));
 vi.mock("../../components/layout/PageLayout", () => ({
   default: ({ children }) => <div>{children}</div>,
@@ -60,6 +64,7 @@ async function openAndEdit() {
 }
 
 beforeEach(() => {
+  guard.options = null;
   useThemeStore.getState().reset();
   getThemeSettings.mockReset().mockResolvedValue(JSON.parse(JSON.stringify(THEME)));
   saveThemeSettingChanges.mockReset();
@@ -105,5 +110,21 @@ describe("Site settings save", () => {
 
     await waitFor(() => expect(showToast).toHaveBeenCalledWith("themeSettings.toasts.conflict", "warning"));
     expect(useThemeStore.getState().hasUnsavedThemeChanges()).toBe(true);
+  });
+});
+
+describe("Site settings discard", () => {
+  // Reproduced 2026-10-09: edit a setting, leave and choose "Discard changes",
+  // then save anything in the page editor — the discarded value was written to
+  // theme.json, because the draft lives in themeStore and outlived the page.
+  it("drops the theme draft when the user leaves and discards", async () => {
+    await openAndEdit();
+    expect(useThemeStore.getState().hasUnsavedThemeChanges()).toBe(true);
+
+    guard.options.onDiscard();
+
+    const state = useThemeStore.getState();
+    expect(state.hasUnsavedThemeChanges()).toBe(false);
+    expect(state.settings.settings.global.colors[0].value).toBe("#ff0000");
   });
 });

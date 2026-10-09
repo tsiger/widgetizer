@@ -334,11 +334,12 @@ const useAutoSave = create((set, get) => ({
           const themeResult = await useThemeStore.getState().saveSettings(activeProject.id);
           if (get().saveGeneration !== myGeneration) {
             // Discarded mid-flight. The submitted values DID reach the server, and
-            // no local state can undo that. When the server returned its copy,
-            // themeStore has already taken it in place of the discarded draft. The
-            // whole-file fallback returns none, so read the server back here —
-            // only while nothing has edited the theme since the discard, because
-            // the editor the user is now looking at stays editable throughout.
+            // no local state can undo that. themeStore normally takes the server's
+            // copy in place of the discarded draft itself (reading it back when the
+            // whole-file fallback returns none). This is a safety net for a result
+            // it did not adopt: read the server back here — only while nothing has
+            // edited the theme since the discard, because the editor the user is
+            // now looking at stays editable throughout.
             const themeNow = useThemeStore.getState();
             if (
               themeResult &&

@@ -105,8 +105,11 @@ const useThemeStore = create((set, get) => {
     if (result.theme) {
       const live = get().settings;
       dropped = adoptServerTheme(result.theme, discarded ? [] : diffThemeSettings(sent, live), discarded ? live : sent);
-    } else if (result.warnings.some((warning) => warning.code === "VALUE_CORRECTED")) {
-      // The whole-file fallback returns no file; read back what it corrected.
+    } else if (discarded || result.warnings.some((warning) => warning.code === "VALUE_CORRECTED")) {
+      // The whole-file fallback returns no file; read back what it corrected —
+      // or, for a draft discarded meanwhile, what it saved: rebaselining to the
+      // sent values under the reverted draft would leave a dirty draft that the
+      // next save sends back over the saved one.
       const fresh = await getThemeSettings(projectId);
       if (moved(projectId, generation)) return { warnings: result.warnings, stale: true };
       const live = get().settings;
@@ -119,7 +122,8 @@ const useThemeStore = create((set, get) => {
 
     invalidateMediaCache(projectId);
     // `adopted`: the store now holds the server's copy (false only when the
-    // whole-file fallback saved without returning or correcting anything).
+    // whole-file fallback saved a draft that was not discarded, without
+    // returning or correcting anything).
     return { warnings: [...result.warnings, ...dropped], adopted };
   };
 

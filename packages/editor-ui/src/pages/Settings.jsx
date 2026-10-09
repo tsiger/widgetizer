@@ -31,10 +31,12 @@ export default function Settings() {
   const loading = useThemeStore((s) => s.loading);
   const saving = useThemeStore((s) => s.saving);
   const hasChanges = useThemeStore((s) => s.hasUnsavedThemeChanges());
-  const { loadSettings, updateThemeSetting, resetThemeSettings, saveSettings, clearConflict } =
+  const { loadSettings, updateThemeSetting, resetThemeSettings, saveSettings, clearConflict, discardDraft } =
     useThemeStore.getState();
 
-  const { getDirtyTitle } = useGuardedFormPage(hasChanges);
+  // The draft lives in themeStore and outlives this page; left in place, the page
+  // editor's next save would send the edits the user just discarded.
+  const { getDirtyTitle } = useGuardedFormPage(hasChanges, { onDiscard: discardDraft });
   const showToast = useToastStore((state) => state.showToast);
   const activeProject = useProjectStore((state) => state.activeProject);
 

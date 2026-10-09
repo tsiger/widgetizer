@@ -473,6 +473,25 @@ describe("themeStore", () => {
         expect(useThemeStore.getState().hasUnsavedThemeChanges()).toBe(false);
       });
 
+      it("takes the saved copy when the draft was discarded during an uncorrected save", async () => {
+        // Rebaselining to the sent values under the reverted draft left it dirty,
+        // so the next save sent the discarded-from value back over the saved one.
+        seedSettings();
+        useThemeStore.getState().updateThemeSetting("colors", "primary_color", "#0000ff");
+        const response = deferred();
+        saveThemeSettingChanges.mockReturnValueOnce(response.promise);
+        getThemeSettings.mockResolvedValueOnce(withValues({ primary: "#0000ff" }));
+
+        const saving = useThemeStore.getState().saveSettings("project-a");
+        useThemeStore.getState().discardDraft();
+        response.resolve({ theme: null, warnings: [] });
+        await saving;
+
+        expect(getThemeSettings).toHaveBeenCalled();
+        expect(valueOf(useThemeStore.getState().settings, "primary_color")).toBe("#0000ff");
+        expect(useThemeStore.getState().hasUnsavedThemeChanges()).toBe(false);
+      });
+
       it("reads back what it corrected, keeping an edit made meanwhile", async () => {
         seedSettings();
         useThemeStore.getState().updateThemeSetting("colors", "primary_color", "bad");

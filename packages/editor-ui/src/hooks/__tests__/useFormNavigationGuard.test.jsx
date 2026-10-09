@@ -15,9 +15,9 @@ vi.mock("react-i18next", () => ({ useTranslation: () => ({ t: (key) => key }) })
 import useFormNavigationGuard from "../useFormNavigationGuard.js";
 import { ConfirmProvider } from "../../components/ui/ConfirmProvider.jsx";
 
-function Harness({ dirty = true }) {
+function Harness({ dirty = true, onDiscard = null }) {
   const [n, setN] = useState(0);
-  useFormNavigationGuard(dirty);
+  useFormNavigationGuard(dirty, null, onDiscard);
   return <button onClick={() => setN(n + 1)}>rerender-{n}</button>;
 }
 
@@ -61,6 +61,35 @@ describe("useFormNavigationGuard", () => {
 
     await waitFor(() => expect(rr.reset).toHaveBeenCalledTimes(1));
     expect(rr.proceed).not.toHaveBeenCalled();
+  });
+
+  it("runs onDiscard before proceeding when the user leaves", async () => {
+    // "Discard changes" has to discard: a draft kept in a store outlives the
+    // page, and the next screen's save would send it.
+    const user = userEvent.setup();
+    const order = [];
+    const onDiscard = vi.fn(() => order.push("discard"));
+    rr.proceed.mockImplementation(() => order.push("proceed"));
+    rr.state = "blocked";
+    renderGuard({ onDiscard });
+
+    await user.click(screen.getByText("common.leaveConfirm.confirm"));
+
+    await waitFor(() => expect(rr.proceed).toHaveBeenCalledTimes(1));
+    expect(order).toEqual(["discard", "proceed"]);
+    rr.proceed.mockReset();
+  });
+
+  it("keeps the draft when the user stays", async () => {
+    const user = userEvent.setup();
+    const onDiscard = vi.fn();
+    rr.state = "blocked";
+    renderGuard({ onDiscard });
+
+    await user.click(screen.getByText("common.leaveConfirm.cancel"));
+
+    await waitFor(() => expect(rr.reset).toHaveBeenCalledTimes(1));
+    expect(onDiscard).not.toHaveBeenCalled();
   });
 
   it("keeps one prompt open across unrelated re-renders", async () => {
