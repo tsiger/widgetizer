@@ -19,20 +19,43 @@ const useStaleProjectStore = create((set) => ({
   isStale: false,
   reason: null, // "project" | "language"
   incomingName: null, // server's current active project name, when known
-  removedLanguage: null, // the language code, when reason is "language"
+  removedLanguage: null, // the language code, when known
+  // A language warning is in force, even while a later "project" warning covers it
+  // on screen (markStale leaves this and removedLanguage in place).
+  languageRemoved: false,
   markStale: (incomingName = null) => set({ isStale: true, reason: "project", incomingName }),
+  // A project warning already up keeps the screen: it is the blocking one, and the
+  // language warning comes back when it clears (clearProjectMismatch).
   markLanguageRemoved: (removedLanguage = null) =>
-    set({ isStale: true, reason: "language", removedLanguage }),
-  clearStale: () => set({ isStale: false, reason: null, incomingName: null, removedLanguage: null }),
+    set((state) => ({
+      isStale: true,
+      reason: state.isStale && state.reason === "project" ? "project" : "language",
+      removedLanguage,
+      languageRemoved: true,
+    })),
+  clearStale: () =>
+    set({ isStale: false, reason: null, incomingName: null, removedLanguage: null, languageRemoved: false }),
+  // The tab is back on its own project. A project warning raised over a language
+  // warning replaces it on screen, but the language is still gone and saving is
+  // still suspended — so the language warning comes back rather than leaving the
+  // editor looking fine while nothing saves.
+  clearProjectMismatch: () =>
+    set((state) =>
+      state.languageRemoved
+        ? { isStale: true, reason: "language", incomingName: null }
+        : { isStale: false, reason: null, incomingName: null },
+    ),
   // Clears ONLY a language warning, for the editing session that warning belongs to
   // ending. A project mismatch is about the tab, not the session, and outlives it —
   // clearing that here would drop a warning nothing else re-raises until the next
-  // focus probe, leaving the tab quietly editing the wrong project.
+  // focus probe, leaving the tab quietly editing the wrong project. The language
+  // behind a project warning does belong to the session, so it goes, and a later
+  // clearProjectMismatch has nothing to bring back.
   clearLanguageRemoved: () =>
     set((state) =>
       state.reason === "language"
-        ? { isStale: false, reason: null, incomingName: null, removedLanguage: null }
-        : {},
+        ? { isStale: false, reason: null, incomingName: null, removedLanguage: null, languageRemoved: false }
+        : { removedLanguage: null, languageRemoved: false },
     ),
 }));
 

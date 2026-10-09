@@ -9,7 +9,7 @@ import usePageStore from "../../stores/pageStore";
 import { useDefaultLanguage, useIsMultilang } from "../../stores/projectStore";
 import useTranslationVersions from "../../hooks/useTranslationVersions";
 import LanguageMenu from "../content/LanguageMenu";
-import { pageEditorHref, pageAddHref } from "../../lib/contentRoutes";
+import { pageEditorHref, pageAddHref, pagesListHref } from "../../lib/contentRoutes";
 import { useEditorPath } from "../../lib/routeBase.jsx";
 import { openPagePreview } from "../../lib/openSitePreview.js";
 import { SlotOutlet } from "../../extension/PluginProvider.jsx";
@@ -28,16 +28,27 @@ export default function EditorTopBar({
   // holds every edit, so the one thing that must not happen is failing silently —
   // the refusal the user can act on is an image that has left the library.
   const saveAndReport = useCallback(() => {
-    save(false).catch((err) => {
-      if (err?.code === "MEDIA_REFERENCE_MISSING") {
-        useToastStore.getState().showToast(t("pageEditor.mediaUsage.missing"), "error");
-      } else {
-        useToastStore.getState().showToast(t("pageEditor.toolbar.saveFailed"), "error");
-      }
-      console.error("Failed to save:", err);
-    });
+    save(false)
+      .then((result) => {
+        // Saving was switched off (the language being edited was removed). The
+        // banner normally says so, but a click that does nothing must not rely on it.
+        if (result?.status === "suspended") {
+          useToastStore.getState().showToast(t("pageEditor.toolbar.saveSuspended"), "error");
+        }
+      })
+      .catch((err) => {
+        if (err?.code === "MEDIA_REFERENCE_MISSING") {
+          useToastStore.getState().showToast(t("pageEditor.mediaUsage.missing"), "error");
+        } else {
+          useToastStore.getState().showToast(t("pageEditor.toolbar.saveFailed"), "error");
+        }
+        console.error("Failed to save:", err);
+      });
   }, [save, t]);
   const [allPages, setAllPages] = useState([]);
+  // Whether `allPages` is the real list yet: the language menu must not offer to
+  // create a version that may already exist.
+  const [allPagesState, setAllPagesState] = useState("loading");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isLanguageMenuOpen, setIsLanguageMenuOpen] = useState(false);
   const [previewMode, setPreviewMode] = useState(() => {
@@ -92,8 +103,10 @@ export default function EditorTopBar({
     const loadPages = async () => {
       try {
         setAllPages(await getAllPages());
+        setAllPagesState("ready");
       } catch (error) {
         console.error("Failed to load pages:", error);
+        setAllPagesState("unknown");
       }
     };
     loadPages();
@@ -119,7 +132,8 @@ export default function EditorTopBar({
       // run instead and leave the field value stale). Ctrl/Cmd+S above still works.
       const el = e.target;
       const isEditableTarget =
-        !!el && (el.tagName === "INPUT" || el.tagName === "TEXTAREA" || el.tagName === "SELECT" || el.isContentEditable);
+        !!el &&
+        (el.tagName === "INPUT" || el.tagName === "TEXTAREA" || el.tagName === "SELECT" || el.isContentEditable);
       if (isEditableTarget) return;
 
       if ((e.ctrlKey || e.metaKey) && e.key === "z") {
@@ -194,8 +208,6 @@ export default function EditorTopBar({
     openPagePreview(pageId, isMultilang ? currentLanguage : undefined);
   }, [pageId, isMultilang, currentLanguage]);
 
-  const hasMultiplePages = pages.length > 1;
-
   const handleNewPage = () => {
     navigate(editorPath(pageAddHref(isMultilang ? currentLanguage : undefined)));
     setIsDropdownOpen(false);
@@ -209,6 +221,7 @@ export default function EditorTopBar({
       onOpen={openPage}
       onCreate={createIn}
       pendingKey={pendingKey}
+      siblingsState={allPagesState}
       label={t("pageEditor.languages.menuLabel")}
     />
   );
@@ -217,7 +230,7 @@ export default function EditorTopBar({
     <div className="bg-white text-slate-900 border-b border-slate-200 p-2 flex justify-between items-center">
       <div className="flex items-center gap-3">
         <button
-          onClick={() => navigate(editorPath("/pages"))}
+          onClick={() => navigate(editorPath(pagesListHref(isMultilang ? currentLanguage : undefined)))}
           className="flex items-center gap-2 px-3 h-9 rounded-sm text-sm bg-slate-200 hover:bg-slate-300 text-slate-800"
           title={t("pageEditor.toolbar.backToPages")}
         >
@@ -229,23 +242,14 @@ export default function EditorTopBar({
       <div className="flex items-center gap-3">
         <span className="text-sm font-medium text-slate-500">{t("navigation.pages")}:</span>
         <div className="relative" ref={dropdownRef}>
-          {hasMultiplePages ? (
-            <button
-              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-              className="font-medium px-4 py-2 rounded-md border border-slate-200 hover:bg-slate-100 flex items-center gap-2"
-            >
-              {pageName} {hasUnsavedPageChanges() && <div className="w-2 h-2 bg-pink-500 rounded-full"></div>}
-              <ChevronDown
-                size={16}
-                className={`transform transition-transform ${isDropdownOpen ? "rotate-180" : ""}`}
-              />
-            </button>
-          ) : (
-            <div className="font-medium px-4 py-2 flex items-center gap-2">
-              {pageName} {hasUnsavedPageChanges() && <div className="w-2 h-2 bg-pink-500 rounded-full"></div>}
-            </div>
-          )}
-          {isDropdownOpen && hasMultiplePages && (
+          <button
+            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+            className="font-medium px-4 py-2 rounded-md border border-slate-200 hover:bg-slate-100 flex items-center gap-2"
+          >
+            {pageName} {hasUnsavedPageChanges() && <div className="w-2 h-2 bg-pink-500 rounded-full"></div>}
+            <ChevronDown size={16} className={`transform transition-transform ${isDropdownOpen ? "rotate-180" : ""}`} />
+          </button>
+          {isDropdownOpen && (
             <div className="absolute top-full left-0 mt-1 w-64 max-h-96 overflow-y-auto bg-white border border-slate-200 rounded-md shadow-lg z-50">
               {pages.map((page) => (
                 <button
@@ -264,8 +268,9 @@ export default function EditorTopBar({
                 </button>
               ))}
               <button
-              onClick={handleNewPage} 
-              className="w-full px-4 py-2 text-left flex items-center gap-2 border-t border-slate-100 text-slate-800 hover:bg-slate-100">
+                onClick={handleNewPage}
+                className="w-full px-4 py-2 text-left flex items-center gap-2 border-t border-slate-100 text-slate-800 hover:bg-slate-100"
+              >
                 <CirclePlus size={16} /> {t("pages.newPage")}
               </button>
             </div>

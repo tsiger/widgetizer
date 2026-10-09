@@ -81,10 +81,13 @@ export const FontsTag = {
     // Falls back to the schema default, like the font pickers above: a project
     // carries no `value` until the setting is saved, so reading `value` alone
     // silently ignored a theme that ships this on and sent visitors to Google.
-    const privacySettings = rawSettings?.settings?.global?.privacy;
-    const bunnySetting = Array.isArray(privacySettings)
-      ? privacySettings.find((s) => s.id === "use_bunny_fonts")
-      : undefined;
+    // Found by id in whichever group holds it: themes file this switch
+    // differently (Arch keeps it under "advanced"), and reading one fixed group
+    // left such a theme's checkbox doing nothing.
+    const bunnySetting = Object.values(rawSettings?.settings?.global ?? {})
+      .filter(Array.isArray)
+      .flat()
+      .find((s) => s?.id === "use_bunny_fonts");
     const useBunnyFonts = (bunnySetting?.value !== undefined ? bunnySetting.value : bunnySetting?.default) || false;
 
     // Build output: preconnect links + stylesheet link

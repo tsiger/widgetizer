@@ -223,7 +223,7 @@ These are not available inside widget templates.
 The following globals are available in all templates, including inside `{% render %}` snippets:
 
 - `currentCanonicalPath`: The un-prefixed path of the page being rendered (e.g., `about.html`, or `portfolio/project-alpha.html` for a collection item page). The core `menu.liquid` snippet compares it against each menu item's `canonicalPath` to mark active items with the `is-active` class, matching on the canonical path (rather than the displayed `href`) so active state still works when item links are depth-prefixed with `../`.
-- `filePath`: Base path for resolving file assets (PDFs uploaded via the `file` setting type). Use it as `{{ filePath | append: '/' | append: filename }}` so links work in both preview and exported output. See [Setting Types](theme-dev-setting-types.html#media-types) for the `file` setting and its template usage.
+- `filePath`: Base path for resolving file assets (PDFs, audio and video uploaded via the `file` and `video` setting types). Use it as `{{ filePath | append: '/' | append: filename }}` so links work in both preview and exported output. See [Setting Types](theme-dev-setting-types.html#media-types) for the `file` and `video` settings and their template usage.
 
 # Practical Guidance
 

@@ -75,7 +75,7 @@ Implementation: [previewController](../../../packages/builder-server/src/control
 
 ## Static-site export
 
-**Before output writes:** resolve the project and theme settings, enumerate pages, require the root `index` homepage, select enabled languages with homepages, and validate collection items and required templates across all included languages. An invalid translated item can stop the entire build. A collection with no renderable items in any included language needs no item-page template. Fail-fast validation is intended to prevent half-built output for these known invalid inputs; forms validation occurs later in the build.
+**Before output writes:** resolve the project and theme settings, enumerate pages, require a default-language homepage (`index` or `home`), refuse a language holding both, select enabled languages with homepages, and validate collection items and required templates across all included languages. An invalid translated item can stop the entire build. A collection with no renderable items in any included language needs no item-page template. Fail-fast validation is intended to prevent half-built output for these known invalid inputs; forms validation occurs later in the build.
 
 Under the project's export-operation lock, allocate the next version, render pages and pagination output, render enumerated item pages, process assets and media, produce configured Markdown and SEO/forms/manifest artifacts, and record the result. Asset URLs and internal hrefs depend on depth and Clean URLs. Export history and retention are managed separately from editable content.
 
@@ -96,14 +96,14 @@ Current behaviour includes multilingual export selection, language-specific coll
 
 | Area | Current behavior |
 | --- | --- |
-| Export eligibility | Root `index` is mandatory. Additional enabled languages without a homepage are omitted as a whole and returned as `LANGUAGE_SKIPPED` warnings; the export UI displays them, including after the first export changes the screen layout. |
+| Export eligibility | A default-language homepage is mandatory: a page slugged `index` or `home`, published as `index.html`. A language holding both is refused ("Export failed: two homepages"), since both would write the same file. Additional enabled languages without a homepage are omitted as a whole and returned as `LANGUAGE_SKIPPED` warnings; the export UI displays them, including after the first export changes the screen layout. |
 | Pages and item pages | Default output stays at the root; other languages use `<language>/`. An item uses `<language>/<collection-prefix>/<slug>.html`. Optional Markdown sits beside the corresponding HTML. |
 | Shared sections | Each page/item uses its language's header/footer. A missing section renders nothing; it does not inherit the previous rendered page's section. |
 | Listings | Items, ordering, valid-item counts and pagination belong to the current language. No default-language item fallback. Item URLs and bare menu-slug selections also resolve with language context. |
 | Pagination | Counts and generated destinations remain in the listing's language in full preview, individual widget updates and export. Different languages can produce different page counts. |
 | Canonicals | Automatic page/item addresses include the language folder and respect Site URL/Clean URLs. An explicit canonical wins on the first page; generated pagination copies use their own addresses. |
 | Sitemap and robots | Describe included languages and their generated listing pages, respecting existing `noindex` rules. Language folders and any Site URL subfolder are retained. A usable Site URL is required for these artifacts. |
-| Alternates | Page/item translation groups supply ordinary hreflang alternates for actual siblings, excluding homepage fallbacks. `x-default` points to the default-language destination and may use its homepage fallback. Sitemap pagination copies have their own entries without translation alternates. |
+| Alternates | Page/item translation groups supply ordinary hreflang alternates for actual siblings, excluding homepage fallbacks. `x-default` points to the default-language destination and may use its homepage fallback. Pagination copies carry no translation alternates, in the sitemap or in their HTML; their translations point at base pages, and another language may have a different number of copies. |
 | Alternates and `noindex` | A destination marked `noindex` is not advertised as an alternate, in the HTML or in the sitemap, and that includes `x-default` — whether the destination is a sibling page, a sibling item or the homepage a fallback entry points at. A `noindex` page publishes no cluster of its own. The language switcher is unaffected: it reads the same `translations` entries and still offers the language. |
 | Links into a skipped language | Cleared, not published. Link resolution is seeded from the pages and items the export is publishing, so a reference into a skipped language reads as absent and is treated exactly like a deleted target — the destination goes, labels and surrounding words stay. Covers widget links, richtext anchors, menus and theme settings. The `LANGUAGE_SKIPPED` warning states that such links were removed. |
 | Forms | Default form keys stay unchanged; additional languages use `<language>:<form-key>`. The rendered form and manifest agree, and the manifest records the language-qualified page path. Identical names across languages therefore stay separate. |
@@ -113,7 +113,7 @@ Current behaviour includes multilingual export selection, language-specific coll
 
 Arch 0.9.10 draws the language selector from `page.translations` when the header setting is enabled. Visitor-facing strings come from the theme's site locale dictionary. Existing projects keep their installed templates until a theme update is applied.
 
-`dateFormat` obtains month names through `Intl.DateTimeFormat` and retains the chosen token order and separators. Date-only handling avoids shifting the day across time zones. The published date filter passes the page language.
+`dateFormat` obtains month names through `Intl.DateTimeFormat` and retains the chosen token order and separators. Date-only handling avoids shifting the day across time zones. The published date filter passes the page language. Core form wording follows the page language too (`22a93fa5`); see the [form guide](../entities/form.md).
 
 A real legacy project retained its root addresses, saved edits, backup contents and English content after adding Greek. The [legacy check](../coverage.md#the-legacy-upgrade-check) records the evidence and its limits.
 

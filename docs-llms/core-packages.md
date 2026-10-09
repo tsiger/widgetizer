@@ -170,11 +170,17 @@ Exported as `@widgetizer/editor-ui/tailwind-preset` → `packages/editor-ui/src/
 
 `@widgetizer/render-engine` never resolves projects or touches SQLite. Its functions take a `RenderDeps` bag that supplies both capabilities and filesystem roots; the engine reads templates, schemas, snippets, menus, and icons from those supplied paths rather than importing builder-server services or concrete storage adapters. The bag has these keys:
 
-`projectId`, `projectDir` (absolute), `coreWidgetsDir`, `coreSnippetsDir`, `getProjectData()`, `getMediaFiles()`, `listPages()`, `sanitizeWidgetData()`, `preprocessThemeSettings()`, `buildRuntimeSiteIcons()`.
+`projectId`, `projectDir` (absolute), `coreWidgetsDir`, `coreSnippetsDir`, `getProjectData()`, `getMediaFiles()`, `listPages()`, `sanitizeWidgetData()`, `preprocessThemeSettings()`, `buildRuntimeSiteIcons()`. Optional `loadSiteStrings()` supplies all configured languages' visitor dictionaries; the engine uses it when available and caches the result on render globals. It does not resolve storage scope itself.
 
 builder-server's `services/renderingService.js` is a **thin wrapper**: `buildRenderDeps(projectId)` resolves `folderName` (the project-resolution error boundary lives here), assembles the bag, and preserves the historical `(projectId, …)` call signatures so existing controllers are unchanged. Hosted assembles its own (cloud) deps bag and reuses the shared helpers re-exported from builder-server's index.
 
 ---
+
+## Language within a project
+
+Content language is a partition within `Scope.projectId`, not a new adapter or actor. Default content remains at root; additional pages/globals/menus use a language subfolder, and collection items use `collections/<type>/<code>/`. Shared `contentAddress` helpers build those keys and language-first published paths. Builder-server validates request language through `contentLanguage` before reading/writing the partition. Theme settings, assets and identity stay shared; media descriptions have per-language overrides.
+
+`GET /widgets?language=<code>` resolves schema `defaultKey` values from app-owned core dictionaries with project-theme overrides, returning `resolvedDefault` and starter-block `resolvedDefaults` for `defaultKeys`. Values with `defaultKey` alone remain runtime suggestions; a literal `default` alongside it requests a stored localized initial value (needed by form field definitions). Widget catalog loads track language and request generation. See [domain language contracts](domain/multilingual.md) and [settings defaults](domain/entities/settings.md#localized-defaults-and-dates).
 
 ## The `require-scope-arg` lint rule
 

@@ -3,18 +3,20 @@ import { getProjectDir } from "../config.js";
 import * as projectRepo from "../db/repositories/projectRepository.js";
 
 /**
- * Delete an editor project and all associated local data.
+ * Delete an editor project and its associated local data.
  *
  * Handles: export file cleanup, SQLite deletion (cascades to media_files,
  * media_sizes, media_usage, exports), active-project reassignment, and
- * project directory removal from disk.
+ * project directory removal from disk. A directory that cannot be fully
+ * removed does not undo the deletion; its path comes back as `folderLeftBehind`.
  *
  * This is the single reusable utility called from:
  *   - projectController.deleteProject()  (editor-initiated delete)
  *
  * @param {string} projectId - Editor project UUID
- * @returns {Promise<{success: boolean, projectName: string, newActiveProjectId: string|null}|null>}
- *   Returns null if project not found, otherwise the result object.
+ * @returns {Promise<{success: boolean, projectName: string, newActiveProjectId: string|null, folderLeftBehind: string|null}|null>}
+ *   Returns null if project not found, otherwise the result object. `folderLeftBehind`
+ *   is the project folder's path when it could not be fully removed.
  */
 export async function deleteProjectById(projectId) {
   const project = projectRepo.getProjectById(projectId);
@@ -46,9 +48,17 @@ export async function deleteProjectById(projectId) {
     newActiveProjectId = projectRepo.deleteProjectAndReassignActive(projectId);
   });
 
-  // Delete project directory from disk
+  // The project is already gone from the database, so a folder that cannot be
+  // removed (a file locked by another program, on Windows) does not undo the
+  // deletion; the caller reports what was left behind instead of a failure.
   const projectDir = getProjectDir(projectFolderName);
-  await fs.remove(projectDir);
+  let folderLeftBehind = null;
+  try {
+    await fs.remove(projectDir);
+  } catch (removeError) {
+    console.warn(`[deleteProjectById] Could not fully remove ${projectDir}:`, removeError);
+    folderLeftBehind = projectDir;
+  }
 
-  return { success: true, projectName, newActiveProjectId };
+  return { success: true, projectName, newActiveProjectId, folderLeftBehind };
 }

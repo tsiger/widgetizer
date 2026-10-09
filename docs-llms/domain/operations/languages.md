@@ -40,7 +40,7 @@ While the project has only one language, you can change its default language des
 
 Editor language controls select content for you to edit. A visitor-facing language selector is supplied by the theme. The current rendering support can point to a related version, or to that language's homepage when the specific version is missing. A language without a homepage is left out of that selector's available destinations.
 
-That fallback does not create or translate a missing page, and it does not silently retarget every ordinary link on the site. Arch 0.9.10 has an optional header selector in desktop and mobile navigation; another theme must provide its own control.
+That fallback does not create or translate a missing page, and it does not silently retarget every ordinary link on the site. Arch 0.9.10 has an optional header selector in desktop and mobile navigation; another theme must provide its own control. Theme-generated home/item links also stay in the page's language; explicit authored links keep their selected target.
 
 ### Including the language in an export
 
@@ -70,7 +70,7 @@ If seeding fails, the language is not recorded as enabled. Retrying is safe by c
 
 Within the translation-operation queue: read the source, check group occupancy, allocate a unique target slug, copy content with a new UUID and the same effective group ID, write into the target folder, then update usage. Item versions also enter the target language's manual ordering. The source document is not rewritten. Page listing/pagination flags are kept when copying to another language.
 
-The content is copied as a starting point; no automatic text translation or ongoing synchronization occurs. Inherited explicit references remain references to the copied targets. Editing sibling pages can change their structures independently.
+The content is copied as a starting point; no automatic text translation or ongoing synchronization occurs. A custom canonical URL is the one field not copied: it names the source's address, so the new version starts with its own automatic one. Inherited explicit references remain references to the copied targets. Editing sibling pages can change their structures independently.
 
 Repeated or concurrent attempts to create the same group's target version produce a conflict rather than two members. Missing/unknown/same-language requests are rejected. Unreadable possible group members prevent a safe occupancy decision and cause failure.
 
@@ -122,7 +122,8 @@ On either, the editor:
 
 - **keeps every edit.** Nothing was written, and no dirty state is cleared. The work is still on screen.
 - **stops saving, and stays stopped.** Stopping the timer once is not enough, because the autosave tick reschedules itself and every edit re-arms it. Saving is suspended for the rest of the editing session, and lifts when the editor loads a page or the session is discarded.
-- **explains, without blocking.** A banner, not an overlay: the draft cannot be saved anywhere and reloading discards it, so the editor underneath is the only place it still exists and covering it would make the one available recovery impossible. The banner names the language the way a person would ("Greek", not `el`) and labels its exit for what it does — *Discard changes and return to Pages*.
+- **explains, without blocking.** A banner, not an overlay: the draft cannot be saved anywhere and reloading discards it, so the editor underneath is the only place it still exists and covering it would make the one available recovery impossible. The banner names the language the way a person would ("Greek", not `el`) and labels its exit for what it does — *Discard changes and return to Pages*. It sits in the page flow above the editor (the `topbarBanner` slot), pushing the editor down rather than floating over it, so the toolbar, Save and toasts stay visible. A manual save while suspended shows a toast saying saving is off, rather than doing nothing.
+- **gives way to a project switch, then comes back.** If another tab switches the active project, the blocking project overlay takes the screen, whichever of the two warnings arrived first. When this project is active again and the overlay clears, the language banner returns: the language is still gone and saving is still suspended.
 - **clears the banner when that session ends**, together with the suspension, so a page that saves perfectly well never inherits the warning. A project-mismatch warning is deliberately left alone: that one is about the tab, not the session.
 
 **What recovery does and does not mean.** The draft is reachable, not rescued: someone who wants to keep it copies it out before leaving. Nothing preserves it automatically, and the banner does not pretend otherwise — earlier wording suggested re-adding the language and reloading, which is wrong twice over, since reloading discards the draft and re-adding a language does not bring back the pages deleted with it. Automatic draft recovery (stashing it locally and offering it back, or exporting it) is a possible future improvement, not part of this behaviour.

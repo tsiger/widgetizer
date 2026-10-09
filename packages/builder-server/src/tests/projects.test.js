@@ -9,11 +9,12 @@
  * Run with: node --test server/tests/projects.test.js
  */
 
-import { describe, it, before, after, beforeEach } from "node:test";
+import { describe, it, before, after, beforeEach, mock } from "node:test";
 import assert from "node:assert/strict";
 import fs from "fs-extra";
 import path from "path";
 import os from "os";
+import { randomUUID } from "node:crypto";
 
 // ============================================================================
 // Isolated test environment
@@ -1017,6 +1018,102 @@ describe("updateProject", () => {
     assert.ok(await fs.pathExists(getProjectDir("renamed-folder")), "new directory should exist");
   });
 
+  it("keeps the renamed copy when the old folder can only be partly removed", async () => {
+    // Removal deletes entries one by one, so a locked file (Windows) stops it
+    // partway with part of the old folder already gone. The copy is then the only
+    // complete version of the project: the row must point at it, and nothing may
+    // remove it.
+    const oldDir = getProjectDir(project.folderName);
+    const newDir = getProjectDir("renamed-locked");
+    const realRemove = fs.remove;
+    const removeMock = mock.method(fs, "remove", async (target, ...rest) => {
+      if (path.resolve(target) === path.resolve(oldDir)) {
+        await realRemove.call(fs, path.join(oldDir, "theme.json"));
+        throw Object.assign(new Error("EBUSY"), { code: "EBUSY" });
+      }
+      return realRemove.call(fs, target, ...rest);
+    });
+    try {
+      const res = await callController(updateProject, {
+        params: { id: project.id },
+        body: { name: "Original Name", folderName: "renamed-locked" },
+      });
+
+      assert.equal(res._status, 200);
+      assert.equal(res._json.folderName, "renamed-locked");
+      assert.equal(res._json.folderLeftBehind, oldDir);
+      assert.equal(projectRepo.getProjectById(project.id).folderName, "renamed-locked");
+      assert.ok(await fs.pathExists(path.join(newDir, "theme.json")), "the copy is complete");
+      assert.ok(await fs.pathExists(path.join(newDir, "pages", "index.json")), "the copy keeps its pages");
+    } finally {
+      removeMock.mock.restore();
+    }
+  });
+
+  it("leaves the project as it was when the copy fails", async () => {
+    const oldDir = getProjectDir(project.folderName);
+    const newDir = getProjectDir("renamed-copy-fails");
+    const copyMock = mock.method(fs, "copy", async (_src, dest) => {
+      // A copy that fails partway leaves some of the destination behind.
+      await fs.outputJson(path.join(dest, "theme.json"), {});
+      throw Object.assign(new Error("ENOSPC"), { code: "ENOSPC" });
+    });
+    try {
+      const res = await callController(updateProject, {
+        params: { id: project.id },
+        body: { name: "Original Name", folderName: "renamed-copy-fails" },
+      });
+
+      assert.equal(res._status, 500);
+      assert.equal(projectRepo.getProjectById(project.id).folderName, project.folderName);
+      assert.ok(await fs.pathExists(path.join(oldDir, "theme.json")), "the old folder is untouched");
+      assert.ok(await fs.pathExists(path.join(oldDir, "pages", "index.json")));
+      assert.ok(!(await fs.pathExists(newDir)), "the unfinished copy is removed");
+    } finally {
+      copyMock.mock.restore();
+    }
+  });
+
+  it("removes the copy and keeps the old folder when the row cannot be updated", async () => {
+    // Until the row names the copy, the old folder is the project. Another row
+    // claiming the destination name makes the row update fail on the unique
+    // folder_name constraint.
+    const oldDir = getProjectDir(project.folderName);
+    const newDir = getProjectDir("renamed-row-fails");
+    const realCopy = fs.copy;
+    const copyMock = mock.method(fs, "copy", async (...args) => {
+      await realCopy.apply(fs, args);
+      projectRepo.createProject({
+        ...projectRepo.getProjectById(project.id),
+        id: randomUUID(),
+        name: "Claimer",
+        folderName: "renamed-row-fails",
+      });
+    });
+    try {
+      const res = await callController(updateProject, {
+        params: { id: project.id },
+        body: { name: "Original Name", folderName: "renamed-row-fails" },
+      });
+
+      assert.equal(res._status, 500);
+      assert.equal(projectRepo.getProjectById(project.id).folderName, project.folderName);
+      assert.ok(await fs.pathExists(path.join(oldDir, "theme.json")), "the old folder is untouched");
+      assert.ok(!(await fs.pathExists(newDir)), "the copy is removed");
+    } finally {
+      copyMock.mock.restore();
+    }
+  });
+
+  it("reports no folder left behind after a clean rename", async () => {
+    const res = await callController(updateProject, {
+      params: { id: project.id },
+      body: { name: "Original Name", folderName: "renamed-clean" },
+    });
+    assert.equal(res._status, 200);
+    assert.equal(res._json.folderLeftBehind, undefined);
+  });
+
   it("preserves project files after folder rename", async () => {
     const newFolderName = "renamed-files";
     const res = await callController(updateProject, {
@@ -1094,6 +1191,25 @@ describe("updateProject", () => {
     });
     assert.equal(res._status, 400);
     assert.match(res._json.error, /folder name.*already exists/i);
+  });
+
+  it("refuses a folderName that only exists on disk, leaving both folders as they were", async () => {
+    // A folder left behind by a deletion that could not remove it is taken: the
+    // project must not merge into it, and nothing may delete it.
+    const leftover = getProjectDir("leftover-folder");
+    await fs.outputJson(path.join(leftover, "pages", "stray.json"), { name: "Stray" });
+    const currentDir = getProjectDir(project.folderName);
+
+    const res = await callController(updateProject, {
+      params: { id: project.id },
+      body: { name: "Original Name", folderName: "leftover-folder" },
+    });
+
+    assert.equal(res._status, 400);
+    assert.match(res._json.error, /folder name.*already exists/i);
+    assert.deepEqual(await fs.readdir(path.join(leftover, "pages")), ["stray.json"]);
+    assert.ok(await fs.pathExists(currentDir), "the project's own folder is untouched");
+    assert.equal(projectRepo.getProjectById(project.id).folderName, project.folderName);
   });
 
   it("returns 404 for non-existent project", async () => {
@@ -1182,6 +1298,35 @@ describe("updateProject", () => {
     });
     assert.equal(res._status, 400);
     assert.match(res._json.error, /name.*required/i);
+  });
+
+  // Through the real route, because the route's input checks run before the
+  // controller: a check that fills in a field the request left out turns
+  // "not sent" into "set to empty". The new-project form saves a picked logo
+  // this way, after the project is created with its notes.
+  it("keeps the description when a partial update through the route leaves it out", async () => {
+    const { default: express } = await import("express");
+    const { default: projectsRouter } = await import("../routes/projects.js");
+    const app = express();
+    app.use((req, _res, next) => {
+      req.adapters = mockReq().adapters;
+      next();
+    });
+    app.use("/api/projects", projectsRouter);
+    const server = await new Promise((resolve) => {
+      const s = app.listen(0, () => resolve(s));
+    });
+    try {
+      const response = await fetch(`http://127.0.0.1:${server.address().port}/api/projects/${project.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: "Original Name", siteUrl: "https://example.com" }),
+      });
+      assert.equal(response.status, 200);
+      assert.equal(projectRepo.getProjectById(project.id).description, "A test project");
+    } finally {
+      await new Promise((resolve) => server.close(resolve));
+    }
   });
 });
 
@@ -1311,6 +1456,37 @@ describe("deleteProject", () => {
     assert.match(res._json.message, /Named Project/);
   });
 
+  it("reports a folder it could not remove instead of failing the deletion", async () => {
+    // The row is already gone when the folder is removed, so a locked file
+    // (Windows) must not turn the deletion into a failure: the project has left
+    // the list either way.
+    const project = await createTestProject("Locked Files");
+    const dir = getProjectDir(project.folderName);
+    const realRemove = fs.remove;
+    const removeMock = mock.method(fs, "remove", async (target, ...rest) => {
+      if (path.resolve(target) === path.resolve(dir)) throw Object.assign(new Error("EBUSY"), { code: "EBUSY" });
+      return realRemove.call(fs, target, ...rest);
+    });
+    try {
+      const res = await callController(deleteProject, { params: { id: project.id } });
+
+      assert.equal(res._status, 200);
+      assert.equal(res._json.success, true);
+      assert.equal(res._json.folderLeftBehind, dir);
+      assert.match(res._json.message, /could not be removed/);
+      const data = await projectRepo.readProjectsData();
+      assert.equal(data.projects.length, 0);
+    } finally {
+      removeMock.mock.restore();
+    }
+  });
+
+  it("reports no folder left behind after a complete deletion", async () => {
+    const project = await createTestProject("Clean Delete");
+    const res = await callController(deleteProject, { params: { id: project.id } });
+    assert.equal(res._json.folderLeftBehind, null);
+  });
+
   it("cascades deletion to media metadata in SQLite", async () => {
     const project = await createTestProject("Media Delete");
     const mediaData = createTestMediaData();
@@ -1404,6 +1580,22 @@ describe("duplicateProject", () => {
 
     const data = await projectRepo.readProjectsData();
     assert.equal(data.projects.length, 2);
+  });
+
+  it("never copies into a folder left on disk by an earlier deletion", async () => {
+    // A folder left on disk by a deletion that could not remove it is taken, so
+    // the copy never merges into its old content.
+    const leftover = getProjectDir("original-project-copy");
+    await fs.outputJson(path.join(leftover, "pages", "stray.json"), { name: "Stray" });
+
+    const res = await callController(duplicateProject, { params: { id: original.id } });
+
+    assert.equal(res._status, 201);
+    assert.notEqual(res._json.folderName, "original-project-copy");
+    const copyDir = getProjectDir(res._json.folderName);
+    assert.ok(!(await fs.pathExists(path.join(copyDir, "pages", "stray.json"))), "copy has none of the leftover");
+    assert.deepEqual(await fs.readdir(leftover), ["pages"], "leftover folder is left as it was");
+    assert.ok(await fs.pathExists(path.join(leftover, "pages", "stray.json")));
   });
 
   it("returns 404 for non-existent project", async () => {

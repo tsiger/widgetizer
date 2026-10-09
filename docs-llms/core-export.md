@@ -62,14 +62,14 @@ Rendering is delegated through `renderingService.js`, which wires capability (co
 
 ### Fail-Fast Ordering: Validation Before Any Write
 
-`exportProjectToDir` is structured so **all read-only setup and validation happen before the first disk write**. A blocked export (missing homepage, invalid collection items, missing collection template) therefore leaves **no** output directory, favicon, manifest, or partial HTML behind. Nothing touches disk until the "validation passed" marker.
+`exportProjectToDir` is structured so **all read-only setup and validation happen before the first disk write**. A blocked export (missing homepage, two homepages in one language, invalid collection items, missing collection template) therefore leaves **no** output directory, favicon, manifest, or partial HTML behind. Nothing touches disk until the "validation passed" marker.
 
 Read-only setup + validation phase:
 
 1. **Resolve project** — `projectRepo.getProjectById(projectId)` yields `folderName`, `siteUrl`, theme, etc. Missing project throws.
 2. **Compute version + output path** — `exportRepo.getNextVersion(projectId)` (auto-incrementing v1, v2, …); the output dir is `<publishDir>/<folderName>-v<version>`.
 3. **Load theme + pages** — `readProjectThemeData` (then `preprocessThemeSettings`), `listProjectPagesData`.
-4. **Homepage validation** — at least one page must have the slug `index` (page `id` is derived from filename). Otherwise throws `statusCode 400` / "Export failed: No homepage found".
+4. **Homepage validation** — the default language must have a homepage: a page slugged `index` or `home` (page `id` is derived from filename), both of which publish as `index.html`. Otherwise throws `statusCode 400` / "Export failed: No homepage found". A language holding both an `index` and a `home` page throws `statusCode 400` / "Export failed: two homepages", since both would write that language's `index.html`; the editor refuses the pair, but older projects, imports and theme updates can carry one.
 5. **Two-pass collection validation** (only when `collectionDeps` supplies storage + scope) — see [§3](#3-collection-item-page-export).
    Then **pagination plans**: `planPagination` runs per page, and the totals (`pageCounts`) feed the sitemap and the page loop. If the homepage paginates while a `hasItemPages` collection uses `slugPrefix: "page"`, the export throws `statusCode 400` / "Export failed: homepage pages clash with a collection" — both would write into `page/`.
 
@@ -102,6 +102,8 @@ After pages: collection item pages ([§3](#3-collection-item-page-export)), the 
 
 ### Structured data (JSON-LD)
 
+**Product rules.** Structured data is automatic: derive it from the project's identity, page relationships and declared collection fields rather than asking authors to write SEO markup. It should describe the site's actual content. Core owns safe graph output; themes declare collection field meanings and display the same project-owned business details. Use plain-language readiness messages and actions, not a technical configuration screen. Widget-level schemas, arbitrary JSON-LD editors and special About/Contact page types are outside the current feature.
+
 `{% seo %}` appends one `<script type="application/ld+json">` to every page, numbered copy and item page. It does this in preview and export alike, and a project gets it with no theme change. The graph is built by `packages/core/src/structuredData/`: `buildGraph` runs the builders in `GRAPH_BUILDERS`, isolating any that throw, and `serializeJsonLd` prunes empty values and writes `<`, `>`, `&`, U+2028 and U+2029 as `\u` escapes so user text cannot close the element. The tag appends the script inside its own `try`, so a structured-data failure never costs the page its other meta tags.
 
 **Site URL required.** Every node carries an absolute `@id`, so without a usable `siteUrl` the graph is empty and no script is written — never a relative or preview address.
@@ -112,9 +114,9 @@ After pages: collection item pages ([§3](#3-collection-item-page-export)), the 
 | Other page, homepage page 2+, numbered copy | `WebPage`, plus `BreadcrumbList` when the trail has two or more entries |
 | Collection item page | `WebPage`, `BreadcrumbList`, and the type's node when its schema declares a `structuredData` block (News → `BlogPosting`, [Collections §5c](core-collections.md)) |
 
-- **Ids and `url` use the page's own published address** (`pageSelfUrl` in `publishedUrls.js`, shared with the canonical): `<address>#webpage`, `#breadcrumb`, `#article`. An explicit `seo.canonical_url` does not move them. Clean URLs shapes them like every other address, and the homepage is the Site URL root.
+- **Ids and `url` use the page's own published address** (`pageSelfUrl` in `publishedUrls.js`, shared with the canonical): `<address>#webpage`, `#breadcrumb`, `#article`. An explicit `seo.canonical_url` does not move them. Clean URLs shapes them like every other address, and a homepage is its language's directory: the Site URL root, or `el/` under it.
 - **Identity node** (`siteNodes.js`), from `project.siteIdentity` via `resolveSiteIdentity`: `name` (public name, else Site Title), `description`, `url`, `email`, `telephone`, `sameAs` (project profiles only). An organization gets `logo`, a person `image`, and a local business both, plus `priceRange`, `address` (`PostalAddress` from the primary location) and `openingHoursSpecification` (one entry per day and range; a closed day is `00:00`–`00:00`). VeterinaryCare is typed `["VeterinaryCare", "LocalBusiness"]`. `WebSite.publisher` and the homepage `WebPage.about` point at it.
-- **`BreadcrumbList`** comes from `page.breadcrumbs`, the same trail the visible breadcrumb draws: the home crumb is the Site URL root, other crumbs are absolute `canonicalPath` addresses, and a numbered copy's last crumb is named `Page N`. A theme that passes its own `page_label` / `home_label` to the breadcrumbs snippet will show different words than the JSON-LD.
+- **`BreadcrumbList`** comes from `page.breadcrumbs`, the same trail the visible breadcrumb draws: the home crumb is its language's homepage as a directory (the Site URL root, or `el/` under it, whatever the Clean URLs value), other crumbs are absolute `canonicalPath` addresses, and a numbered copy's last crumb is named `Page N`. A theme that passes its own `page_label` / `home_label` to the breadcrumbs snippet will show different words than the JSON-LD.
 - **Images** use the og:image rules (`publishedImageUrl`): `<site>/assets/images/<file>`, the `large` variant for rasters that have one. The identity logo is tracked as media usage `global:site-identity` ([Media Library](core-media.md)), so the used-images copy in [§4](#4-asset-copying) ships it.
 
 **Readiness.** `exportProjectToDir` returns `structuredData: { readiness }` and `POST /api/export` passes it through. `readiness` is `identityReadiness(siteIdentity, project)`: one `{ item, ok }` for `siteUrl` and `name`, `logo` unless the identity is a person, and `address` for a local business (street, city and country all set). Project details computes the same list for its readiness line.
@@ -151,13 +153,13 @@ See [Collections](core-collections.md) for the collection model and item-templat
 
 All copying happens **after** HTML generation, into the export's `assets/` tree:
 
-- **Theme assets** — everything under the project's `assets/` directory (e.g. `base.css`, `scripts.js`) is copied to `assets/`.
+- **Theme assets** — the project's `assets/` directory (e.g. `base.css`, `scripts.js`) is copied to `assets/` with subfolders preserved, excluding OS metadata and the render-time `icons.json` source. Shared dependencies requiring subfolders belong here; widgets enqueue them with `theme: true`.
 - **Core placeholder assets** — `placeholder.svg`, `placeholder-portrait.svg`, `placeholder-square.svg` from `STATIC_CORE_ASSETS_DIR` are copied to `assets/` so placeholder-using widgets work.
-- **Widget assets** — the project's `widgets/` tree is searched recursively for `.css`/`.js` files, which are copied (flattened) into `assets/`. Filenames are flattened, so collisions are possible — the later copy overwrites the earlier one. Theme authors should use unique, widget-prefixed names (`slideshow.css`, `comparison-slider.js`).
+- **Widget assets** — the project's `widgets/` tree is searched recursively for `.css`/`.js` files, but only filenames registered by script/style enqueues during rendering are selected for copying. Selected files are intentionally flattened into `assets/`. The supported authoring contract requires CSS/JS directly in each widget folder, with widget-prefixed filenames (`slideshow.css`, `comparison-slider.js`) unique across widgets and shared theme assets. Recursive discovery does not imply nested widget asset support: generated URLs retain subpaths while copying drops them. Later copies overwrite filename conflicts. See [Widget asset rules](theming-widgets.md#enqueuing-external-css--js); the app does not currently enforce these requirements, and automated checks belong to the future theme-author CLI.
 - **Used images only** — media metadata is read (`readMediaFile` from `mediaService.js`) and only images with a non-empty `usedIn` whose `path` starts with `/uploads/images/` are copied to `assets/images/`. For each, all generated public sizes except `thumb` are copied; raster originals are copied only when there is no public `large` variant; SVG originals are always copied. The count copied vs. skipped is logged. If media tracking fails, it falls back to copying the entire `uploads/images/` tree.
 - **Used file assets only** — the same usage-based approach copies non-image file assets (PDFs): media files with non-empty `usedIn` whose `path` starts with `/uploads/files/` are copied to `assets/files/`. Files have no size variants. If tracking fails, it falls back to copying the entire `uploads/files/` tree.
 
-The file-asset path (copy to `assets/files/`, `/uploads/files/` → `assets/files/` rewrite, and the `filePath` render variable supplied to widget templates) is what makes referenced PDFs downloadable from the exported static site. See [Media Library](core-media.md) for the shared image/file media model and usage tracking, and [Setting Types](theming-setting-types.md) for the `file` setting type that themes use to reference a file asset.
+The file-asset path (copy to `assets/files/`, `/uploads/files/` → `assets/files/` rewrite, and the `filePath` render variable supplied to widget templates) is what makes referenced PDFs downloadable and MP4/MP3 files playable from the exported static site. See [Media Library](core-media.md) for the shared image/file media model and usage tracking, and [Setting Types](theming-setting-types.md) for the `file` and `video` setting types that themes use to reference a file asset.
 
 ### Asset cache busting
 
@@ -255,7 +257,7 @@ See [Packages & Adapter Architecture](core-packages.md) and [Platform Security](
 
 - [App Settings](core-appSettings.md) — Export retention limit and developer mode
 - [Media Library](core-media.md) — Image/file media model and usage tracking that drive selective copying
-- [Setting Types](theming-setting-types.md) — The `file` setting type for referencing file assets
+- [Setting Types](theming-setting-types.md) — The `file` and `video` setting types for referencing file assets
 - [Collections](core-collections.md) — Collection model and item-template rendering
 - [Form Widget](core-form-widget.md) — The `core-form` widget and the forms manifest
 - [Platform Security](core-security.md) — Path-traversal and cross-tenant export-serving safeguards

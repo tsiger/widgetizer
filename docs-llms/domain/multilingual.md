@@ -53,6 +53,14 @@ Export requires the default homepage and includes additional languages only when
 
 The main distinction is **independent documents versus shared resources**. Language support does not multiply every entity or introduce a translation wrapper around every setting.
 
+One project per language was rejected because theme settings, updates and media libraries would drift apart and uploads would be duplicated. Per-field translation overlays were rejected because they would affect every input and save flow while forcing translations to retain the same structure. Independent pages deliberately allow cultural adaptation, including different widgets and blocks.
+
+The default language can change while the project has only one language. Once another language exists, changing the default would move content between root and language folders, change public URLs and reinterpret default media metadata. Static exports cannot issue redirects, so supporting that later requires an explicit migration rather than unlocking the selector.
+
+### Current language limits
+
+Right-to-left languages are excluded from the picker and rejected by the service; supporting them needs direction handling and theme work. `page.translations.dir` reserves that extension without changing the theme contract. Per-language site titles and per-language 404 pages are not supported. Further editor language indicators beyond the existing tabs, chips and page menu remain outside the current feature.
+
 ## What changes by language?
 
 | Object | Shared | Language-specific |
@@ -62,7 +70,7 @@ The main distinction is **independent documents versus shared resources**. Langu
 | Header/footer | Widget definitions | Complete content instance for each language |
 | Menu | Definition of menu behavior | Entire tree and menu identity; no translation-group linkage |
 | Collection | Schema, item template and URL prefix | Item records, SEO and manual order |
-| Theme | Layout, widget definitions/assets, theme settings | Authored content in page/global/item documents |
+| Theme | Layout, widget definitions/assets, theme settings | Authored content in page/global/item documents; visitor strings selected from shared theme dictionaries |
 | Media | File identity, binary, renditions | Optional alt/title/caption overrides |
 | Editor | UI infrastructure | Selected editing language; separate from UI locale |
 
@@ -96,6 +104,8 @@ A slug identifies content within a language (and collection type for items); a U
 | Translated media field is `""` | Deliberately blank; must not fall back |
 | Explicit link to an English page from Greek content | Resolves that English target; group membership is not an automatic retargeting instruction |
 | Menu selected by bare slug | Resolves in rendering language; explicit UUID can select a menu from another language |
+| Missing theme visitor string | English is merged under the requested dictionary key by key; this is theme UI text, not authored page fallback |
+| Theme-generated `page_url` / `item_url` link | Uses the rendered language, or explicit `lang:`; no implicit missing-target fallback |
 | Theme language-switch destination with no sibling | Current `buildTranslations` uses the language's homepage and marks it as fallback; languages without a homepage are omitted |
 
 Do not generalize media metadata fallback into a whole-site fallback policy. [buildTranslations](../../packages/core/src/utils/translations.js) supplies the current theme language-switch contract. Homepage fallbacks are excluded from ordinary language alternates; the special `x-default` destination may use the default homepage, unless that homepage is itself `noindex`. [Export rules](operations/output.md#multilingual-boundary-at-this-snapshot) explain the sitemap, canonical and form behavior.
@@ -117,13 +127,19 @@ Do not generalize media metadata fallback into a whole-site fallback policy. [bu
 
 What `buildTranslations` reads off a sibling is defined once, as `translationSibling`. The SEO builders hold whole page and item records while a render holds the uuid reference map, and both are narrowed through that projection before anything is read. Both paths now use one definition of the sibling fields, preventing the missing-field mismatch found in the R7 review.
 
-Additional languages without homepages are omitted. The default destination assumes the required root homepage; export fails when that homepage is missing. For a listing's generated copies, language destinations point to the related base page or homepage, not the same page number in another language: the two lists may have different lengths. This describes the current [builder](../../packages/core/src/utils/translations.js); final theme-contract documentation remains part of step 25.
+Additional languages without homepages are omitted. The default destination assumes the required root homepage; export fails when that homepage is missing. For a listing's generated copies, language destinations point to the related base page or homepage, not the same page number in another language: the two lists may have different lengths. That is what the visitor switcher shows; the copies publish no `hreflang` alternates, since a set pointing at the base pages would leave the copy itself out. See the [builder](../../packages/core/src/utils/translations.js) and the [theme language-switcher contract](../theming.md#the-language-switcher-pagetranslations).
+
+## Theme words, authored words and dates
+
+Arch's English/Greek `site` dictionaries translate its own visitor controls, empty-state messages and accessibility labels. Missing translations fall back key by key to English. A schema `defaultKey` alone stays a runtime suggestion until edited; with a literal `default` it supplies stored initial content. Stored values still win, subject to any template-specific blank fallback. Browser scripts receive their words from the rendered markup. Core forms now have their own English/Greek dictionary beneath theme overrides. New form fields start in the editing language and are stored; existing/copied field content is not automatically translated. See [form behavior and review boundaries](entities/form.md#languages-and-current-boundaries).
+
+Dates retain the chosen format but use the rendered language's month names. Theme-created `page_url` and `item_url` links inherit that language too, with explicit `lang:` available for deliberate cross-language links. UUID-backed user selections continue to point to the exact selected version. See [settings and references](entities/settings.md).
 
 ## Lifecycle expectations
 
 1. Create a project with one default language.
 2. Add another language: seed its menus and globals, not every page/item.
-3. Create a page/item version: copy content once, create a fresh UUID, join the same group, then edit independently.
+3. Create a page/item version: copy content once (except a custom canonical URL), create a fresh UUID, join the same group, then edit independently.
 4. Duplicate content: create unrelated content with a new group, even if the source has translations.
 5. Remove a language: delete that partition and its usage/metadata overrides; retain shared assets and other versions.
 6. Change the default code only while no additional languages exist. Root content stays in place and is relabeled.

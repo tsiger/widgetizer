@@ -12,6 +12,7 @@ import { invalidateMediaCache } from "../queries/mediaManager";
 import { invalidateLinkTargetsCache } from "../hooks/useLinkTargets";
 import useGuardedFormPage from "../hooks/useGuardedFormPage";
 import { useEditorPath } from "../lib/routeBase.jsx";
+import { itemsListHref } from "../lib/contentRoutes";
 
 export default function CollectionItemAdd() {
   const { t } = useTranslation();
@@ -57,7 +58,7 @@ export default function CollectionItemAdd() {
       invalidateMediaCache(activeProject?.id);
       invalidateLinkTargetsCache(activeProject?.id);
 
-      navigateSafely(editorPath(`/collections/${type}`));
+      navigateSafely(editorPath(itemsListHref(type, language)));
       return true;
     } catch (err) {
       showToast(err.message || t("collectionsForm.toasts.createError"), "error");
@@ -88,7 +89,7 @@ export default function CollectionItemAdd() {
           onSubmit={handleSubmit}
           isSubmitting={isSubmitting}
           submitLabel={t("collectionsForm.create")}
-          onCancel={() => navigateSafely(editorPath(`/collections/${type}`))}
+          onCancel={() => navigateSafely(editorPath(itemsListHref(type, language)))}
           onDirtyChange={setIsDirty}
           isDirty={isDirty}
         />

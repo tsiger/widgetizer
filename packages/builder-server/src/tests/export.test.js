@@ -21,6 +21,7 @@ import assert from "node:assert/strict";
 import fs from "fs-extra";
 import path from "path";
 import os from "os";
+import { fileURLToPath } from "node:url";
 
 // ============================================================================
 // Isolated test environment
@@ -32,6 +33,7 @@ const TEST_THEMES_DIR = path.join(TEST_ROOT, "themes");
 
 process.env.DATA_ROOT = TEST_DATA_DIR;
 process.env.THEMES_ROOT = TEST_THEMES_DIR;
+process.env.CORE_WIDGETS_DIR = path.join(TEST_ROOT, "core-widgets");
 process.env.NODE_ENV = "test";
 
 // Silence noisy console output from production code during tests.
@@ -93,11 +95,6 @@ after(async () => {
   await fs.remove(TEST_ROOT);
   // Also clean up any publish dirs we created
   // (PUBLISH_DIR is under TEST_DATA_DIR which is under TEST_ROOT, so already handled)
-
-  // Remove the test-only core-link widget that gets written into the real
-  // CORE_WIDGETS_DIR. export.test.js doesn't override CORE_WIDGETS_DIR, so
-  // without this cleanup the widget pollutes @widgetizer/core's widgets dir.
-  await fs.remove(path.join(CORE_WIDGETS_DIR, "core-link"));
 });
 
 // ============================================================================
@@ -185,6 +182,8 @@ function getLatestExportDir() {
 // ============================================================================
 
 before(async () => {
+  // Keep test-only widgets out of the catalog read by concurrent theme checks.
+  await fs.copy(fileURLToPath(new URL("../../../core/src/widgets/", import.meta.url)), CORE_WIDGETS_DIR);
   // -----------------------------------------------------------
   // 1. Seed test project in the DB
   // -----------------------------------------------------------
@@ -1730,17 +1729,15 @@ describe("home page slug mapping", () => {
     await projectRepo.writeProjectsData(data);
   });
 
-  it("'home' slug produces index.html (same as 'index')", async () => {
+  // Both slugs publish as index.html, so the pair is refused rather than one
+  // page silently replacing the other.
+  it("refuses a project holding both an 'index' and a 'home' page", async () => {
     const res = await callController(exportProject, {
       params: { projectId: HOME_SLUG_ID },
     });
-    assert.equal(res._status, 200);
-
-    const exportDir = res._json.outputDir;
-    // "home" page should produce index.html too (the controller maps both to index.html)
-    // This means there could be a conflict — let's document what happens
-    const indexExists = await fs.pathExists(path.join(exportDir, "index.html"));
-    assert.ok(indexExists, "index.html should exist from either index or home page");
+    assert.equal(res._status, 400);
+    assert.equal(res._json.error, "Export failed: two homepages");
+    assert.match(res._json.message, /The pages include both "index" and "home"/);
   });
 });
 

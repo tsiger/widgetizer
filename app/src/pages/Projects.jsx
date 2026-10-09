@@ -62,9 +62,18 @@ export default function Projects() {
 
   const handleDelete = async (data) => {
     try {
-      await deleteProject(data.projectId);
+      const result = await deleteProject(data.projectId);
       await loadProjects();
-      showToast(t("projects.toasts.deleteSuccess", { name: data.projectName }), "success");
+      if (result?.folderLeftBehind) {
+        showToast(
+          t("projects.toasts.deleteFolderLeftBehind", { name: data.projectName, path: result.folderLeftBehind }),
+          "warning",
+          // Stays until dismissed: it names a folder the user may want to find.
+          { duration: null },
+        );
+      } else {
+        showToast(t("projects.toasts.deleteSuccess", { name: data.projectName }), "success");
+      }
     } catch (error) {
       console.error("Failed to delete project:", error);
       showToast(t("projects.toasts.deleteError"), "error");

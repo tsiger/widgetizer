@@ -211,6 +211,34 @@ describe("createEditorApp", () => {
     await assert.rejects(() => createEditorApp({ adapters: { storage: {} } }), /missing required adapter/);
   });
 
+  // The editor falls back from PATCH to the whole-file POST only on a 404 that
+  // carries no error code: what a server without the route answers. A route that
+  // exists answers its own 404s with a code.
+  it("answers a write to an API route it does not serve with a 404 that carries no code", async () => {
+    const app = await createEditorApp({ adapters: fakeAdapters() });
+    const { server, baseUrl } = await startServer(app);
+
+    try {
+      const response = await fetch(`${baseUrl}/api/not-a-route`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ changes: [] }),
+      });
+      const text = await response.text();
+      let code;
+      try {
+        code = JSON.parse(text)?.code;
+      } catch {
+        code = undefined;
+      }
+
+      assert.equal(response.status, 404);
+      assert.equal(code, undefined);
+    } finally {
+      await stopServer(server);
+    }
+  });
+
   it("serves the health endpoint", async () => {
     const app = await createEditorApp({ adapters: fakeAdapters() });
     const { server, baseUrl } = await startServer(app);

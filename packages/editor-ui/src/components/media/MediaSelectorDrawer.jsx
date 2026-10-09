@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
-import { X, Search, FileText, Music } from "lucide-react";
+import { X, Search, FileText, Music, Film } from "lucide-react";
 import { API_URL } from "../../lib/config";
 import { getProjectMedia } from "../../queries/mediaManager";
 import LoadingSpinner from "../ui/LoadingSpinner";
@@ -11,15 +11,22 @@ import useMediaUpload from "../../hooks/useMediaUpload";
 import useAppSettings from "../../hooks/useAppSettings";
 import useToastStore from "../../stores/toastStore";
 import { showRejectedFiles } from "../../utils/uploadFeedback";
-import { IMAGE_ACCEPT, AUDIO_ACCEPT, NON_IMAGE_ACCEPT, MEDIA_ACCEPT, mapDropzoneRejections } from "../../utils/uploadValidation";
+import {
+  IMAGE_ACCEPT,
+  AUDIO_ACCEPT,
+  VIDEO_ACCEPT,
+  NON_IMAGE_ACCEPT,
+  MEDIA_ACCEPT,
+  mapDropzoneRejections,
+} from "../../utils/uploadValidation";
 
 /**
- * @param {string} [filterType="all"] — Media type to show: `image`, `audio`, `file`
+ * @param {string} [filterType="all"] — Media type to show: `image`, `audio`, `video`, `file`
  *   (non-image), or `all`. Fixed when `showTypeFilter` is off; when on it seeds the
  *   in-drawer dropdown's initial value.
  * @param {boolean} [showTypeFilter=false] — Render a type dropdown next to search (All /
- *   Images / Audio / Files) so the user can switch type within the drawer. Off for
- *   type-locked pickers (image/file settings); on for the richtext "Link to file" picker.
+ *   Images / Audio / Videos / Files) so the user can switch type within the drawer. Off for
+ *   type-locked pickers (image/file/video settings); on for the richtext "Link to file" picker.
  * @param {boolean} [elevated=false] — Raises the drawer above an unusually high-z host
  *   (e.g. the richtext editor's expand overlay at z-1000). Default keeps the standard
  *   z-40/z-50 used everywhere else.
@@ -101,8 +108,11 @@ export default function MediaSelectorDrawer({
       if (effectiveFilter === "audio") {
         return matchesSearch && file.type && file.type.startsWith("audio/");
       }
+      if (effectiveFilter === "video") {
+        return matchesSearch && file.type && file.type.startsWith("video/");
+      }
       if (effectiveFilter === "file") {
-        // "file" = any non-image asset (documents + audio), mirroring the media screen's "Files" option.
+        // "file" = any non-image asset (documents + audio + video), mirroring the media screen's "Files" option.
         return matchesSearch && file.type && !file.type.startsWith("image/");
       }
 
@@ -138,15 +148,17 @@ export default function MediaSelectorDrawer({
   const uploadAccept =
     effectiveFilter === "image" ? IMAGE_ACCEPT
       : effectiveFilter === "audio" ? AUDIO_ACCEPT
-        // "file" = any non-image asset (documents + audio), matching the file filter, so a
-        // new MP3 can be uploaded from a file-filtered picker, not just selected.
-        : effectiveFilter === "file" ? NON_IMAGE_ACCEPT
-          : MEDIA_ACCEPT;
+        : effectiveFilter === "video" ? VIDEO_ACCEPT
+          // "file" = any non-image asset (documents + audio + video), matching the file filter, so a
+          // new MP3 or MP4 can be uploaded from a file-filtered picker, not just selected.
+          : effectiveFilter === "file" ? NON_IMAGE_ACCEPT
+            : MEDIA_ACCEPT;
   const supportedLabel =
     effectiveFilter === "image" ? t("components.mediaUploader.supportedImages")
       : effectiveFilter === "audio" ? t("components.mediaUploader.supportedAudio")
-        : effectiveFilter === "file" ? t("components.mediaUploader.supportedFiles")
-          : t("components.mediaUploader.supportedFormats");
+        : effectiveFilter === "video" ? t("components.mediaUploader.supportedVideo")
+          : effectiveFilter === "file" ? t("components.mediaUploader.supportedFiles")
+            : t("components.mediaUploader.supportedFormats");
 
   if (!visible) return null;
 
@@ -211,6 +223,7 @@ export default function MediaSelectorDrawer({
                 <option value="all">{t("components.mediaToolbar.all")}</option>
                 <option value="image">{t("components.mediaToolbar.images")}</option>
                 <option value="audio">{t("components.mediaToolbar.audio")}</option>
+                <option value="video">{t("components.mediaToolbar.videos")}</option>
                 <option value="file">{t("components.mediaToolbar.files")}</option>
               </select>
             )}
@@ -252,6 +265,8 @@ export default function MediaSelectorDrawer({
                         <div className="flex flex-col items-center gap-1">
                           {file.type?.startsWith("audio/") ? (
                             <Music className="text-slate-400" size={32} />
+                          ) : file.type?.startsWith("video/") ? (
+                            <Film className="text-slate-400" size={32} />
                           ) : (
                             <FileText className="text-slate-400" size={32} />
                           )}

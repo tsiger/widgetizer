@@ -19,8 +19,13 @@
   {%- assign form_key = page.language | append: ':' | append: form_key -%}
 {% endif %}
 
+{%- comment -%} A button with no label is not a form, so this one keeps a floor under any empty value. {%- endcomment -%}
 {% assign submit_label = widget.settings.submit_label %}
-{% if submit_label == blank %}{% assign submit_label = 'Send message' %}{% endif %}
+{% if submit_label == blank %}{% assign submit_label = 'site.core_form.submit' | t %}{% endif %}
+
+{%- comment -%} nil, not blank: the setting resolves its own wording per language, so nil means nothing reached it at all, while "" is a note the owner cleared on purpose and must stay gone. {%- endcomment -%}
+{% assign required_note = widget.settings.required_note %}
+{% if required_note == nil %}{% assign required_note = 'site.core_form.required_note' | t %}{% endif %}
 
 <section
   id="{{ widget.id }}"
@@ -274,8 +279,8 @@
             action="/__widgetizer/forms/{{ form_key }}"
             method="post"
           >
-            {% if has_required_fields %}
-              <p class="form-required-note"><span class="form-required" aria-hidden="true">*</span> Required fields</p>
+            {% if has_required_fields and required_note != blank %}
+              <p class="form-required-note"><span class="form-required" aria-hidden="true">*</span> {{ required_note }}</p>
             {% endif %}
             {% assign field_i = 0 %}
             {% for blockId in widget.blocksOrder %}
@@ -358,7 +363,7 @@
                       class="form-input form-select"
                       {% if block.settings.required %}required aria-required="true"{% endif %}
                     >
-                      <option value="">{{ block.settings.placeholder | default: 'Select an option' }}</option>
+                      <option value="">{{ block.settings.placeholder }}</option>
                       {% assign option_i = 0 %}
                       {% for option_line in options_lines %}
                         {% assign option_label = option_line | strip %}

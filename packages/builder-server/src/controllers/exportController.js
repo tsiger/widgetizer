@@ -105,6 +105,18 @@ async function getDirectorySize(dirPath) {
 const serializeExportOps = createKeyedSerializer();
 
 /**
+ * Where a tracked media path's file is, when it lies inside the project's
+ * `uploads/<folder>`; null otherwise. The media library can arrive from a backup
+ * made elsewhere, and a path such as `/uploads/images/../../../etc/passwd` would
+ * otherwise copy a file from outside the project into the published site.
+ */
+function uploadSourcePath(projectDir, mediaPath, folder) {
+  if (typeof mediaPath !== "string") return null;
+  const resolved = path.resolve(projectDir, mediaPath.replace(/^\//, ""));
+  return isWithinDirectory(resolved, path.resolve(projectDir, "uploads", folder)) ? resolved : null;
+}
+
+/**
  * Run fn under the per-project export lock, serialized with every export
  * operation (export, delete, cleanup). For callers outside this module whose
  * work must not interleave with exports — project deletion holds it across
@@ -303,13 +315,29 @@ export async function exportProjectToDir(projectId, options = {}, collectionDeps
     const allPages = await listPagesFromDir(projectDir, { defaultLanguage });
     const rootPages = allPages.filter((pageData) => !languageFolder(pageLang(pageData)));
 
-    // Validate that at least one page has the "index" slug (required for homepage)
-    // Note: page.id is derived from filename, which is the authoritative slug
-    const hasIndexPage = rootPages.some((page) => page.id === "index");
+    // The default language needs a homepage: a page slugged "index" or "home",
+    // both of which publish as index.html. page.id is the filename, the
+    // authoritative slug.
+    const hasIndexPage = rootPages.some((page) => isHomeSlug(page.id));
     if (!hasIndexPage) {
       const err = new Error('Your project must have a page with the slug "index" to serve as the homepage. Please create or rename a page to have the slug "index" before exporting.');
       err.statusCode = 400;
       err.errorTitle = "Export failed: No homepage found";
+      throw err;
+    }
+
+    // `index` and `home` both publish as the language's index.html, so a language
+    // holding both would publish one over the other. The editor refuses the pair,
+    // but older projects, imports and theme updates can still carry one.
+    for (const language of new Set(allPages.map((pageData) => pageData.language))) {
+      const homes = allPages.filter((pageData) => pageData.language === language && isHomeSlug(pageData.id));
+      if (homes.length < 2) continue;
+      const folder = languageFolder(pageLang(homes[0]));
+      const err = new Error(
+        `The ${folder ? `"${folder}" ` : ""}pages include both "index" and "home". Both are published as the homepage (${folder ? `${folder}/` : ""}index.html), so one would replace the other. Rename one of them and export again.`,
+      );
+      err.statusCode = 400;
+      err.errorTitle = "Export failed: two homepages";
       throw err;
     }
 
@@ -1074,7 +1102,7 @@ Per aspera ad astra
         let skippedCount = 0;
 
         for (const imageFile of usedImages) {
-          const sourceImagePath = path.join(projectDir, imageFile.path.replace(/^\//, ""));
+          const sourceImagePath = uploadSourcePath(projectDir, imageFile.path, "images");
           // Export images under the public assets/images/ directory.
           const targetImagePath = path.join(outputDir, "assets", "images", path.basename(imageFile.path));
           const hasLargeVariant = Boolean(imageFile.sizes?.large?.path);
@@ -1085,7 +1113,7 @@ Per aspera ad astra
 
           if (shouldCopyOriginal) {
             try {
-              if (await fs.pathExists(sourceImagePath)) {
+              if (sourceImagePath && (await fs.pathExists(sourceImagePath))) {
                 await fs.ensureDir(path.dirname(targetImagePath));
                 await fs.copy(sourceImagePath, targetImagePath);
                 copiedCount++;
@@ -1100,7 +1128,11 @@ Per aspera ad astra
             for (const [sizeName, sizeInfo] of Object.entries(imageFile.sizes)) {
               // Skip thumb variants — only used for the media library UI
               if (sizeName === "thumb") continue;
-              const sourceSizePath = path.join(projectDir, sizeInfo.path.replace(/^\//, ""));
+              const sourceSizePath = uploadSourcePath(projectDir, sizeInfo?.path, "images");
+              if (!sourceSizePath) {
+                console.warn(`Skipped the ${sizeName} size of ${imageFile.filename}: its path is outside the project's images.`);
+                continue;
+              }
               // Export generated image sizes under the public assets/images/ directory.
               const targetSizePath = path.join(outputDir, "assets", "images", path.basename(sizeInfo.path));
 
@@ -1154,11 +1186,11 @@ Per aspera ad astra
         let fileCopiedCount = 0;
 
         for (const fileAsset of usedFiles) {
-          const sourceFilePath = path.join(projectDir, fileAsset.path.replace(/^\//, ""));
+          const sourceFilePath = uploadSourcePath(projectDir, fileAsset.path, "files");
           const targetFilePath = path.join(outputDir, "assets", "files", path.basename(fileAsset.path));
 
           try {
-            if (await fs.pathExists(sourceFilePath)) {
+            if (sourceFilePath && (await fs.pathExists(sourceFilePath))) {
               await fs.ensureDir(path.dirname(targetFilePath));
               await fs.copy(sourceFilePath, targetFilePath);
               fileCopiedCount++;

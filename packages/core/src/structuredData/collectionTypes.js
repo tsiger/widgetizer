@@ -12,6 +12,10 @@ const FIELD_RULES = Object.freeze({
 
 export const COLLECTION_STRUCTURED_DATA_TYPES = Object.freeze(Object.keys(FIELD_RULES));
 
+// Read-only view of the rules for tooling that documents or checks themes
+// outside the app (the theme-authoring skill's contract file).
+export const COLLECTION_STRUCTURED_DATA_RULES = FIELD_RULES;
+
 /**
  * Check a collection schema's `structuredData` block against its settings. Every
  * mapped property must be one the type supports and must name an existing,

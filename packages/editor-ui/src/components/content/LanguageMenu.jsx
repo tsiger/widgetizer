@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { ChevronDown, Plus } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { nativeLanguageName } from "@widgetizer/core/languages";
+import { nativeLanguageName, hreflangCase } from "@widgetizer/core/languages";
 import { useDefaultLanguage, useExtraLanguages, useIsMultilang } from "../../stores/projectStore";
 
 /**
@@ -15,9 +15,22 @@ import { useDefaultLanguage, useExtraLanguages, useIsMultilang } from "../../sto
  * @param {(sibling: object) => void} onOpen
  * @param {(entry: object, code: string) => void} onCreate
  * @param {string|null} pendingKey `${entry.id}:${code}` while one is being created
+ * @param {"ready"|"loading"|"unknown"} [siblingsState] whether `siblings` is the
+ *   whole group yet: until it is, a language missing from it may well exist, so
+ *   it is not offered for creation ("loading" while the group is read, "unknown"
+ *   when it could not be)
  * @param {string} label accessible name for the trigger
  */
-export default function LanguageMenu({ entry, language, siblings, onOpen, onCreate, pendingKey, label }) {
+export default function LanguageMenu({
+  entry,
+  language,
+  siblings,
+  onOpen,
+  onCreate,
+  pendingKey,
+  siblingsState = "ready",
+  label,
+}) {
   const { t } = useTranslation();
   const isMultilang = useIsMultilang();
   const defaultLanguage = useDefaultLanguage();
@@ -44,9 +57,9 @@ export default function LanguageMenu({ entry, language, siblings, onOpen, onCrea
         onClick={() => setIsOpen(!isOpen)}
         title={label}
         aria-label={label}
-        className="flex items-center gap-2 rounded-md border border-slate-200 px-3 py-2 text-sm font-medium uppercase hover:bg-slate-100"
+        className="flex items-center gap-2 rounded-md border border-slate-200 px-3 py-2 text-sm font-medium hover:bg-slate-100"
       >
-        {current}
+        {nativeLanguageName(current)}
         <ChevronDown size={16} className={`transform transition-transform ${isOpen ? "rotate-180" : ""}`} />
       </button>
       {isOpen && (
@@ -54,6 +67,22 @@ export default function LanguageMenu({ entry, language, siblings, onOpen, onCrea
           {[defaultLanguage, ...extraLanguages].map((code) => {
             const sibling = siblings.get(code);
             const name = nativeLanguageName(code);
+            if (code === current) {
+              // The language being edited exists by definition, whether or not the
+              // group has been read: never something to create.
+              return (
+                <button
+                  key={code}
+                  type="button"
+                  onClick={() => setIsOpen(false)}
+                  aria-current="true"
+                  className="flex w-full items-center justify-between bg-pink-600 px-4 py-2 text-left text-white hover:bg-pink-700"
+                >
+                  <span>{name}</span>
+                  <span className="text-xs opacity-70">{hreflangCase(code)}</span>
+                </button>
+              );
+            }
             if (sibling) {
               return (
                 <button
@@ -64,13 +93,26 @@ export default function LanguageMenu({ entry, language, siblings, onOpen, onCrea
                     onOpen(sibling);
                   }}
                   aria-label={t("common.languages.open", { name })}
-                  aria-current={code === current ? "true" : undefined}
-                  className={`flex w-full items-center justify-between px-4 py-2 text-left ${
-                    code === current ? "bg-pink-600 text-white hover:bg-pink-700" : "text-slate-800 hover:bg-slate-100"
-                  }`}
+                  className="flex w-full items-center justify-between px-4 py-2 text-left text-slate-800 hover:bg-slate-100"
                 >
                   <span>{name}</span>
-                  <span className="text-xs uppercase opacity-70">{code}</span>
+                  <span className="text-xs opacity-70">{hreflangCase(code)}</span>
+                </button>
+              );
+            }
+            if (siblingsState !== "ready") {
+              const why = t(siblingsState === "loading" ? "common.languages.checking" : "common.languages.unknown", { name });
+              return (
+                <button
+                  key={code}
+                  type="button"
+                  disabled
+                  aria-label={why}
+                  title={why}
+                  className="flex w-full items-center justify-between px-4 py-2 text-left text-slate-500 disabled:opacity-50"
+                >
+                  <span>{name}</span>
+                  <span className="text-xs opacity-70">{hreflangCase(code)}</span>
                 </button>
               );
             }
@@ -93,7 +135,7 @@ export default function LanguageMenu({ entry, language, siblings, onOpen, onCrea
                 <span className="flex items-center gap-2">
                   <Plus size={14} /> {name}
                 </span>
-                <span className="text-xs uppercase opacity-70">{code}</span>
+                <span className="text-xs opacity-70">{hreflangCase(code)}</span>
               </button>
             );
           })}

@@ -317,6 +317,29 @@ const usePageStore = create(
         set({ themeSettingsSnapshot: liveSettings ? JSON.parse(JSON.stringify(liveSettings)) : null });
         history.resume();
       },
+
+      /**
+       * themeStore took the server's copy of the theme. `expected` is what this
+       * client believed the server would hold, so whatever differs between it and
+       * `baseline` came from the server (a correction, or another screen's edits),
+       * never from this user's own undoable edits.
+       *
+       * A different theme version means the history holds snapshots of an older
+       * theme structure; undoing into one would bring that structure back on
+       * screen. The history is cleared then. Within one version the existing
+       * correction rewrite brings history and the live snapshot into step.
+       */
+      rebaseThemeHistory: (expected, baseline, draft) => {
+        if (expected?.version !== baseline?.version) {
+          const history = usePageStore.temporal.getState();
+          history.pause();
+          set({ themeSettingsSnapshot: draft ? JSON.parse(JSON.stringify(draft)) : null });
+          history.resume();
+          history.clear();
+          return;
+        }
+        get().applyThemeCorrections(expected, baseline);
+      },
     }),
     {
       // zundo options
@@ -352,5 +375,13 @@ const usePageStore = create(
     },
   ),
 );
+
+// Keep the undo history in step whenever themeStore takes the server's copy.
+// Guarded: suites that mock themeStore as a bare { getState } have no hook.
+if (typeof useThemeStore.onServerThemeAdopted === "function") {
+  useThemeStore.onServerThemeAdopted((expected, baseline, draft) =>
+    usePageStore.getState().rebaseThemeHistory(expected, baseline, draft),
+  );
+}
 
 export default usePageStore;

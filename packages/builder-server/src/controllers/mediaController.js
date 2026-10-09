@@ -178,7 +178,7 @@ export const mediaUploadFileFilter = (req, file, cb) => {
   ) {
     cb(null, true);
   } else {
-    cb(new Error("Invalid file type. Supported types: images, audio (MP3), and PDF."), false);
+    cb(new Error("Invalid file type. Supported types: images, audio (MP3), video (MP4), and PDF."), false);
   }
 };
 

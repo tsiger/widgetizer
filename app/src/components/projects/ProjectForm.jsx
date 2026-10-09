@@ -8,7 +8,7 @@ import Button from "@widgetizer/editor-ui/components/ui/Button.jsx";
 import { formatSlug } from "@widgetizer/editor-ui/utils/slugUtils";
 import { isValidSiteUrl, siteUrlHasQueryOrFragment } from "@widgetizer/core/urlSafety";
 import { identityKind } from "@widgetizer/core/siteIdentity";
-import { DEFAULT_LANGUAGE, SUPPORTED_LANGUAGES, nativeLanguageName } from "@widgetizer/core/languages";
+import { DEFAULT_LANGUAGE, SUPPORTED_LANGUAGES, nativeLanguageName, hreflangCase } from "@widgetizer/core/languages";
 import useToastStore from "@widgetizer/editor-ui/stores/toastStore";
 import { getThemePresets, getPresetScreenshotUrl } from "@widgetizer/editor-ui/queries/themeManager";
 import SiteIdentityFields from "./SiteIdentityFields.jsx";
@@ -21,6 +21,23 @@ const READINESS_TARGETS = {
   logo: { tab: "identity", fieldId: "identity-logo" },
   address: { tab: "business", fieldId: "identity-streetAddress" },
 };
+
+function toFormValues(initialData) {
+  return {
+    name: initialData.name || "",
+    folderName: initialData.folderName || initialData.id || "",
+    description: initialData.description || "",
+    siteTitle: initialData.siteTitle || "",
+    theme: initialData.theme || "",
+    siteUrl: initialData.siteUrl || "",
+    cleanUrls: initialData.cleanUrls || false,
+    defaultLanguage: initialData.defaultLanguage || DEFAULT_LANGUAGE,
+    receiveThemeUpdates: initialData.receiveThemeUpdates || false,
+    preset: "",
+    siteIdentity: identityToForm(initialData.siteIdentity),
+    logoFile: null,
+  };
+}
 
 export default function ProjectForm({
   initialData = { name: "", description: "", siteTitle: "", theme: "", siteUrl: "", cleanUrls: false },
@@ -61,20 +78,7 @@ export default function ProjectForm({
     watch,
     setValue,
   } = useForm({
-    defaultValues: {
-      name: initialData.name || "",
-      folderName: initialData.folderName || initialData.id || "",
-      description: initialData.description || "",
-      siteTitle: initialData.siteTitle || "",
-      theme: initialData.theme || "",
-      siteUrl: initialData.siteUrl || "",
-      cleanUrls: initialData.cleanUrls || false,
-      defaultLanguage: initialData.defaultLanguage || DEFAULT_LANGUAGE,
-      receiveThemeUpdates: initialData.receiveThemeUpdates || false,
-      preset: "",
-      siteIdentity: identityToForm(initialData.siteIdentity),
-      logoFile: null,
-    },
+    defaultValues: toFormValues(initialData),
   });
 
   // Watch name for auto-folder-name generation
@@ -131,19 +135,7 @@ export default function ProjectForm({
   useEffect(() => {
     const currentInitialDataStr = JSON.stringify(initialData);
     if (prevInitialDataRef.current !== currentInitialDataStr) {
-      reset({
-        name: initialData.name || "",
-        folderName: initialData.folderName || initialData.id || "",
-        description: initialData.description || "",
-        siteTitle: initialData.siteTitle || "",
-        theme: initialData.theme || "",
-        siteUrl: initialData.siteUrl || "",
-        cleanUrls: initialData.cleanUrls || false,
-        receiveThemeUpdates: initialData.receiveThemeUpdates || false,
-        preset: "",
-        siteIdentity: identityToForm(initialData.siteIdentity),
-        logoFile: null,
-      });
+      reset(toFormValues(initialData));
       prevInitialDataRef.current = currentInitialDataStr;
     }
   });
@@ -268,20 +260,7 @@ export default function ProjectForm({
 
       // If the parent component signals to reset the form
       if (result === true) {
-        reset({
-          name: "",
-          folderName: "",
-          description: "",
-          siteTitle: "",
-          theme: "",
-          siteUrl: "",
-          cleanUrls: false,
-          defaultLanguage: DEFAULT_LANGUAGE,
-          receiveThemeUpdates: false,
-          preset: "",
-          siteIdentity: identityToForm({}),
-          logoFile: null,
-        });
+        reset(toFormValues({}));
         setPresets({ default: null, presets: [] });
         setSelectedPreset(null);
         setActiveTab("general");
@@ -417,7 +396,7 @@ export default function ProjectForm({
       >
         {languageOptions.map(({ code }) => (
           <option key={code} value={code}>
-            {nativeLanguageName(code)} ({code})
+            {nativeLanguageName(code)} ({hreflangCase(code)})
           </option>
         ))}
       </select>

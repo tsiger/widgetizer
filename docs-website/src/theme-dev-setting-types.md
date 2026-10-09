@@ -216,7 +216,7 @@ In [collection](theme-dev-collections.html) schemas, a `date` field can be marke
 }
 ```
 
-**`file`:** File asset selector for downloadable documents (currently PDF). The value is the storage path to the uploaded file (e.g. `/uploads/files/brochure.pdf`). Unlike the image input, this input is filename-oriented with no visual preview.
+**`file`:** File asset selector for downloadable documents, audio and video (PDF, MP3, MP4). The value is the storage path to the uploaded file (e.g. `/uploads/files/brochure.pdf`). Unlike the image input, this input is filename-oriented with no visual preview.
 
 ```json
 {
@@ -228,7 +228,7 @@ In [collection](theme-dev-collections.html) schemas, a `date` field can be marke
 
 Features:
 
-- **Upload**: Direct file upload from the OS file picker (accepts PDF)
+- **Upload**: Direct file upload from the OS file picker (accepts PDF, MP3, MP4)
 - **Browse**: Opens the media selector drawer filtered to file assets
 - **Selected state**: Displays filename and extension badge with a clear button
 - **No metadata editing**: File assets do not have alt text or title metadata
@@ -242,6 +242,27 @@ In Liquid, resolve the file path using the `filePath` context variable (set by t
 ```
 
 The export pipeline rewrites `/uploads/files/` paths to `assets/files/` in exported HTML automatically.
+
+**`video`:** An uploaded MP4 for native playback. The value is the upload path (e.g. `/uploads/files/product-tour.mp4`) or `""`; anything else, such as a YouTube URL, is cleared when the page renders. Use `youtube` (or a text URL) for hosted video.
+
+```json
+{
+  "id": "video_file",
+  "type": "video",
+  "label": "Uploaded video (MP4)"
+}
+```
+
+The picker only uploads and selects MP4 files. Resolve the URL from `filePath` as for `file`, and leave `data-setting` off the `<video>` so the editor re-renders the widget instead of writing the raw path into `src`:
+
+```liquid
+{% if widget.settings.video_file != blank %}
+  {% assign video_name = widget.settings.video_file | split: '/' | last %}
+  <video src="{{ filePath | append: '/' | append: video_name }}" controls playsinline preload="metadata"></video>
+{% endif %}
+```
+
+Playback depends on the visitor's browser decoding the file; H.264/AAC is the safe choice.
 
 **`gallery`:** Ordered set of images managed through the media library (add, remove, drag-reorder). The value is an **array of upload-path strings** (e.g. `["/uploads/images/a.jpg", "/uploads/images/b.jpg"]`); an empty gallery is `[]`. Image alt/title/caption live on the media record, not in the gallery value.
 

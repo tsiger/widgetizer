@@ -97,7 +97,7 @@ The editor provides a way to see a true, live preview of the page, exactly as an
 The editor is designed to save changes automatically, providing a seamless user experience.
 
 1.  Most actions that alter page data—such as editing a setting, adding a widget, or reordering the list—also call a corresponding function on the `useAutoSave` store (e.g., `markWidgetModified`, `setStructureModified`).
-2.  These functions set internal dirty flags and also rely on deep comparison between current and original page/theme state so the `EditorTopBar` reflects the real save state after undo/redo operations.
+2.  These functions set internal dirty flags and also rely on deep comparison between current and original page/theme state so the `EditorTopBar` reflects the real save state after undo/redo operations. The saved copy is a JSON round trip, the form a save sends, and the current page and header/footer are compared in that same form, so a key holding `undefined` (which no save can store) never keeps the page dirty after a save or an undo/redo reconcile.
 3.  The `useAutoSave` store implements a **debounced auto-save** strategy. Instead of a fixed interval, a 60-second timer is reset on every modification. This ensures that auto-saving only occurs after a period of inactivity, providing a smoother experience.
 4.  For immediate persistence, the user can also click the "Save" button in the `EditorTopBar` (or use the `Ctrl+S` / `Cmd+S` shortcut), which directly invokes the `save()` action.
 
@@ -116,7 +116,9 @@ The Page Editor features a comprehensive undo/redo system powered by `zundo` (Zu
   - `Ctrl+Shift+Z` (or `Cmd+Shift+Z`) / `Ctrl+Y`: Redo
   - `Ctrl+S` (or `Cmd+S`): Save Changes
 - **History Management**:
-  - The history is cleared whenever a new page is loaded to prevent cross-page undoing. Saving (manual or autosave) keeps it: undoing past a save makes the page dirty again, and autosave re-saves it. When the server corrects theme values on save, `pageStore.applyThemeCorrections` swaps the rejected values for the corrected ones in every history entry that still holds them, so undoing an unrelated edit can't bring them back.
+  - The history is cleared whenever a new page is loaded to prevent cross-page undoing. Saving (manual or autosave) keeps it: undoing past a save makes the page dirty again, and autosave re-saves it.
+  - Whenever `themeStore` takes the server's copy of the theme (a save response, a conflict refetch, a reconcile), it tells `pageStore.rebaseThemeHistory` what it expected the server to hold and what the server holds. Within one theme version, `applyThemeCorrections` swaps each value the server changed (a correction, or another screen's edit) into every history entry that still holds the expected value, so undoing an unrelated edit can't bring the old value back. A different theme version clears the history, because its snapshots describe an older theme structure.
+  - A theme save refused because the settings changed elsewhere keeps the edits on top of the current settings; the editor announces it (`themeConflict` in `saveStore`) and autosave sends them.
   - Quick edits to one value — typing into a field, dragging a color or range — are one step. `pageStore`'s `handleSet` extends the last step instead of adding one when the change touches the same single value within 500 ms and nothing was undone, redone or cleared in between.
   - The system tracks up to 150 steps.
   - It intelligently handles state snapshots to ensure that only relevant data changes (and not loading/error states) are recorded.

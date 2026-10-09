@@ -35,7 +35,7 @@ const _origError = console.error;
 console.warn = () => {};
 console.error = () => {};
 
-const { getProjectDir, getProjectPagesDir, getProjectImagesDir } = await import("../config.js");
+const { getProjectDir, getProjectPagesDir, getProjectImagesDir, getProjectFilesDir } = await import("../config.js");
 const projectRepo = await import("../db/repositories/projectRepository.js");
 const mediaRepo = await import("../db/repositories/mediaRepository.js");
 const { deleteProjectMedia, bulkDeleteProjectMedia, refreshMediaUsage } = await import(
@@ -237,6 +237,66 @@ describe("deleting an image the usage rows have lost track of", () => {
     assert.equal(res._status, 200, "verification must not block ordinary deletion");
     assert.equal(await imageStillOnDisk(), false);
     assert.ok(!mediaRepo.getMediaFileById(PROJECT_ID, FILE_ID), "and its record is gone");
+  });
+});
+
+describe("an uploaded MP4", () => {
+  const VIDEO_ID = "file-tour-video";
+  const VIDEO_PATH = "/uploads/files/tour.mp4";
+  const videoOnDisk = () => fs.pathExists(path.join(getProjectFilesDir(PROJECT_FOLDER), "tour.mp4"));
+  const pageWithVideo = (slug) => ({
+    ...plainPage(slug),
+    widgets: { widget_1: { type: "video-embed", settings: { video_file: VIDEO_PATH } } },
+  });
+
+  beforeEach(async () => {
+    mediaRepo.deleteMediaFiles(PROJECT_ID, [VIDEO_ID]);
+    await fs.outputFile(path.join(getProjectFilesDir(PROJECT_FOLDER), "tour.mp4"), Buffer.from("mp4bytes"));
+    mediaRepo.addMediaFile(PROJECT_ID, {
+      id: VIDEO_ID,
+      filename: "tour.mp4",
+      originalName: "tour.mp4",
+      path: VIDEO_PATH,
+      type: "video/mp4",
+      size: 8,
+      uploadedAt: new Date().toISOString(),
+      metadata: { alt: "", title: "" },
+      sizes: {},
+    });
+  });
+
+  it("stays while any saved page still plays it, and goes once none does", async () => {
+    await writePage(pageWithVideo("home"));
+    await writePage(pageWithVideo("about"));
+
+    let res = await call(deleteProjectMedia, { params: { fileId: VIDEO_ID } });
+    assert.equal(res._status, 400);
+    assert.deepEqual([...res._json.usedIn].sort(), ["page:uuid-about", "page:uuid-home"]);
+
+    const save = async (slug) =>
+      assert.equal((await call(savePageContent, { params: { id: slug }, body: plainPage(slug) }))._status, 200);
+
+    await save("home");
+    res = await call(deleteProjectMedia, { params: { fileId: VIDEO_ID } });
+    assert.equal(res._status, 400, "the other page still shares it");
+    assert.ok(await videoOnDisk());
+
+    await save("about");
+    res = await call(deleteProjectMedia, { params: { fileId: VIDEO_ID } });
+    assert.equal(res._status, 200);
+    assert.equal(await videoOnDisk(), false);
+  });
+
+  it("refuses a save that would point a page at a video deleted meanwhile", async () => {
+    await writePage(plainPage("about"));
+    assert.equal((await call(deleteProjectMedia, { params: { fileId: VIDEO_ID } }))._status, 200);
+
+    const saveRes = await call(savePageContent, {
+      params: { id: "about" },
+      body: pageWithVideo("about"),
+    });
+    assert.equal(saveRes._status, 409);
+    assert.equal(saveRes._json.code, "MEDIA_REFERENCE_MISSING");
   });
 });
 

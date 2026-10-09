@@ -47,6 +47,7 @@ const { buildLatestSnapshot, invalidateThemeSourceCache } = await import("../con
 const { checkForUpdates, applyThemeUpdate, mergeThemeSettings, toggleThemeUpdates } =
   await import("../services/themeUpdateService.js");
 const { closeDb } = await import("../db/index.js");
+const { withContentWriteLock } = await import("../services/contentCoordination.js");
 
 // ============================================================================
 // Test constants
@@ -794,5 +795,49 @@ describe("toggleThemeUpdates", () => {
         return true;
       },
     );
+  });
+});
+
+// ============================================================================
+// An update and a theme-settings save take turns
+// ============================================================================
+
+describe("applyThemeUpdate and concurrent content writes", () => {
+  beforeEach(async () => {
+    closeDb();
+    await fs.remove(TEST_DATA_DIR);
+    await fs.remove(TEST_THEMES_DIR);
+    invalidateThemeSourceCache();
+  });
+
+  // The update reads and merges theme.json while preparing, and writes the merge
+  // in its swap. A save landing in between used to be overwritten by the swap.
+  it("holds the content-write section, so a save started mid-update lands on top of it", async () => {
+    await createTheme("1.0.0", { updates: [{ version: "1.1.0" }] });
+    await buildLatestSnapshot(THEME_NAME);
+    await createProject("1.0.0");
+    const themeJsonPath = getProjectThemeJsonPath(PROJECT_FOLDER);
+    const stageDir = path.join(getProjectDir(PROJECT_FOLDER), ".theme-update-stage");
+
+    const update = applyThemeUpdate(PROJECT_ID);
+    // Wait until the update is preparing (its staging directory exists).
+    for (let i = 0; i < 500 && !(await fs.pathExists(stageDir)); i++) {
+      await new Promise((resolve) => setImmediate(resolve));
+    }
+    assert.ok(await fs.pathExists(stageDir), "the update had not started preparing; the test would prove nothing");
+    let sawUpdateInProgress = null;
+    const save = withContentWriteLock(PROJECT_ID, async () => {
+      sawUpdateInProgress = await fs.pathExists(stageDir);
+      const theme = await fs.readJson(themeJsonPath);
+      theme.settings.colors[0].value = "#123456";
+      await fs.writeJson(themeJsonPath, theme, { spaces: 2 });
+    });
+    const [result] = await Promise.all([update, save]);
+
+    assert.ok(result.success);
+    assert.equal(sawUpdateInProgress, false, "the save ran while the update was still in progress");
+    const saved = await fs.readJson(themeJsonPath);
+    assert.equal(saved.version, "1.1.0");
+    assert.equal(saved.settings.colors.find((s) => s.id === "primary_color").value, "#123456");
   });
 });

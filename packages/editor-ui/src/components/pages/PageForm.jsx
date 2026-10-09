@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/incompatible-library */
 import { useState, useEffect, useRef } from "react";
 import { Trans, useTranslation } from "react-i18next";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { formatSlug } from "../../utils/slugUtils";
 import useToastStore from "../../stores/toastStore";
@@ -9,8 +9,26 @@ import useStickyActionBar from "../../hooks/useStickyActionBar";
 import Button from "../ui/Button";
 import ImageInput from "../settings/inputs/ImageInput";
 import { isHomeSlug } from "@widgetizer/core/internalHref";
-import { isReservedPageSlug } from "@widgetizer/core/contentAddress";
+import { isReservedPageSlug, translationGroupIdOf } from "@widgetizer/core/contentAddress";
 import { getAllPages } from "../../queries/pageManager";
+import ParentPagePicker from "./ParentPagePicker";
+
+function toFormValues(initialData) {
+  return {
+    name: initialData.name || "",
+    slug: initialData.slug || "",
+    seo: {
+      description: initialData.seo?.description || "",
+      og_title: initialData.seo?.og_title || "",
+      og_image: initialData.seo?.og_image || "",
+      og_type: initialData.seo?.og_type || "website",
+      twitter_card: initialData.seo?.twitter_card || "summary",
+      canonical_url: initialData.seo?.canonical_url || "",
+      robots: initialData.seo?.robots || "index,follow",
+    },
+    parentPageUuid: initialData.parentPageUuid || "",
+  };
+}
 
 export default function PageForm({
   initialData = { name: "", slug: "" },
@@ -20,6 +38,7 @@ export default function PageForm({
   onCancel,
   onDirtyChange,
   isDirty: isDirtyProp = false,
+  language,
 }) {
   const { t } = useTranslation();
   const isNew = !initialData.id;
@@ -37,21 +56,9 @@ export default function PageForm({
     reset,
     watch,
     setValue,
+    control,
   } = useForm({
-    defaultValues: {
-      name: initialData.name || "",
-      slug: initialData.slug || "",
-      seo: {
-        description: initialData.seo?.description || "",
-        og_title: initialData.seo?.og_title || "",
-        og_image: initialData.seo?.og_image || "",
-        og_type: initialData.seo?.og_type || "website",
-        twitter_card: initialData.seo?.twitter_card || "summary",
-        canonical_url: initialData.seo?.canonical_url || "",
-        robots: initialData.seo?.robots || "index,follow",
-      },
-      parentPageUuid: initialData.parentPageUuid || "",
-    },
+    defaultValues: toFormValues(initialData),
   });
 
   // Watch fields for auto-slug and media display
@@ -76,7 +83,10 @@ export default function PageForm({
   }, []);
 
   // A page cannot parent itself, its own descendants (that is a cycle), or be
-  // parented by the homepage — every trail already starts there.
+  // parented by the homepage — every trail already starts there. Nor by its own
+  // translations: the breadcrumb shows a parent's version in the page's language,
+  // which for one of its translations is the page itself.
+  const ownGroup = initialData.uuid ? translationGroupIdOf(initialData) : null;
   const parentOptions = (() => {
     const descendants = new Set();
     if (initialData.uuid) {
@@ -93,8 +103,15 @@ export default function PageForm({
       }
     }
     return allPages
-      .filter((page) => page.uuid && !descendants.has(page.uuid) && !isHomeSlug(page.slug))
-      .sort((a, b) => String(a.name || a.slug).localeCompare(String(b.name || b.slug)));
+      .filter(
+        (page) =>
+          page.uuid &&
+          !descendants.has(page.uuid) &&
+          !isHomeSlug(page.slug) &&
+          !(ownGroup && translationGroupIdOf(page) === ownGroup),
+      )
+      .sort((a, b) => String(a.name || a.slug).localeCompare(String(b.name || b.slug)))
+      .map((page) => ({ value: page.uuid, label: page.name || page.slug, language: page.language }));
   })();
 
   // Notify parent of dirty state changes
@@ -116,19 +133,7 @@ export default function PageForm({
   useEffect(() => {
     const currentInitialDataStr = JSON.stringify(initialData);
     if (prevInitialDataRef.current !== currentInitialDataStr) {
-      reset({
-        name: initialData.name || "",
-        slug: initialData.slug || "",
-        seo: {
-          description: initialData.seo?.description || "",
-          og_title: initialData.seo?.og_title || "",
-          og_image: initialData.seo?.og_image || "",
-          og_type: initialData.seo?.og_type || "website",
-          twitter_card: initialData.seo?.twitter_card || "summary",
-          canonical_url: initialData.seo?.canonical_url || "",
-          robots: initialData.seo?.robots || "index,follow",
-        },
-      });
+      reset(toFormValues(initialData));
       prevInitialDataRef.current = currentInitialDataStr;
     }
   });
@@ -232,14 +237,19 @@ export default function PageForm({
             <label htmlFor="parent-page" className="form-label">
               {t("forms.page.parentPageLabel")}
             </label>
-            <select id="parent-page" {...register("parentPageUuid")} className="form-select">
-              <option value="">{t("forms.page.parentPageNone")}</option>
-              {parentOptions.map((page) => (
-                <option key={page.uuid} value={page.uuid}>
-                  {page.name || page.slug}
-                </option>
-              ))}
-            </select>
+            <Controller
+              name="parentPageUuid"
+              control={control}
+              render={({ field }) => (
+                <ParentPagePicker
+                  id="parent-page"
+                  options={parentOptions}
+                  value={field.value}
+                  onChange={field.onChange}
+                  language={initialData.language || language}
+                />
+              )}
+            />
             <p className="form-description">{t("forms.page.parentPageHelp")}</p>
           </div>
         </div>

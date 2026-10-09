@@ -1,4 +1,4 @@
-import { nativeLanguageName } from "@widgetizer/core/languages";
+import { nativeLanguageName, hreflangCase } from "@widgetizer/core/languages";
 import { useDefaultLanguage, useExtraLanguages, useIsMultilang } from "../../stores/projectStore";
 
 /**
@@ -31,7 +31,7 @@ export default function LanguageTabs({ value, onChange, label }) {
           }`}
         >
           {nativeLanguageName(code)}
-          <span className="ml-1 text-xs text-slate-400">({code})</span>
+          <span className="ml-1 text-xs text-slate-400">({hreflangCase(code)})</span>
         </button>
       ))}
     </div>

@@ -131,6 +131,47 @@ describe("useLinkTargets across languages", () => {
     expect(getAllPages.mock.calls.length).toBe(2);
   });
 
+  it("does not cache a load that an invalidation overtook, nor drop the load that replaced it", async () => {
+    setSiteLanguages([]);
+    // The first load reads the page list from before the page was created, and
+    // its reply is held until a second load is under way.
+    let releaseStale;
+    getAllPages
+      .mockImplementationOnce(
+        () =>
+          new Promise((resolve) => {
+            releaseStale = () => resolve([{ uuid: "u-about", name: "About", slug: "about", language: "en" }]);
+          }),
+      )
+      .mockImplementationOnce(
+        () =>
+          new Promise(() => {
+            // Still loading when the stale reply lands.
+          }),
+      );
+    render(<Probe />);
+    await waitFor(() => expect(getAllPages).toHaveBeenCalledTimes(1));
+
+    // A page is created mid-load; a picker opened now starts a fresh load.
+    invalidateLinkTargetsCache("p1");
+    render(<Probe />);
+    await waitFor(() => expect(getAllPages).toHaveBeenCalledTimes(2));
+
+    releaseStale();
+    await waitFor(() => expect(screen.getAllByTestId("targets").length).toBe(1));
+
+    // A third picker joins the newer load instead of reading the stale reply from
+    // the cache or starting a load of its own.
+    getAllPages.mockResolvedValue([
+      { uuid: "u-about", name: "About", slug: "about", language: "en" },
+      { uuid: "u-new", name: "New", slug: "new", language: "en" },
+    ]);
+    cleanup();
+    render(<Probe />);
+    expect(screen.getByText("loading")).toBeTruthy();
+    expect(getAllPages).toHaveBeenCalledTimes(2);
+  });
+
   it("keeps the other languages when one language's items cannot be read", async () => {
     setSiteLanguages(["el"]);
     getCollectionItems.mockImplementation(async (type, params) => {

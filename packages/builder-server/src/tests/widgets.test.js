@@ -231,3 +231,59 @@ describe("getProjectWidgets — defaults that come from the theme's words", () =
     assert.deepEqual(hero.settings, []);
   });
 });
+
+// The built-in widgets belong to no theme, so their words ship with the app and
+// have to reach the editor through the same route a theme's do.
+describe("getProjectWidgets — the built-in widgets' own words", () => {
+  const coreForm = async (query) => {
+    const res = mockRes();
+    await getProjectWidgets(mockReq(query), res);
+    assert.equal(res._status, 200);
+    return res._json.find((schema) => schema.type === "core-form");
+  };
+
+  const setting = (schema, id) => schema.settings.find((s) => s.id === id);
+  const blockSetting = (schema, type, id) => schema.blocks.find((b) => b.type === type).settings.find((s) => s.id === id);
+
+  it("reach the editor in the language being edited, with no theme locales in sight", async () => {
+    const greek = await coreForm({ language: "el" });
+    assert.equal(setting(greek, "submit_label").resolvedDefault, "Αποστολή μηνύματος");
+    assert.equal(setting(greek, "required_note").resolvedDefault, "Υποχρεωτικά πεδία");
+    assert.equal(blockSetting(greek, "consent", "label").resolvedDefault, "Συμφωνώ να επικοινωνήσετε μαζί μου σχετικά με το αίτημά μου.");
+  });
+
+  // A field's label is its submitted name, so a form cannot be saved without
+  // one — which is why these keep a literal `default` for the editor to store,
+  // while the wording a page can resolve for itself does not.
+  it("says which of them content must carry and which stay suggestions", async () => {
+    const greek = await coreForm({ language: "el" });
+
+    assert.equal(blockSetting(greek, "field", "label").default, "Your name");
+    assert.equal(blockSetting(greek, "field", "label").resolvedDefault, "Το όνομά σας");
+
+    assert.equal(setting(greek, "submit_label").default, undefined);
+    assert.equal(setting(greek, "required_note").default, undefined);
+  });
+
+  // One block schema cannot hold three different labels, so each starting block
+  // names its own word.
+  it("give each starting field its own word", async () => {
+    const greek = await coreForm({ language: "el" });
+    assert.deepEqual(
+      greek.defaultBlocks.map((block) => block.resolvedDefaults?.label),
+      ["Το όνομά σας", "Διεύθυνση email", "Μήνυμα"],
+    );
+
+    const english = await coreForm({ language: "en" });
+    assert.deepEqual(
+      english.defaultBlocks.map((block) => block.resolvedDefaults?.label),
+      ["Your name", "Email address", "Message"],
+    );
+  });
+
+  it("keep the form's own name out of it, because that is its exported identity", async () => {
+    const greek = await coreForm({ language: "el" });
+    assert.equal(setting(greek, "form_name").default, "Contact");
+    assert.equal(setting(greek, "form_name").resolvedDefault, undefined);
+  });
+});

@@ -29,7 +29,7 @@ If you continue typing while a save is underway, those newer edits still need to
 
 ### Leaving a page or switching language
 
-If there are unsaved changes, the navigation prompt offers leaving or staying. To keep them, stay, save and then navigate. Leaving discards pending editing state; it cannot take back changes that autosave or an earlier save already stored.
+If there are unsaved changes, the navigation prompt offers leaving or staying. To keep them, stay, save and then navigate. Leaving discards pending editing state, including the shared theme-settings draft; it cannot take back changes that autosave or an earlier save already stored. If an already-sent theme save lands afterward, the editor rereads the server while preserving any newer work.
 
 Opening another language version opens a different page or entry. It does not translate the content you are currently looking at. Switching projects also clears project-specific editing state, including the widget clipboard.
 
@@ -73,9 +73,11 @@ These are in-memory changes until the corresponding save succeeds. A block or wi
 3. Capture the session generation and content snapshots; verify loaded and active project identity.
 4. Save dirty header/footer and page content concurrently, carrying the page language for globals.
 5. After those guarded writes succeed, save shared theme settings through the canonical theme store.
-6. Invalidate media cache; if the session was reset, abandon state write-back. Otherwise rebaseline against the content sent, leaving newer edits detectable as dirty.
+6. Invalidate media cache and rebaseline against the content sent, leaving newer edits detectable as dirty. A reset suppresses ordinary old-session write-back. If a theme save finishes after discard, reread the server and reconcile the theme baseline/draft and undo snapshots only within the guarded project/load context; preserve a newer draft.
 
 Autosave uses a 60-second base delay and increases delay after failures, capped at ten minutes. Manual ordinary failures reject; autosave failures return a failure result and can retry. A project mismatch marks the workspace stale and stops autosave. A reset increments the generation so an older response cannot overwrite the new session's baselines.
+
+`hasUnsavedPageChanges` drives the page-name marker and includes page/global edits; `hasUnsavedChanges` additionally includes theme settings and drives Save, autosave and navigation. Reset restores the theme draft, not just modification flags. The discard/reconciliation regression cases are in [saveStore](../../../packages/editor-ui/src/stores/__tests__/saveStore.test.js) and [themeStore](../../../packages/editor-ui/src/stores/__tests__/themeStore.test.js).
 
 **Boundary:** this is coordinated saving, not a transaction across page, globals, theme settings and media usage. Some requests may have persisted even when the overall save fails. Discard/reset cannot undo a request already committed on the server.
 

@@ -1,0 +1,1782 @@
+{
+  "appVersion": "0.9.10",
+  "liquidVersion": "10.27.0",
+  "settingTypes": [
+    "header",
+    "text",
+    "number",
+    "date",
+    "textarea",
+    "richtext",
+    "code",
+    "color",
+    "range",
+    "select",
+    "checkbox",
+    "radio",
+    "font_picker",
+    "menu",
+    "image",
+    "gallery",
+    "table",
+    "file",
+    "video",
+    "link",
+    "youtube",
+    "icon"
+  ],
+  "liquid": {
+    "builtInTags": [
+      "#",
+      "assign",
+      "block",
+      "break",
+      "capture",
+      "case",
+      "comment",
+      "continue",
+      "cycle",
+      "decrement",
+      "echo",
+      "for",
+      "if",
+      "include",
+      "increment",
+      "layout",
+      "liquid",
+      "raw",
+      "render",
+      "tablerow",
+      "unless"
+    ],
+    "builtInFilters": [
+      "abs",
+      "append",
+      "array_to_sentence_string",
+      "at_least",
+      "at_most",
+      "base64_decode",
+      "base64_encode",
+      "capitalize",
+      "ceil",
+      "cgi_escape",
+      "compact",
+      "concat",
+      "date",
+      "date_to_long_string",
+      "date_to_rfc822",
+      "date_to_string",
+      "date_to_xmlschema",
+      "default",
+      "divided_by",
+      "downcase",
+      "escape",
+      "escape_once",
+      "find",
+      "find_exp",
+      "find_index",
+      "find_index_exp",
+      "first",
+      "floor",
+      "group_by",
+      "group_by_exp",
+      "has",
+      "has_exp",
+      "hmac_sha256",
+      "inspect",
+      "join",
+      "json",
+      "jsonify",
+      "last",
+      "lstrip",
+      "map",
+      "minus",
+      "modulo",
+      "newline_to_br",
+      "normalize_whitespace",
+      "number_of_words",
+      "plus",
+      "pop",
+      "prepend",
+      "push",
+      "raw",
+      "reject",
+      "reject_exp",
+      "remove",
+      "remove_first",
+      "remove_last",
+      "replace",
+      "replace_first",
+      "replace_last",
+      "reverse",
+      "round",
+      "rstrip",
+      "sample",
+      "sha256",
+      "shift",
+      "size",
+      "slice",
+      "slugify",
+      "sort",
+      "sort_natural",
+      "split",
+      "strip",
+      "strip_html",
+      "strip_newlines",
+      "sum",
+      "times",
+      "to_integer",
+      "truncate",
+      "truncatewords",
+      "uniq",
+      "unshift",
+      "upcase",
+      "uri_escape",
+      "url_decode",
+      "url_encode",
+      "where",
+      "where_exp",
+      "xml_escape"
+    ],
+    "customTags": {
+      "theme_settings": [],
+      "asset": [
+        "alt",
+        "async",
+        "crossorigin",
+        "defer",
+        "id",
+        "integrity",
+        "media",
+        "src"
+      ],
+      "fonts": [],
+      "seo": [],
+      "enqueue_style": [
+        "id",
+        "location",
+        "media",
+        "priority",
+        "src",
+        "theme"
+      ],
+      "enqueue_script": [
+        "async",
+        "defer",
+        "location",
+        "priority",
+        "src",
+        "theme"
+      ],
+      "header_assets": [],
+      "footer_assets": [],
+      "placeholder_image": [
+        "alt",
+        "aspect",
+        "class",
+        "height",
+        "loading",
+        "output",
+        "src",
+        "style",
+        "width"
+      ],
+      "custom_css": [],
+      "custom_head_scripts": [],
+      "custom_footer_scripts": [],
+      "image": [
+        "alt",
+        "class",
+        "decoding",
+        "fetchpriority",
+        "lazy",
+        "loading",
+        "output",
+        "size",
+        "sizes",
+        "src",
+        "srcset",
+        "title"
+      ],
+      "youtube": [
+        "autoplay",
+        "class",
+        "controls",
+        "end",
+        "height",
+        "loading",
+        "loop",
+        "modestbranding",
+        "mute",
+        "output",
+        "quality",
+        "rel",
+        "src",
+        "start",
+        "title",
+        "width"
+      ],
+      "enqueue_preload": [
+        "as",
+        "crossorigin",
+        "fetchpriority",
+        "imagesizes",
+        "imagesrcset",
+        "media",
+        "src",
+        "theme",
+        "type"
+      ]
+    },
+    "customFilters": [
+      "collection",
+      "format_date",
+      "handleize",
+      "item_url",
+      "media_meta",
+      "page_url",
+      "rte_blank",
+      "rte_text",
+      "safe_url",
+      "t"
+    ]
+  },
+  "coreWidgets": {
+    "core-divider": {
+      "settings": {
+        "color": "color",
+        "thickness": "range",
+        "width": "range",
+        "padding": "range"
+      },
+      "blocks": {}
+    },
+    "core-form": {
+      "settings": {
+        "form_name": "text",
+        "submit_label": "text",
+        "required_note": "text",
+        "eyebrow": "text",
+        "eyebrow_uppercase": "checkbox",
+        "title": "text",
+        "description": "text",
+        "heading_alignment": "select",
+        "style": "select",
+        "sidebar_position": "select",
+        "color_scheme": "select",
+        "top_spacing": "select",
+        "bottom_spacing": "select"
+      },
+      "blocks": {
+        "field": {
+          "label": "text",
+          "type": "select",
+          "placeholder": "text",
+          "required": "checkbox"
+        },
+        "choice": {
+          "label": "text",
+          "type": "select",
+          "options": "textarea",
+          "placeholder": "text",
+          "required": "checkbox"
+        },
+        "consent": {
+          "label": "text",
+          "required": "checkbox"
+        },
+        "info": {
+          "title": "text",
+          "text": "richtext"
+        },
+        "social": {}
+      }
+    },
+    "core-spacer": {
+      "settings": {
+        "height": "range",
+        "showOnMobile": "checkbox",
+        "mobileHeight": "range"
+      },
+      "blocks": {}
+    }
+  },
+  "coreSnippets": [
+    "breadcrumbs",
+    "menu"
+  ],
+  "coreSiteKeys": [
+    "site.core_form.choice_label",
+    "site.core_form.choice_options",
+    "site.core_form.consent_label",
+    "site.core_form.description",
+    "site.core_form.email_field",
+    "site.core_form.eyebrow",
+    "site.core_form.info_title",
+    "site.core_form.message_field",
+    "site.core_form.name_field",
+    "site.core_form.required_note",
+    "site.core_form.select_placeholder",
+    "site.core_form.submit",
+    "site.core_form.title"
+  ],
+  "imageSizes": [
+    "thumb",
+    "small",
+    "medium",
+    "large"
+  ],
+  "collections": {
+    "sorts": [
+      "manual",
+      "created_desc",
+      "created_asc",
+      "title_asc",
+      "title_desc",
+      "date_desc",
+      "date_asc"
+    ],
+    "structuredData": {
+      "BlogPosting": {
+        "headline": {
+          "types": [
+            "text"
+          ],
+          "required": true
+        },
+        "datePublished": {
+          "types": [
+            "date"
+          ]
+        },
+        "description": {
+          "types": [
+            "text",
+            "textarea"
+          ]
+        },
+        "image": {
+          "types": [
+            "image"
+          ]
+        },
+        "articleBody": {
+          "types": [
+            "richtext",
+            "textarea"
+          ]
+        }
+      }
+    }
+  },
+  "fonts": {
+    "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\"": [
+      400,
+      700
+    ],
+    "Arial, Helvetica, sans-serif": [
+      400,
+      700
+    ],
+    "Georgia, serif": [
+      400,
+      700
+    ],
+    "\"Abel\", sans-serif": [
+      400
+    ],
+    "\"Abril Fatface\", display": [
+      400
+    ],
+    "\"Actor\", sans-serif": [
+      400
+    ],
+    "\"Alata\", sans-serif": [
+      400
+    ],
+    "\"Albert Sans\", sans-serif": [
+      100,
+      200,
+      300,
+      400,
+      500,
+      600,
+      700,
+      800,
+      900
+    ],
+    "\"Alegreya\", serif": [
+      400,
+      500,
+      600,
+      700,
+      800,
+      900
+    ],
+    "\"Alegreya Sans\", sans-serif": [
+      100,
+      300,
+      400,
+      500,
+      700,
+      800,
+      900
+    ],
+    "\"Alfa Slab One\", display": [
+      400
+    ],
+    "\"Alice\", serif": [
+      400
+    ],
+    "\"Allerta Stencil\", sans-serif": [
+      400
+    ],
+    "\"Amaranth\", sans-serif": [
+      400,
+      700
+    ],
+    "\"Amatic SC\", handwriting": [
+      400,
+      700
+    ],
+    "\"Amiri\", serif": [
+      400,
+      700
+    ],
+    "\"Antic Slab\", serif": [
+      400
+    ],
+    "\"Anton\", sans-serif": [
+      400
+    ],
+    "\"Archivo\", sans-serif": [
+      100,
+      200,
+      300,
+      400,
+      500,
+      600,
+      700,
+      800,
+      900
+    ],
+    "\"Arvo\", serif": [
+      400,
+      700
+    ],
+    "\"Asap\", sans-serif": [
+      100,
+      200,
+      300,
+      400,
+      500,
+      600,
+      700,
+      800,
+      900
+    ],
+    "\"Asap Condensed\", sans-serif": [
+      200,
+      300,
+      400,
+      500,
+      600,
+      700,
+      800,
+      900
+    ],
+    "\"Assistant\", sans-serif": [
+      200,
+      300,
+      400,
+      500,
+      600,
+      700,
+      800
+    ],
+    "\"Baloo 2\", display": [
+      400,
+      500,
+      600,
+      700,
+      800
+    ],
+    "\"Balsamiq Sans\", display": [
+      400,
+      700
+    ],
+    "\"Bangers\", display": [
+      400
+    ],
+    "\"Barlow\", sans-serif": [
+      100,
+      200,
+      300,
+      400,
+      500,
+      600,
+      700,
+      800,
+      900
+    ],
+    "\"Barlow Condensed\", sans-serif": [
+      100,
+      200,
+      300,
+      400,
+      500,
+      600,
+      700,
+      800,
+      900
+    ],
+    "\"Be Vietnam Pro\", sans-serif": [
+      100,
+      200,
+      300,
+      400,
+      500,
+      600,
+      700,
+      800,
+      900
+    ],
+    "\"Bebas Neue\", sans-serif": [
+      400
+    ],
+    "\"BenchNine\", sans-serif": [
+      300,
+      400,
+      700
+    ],
+    "\"Bitter\", serif": [
+      100,
+      200,
+      300,
+      400,
+      500,
+      600,
+      700,
+      800,
+      900
+    ],
+    "\"Bodoni Moda\", serif": [
+      400,
+      500,
+      600,
+      700,
+      800,
+      900
+    ],
+    "\"Cabin\", sans-serif": [
+      400,
+      500,
+      600,
+      700
+    ],
+    "\"Cabin Condensed\", sans-serif": [
+      400,
+      500,
+      600,
+      700
+    ],
+    "\"Cabin Sketch\", display": [
+      400,
+      700
+    ],
+    "\"Cairo\", sans-serif": [
+      200,
+      300,
+      400,
+      500,
+      600,
+      700,
+      800,
+      900
+    ],
+    "\"Candal\", sans-serif": [
+      400
+    ],
+    "\"Cantarell\", sans-serif": [
+      400,
+      700
+    ],
+    "\"Cardo\", serif": [
+      400,
+      700
+    ],
+    "\"Carter One\", display": [
+      400
+    ],
+    "\"Catamaran\", sans-serif": [
+      100,
+      200,
+      300,
+      400,
+      500,
+      600,
+      700,
+      800,
+      900
+    ],
+    "\"Caveat\", handwriting": [
+      400,
+      500,
+      600,
+      700
+    ],
+    "\"Chewy\", display": [
+      400
+    ],
+    "\"Chivo\", sans-serif": [
+      100,
+      200,
+      300,
+      400,
+      500,
+      600,
+      700,
+      800,
+      900
+    ],
+    "\"Cinzel\", serif": [
+      400,
+      500,
+      600,
+      700,
+      800,
+      900
+    ],
+    "\"Cinzel Decorative\", display": [
+      400,
+      700,
+      900
+    ],
+    "\"Comfortaa\", display": [
+      300,
+      400,
+      500,
+      600,
+      700
+    ],
+    "\"Cormorant Garamond\", serif": [
+      300,
+      400,
+      500,
+      600,
+      700
+    ],
+    "\"Courier Prime\", monospace": [
+      400,
+      700
+    ],
+    "\"Cousine\", monospace": [
+      400,
+      700
+    ],
+    "\"Crimson Text\", serif": [
+      400,
+      600,
+      700
+    ],
+    "\"Dancing Script\", handwriting": [
+      400,
+      500,
+      600,
+      700
+    ],
+    "\"Days One\", sans-serif": [
+      400
+    ],
+    "\"Didact Gothic\", sans-serif": [
+      400
+    ],
+    "\"DM Sans\", sans-serif": [
+      100,
+      200,
+      300,
+      400,
+      500,
+      600,
+      700,
+      800,
+      900
+    ],
+    "\"Domine\", serif": [
+      400,
+      500,
+      600,
+      700
+    ],
+    "\"Dosis\", sans-serif": [
+      200,
+      300,
+      400,
+      500,
+      600,
+      700,
+      800
+    ],
+    "\"EB Garamond\", serif": [
+      400,
+      500,
+      600,
+      700,
+      800
+    ],
+    "\"Epilogue\", sans-serif": [
+      100,
+      200,
+      300,
+      400,
+      500,
+      600,
+      700,
+      800,
+      900
+    ],
+    "\"Exo 2\", sans-serif": [
+      100,
+      200,
+      300,
+      400,
+      500,
+      600,
+      700,
+      800,
+      900
+    ],
+    "\"Fira Code\", monospace": [
+      300,
+      400,
+      500,
+      600,
+      700
+    ],
+    "\"Fira Sans\", sans-serif": [
+      100,
+      200,
+      300,
+      400,
+      500,
+      600,
+      700,
+      800,
+      900
+    ],
+    "\"Fira Sans Condensed\", sans-serif": [
+      100,
+      200,
+      300,
+      400,
+      500,
+      600,
+      700,
+      800,
+      900
+    ],
+    "\"Fjalla One\", sans-serif": [
+      400
+    ],
+    "\"Forum\", display": [
+      400
+    ],
+    "\"Francois One\", sans-serif": [
+      400
+    ],
+    "\"Frank Ruhl Libre\", serif": [
+      300,
+      400,
+      500,
+      600,
+      700,
+      800,
+      900
+    ],
+    "\"Fraunces\", serif": [
+      100,
+      200,
+      300,
+      400,
+      500,
+      600,
+      700,
+      800,
+      900
+    ],
+    "\"Fredoka\", sans-serif": [
+      300,
+      400,
+      500,
+      600,
+      700
+    ],
+    "\"Glegoo\", serif": [
+      400,
+      700
+    ],
+    "\"Golos Text\", sans-serif": [
+      400,
+      500,
+      600,
+      700,
+      800,
+      900
+    ],
+    "\"Gothic A1\", sans-serif": [
+      100,
+      200,
+      300,
+      400,
+      500,
+      600,
+      700,
+      800,
+      900
+    ],
+    "\"Great Vibes\", handwriting": [
+      400
+    ],
+    "\"Gudea\", sans-serif": [
+      400,
+      700
+    ],
+    "\"Handlee\", handwriting": [
+      400
+    ],
+    "\"Hedvig Letters Sans\", sans-serif": [
+      400
+    ],
+    "\"Heebo\", sans-serif": [
+      100,
+      200,
+      300,
+      400,
+      500,
+      600,
+      700,
+      800,
+      900
+    ],
+    "\"Hind\", sans-serif": [
+      300,
+      400,
+      500,
+      600,
+      700
+    ],
+    "\"Hind Siliguri\", sans-serif": [
+      300,
+      400,
+      500,
+      600,
+      700
+    ],
+    "\"IBM Plex Mono\", monospace": [
+      100,
+      200,
+      300,
+      400,
+      500,
+      600,
+      700
+    ],
+    "\"IBM Plex Sans\", sans-serif": [
+      100,
+      200,
+      300,
+      400,
+      500,
+      600,
+      700
+    ],
+    "\"IBM Plex Serif\", serif": [
+      100,
+      200,
+      300,
+      400,
+      500,
+      600,
+      700
+    ],
+    "\"Inconsolata\", monospace": [
+      200,
+      300,
+      400,
+      500,
+      600,
+      700,
+      800,
+      900
+    ],
+    "\"Indie Flower\", handwriting": [
+      400
+    ],
+    "\"Instrument Sans\", sans-serif": [
+      400,
+      500,
+      600,
+      700
+    ],
+    "\"Inter\", sans-serif": [
+      100,
+      200,
+      300,
+      400,
+      500,
+      600,
+      700,
+      800,
+      900
+    ],
+    "\"Inter Tight\", sans-serif": [
+      100,
+      200,
+      300,
+      400,
+      500,
+      600,
+      700,
+      800,
+      900
+    ],
+    "\"Istok Web\", sans-serif": [
+      400,
+      700
+    ],
+    "\"JetBrains Mono\", monospace": [
+      100,
+      200,
+      300,
+      400,
+      500,
+      600,
+      700,
+      800
+    ],
+    "\"Josefin Sans\", sans-serif": [
+      100,
+      200,
+      300,
+      400,
+      500,
+      600,
+      700
+    ],
+    "\"Jost\", sans-serif": [
+      100,
+      200,
+      300,
+      400,
+      500,
+      600,
+      700,
+      800,
+      900
+    ],
+    "\"Jura\", sans-serif": [
+      300,
+      400,
+      500,
+      600,
+      700
+    ],
+    "\"Kalam\", handwriting": [
+      300,
+      400,
+      700
+    ],
+    "\"Kameron\", serif": [
+      400,
+      500,
+      600,
+      700
+    ],
+    "\"Kanit\", sans-serif": [
+      100,
+      200,
+      300,
+      400,
+      500,
+      600,
+      700,
+      800,
+      900
+    ],
+    "\"Karla\", sans-serif": [
+      200,
+      300,
+      400,
+      500,
+      600,
+      700,
+      800
+    ],
+    "\"Krona One\", sans-serif": [
+      400
+    ],
+    "\"Lato\", sans-serif": [
+      300,
+      400,
+      700
+    ],
+    "\"League Spartan\", sans-serif": [
+      100,
+      200,
+      300,
+      400,
+      500,
+      600,
+      700,
+      800,
+      900
+    ],
+    "\"Lexend\", sans-serif": [
+      100,
+      200,
+      300,
+      400,
+      500,
+      600,
+      700,
+      800,
+      900
+    ],
+    "\"Lexend Deca\", sans-serif": [
+      100,
+      200,
+      300,
+      400,
+      500,
+      600,
+      700,
+      800,
+      900
+    ],
+    "\"Libre Baskerville\", serif": [
+      400,
+      500,
+      600,
+      700
+    ],
+    "\"Libre Franklin\", sans-serif": [
+      100,
+      200,
+      300,
+      400,
+      500,
+      600,
+      700,
+      800,
+      900
+    ],
+    "\"Literata\", serif": [
+      200,
+      300,
+      400,
+      500,
+      600,
+      700,
+      800,
+      900
+    ],
+    "\"Livvic\", sans-serif": [
+      100,
+      200,
+      300,
+      400,
+      500,
+      600,
+      700,
+      900
+    ],
+    "\"Lobster\", display": [
+      400
+    ],
+    "\"Lobster Two\", display": [
+      400,
+      700
+    ],
+    "\"Lora\", serif": [
+      400,
+      500,
+      600,
+      700
+    ],
+    "\"Lustria\", serif": [
+      400
+    ],
+    "\"M PLUS Rounded 1c\", sans-serif": [
+      100,
+      300,
+      400,
+      500,
+      700,
+      800,
+      900
+    ],
+    "\"Macondo\", display": [
+      400
+    ],
+    "\"Mada\", sans-serif": [
+      200,
+      300,
+      400,
+      500,
+      600,
+      700,
+      800,
+      900
+    ],
+    "\"Manrope\", sans-serif": [
+      200,
+      300,
+      400,
+      500,
+      600,
+      700,
+      800
+    ],
+    "\"Marcellus\", serif": [
+      400
+    ],
+    "\"Marmelad\", sans-serif": [
+      400
+    ],
+    "\"Marvel\", sans-serif": [
+      400,
+      700
+    ],
+    "\"Merriweather\", serif": [
+      300,
+      400,
+      500,
+      600,
+      700,
+      800,
+      900
+    ],
+    "\"Monda\", sans-serif": [
+      400,
+      500,
+      600,
+      700
+    ],
+    "\"Monoton\", display": [
+      400
+    ],
+    "\"Montserrat\", sans-serif": [
+      300,
+      400,
+      500,
+      600,
+      700
+    ],
+    "\"Mukta\", sans-serif": [
+      200,
+      300,
+      400,
+      500,
+      600,
+      700,
+      800
+    ],
+    "\"Mulish\", sans-serif": [
+      200,
+      300,
+      400,
+      500,
+      600,
+      700,
+      800,
+      900
+    ],
+    "\"News Cycle\", sans-serif": [
+      400,
+      700
+    ],
+    "\"Noto Sans\", sans-serif": [
+      100,
+      200,
+      300,
+      400,
+      500,
+      600,
+      700,
+      800,
+      900
+    ],
+    "\"Noto Sans Arabic\", sans-serif": [
+      100,
+      200,
+      300,
+      400,
+      500,
+      600,
+      700,
+      800,
+      900
+    ],
+    "\"Noto Sans Hebrew\", sans-serif": [
+      100,
+      200,
+      300,
+      400,
+      500,
+      600,
+      700,
+      800,
+      900
+    ],
+    "\"Noto Sans JP\", sans-serif": [
+      100,
+      200,
+      300,
+      400,
+      500,
+      600,
+      700,
+      800,
+      900
+    ],
+    "\"Noto Sans KR\", sans-serif": [
+      100,
+      200,
+      300,
+      400,
+      500,
+      600,
+      700,
+      800,
+      900
+    ],
+    "\"Noto Sans SC\", sans-serif": [
+      100,
+      200,
+      300,
+      400,
+      500,
+      600,
+      700,
+      800,
+      900
+    ],
+    "\"Noto Sans TC\", sans-serif": [
+      100,
+      200,
+      300,
+      400,
+      500,
+      600,
+      700,
+      800,
+      900
+    ],
+    "\"Noto Serif\", serif": [
+      100,
+      200,
+      300,
+      400,
+      500,
+      600,
+      700,
+      800,
+      900
+    ],
+    "\"Nunito\", sans-serif": [
+      200,
+      300,
+      400,
+      500,
+      600,
+      700,
+      800,
+      900
+    ],
+    "\"Nunito Sans\", sans-serif": [
+      200,
+      300,
+      400,
+      500,
+      600,
+      700,
+      800,
+      900
+    ],
+    "\"Oleo Script\", display": [
+      400,
+      700
+    ],
+    "\"Onest\", sans-serif": [
+      100,
+      200,
+      300,
+      400,
+      500,
+      600,
+      700,
+      800,
+      900
+    ],
+    "\"Open Sans\", sans-serif": [
+      300,
+      400,
+      500,
+      600,
+      700
+    ],
+    "\"Oswald\", sans-serif": [
+      200,
+      300,
+      400,
+      500,
+      600,
+      700
+    ],
+    "\"Outfit\", sans-serif": [
+      100,
+      200,
+      300,
+      400,
+      500,
+      600,
+      700,
+      800,
+      900
+    ],
+    "\"Overpass\", sans-serif": [
+      100,
+      200,
+      300,
+      400,
+      500,
+      600,
+      700,
+      800,
+      900
+    ],
+    "\"Ovo\", serif": [
+      400
+    ],
+    "\"Oxygen\", sans-serif": [
+      300,
+      400,
+      700
+    ],
+    "\"Pacifico\", handwriting": [
+      400
+    ],
+    "\"Pathway Gothic One\", sans-serif": [
+      400
+    ],
+    "\"Patrick Hand\", handwriting": [
+      400
+    ],
+    "\"Patua One\", display": [
+      400
+    ],
+    "\"Paytone One\", sans-serif": [
+      400
+    ],
+    "\"Philosopher\", sans-serif": [
+      400,
+      700
+    ],
+    "\"Playfair\", serif": [
+      300,
+      400,
+      500,
+      600,
+      700,
+      800,
+      900
+    ],
+    "\"Playfair Display\", serif": [
+      400,
+      500,
+      600,
+      700,
+      800,
+      900
+    ],
+    "\"Plus Jakarta Sans\", sans-serif": [
+      200,
+      300,
+      400,
+      500,
+      600,
+      700,
+      800
+    ],
+    "\"Pontano Sans\", sans-serif": [
+      300,
+      400,
+      500,
+      600,
+      700
+    ],
+    "\"Poppins\", sans-serif": [
+      300,
+      400,
+      500,
+      600,
+      700
+    ],
+    "\"Port Lligat Sans\", sans-serif": [
+      400
+    ],
+    "\"Prata\", serif": [
+      400
+    ],
+    "\"Press Start 2P\", display": [
+      400
+    ],
+    "\"Prompt\", sans-serif": [
+      100,
+      200,
+      300,
+      400,
+      500,
+      600,
+      700,
+      800,
+      900
+    ],
+    "\"PT Mono\", monospace": [
+      400
+    ],
+    "\"PT Sans\", sans-serif": [
+      400,
+      700
+    ],
+    "\"PT Serif\", serif": [
+      400,
+      700
+    ],
+    "\"Public Sans\", sans-serif": [
+      100,
+      200,
+      300,
+      400,
+      500,
+      600,
+      700,
+      800,
+      900
+    ],
+    "\"Questrial\", sans-serif": [
+      400
+    ],
+    "\"Quicksand\", sans-serif": [
+      300,
+      400,
+      500,
+      600,
+      700
+    ],
+    "\"Rajdhani\", sans-serif": [
+      300,
+      400,
+      500,
+      600,
+      700
+    ],
+    "\"Raleway\", sans-serif": [
+      100,
+      200,
+      300,
+      400,
+      500,
+      600,
+      700,
+      800,
+      900
+    ],
+    "\"Rambla\", sans-serif": [
+      400,
+      700
+    ],
+    "\"Red Hat Display\", sans-serif": [
+      300,
+      400,
+      500,
+      600,
+      700,
+      800,
+      900
+    ],
+    "\"Righteous\", display": [
+      400
+    ],
+    "\"Roboto\", sans-serif": [
+      300,
+      400,
+      500,
+      700
+    ],
+    "\"Roboto Mono\", monospace": [
+      100,
+      200,
+      300,
+      400,
+      500,
+      600,
+      700
+    ],
+    "\"Rokkitt\", serif": [
+      100,
+      200,
+      300,
+      400,
+      500,
+      600,
+      700,
+      800,
+      900
+    ],
+    "\"Rubik\", sans-serif": [
+      300,
+      400,
+      500,
+      600,
+      700,
+      800,
+      900
+    ],
+    "\"Ruda\", sans-serif": [
+      400,
+      500,
+      600,
+      700,
+      800,
+      900
+    ],
+    "\"Sacramento\", handwriting": [
+      400
+    ],
+    "\"Salsa\", display": [
+      400
+    ],
+    "\"Sarabun\", sans-serif": [
+      100,
+      200,
+      300,
+      400,
+      500,
+      600,
+      700,
+      800
+    ],
+    "\"Satisfy\", handwriting": [
+      400
+    ],
+    "\"Schibsted Grotesk\", sans-serif": [
+      400,
+      500,
+      600,
+      700,
+      800,
+      900
+    ],
+    "\"Secular One\", sans-serif": [
+      400
+    ],
+    "\"Sen\", sans-serif": [
+      400,
+      500,
+      600,
+      700,
+      800
+    ],
+    "\"Share Tech\", sans-serif": [
+      400
+    ],
+    "\"Share Tech Mono\", monospace": [
+      400
+    ],
+    "\"Shrikhand\", display": [
+      400
+    ],
+    "\"Signika\", sans-serif": [
+      300,
+      400,
+      500,
+      600,
+      700
+    ],
+    "\"Sniglet\", display": [
+      400,
+      800
+    ],
+    "\"Sora\", sans-serif": [
+      100,
+      200,
+      300,
+      400,
+      500,
+      600,
+      700,
+      800
+    ],
+    "\"Source Code Pro\", monospace": [
+      200,
+      300,
+      400,
+      500,
+      600,
+      700,
+      800,
+      900
+    ],
+    "\"Source Sans 3\", sans-serif": [
+      200,
+      300,
+      400,
+      500,
+      600,
+      700,
+      800,
+      900
+    ],
+    "\"Source Serif 4\", serif": [
+      200,
+      300,
+      400,
+      500,
+      600,
+      700,
+      800,
+      900
+    ],
+    "\"Space Grotesk\", sans-serif": [
+      300,
+      400,
+      500,
+      600,
+      700
+    ],
+    "\"Space Mono\", monospace": [
+      400,
+      700
+    ],
+    "\"Spinnaker\", sans-serif": [
+      400
+    ],
+    "\"Staatliches\", display": [
+      400
+    ],
+    "\"STIX Two Text\", serif": [
+      400,
+      500,
+      600,
+      700
+    ],
+    "\"Suez One\", serif": [
+      400
+    ],
+    "\"Syne\", sans-serif": [
+      400,
+      500,
+      600,
+      700,
+      800
+    ],
+    "\"Tajawal\", sans-serif": [
+      200,
+      300,
+      400,
+      500,
+      700,
+      800,
+      900
+    ],
+    "\"Teko\", sans-serif": [
+      300,
+      400,
+      500,
+      600,
+      700
+    ],
+    "\"Tenor Sans\", sans-serif": [
+      400
+    ],
+    "\"Tinos\", serif": [
+      400,
+      700
+    ],
+    "\"Titillium Web\", sans-serif": [
+      200,
+      300,
+      400,
+      600,
+      700,
+      900
+    ],
+    "\"Ubuntu\", sans-serif": [
+      300,
+      400,
+      500,
+      700
+    ],
+    "\"Ubuntu Mono\", monospace": [
+      400,
+      700
+    ],
+    "\"Varela Round\", sans-serif": [
+      400
+    ],
+    "\"Vidaloka\", serif": [
+      400
+    ],
+    "\"Volkhov\", serif": [
+      400,
+      700
+    ],
+    "\"VT323\", monospace": [
+      400
+    ],
+    "\"Wix Madefor Display\", sans-serif": [
+      400,
+      500,
+      600,
+      700,
+      800
+    ],
+    "\"Wix Madefor Text\", sans-serif": [
+      400,
+      500,
+      600,
+      700,
+      800
+    ],
+    "\"Work Sans\", sans-serif": [
+      100,
+      200,
+      300,
+      400,
+      500,
+      600,
+      700,
+      800,
+      900
+    ],
+    "\"Yanone Kaffeesatz\", sans-serif": [
+      200,
+      300,
+      400,
+      500,
+      600,
+      700
+    ],
+    "\"Yeseva One\", display": [
+      400
+    ],
+    "\"Zilla Slab\", serif": [
+      300,
+      400,
+      500,
+      600,
+      700
+    ]
+  }
+}

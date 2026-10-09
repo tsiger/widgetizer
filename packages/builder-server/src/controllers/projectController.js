@@ -1,4 +1,7 @@
 import fs from "fs-extra";
+import { isSafePathSegment } from "../utils/pathSecurity.js";
+import { extractZipSafely, openZip, readZipEntry, UnsafeZipError } from "../utils/zipSafety.js";
+import { mediaLibraryProblem, collectionItemsProblem } from "../utils/backupContentChecks.js";
 import path from "path";
 import * as themeController from "./themeController.js";
 import archiver from "archiver";
@@ -486,6 +489,15 @@ export async function createProject(req, res) {
       return res.status(400).json({ error: "cleanUrls must be a boolean." });
     }
 
+    // Both name a folder the new project is built from, under the themes folder
+    // and the theme's presets folder, so neither may step outside it.
+    if (!isSafePathSegment(theme)) {
+      return res.status(400).json({ error: "This theme is not installed." });
+    }
+    if (preset && !isSafePathSegment(preset)) {
+      return res.status(400).json({ error: "This theme has no such preset." });
+    }
+
     const { value: languageFields, error: languageError } = readLanguages(req.body);
     if (languageError) return res.status(400).json({ error: languageError });
 
@@ -685,7 +697,8 @@ export async function updateProject(req, res) {
       return res.status(400).json({ error: "cleanUrls must be a boolean." });
     }
 
-    const { value: languageFields, error: languageError } = readLanguages(updates, currentProject);
+    // Checked here to refuse early, and again inside the write section below.
+    const { error: languageError } = readLanguages(updates, currentProject);
     if (languageError) return res.status(400).json({ error: languageError });
 
     const sanitizedSiteTitle = sanitizeOptionalText(updates.siteTitle);
@@ -705,8 +718,10 @@ export async function updateProject(req, res) {
         return res.status(400).json({ error: "Folder Name can only contain lowercase letters, numbers, and hyphens" });
       }
 
-      // Check for duplicate folderNames (excluding current project)
-      if (projectRepo.projectFolderExists(newFolderName, id)) {
+      // Taken in the DB, or on disk: a folder left behind by a deletion that could
+      // not remove it would otherwise receive this project merged into its old
+      // content, and a failed rename's cleanup would delete it.
+      if (projectRepo.projectFolderExists(newFolderName, id) || (await fs.pathExists(getProjectDir(newFolderName)))) {
         return res.status(400).json({
           error: `A project with folder name "${newFolderName}" already exists. Please choose a different folder name.`,
         });
@@ -723,7 +738,16 @@ export async function updateProject(req, res) {
     // before it: a rejected logo used to leave the directory already moved while the
     // row still named the old one, which strands the project. Everything that can
     // refuse this request now refuses before anything on disk has moved.
-    const { updatedProject, usageStale } = await withContentWriteLock(id, async () => {
+    const { updatedProject, usageStale, languageRefusal, folderLeftBehind } = await withContentWriteLock(id, async () => {
+      // Checked again against the row as it is NOW. Adding a language takes this
+      // section and records the code at its end, so the copy loaded before it can
+      // still show a single-language site: changing the default then would leave
+      // the new code as both the default and an additional language — a row no
+      // save, removal or default change can get out of again.
+      const languageCheck = readLanguages(updates, projectRepo.getProjectById(id));
+      if (languageCheck.error) return { languageRefusal: languageCheck.error };
+      const languageFields = languageCheck.value;
+
       if (siteIdentity !== undefined) {
         // Re-read the row HERE rather than comparing against the copy loaded before
         // the lock. A baseline read earlier can still show a logo that another save
@@ -741,58 +765,82 @@ export async function updateProject(req, res) {
         });
       }
 
-      if (folderRename) {
-        const oldDir = getProjectDir(folderRename.from);
-        const newDir = getProjectDir(folderRename.to);
-
+      // A folder rename is copy, then repoint the row, then remove the old folder
+      // (copy + remove rather than rename, for Windows). Until the row names the
+      // new folder, the old one is the project and the copy is disposable: the
+      // copy's name was checked free on disk above, so removing it can only remove
+      // what this request made. Once the row names the copy, the copy is the
+      // project and must never be removed; an old folder that cannot be fully
+      // removed (a locked file) is reported, like a deletion's leftover.
+      const oldDir = folderRename ? getProjectDir(folderRename.from) : null;
+      const newDir = folderRename ? getProjectDir(folderRename.to) : null;
+      const discardCopy = async () => {
         try {
-          // Use copy + remove instead of rename for better Windows compatibility
+          await fs.remove(newDir);
+        } catch (cleanupError) {
+          console.warn(`[ProjectController] Failed to remove the unused copy ${newDir}: ${cleanupError.message}`);
+        }
+      };
+
+      if (folderRename) {
+        try {
           await fs.copy(oldDir, newDir);
-          await new Promise((resolve) => setTimeout(resolve, 100));
-          await fs.remove(oldDir);
-        } catch (renameError) {
-          // If copy succeeded but remove failed, try to clean up the new directory
-          try {
-            if (await fs.pathExists(newDir)) {
-              await fs.remove(newDir);
-            }
-          } catch (cleanupError) {
-            console.warn(`Failed to cleanup new directory after error: ${cleanupError.message}`);
-          }
-          throw new Error(`Failed to rename project directory: ${renameError.message}`);
+        } catch (copyError) {
+          await discardCopy();
+          throw new Error(`Failed to rename project directory: ${copyError.message}`);
         }
       }
 
-      const saved = projectRepo.updateProject(id, {
-        folderName: updates.folderName || currentFolderName,
-        name: updates.name,
-        description: updates.description,
-        siteTitle: sanitizedSiteTitle,
-        siteUrl: sanitizedSiteUrl,
-        cleanUrls: updates.cleanUrls,
-        siteIdentity,
-        defaultLanguage: languageFields.defaultLanguage,
-        languages: languageFields.languages,
-        receiveThemeUpdates: updates.receiveThemeUpdates,
-      });
+      let saved;
+      try {
+        saved = projectRepo.updateProject(id, {
+          folderName: updates.folderName || currentFolderName,
+          name: updates.name,
+          description: updates.description,
+          siteTitle: sanitizedSiteTitle,
+          siteUrl: sanitizedSiteUrl,
+          cleanUrls: updates.cleanUrls,
+          siteIdentity,
+          defaultLanguage: languageFields.defaultLanguage,
+          languages: languageFields.languages,
+          receiveThemeUpdates: updates.receiveThemeUpdates,
+        });
+      } catch (rowError) {
+        if (folderRename) await discardCopy();
+        throw rowError;
+      }
 
-      if (siteIdentity === undefined) return { updatedProject: saved, usageStale: false };
+      let folderLeftBehind = null;
+      if (folderRename) {
+        // Windows can still hold handles from the copy for a moment.
+        await new Promise((resolve) => setTimeout(resolve, 100));
+        try {
+          await fs.remove(oldDir);
+        } catch (removeError) {
+          console.warn(`[ProjectController] Could not fully remove the old folder ${oldDir}: ${removeError.message}`);
+          folderLeftBehind = oldDir;
+        }
+      }
+
+      if (siteIdentity === undefined) return { updatedProject: saved, usageStale: false, folderLeftBehind };
 
       try {
         await updateSiteIdentityMediaUsage(id, saved.siteIdentity);
-        return { updatedProject: saved, usageStale: false };
+        return { updatedProject: saved, usageStale: false, folderLeftBehind };
       } catch (error) {
         // The details ARE saved; only the derived usage rows are behind.
         console.warn(`[ProjectController] Failed to update business details media usage: ${error.message}`);
-        return { updatedProject: saved, usageStale: true };
+        return { updatedProject: saved, usageStale: true, folderLeftBehind };
       }
     });
 
-    res.json(
-      usageStale
-        ? { ...updatedProject, warnings: [{ code: "MEDIA_USAGE_STALE", path: "site-identity" }] }
-        : updatedProject,
-    );
+    if (languageRefusal) return res.status(400).json({ error: languageRefusal });
+
+    res.json({
+      ...updatedProject,
+      ...(usageStale && { warnings: [{ code: "MEDIA_USAGE_STALE", path: "site-identity" }] }),
+      ...(folderLeftBehind && { folderLeftBehind }),
+    });
   } catch (error) {
     if (error?.code === "MEDIA_REFERENCE_MISSING") {
       return res.status(error.statusCode).json({ error: "Missing media", message: error.message, code: error.code });
@@ -803,7 +851,9 @@ export async function updateProject(req, res) {
 }
 
 /**
- * Deletes a project and all its associated files including exports.
+ * Deletes a project and its associated files including exports. A project
+ * folder that cannot be fully removed is reported as `folderLeftBehind` rather
+ * than failing the deletion, which has already happened.
  * @param {import('express').Request} req - Express request object with project ID in params
  * @param {import('express').Response} res - Express response object
  * @returns {Promise<void>}
@@ -822,8 +872,11 @@ export async function deleteProject(req, res) {
 
     res.json({
       success: true,
-      message: `Project "${result.projectName}" and all associated files have been deleted successfully`,
+      message: result.folderLeftBehind
+        ? `Project "${result.projectName}" was deleted, but some of its files could not be removed from ${result.folderLeftBehind}`
+        : `Project "${result.projectName}" and all associated files have been deleted successfully`,
       activeProjectId: result.newActiveProjectId,
+      folderLeftBehind: result.folderLeftBehind,
     });
   } catch (error) {
     console.error("Error deleting project:", error);
@@ -848,7 +901,14 @@ export async function duplicateProject(req, res) {
 
     const allProjects = projectRepo.getAllProjects();
     const newName = generateCopyName(originalProject.name, allProjects.map((p) => p.name));
-    const newFolderName = await generateUniqueSlug(newName, (slug) => projectRepo.projectFolderExists(slug, null), { fallback: "project" });
+    // Free on disk as well as in the DB, like create and import: a folder left
+    // behind by a deletion that could not remove it would otherwise receive this
+    // copy merged into its old content, and a failed copy's cleanup would delete it.
+    const newFolderName = await generateUniqueSlug(
+      newName,
+      async (slug) => projectRepo.projectFolderExists(slug, null) || (await fs.pathExists(getProjectDir(slug))),
+      { fallback: "project" },
+    );
 
     // Create the new project metadata
     const newProject = {
@@ -935,7 +995,13 @@ export async function duplicateProject(req, res) {
  */
 async function withResolvedDefaults(schemas, req, res) {
   const names = (list) => Array.isArray(list) && list.some((setting) => setting?.defaultKey);
-  const wanted = schemas.some((s) => names(s?.settings) || (Array.isArray(s?.blocks) && s.blocks.some((b) => names(b?.settings))));
+  const startingBlocksName = (list) => Array.isArray(list) && list.some((block) => block?.defaultKeys);
+  const wanted = schemas.some(
+    (s) =>
+      names(s?.settings) ||
+      (Array.isArray(s?.blocks) && s.blocks.some((b) => names(b?.settings))) ||
+      startingBlocksName(s?.defaultBlocks),
+  );
   if (!wanted) return schemas;
 
   const lang = requestLanguage(req, res);
@@ -959,12 +1025,25 @@ async function withResolvedDefaults(schemas, req, res) {
           return found === undefined ? setting : { ...setting, resolvedDefault: found };
         });
 
+  // A starting block names its words itself, one key per setting, because the
+  // blocks a widget opens with can differ while sharing one block schema.
+  const fillStartingBlock = (block) => {
+    if (!block?.defaultKeys) return block;
+    const resolvedDefaults = {};
+    for (const [settingId, key] of Object.entries(block.defaultKeys)) {
+      const found = resolveSiteString(strings, key, lang.language, defaultLanguage);
+      if (found !== undefined) resolvedDefaults[settingId] = found;
+    }
+    return Object.keys(resolvedDefaults).length ? { ...block, resolvedDefaults } : block;
+  };
+
   return schemas.map((schema) => ({
     ...schema,
     settings: fill(schema.settings),
     ...(Array.isArray(schema.blocks)
       ? { blocks: schema.blocks.map((block) => ({ ...block, settings: fill(block?.settings) })) }
       : {}),
+    ...(Array.isArray(schema.defaultBlocks) ? { defaultBlocks: schema.defaultBlocks.map(fillStartingBlock) } : {}),
   }));
 }
 
@@ -1311,6 +1390,72 @@ export async function handleImportUpload(req, res, next) {
   }
 }
 
+/** A backup refused for what it contains, after it was unpacked. */
+class BackupRefusedError extends Error {
+  constructor(message) {
+    super(message);
+    this.statusCode = 400;
+  }
+}
+
+function refusedBackupMessage(problem) {
+  return `This backup cannot be imported: ${problem} A backup made by Widgetizer never contains this, so the file may have been changed. The project was not imported.`;
+}
+
+/**
+ * A yes/no setting from a backup: a boolean, or the 0/1 a database column holds
+ * when a writer passes it through unconverted. Null for anything else.
+ */
+function importedFlag(value) {
+  if (typeof value === "boolean") return value;
+  if (value === 0 || value === 1) return value === 1;
+  return null;
+}
+
+/**
+ * Why a backup's project details cannot be imported, or null.
+ * @param {object} project - `manifest.project`
+ * @returns {string|null}
+ */
+function importManifestProblem(project) {
+  if (!isSafePathSegment(project.theme)) return `its theme name ${JSON.stringify(project.theme)} is not a valid theme folder name.`;
+  if (project.preset != null && project.preset !== "" && !isSafePathSegment(project.preset)) {
+    return `its preset name ${JSON.stringify(project.preset)} is not a valid preset folder name.`;
+  }
+  if (typeof project.name !== "string") return "its project name is not text.";
+  for (const field of ["description", "siteTitle", "siteUrl"]) {
+    if (!isOptionalString(project[field])) return `its ${field} is not text.`;
+  }
+  // An unusable Site Address is not refused: projects saved before the address
+  // was checked can still hold one, and every use of it already ignores a value
+  // it cannot parse (no full URLs, no sitemap) while export warns about it.
+  for (const field of ["receiveThemeUpdates", "cleanUrls"]) {
+    if (project[field] != null && importedFlag(project[field]) === null) return `its ${field} setting is not true or false.`;
+  }
+  return null;
+}
+
+/**
+ * Why an unpacked backup's content cannot be imported, or null: its media
+ * library's paths and translation languages, and its collection item slugs.
+ * @param {string} dir - the unpacked backup
+ * @param {string[]} languages - the project's languages other than the default
+ */
+async function backupContentProblem(dir, languages) {
+  const mediaJsonPath = path.join(dir, "uploads", "media.json");
+  if (await fs.pathExists(mediaJsonPath)) {
+    let mediaData = null;
+    try {
+      mediaData = await fs.readJson(mediaJsonPath);
+    } catch {
+      // An unreadable library is refused further on, with its own message.
+    }
+    const problem = mediaLibraryProblem(mediaData, languages);
+    if (problem) return problem;
+  }
+  return collectionItemsProblem(dir);
+}
+
 /**
  * Imports a project from an uploaded ZIP archive.
  * Validates the archive structure and theme compatibility before import.
@@ -1335,8 +1480,14 @@ export async function importProject(req, res) {
       });
     }
 
-    const AdmZip = await import("adm-zip");
-    const zip = new AdmZip.default(uploadedFilePath);
+    let zip;
+    try {
+      zip = await openZip(uploadedFilePath);
+    } catch (error) {
+      return res.status(400).json({ error: error.message });
+    }
+    // The unpacking budget is measured against the file as it is on disk.
+    const zipSize = (await fs.stat(uploadedFilePath)).size;
 
     // Safety: validate ZIP paths (prevent path traversal)
     for (const entry of zip.getEntries()) {
@@ -1372,9 +1523,10 @@ export async function importProject(req, res) {
 
     let manifest;
     try {
-      const manifestContent = manifestEntry.getData().toString("utf8");
+      const manifestContent = (await readZipEntry(manifestEntry, zipSize)).toString("utf8");
       manifest = JSON.parse(manifestContent);
-    } catch {
+    } catch (error) {
+      if (error instanceof UnsafeZipError) return res.status(400).json({ error: error.message });
       return res.status(400).json({ error: "Invalid project export: corrupted manifest file" });
     }
 
@@ -1397,6 +1549,11 @@ export async function importProject(req, res) {
       });
     }
 
+    // The project details a backup carries are held to what the app itself
+    // writes. The theme and preset name folders; the rest becomes the project row.
+    const manifestProblem = importManifestProblem(manifest.project);
+    if (manifestProblem) return res.status(400).json({ error: refusedBackupMessage(manifestProblem) });
+
     // Check if theme exists
     const themeDir = getThemeDir(manifest.project.theme);
     if (!(await fs.pathExists(themeDir))) {
@@ -1408,7 +1565,10 @@ export async function importProject(req, res) {
     // Resolve a unique name + folder pair using the same scheme as createProject.
     // If a project with the same name already exists, the imported one becomes
     // "X (Copy)" / "X (Copy N)" so the project switcher stays unambiguous.
-    const { name: resolvedName, folder: folderName } = await resolveProjectIdentity(manifest.project.name);
+    // Stripped of markup as the create form's name is.
+    const importedName = stripHtmlToText(manifest.project.name.trim());
+    if (!importedName) return res.status(400).json({ error: refusedBackupMessage("its project name is empty.") });
+    const { name: resolvedName, folder: folderName } = await resolveProjectIdentity(importedName);
     const projectDir = getProjectDir(folderName);
 
     // Create temporary extraction directory
@@ -1417,8 +1577,13 @@ export async function importProject(req, res) {
 
     let newProject = null;
     try {
-      // Extract ZIP to temporary directory
-      zip.extractAllTo(tempDir, true);
+      // Extract ZIP to temporary directory. Top-level dot entries are working
+      // files (a theme update's `.theme-update-backup`, its staging folder) that
+      // a backup never contains — export leaves every one of them out — and a
+      // planted one would be acted on by the next theme update.
+      await extractZipSafely(zip, zipSize, tempDir, {
+        skip: (entryName) => entryName.split("/")[0].startsWith("."),
+      });
 
       // Validate extracted structure
       const extractedManifestPath = path.join(tempDir, "project-export.json");
@@ -1448,14 +1613,14 @@ export async function importProject(req, res) {
         id: randomUUID(),
         folderName,
         name: resolvedName,
-        description: manifest.project.description || "",
-        siteTitle: manifest.project.siteTitle || "",
+        description: sanitizeOptionalText(manifest.project.description) || "",
+        siteTitle: sanitizeOptionalText(manifest.project.siteTitle) || "",
         theme: manifest.project.theme,
         themeVersion,
-        receiveThemeUpdates: manifest.project.receiveThemeUpdates || false,
+        receiveThemeUpdates: importedFlag(manifest.project.receiveThemeUpdates) ?? false,
         preset: manifest.project.preset || null,
         siteUrl: manifest.project.siteUrl || "",
-        cleanUrls: manifest.project.cleanUrls || false,
+        cleanUrls: importedFlag(manifest.project.cleanUrls) ?? false,
         siteIdentity: readSiteIdentity(manifest.project.siteIdentity).value,
         // An export from another install can carry anything; fall back to a
         // single-language project rather than importing an unusable code.
@@ -1466,6 +1631,11 @@ export async function importProject(req, res) {
         created: new Date().toISOString(),
         updated: new Date().toISOString(),
       };
+
+      // What the backup names inside its files, checked before any of it is
+      // copied into the new project.
+      const contentProblem = await backupContentProblem(tempDir, importedLanguages.languages ?? []);
+      if (contentProblem) throw new BackupRefusedError(refusedBackupMessage(contentProblem));
 
       // Create project directory
       await fs.ensureDir(projectDir);
@@ -1568,6 +1738,8 @@ export async function importProject(req, res) {
       throw error;
     }
   } catch (error) {
+    // A refused backup is the file's problem, not the server's.
+    if (error.statusCode === 400) return res.status(400).json({ error: error.message });
     console.error("Error importing project:", error);
     res.status(500).json({ error: error.message || "Failed to import project" });
   } finally {

@@ -16,7 +16,7 @@ This document serves as a comprehensive index to all documentation in the Widget
 - Every entity and workflow page begins with a plain-language guide covering everyday examples, available actions, shared effects, languages and saving; implementation references follow under Technical details.
 - Follow operation walkthroughs for project creation/import, content editing, language lifecycle, media, themes, preview, and export.
 - Use the multilingual shared-versus-local matrix and coverage evidence to understand current behaviour and its verification limits. The handbook contains no task queue.
-- Updated through the completed R1–R8 review and both real-project checks recorded at `f10e20ce` (2026-09-20). Includes theme language controls, date formatting, integration contracts and current limitations.
+- Updated through the completed R1–R8 review and both real-project checks recorded at `f10e20ce` (2026-09-20). Includes theme language controls, date formatting, integration contracts and current limitations. [Built-in widgets](domain/entities/core-widget.md) and [forms](domain/operations/forms.md) have their own guides, including core form localization (`22a93fa5`).
 
 ---
 
@@ -49,6 +49,8 @@ This document serves as a comprehensive index to all documentation in the Widget
 
 ## 📚 Theme Development & Authoring
 
+The draft [Widgetizer Theme skill](../skills/widgetizer-theme/SKILL.md) provides a task-oriented technical authoring workflow and seven focused references. It distinguishes importer checks, runtime contracts, and design conventions; it is maintained in the repository and has not been installed or published.
+
 ### **[theming.md](theming.md)** - Theme Development & Structure
 
 **Purpose**: Canonical theme-authoring entry point — theme structure, `theme.json` manifest/global settings, `layout.liquid`, Liquid tags, widgets/blocks/templates/menus/assets/locales/presets, and advanced features, tightened to defer deep detail to the dedicated docs **When to use**:
@@ -56,6 +58,7 @@ This document serves as a comprehensive index to all documentation in the Widget
 - Building new themes from scratch
 - Understanding theme structure and file organization
 - Working with Liquid templates, tags, and global components (header/footer)
+- Writing snippets: what a `{% render %}`'d snippet can see, and the engine's reserved variable names
 - Managing theme assets, CSS variables, and locales (i18n)
 - Implementing scroll reveal animations
 
@@ -78,14 +81,14 @@ This document serves as a comprehensive index to all documentation in the Widget
 
 ### **[theming-setting-types.md](theming-setting-types.md)** - Setting Types Reference
 
-**Purpose**: Authoritative author-facing catalog of all theme/widget setting types with schema properties, JSON examples, and Liquid usage — now also the home for the shipped `file` setting type **When to use**:
+**Purpose**: Authoritative author-facing catalog of all theme/widget setting types with schema properties, JSON examples, and Liquid usage — now also the home for the shipped `file` and `video` setting types **When to use**:
 
 - Defining settings in `theme.json` global configuration
 - Creating widget schemas with proper setting types
 - Understanding setting properties, CSS variable output, and i18n labels
-- Looking up the `file` setting type or richtext/link options
+- Looking up the `file`/`video` setting types or richtext/link options
 
-**Key topics**: Setting types (color, text, range, select, date, gallery, table, icon, youtube, richtext, code, `file`, etc.), common properties, CSS variable generation, i18n label resolution (tTheme: keys), collection field flags (`usedAsTitle`/`usedAsDate`), richtext `allow_headings`/`allow_images`/`min_height` + stable internal-link refs in richtext anchors (`data-page-uuid`/`data-collection-item-uuid`), structured link targets (`pageUuid`/`collectionType`/`collectionItemUuid`), icon `allow_patterns`, `rte_text`/`rte_blank`
+**Key topics**: Setting types (color, text, range, select, date, gallery, table, icon, youtube, richtext, code, `file`, `video`, etc.), common properties, CSS variable generation, i18n label resolution (tTheme: keys), collection field flags (`usedAsTitle`/`usedAsDate`), richtext `allow_headings`/`allow_images`/`min_height` + stable internal-link refs in richtext anchors (`data-page-uuid`/`data-collection-item-uuid`), structured link targets (`pageUuid`/`collectionType`/`collectionItemUuid`), icon `allow_patterns`, `rte_text`/`rte_blank`
 
 ---
 
@@ -432,87 +435,50 @@ This document serves as a comprehensive index to all documentation in the Widget
 
 ---
 
-### **[future-roadmap.md](future-roadmap.md)** - Future: Roadmap (eight items in series)
-
-**Purpose**: Entry point for the planned series — groundwork (page-link filter, Site URL helper) → breadcrumbs → collection pagination → structured data → multilang → undo-history fix → rename to "Widgetizer Desktop" → upload file names — with what each stage ships, which doc holds its design, what it lands for later stages, and the reading order when picking the work up; the undo-history, rename and upload-file-names stages are specified inline **When to use**:
-
-- Starting or resuming any of the eight items
-- Deciding what must be finished before a given feature can begin
-- Finding which `future-*` doc to open
-
-**Key topics**: Series order, per-stage design docs, cross-stage groundwork (derived output depth, addressing module, global-widget context, stable-vs-translatable split), rules that hold across all stages
-
----
-
-### **[future-multilang-design.md](future-multilang-design.md)** - Future: Multilanguage Support
-
-**Purpose**: Locked design decisions for per-language pages within one project (rejected alternatives, activation, seeding, tabs/chips UX, per-language slugs and `pages/<lang>/` layout, shared media with per-language metadata, zero-config export) **When to use**:
-
-- Designing or implementing any multilanguage feature
-- Checking which multilang approaches were already rejected and why
-- Understanding the per-language page/slug/file-layout contract before touching page identity code
-
-**Key topics**: Per-language pages with loose translation links, project language setting, skeleton-only seeding, language tabs + status chips, per-language header/footer/menus, shared media library with per-language alt/title/caption, `/lang/` export prefix + hreflang (self-reference + `x-default` rules), slug uniqueness per language, enabled language codes reserved as page/collection names, single Site URL base helper as a prerequisite
-
----
-
-### **[future-multilang-implementation-plan.md](future-multilang-implementation-plan.md)** - Future: Multilanguage Implementation Plan
-
-**Purpose**: Ordered, step-by-step build plan for the design locked in `future-multilang-design.md` — prerequisites first, then the addressing layer, storage/API, editor UI, rendering/export, collections, forms, dates, theme — each step naming the files it touches and what "done" means **When to use**:
-
-- Starting or resuming multilang implementation work
-- Deciding what must land before a given multilang feature can be built
-- Checking a step's exit criteria before moving to the next
-
-**Key topics**: series order (groundwork → pagination → structured data → multilang), phase-one blockers (media-usage ids, global render context, derived output depth, Site URL base helper), addressing layer contract, per-step file lists and done-when criteria, test coverage per step
-
----
-
-### **[future-pagination-design.md](future-pagination-design.md)** - Future: Collection Pagination
-
-**Purpose**: Design, shipped 2026-09-14, for paginating collection listings as copies of the hosting page (`blog.html`, `blog/page/2.html`) — what changed during the build, rejected alternatives, the one-switch authoring model, URL shape under both Clean URLs modes, SEO rules, the frozen `pagination` theme contract, and the build steps **When to use**:
-
-- Implementing or reviewing collection pagination
-- Checking which pagination approaches were rejected (theme listing pages, client-side load-more) and why
-- Understanding what pagination lands for multilang (derived output depth, the addressing layer, the `page` reserved name)
-
-**Key topics**: Paginate switch + items per page, one paginating widget per page, `page/<n>` URL segment, `page` reserved slug, self-canonical + number-only title suffix + sitemap inclusion, `pagination` render object, exporter renders one copy per slice, `/preview/paged/` route, homepage vs `page/` collection clash, one collection snapshot per export
-
----
-
-### **[future-breadcrumbs-design.md](future-breadcrumbs-design.md)** - Future: Breadcrumbs
-
-**Purpose**: Locked design for breadcrumbs (stage 1 of the series) — core computes one trail per page from explicit associations only (parent page for pages; listing anchor → single listing page for items; homepage by slug; no parent means Home → page), exposes it as `page.breadcrumbs` / `globals.breadcrumbs`, and themes render it with a core snippet or their own markup; introduces the widget-schema `collection` declaration and the listing anchor that pagination and structured data reuse **When to use**:
-
-- Adding breadcrumbs to a theme (the Widgetizer marketing-site theme is the first consumer)
-- Touching the parent-page field, the listing-anchor toggle, or the `collection` widget-schema block
-- Building `BreadcrumbList` structured data from the trail
-
-**Key topics**: Trail sources and fallbacks, why menu position was dropped from v1, home detection and label, the frozen `breadcrumbs` contract, the core `breadcrumbs` snippet and its params, engine/editor work, multilang note, definition of done
-
----
-
-### **[future-structured-data-design.md](future-structured-data-design.md)** - Future: Schema.org / JSON-LD
-
-**Purpose**: Design, shipped 2026-09-15, for automatic structured data — what changed during the build, one safe JSON-LD graph through the existing SEO tag, project-owned site identity and business details that Arch displays in a Business details block, a closed collection-schema mapping contract (Arch News → `BlogPosting`), breadcrumbs from the shared stage-1 trail, and the stage-3 build steps **When to use**:
-
-- Implementing or reviewing structured data / JSON-LD output
-- Adding identity or business fields to Project details, or displaying them in a theme
-- Checking what was deliberately left out (About/Contact page types, widget-level schema, custom JSON-LD editors) and why
-
-**Key topics**: Three rules for a non-technical audience (visible data, zero vocabulary, derive don't ask), stable facts vs translatable text (`text` keys), `site_identity` shape and categories, project profiles win over theme social settings, `structuredData` collection-schema block, ids on the page's own address, BreadcrumbList from the visible trail, readiness line, Arch `business_details` block instead of a toggle, `project.identity`, cut order, resolved questions
-
----
-
 ### **[future-image-optimization.md](future-image-optimization.md)** - Future: Image Optimization
 
-**Purpose**: Standalone backlog item (not part of the feature series) — why uploaded PNGs stay heavy (format never changed, PNG quality quantises to a palette, no reprocess action, missing `sizes` hints), measured WebP/AVIF gains, and four approaches: silent WebP conversion on upload, theme `sizes` hints, a one-button cleanup for existing libraries built from the existing CLI script, and preset-style quality settings **When to use**:
+**Purpose**: Early concept for lighter website images without extra work for the owner: use the right image size first, optimize new uploads automatically, then safely improve existing projects. Implementation choices remain open. **When to use**:
 
 - Deciding how to reduce image weight for non-technical users
-- Touching the upload pipeline, the `{% image %}` tag, or the media settings
-- Promoting `scripts/optimize-project-media.mjs` into a product feature
+- Discussing automatic upload improvements and preserving original images
+- Planning a safe way to optimize images already used in a project
 
-**Key topics**: Format conversion at upload, retained originals, near-lossless for graphics, `sizes` audit in Arch, reference-rewriting cleanup job, quality presets, `og:image` crawler caveat, definition of done
+**Key topics**: Appropriate image sizes, appearance and transparency, worthwhile savings, retained originals, storage versus download size, progress and recovery, existing image uses, re-exporting, quality controls deferred until needed
+
+---
+
+### **[future-drafts-and-trash.md](future-drafts-and-trash.md)** - Drafts and trash
+
+**Purpose**: Early concept for Draft and Published pages and collection items, with a separate trash area for recoverable deletion. **When to use**:
+
+- Discussing unfinished content and temporary removal from the website
+- Planning restoration, permanent deletion and affected links
+- Considering language versions, homepages and project storage
+
+**Key topics**: Export inclusion, ordinary editing versus separate draft revisions, collection lists, saved relationships, restoration choices, media preservation, backups and open decisions
+
+---
+
+### **[future-skills-theme.md](future-skills-theme.md)** - Future: Widgetizer Theme Skill
+
+**Purpose**: Proposal and build notes for a distributable, tool-neutral Agent Skill that lets desktop-app users' AI agents create and update Widgetizer themes **When to use**:
+
+- Building or scoping the theme-creation skill
+- Deciding how the skill is distributed to Claude and OpenAI users
+- Checking the desktop data-folder paths, theme copy model and dev-loop gotchas an agent must handle
+
+**Key topics**: SKILL.md format and progressive disclosure, master copy in repo + small public repo, Claude plugin marketplace / app upload / directory, OpenAI ChatGPT + Codex, desktop `<userData>/data/` paths, seed/runtime/project theme copies, `latest/` precedence, theme ZIP upload requirements, update folders, knowledge sources, open questions
+
+---
+
+### **[future-skills-site.md](future-skills-site.md)** - Future: Widgetizer Site Skill
+
+**Purpose**: Early notes for a skill that lets a desktop-app user's AI agent build a website with a theme/preset (pages, header/footer, menus, collections, images); shared skill/distribution facts live in future-skills-theme.md **When to use**:
+
+- Scoping the site-building skill
+- Checking what an agent can do through project files versus what needs the app's database or local API
+
+**Key topics**: Files vs SQLite (projects, media), open-editor overwrite risk, no schema validator, three routes (files only / local API / MCP server), creating a project from a prompt via `POST /api/projects`, proposed `server.json` port file, active-project switch behaviour, page and menu JSON shape, knowledge sources, open questions
 
 ---
 

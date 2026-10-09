@@ -50,9 +50,10 @@
  * ## Lock ordering — the rule that keeps four per-project locks from deadlocking
  *
  * The content-write section is ALWAYS INNERMOST. Never acquire another per-project
- * lock (serializeTranslationOps, serializeLanguageOps, serializeExportOps) while
- * holding it. Those may be held while taking this one — a translation op writing a
- * page, a language op seeding or removing content — which is exactly why the order
+ * lock (serializeTranslationOps, serializeLanguageOps, serializeExportOps,
+ * serializeThemeUpdates) while holding it. Those may be held while taking this one —
+ * a translation op writing a page, a language op seeding or removing content, a
+ * theme update rewriting theme.json — which is exactly why the order
  * has to run one way only. Separate serializer instances do not rule out a cycle;
  * a consistent order does.
  *
@@ -94,10 +95,11 @@
  *     language version
  *   - theme settings, site identity
  *   - language add and remove
+ *   - theme update (the whole run, inside serializeThemeUpdates)
  *
  * These do NOT participate, and can still write content or a media reference outside
  * the section: link enrichment, and the structural flows (project create, duplicate,
- * import, theme update) that rebuild usage wholesale afterwards. Each of them COPIES
+ * import) that rebuild usage wholesale afterwards. Each of them COPIES
  * content that already exists in the project, so the reference it introduces is
  * normally also held by the source a verification scan reads — but that is a reason
  * to expect no harm, not a proof of exclusion. They are the obvious next extension.
@@ -195,6 +197,21 @@ export function assertLanguageStillEnabled(projectId, lang) {
   // Carried as a field so the editor can name the language without parsing prose.
   error.language = lang.language;
   throw error;
+}
+
+/**
+ * `lang` with the project's languages as they are NOW, for a check made inside
+ * the section. A request carries the row it loaded when it arrived; a language
+ * added while it waited reserves its code as a page slug at the root (`el.html`
+ * and the Greek folder `el/` would publish over each other), which that row does
+ * not show yet.
+ *
+ * @param {string} projectId
+ * @param {{ language?: string, defaultLanguage?: string }} lang
+ */
+export function withCurrentLanguages(projectId, lang) {
+  const { languages } = projectLanguages(projectRepo.getProjectById(projectId));
+  return { ...lang, languages };
 }
 
 /** The adapter key for a tracked upload path: `/uploads/images/a.jpg` -> `images/a.jpg`. */

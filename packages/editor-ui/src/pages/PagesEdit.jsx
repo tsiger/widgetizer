@@ -15,6 +15,7 @@ import { getPage, updatePage } from "../queries/pageManager";
 import { invalidateMediaCache } from "../queries/mediaManager";
 import useGuardedFormPage from "../hooks/useGuardedFormPage";
 import { useEditorPath } from "../lib/routeBase.jsx";
+import { pagesListHref } from "../lib/contentRoutes";
 
 export default function PagesEdit() {
   const { t } = useTranslation();
@@ -113,7 +114,7 @@ export default function PagesEdit() {
     <PageLayout title={getDirtyTitle(t("pagesEdit.title"))}>
       {showSuccessActions && (
         <div className="mb-4 flex flex-wrap gap-3">
-          <Button variant="secondary" onClick={() => navigate(editorPath("/pages"))} icon={<ChevronLeft size={18} />}>
+          <Button variant="secondary" onClick={() => navigate(editorPath(pagesListHref(language)))} icon={<ChevronLeft size={18} />}>
             {t("pagesEdit.backToList")}
           </Button>
         </div>
@@ -125,7 +126,7 @@ export default function PagesEdit() {
           onSubmit={handleSubmit}
           isSubmitting={isSubmitting}
           submitLabel={t("pagesEdit.saveChanges")}
-          onCancel={() => navigateSafely(editorPath("/pages"))}
+          onCancel={() => navigateSafely(editorPath(pagesListHref(language)))}
           onDirtyChange={setIsDirty}
           isDirty={isDirty}
         />

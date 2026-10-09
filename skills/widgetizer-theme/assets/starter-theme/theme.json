@@ -1,0 +1,86 @@
+{
+  "name": "Starter",
+  "version": "1.0.0",
+  "author": "Theme Author",
+  "description": "Minimal starting point for a Widgetizer theme",
+  "useCoreWidgets": true,
+  "settings": {
+    "global": {
+      "general": [
+        {
+          "type": "image",
+          "id": "favicon",
+          "label": "Site icon",
+          "description": "Shown in browser tabs and bookmarks. A square SVG or a PNG of 512×512 or larger works best.",
+          "default": "",
+          "size": "narrow"
+        }
+      ],
+      "colors": [
+        { "type": "color", "id": "background", "label": "Background", "default": "#ffffff", "outputAsCssVar": true },
+        { "type": "color", "id": "surface", "label": "Surface", "default": "#f1f4f8", "outputAsCssVar": true },
+        { "type": "color", "id": "text", "label": "Text", "default": "#1c2430", "outputAsCssVar": true },
+        { "type": "color", "id": "heading", "label": "Headings", "default": "#0d131c", "outputAsCssVar": true },
+        { "type": "color", "id": "muted", "label": "Muted text", "default": "#5b6676", "outputAsCssVar": true },
+        { "type": "color", "id": "border", "label": "Borders", "default": "#d7dde6", "outputAsCssVar": true },
+        { "type": "color", "id": "accent", "label": "Accent", "default": "#1f5fe0", "outputAsCssVar": true },
+        { "type": "color", "id": "accent_text", "label": "Text on accent", "default": "#ffffff", "outputAsCssVar": true }
+      ],
+      "typography": [
+        {
+          "type": "font_picker",
+          "id": "heading_font",
+          "label": "Heading font",
+          "default": { "stack": "\"Inter\", sans-serif", "weight": 700 }
+        },
+        {
+          "type": "font_picker",
+          "id": "body_font",
+          "label": "Body font",
+          "default": { "stack": "\"Inter\", sans-serif", "weight": 400 }
+        }
+      ],
+      "layout": [
+        {
+          "type": "range",
+          "id": "content_width",
+          "label": "Content width",
+          "default": 1200,
+          "min": 960,
+          "max": 1440,
+          "step": 20,
+          "unit": "px",
+          "outputAsCssVar": true
+        }
+      ],
+      "privacy": [
+        {
+          "type": "checkbox",
+          "id": "use_bunny_fonts",
+          "label": "Load fonts from Bunny Fonts",
+          "description": "A privacy-friendly alternative to Google Fonts.",
+          "default": false
+        }
+      ],
+      "advanced": [
+        { "type": "code", "id": "custom_css", "label": "Custom CSS", "language": "css", "rows": 12, "default": "" },
+        {
+          "type": "code",
+          "id": "custom_head_scripts",
+          "label": "Custom head code",
+          "language": "html",
+          "rows": 12,
+          "default": ""
+        },
+        {
+          "type": "code",
+          "id": "custom_footer_scripts",
+          "label": "Custom footer code",
+          "language": "html",
+          "rows": 12,
+          "default": ""
+        }
+      ]
+    }
+  }
+}

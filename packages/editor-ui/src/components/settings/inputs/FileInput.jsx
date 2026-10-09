@@ -1,17 +1,40 @@
 import { useState, useRef, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { uploadProjectMedia, getProjectMedia } from "../../../queries/mediaManager";
-import { FileText, X, UploadCloud } from "lucide-react";
+import { FileText, Film, X, UploadCloud } from "lucide-react";
 import useProjectStore from "../../../stores/projectStore";
 import useToastStore from "../../../stores/toastStore";
 import useAppSettings from "../../../hooks/useAppSettings";
 import MediaSelectorDrawer from "../../../components/media/MediaSelectorDrawer";
 import Button from "../../ui/Button";
 import { showRejectedFiles, showUploadOutcome } from "../../../utils/uploadFeedback";
-import { NON_IMAGE_ACCEPT, validateFileSizes } from "../../../utils/uploadValidation";
+import { NON_IMAGE_ACCEPT, VIDEO_ACCEPT, createRejectedFile, validateFileSizes } from "../../../utils/uploadValidation";
 
-export default function FileInput({ id, value = "", onChange }) {
+const MODES = {
+  file: {
+    filter: "file",
+    accept: NON_IMAGE_ACCEPT,
+    accepts: (type) => !type?.startsWith("image/"),
+    icon: FileText,
+    importKey: "components.fileInput.importNew",
+    formatsKey: "components.fileInput.fileFormats",
+    rejectKey: "components.fileInput.selectFileOnly",
+  },
+  video: {
+    filter: "video",
+    accept: VIDEO_ACCEPT,
+    accepts: (type) => type === "video/mp4",
+    icon: Film,
+    importKey: "components.fileInput.importNewVideo",
+    formatsKey: "components.fileInput.videoFormats",
+    rejectKey: "components.fileInput.selectVideoOnly",
+  },
+};
+
+export default function FileInput({ id, value = "", onChange, filterType = "file" }) {
   const { t } = useTranslation();
+  const mode = MODES[filterType] ?? MODES.file;
+  const acceptedExtensions = Object.values(mode.accept).flat();
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const fileInputRef = useRef(null);
@@ -25,11 +48,10 @@ export default function FileInput({ id, value = "", onChange }) {
   // Get the current file metadata when value changes
   useEffect(() => {
     if (value && activeProject) {
-      const filename = value.split("/").pop();
       const fetchFileData = async () => {
         try {
           const mediaData = await getProjectMedia(activeProject.id);
-          const fileRecord = mediaData.files.find((file) => file.path.includes(filename));
+          const fileRecord = mediaData.files.find((file) => file.path === value);
           setCurrentFile(fileRecord || null);
         } catch (error) {
           console.error("Error fetching file metadata:", error);
@@ -45,6 +67,13 @@ export default function FileInput({ id, value = "", onChange }) {
   const handleFileChange = async (event) => {
     const file = event.target.files[0];
     if (!file || !activeProject) return;
+
+    // `accept` only steers the OS dialog; "All files" can still hand over anything.
+    if (!acceptedExtensions.some((ext) => file.name.toLowerCase().endsWith(ext))) {
+      showRejectedFiles(showToast, [createRejectedFile(file.name, "File type not supported.")]);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      return;
+    }
 
     const limitMB = settings?.media?.maxFileSizeMB ?? 50;
     const { valid, rejected } = validateFileSizes([file], { maxSizeMB: limitMB });
@@ -87,16 +116,17 @@ export default function FileInput({ id, value = "", onChange }) {
   const handleOpenMediaSelector = () => setSelectorDrawerVisible(true);
 
   const handleSelectMedia = (selectedFile) => {
-    if (selectedFile && !selectedFile.type?.startsWith("image/")) {
+    if (selectedFile && mode.accepts(selectedFile.type)) {
       onChange(selectedFile.path);
       setSelectorDrawerVisible(false);
     } else {
-      showToast(t("components.fileInput.selectFileOnly"), "error");
+      showToast(t(mode.rejectKey), "error");
     }
   };
 
   const displayFilename = currentFile?.filename || currentFile?.originalName || value.split("/").pop();
   const displayExtension = displayFilename?.split(".").pop()?.toUpperCase();
+  const FileIcon = mode.icon;
 
   return (
     <div className="w-full">
@@ -104,7 +134,7 @@ export default function FileInput({ id, value = "", onChange }) {
         ref={fileInputRef}
         type="file"
         id={id}
-        accept={Object.values(NON_IMAGE_ACCEPT).flat().join(",")}
+        accept={acceptedExtensions.join(",")}
         onChange={handleFileChange}
         disabled={uploading}
         className="hidden"
@@ -113,7 +143,7 @@ export default function FileInput({ id, value = "", onChange }) {
       {value && currentFile ? (
         <div className="flex items-center gap-3 p-3 bg-slate-50 border border-slate-200 rounded-md">
           <div className="flex-shrink-0 w-10 h-10 bg-slate-200 rounded flex items-center justify-center">
-            <FileText className="text-slate-500" size={20} />
+            <FileIcon className="text-slate-500" size={20} />
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium text-slate-700 truncate">{displayFilename}</p>
@@ -137,9 +167,9 @@ export default function FileInput({ id, value = "", onChange }) {
         >
           <UploadCloud size={24} />
           <p className="mt-1 text-sm font-semibold">
-            {uploading ? `${t("components.fileInput.uploading")} ${uploadProgress}%` : t("components.fileInput.importNew")}
+            {uploading ? `${t("components.fileInput.uploading")} ${uploadProgress}%` : t(mode.importKey)}
           </p>
-          <p className="text-xs">PDF, MP3</p>
+          <p className="text-xs">{t(mode.formatsKey)}</p>
         </div>
       )}
 
@@ -161,7 +191,7 @@ export default function FileInput({ id, value = "", onChange }) {
           onClose={() => setSelectorDrawerVisible(false)}
           onSelect={handleSelectMedia}
           activeProject={activeProject}
-          filterType="file"
+          filterType={mode.filter}
         />
       )}
     </div>

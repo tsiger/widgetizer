@@ -94,6 +94,8 @@ The server validates the target and changes the active-project pointer. The shel
 
 Groups whose original identifying member no longer exists keep their group label so surviving versions stay related inside the new project. The group label is interpreted within a project, not as permission to access another project.
 
+The copy's folder name is free in the database and on disk, so a copy never lands in a folder left behind by a deletion.
+
 Failure boundary: a duplicate is made whole or not at all. Copying, re-pointing the identities and copying the media library are one operation — a failure in any of them removes the unfinished copy and reports failure, because a copy whose links still name the original project's pages renders as a site that has lost its internal navigation. The original is never touched, and the operation can be retried.
 
 Checked against one bilingual fixture carrying every language (including one the [static site export](output.md#multilingual-boundary-at-this-snapshot) would skip), both kinds of translation group, groups whose original member was deleted, out-of-schema item fields, per-language manual order, `siteIdentity`, theme-update provenance, per-language media overrides, and every reference kind in root and language folders. A duplicate whose source directory still holds a stale `uploads/media.json` copies that file along with the rest; harmless, because the backup path below never reads it.
@@ -135,6 +137,8 @@ Evidence: [projectController](../../../packages/builder-server/src/controllers/p
 
 Under the per-project export lock, attempt generated-export cleanup, delete the project row with cascaded metadata, and reassign the active project in one database transaction. Then remove the project directory. All language content belongs to that directory; shared-within-project media is deleted with the project. The theme library source is not owned by this project.
 
-Export cleanup can warn and proceed. Directory removal occurs after row deletion, so a filesystem failure may leave files without a project row. Review this as a cleanup/recovery case, not as a promise of atomic deletion.
+Export cleanup can warn and proceed. Directory removal occurs after row deletion, so a filesystem failure (a file locked by another program, on Windows) can leave files without a project row. The deletion still succeeds: the response names the folder as `folderLeftBehind`, and the Projects screen shows a warning with its path that stays until dismissed. Nothing removes the leftover automatically. Create, import, duplicate and folder rename all treat a folder that exists on disk as taken, so a leftover folder is never reused or merged into.
+
+Changing a project's folder name copies the folder, points the project row at the copy, then removes the old folder. A failed copy or row update removes only the copy and leaves the project in its old folder; an old folder that cannot be fully removed is reported (`folderLeftBehind`) and the project keeps its complete new folder.
 
 Evidence: [projectService](../../../packages/builder-server/src/services/projectService.js), [projectRepository](../../../packages/builder-server/src/db/repositories/projectRepository.js), [exportController](../../../packages/builder-server/src/controllers/exportController.js), [projects](../../../packages/builder-server/src/tests/projects.test.js) and [export](../../../packages/builder-server/src/tests/export.test.js) tests.

@@ -1,4 +1,5 @@
 import { randomUUID } from "crypto";
+import { ConflictError } from "@widgetizer/core/errors";
 import {
   syncPageMediaUsageOnDelete,
   syncPageMediaUsageOnWrite,
@@ -8,13 +9,14 @@ import {
   withContentWriteLock,
   assertIntroducedMediaExists,
   assertLanguageStillEnabled,
+  withCurrentLanguages,
 } from "../services/contentCoordination.js";
 import { clearDeletedReferencesInSection, referenceCleanupWarnings } from "../utils/linkEnrichment.js";
 import { stripHtmlToText } from "../services/sanitizationService.js";
 import { LIMIT_KEYS, MAX_WIDGETS_PER_PAGE } from "@widgetizer/core/adapters";
 import { sanitizeSlug, generateUniqueSlug } from "../utils/slugHelpers.js";
 import { generateCopyName } from "../utils/namingHelpers.js";
-import { isReservedPageSlug, pageKey, pagesDir } from "@widgetizer/core/contentAddress";
+import { isHomeSlug, isReservedPageSlug, pageKey, pagesDir } from "@widgetizer/core/contentAddress";
 import { requestLanguage, projectLanguageContexts, withoutLanguage } from "../utils/contentLanguage.js";
 import {
   assertHasIdentity,
@@ -25,8 +27,19 @@ import {
   serializeTranslationOps,
 } from "../services/translationService.js";
 
-const pageSlugTaken = (storage, scope, lang) => (slug) =>
-  isReservedPageSlug(slug, lang) || storage.exists(scope, pageKey(slug, lang));
+// `index` and `home` both publish as the language's index.html, so a language
+// may hold only one of them. `ownSlug` is the page being renamed, which does not
+// clash with itself.
+async function homeSlugClash(storage, scope, slug, lang, ownSlug) {
+  if (!isHomeSlug(slug)) return false;
+  const other = slug === "index" ? "home" : "index";
+  return other !== ownSlug && storage.exists(scope, pageKey(other, lang));
+}
+
+const pageSlugTaken = (storage, scope, lang, ownSlug) => async (slug) =>
+  isReservedPageSlug(slug, lang) ||
+  (await storage.exists(scope, pageKey(slug, lang))) ||
+  homeSlugClash(storage, scope, slug, lang, ownSlug);
 
 async function listPageFiles(storage, scope, lang) {
   return (await storage.list(scope, pagesDir(lang))).filter((name) => name.endsWith(".json"));
@@ -36,6 +49,13 @@ function reservedPageSlug(res, slug) {
   return res.status(400).json({
     error: "Reserved slug",
     message: `"${slug}" is reserved and cannot be used as a page filename.`,
+  });
+}
+
+function secondHomepage(res, slug) {
+  return res.status(409).json({
+    error: "Slug already exists",
+    message: `"${slug}" would be a second homepage: this language already has one. Please choose a different slug.`,
   });
 }
 
@@ -78,13 +98,25 @@ async function enforcePaginationRules({ scope, storage, widgets }) {
 // scope-aware storage adapter. No folderName-based fs readers live here anymore.
 
 /**
- * A write refused because it would introduce a reference to a media file that has
- * been deleted. Nothing was written, so the editor keeps the work and can name the
- * image — which a generic 500 cannot. Every caller of the persist helper needs this,
- * or the specific reason is lost behind "Failed to ...".
+ * A write refused inside the section: it would introduce a reference to a media
+ * file that has been deleted, its language was removed, or a language added
+ * meanwhile reserved its slug. Nothing was written, so the editor keeps the work
+ * and can name the reason — which a generic 500 cannot. Every caller of the
+ * persist helper needs this, or the specific reason is lost behind "Failed to ...".
  * @returns {boolean} true when it answered
  */
+const SLUG_REFUSALS = {
+  RESERVED_SLUG: "Reserved slug",
+  SLUG_TAKEN: "Slug already exists",
+  SECOND_HOMEPAGE: "Slug already exists",
+};
+
 function respondMissingMedia(res, error) {
+  if (SLUG_REFUSALS[error?.code]) {
+    // Another write took the slug while this one waited. Nothing was written.
+    res.status(error.statusCode).json({ error: SLUG_REFUSALS[error.code], message: error.message, code: error.code });
+    return true;
+  }
   if (error?.code === "LANGUAGE_REMOVED") {
     // Nothing was written. The editor keeps the work and stops retrying; it cannot
     // be saved anywhere, because the language it belongs to is gone.
@@ -94,6 +126,73 @@ function respondMissingMedia(res, error) {
   if (error?.code !== "MEDIA_REFERENCE_MISSING") return false;
   res.status(error.statusCode).json({ error: "Missing media", message: error.message, code: error.code });
   return true;
+}
+
+/**
+ * The slug this write may use, decided inside the section.
+ *
+ * A request picks its slug before it waits for the section, so two requests can
+ * pick the same free slug and the second would write over the first, or a
+ * language added meanwhile can reserve it. Both requests would report success
+ * and a page would be gone. So the slug is checked again here, against the files
+ * and the project row as they are now:
+ *
+ * - a new page (no `previousPageId`) moves on to a free slug, numbered from the
+ *   one it picked (`about-1` taken meanwhile becomes `about-1-1`).
+ *   `pageData.id`/`slug` are updated to match, so the caller's response names
+ *   the slug that was written;
+ * - a rename, or a save to a page whose file is gone, is refused if the slug was
+ *   taken: the user chose that slug, so it is not swapped for another;
+ * - a save to the page's own existing file keeps its slug.
+ *
+ * @returns {Promise<string>} the slug to write
+ * @throws {ConflictError} RESERVED_SLUG, SLUG_TAKEN or SECOND_HOMEPAGE
+ */
+async function claimPageSlug({ scope, storage, pageId, pageData, previousPageId, lang }) {
+  if (previousPageId === pageId) {
+    const buf = await storage.read(scope, pageKey(pageId, lang));
+    if (buf != null) {
+      // The file is this page's own unless it carries another page's uuid: a save
+      // that found no file when it started (and so made up a uuid) must not write
+      // over a page created under that slug since. An unreadable file, or one
+      // from before pages had uuids, is treated as the page's own, as before.
+      let onDisk = null;
+      try {
+        onDisk = JSON.parse(buf.toString("utf8")).uuid;
+      } catch {
+        // Unreadable: nothing says it belongs to another page.
+      }
+      if (onDisk && pageData.uuid && onDisk !== pageData.uuid) {
+        throw new ConflictError(`A page with the slug "${pageId}" already exists. Please choose a different slug.`, {
+          code: "SLUG_TAKEN",
+        });
+      }
+      return pageId;
+    }
+  }
+
+  const current = withCurrentLanguages(scope.projectId, lang);
+  if (!previousPageId) {
+    const slug = await generateUniqueSlug(pageId, pageSlugTaken(storage, scope, current), { fallback: "page" });
+    if (slug !== pageId) Object.assign(pageData, { id: slug, slug });
+    return slug;
+  }
+
+  if (isReservedPageSlug(pageId, current)) {
+    throw new ConflictError(`"${pageId}" is reserved and cannot be used as a page filename.`, { code: "RESERVED_SLUG" });
+  }
+  if (await storage.exists(scope, pageKey(pageId, lang))) {
+    throw new ConflictError(`A page with the slug "${pageId}" already exists. Please choose a different slug.`, {
+      code: "SLUG_TAKEN",
+    });
+  }
+  if (await homeSlugClash(storage, scope, pageId, lang, previousPageId)) {
+    throw new ConflictError(
+      `"${pageId}" would be a second homepage: this language already has one. Please choose a different slug.`,
+      { code: "SECOND_HOMEPAGE" },
+    );
+  }
+  return pageId;
 }
 
 // The write and its usage sync are one media section: media deletion verifies and
@@ -123,6 +222,7 @@ async function persistPageInSection({ scope, storage, pageId, pageData, previous
     // project no longer has — invisible to the editor and to export, but visible to
     // the media usage rebuild, where it can hold an image hostage.
     assertLanguageStillEnabled(scope.projectId, lang);
+    pageId = await claimPageSlug({ scope, storage, pageId, pageData, previousPageId, lang });
 
     // Refuse to introduce a reference to a file that is gone — the save queued
     // behind a delete, which the lock orders but cannot make safe on its own.
@@ -208,12 +308,14 @@ async function deletePageInSection({ scope, storage, pageId, lang }) {
  * thrown — the pages ARE deleted, and a dangling reference renders as a dead link
  * rather than a wrong one.
  */
-async function clearRefsToDeletedPages(storage, scope, uuids, lang) {
-  const pageUuids = uuids.filter(Boolean);
-  if (pageUuids.length === 0) return [];
+async function clearRefsToDeletedPages(storage, scope, deleted, lang) {
+  const known = deleted.filter((page) => page?.uuid);
+  if (known.length === 0) return [];
+  const pageUuids = known.map((page) => page.uuid);
   try {
     const { incomplete } = await clearDeletedReferencesInSection(storage, scope, {
       pageUuids,
+      pageGroups: known.map((page) => [page.uuid, groupIdOf(page)]),
       defaultLanguage: lang.defaultLanguage,
     });
     return incomplete;
@@ -282,7 +384,7 @@ export async function updatePage(req, res) {
       console.warn(
         `Missing/empty slug in update request for oldSlug '${oldSlug}', generating from name: '${pageData.name}'`,
       );
-      desiredNewSlug = await generateUniqueSlug(pageData.name, pageSlugTaken(storage, scope, lang));
+      desiredNewSlug = await generateUniqueSlug(pageData.name, pageSlugTaken(storage, scope, lang, oldSlug));
     } else {
       // Sanitize the provided slug through the shared helper
       desiredNewSlug = sanitizeSlug(desiredNewSlug);
@@ -306,6 +408,7 @@ export async function updatePage(req, res) {
             message: `A page with the slug "${desiredNewSlug}" already exists. Please choose a different slug.`,
           });
         }
+        if (await homeSlugClash(storage, scope, desiredNewSlug, lang, oldSlug)) return secondHomepage(res, desiredNewSlug);
         finalNewSlug = desiredNewSlug;
       } else {
         finalNewSlug = desiredNewSlug; // Already unique from generateUniqueSlug fallback
@@ -474,15 +577,15 @@ export async function deletePage(req, res) {
       const pageBuf = await storage.read(scope, pageKey(pageId, lang));
       if (pageBuf == null) return null;
 
-      let deletedPageUuid = null;
+      let deletedPage = null;
       try {
-        deletedPageUuid = JSON.parse(pageBuf.toString("utf8")).uuid || null;
+        deletedPage = JSON.parse(pageBuf.toString("utf8"));
       } catch (readError) {
         console.warn(`Could not read page UUID before deletion for ${pageId}:`, readError.message);
       }
 
       await deletePageInSection({ scope, storage, pageId, lang });
-      return { incomplete: await clearRefsToDeletedPages(storage, scope, [deletedPageUuid], lang) };
+      return { incomplete: await clearRefsToDeletedPages(storage, scope, [deletedPage], lang) };
     });
 
     if (!found) return res.status(404).json({ error: "Page not found" });
@@ -515,7 +618,7 @@ export async function bulkDeletePages(req, res) {
     errors: [],
   };
 
-  const deletedUuids = [];
+  const deletedPages = [];
   let incompleteCleanup = [];
 
   // One section for the whole batch, so a save cannot slip a new reference to any
@@ -533,16 +636,16 @@ export async function bulkDeletePages(req, res) {
         // Read the uuid before deleting (the file is about to go) but record it
         // as deleted only after the delete returns — a page whose delete threw may
         // still be there, and clearing references to it would break live links.
-        let uuid = null;
+        let page = null;
         try {
-          uuid = JSON.parse(pageBuf.toString("utf8")).uuid ?? null;
+          page = JSON.parse(pageBuf.toString("utf8"));
         } catch (readError) {
           console.warn(`Could not read page UUID before deletion for ${pageId}:`, readError.message);
         }
 
         await deletePageInSection({ scope, storage, pageId, lang });
 
-        if (uuid) deletedUuids.push(uuid);
+        if (page?.uuid) deletedPages.push(page);
         results.deleted.push(pageId);
       } catch (error) {
         console.error(`Error deleting page ${pageId}:`, error);
@@ -551,7 +654,7 @@ export async function bulkDeletePages(req, res) {
     }
 
     // Confirmed deletions only, in one walk.
-    incompleteCleanup = await clearRefsToDeletedPages(storage, scope, deletedUuids, lang);
+    incompleteCleanup = await clearRefsToDeletedPages(storage, scope, deletedPages, lang);
   });
 
   // Determine response status based on results
@@ -683,6 +786,15 @@ export async function savePageContent(req, res) {
       return res.status(400).json({ error: "Missing required page data (slug, name, widgets)." });
     }
     if (pageData.slug !== id && isReservedPageSlug(pageData.slug, lang)) return reservedPageSlug(res, pageData.slug);
+    if (pageData.slug !== id && (await storage.exists(scope, pageKey(pageData.slug, lang)))) {
+      return res.status(409).json({
+        error: "Slug already exists",
+        message: `A page with the slug "${pageData.slug}" already exists. Please choose a different slug.`,
+      });
+    }
+    if (pageData.slug !== id && (await homeSlugClash(storage, scope, pageData.slug, lang, id))) {
+      return secondHomepage(res, pageData.slug);
+    }
 
     // Cap the per-page widget count before persisting. Without this an
     // authenticated owner could store tens of thousands of widgets in one page,
@@ -970,6 +1082,10 @@ export async function createPageLanguageVersion(req, res) {
 
       const created = {
         ...source,
+        // A custom canonical names the source's address; copied, it would point
+        // the new version at the other language. The new version starts with its
+        // own automatic address instead.
+        ...(source.seo ? { seo: { ...source.seo, canonical_url: "" } } : {}),
         uuid: randomUUID(),
         translationGroupId: groupId,
         language: target.language,

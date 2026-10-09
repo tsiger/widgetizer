@@ -18,7 +18,9 @@ import DebugStatePanel from "./components/dev/DebugStatePanel";
 import ToastContainer from "@widgetizer/editor-ui/components/ui/ToastContainer.jsx";
 import { ConfirmProvider } from "@widgetizer/editor-ui/components/ui/ConfirmProvider.jsx";
 import ErrorBoundary from "@widgetizer/editor-ui/components/ui/ErrorBoundary.jsx";
-import StaleProjectCurtain from "@widgetizer/editor-ui/components/ui/StaleProjectCurtain.jsx";
+import StaleProjectCurtain, {
+  StaleLanguageBanner,
+} from "@widgetizer/editor-ui/components/ui/StaleProjectCurtain.jsx";
 import LanguageInitializer from "./components/layout/LanguageInitializer";
 import useProjectStore from "@widgetizer/editor-ui/stores/projectStore";
 import useThemeStore from "@widgetizer/editor-ui/stores/themeStore";
@@ -49,6 +51,13 @@ function EditorStaleProjectGuard() {
   return <StaleProjectCurtain onReload={() => window.location.assign("/pages")} />;
 }
 
+// The removed-language banner shares the store but not the overlay slot: it goes in
+// `topbarBanner`, in the page flow, so it never covers the editor it is telling the
+// user to copy their work out of. Same exit as the curtain, for the same reason.
+function EditorStaleLanguageBanner() {
+  return <StaleLanguageBanner onReload={() => window.location.assign("/pages")} />;
+}
+
 // Create router with data router API (required for useBlocker). The editor tree
 // is contributed by editor-ui's `createEditorRoutes` and composed in here; the
 // OSS shell supplies its chrome through slots and keeps its own picker routes.
@@ -75,6 +84,7 @@ const router = createBrowserRouter([
     errorElement: <RouteError />,
     slots: {
       topbarRight: <AdminMenu />,
+      topbarBanner: <EditorStaleLanguageBanner />,
       overlay: (
         <>
           <DebugStatePanel />

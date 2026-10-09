@@ -4,7 +4,17 @@ import { randomUUID } from "crypto";
 import { getProjectPagesDir, getProjectMenusDir, getProjectDir } from "../config.js";
 import { syncCollectionItemMediaUsageOnWrite } from "../services/mediaUsageService.js";
 import { cleanupRichtextLinkRefs, remapRichtextLinkRefs, enrichRichtextLinkRefs } from "@widgetizer/core/richtextLinks";
-import { pagesDir, pageKey, globalKey, menusDir, menuKey, itemsDir, itemKey } from "@widgetizer/core/contentAddress";
+import {
+  pagesDir,
+  pageKey,
+  globalKey,
+  menusDir,
+  menuKey,
+  itemsDir,
+  itemKey,
+  resolveLanguage,
+  translationGroupIdOf,
+} from "@widgetizer/core/contentAddress";
 import { languageFoldersIn } from "./contentLanguage.js";
 import { LANGUAGE_CODE_RE } from "@widgetizer/core/languages";
 
@@ -204,35 +214,112 @@ async function updateCollectionItems(collectionsDir, itemTransformer) {
 // The walkers below take the language from the folder a file sits in, so they
 // need the project's default to key a folder correctly whatever it is called.
 
-/** Every page key across the root and each language folder present. */
-async function listAllPageKeys(storage, scope, defaultLanguage) {
-  const keys = [];
-  for (const language of ["", ...(await languageFoldersIn(storage, scope, "pages"))]) {
-    const lang = { language, defaultLanguage };
-    const names = (await storage.list(scope, pagesDir(lang))).filter((name) => name.endsWith(".json"));
-    keys.push(...names.map((name) => pageKey(name.replace(/\.json$/, ""), lang)));
-  }
-  return keys;
-}
-
 /**
- * One pass over every page: clear references inside widgets, and drop a
- * `parentPageUuid` naming any of the deleted pages.
+ * Clear references inside every page's widgets, and repoint or drop a
+ * `parentPageUuid` naming any of the deleted pages. The deleted set is handled
+ * whole: scanning once per deleted uuid meant ten deleted pages read every
+ * surviving page eleven times.
  *
- * Both in the same walk, and the parent check takes the whole SET. Scanning once
- * per deleted uuid meant ten deleted pages read every surviving page eleven times.
+ * A language version keeps its source's parent, and the breadcrumb shows that
+ * parent's version in the page's own language. So a deleted parent whose
+ * translation survives is not gone for its children: the parent moves to the
+ * surviving version in the child's language, else in the site's default
+ * language. Only a child with neither loses its parent. A version in some third
+ * language is not used: the breadcrumb never shows a page in another language.
+ * Nor is a version that would make the child its own ancestor.
+ *
+ * Two passes. The first reads only what a parent choice needs (uuid, group,
+ * language, parent) for every page, so the whole site's content is never held at
+ * once; the second rewrites pages one at a time. A page the first pass cannot
+ * read might be the version a child should move to, or an ancestor that would
+ * make a candidate loop, so while any page is unreadable a child's parent is
+ * left as it is: a parent pointing at a deleted page still renders, and a wrong
+ * move or clear cannot be undone.
  *
  * A file that cannot be read or written is recorded in `failed` and the walk
  * continues: one unwritable page must not stop the menus and items after it from
  * being cleaned, and the caller needs to know what was left behind.
+ *
+ * @param {Map<string, string>} deletedPageGroups - deleted page uuid -> its
+ *   translation group, where known; a page whose group is not given is taken to
+ *   head its own (a page that was never translated, or a source).
  */
-async function updatePagesViaStorage(storage, scope, widgetProcessor, deletedPageUuids, defaultLanguage, failed) {
-  for (const key of await listAllPageKeys(storage, scope, defaultLanguage)) {
+async function updatePagesViaStorage(
+  storage,
+  scope,
+  widgetProcessor,
+  deletedPageUuids,
+  deletedPageGroups,
+  defaultLanguage,
+  failed,
+) {
+  const defaultCode = resolveLanguage("", defaultLanguage);
+
+  // Pass one: who survives, in which group and language, and who their parents are.
+  const entries = [];
+  const byUuid = new Map();
+  const survivors = new Map();
+  let censusComplete = true;
+  for (const language of ["", ...(await languageFoldersIn(storage, scope, "pages"))]) {
+    const lang = { language, defaultLanguage };
+    const names = (await storage.list(scope, pagesDir(lang))).filter((name) => name.endsWith(".json"));
+    for (const name of names) {
+      const key = pageKey(name.replace(/\.json$/, ""), lang);
+      let page;
+      try {
+        const buf = await storage.read(scope, key);
+        if (buf == null) continue;
+        page = JSON.parse(buf.toString("utf8"));
+      } catch (error) {
+        censusComplete = false;
+        failed.push({ key, reason: error.message });
+        continue;
+      }
+      if (page.type === "header" || page.type === "footer") continue;
+      const entry = { key, language: language || defaultCode, uuid: page.uuid, parentPageUuid: page.parentPageUuid };
+      entries.push(entry);
+      if (!page.uuid) continue;
+      byUuid.set(page.uuid, entry);
+      const group = translationGroupIdOf(page);
+      if (!survivors.has(group)) survivors.set(group, new Map());
+      survivors.get(group).set(entry.language, page.uuid);
+    }
+  }
+
+  /** Whether `child` is reached walking up from `candidate`, by the parents as they now stand. */
+  const wouldLoop = (candidate, child) => {
+    const seen = new Set();
+    for (let uuid = candidate; uuid && !seen.has(uuid); uuid = byUuid.get(uuid)?.parentPageUuid) {
+      if (uuid === child) return true;
+      seen.add(uuid);
+    }
+    return false;
+  };
+
+  /**
+   * The parent a child of a deleted page moves to: a uuid, null to clear, or
+   * undefined to leave it. With a page unread, neither choice can be trusted: the
+   * unread page may be the version in the child's own language, or an ancestor
+   * that makes a candidate loop back to the child.
+   */
+  const replacementParent = (entry) => {
+    if (!censusComplete) return undefined;
+    const versions = survivors.get(deletedPageGroups.get(entry.parentPageUuid) ?? entry.parentPageUuid);
+    for (const language of [entry.language, defaultCode]) {
+      const candidate = versions?.get(language);
+      // A page without a uuid cannot be anyone's parent, so it cannot be in a loop.
+      if (candidate && (!entry.uuid || !wouldLoop(candidate, entry.uuid))) return candidate;
+    }
+    return null;
+  };
+
+  // Pass two: one page at a time.
+  for (const entry of entries) {
+    const { key } = entry;
     try {
       const buf = await storage.read(scope, key);
       if (buf == null) continue;
       const page = JSON.parse(buf.toString("utf8"));
-      if (page.type === "header" || page.type === "footer") continue;
 
       let modified = false;
       const processedWidgets = {};
@@ -244,15 +331,26 @@ async function updatePagesViaStorage(storage, scope, widgetProcessor, deletedPag
 
       // A child left pointing at a deleted parent still renders (the breadcrumb
       // builder falls back), but the page picker would show a dangling selection.
+      let parentChanged = false;
       if (page.parentPageUuid && deletedPageUuids.has(page.parentPageUuid)) {
-        delete page.parentPageUuid;
-        modified = true;
+        const parent = replacementParent({ ...entry, parentPageUuid: page.parentPageUuid });
+        if (parent) page.parentPageUuid = parent;
+        else if (parent === null) delete page.parentPageUuid;
+        if (parent !== undefined) {
+          parentChanged = true;
+          modified = true;
+        } else {
+          failed.push({ key, reason: "its parent was deleted, and a page that could not be read may be its translation" });
+        }
       }
 
       if (modified) {
         page.widgets = processedWidgets;
         await storage.write(scope, key, JSON.stringify(page, null, 2));
       }
+      // Later loop checks see this page's new parent only once it is on disk: a
+      // write that failed left the old one, which a later choice must not avoid.
+      if (parentChanged) entry.parentPageUuid = page.parentPageUuid;
     } catch (error) {
       failed.push({ key, reason: error.message });
     }
@@ -754,7 +852,10 @@ export async function remapDuplicatedProjectUuids(projectFolderName) {
  * The destination goes; the surrounding content stays. A link keeps its text and
  * target and loses only its href and ref, a menu item keeps its label, and
  * richtext keeps the words and loses only the anchor around them. Nothing is
- * substituted: no nearest page, no other menu, no guessing.
+ * substituted: no nearest page, no other menu, no guessing. The one exception is
+ * a page's parent, which moves to a surviving translation of the deleted parent
+ * (see updatePagesViaStorage): that is the same page in another language, not a
+ * guess.
  *
  * ## Confirmed, not assumed
  *
@@ -773,11 +874,18 @@ export async function remapDuplicatedProjectUuids(projectFolderName) {
  *
  * @param {object} storage
  * @param {object} scope
- * @param {{ pageUuids?: Iterable<string>, itemUuids?: Iterable<string>,
- *           menuUuids?: Iterable<string>, defaultLanguage?: string }} targets
+ * @param {{ pageUuids?: Iterable<string>, pageGroups?: Iterable<[string, string]>,
+ *           itemUuids?: Iterable<string>, menuUuids?: Iterable<string>,
+ *           defaultLanguage?: string }} targets - `pageGroups` maps a deleted
+ *   page's uuid to its translation group, so its children can move to a version
+ *   that survives
  * @returns {Promise<{ incomplete: Array<{ key: string, reason: string }> }>}
  */
-export async function clearDeletedReferencesInSection(storage, scope, { pageUuids, itemUuids, menuUuids, defaultLanguage }) {
+export async function clearDeletedReferencesInSection(
+  storage,
+  scope,
+  { pageUuids, pageGroups, itemUuids, menuUuids, defaultLanguage },
+) {
   const pages = new Set(pageUuids || []);
   const items = new Set(itemUuids || []);
   const menus = new Set(menuUuids || []);
@@ -811,7 +919,7 @@ export async function clearDeletedReferencesInSection(storage, scope, { pageUuid
   const widgetProcessor = (widget) => transformWidgetSettings(widget, cleanValue);
 
   // Widgets and parent refs in one pass over the pages, with the whole deleted set.
-  await updatePagesViaStorage(storage, scope, widgetProcessor, pages, defaultLanguage, failed);
+  await updatePagesViaStorage(storage, scope, widgetProcessor, pages, new Map(pageGroups || []), defaultLanguage, failed);
   await updateGlobalWidgetsViaStorage(storage, scope, widgetProcessor, defaultLanguage, failed);
 
   await cleanupMenusViaStorage(
@@ -883,9 +991,16 @@ export function referenceCleanupWarnings(incomplete) {
   ];
 }
 
-/** One deleted page. Thin wrapper over the batch walk. */
-export async function cleanupDeletedPageReferences(storage, scope, { deletedPageUuid, defaultLanguage }) {
-  return clearDeletedReferencesInSection(storage, scope, { pageUuids: [deletedPageUuid], defaultLanguage });
+/**
+ * One deleted page. Thin wrapper over the batch walk. `deletedPageGroup` is the
+ * page's translation group, needed when it was a version of another page.
+ */
+export async function cleanupDeletedPageReferences(storage, scope, { deletedPageUuid, deletedPageGroup, defaultLanguage }) {
+  return clearDeletedReferencesInSection(storage, scope, {
+    pageUuids: [deletedPageUuid],
+    pageGroups: deletedPageGroup ? [[deletedPageUuid, deletedPageGroup]] : [],
+    defaultLanguage,
+  });
 }
 
 /** One or more deleted collection items. Accepts a Set, an array, or a single uuid. */

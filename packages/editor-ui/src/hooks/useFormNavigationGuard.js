@@ -8,6 +8,9 @@ import { useConfirm } from "../components/ui/ConfirmProvider";
  *
  * @param {boolean} hasUnsavedChanges - Whether there are unsaved changes
  * @param {React.RefObject<boolean>} skipRef - Optional ref to bypass the guard (for programmatic navigation after save)
+ * @param {() => void} [onDiscard] - Runs when the user confirms leaving, before the navigation proceeds. Needed by
+ *   pages whose draft lives in a store that outlives them: without it, "Discard changes" leaves the draft behind
+ *   for the next screen to save.
  *
  * Features:
  * - Blocks internal navigation (React Router) with the in-app confirmation dialog
@@ -22,9 +25,15 @@ import { useConfirm } from "../components/ui/ConfirmProvider";
  * // Set skipRef.current = true before navigate() to bypass guard
  * ```
  */
-export default function useFormNavigationGuard(hasUnsavedChanges, skipRef = null) {
+export default function useFormNavigationGuard(hasUnsavedChanges, skipRef = null, onDiscard = null) {
   const confirm = useConfirm();
   const { t } = useTranslation();
+  // Read at answer time, so a new callback each render neither re-runs the
+  // prompt effect nor goes stale.
+  const onDiscardRef = useRef(onDiscard);
+  useEffect(() => {
+    onDiscardRef.current = onDiscard;
+  });
 
   // Layer 1: Browser navigation (beforeunload) - handles tab closing, URL changes, etc.
   useEffect(() => {
@@ -84,7 +93,9 @@ export default function useFormNavigationGuard(hasUnsavedChanges, skipRef = null
     pending.then((confirmed) => {
       if (cancelled) return;
       if (confirmed) {
-        // Allow the navigation to proceed
+        // The dialog promised the changes would be lost; make that true before
+        // the next screen can read the draft.
+        onDiscardRef.current?.();
         blockerRef.current.proceed();
       } else {
         // Cancel the navigation

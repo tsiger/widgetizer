@@ -10,7 +10,7 @@ A block is an individual piece of content inside a widget. For example, a Testim
 
 **Home page → Testimonials widget → Individual customer review**
 
-The widget controls the overall section; each block supplies one part of it. A different widget might offer heading, text, image or button blocks. The theme decides which kinds are available, what you can change, their starting values and any maximum number of blocks. Some widgets arrive with example blocks already added.
+The widget controls the overall section; each block supplies one part of it. A different widget might offer heading, text, image or button blocks. The theme or built-in widget definition decides which kinds are available, what you can change, their starting values and any maximum number of blocks. Some widgets arrive with example blocks already added.
 
 ### What can you do?
 

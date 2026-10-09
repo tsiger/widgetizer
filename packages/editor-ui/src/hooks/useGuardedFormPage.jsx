@@ -13,16 +13,18 @@ import useFormNavigationGuard from "./useFormNavigationGuard";
  * simply ignore navigateSafely — the guard still works with just hasUnsavedChanges.
  *
  * @param {boolean} hasUnsavedChanges - Whether the form has unsaved changes
+ * @param {{ onDiscard?: () => void }} [options] - onDiscard runs when the user confirms leaving with unsaved
+ *   changes; pages whose draft outlives them (in a store) use it to drop the draft.
  * @returns {{
  *   navigateSafely: (to: string, options?: object) => void,
  *   getDirtyTitle: (title: string) => React.ReactNode,
  * }}
  */
-export default function useGuardedFormPage(hasUnsavedChanges) {
+export default function useGuardedFormPage(hasUnsavedChanges, { onDiscard } = {}) {
   const navigate = useNavigate();
   const skipRef = useRef(false);
 
-  useFormNavigationGuard(hasUnsavedChanges, skipRef);
+  useFormNavigationGuard(hasUnsavedChanges, skipRef, onDiscard);
 
   /**
    * Navigate without triggering the guard.

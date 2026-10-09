@@ -1,0 +1,46 @@
+.widget-hero {
+  padding-block: var(--space-section);
+}
+
+.hero {
+  display: grid;
+  gap: 3.2rem;
+  align-items: center;
+}
+
+.hero__content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2rem;
+}
+
+.hero__heading {
+  font-size: clamp(3.2rem, 5vw, 5.6rem);
+}
+
+.hero__text {
+  font-size: 1.8rem;
+  color: var(--muted);
+  max-width: 56ch;
+}
+
+.hero__image {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: var(--radius);
+}
+
+@media (min-width: 750px) {
+  .hero {
+    grid-template-columns: 1fr 1fr;
+    gap: 6.4rem;
+  }
+
+  .widget-hero--image-start .hero__media {
+    order: -1;
+  }
+}

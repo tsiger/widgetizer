@@ -18,6 +18,8 @@ export default {
     // @widgetizer/core and ride along via that dependency.
     "themes",
     "!themes/widgetizer/**",
+    // Local scratch themes (gitignored) must never ride along into an installer.
+    "!themes/__*/**",
     "electron",
     "package.json",
   ],
@@ -25,6 +27,7 @@ export default {
   asarUnpack: [
     "themes/**",
     "!themes/widgetizer/**",
+    "!themes/__*/**",
     "dist/**",
     // Core placeholder SVGs are served via res.sendFile, which needs real files
     // on disk (not inside the asar).

@@ -1,0 +1,319 @@
+/*
+ * Base styles shared by every page.
+ *
+ * {% theme_settings %} in layout.liquid prints the theme settings as CSS
+ * variables named --<group>-<id> (for example --colors-accent). They are mapped
+ * to short names once here, so the rest of the CSS never depends on how the
+ * settings are grouped in theme.json.
+ */
+:root {
+  --bg: var(--colors-background, #ffffff);
+  --surface: var(--colors-surface, #f1f4f8);
+  --text: var(--colors-text, #1c2430);
+  --heading: var(--colors-heading, #0d131c);
+  --muted: var(--colors-muted, #5b6676);
+  --border: var(--colors-border, #d7dde6);
+  --accent: var(--colors-accent, #1f5fe0);
+  --accent-text: var(--colors-accent_text, #ffffff);
+
+  --heading-font: var(--typography-heading_font-family, sans-serif);
+  --heading-weight: var(--typography-heading_font-weight, 700);
+  --body-font: var(--typography-body_font-family, sans-serif);
+  --body-weight: var(--typography-body_font-weight, 400);
+  --body-bold-weight: var(--typography-body_font_bold-weight, 700);
+
+  --content-width: var(--layout-content_width, 1200px);
+  --gutter: 2rem;
+  --space-section: clamp(4.8rem, 8vw, 9.6rem);
+  --radius: 0.8rem;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  /* 1rem = 10px, so 1.6rem reads as 16px. */
+  font-size: 62.5%;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--body-font);
+  font-weight: var(--body-weight);
+  font-size: 1.6rem;
+  line-height: 1.6;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  margin: 0;
+  color: var(--heading);
+  font-family: var(--heading-font);
+  font-weight: var(--heading-weight);
+  line-height: 1.15;
+  text-wrap: balance;
+}
+
+h1 {
+  font-size: clamp(3.2rem, 5vw, 5.6rem);
+}
+
+h2 {
+  font-size: clamp(2.6rem, 3.5vw, 4rem);
+}
+
+h3 {
+  font-size: 2rem;
+}
+
+p {
+  margin: 0;
+}
+
+img,
+svg {
+  max-width: 100%;
+}
+
+a {
+  color: var(--accent);
+}
+
+strong,
+b {
+  font-weight: var(--body-bold-weight);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.skip-link {
+  position: absolute;
+  inset-inline-start: 1rem;
+  top: -10rem;
+  z-index: 100;
+  padding: 1rem 1.6rem;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.skip-link:focus {
+  top: 1rem;
+}
+
+.container {
+  width: 100%;
+  max-width: calc(var(--content-width) + var(--gutter) * 2);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+.container--narrow {
+  max-width: calc(76rem + var(--gutter) * 2);
+}
+
+.icon {
+  width: 2.4rem;
+  height: 2.4rem;
+}
+
+/* Rich text: spacing between the elements an author can create. */
+.rte > * + * {
+  margin-block-start: 1em;
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 4.4rem;
+  padding: 1rem 2.2rem;
+  border-radius: var(--radius);
+  background: var(--accent);
+  color: var(--accent-text);
+  font-weight: var(--body-bold-weight);
+  text-decoration: none;
+}
+
+.button:hover {
+  filter: brightness(0.92);
+}
+
+/* Header */
+.site-header {
+  border-block-end: 1px solid var(--border);
+  background: var(--bg);
+}
+
+.site-header__inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.6rem;
+  padding-block: 1.6rem;
+}
+
+.site-logo {
+  color: var(--heading);
+  font-family: var(--heading-font);
+  font-weight: var(--heading-weight);
+  font-size: 2rem;
+  text-decoration: none;
+}
+
+.site-logo__image {
+  display: block;
+  width: auto;
+  max-height: 4.8rem;
+}
+
+.nav-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 4.4rem;
+  height: 4.4rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: none;
+  color: var(--heading);
+  cursor: pointer;
+}
+
+.site-header__menu {
+  display: none;
+  flex-basis: 100%;
+  flex-direction: column;
+  gap: 1.6rem;
+}
+
+.site-header__menu.is-open {
+  display: flex;
+}
+
+.site-nav__list,
+.site-nav__submenu,
+.footer-nav__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.site-nav__link {
+  display: block;
+  padding: 1rem 0;
+  color: var(--text);
+  text-decoration: none;
+}
+
+.site-nav__link:hover,
+.site-nav__item.is-active > .site-nav__link {
+  color: var(--accent);
+}
+
+.site-nav__submenu {
+  padding-inline-start: 1.6rem;
+}
+
+.language-switcher {
+  display: flex;
+  gap: 1.2rem;
+}
+
+.language-switcher [aria-current="true"] {
+  font-weight: var(--body-bold-weight);
+  text-decoration: none;
+}
+
+@media (min-width: 750px) {
+  .nav-toggle {
+    display: none;
+  }
+
+  .site-header__menu {
+    display: flex;
+    flex-basis: auto;
+    flex-direction: row;
+    align-items: center;
+    gap: 3.2rem;
+  }
+
+  .site-nav__list {
+    display: flex;
+    gap: 2.4rem;
+  }
+
+  .site-nav__item {
+    position: relative;
+  }
+
+  .site-nav__submenu {
+    position: absolute;
+    inset-inline-start: 0;
+    top: 100%;
+    z-index: 10;
+    display: none;
+    min-width: 20rem;
+    padding: 0.8rem 1.6rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--bg);
+  }
+
+  .site-nav__submenu .site-nav__submenu {
+    inset-inline-start: 100%;
+    top: 0;
+  }
+
+  .has-submenu:hover > .site-nav__submenu,
+  .has-submenu:focus-within > .site-nav__submenu {
+    display: block;
+  }
+}
+
+/* Footer */
+.site-footer {
+  margin-block-start: var(--space-section);
+  border-block-start: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--muted);
+}
+
+.site-footer__inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.6rem;
+  padding-block: 3.2rem;
+}
+
+.footer-nav__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2.4rem;
+}
+
+.footer-nav__link {
+  color: inherit;
+}

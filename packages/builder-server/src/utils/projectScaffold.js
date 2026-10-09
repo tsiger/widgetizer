@@ -3,6 +3,7 @@ import path from "path";
 import { randomUUID } from "crypto";
 import * as themeController from "../controllers/themeController.js";
 import { processTemplatesRecursive } from "./templateHelpers.js";
+import { isSafePathSegment } from "./pathSecurity.js";
 import { enrichNewProjectReferences } from "./linkEnrichment.js";
 
 /**
@@ -25,6 +26,11 @@ import { enrichNewProjectReferences } from "./linkEnrichment.js";
 export async function scaffoldProjectContent({ projectDir, theme, preset }) {
   if (!theme) {
     throw new Error("Theme is required");
+  }
+  // Checked here too, because embedding apps call this directly: the theme names
+  // the folder the project is copied from.
+  if (!isSafePathSegment(theme)) {
+    throw new Error(`Invalid theme name: ${JSON.stringify(theme)}`);
   }
 
   const pagesDir = path.join(projectDir, "pages");

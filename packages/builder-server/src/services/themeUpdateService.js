@@ -11,7 +11,9 @@ import { getProjectFolderName } from "../utils/projectHelpers.js";
 import * as projectRepo from "../db/repositories/projectRepository.js";
 import { getThemeSourceDir, readThemeSourceMetadata } from "../controllers/themeController.js";
 import { createKeyedSerializer } from "../utils/serializeByKey.js";
+import { isWithinDirectory } from "../utils/pathSecurity.js";
 import { refreshMediaUsageAfterStructuralChange } from "./mediaUsageService.js";
+import { withContentWriteLock } from "./contentCoordination.js";
 import { getUpdateStatus } from "../utils/updateStatus.js";
 import { processTemplatesRecursive } from "../utils/templateHelpers.js";
 
@@ -185,6 +187,21 @@ async function movePath(from, to) {
 }
 
 /**
+ * Remove one path a plan names, only when it lies inside the project. The plan is
+ * a file in the project folder, and a project can arrive from a backup made
+ * elsewhere, so an entry such as `../other-project` must not delete outside it.
+ */
+async function removeInsideProject(projectDir, rel) {
+  const root = path.resolve(projectDir);
+  const target = typeof rel === "string" && rel !== "" ? path.resolve(root, rel) : null;
+  if (!target || !isWithinDirectory(target, root)) {
+    console.warn(`[applyThemeUpdate] Skipped a recorded path outside the project: ${JSON.stringify(rel)}`);
+    return;
+  }
+  await fs.remove(target);
+}
+
+/**
  * Put the project back the way it was before a swap: remove everything the
  * update introduced, then move back everything it displaced.
  *
@@ -195,12 +212,12 @@ async function movePath(from, to) {
 async function undoSwap({ projectDir, backupDir, plan }) {
   try {
     for (const rel of plan.added ?? []) {
-      await fs.remove(path.join(projectDir, rel));
+      await removeInsideProject(projectDir, rel);
     }
     // A path the update created where the project had none: putting the
     // previous state back means it should not be there at all.
     for (const rel of plan.placedWhereAbsent ?? []) {
-      await fs.remove(path.join(projectDir, rel));
+      await removeInsideProject(projectDir, rel);
     }
     for (const entry of await fs.readdir(backupDir)) {
       if (entry === PLAN_FILE) continue;
@@ -429,10 +446,19 @@ export async function applyThemeUpdateToDir({ themeSourceDir, projectDir }) {
 // their own — the second would take the first's backup for an interrupted
 // update and undo work that had just succeeded. Recovery, the swap and the
 // version write all have to be inside this.
+//
+// The content-write section goes inside it (that section is always innermost)
+// and covers the whole run, because an update rewrites theme.json across a long
+// interval: prep reads and merges the current file, the swap writes the merge,
+// and a failed swap restores the backup. A theme-settings save landing anywhere
+// in between would be overwritten or rolled back, so saves wait for the update
+// and then apply on top of what it left.
 const serializeThemeUpdates = createKeyedSerializer();
 
 export async function applyThemeUpdate(projectId) {
-  return serializeThemeUpdates(projectId, () => applyThemeUpdateExclusively(projectId));
+  return serializeThemeUpdates(projectId, () =>
+    withContentWriteLock(projectId, () => applyThemeUpdateExclusively(projectId)),
+  );
 }
 
 async function applyThemeUpdateExclusively(projectId) {

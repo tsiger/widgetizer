@@ -23,7 +23,14 @@
       "type": "text",
       "id": "submit_label",
       "label": "tTheme:core_form.settings.submit_label.label",
-      "default": "Send message"
+      "defaultKey": "site.core_form.submit"
+    },
+    {
+      "type": "text",
+      "id": "required_note",
+      "label": "tTheme:core_form.settings.required_note.label",
+      "description": "tTheme:core_form.settings.required_note.description",
+      "defaultKey": "site.core_form.required_note"
     },
     {
       "type": "header",
@@ -34,7 +41,7 @@
       "type": "text",
       "id": "eyebrow",
       "label": "tTheme:global.widgets.settings.eyebrow.label",
-      "default": "Contact"
+      "defaultKey": "site.core_form.eyebrow"
     },
     {
       "type": "checkbox",
@@ -46,13 +53,13 @@
       "type": "text",
       "id": "title",
       "label": "tTheme:global.widgets.settings.title.label",
-      "default": "Get in touch"
+      "defaultKey": "site.core_form.title"
     },
     {
       "type": "text",
       "id": "description",
       "label": "tTheme:global.widgets.settings.description.label",
-      "default": "Send us a message and we'll get back to you within one business day."
+      "defaultKey": "site.core_form.description"
     },
     {
       "type": "select",
@@ -191,7 +198,8 @@
           "type": "text",
           "id": "label",
           "label": "tTheme:core_form.blocks.field.settings.label.label",
-          "default": "Your name"
+          "default": "Your name",
+          "defaultKey": "site.core_form.name_field"
         },
         {
           "type": "select",
@@ -247,7 +255,8 @@
           "type": "text",
           "id": "label",
           "label": "tTheme:core_form.blocks.choice.settings.label.label",
-          "default": "How can we help?"
+          "default": "How can we help?",
+          "defaultKey": "site.core_form.choice_label"
         },
         {
           "type": "select",
@@ -270,14 +279,15 @@
           "id": "options",
           "label": "tTheme:core_form.blocks.choice.settings.options.label",
           "description": "tTheme:core_form.blocks.choice.settings.options.description",
-          "default": "General inquiry\nSupport\nSales"
+          "default": "General inquiry\nSupport\nSales",
+          "defaultKey": "site.core_form.choice_options"
         },
         {
           "type": "text",
           "id": "placeholder",
           "label": "tTheme:core_form.blocks.choice.settings.placeholder.label",
           "description": "tTheme:core_form.blocks.choice.settings.placeholder.description",
-          "default": "Select an option"
+          "defaultKey": "site.core_form.select_placeholder"
         },
         {
           "type": "checkbox",
@@ -300,7 +310,8 @@
           "type": "text",
           "id": "label",
           "label": "tTheme:core_form.blocks.consent.settings.label.label",
-          "default": "I agree to be contacted about my inquiry."
+          "default": "I agree to be contacted about my inquiry.",
+          "defaultKey": "site.core_form.consent_label"
         },
         {
           "type": "checkbox",
@@ -323,7 +334,7 @@
           "type": "text",
           "id": "title",
           "label": "tTheme:global.widgets.blocks.info.settings.title.label",
-          "default": "Reach us directly"
+          "defaultKey": "site.core_form.info_title"
         },
         {
           "type": "richtext",
@@ -346,6 +357,9 @@
         "label": "Your name",
         "type": "text",
         "required": true
+      },
+      "defaultKeys": {
+        "label": "site.core_form.name_field"
       }
     },
     {
@@ -354,6 +368,9 @@
         "label": "Email address",
         "type": "email",
         "required": true
+      },
+      "defaultKeys": {
+        "label": "site.core_form.email_field"
       }
     },
     {
@@ -362,6 +379,9 @@
         "label": "Message",
         "type": "textarea",
         "required": true
+      },
+      "defaultKeys": {
+        "label": "site.core_form.message_field"
       }
     }
   ]

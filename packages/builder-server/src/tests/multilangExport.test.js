@@ -136,6 +136,49 @@ describe("a language with no homepage", () => {
     }
   });
 
+  it("refuses a language holding both an index and a home page", async () => {
+    const homePath = path.join(getProjectPagesDir(PROJECT_FOLDER), "el", "home.json");
+    await writePage("el", "home", "Arxiki 2");
+    try {
+      await resetExports();
+      const res = await runExport();
+      assert.equal(res._status, 400);
+      assert.equal(res._json.error, "Export failed: two homepages");
+      assert.match(res._json.message, /"el" pages include both "index" and "home"/);
+    } finally {
+      await fs.remove(homePath);
+    }
+  });
+
+  it("allows index in one language and home in another", async () => {
+    const indexPath = path.join(getProjectPagesDir(PROJECT_FOLDER), "el", "index.json");
+    const saved = await fs.readFile(indexPath, "utf8");
+    await fs.remove(indexPath);
+    await writePage("el", "home", "Arxiki");
+    try {
+      const { dir } = await exportSite();
+      assert.equal(await fs.pathExists(path.join(dir, "el", "index.html")), true);
+    } finally {
+      await fs.remove(path.join(getProjectPagesDir(PROJECT_FOLDER), "el", "home.json"));
+      await fs.outputFile(indexPath, saved);
+    }
+  });
+
+  it("accepts a default-language homepage slugged home, published as index.html", async () => {
+    const pagesDir = getProjectPagesDir(PROJECT_FOLDER);
+    const saved = await fs.readFile(path.join(pagesDir, "index.json"), "utf8");
+    await fs.remove(path.join(pagesDir, "index.json"));
+    await writePage("", "home", "Home");
+    try {
+      const { dir } = await exportSite();
+      assert.equal(await fs.pathExists(path.join(dir, "index.html")), true);
+      assert.equal(await fs.pathExists(path.join(dir, "home.html")), false);
+    } finally {
+      await fs.remove(path.join(pagesDir, "home.json"));
+      await fs.outputFile(path.join(pagesDir, "index.json"), saved);
+    }
+  });
+
   it("still fails outright when the DEFAULT language has no homepage", async () => {
     const homePath = path.join(getProjectPagesDir(PROJECT_FOLDER), "index.json");
     const saved = await fs.readFile(homePath, "utf8");

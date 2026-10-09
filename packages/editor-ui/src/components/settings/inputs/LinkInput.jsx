@@ -36,32 +36,27 @@ export default function LinkInput({ id, value = {}, onChange, setting }) {
     [value, optionsByUuid, pageOptionBySlug, loading],
   );
 
-  // On select: store the matching stable ref, always clearing the other two.
+  // On select: store the matching stable ref, always removing the other two.
+  // Removed rather than set to undefined: the saved copy drops undefined keys, so
+  // the editor would compare the value against something it can never equal.
   const handleLinkChange = useCallback(
     (selectedValue) => {
       const opt = optionsByUuid.get(selectedValue);
+      const rest = { ...resolvedValue };
+      delete rest.pageUuid;
+      delete rest.collectionItemUuid;
+      delete rest.collectionType;
       if (opt?.isPage) {
-        onChange({
-          ...resolvedValue,
-          pageUuid: opt.value,
-          collectionType: undefined,
-          collectionItemUuid: undefined,
-          href: `${opt.slug}.html`,
-        });
+        onChange({ ...rest, pageUuid: opt.value, href: `${opt.slug}.html` });
       } else if (opt?.isCollectionItem) {
         onChange({
-          ...resolvedValue,
-          pageUuid: undefined,
+          ...rest,
           collectionType: opt.collectionType,
           collectionItemUuid: opt.value,
           href: `${opt.slugPrefix}/${opt.slug}.html`,
         });
       } else {
-        // Custom URL — drop any stable refs.
-        const rest = { ...resolvedValue };
-        delete rest.pageUuid;
-        delete rest.collectionItemUuid;
-        delete rest.collectionType;
+        // Custom URL — no stable ref.
         onChange({ ...rest, href: selectedValue });
       }
     },

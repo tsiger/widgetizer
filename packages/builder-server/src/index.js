@@ -22,6 +22,9 @@ export { default as errorHandler } from "./middleware/errorHandler.js";
 export { buildFormsManifest } from "./services/formsManifestService.js";
 export { buildSitemap, buildRobotsTxt } from "./services/seoArtifacts.js";
 export { sanitizeWidgetData, sanitizeThemeSettings } from "./services/sanitizationService.js";
+// Change-only theme-settings saves: an embedding route that saves theme settings
+// reads theme.json, merges with this inside its own write section, and writes.
+export { mergeThemeSettingChanges, readThemeSettingChanges } from "./services/themeSettingChanges.js";
 // Media-usage tracking for theme settings — hosted's theme-save route calls this
 // after writing theme.json so favicon/themed-image assets are recorded as used.
 // DB-only via the shared getDb() singleton, no scope/adapter needed.

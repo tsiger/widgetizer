@@ -114,9 +114,11 @@ Implementation: [collectionController](../../../packages/builder-server/src/cont
 
 Deleting a page, a collection item, a menu, or a whole language all follow the same rule, because the loss is the same either way and the route to it should not change the outcome.
 
-**What is cleared.** Explicit references to Widgetizer-managed content: `pageUuid` and `collectionItemUuid` on link settings and menu items, the matching `data-…-uuid` attributes inside richtext, `parentPageUuid`, and a `menu` setting holding a deleted menu's uuid. Across every surviving language, the default one included.
+**What is cleared.** Explicit references to Widgetizer-managed content: `pageUuid` and `collectionItemUuid` on link settings and menu items, the matching `data-…-uuid` attributes inside richtext, and a `menu` setting holding a deleted menu's uuid. Across every surviving language, the default one included.
 
-**What is kept.** The destination goes; the content around it does not. A link keeps its text and target and loses only its href and reference, a menu item keeps its label, and richtext keeps the words while losing the anchor around them. Nothing is substituted — no nearest page, no other menu, no guessing at what was meant.
+**A child page's parent moves to a surviving translation.** A language version keeps its source's parent, and the breadcrumb shows that parent's version in the page's own language. So when a parent is deleted, each child's `parentPageUuid` moves to the parent's surviving version in the child's language, else in the site's default language, and is cleared only when neither exists. A version in a third language is never used, nor one that would make the child its own ancestor. While some page cannot be read (it may be that surviving version, or an ancestor that would close a loop), the parent is left as it is and the child is reported as not cleaned up.
+
+**What is kept.** The destination goes; the content around it does not. A link keeps its text and target and loses only its href and reference, a menu item keeps its label, and richtext keeps the words while losing the anchor around them. Nothing is substituted — no nearest page, no other menu, no guessing at what was meant. The parent rule above is not a substitution: a translation is the same page in another language.
 
 **Hand-typed URLs are never rewritten.** They are not references to managed content, so they are left exactly as written even when they happen to point at the address of a page that was just deleted. The author wrote it and it is theirs to change.
 

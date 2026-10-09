@@ -1,5 +1,16 @@
 import { describe, expect, it } from "vitest";
-import { isZipFile, mapDropzoneRejections, validateFileSizes, validateZipFiles } from "../uploadValidation";
+import {
+  AUDIO_ACCEPT,
+  FILE_ACCEPT,
+  IMAGE_ACCEPT,
+  MEDIA_ACCEPT,
+  NON_IMAGE_ACCEPT,
+  VIDEO_ACCEPT,
+  isZipFile,
+  mapDropzoneRejections,
+  validateFileSizes,
+  validateZipFiles,
+} from "../uploadValidation";
 
 function makeFile({ name, size, type }) {
   return { name, size, type };
@@ -27,6 +38,17 @@ describe("validateFileSizes", () => {
         reason: "File is too large (6.0MB). Maximum allowed size is 5MB.",
       },
     ]);
+  });
+});
+
+describe("accept lists", () => {
+  it("offers MP4 only through the video, non-image and media lists", () => {
+    expect(VIDEO_ACCEPT).toEqual({ "video/mp4": [".mp4"] });
+    expect(NON_IMAGE_ACCEPT["video/mp4"]).toEqual([".mp4"]);
+    expect(MEDIA_ACCEPT["video/mp4"]).toEqual([".mp4"]);
+    for (const list of [IMAGE_ACCEPT, AUDIO_ACCEPT, FILE_ACCEPT]) {
+      expect(Object.values(list).flat()).not.toContain(".mp4");
+    }
   });
 });
 

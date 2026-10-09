@@ -1,8 +1,9 @@
 import express from "express";
-import { body, param } from "express-validator";
+import { body } from "express-validator";
 import * as menuController from "../controllers/menuController.js";
 import { stripHtmlToText } from "../services/sanitizationService.js";
 import { resolveActiveProject } from "../middleware/resolveActiveProject.js";
+import { segmentParam } from "../middleware/slugValidators.js";
 import { validateRequest } from "../middleware/validateRequest.js";
 
 import { standardJsonParser } from "../middleware/jsonParser.js";
@@ -15,7 +16,7 @@ router.use(resolveActiveProject);
 router.get("/", menuController.getAllMenus);
 
 // Get a menu by id
-router.get("/:id", [param("id").notEmpty().withMessage("Menu ID is required.")], validateRequest, menuController.getMenu);
+router.get("/:id", [segmentParam("id")], validateRequest, menuController.getMenu);
 
 // Create a new menu
 router.post(
@@ -32,7 +33,7 @@ router.post(
 router.put(
   "/:id",
   [
-    param("id").notEmpty().withMessage("Menu ID is required."),
+    segmentParam("id"),
     body("name").trim().customSanitizer(stripHtmlToText).notEmpty().withMessage("Menu title is required. HTML tags are not allowed.").isLength({ max: 200 }).withMessage(`Menu title must be at most ${200} characters.`),
     body("description").optional().trim().customSanitizer(stripHtmlToText),
   ],
@@ -43,12 +44,12 @@ router.put(
 // Duplicate a menu by id
 router.post(
   "/:id/duplicate",
-  [param("id").notEmpty().withMessage("Menu ID is required.")],
+  [segmentParam("id")],
   validateRequest,
   menuController.duplicateMenu,
 );
 
 // Delete a menu by id
-router.delete("/:id", [param("id").notEmpty().withMessage("Menu ID is required.")], validateRequest, menuController.deleteMenu);
+router.delete("/:id", [segmentParam("id")], validateRequest, menuController.deleteMenu);
 
 export default router;

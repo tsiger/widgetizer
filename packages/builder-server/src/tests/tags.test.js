@@ -403,6 +403,15 @@ describe("FontsTag", () => {
     assert.doesNotMatch(result, /googleapis/, "should not use Google Fonts when Bunny is enabled");
   });
 
+  it("honours the Bunny Fonts switch in whichever settings group a theme files it under", async () => {
+    // Arch keeps the checkbox under "advanced"; a fixed "privacy" lookup left it doing nothing.
+    const { privacy, ...groups } = fixtures.themeWithBunnyFonts.settings.global;
+    const themeSettingsRaw = { settings: { global: { ...groups, advanced: privacy } } };
+    const result = await render("{% fonts %}", {}, { themeSettingsRaw });
+    assert.match(result, /href="https:\/\/fonts\.bunny\.net"/);
+    assert.doesNotMatch(result, /googleapis/);
+  });
+
   it("includes display=swap for font loading", async () => {
     const result = await render("{% fonts %}", {}, { themeSettingsRaw: fixtures.themeWithGoogleFonts });
     assert.match(result, /display=swap/);

@@ -33,15 +33,16 @@ export function useStaleActiveProjectDetection() {
       try {
         const serverProject = await getActiveProject();
         if (cancelled) return;
-        const { markStale, clearStale, reason } = useStaleProjectStore.getState();
+        const { markStale, clearProjectMismatch } = useStaleProjectStore.getState();
         if (isActiveProjectStale(getActiveProjectId(), serverProject)) {
           markStale(serverProject?.name ?? null);
-        } else if (reason !== "language") {
+        } else {
           // This probe only answers "is this tab on the right project". A removed
           // language is a different fact, and this check knows nothing about it —
-          // switching away and back would otherwise clear a warning that is still
-          // true, leaving the editor apparently fine while every save fails.
-          clearStale();
+          // switching away and back must not clear a warning that is still true,
+          // leaving the editor apparently fine while every save fails.
+          // clearProjectMismatch keeps (or restores) the language warning.
+          clearProjectMismatch();
         }
       } catch {
         // transient probe failure — don't curtain on a network hiccup

@@ -104,6 +104,12 @@ function collectSiteKeyUses(dir) {
           };
           fromList(schema.settings);
           if (Array.isArray(schema.blocks)) for (const block of schema.blocks) fromList(block?.settings);
+          // A starting block names its own words, one key per setting.
+          if (Array.isArray(schema.defaultBlocks)) {
+            for (const block of schema.defaultBlocks) {
+              for (const key of Object.values(block?.defaultKeys || {})) note(key, relative(dir, full));
+            }
+          }
         } catch {
           // A malformed schema is already reported by the key collection above.
         }
@@ -115,7 +121,22 @@ function collectSiteKeyUses(dir) {
   return uses;
 }
 
-function validateLocaleSet(label, localesDir, schemaKeys, ignoredExtraKeys = new Set(), siteKeyUses = new Map()) {
+/**
+ * @param inheritedSite - what this locale set gets for free from the one under
+ *   it. A theme renders over the built-in widgets' dictionary, so a key core
+ *   defines resolves in a theme template that never wrote it, and a key core's
+ *   own templates ask for is not an orphan when a theme rewords it. Validation
+ *   has to see the same two directions the renderer does or it reports as
+ *   broken what works.
+ */
+function validateLocaleSet(
+  label,
+  localesDir,
+  schemaKeys,
+  ignoredExtraKeys = new Set(),
+  siteKeyUses = new Map(),
+  inheritedSite = { defined: new Set(), used: new Set() },
+) {
   if (!existsSync(localesDir)) {
     console.error(`  No locales/ directory found.`);
     return false;
@@ -170,7 +191,9 @@ function validateLocaleSet(label, localesDir, schemaKeys, ignoredExtraKeys = new
     console.log(`  ✓ ${siteEnKeys.length} site string(s) for visitors`);
   }
 
-  const askedForNothing = [...siteKeyUses].filter(([key]) => getNested(en, key) === undefined);
+  const askedForNothing = [...siteKeyUses].filter(
+    ([key]) => getNested(en, key) === undefined && !inheritedSite.defined.has(key),
+  );
   if (askedForNothing.length > 0) {
     hasErrors = true;
     console.error(`  ✗ ${askedForNothing.length} site string(s) asked for but never written:`);
@@ -179,7 +202,7 @@ function validateLocaleSet(label, localesDir, schemaKeys, ignoredExtraKeys = new
     }
   }
 
-  const neverAsked = siteEnKeys.filter((key) => !siteKeyUses.has(key));
+  const neverAsked = siteEnKeys.filter((key) => !siteKeyUses.has(key) && !inheritedSite.used.has(key));
   if (neverAsked.length > 0) {
     console.warn(`  ⚠ ${neverAsked.length} site string(s) nothing asks for:`);
     for (const key of neverAsked) {
@@ -242,7 +265,9 @@ function validateLocaleSet(label, localesDir, schemaKeys, ignoredExtraKeys = new
 function validateCoreLocales() {
   console.log(`\n━━ core widgets (packages/core/src/widgets) ━━`);
   const schemaKeys = collectSchemaKeysFromDir(coreWidgetsDir);
-  return validateLocaleSet("core widgets", coreLocalesDir, schemaKeys);
+  // The built-in widgets own their visitor words the way a theme owns its own,
+  // so a key nobody wrote has to fail here for the same reason it does there.
+  return validateLocaleSet("core widgets", coreLocalesDir, schemaKeys, new Set(), collectSiteKeyUses(coreWidgetsDir));
 }
 
 function validateTheme(themeName, coreKeySet) {
@@ -274,10 +299,25 @@ function validateTheme(themeName, coreKeySet) {
     schemaKeys,
     coreKeySet,
     collectSiteKeyUses(dir),
+    coreSite(),
   );
 }
 
 // ── Main ──────────────────────────────────────────────────────────────
+
+/** The built-in widgets' visitor words: what they define, and what they ask for. */
+let _coreSite = null;
+function coreSite() {
+  if (!_coreSite) {
+    const enPath = join(coreLocalesDir, "en.json");
+    const en = existsSync(enPath) ? JSON.parse(readFileSync(enPath, "utf-8")) : {};
+    _coreSite = {
+      defined: new Set(flattenKeys(en).filter((k) => k === "site" || k.startsWith("site."))),
+      used: new Set(collectSiteKeyUses(coreWidgetsDir).keys()),
+    };
+  }
+  return _coreSite;
+}
 
 const requestedTheme = process.argv[2];
 const coreSchemaKeys = collectSchemaKeysFromDir(coreWidgetsDir);

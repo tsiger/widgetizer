@@ -78,38 +78,43 @@ function getOrCreateEngine(projectDir, themeSnippetsDir, coreSnippetsDir) {
   }
 
   // Create a NEW engine instance with correct roots
-  const engine = new Liquid({
-    extname: ".liquid",
+  const engine = createLiquidEngine({
     cache: process.env.NODE_ENV === "production",
     root: [themeSnippetsDir, coreSnippetsDir],
     partials: [themeSnippetsDir, coreSnippetsDir],
-    outputEscape: "escape",
   });
-
-  configureLiquidEngine(engine);
 
   engineCache.set(cacheKey, engine);
   return engine;
 }
 
-// Configure LiquidJS engine helper
+// Authoring tools share the runtime dialect, with optional stricter diagnostics.
+export function createLiquidEngine(options = {}) {
+  const engine = new Liquid({ extname: ".liquid", outputEscape: "escape", ...options });
+  configureLiquidEngine(engine);
+  return engine;
+}
+
+export const widgetizerLiquidTags = Object.freeze({
+  theme_settings: ThemeSettingsTag,
+  asset: AssetTag,
+  fonts: FontsTag,
+  seo: SeoTag,
+  enqueue_style: EnqueueStyleTag,
+  enqueue_script: EnqueueScriptTag,
+  header_assets: RenderHeaderAssetsTag,
+  footer_assets: RenderFooterAssetsTag,
+  placeholder_image: PlaceholderImageTag,
+  custom_css: CustomCssTag,
+  custom_head_scripts: CustomHeadScriptsTag,
+  custom_footer_scripts: CustomFooterScriptsTag,
+  image: ImageTag,
+  youtube: YouTubeTag,
+  enqueue_preload: EnqueuePreloadTag,
+});
+
 function configureLiquidEngine(engine) {
-  // Register custom tags
-  engine.registerTag("theme_settings", ThemeSettingsTag);
-  engine.registerTag("asset", AssetTag);
-  engine.registerTag("fonts", FontsTag);
-  engine.registerTag("seo", SeoTag);
-  engine.registerTag("enqueue_style", EnqueueStyleTag);
-  engine.registerTag("enqueue_script", EnqueueScriptTag);
-  engine.registerTag("header_assets", RenderHeaderAssetsTag);
-  engine.registerTag("footer_assets", RenderFooterAssetsTag);
-  engine.registerTag("placeholder_image", PlaceholderImageTag);
-  engine.registerTag("custom_css", CustomCssTag);
-  engine.registerTag("custom_head_scripts", CustomHeadScriptsTag);
-  engine.registerTag("custom_footer_scripts", CustomFooterScriptsTag);
-  engine.registerTag("image", ImageTag);
-  engine.registerTag("youtube", YouTubeTag);
-  engine.registerTag("enqueue_preload", EnqueuePreloadTag);
+  for (const [name, tag] of Object.entries(widgetizerLiquidTags)) engine.registerTag(name, tag);
 
   // Register custom filters
   registerMediaMetaFilter(engine);
@@ -1040,6 +1045,9 @@ async function createBaseRenderContext(deps, rawThemeSettings, renderMode = "pre
   // stamped by `renderWidget` on first use when absent.
   if (globals.outputPathPrefix === undefined) globals.outputPathPrefix = outputPathPrefix;
   if (globals.currentCanonicalPath === undefined) globals.currentCanonicalPath = "";
+  // A `{% render %}`'d snippet sees only the globals, and `{% image %}` / `media_meta` need both.
+  globals.mediaFiles = mediaFiles;
+  globals.imagePath = imageBasePath;
   // Published date format (theme-owned, set via the `date_format` theme setting).
   // Consumed by the `format_date` filter; when a theme defines no such setting the
   // filter falls back to its own default, so we only set this when present.

@@ -55,7 +55,8 @@ router.put(
   [
     param("id").notEmpty().withMessage("Project ID is required."),
     body("name").trim().customSanitizer(stripHtmlToText).notEmpty().withMessage("Project name is required.").isLength({ max: 200 }).withMessage(`Project name must be at most ${200} characters.`),
-    body("description").trim().customSanitizer(stripHtmlToText).isLength({ max: 1000 }).withMessage(`Description must be at most ${1000} characters.`),
+    // Optional: an update that leaves the field out keeps the stored value.
+    body("description").optional().trim().customSanitizer(stripHtmlToText).isLength({ max: 1000 }).withMessage(`Description must be at most ${1000} characters.`),
     body("siteUrl").optional().trim().customSanitizer(stripHtmlToText),
     optionalBooleanField("receiveThemeUpdates"),
   ],

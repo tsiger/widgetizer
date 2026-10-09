@@ -4,6 +4,12 @@ Widgetizer runs as a native desktop app using Electron. The app embeds the React
 
 This doc covers the **Electron-runtime-specific** material: dev mode, the dynamic-port server model, runtime data paths, the preview window, error handling, build output/distribution, and the local Windows update test. The full **release / auto-update flow** is in [CLAUDE.md](../CLAUDE.md); **asar bundling rules** for the workspace packages live in [core-packages.md](core-packages.md).
 
+## Display name and installation identity
+
+The visible OSS app name is **Widgetizer Desktop**, supplied to the editor by `packages/editor-ui/src/lib/appName.js`. This is a display-name change only. Keep Electron's internal `productName` as **Widgetizer**, and preserve `appId`, installer `artifactName` and the macOS app-menu name.
+
+Electron derives its user-data location, macOS bundle and Windows installation folder from the internal identity. Renaming it can make existing projects appear missing or leave a second installation after an update. Any future internal rename requires an explicit migration for existing installs and data.
+
 ## Development
 
 Run the API server, Vite dev server, and Electron together:
@@ -294,7 +300,7 @@ The full release procedure and the user-facing update flow are documented once i
 
 - **Main process** — `setupAutoUpdater()` and IPC handlers in `electron/main.js`; `autoUpdater.autoDownload = false` (user-initiated), `autoInstallOnAppQuit = true`. Provider is GitHub Releases (`publish` block in `electron/builder.config.mjs`).
 - **Preload** — `electron/preload.js` exposes `window.electronUpdater` via `contextBridge`.
-- **UI** — `app/src/components/layout/UpdateBanner.jsx` renders the "Version X.Y.Z is available" bar. It mounts in **`app/src/App.jsx`** (passed as the `topbarBanner` slot), **not** in `Layout.jsx`. The shared `Layout` itself lives in `packages/editor-ui/src/components/layout/Layout.jsx`.
+- **UI** — `app/src/components/layout/UpdateBanner.jsx` renders the "Version X.Y.Z is available" bar. It mounts in **`app/src/App.jsx`** at the app root, above the router, so it shows on every route (project picker, settings, editor) — **not** in `Layout.jsx` and not through an editor slot. The shared `Layout` itself lives in `packages/editor-ui/src/components/layout/Layout.jsx`.
 
 ### Local Windows Update Test
 
@@ -383,7 +389,7 @@ The workspace packages are bundled into the asar by their presence in the OSS `p
 
 Quick reference for what `electron/builder.config.mjs` unpacks (`asarUnpack`):
 
-- `themes/**` (excluding `themes/widgetizer/**`) and `dist/**`
+- `themes/**` and `dist/**`. Two theme paths are excluded, both here and from the packed `files`: `themes/widgetizer/**`, and `themes/__*/**` — local scratch themes, which git also ignores, so one left on the build machine never ships in an installer.
 - `node_modules/@widgetizer/core/src/assets/**` — placeholder SVGs served via `res.sendFile`
 - `node_modules/@widgetizer/core/src/runtime/*.js` — `previewRuntime.js` + its sibling `standalonePreviewTarget.js`, served raw via `express.static`
 - native modules: `sharp`, `@img/sharp-*`, `better-sqlite3`

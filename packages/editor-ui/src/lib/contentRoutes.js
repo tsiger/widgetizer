@@ -40,3 +40,22 @@ export function itemAddHref(type, language) {
   const base = `/collections/${type}/add`;
   return language ? `${base}?language=${language}` : base;
 }
+
+/**
+ * The lists, opened on a language tab. Every way back from a page, item or menu
+ * names the language it was in, so the list shows the tab the user came from
+ * instead of the default language's.
+ */
+const listHref = (base, language) => (language ? `${base}?language=${language}` : base);
+
+export function pagesListHref(language) {
+  return listHref("/pages", language);
+}
+
+export function menusListHref(language) {
+  return listHref("/menus", language);
+}
+
+export function itemsListHref(type, language) {
+  return listHref(`/collections/${type}`, language);
+}

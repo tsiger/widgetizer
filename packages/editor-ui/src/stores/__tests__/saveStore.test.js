@@ -29,6 +29,8 @@ const mockThemeStoreState = {
   reconcileFromServer: vi.fn().mockResolvedValue(null),
   updateThemeSetting: vi.fn(),
   resetThemeSettings: vi.fn(),
+  discardDraft: vi.fn(),
+  isDraftDiscarded: vi.fn(() => false),
   resetForProjectChange: vi.fn(),
 };
 
@@ -49,6 +51,16 @@ function makeThemeStoreLive(saved, draft) {
   mockThemeStoreState.resetThemeSettings.mockImplementation(() => {
     mockThemeStoreState.settings = clone(mockThemeStoreState.originalSettings);
   });
+  // The real discardDraft marks the reverted draft; any later draft write (a new
+  // object here, as updateThemeSetting makes) unmarks it.
+  let discarded = null;
+  mockThemeStoreState.discardDraft.mockImplementation(() => {
+    mockThemeStoreState.resetThemeSettings();
+    discarded = mockThemeStoreState.settings;
+  });
+  mockThemeStoreState.isDraftDiscarded.mockImplementation(
+    () => discarded !== null && mockThemeStoreState.settings === discarded,
+  );
   // The real reconcileFromServer: the baseline always follows the server, the
   // draft only while nothing has touched it since it was captured.
   mockThemeStoreState.reconcileFromServer.mockImplementation(async (projectId, expectedDraft) => {
@@ -671,6 +683,16 @@ describe("saveStore (useAutoSave)", () => {
       expect(useAutoSave.getState().autoSaveInterval).not.toBeNull();
     });
 
+    it("leaves a widget clean, and the timer unarmed, when it differs only by a key holding undefined", () => {
+      const page = seedPageStore();
+      usePageStore.setState({
+        page: { ...page, widgets: { ...page.widgets, "w-1": { ...page.widgets["w-1"], extra: undefined } } },
+      });
+      useAutoSave.getState().reconcileModifiedWidgets();
+      expect(useAutoSave.getState().modifiedWidgets.size).toBe(0);
+      expect(useAutoSave.getState().autoSaveInterval).toBeNull();
+    });
+
     it("reconciles header/footer against originalGlobalWidgets", () => {
       const header = { type: "header", settings: { text: "v1" }, blocks: {}, blocksOrder: [] };
       usePageStore.setState({
@@ -774,12 +796,31 @@ describe("saveStore (useAutoSave)", () => {
       expect(useAutoSave.getState().hasUnsavedChanges()).toBe(false);
     });
 
-    it("detects a page diff even when the only change is an undefined-valued key (JSON.stringify would silently drop it)", () => {
+    // The saved copy is a JSON round trip, which drops a key holding undefined.
+    // Counting that key as a change would leave the editor dirty after every save.
+    it("does not count a key holding undefined, which the saved copy cannot carry, as a change", () => {
       const page = seedPageStore();
       usePageStore.setState({
         page: { ...page, widgets: { ...page.widgets, "w-1": { ...page.widgets["w-1"], extra: undefined } } },
       });
+      expect(useAutoSave.getState().hasUnsavedChanges()).toBe(false);
+    });
+
+    it("still detects a saved value cleared to undefined", () => {
+      const page = seedPageStore();
+      usePageStore.setState({
+        page: { ...page, widgets: { ...page.widgets, "w-1": { ...page.widgets["w-1"], settings: { text: undefined } } } },
+      });
       expect(useAutoSave.getState().hasUnsavedChanges()).toBe(true);
+    });
+
+    it("does not count a header key holding undefined as a change", () => {
+      const header = { type: "header", settings: { text: "v1" }, blocks: {}, blocksOrder: [] };
+      usePageStore.setState({
+        globalWidgets: { header: { ...header, settings: { ...header.settings, link: undefined } }, footer: null },
+        originalGlobalWidgets: { header: JSON.parse(JSON.stringify(header)), footer: null },
+      });
+      expect(useAutoSave.getState().hasUnsavedChanges()).toBe(false);
     });
 
     it("does not report a diff when header/footer are rebuilt with the same values in a different key order", () => {
@@ -1069,13 +1110,13 @@ describe("saveStore (useAutoSave)", () => {
     });
 
     // Undo must not resurrect the theme the destination page happened to load
-    // with — the history follows the reconciliation, without a step of its own.
-    it("rewrites the editor's undo history to match", async () => {
+    // with. The reconcile is told the draft the destination editor was showing,
+    // which themeStore hands to the history rebase (see undoThemeCorrection.test).
+    it("reconciles against the discarded draft", async () => {
       const { SAVED, EDITED, saving, land } = startDiscardedThemeSave();
       mockServerTheme = EDITED;
       await vi.advanceTimersByTimeAsync(0);
 
-      const corrections = vi.spyOn(usePageStore.getState(), "applyThemeCorrections");
       useAutoSave.getState().reset();
       const discardedDraft = mockThemeStoreState.settings;
       expect(discardedDraft).toEqual(SAVED);
@@ -1083,10 +1124,27 @@ describe("saveStore (useAutoSave)", () => {
       land();
       expect(await saving).toEqual({ status: "abandoned" });
 
-      // The draft the destination editor was showing, and what the server
-      // actually holds — which is what a server-corrected save passes too.
-      expect(corrections).toHaveBeenCalledWith(discardedDraft, EDITED);
-      corrections.mockRestore();
+      expect(mockThemeStoreState.reconcileFromServer).toHaveBeenCalledWith("test-project", discardedDraft);
+    });
+
+    // A server that returns its copy: themeStore already took it in place of
+    // the discarded draft, so there is nothing to read back.
+    it("does not read back when the store already holds the server's copy", async () => {
+      makeThemeStoreLive({ settings: { global: {} } }, { settings: { global: { a: [] } } });
+      seedPageStore();
+      useAutoSave.getState().setThemeSettingsModified(true);
+      let land;
+      mockThemeStoreState.saveSettings.mockImplementationOnce(
+        () => new Promise((resolve) => (land = () => resolve({ warnings: [], adopted: true }))),
+      );
+
+      const saving = useAutoSave.getState().save();
+      await vi.advanceTimersByTimeAsync(0);
+      useAutoSave.getState().reset();
+      land();
+
+      expect(await saving).toEqual({ status: "abandoned" });
+      expect(mockThemeStoreState.reconcileFromServer).not.toHaveBeenCalled();
     });
 
     it("leaves the theme in place when the user has already landed on another page", async () => {
@@ -1170,6 +1228,44 @@ describe("saveStore (useAutoSave)", () => {
   // --------------------------------------------------------------------------
 
   describe("save", () => {
+    // A link value carrying undefined refs, as the link picker once wrote it.
+    const pickedLink = {
+      href: "about.html",
+      text: "About",
+      target: "_self",
+      pageUuid: "p-about",
+      collectionType: undefined,
+      collectionItemUuid: undefined,
+    };
+
+    it("leaves the editor clean after saving a value that carries undefined keys", async () => {
+      const page = seedPageStore();
+      usePageStore.setState({
+        page: { ...page, widgets: { ...page.widgets, "w-1": { type: "rich-text", settings: { link: pickedLink } } } },
+      });
+      useAutoSave.getState().markWidgetModified("w-1");
+
+      expect(await useAutoSave.getState().save(false)).toEqual({ status: "success" });
+      expect(useAutoSave.getState().hasUnsavedChanges()).toBe(false);
+      expect(await useAutoSave.getState().save(true)).toEqual({ status: "clean" });
+      expect(savePageContent).toHaveBeenCalledTimes(1);
+    });
+
+    it("leaves the editor clean after saving a header value that carries undefined keys", async () => {
+      seedPageStore();
+      const header = { type: "header", settings: { text: "v1" }, blocks: {}, blocksOrder: [] };
+      usePageStore.setState({
+        globalWidgets: { header: { ...header, settings: { link: pickedLink } }, footer: null },
+        originalGlobalWidgets: { header: JSON.parse(JSON.stringify(header)), footer: null },
+      });
+      useAutoSave.getState().markWidgetModified("header");
+
+      expect(await useAutoSave.getState().save(false)).toEqual({ status: "success" });
+      expect(useAutoSave.getState().hasUnsavedChanges()).toBe(false);
+      expect(await useAutoSave.getState().save(true)).toEqual({ status: "clean" });
+      expect(saveGlobalWidget).toHaveBeenCalledTimes(1);
+    });
+
     it("sets isSaving during a manual save", async () => {
       seedPageStore();
       useAutoSave.getState().markWidgetModified("w-1");
@@ -1838,8 +1934,7 @@ describe("saveStore (useAutoSave)", () => {
 
       expect(result).toEqual({ status: "success" });
       // The in-flight save actually sent "Changed" (what it captured at entry) to
-      // the server — per the design (docs-llms/plan-savestore-concurrency-redesign.md),
-      // the write-back rebaselines originalPage to THAT captured snapshot, not to
+      // the server. The write-back rebaselines originalPage to THAT captured snapshot, not to
       // whatever pageStore's live `page` has become — because that's genuinely
       // what the server now holds, regardless of a later local undo.
       expect(usePageStore.getState().originalPage.widgets["w-1"].settings.text).toBe("Changed");
@@ -1849,6 +1944,73 @@ describe("saveStore (useAutoSave)", () => {
       // the value-based diff fallback catches this, which is exactly why it exists.
       expect(useAutoSave.getState().modifiedWidgets.has("w-1")).toBe(false);
       expect(useAutoSave.getState().hasUnsavedChanges()).toBe(true);
+    });
+  });
+  describe("theme save outcomes", () => {
+    it("sends no theme save when the user discarded during the page save", async () => {
+      seedPageStore();
+      makeThemeStoreLive({ colors: { primary: "#fff" } }, { colors: { primary: "#000" } });
+      usePageStore.getState().setPage({
+        ...usePageStore.getState().page,
+        title: "Edited",
+      });
+      useAutoSave.getState().setThemeSettingsModified(true);
+      let landPage;
+      savePageContent.mockImplementationOnce(() => new Promise((resolve) => (landPage = () => resolve({}))));
+
+      const saving = useAutoSave.getState().save(false);
+      await vi.advanceTimersByTimeAsync(0);
+      useAutoSave.getState().reset();
+      landPage();
+
+      expect(await saving).toEqual({ status: "abandoned" });
+      expect(mockThemeStoreState.saveSettings).not.toHaveBeenCalled();
+    });
+
+    it("reports a theme conflict as its own status, not a failure, and records the notice", async () => {
+      seedPageStore();
+      makeThemeStoreLive({ colors: { primary: "#fff" } }, { colors: { primary: "#000" } });
+      useAutoSave.getState().setThemeSettingsModified(true);
+      mockThemeStoreState.saveSettings.mockResolvedValueOnce({ warnings: [], conflict: true, adopted: true });
+
+      const result = await useAutoSave.getState().save(false);
+
+      expect(result).toEqual({ status: "conflict" });
+      expect(useAutoSave.getState().themeConflict).toMatchObject({ editsDropped: false });
+      useAutoSave.getState().clearThemeConflict();
+      expect(useAutoSave.getState().themeConflict).toBe(null);
+    });
+
+    it("records that a conflict dropped an edit to a setting the theme no longer has", async () => {
+      seedPageStore();
+      makeThemeStoreLive({ colors: { primary: "#fff" } }, { colors: { primary: "#000" } });
+      useAutoSave.getState().setThemeSettingsModified(true);
+      mockThemeStoreState.saveSettings.mockResolvedValueOnce({
+        warnings: [{ id: "old", code: "SETTING_REMOVED" }],
+        conflict: true,
+        adopted: true,
+      });
+
+      await useAutoSave.getState().save(false);
+
+      expect(useAutoSave.getState().themeConflict).toMatchObject({ editsDropped: true });
+    });
+
+    it("resets the autosave backoff after a conflict and keeps autosaving the kept edits", async () => {
+      seedPageStore();
+      makeThemeStoreLive({ colors: { primary: "#fff" } }, { colors: { primary: "#000" } });
+      // Armed first: setThemeSettingsModified resets the count itself, so the
+      // count has to be set after it for the tick's own reset to be what clears it.
+      useAutoSave.getState().setThemeSettingsModified(true);
+      useAutoSave.setState({ autoSaveFailureCount: 3 });
+      mockThemeStoreState.saveSettings.mockResolvedValueOnce({ warnings: [], conflict: true, adopted: true });
+
+      await vi.advanceTimersByTimeAsync(120000);
+
+      expect(mockThemeStoreState.saveSettings).toHaveBeenCalled();
+      expect(useAutoSave.getState().autoSaveFailureCount).toBe(0);
+      // The theme is still dirty, so another tick is armed.
+      expect(useAutoSave.getState().autoSaveInterval).not.toBe(null);
     });
   });
 });

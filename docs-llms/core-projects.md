@@ -127,15 +127,16 @@ Projects can be imported from ZIP files previously exported from Widgetizer.
 3.  **Upload**: The user clicks "Import Project" to upload the ZIP file via `POST /api/projects/import`.
 4.  **Server-Side Validation**: The backend validates:
     - ZIP structure contains `project-export.json` manifest
-    - Manifest contains required fields (name, theme)
+    - Manifest contains required fields (name, theme), and its project details are the kind the app writes: the theme and preset are single folder names, the name, title, notes and Site Address are text (a Site Address that is not a valid address is kept as it was, since older projects can hold one; output ignores it and export warns), and `receiveThemeUpdates`/`cleanUrls` are true or false. Markup is stripped from the name, title and notes, as on the create form.
     - Referenced theme exists in the installation
-5.  **Isolation**: Files are extracted to a temporary directory first for validation before any permanent changes.
+5.  **Isolation**: Files are extracted to a temporary directory first for validation before any permanent changes. Extraction refuses a ZIP that unpacks to more than 100 times its own size (a ZIP bomb), counting the bytes actually produced rather than the sizes the ZIP records (`utils/zipSafety.js`), and leaves out top-level dot entries such as a theme update's `.theme-update-backup`, which a backup never contains. Before anything is copied, the unpacked content is checked (`utils/backupContentChecks.js`): every media path is `/uploads/images/<name>` or `/uploads/files/<name>` (sizes under `images`), media translations name only the project's additional languages, and every collection item's stored slug matches `^[a-z0-9-]+$`.
+    - Any of these refuses the whole import with a 400 that names the problem; nothing is created and the unpacked copy is removed.
 6.  **Project Creation**:
     - A new UUID is generated for the imported project
     - A unique `folderName` is generated (checking existing project metadata in SQLite and existing directories)
     - Files are copied from the temp directory to the new project directory
     - Project metadata is written to SQLite only after successful file copy
-    - The imported manifest restores `siteTitle`, `receiveThemeUpdates`, `preset`, `siteUrl`, `cleanUrls`, `siteIdentity` and the site languages in addition to the core project fields. An imported identity is never refused: only its valid part is kept, and a language code this version cannot use falls back to a single English site.
+    - The imported manifest restores `siteTitle`, `receiveThemeUpdates`, `preset`, `siteUrl`, `cleanUrls`, `siteIdentity` and the site languages in addition to the core project fields. An imported identity is never refused: only its valid part is kept. A language code this version cannot use refuses the import with a 400 telling the user to open the backup with a newer version.
 7.  **Cleanup**: Temporary files are removed on both success and failure.
 8.  **Feedback + Navigation**: A success toast is shown, the modal closes, and the imported project is immediately opened as the active project inside the site workspace.
 
@@ -171,6 +172,8 @@ Projects can be imported from ZIP files previously exported from Widgetizer.
 10. **Feedback**: Localized success toast notifications show the completion status, and navigation buttons allow returning to the project list.
 
 ### 6. Site Identity and Business Details
+
+Business facts belong to the project, independently of theme presentation. Themes can display them in ordinary page or footer blocks, so authors maintain useful visible content rather than a second set of SEO-only fields. Core derives search metadata from those facts; category determines identity kind, and public name can default from Site Title. Reusing the Site Icon as the identity logo requires the author's confirmation.
 
 A project stores who is behind the site — the facts core publishes as structured data ([Site Exporting](core-export.md#structured-data-json-ld)) and themes read as `project.identity` ([Theming](theming.md)). It lives in the `site_identity` JSON column (migration v6, [Database](core-database.md)) and reaches controllers as `project.siteIdentity`.
 
@@ -257,7 +260,7 @@ When the user switches projects, the app must ensure no data from the previous p
 
 - **RequireActiveProject** is the central project-switch boundary for site-workspace routes. It clears singleton frontend stores on active-project changes and keys the route outlet by project ID so project-owned components remount cleanly.
 - **pageStore** uses an `activeLoadId` counter to discard stale async loads. Tracks `loadedProjectId` so `saveStore` can compare before saving.
-- **themeStore** is the canonical owner of theme settings across Settings and the editor. It uses `activeLoadId` to drop stale loads, and its `resetForProjectChange()` action is invoked by the shared route boundary on real project switches.
+- **themeStore** is the canonical owner of theme settings across Settings and the editor. It uses `activeLoadId` to drop stale loads, and its `resetForProjectChange()` action is invoked by the shared route boundary on real project switches. Applying a theme update calls its `invalidate()`, so Settings and the editor load the updated settings instead of keeping (and saving) the copy they loaded before; an unsaved Site settings draft is discarded with it.
 - **widgetStore** resets schemas and selection via `resetForProjectChange()`, reads the project ID internally via `getActiveProjectId()`, and now relies on the shared route boundary rather than page-local reset calls.
 - **saveStore** preserves edits when a stale save is rejected with `PROJECT_MISMATCH`, stops auto-save retries, and is reset centrally on project switches by the shared route boundary.
 - **Settings.jsx** reads/writes through `themeStore`; it still guards save completion against mid-flight project changes, but project-switch reset ownership now lives in the route boundary rather than the page component.

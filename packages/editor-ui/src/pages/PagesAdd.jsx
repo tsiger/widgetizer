@@ -11,6 +11,7 @@ import { invalidateMediaCache } from "../queries/mediaManager";
 import { invalidateLinkTargetsCache } from "../hooks/useLinkTargets";
 import useGuardedFormPage from "../hooks/useGuardedFormPage";
 import { useEditorPath } from "../lib/routeBase.jsx";
+import { pagesListHref } from "../lib/contentRoutes";
 
 export default function PagesAdd() {
   const { t } = useTranslation();
@@ -40,7 +41,7 @@ export default function PagesAdd() {
         invalidateLinkTargetsCache(activeProject.id);
       }
 
-      navigateSafely(editorPath("/pages"));
+      navigateSafely(editorPath(pagesListHref(language)));
       return true;
     } catch (err) {
       showToast(err.message || t("pagesAdd.toasts.createError"), "error");
@@ -56,9 +57,10 @@ export default function PagesAdd() {
         onSubmit={handleSubmit}
         isSubmitting={isSubmitting}
         submitLabel={t("pagesAdd.create")}
-        onCancel={() => navigateSafely(editorPath("/pages"))}
+        onCancel={() => navigateSafely(editorPath(pagesListHref(language)))}
         onDirtyChange={setIsDirty}
         isDirty={isDirty}
+        language={language}
       />
     </PageLayout>
   );

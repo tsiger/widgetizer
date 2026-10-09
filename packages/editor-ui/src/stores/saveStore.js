@@ -21,6 +21,13 @@ function autosaveDelay(failureCount) {
   return Math.min(BASE_AUTOSAVE_DELAY_MS * 2 ** failureCount, MAX_AUTOSAVE_DELAY_MS);
 }
 
+// The saved baselines (pageStore's originalPage / originalGlobalWidgets) are JSON
+// round trips, the same form a save sends. The live value is compared in that form
+// too: a key holding `undefined` is gone once saved, and lodash's isEqual would
+// otherwise count it as a difference that no save can ever clear.
+const asSaved = (value) => (value === undefined ? undefined : JSON.parse(JSON.stringify(value)));
+const matchesSaved = (current, saved) => isEqual(asSaved(current), saved);
+
 const useAutoSave = create((set, get) => ({
   // State
   isSaving: false,
@@ -48,10 +55,10 @@ const useAutoSave = create((set, get) => ({
   queuedFollowUp: null,
   saveGeneration: 0,
   autoSaveFailureCount: 0,
-  // The theme draft a discard left in place, by identity. An in-flight save
-  // landing afterwards uses it to tell "nothing has touched the theme since"
-  // from "someone owns this state now" — see reset() and save().
-  discardedThemeDraft: null,
+  // A theme save found the settings changed elsewhere; the edits were kept on
+  // top of the server's copy, still unsaved, and the next save sends them.
+  // Announced by a mounted component, same as listingAnchorMoved.
+  themeConflict: null,
 
   // Computed
   // The PAGE's own dirtiness — its widgets, its structure, its header and
@@ -69,7 +76,7 @@ const useAutoSave = create((set, get) => ({
     const pageStore = usePageStore.getState();
     const { page, originalPage, globalWidgets, originalGlobalWidgets } = pageStore;
 
-    if (page && originalPage && !isEqual(page, originalPage)) {
+    if (page && originalPage && !matchesSaved(page, originalPage)) {
       return true;
     }
 
@@ -81,14 +88,14 @@ const useAutoSave = create((set, get) => ({
     if (
       globalWidgets.header &&
       originalGlobalWidgets.header &&
-      !isEqual(globalWidgets.header, originalGlobalWidgets.header)
+      !matchesSaved(globalWidgets.header, originalGlobalWidgets.header)
     ) {
       return true;
     }
     if (
       globalWidgets.footer &&
       originalGlobalWidgets.footer &&
-      !isEqual(globalWidgets.footer, originalGlobalWidgets.footer)
+      !matchesSaved(globalWidgets.footer, originalGlobalWidgets.footer)
     ) {
       return true;
     }
@@ -134,10 +141,11 @@ const useAutoSave = create((set, get) => ({
     // which would rebuild the Set and re-arm the autosave timer).
     const next = new Set(get().modifiedWidgets);
 
-    if (page && originalPage) {
-      const ids = new Set([...Object.keys(page.widgets ?? {}), ...Object.keys(originalPage.widgets ?? {})]);
+    const savedFormPage = page ? asSaved(page) : null;
+    if (savedFormPage && originalPage) {
+      const ids = new Set([...Object.keys(savedFormPage.widgets ?? {}), ...Object.keys(originalPage.widgets ?? {})]);
       for (const id of ids) {
-        if (!isEqual(page.widgets?.[id], originalPage.widgets?.[id])) {
+        if (!isEqual(savedFormPage.widgets?.[id], originalPage.widgets?.[id])) {
           next.add(id);
         } else {
           next.delete(id);
@@ -146,7 +154,7 @@ const useAutoSave = create((set, get) => ({
     }
 
     for (const key of ["header", "footer"]) {
-      if (!isEqual(globalWidgets[key], originalGlobalWidgets[key])) {
+      if (!matchesSaved(globalWidgets[key], originalGlobalWidgets[key])) {
         next.add(key);
       } else {
         next.delete(key);
@@ -164,7 +172,7 @@ const useAutoSave = create((set, get) => ({
     // through syncThemeStoreFromSnapshot). Without those, an undone/redone
     // reorder or theme edit sits unsaved until the next content edit happens
     // to re-arm the timer — save() persists both (hasPageDiff / hasThemeDrift).
-    const hasPageDiff = page && originalPage && !isEqual(page, originalPage);
+    const hasPageDiff = savedFormPage && originalPage && !isEqual(savedFormPage, originalPage);
     if (next.size > 0 || hasPageDiff || useThemeStore.getState().hasUnsavedThemeChanges()) {
       set({ autoSaveFailureCount: 0 });
       get().resetAutoSaveTimer();
@@ -267,11 +275,11 @@ const useAutoSave = create((set, get) => ({
         // or that re-edit would silently never get sent.
         const hasHeaderDiff =
           globalWidgets.header && pageStore.originalGlobalWidgets.header
-            ? !isEqual(globalWidgets.header, pageStore.originalGlobalWidgets.header)
+            ? !matchesSaved(globalWidgets.header, pageStore.originalGlobalWidgets.header)
             : false;
         const hasFooterDiff =
           globalWidgets.footer && pageStore.originalGlobalWidgets.footer
-            ? !isEqual(globalWidgets.footer, pageStore.originalGlobalWidgets.footer)
+            ? !matchesSaved(globalWidgets.footer, pageStore.originalGlobalWidgets.footer)
             : false;
 
         // Kept so their responses can be read: a header-only save carries its
@@ -292,7 +300,7 @@ const useAutoSave = create((set, get) => ({
         }
 
         const hasPageWidgetChanges = [...modifiedWidgets].some((id) => id !== "header" && id !== "footer");
-        const hasPageDiff = page && pageStore.originalPage ? !isEqual(page, pageStore.originalPage) : false;
+        const hasPageDiff = page && pageStore.originalPage ? !matchesSaved(page, pageStore.originalPage) : false;
         // Kept separately from the fan-out so its response can be read: the
         // server reports which page it took a listing anchor from, if any.
         let pageSave = null;
@@ -309,45 +317,46 @@ const useAutoSave = create((set, get) => ({
         // Settled above by the same Promise.all, so these are already resolved.
         const globalSaveResults = await Promise.all(globalSaves);
 
-        // Phase 2: theme settings via themeStore's canonical save path.
-        // This handles warning/correction reloads from the server automatically.
+        // A reset() (discard-and-leave) during Phase 1: the theme draft in force
+        // now is not the one this save was asked to send, so send none.
+        if (get().saveGeneration !== myGeneration) {
+          return { status: "abandoned" };
+        }
+
+        // Phase 2: theme settings via themeStore's canonical save path. It sends
+        // only the changed settings, takes the server's copy, and keeps the undo
+        // history in step with what the server stored.
         const hasThemeDrift = themeStore.hasUnsavedThemeChanges();
-        let themeCorrection = null;
         let themeUsageStale = false;
+        let themeConflict = false;
+        let themeEditsDropped = false;
         if ((themeSettingsModified || hasThemeDrift) && themeSettings && activeProject) {
-          const sentTheme = useThemeStore.getState().settings;
           const themeResult = await useThemeStore.getState().saveSettings(activeProject.id);
           if (get().saveGeneration !== myGeneration) {
-            // Discarded mid-flight. The submitted values DID reach the server,
-            // and no local state can undo that — anything written from here
-            // would only make this store agree with itself while disagreeing
-            // with the site. So read the server back, as the page path gets
-            // for free by being refetched. This is the same shape as a save
-            // the server corrected, so it ends the same way: the theme store
-            // reconciles, then the editor's undo history is rewritten to match
-            // without adding a step.
-            //
-            // The check here only avoids a pointless request — the decision
-            // that matters is made against the draft in force when the
-            // response lands, because the editor the user is now looking at
-            // stays editable throughout.
+            // Discarded mid-flight. The submitted values DID reach the server, and
+            // no local state can undo that. themeStore normally takes the server's
+            // copy in place of the discarded draft itself (reading it back when the
+            // whole-file fallback returns none). This is a safety net for a result
+            // it did not adopt: read the server back here — only while nothing has
+            // edited the theme since the discard, because the editor the user is
+            // now looking at stays editable throughout.
             const themeNow = useThemeStore.getState();
-            if (themeNow.loadedProjectId === activeProject.id && themeNow.settings === get().discardedThemeDraft) {
-              const discardedDraft = themeNow.settings;
-              const serverTheme = await useThemeStore.getState().reconcileFromServer(activeProject.id, discardedDraft);
-              if (serverTheme) usePageStore.getState().applyThemeCorrections(discardedDraft, serverTheme);
+            if (
+              themeResult &&
+              !themeResult.adopted &&
+              themeNow.loadedProjectId === activeProject.id &&
+              themeNow.isDraftDiscarded?.()
+            ) {
+              await themeNow.reconcileFromServer(activeProject.id, themeNow.settings);
             }
-          } else if (themeResult?.warnings?.length && useThemeStore.getState().loadedProjectId === activeProject.id) {
-            // Theme warnings are not all the same kind. A sanitization warning means
-            // the server changed what it stored, so undo history has to be rewritten
-            // to match. "Image tracking is behind" changed nothing about the settings
-            // — treating it as a correction would rewrite history over a save the
-            // server took verbatim.
-            const corrections = themeResult.warnings.filter((w) => w?.code !== "MEDIA_USAGE_STALE");
-            themeUsageStale = themeResult.warnings.some((w) => w?.code === "MEDIA_USAGE_STALE");
-            if (corrections.length) {
-              themeCorrection = { sent: sentTheme, saved: useThemeStore.getState().originalSettings };
-            }
+          } else {
+            // "Image tracking is behind" changed nothing about the settings; it is
+            // announced, not treated as a correction.
+            themeUsageStale = !!themeResult?.warnings?.some((w) => w?.code === "MEDIA_USAGE_STALE");
+            themeConflict = !!themeResult?.conflict;
+            themeEditsDropped = !!themeResult?.warnings?.some(
+              (w) => w?.code === "SETTING_REMOVED" || w?.code === "SETTING_AMBIGUOUS",
+            );
           }
         }
 
@@ -392,6 +401,7 @@ const useAutoSave = create((set, get) => ({
             ) || themeUsageStale
               ? { at: Date.now() }
               : state.mediaUsageStale,
+            themeConflict: themeConflict ? { at: Date.now(), editsDropped: themeEditsDropped } : state.themeConflict,
           };
         });
 
@@ -405,12 +415,10 @@ const useAutoSave = create((set, get) => ({
         // hasUnsavedChanges() check correctly sees a fresh diff instead of
         // wrongly reading clean.
         pageStore.setOriginalGlobalWidgets(globalWidgets);
-        // Undo history still holds the theme values the server just rejected.
-        if (themeCorrection) {
-          pageStore.applyThemeCorrections(themeCorrection.sent, themeCorrection.saved);
-        }
 
-        return { status: "success" };
+        // Not a failure: the theme edits are kept, still unsaved, and the next
+        // save sends them against the server's current copy.
+        return { status: themeConflict ? "conflict" : "success" };
       } catch (err) {
         // Mirrors the success path's generation check above: a reset() that
         // fired while this save was in flight means the user has already
@@ -537,7 +545,7 @@ const useAutoSave = create((set, get) => ({
         }
         if (result.status === "failed") {
           set((s) => ({ autoSaveFailureCount: s.autoSaveFailureCount + 1 }));
-        } else if (result.status === "success") {
+        } else if (result.status === "success" || result.status === "conflict") {
           set({ autoSaveFailureCount: 0 });
         } else if (
           result.status === "mismatch" ||
@@ -574,6 +582,8 @@ const useAutoSave = create((set, get) => ({
 
   clearMediaUsageStale: () => set({ mediaUsageStale: null }),
 
+  clearThemeConflict: () => set({ themeConflict: null }),
+
   /**
    * A new editing session: the editor has loaded a page, so saving applies again —
    * and the banner saying it does not must go with it. The two are one fact, so
@@ -596,7 +606,11 @@ const useAutoSave = create((set, get) => ({
     // alive across navigations — so a discarded change came straight back the
     // next time the editor opened. The page and its globals are refetched by
     // the load itself, so this is the only draft that outlives the discard.
-    useThemeStore.getState().resetThemeSettings();
+    // discardDraft also marks the reverted draft, so a theme save still in
+    // flight takes the saved values rather than reverting them on top.
+    const themeStore = useThemeStore.getState();
+    if (typeof themeStore.discardDraft === "function") themeStore.discardDraft();
+    else themeStore.resetThemeSettings?.();
     // isSaving/isAutoSaving/runningSave/queuedFollowUp are deliberately NOT
     // force-cleared here. An in-flight save (if any) owns its own bookkeeping
     // cleanup in its finally block regardless of generation — forcing them
@@ -614,9 +628,7 @@ const useAutoSave = create((set, get) => ({
       structureModified: false,
       themeSettingsModified: false,
       autoSaveFailureCount: 0,
-      // By identity: anything that replaces this draft — an edit, a load, a
-      // project switch — makes a still-running save's cleanup stand down.
-      discardedThemeDraft: useThemeStore.getState().settings,
+      themeConflict: null,
     });
   },
 }));

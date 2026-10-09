@@ -1109,7 +1109,7 @@ Widgets with custom token usage (selected):
 | testimonial-hero | `.testimonial-image-wrapper` | `--radius-lg` |
 | timeline | `.timeline-content` / `.timeline-marker` | `--radius-sm` / `--radius-marker` |
 | steps | `.steps-badge` | `--radius-marker` |
-| video-embed | iframe | `--radius-md` |
+| video-embed | iframe / video | `--radius-md` |
 | map | `.map-container` | `--radius-md` |
 
 Widgets intentionally **not** affected by shapes include fullwidth banner/slideshow/split-hero (edge-to-edge backgrounds), profile-grid/testimonials avatars and hotspot dots (`border-radius: 50%`), and gallery/masonry/project-showcase card images (`border-radius: 0` — the image fills the card while the card carries the radius).

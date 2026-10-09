@@ -18,10 +18,13 @@ import { getAllProjects, getProjectById } from "../db/repositories/projectReposi
 import { handleProjectResolutionError } from "../utils/projectErrors.js";
 import { sortVersions, getLatestVersion, isValidVersion, isNewerVersion } from "../utils/semver.js";
 import { hasAvailableUpdate } from "../utils/updateStatus.js";
+import { isSafePathSegment } from "../utils/pathSecurity.js";
+import { extractZipSafely, openZip, readZipEntry, UnsafeZipError } from "../utils/zipSafety.js";
 import { ZIP_MIME_TYPES } from "../utils/mimeTypes.js";
 import { updateThemeSettingsMediaUsage, extractMediaPathsFromThemeSettings } from "../services/mediaUsageService.js";
 import { withContentWriteLock, assertIntroducedMediaExists } from "../services/contentCoordination.js";
 import { sanitizeThemeSettings } from "../services/sanitizationService.js";
+import { mergeThemeSettingChanges, readThemeSettingChanges } from "../services/themeSettingChanges.js";
 import { validateThemeCollectionSchemas } from "../services/collectionService.js";
 import { readAppSettingsFile } from "./appSettingsController.js";
 
@@ -652,11 +655,21 @@ async function buildLatestSnapshotSerial(themeId) {
 /**
  * Resolve template, menu, and settings override paths for a preset.
  * If no presetId or preset directory doesn't exist, falls back to root.
+ * Throws when either name is not a single folder name.
  * @param {string} themeId - Theme identifier
  * @param {string|null} presetId - Preset identifier (null = use root defaults)
  * @returns {Promise<{templatesDir: string, menusDir: string|null, settingsOverrides: object|null, collectionsDir: string|null, mediaDir: string|null}>}
  */
 export async function resolvePresetPaths(themeId, presetId) {
+  // Checked here as well as on the create route, because embedding apps call
+  // this directly: a name with a separator or `..` would read another folder.
+  if (!isSafePathSegment(themeId)) {
+    throw new Error(`Invalid theme name: ${JSON.stringify(themeId)}`);
+  }
+  if (presetId && !isSafePathSegment(presetId)) {
+    throw new Error(`Invalid preset name: ${JSON.stringify(presetId)}`);
+  }
+
   // Use the theme source directory (latest/ if it exists, root otherwise)
   const sourceDir = await getThemeSourceDir(themeId);
   const rootTemplatesDir = path.join(sourceDir, "templates");
@@ -1288,8 +1301,14 @@ export async function uploadTheme(req, res) {
       return res.status(400).json({ message: "No theme zip file uploaded." });
     }
 
-    const AdmZip = await import("adm-zip");
-    const zip = new AdmZip.default(uploadedFilePath);
+    let zip;
+    try {
+      zip = await openZip(uploadedFilePath);
+    } catch (error) {
+      return res.status(400).json({ message: error.message });
+    }
+    // The unpacking budget is measured against the file as it is on disk.
+    const zipSize = (await fs.stat(uploadedFilePath)).size;
 
     // Safety: validate ZIP paths (prevent path traversal)
     for (const entry of zip.getEntries()) {
@@ -1392,7 +1411,7 @@ export async function uploadTheme(req, res) {
   // Validate theme.json metadata and extract version info
   let uploadedThemeJson;
   try {
-    const themeJsonContent = themeJsonEntry.getData().toString("utf8");
+    const themeJsonContent = (await readZipEntry(themeJsonEntry, zipSize)).toString("utf8");
     uploadedThemeJson = JSON.parse(themeJsonContent);
 
     // Enforce required metadata fields for theme identification and display
@@ -1412,6 +1431,7 @@ export async function uploadTheme(req, res) {
       });
     }
   } catch (error) {
+    if (error instanceof UnsafeZipError) return res.status(400).json({ message: error.message });
     if (error instanceof SyntaxError) {
       return res.status(400).json({ message: "Invalid theme.json: Failed to parse JSON." });
     }
@@ -1463,9 +1483,10 @@ export async function uploadTheme(req, res) {
     // Parse and validate theme.json
     let updateThemeJson;
     try {
-      const content = updateThemeJsonEntry.getData().toString("utf8");
+      const content = (await readZipEntry(updateThemeJsonEntry, zipSize)).toString("utf8");
       updateThemeJson = JSON.parse(content);
-    } catch {
+    } catch (error) {
+      if (error instanceof UnsafeZipError) return res.status(400).json({ message: error.message });
       return res.status(400).json({
         message: `Update folder '${versionFolder}' has invalid theme.json: Failed to parse JSON`,
       });
@@ -1565,7 +1586,7 @@ export async function uploadTheme(req, res) {
       await fs.ensureDir(tempDir);
 
       try {
-        zip.extractAllTo(tempDir, /*overwrite*/ false);
+        await extractZipSafely(zip, zipSize, tempDir);
 
         const extractedThemeDir = path.join(tempDir, themeFolderName);
 
@@ -1623,7 +1644,7 @@ export async function uploadTheme(req, res) {
       await fs.ensureDir(tempDir);
 
       try {
-        zip.extractAllTo(tempDir, /*overwrite*/ false);
+        await extractZipSafely(zip, zipSize, tempDir);
 
         const extractedThemeDir = path.join(tempDir, themeFolderName);
         const extractedUpdatesDir = path.join(extractedThemeDir, "updates");
@@ -1745,7 +1766,6 @@ export async function uploadTheme(req, res) {
       theme: newThemeData,
     });
   } catch (error) {
-    console.error("Error extracting theme zip:", error);
     // Attempt cleanup if extraction failed partially for new themes
     if (isNewTheme) {
       try {
@@ -1754,6 +1774,8 @@ export async function uploadTheme(req, res) {
         console.error("Error cleaning up failed theme extraction:", cleanupError);
       }
     }
+    if (error instanceof UnsafeZipError) return res.status(400).json({ message: error.message });
+    console.error("Error extracting theme zip:", error);
     res.status(500).json({ message: "Failed to extract theme zip file." });
   }
   } finally {
@@ -1804,15 +1826,20 @@ export async function saveProjectThemeSettings(req, res) {
 
     // The write and its usage sync are one media section, so media deletion cannot
     // verify between them. See services/contentCoordination.
-    const usageStale = await withContentWriteLock(scope.projectId, async () => {
+    const outcome = await withContentWriteLock(scope.projectId, async () => {
       // A favicon picked from the library just before it was deleted must not be
       // written in; references the settings already carried are left alone.
-      let previousPaths = [];
-      try {
-        const buf = await storage.read(scope, "theme.json");
-        if (buf != null) previousPaths = extractMediaPathsFromThemeSettings(JSON.parse(buf.toString("utf8")));
-      } catch {
-        // No theme.json yet, or unreadable: nothing known to be pre-existing.
+      // No theme.json yet: nothing to compare against or known to be pre-existing.
+      // An unreadable or unparsable one is not "no file" — reading past it would
+      // skip the version check below — so it fails the save instead.
+      const buf = await storage.read(scope, "theme.json");
+      const current = buf == null ? null : JSON.parse(buf.toString("utf8"));
+      const previousPaths = current ? extractMediaPathsFromThemeSettings(current) : [];
+      // A whole file from a screen that loaded the theme before an update would
+      // put the old version and structure back while the project row keeps the
+      // new version, so the update is never offered again. Refuse it.
+      if (current?.version && sanitizedThemeData?.version && current.version !== sanitizedThemeData.version) {
+        return { versionChanged: true };
       }
       await assertIntroducedMediaExists({
         assetStorage: req.adapters.assetStorage,
@@ -1830,13 +1857,20 @@ export async function saveProjectThemeSettings(req, res) {
       // Track media used in theme settings (e.g. favicon) for usage and export
       try {
         await updateThemeSettingsMediaUsage(scope.projectId, sanitizedThemeData);
-        return false;
+        return { usageStale: false };
       } catch (usageError) {
         console.warn("Failed to update theme settings media usage:", usageError.message);
-        return true;
+        return { usageStale: true };
       }
     });
 
+    if (outcome.versionChanged) {
+      return res.status(409).json({
+        message: "The theme was updated since these settings were loaded. Reload to continue.",
+        code: "THEME_VERSION_CHANGED",
+      });
+    }
+    const { usageStale } = outcome;
     const response = { message: "Theme settings saved successfully" };
     // Joins the sanitization warnings already carried here: the settings ARE saved,
     // and this says only that the derived image-usage rows are behind.
@@ -1853,6 +1887,81 @@ export async function saveProjectThemeSettings(req, res) {
     }
     if (handleProjectResolutionError(res, error)) return;
     console.error("Error saving project theme:", error);
+    res.status(500).json({ message: "Error saving project theme" });
+  }
+}
+
+/**
+ * Save theme setting CHANGES (PATCH): only the settings the editor changed, each
+ * with the value it started from, merged into the theme.json held now. A screen
+ * holding an older copy of the theme can then never put back a version,
+ * structure or values it did not change; a setting changed elsewhere since the
+ * screen loaded it is a conflict (409), and nothing is written.
+ * Responds `{ theme, warnings }` with the file as saved.
+ * @param {import('express').Request} req - Express request with `{ changes }` body
+ * @param {import('express').Response} res - Express response object
+ * @returns {Promise<void>}
+ */
+export async function saveProjectThemeSettingChanges(req, res) {
+  try {
+    const { scope } = req;
+    const { storage } = req.adapters;
+
+    const changes = readThemeSettingChanges(req.body);
+    if (!changes) {
+      return res.status(400).json({ message: "Expected { changes: [{ group, id, baseValue?, value? }] }.", code: "INVALID_CHANGES" });
+    }
+
+    const outcome = await withContentWriteLock(scope.projectId, async () => {
+      const buf = await storage.read(scope, "theme.json");
+      // Coded, so the editor can tell it from a server that has no PATCH route.
+      if (buf == null) return { missing: true };
+      const current = JSON.parse(buf.toString("utf8"));
+      if (changes.length === 0) return { theme: current, warnings: [] };
+
+      const { theme, warnings, conflicts } = mergeThemeSettingChanges(current, changes);
+      if (conflicts.length > 0) return { conflicts };
+
+      // A favicon picked from the library just before it was deleted must not be
+      // written in; references the settings already carried are left alone.
+      await assertIntroducedMediaExists({
+        assetStorage: req.adapters.assetStorage,
+        scope,
+        previousPaths: extractMediaPathsFromThemeSettings(current),
+        nextPaths: extractMediaPathsFromThemeSettings(theme),
+      });
+      await storage.write(scope, "theme.json", JSON.stringify(theme, null, 2));
+
+      // The settings ARE saved; this says only that the derived image-usage rows are behind.
+      try {
+        await updateThemeSettingsMediaUsage(scope.projectId, theme);
+      } catch (usageError) {
+        console.warn("Failed to update theme settings media usage:", usageError.message);
+        warnings.push({ code: "MEDIA_USAGE_STALE", path: "theme.json" });
+      }
+      return { theme, warnings };
+    });
+
+    if (outcome.missing) {
+      return res.status(404).json({
+        message: `Theme settings file not found for project ${scope.projectId}.`,
+        code: "THEME_SETTINGS_NOT_FOUND",
+      });
+    }
+    if (outcome.conflicts) {
+      return res.status(409).json({
+        message: "Some of these settings were changed elsewhere since they were loaded.",
+        code: "THEME_SETTINGS_CHANGED",
+        conflicts: outcome.conflicts,
+      });
+    }
+    res.json({ theme: outcome.theme, warnings: outcome.warnings });
+  } catch (error) {
+    if (error?.code === "MEDIA_REFERENCE_MISSING") {
+      return res.status(error.statusCode).json({ message: error.message, code: error.code });
+    }
+    if (handleProjectResolutionError(res, error)) return;
+    console.error("Error saving project theme setting changes:", error);
     res.status(500).json({ message: "Error saving project theme" });
   }
 }

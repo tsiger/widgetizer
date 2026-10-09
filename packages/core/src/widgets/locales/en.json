@@ -1,4 +1,21 @@
 {
+  "site": {
+    "core_form": {
+      "required_note": "Required fields",
+      "submit": "Send message",
+      "select_placeholder": "Select an option",
+      "eyebrow": "Contact",
+      "title": "Get in touch",
+      "description": "Send us a message and we'll get back to you within one business day.",
+      "name_field": "Your name",
+      "email_field": "Email address",
+      "message_field": "Message",
+      "choice_label": "How can we help?",
+      "choice_options": "General inquiry\nSupport\nSales",
+      "consent_label": "I agree to be contacted about my inquiry.",
+      "info_title": "Reach us directly"
+    }
+  },
   "global": {
     "widgets": {
       "settings": {
@@ -138,6 +155,10 @@
       },
       "submit_label": {
         "label": "Submit button label"
+      },
+      "required_note": {
+        "label": "Required fields note",
+        "description": "Shown above the fields when at least one is required."
       },
       "style": {
         "label": "Field style",

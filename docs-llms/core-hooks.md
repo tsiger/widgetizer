@@ -216,6 +216,14 @@ Stay-in-place pages (`Settings.jsx`, App Settings) that don't navigate after sav
 - `CollectionItemAdd.jsx`, `CollectionItemEdit.jsx`
 - `Settings.jsx`
 
+### `useListLanguage` (`packages/editor-ui/src/hooks/useListLanguage.js`)
+
+The language tab of a content list (pages, collection items, menus), kept in the URL as `?language=` so that coming back to the list lands on the tab the user left: the browser's back button returns to a URL that names it, and every back, Cancel and after-create link from a page, item or menu names that content's language (`pagesListHref`, `itemsListHref`, `menusListHref` in `lib/contentRoutes.js`). Returns `[language, setLanguage]`.
+
+- A URL with no language shows the optional `fallback`, else the default language. Choosing a tab always writes it, the default included, so "no language" means "not said".
+- A code the site does not have (a removed language, a hand-typed URL) is dropped from the URL. A fallback tab is written into it. Both replace the history entry, as does choosing a tab, so back leaves the list rather than stepping through its tabs.
+- A single-language site ignores the parameter.
+
 ## Selection & Shortcut Hooks
 
 ### `usePageSelection` (`packages/editor-ui/src/hooks/usePageSelection.js`)
@@ -343,6 +351,8 @@ Loads the active project's collection schemas. Per-project module-level cache (1
 
 Loads the items of a single collection type. Unlike schemas, item lists are **not** cached across navigations — list pages mutate them frequently, so each mount fetches fresh.
 
+Only the newest load updates `items`, `loading` and `error`: a load still running when the type, project or language set changes (or the screen unmounts, or `refetch` starts another) is discarded. `refetch` keeps one identity and always loads for the current type, project and languages, so a caller holding it from an earlier render (an edit that finishes after the user moved on) cannot load what that render saw. After the hook unmounts, `refetch` does nothing. `CollectionItems` also renders one screen per collection (keyed by type), so a pending refresh or an open delete confirmation from one collection cannot act on the next; an edit already sent still finishes on the collection it was made in. The language tab being viewed lives in the URL (`useListLanguage`), and the last one shown is held above that key, so it carries over between collections even though the sidebar's collection links name no language.
+
 **Parameters:** `type` (collection type slug), `params` (optional query params: sort, invalid, limit, offset).
 
 **Returns:** `{ items, loading, error, refetch }`.
@@ -372,6 +382,7 @@ Powers the link picker in `LinkInput.jsx` and the menu editor (`MenuEditor`). Ea
 
 - Per-project module-level cache (1-minute TTL) shared across all `LinkInput` instances, so the many link inputs a page can host don't each refetch.
 - Single in-flight promise per project deduplicates concurrent loads.
+- A load that was in flight when the cache was invalidated still answers the picker that started it, but doesn't refill the cache, so the next picker loads afresh.
 
 #### Used In
 

@@ -10,7 +10,7 @@
 
 **Areas:** OSS = the standalone app; Shared = code used by both apps; Embedding = an app reusing Widgetizer. Names on GitHub tasks are their recorded assignees.
 
-**Jump to:** [Reviews](#ready-to-review) · [Decisions](#decisions-to-make) · [Fixes/checks](#fixes-and-investigations) · [Later](#later--only-when-the-stated-need-arises) · [Embedding apps](#embedding-apps)
+**Jump to:** [Reviews](#ready-to-review) · [Decisions](#decisions-to-make) · [Planned features](#planned-features) · [Fixes/checks](#fixes-and-investigations) · [Later](#later--only-when-the-stated-need-arises) · [Embedding apps](#embedding-apps)
 
 These local files own task status. GitHub is updated only when requested; its board may lag.
 The same IDs appear in [the agent version](TODO-agents.md). Technical detail and evidence live there.
@@ -23,7 +23,7 @@ The same IDs appear in [the agent version](TODO-agents.md). Technical detail and
 
 Multilingual websites work and both real-project walkthroughs passed. Some broader documentation may still lag.
 
-**Next:** Reconcile the remaining documentation before closing the feature locally. [GitHub #115](https://github.com/tsiger/widgetizer/issues/115)
+**Next:** Reconcile the remaining documentation before closing the feature locally, starting with the [multilingual rules](domain/multilingual.md) and [user checklist](user-test-checklist.md). [GitHub #115](https://github.com/tsiger/widgetizer/issues/115)
 
 ### GH118 · Review export asset naming
 
@@ -39,7 +39,7 @@ Exports should identify their assets using a number, app version and date.
 
 Automatic structured information for search engines has been implemented.
 
-**Next:** Check the shipped feature against the original intention before closing the issue. [GitHub #122](https://github.com/tsiger/widgetizer/issues/122)
+**Next:** Check the shipped feature against the [documented rules](core-export.md#structured-data-json-ld) and [business details](core-projects.md#6-site-identity-and-business-details) before closing the issue. [GitHub #122](https://github.com/tsiger/widgetizer/issues/122)
 
 ### GH126 · Review the Windows leave-page prompt fix
 
@@ -61,7 +61,7 @@ The code input had an unwanted gap at the bottom.
 
 **Review · Unrated · OSS · tsiger**
 
-Undo history now survives saves, so autosave should not prevent undoing an edit.
+Undo history now survives saves, so autosave should not prevent undoing an edit. Turning on "Split into pages" currently takes three undo steps to fully reverse.
 
 **Next:** Check the shipped behaviour against the intended experience. [GitHub #134](https://github.com/tsiger/widgetizer/issues/134)
 
@@ -71,7 +71,7 @@ Undo history now survives saves, so autosave should not prevent undoing an edit.
 
 The visible app rename has already been implemented.
 
-**Next:** Check the user-facing names before closing the task. [GitHub #135](https://github.com/tsiger/widgetizer/issues/135)
+**Next:** Check the user-facing names and preserve the [existing installation identity](core-electron.md#display-name-and-installation-identity) before closing the task. [GitHub #135](https://github.com/tsiger/widgetizer/issues/135)
 
 ## Decisions to make
 
@@ -155,7 +155,49 @@ The folder-name field may expose a technical detail users do not need.
 
 **Next:** Decide whether to hide it, explain it or make it advanced. [GitHub #139](https://github.com/tsiger/widgetizer/issues/139)
 
+### MEDIA-BLANK-ALT · Decide whether translated media text can be deliberately blank
+
+**Decision needed · Low · Shared**
+
+The server understands "deliberately blank" alt text for one language (useful for decorative images), but the media panel has no way to set it, and saving the panel quietly turns an existing blank back into "use the main language's text".
+
+**Next:** Either bring back a control for it, or drop the idea from the server and docs so they match the screen.
+
+## Planned features
+
+### SYMLINK-PATHS · Decide whether path checks should follow symlinks
+
+**Decision · Low · Shared**
+
+The checks that keep theme updates and exports inside their own folders look at file paths, not at shortcuts (symlinks) inside them. A shortcut placed inside a project by hand could still lead outside it. Importing a backup or uploading a theme cannot create one.
+
+**Next:** Decide whether to refuse such shortcuts or to document that project folders must not contain them.
+
 ## Fixes and investigations
+
+### SKIPPED-ITEM-NOTICE · Say when a collection item is skipped for a bad slug
+
+**Open · Low · Shared**
+
+A collection item whose stored address is broken (only possible from a hand-edited project or a crafted backup) is now left out of the editor, link pickers and export, with nothing on screen to say so.
+
+**Next:** Show such items on the collection screen, or repair their address, and test it.
+
+### TRANSLATION-CREATE-NAV · A translation created just before leaving a list pulls the user back
+
+**Open · Low · Shared**
+
+If you click to create a missing translation on the pages or collection list and move to another screen before it finishes, the app jumps you into the new translation's editor anyway. The translation itself is created correctly.
+
+**Next:** Skip the jump when you have already left the screen, and test it.
+
+### THEME-UPLOAD-CLEANUP · A failed theme update upload can leave its new versions installed
+
+**Open · Low · OSS**
+
+If uploading new versions for an installed theme fails near the end, the new versions can stay installed even though the upload reported a failure.
+
+**Next:** Put the theme back as it was when the upload fails, and test it.
 
 ### T32 · Check theme-upload validation cleanup
 
@@ -213,6 +255,149 @@ Some failures may look like an empty list or disappear with a brief notification
 
 **Next:** Recheck the reported screens, then fix one coherent group at a time.
 
+### UI-LIST-REPLY · A bad list reply crashes or silently empties editor screens
+
+**Open · Low · Shared**
+
+During one Firefox session after upgrading, some of the editor's data requests came back empty, even though the server had sent everything; a browser restart made it stop. The editor handled those empty replies badly:
+
+- the Pages screen showed "Error 500 / Unexpected error"
+- the page editor showed widgets without names or settings, and "Add widget" listed nothing
+- Media's "Used in" showed codes like `page:abc…` instead of page names
+- the theme-update count failed quietly
+
+None of these told the user that something had failed to load.
+
+**Next:** When a reply isn't what's expected, show a clear "couldn't load" message instead of crashing or showing empty content (not an empty list, which would look like deleted pages). Fix the four cases above and the other screens that use the same language-version code (collection items list, collection item form, editor top bar). Then check the other list screens (menus, media, collections and similar) once: fix crashes and silent failures here, and pass any that show an empty list instead of an error to T64. Also decide whether the server should tell browsers not to keep copies of editor data.
+
+### EXPORT-CLASH-LANG · Catch output-path clashes inside language folders
+
+**Open · Low · Shared**
+
+Export refuses some address clashes only for the main language. In a translated language, a collection can silently overwrite pages: after a theme update adds a collection named like a language code, or with a split homepage and a collection item called "2".
+
+**Next:** Detect these clashes in every language and refuse the export with a clear message.
+
+### THEME-STRINGS · Translate the remaining built-in breadcrumb and business-details text
+
+**Open · Low · Shared**
+
+Translated pages still show some English: "Page 2" and the hidden "Breadcrumb" label in breadcrumbs, and "Mon"–"Sun" and "Closed" in opening hours.
+
+**Next:** Take these words from the theme's language files.
+
+### RENDER-LANG · Make site-wide links and single-widget re-renders follow the page language
+
+**Investigate · Low · Shared**
+
+Links and menus chosen in site-wide theme settings always point to the same language, so translated pages show the original targets. Arch has no such settings, so this only affects other themes. A small preview-only case can also show the wrong language in a breadcrumb.
+
+**Next:** Decide whether theme settings should follow the page language, and fix the preview lookup.
+
+### THEME-UPDATE-RESUME · Undo an interrupted theme update at startup instead of waiting for the next update
+
+**Open · Low · Shared**
+
+If the app crashes in the middle of a theme update, the project is left half-updated: some theme files are tucked away, so pages show without styles or widgets, and a backup made then leaves them out. The update is still offered when the app reopens, and pressing it again repairs the project and updates it. Until then, nothing tells the user why the site looks broken.
+
+**Next:** Undo a half-finished update automatically when the app starts, or close this as covered by retrying the update.
+
+### MENU-MEDIA-USAGE · Count upload links in menus as media usage
+
+**Investigate · Low · Shared**
+
+A file linked from a menu isn't counted as "used", so the media library may let you delete it.
+
+**Next:** First check whether menus can link uploaded files at all; if they can, count those links.
+
+### MEDIA-USAGE-LABELS · Show readable "Used in" labels for other-language content
+
+**Open · Low · Shared**
+
+In the media library, a translated header shows as "El:header (Global)" and translated collection items show a raw code instead of their title.
+
+**Next:** Show a readable title with its language for every language.
+
+### THEME-CHECKER · Close gaps in the theme checker
+
+**Open · Low · OSS**
+
+The new theme checker passes some things that break in an export (thumbnail-size images, image files placed inside a widget folder, image sizes without a width). It crashes on one valid template tag, and it reports wrong results for themes that use linked folders or odd preset names.
+
+**Next:** Fix each case so the checker gives the right answer, with a test for each.
+
+### PREVIEW-SCRIPT-URL · A malformed theme script address stops a widget's live preview
+
+**Open · Low · Shared**
+
+If a theme widget loads a script whose address is badly written (a typo that makes it not a valid address at all), the editor preview stops showing your edits to that widget until the preview reloads. The published site and the first page load are fine; only that one script fails there.
+
+**Next:** Skip an address that can't be read and still apply the widget's update, with a test.
+
+### VIDEO-EMBED-FILTER · Turn YouTube/Vimeo links into embed addresses in one core filter
+
+**Open · Low · Shared**
+
+Arch's Video and Video popup widgets each work out a YouTube or Vimeo link by looking for bits of text in it. They now always point the player at YouTube's or Vimeo's player, but a mistyped video ID still shows a broken player instead of none, don't understand YouTube Shorts or unlisted Vimeo share links, and repeat the same code twice.
+
+**Next:** Add one shared filter in the app that reads the link properly and returns a safe player address (or nothing), use it in both widgets, and document it for theme authors.
+
+### THEME-WARNING-LABEL · Name the corrected setting in theme-save warnings
+
+**Open · Low · Shared**
+
+When a site setting is saved with an invalid value, the warning names it by an internal code such as "tTheme:global.colors.settings.standard_border_color.label" instead of its label.
+
+**Next:** Show the setting's label in the user's language.
+
+### THEME-DISCARD-READBACK · An edit made while a discarded save reads back can bring the discarded value back
+
+**Open · Low · Shared**
+
+In a very narrow case (discarding theme changes while a save is still finishing on an older server, then editing the theme within that moment), a value you discarded can come back as an unsaved change and be saved next time.
+
+**Next:** Keep only the edits made after the discard.
+
+### UNDO-CLEAN · Undoing back to the saved state leaves Save enabled
+
+**Open · Low · Shared**
+
+In the page editor, undoing a site-setting change or a widget delete or move back to exactly what was saved still leaves Save enabled. Saving then does nothing harmful.
+
+**Next:** Turn Save off when undo brings everything back to the saved state.
+
+### EDITOR-THEME-USAGE-NOTICE · The editor's image-tracking notice says "this page" for theme saves
+
+**Open · Low · Shared**
+
+When the editor saves site settings and image tracking falls behind, the notice talks about "this page" instead of the site settings.
+
+**Next:** Use wording about the site settings for that case.
+
+### SETTINGS-LOAD-RETRY · Site settings does not retry a failed load
+
+**Open · Low · Shared**
+
+If Site settings fails to load (for example the server was down), it shows "No theme settings available" with no error, and keeps showing it after the server is back until you open the editor or switch project.
+
+**Next:** Show the error and load again when you return to the page.
+
+### MISSING-IMAGE-MESSAGE · Say why a theme save with a deleted image failed
+
+**Open · Low · Shared**
+
+If an image picked for a site setting is deleted from the media library before you save, the save fails with "Please try again", which won't help.
+
+**Next:** Say that the image is gone and to choose another one.
+
+### THEME-LOCALE-STALE · Theme labels stay untranslated after a theme update
+
+**Open · Low · Shared**
+
+After applying a theme update, settings the update added show internal codes instead of their names until the page is reloaded.
+
+**Next:** Refresh the theme's labels when an update is applied.
+
 ### T66 · Explain form errors beside the right field
 
 **Open · Medium · Shared**
@@ -220,14 +405,6 @@ Some failures may look like an empty list or disappear with a brief notification
 Messages such as “Validation failed” do not explain what the user should change.
 
 **Next:** Start with duplicate or reserved page and item filenames.
-
-### T70 · Preserve nested widget scripts and styles on export
-
-**Open · Low · Shared**
-
-A custom widget can work in preview but lose a script stored in a subfolder when exported.
-
-**Next:** Reproduce with a widget using vendor/lib.js.
 
 ### T73 · Let themes choose the page-title separator
 
@@ -395,17 +572,9 @@ Current controls do not create nested links inside a setting value, but a future
 
 **Deferred · Medium · OSS**
 
-Real backups restore correctly; some unusual or damaged archive shapes have not been examined.
+Real backups restore correctly; some unusual or damaged archive shapes have not been examined. Deliberately crafted backups are now refused (BACKUP-TRUST, completed).
 
 **Next:** Take a bounded case when reported or when changing the backup format.
-
-### R6-DELETE · Clean up after a project deletion partly fails
-
-**Deferred · Medium · OSS**
-
-A disk failure during deletion can leave files after the project disappears from the list.
-
-**Next:** Revisit if leftover folders are reported or recovery is added.
 
 ### QA-EXTRA · Choose extra checks when changing an area
 
@@ -501,6 +670,6 @@ An embedding app’s update must not leave half of the old theme and half of the
 
 **Open · High · Embedding**
 
-A host can configure a page limit, but page-creation paths currently ignore it. OSS is unlimited.
+A host can configure a page limit, but page-creation paths currently ignore it. The collection-item limit can be exceeded when two items are created at once. OSS is unlimited.
 
 **Next:** Fix before relying on a finite page allowance.

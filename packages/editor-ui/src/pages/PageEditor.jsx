@@ -89,6 +89,19 @@ export default function PageEditor() {
     useAutoSave.getState().clearMediaUsageStale();
   }, [mediaUsageStale, t]);
 
+  // Theme settings were changed elsewhere (another tab, or Site settings) since
+  // this editor loaded them. The edits were kept on top of the current settings
+  // and autosave sends them; this only says so.
+  const themeConflict = useAutoSave((state) => state.themeConflict);
+  useEffect(() => {
+    if (!themeConflict) return;
+    useToastStore.getState().showToast(t("pageEditor.themeConflict"), "info");
+    // A setting a theme update removed cannot take the edit that was made to it.
+    if (themeConflict.editsDropped) useToastStore.getState().showToast(t("themeSettings.toasts.settingRemoved"), "warning");
+    useAutoSave.getState().clearThemeConflict();
+    useThemeStore.getState().clearConflict?.();
+  }, [themeConflict, t]);
+
   // Handle block selection (cross-component coordination)
   const handleBlockSelect = (blockId) => {
     setSelectedBlockId(blockId);

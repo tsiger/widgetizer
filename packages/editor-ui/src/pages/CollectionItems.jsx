@@ -31,6 +31,7 @@ import useToastStore from "../stores/toastStore";
 import useProjectStore, { useDefaultLanguage, useIsMultilang } from "../stores/projectStore";
 import useTranslationVersions from "../hooks/useTranslationVersions";
 import LanguageTabs from "../components/content/LanguageTabs";
+import useListLanguage from "../hooks/useListLanguage";
 import TranslationChips from "../components/content/TranslationChips";
 import { itemEditHref, itemAddHref } from "../lib/contentRoutes";
 import { resolveLucideIcon } from "../utils/lucideIcon";
@@ -42,7 +43,28 @@ import LoadingSpinner from "../components/ui/LoadingSpinner";
 import { openCollectionItemPreview } from "../lib/openSitePreview";
 import { useEditorPath } from "../lib/routeBase.jsx";
 
+/**
+ * One screen per collection. The route stays mounted when the user switches
+ * collection, so without the key the screen for A carried on under B: a refresh
+ * due after an edit on A loaded A's items into B's list, and a delete
+ * confirmation opened on A deleted from B by A's slug once confirmed there.
+ * The language being looked at lives in the URL, and the last one shown is held
+ * here, above the key: the sidebar's links to a collection carry no language,
+ * so it is what carries the tab over from one collection to the next.
+ */
 export default function CollectionItems() {
+  const { type } = useParams();
+  const [lastLanguage, setLastLanguage] = useState();
+  const [activeLanguage, setActiveLanguage] = useListLanguage(lastLanguage);
+  // Remembered as it changes, during render (React's pattern for state that tracks
+  // a value), so the next collection's first render already has it.
+  if (activeLanguage !== lastLanguage) setLastLanguage(activeLanguage);
+  return (
+    <CollectionItemsScreen key={type} activeLanguage={activeLanguage} setActiveLanguage={setActiveLanguage} />
+  );
+}
+
+function CollectionItemsScreen({ activeLanguage, setActiveLanguage }) {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { type } = useParams();
@@ -56,7 +78,6 @@ export default function CollectionItems() {
   const isMultilang = useIsMultilang();
   const defaultLanguage = useDefaultLanguage();
 
-  const [activeLanguage, setActiveLanguage] = useState(defaultLanguage);
   const [searchTerm, setSearchTerm] = useState("");
   const [showInvalidOnly, setShowInvalidOnly] = useState(false);
   const [openMenuId, setOpenMenuId] = useState(null);
@@ -72,13 +93,6 @@ export default function CollectionItems() {
   const displayNamePlural = schema?.displayNamePlural || displayName;
 
   // Reset transient UI state when switching collection types.
-  useEffect(() => {
-    setSearchTerm("");
-    setShowInvalidOnly(false);
-    setOpenMenuId(null);
-    setSelectedSlugs([]);
-  }, [type]);
-
   // Keep the local (drag-mutable) order in sync with fetched items.
   useEffect(() => {
     setOrderedItems(items);

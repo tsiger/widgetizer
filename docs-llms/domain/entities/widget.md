@@ -10,7 +10,7 @@ A widget is a section you place on a page: for example, a hero, a gallery, a con
 
 **Home page → Testimonials widget → Review blocks**
 
-A widget offers controls for its own content and appearance. Some widgets also contain blocks, letting you add or rearrange pieces within the section. The theme determines the available widgets and controls.
+A widget offers controls for its own content and appearance. Some widgets also contain blocks, letting you add or rearrange pieces within the section. The theme supplies its widgets and controls; Widgetizer also supplies [three built-in widgets](core-widget.md), unless the theme opts out. [Forms](form.md) have additional identity and export rules.
 
 ### What can you do?
 
@@ -55,7 +55,7 @@ A widget instance belongs to a page version. Its `type` selects a widget definit
 | `settings` | Values for that instance |
 | `blocks` and `blocksOrder` | Child instances and their display order |
 
-Adding a widget builds settings/default blocks from its schema. Duplicating or pasting a widget generates a new widget ID and new block IDs, inserts it into the order, and clears listing/pagination flags. Copying places a snapshot in editor memory; persistence happens when the containing page is saved.
+Adding a widget builds settings/default blocks from its schema. A localized `defaultKey` alone stays a runtime suggestion; paired with a literal `default`, it seeds a stored localized value. Starter blocks can use `defaultKeys` for their own initial wording; see [settings defaults](settings.md#localized-defaults-and-dates). Duplicating or pasting a widget generates a new widget ID and new block IDs, inserts it into the order, and clears listing/pagination flags. Copying places a snapshot in editor memory; persistence happens when the containing page is saved.
 
 A widget has no independent language or translation-group record. Creating a page version initially copies the widget content, after which the versions can diverge in content and structure. Copying an entire page can retain its child IDs because those children live in a different page document; that differs from duplicating a widget within a page.
 

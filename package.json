@@ -39,6 +39,7 @@
     "preset:sync": "node scripts/preset-sync.js",
     "preset:media": "node scripts/pack-preset-media.js",
     "preset:templates": "node scripts/sync-preset-templates.js",
+    "validate:theme": "node scripts/validate-theme.js",
     "validate:locales": "node scripts/validate-locales.js",
     "validate:theme-locales": "node scripts/validate-theme-locales.js",
     "validate:all-locales": "node scripts/validate-locales.js && node scripts/validate-theme-locales.js",

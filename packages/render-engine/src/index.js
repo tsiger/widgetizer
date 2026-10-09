@@ -12,6 +12,8 @@ export {
   renderEnqueuedAssetTags,
   widgetSupportsTransparentHeader,
   planPagination,
+  createLiquidEngine,
+  widgetizerLiquidTags,
 } from "./renderEngine.js";
 
 // Pure `menu`-type setting resolver shared by widget and collection-item rendering.
