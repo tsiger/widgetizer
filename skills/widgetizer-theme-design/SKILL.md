@@ -32,6 +32,7 @@ Read any collection rules identified by the repository instructions or supplied 
 
 - Use answers already supplied in the conversation or brief. Do not restart discovery when handing off between design and implementation.
 - Ask only when the missing answer would materially change the result. Keep each round small and use plain language.
+- If a new exploration's intended character cannot be inferred from the brief or references and the author has not delegated the choice, ask a short question before committing to a direction. Offer two or three possibilities tailored to the audience and content, with a recommendation; this can also serve as the direction proposal below. Wait for the answer before building the preview, and continue any work that does not depend on that choice.
 - Invite the author's knowledge of the business and their taste. Propose concrete design choices with their effects instead of asking the author to specify technical design values.
 - When the author is unsure, give them a useful recommendation to react to. When they delegate a choice, make it and identify the assumption briefly.
 
@@ -43,9 +44,9 @@ Identify the visible qualities that could inform this theme: page composition, t
 
 The author may like only part of a reference. Use their annotations and comments to distinguish desired qualities from incidental details. If their preference is unclear, explain what stands out and invite a reaction to the relevant choices. Do not require them to name fonts or describe design techniques.
 
-For an open-ended brief, research references when browsing is available and propose a small selection of distinct directions, usually two or three. Include visual examples or source links when available, explain how each direction fits the audience and content, and identify your recommendation. Describe meaningful differences in composition, typography and imagery. For example, a restaurant theme could emphasize large dining photographs or give menus and editorial storytelling the leading role.
+For an open-ended brief, research references when browsing is available and propose a small selection of distinct directions, usually two or three. Include visual examples or source links when available, explain how each direction fits the audience and content, and identify your recommendation. Describe meaningful differences in character and intensity as well as composition, typography and imagery. For example, a restaurant theme could emphasize large dining photographs or give menus and editorial storytelling the leading role.
 
-When the author supplies a clear direction, develop it directly. When they delegate the choice, select a suitable direction and proceed within the requested scope. Once a direction is established, carry its defining qualities and reference observations into the working brief so implementation can use them without restarting the discussion.
+When the author supplies a clear direction, develop it directly. When they delegate the choice, select a suitable direction and proceed within the requested scope. Once a direction is established, record its intended character in a few words and briefly explain what it means for typography, contrast, composition, imagery and motion. Carry those decisions and reference observations into the working brief so implementation can use them without restarting the discussion.
 
 ## Preview the direction in a working page
 
@@ -59,7 +60,7 @@ Establish the theme's typography roles, color roles, content widths, spacing, im
 
 Choose examples that reveal how the design works together; the page need not demonstrate every possible widget. These are layouts within the theme and do not require new Widgetizer Core widgets. Keep page text and controls in the real page implementation so that typography, wrapping and responsive behavior can be assessed.
 
-Inspect the rendered page at desktop and mobile widths using available browser tools, then show the author the preview and briefly explain its defining choices. Name any uninspected views or provisional assets. Use this as an early collaboration point when the author wants to review the direction; when they have delegated design decisions, inspect and refine the preview yourself before continuing. Carry accepted changes into the theme's visual rules and subsequent widgets.
+Inspect the rendered page at desktop and mobile widths using available browser tools. Check whether the whole preview expresses the character recorded in the brief, including supporting sections and interactions, and refine any drift before presenting it. Show the author the preview and briefly explain its defining choices. Name any uninspected views or provisional assets. Use this as an early collaboration point when the author wants to review the direction; when they have delegated design decisions, inspect and refine the preview yourself before continuing. Carry accepted changes into the theme's visual rules and subsequent widgets.
 
 This page demonstrates a direction. Completing a reusable theme, its presets and its editor/export checks remains further work.
 

@@ -59,11 +59,11 @@
     },
     {
       "id": "premium-level-of-finish",
-      "instruction": "Premium themes must show a clear increase in design care and detail, even for a small business. Develop the whole page beyond a pleasing palette, fonts and hero: compose each section deliberately, give photographs and useful information appropriate emphasis, refine spacing and alignment, and finish interaction states. Keep layouts calm while making the content relationships and individual character apparent."
+      "instruction": "Premium themes must show a clear increase in design care and detail, even for a small business. Develop the whole page beyond a pleasing palette, fonts and hero: compose each section deliberately, give photographs and useful information appropriate emphasis, refine spacing and alignment, and finish interaction states. Make layouts express the theme's intended character while keeping content relationships clear."
     },
     {
       "id": "explore-layout-variety",
-      "instruction": "Use new explorations to test meaningfully different page compositions and widget layouts as well as colors and typography. Avoid repeating the same large headline, photograph and alternating split sections across the collection. Choose layouts that help the niche's content, interaction and visitor goals; keep them calm and easy to edit.",
+      "instruction": "Use new explorations to test meaningfully different page compositions and widget layouts as well as colors and typography. Directions may range from restrained to forceful. Avoid repeating the same large headline, photograph and alternating split sections across the collection. Choose layouts that help the niche's content, interaction and visitor goals, express the theme's intended character and remain easy to edit.",
       "rollout": "Keep the accepted Common, Kiln, Margin, Afterhours, Cove, Panna, Sill and Parla directions. Continue exploring stronger layout variety. Each retained theme will later have 2–3 presets demonstrating different uses of its design system; follow the preset strategy below."
     },
     {
@@ -82,8 +82,8 @@
       "instruction": "Give practical visitor information such as location, opening hours and pricing a clear hierarchy with meaningful headings and tightly grouped related values. Keep day/time and label/value pairs close enough to read together. Tie actions to the information they serve. Design normal, hover and keyboard-focus states as one coherent treatment; avoid accidental doubled underlines, layout jumps or lost contrast."
     },
     {
-      "id": "gentle-reveal-effects",
-      "instruction": "Introduce gentle reveal effects that suit each theme's calm character. Use restrained fades or small movements with short, considered timing; avoid making visitors wait for content or animating every element independently.",
+      "id": "purposeful-motion",
+      "instruction": "Choose motion that suits the theme's intended character and visitor needs. Gentle reveals, crisp transitions or no animation can all be appropriate. Use considered timing; avoid making visitors wait for content or animating every element independently.",
       "implementation": "Respect reduced-motion preferences, keep content available when animation or JavaScript is disabled, and support widgets added or re-rendered in the editor. Arch's assets/reveal.js and related styles are an implementation reference; adapt the treatment to each theme.",
       "rollout": "Consider in subsequent previews and carry into full theme development. This note does not request changes to the existing previews before review."
     },
@@ -105,5 +105,5 @@
     "scope": "Explore one direction first. Develop the full preset set later; these examples guide the theme's flexibility and do not require building all variants during the initial preview."
   },
   "boundary": "These rules do not prohibit ordinary punctuation in sentences or markers in genuine content lists.",
-  "review": "Review the entire page and its source: composition and level of finish, practical information hierarchy, adjacent separators, purposeful content and action icons, consistent button shape, hover and focus states, CSS-generated decoration, captions, language-specific casing, meaningful heading treatments, and type sizes and readability at desktop and mobile widths. Review reveal timing and reduced-motion behavior when motion is introduced; check token use and widget CSS organization during full theme development. Structural theme validation alone does not check these collection rules."
+  "review": "Review the entire page and its source: expression of the intended character, composition and level of finish, practical information hierarchy, adjacent separators, purposeful content and action icons, consistent button shape, hover and focus states, CSS-generated decoration, captions, language-specific casing, meaningful heading treatments, and type sizes and readability at desktop and mobile widths. Review motion timing and reduced-motion behavior when motion is introduced; check token use and widget CSS organization during full theme development. Structural theme validation alone does not check these collection rules."
 }
