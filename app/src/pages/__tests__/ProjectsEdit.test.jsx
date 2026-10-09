@@ -4,6 +4,8 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 
 const getAllProjects = vi.fn();
+const updateProject = vi.fn();
+const getActiveProject = vi.fn();
 const checkThemeUpdates = vi.fn();
 const applyThemeUpdate = vi.fn();
 const invalidateTheme = vi.fn();
@@ -12,8 +14,8 @@ let storeState;
 vi.mock("@widgetizer/editor-ui/queries/projectManager", () => ({
   getAllProjects: (...args) => getAllProjects(...args),
   checkThemeUpdates: (...args) => checkThemeUpdates(...args),
-  updateProject: vi.fn(),
-  getActiveProject: vi.fn(),
+  updateProject: (...args) => updateProject(...args),
+  getActiveProject: (...args) => getActiveProject(...args),
   applyThemeUpdate: (...args) => applyThemeUpdate(...args),
 }));
 vi.mock("@widgetizer/editor-ui/stores/themeStore", () => ({
@@ -37,10 +39,18 @@ vi.mock("@widgetizer/editor-ui/components/layout/PageLayout.jsx", () => ({
   default: ({ children }) => <div>{children}</div>,
 }));
 vi.mock("../../components/projects/ProjectForm.jsx", () => ({
-  default: () => <p>project form</p>,
+  default: ({ onSubmit }) => (
+    <>
+      <p>project form</p>
+      <button type="button" onClick={() => onSubmit({ name: "Bakery", folderName: "bakery-new" })}>
+        submit form
+      </button>
+    </>
+  ),
 }));
 
 import ProjectsEdit from "../ProjectsEdit.jsx";
+import useToastStore from "@widgetizer/editor-ui/stores/toastStore";
 
 function openDetails(id) {
   render(
@@ -110,5 +120,39 @@ describe("ProjectsEdit — applying a theme update", () => {
 
     await waitFor(() => expect(applyThemeUpdate).toHaveBeenCalled());
     expect(invalidateTheme).not.toHaveBeenCalled();
+  });
+});
+
+describe("ProjectsEdit — folder rename", () => {
+  beforeEach(() => {
+    storeState = { activeProject: { id: "p1" }, loading: false, setActiveProject: vi.fn() };
+    getAllProjects.mockResolvedValue([{ id: "p1", name: "Bakery", folderName: "bakery" }]);
+    getActiveProject.mockReset().mockResolvedValue({ id: "p1", name: "Bakery", folderName: "bakery-new" });
+    useToastStore.getState().showToast.mockReset();
+  });
+
+  it("warns, until dismissed, when the old folder could not be fully removed", async () => {
+    updateProject.mockReset().mockResolvedValue({
+      id: "p1",
+      name: "Bakery",
+      folderName: "bakery-new",
+      folderLeftBehind: "/data/projects/bakery",
+    });
+    openDetails("p1");
+    fireEvent.click(await screen.findByText("submit form"));
+
+    const { showToast } = useToastStore.getState();
+    await waitFor(() => expect(showToast).toHaveBeenCalled());
+    expect(showToast).toHaveBeenCalledWith(expect.any(String), "warning", { duration: null });
+  });
+
+  it("reports a plain success when the rename left nothing behind", async () => {
+    updateProject.mockReset().mockResolvedValue({ id: "p1", name: "Bakery", folderName: "bakery-new" });
+    openDetails("p1");
+    fireEvent.click(await screen.findByText("submit form"));
+
+    const { showToast } = useToastStore.getState();
+    await waitFor(() => expect(showToast).toHaveBeenCalled());
+    expect(showToast).toHaveBeenCalledWith(expect.any(String), "success");
   });
 });

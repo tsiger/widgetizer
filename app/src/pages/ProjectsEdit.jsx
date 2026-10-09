@@ -106,7 +106,7 @@ export default function ProjectsEdit() {
     setIsSubmitting(true);
 
     try {
-      const updatedProject = await updateProject(id, {
+      const { folderLeftBehind, ...updatedProject } = await updateProject(id, {
         ...formData,
         theme: project.theme,
       });
@@ -119,7 +119,16 @@ export default function ProjectsEdit() {
           const refreshedActiveProject = await getActiveProject();
           setActiveProject(refreshedActiveProject);
         }
-        showToast(t("projectsEdit.toasts.updateSuccessRenamed", { name: updatedProject.name }), "success");
+        if (folderLeftBehind) {
+          showToast(
+            t("projectsEdit.toasts.updateRenamedFolderLeftBehind", { name: updatedProject.name, path: folderLeftBehind }),
+            "warning",
+            // Stays until dismissed: it names a folder the user may want to find.
+            { duration: null },
+          );
+        } else {
+          showToast(t("projectsEdit.toasts.updateSuccessRenamed", { name: updatedProject.name }), "success");
+        }
         // No need to navigate as ID is stable
       } else {
         // If this was the active project, refresh the active project state

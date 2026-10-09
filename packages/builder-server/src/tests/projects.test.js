@@ -14,6 +14,7 @@ import assert from "node:assert/strict";
 import fs from "fs-extra";
 import path from "path";
 import os from "os";
+import { randomUUID } from "node:crypto";
 
 // ============================================================================
 // Isolated test environment
@@ -1015,6 +1016,102 @@ describe("updateProject", () => {
     assert.ok(!(await fs.pathExists(oldDir)), "old directory should be removed");
     // New directory should exist
     assert.ok(await fs.pathExists(getProjectDir("renamed-folder")), "new directory should exist");
+  });
+
+  it("keeps the renamed copy when the old folder can only be partly removed", async () => {
+    // Removal deletes entries one by one, so a locked file (Windows) stops it
+    // partway with part of the old folder already gone. The copy is then the only
+    // complete version of the project: the row must point at it, and nothing may
+    // remove it.
+    const oldDir = getProjectDir(project.folderName);
+    const newDir = getProjectDir("renamed-locked");
+    const realRemove = fs.remove;
+    const removeMock = mock.method(fs, "remove", async (target, ...rest) => {
+      if (path.resolve(target) === path.resolve(oldDir)) {
+        await realRemove.call(fs, path.join(oldDir, "theme.json"));
+        throw Object.assign(new Error("EBUSY"), { code: "EBUSY" });
+      }
+      return realRemove.call(fs, target, ...rest);
+    });
+    try {
+      const res = await callController(updateProject, {
+        params: { id: project.id },
+        body: { name: "Original Name", folderName: "renamed-locked" },
+      });
+
+      assert.equal(res._status, 200);
+      assert.equal(res._json.folderName, "renamed-locked");
+      assert.equal(res._json.folderLeftBehind, oldDir);
+      assert.equal(projectRepo.getProjectById(project.id).folderName, "renamed-locked");
+      assert.ok(await fs.pathExists(path.join(newDir, "theme.json")), "the copy is complete");
+      assert.ok(await fs.pathExists(path.join(newDir, "pages", "index.json")), "the copy keeps its pages");
+    } finally {
+      removeMock.mock.restore();
+    }
+  });
+
+  it("leaves the project as it was when the copy fails", async () => {
+    const oldDir = getProjectDir(project.folderName);
+    const newDir = getProjectDir("renamed-copy-fails");
+    const copyMock = mock.method(fs, "copy", async (_src, dest) => {
+      // A copy that fails partway leaves some of the destination behind.
+      await fs.outputJson(path.join(dest, "theme.json"), {});
+      throw Object.assign(new Error("ENOSPC"), { code: "ENOSPC" });
+    });
+    try {
+      const res = await callController(updateProject, {
+        params: { id: project.id },
+        body: { name: "Original Name", folderName: "renamed-copy-fails" },
+      });
+
+      assert.equal(res._status, 500);
+      assert.equal(projectRepo.getProjectById(project.id).folderName, project.folderName);
+      assert.ok(await fs.pathExists(path.join(oldDir, "theme.json")), "the old folder is untouched");
+      assert.ok(await fs.pathExists(path.join(oldDir, "pages", "index.json")));
+      assert.ok(!(await fs.pathExists(newDir)), "the unfinished copy is removed");
+    } finally {
+      copyMock.mock.restore();
+    }
+  });
+
+  it("removes the copy and keeps the old folder when the row cannot be updated", async () => {
+    // Until the row names the copy, the old folder is the project. Another row
+    // claiming the destination name makes the row update fail on the unique
+    // folder_name constraint.
+    const oldDir = getProjectDir(project.folderName);
+    const newDir = getProjectDir("renamed-row-fails");
+    const realCopy = fs.copy;
+    const copyMock = mock.method(fs, "copy", async (...args) => {
+      await realCopy.apply(fs, args);
+      projectRepo.createProject({
+        ...projectRepo.getProjectById(project.id),
+        id: randomUUID(),
+        name: "Claimer",
+        folderName: "renamed-row-fails",
+      });
+    });
+    try {
+      const res = await callController(updateProject, {
+        params: { id: project.id },
+        body: { name: "Original Name", folderName: "renamed-row-fails" },
+      });
+
+      assert.equal(res._status, 500);
+      assert.equal(projectRepo.getProjectById(project.id).folderName, project.folderName);
+      assert.ok(await fs.pathExists(path.join(oldDir, "theme.json")), "the old folder is untouched");
+      assert.ok(!(await fs.pathExists(newDir)), "the copy is removed");
+    } finally {
+      copyMock.mock.restore();
+    }
+  });
+
+  it("reports no folder left behind after a clean rename", async () => {
+    const res = await callController(updateProject, {
+      params: { id: project.id },
+      body: { name: "Original Name", folderName: "renamed-clean" },
+    });
+    assert.equal(res._status, 200);
+    assert.equal(res._json.folderLeftBehind, undefined);
   });
 
   it("preserves project files after folder rename", async () => {

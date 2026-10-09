@@ -860,6 +860,7 @@
       "notFound": "Project not found",
       "loadError": "Failed to load project",
       "updateSuccessRenamed": "Project \"{{name}}\" was updated successfully and folder was renamed.",
+      "updateRenamedFolderLeftBehind": "Project \"{{name}}\" was updated and now uses its new folder, but some files couldn't be removed from the old folder {{path}}",
       "updateSuccess": "Project \"{{name}}\" was updated successfully!",
       "updateError": "Failed to update project",
       "noActiveProject": "Please select or create a project to manage your projects",

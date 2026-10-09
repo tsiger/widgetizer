@@ -738,7 +738,7 @@ export async function updateProject(req, res) {
     // before it: a rejected logo used to leave the directory already moved while the
     // row still named the old one, which strands the project. Everything that can
     // refuse this request now refuses before anything on disk has moved.
-    const { updatedProject, usageStale, languageRefusal } = await withContentWriteLock(id, async () => {
+    const { updatedProject, usageStale, languageRefusal, folderLeftBehind } = await withContentWriteLock(id, async () => {
       // Checked again against the row as it is NOW. Adding a language takes this
       // section and records the code at its end, so the copy loaded before it can
       // still show a single-language site: changing the default then would leave
@@ -765,60 +765,82 @@ export async function updateProject(req, res) {
         });
       }
 
-      if (folderRename) {
-        const oldDir = getProjectDir(folderRename.from);
-        const newDir = getProjectDir(folderRename.to);
-
+      // A folder rename is copy, then repoint the row, then remove the old folder
+      // (copy + remove rather than rename, for Windows). Until the row names the
+      // new folder, the old one is the project and the copy is disposable: the
+      // copy's name was checked free on disk above, so removing it can only remove
+      // what this request made. Once the row names the copy, the copy is the
+      // project and must never be removed; an old folder that cannot be fully
+      // removed (a locked file) is reported, like a deletion's leftover.
+      const oldDir = folderRename ? getProjectDir(folderRename.from) : null;
+      const newDir = folderRename ? getProjectDir(folderRename.to) : null;
+      const discardCopy = async () => {
         try {
-          // Use copy + remove instead of rename for better Windows compatibility
+          await fs.remove(newDir);
+        } catch (cleanupError) {
+          console.warn(`[ProjectController] Failed to remove the unused copy ${newDir}: ${cleanupError.message}`);
+        }
+      };
+
+      if (folderRename) {
+        try {
           await fs.copy(oldDir, newDir);
-          await new Promise((resolve) => setTimeout(resolve, 100));
-          await fs.remove(oldDir);
-        } catch (renameError) {
-          // If copy succeeded but remove failed, try to clean up the new directory
-          try {
-            if (await fs.pathExists(newDir)) {
-              await fs.remove(newDir);
-            }
-          } catch (cleanupError) {
-            console.warn(`Failed to cleanup new directory after error: ${cleanupError.message}`);
-          }
-          throw new Error(`Failed to rename project directory: ${renameError.message}`);
+        } catch (copyError) {
+          await discardCopy();
+          throw new Error(`Failed to rename project directory: ${copyError.message}`);
         }
       }
 
-      const saved = projectRepo.updateProject(id, {
-        folderName: updates.folderName || currentFolderName,
-        name: updates.name,
-        description: updates.description,
-        siteTitle: sanitizedSiteTitle,
-        siteUrl: sanitizedSiteUrl,
-        cleanUrls: updates.cleanUrls,
-        siteIdentity,
-        defaultLanguage: languageFields.defaultLanguage,
-        languages: languageFields.languages,
-        receiveThemeUpdates: updates.receiveThemeUpdates,
-      });
+      let saved;
+      try {
+        saved = projectRepo.updateProject(id, {
+          folderName: updates.folderName || currentFolderName,
+          name: updates.name,
+          description: updates.description,
+          siteTitle: sanitizedSiteTitle,
+          siteUrl: sanitizedSiteUrl,
+          cleanUrls: updates.cleanUrls,
+          siteIdentity,
+          defaultLanguage: languageFields.defaultLanguage,
+          languages: languageFields.languages,
+          receiveThemeUpdates: updates.receiveThemeUpdates,
+        });
+      } catch (rowError) {
+        if (folderRename) await discardCopy();
+        throw rowError;
+      }
 
-      if (siteIdentity === undefined) return { updatedProject: saved, usageStale: false };
+      let folderLeftBehind = null;
+      if (folderRename) {
+        // Windows can still hold handles from the copy for a moment.
+        await new Promise((resolve) => setTimeout(resolve, 100));
+        try {
+          await fs.remove(oldDir);
+        } catch (removeError) {
+          console.warn(`[ProjectController] Could not fully remove the old folder ${oldDir}: ${removeError.message}`);
+          folderLeftBehind = oldDir;
+        }
+      }
+
+      if (siteIdentity === undefined) return { updatedProject: saved, usageStale: false, folderLeftBehind };
 
       try {
         await updateSiteIdentityMediaUsage(id, saved.siteIdentity);
-        return { updatedProject: saved, usageStale: false };
+        return { updatedProject: saved, usageStale: false, folderLeftBehind };
       } catch (error) {
         // The details ARE saved; only the derived usage rows are behind.
         console.warn(`[ProjectController] Failed to update business details media usage: ${error.message}`);
-        return { updatedProject: saved, usageStale: true };
+        return { updatedProject: saved, usageStale: true, folderLeftBehind };
       }
     });
 
     if (languageRefusal) return res.status(400).json({ error: languageRefusal });
 
-    res.json(
-      usageStale
-        ? { ...updatedProject, warnings: [{ code: "MEDIA_USAGE_STALE", path: "site-identity" }] }
-        : updatedProject,
-    );
+    res.json({
+      ...updatedProject,
+      ...(usageStale && { warnings: [{ code: "MEDIA_USAGE_STALE", path: "site-identity" }] }),
+      ...(folderLeftBehind && { folderLeftBehind }),
+    });
   } catch (error) {
     if (error?.code === "MEDIA_REFERENCE_MISSING") {
       return res.status(error.statusCode).json({ error: "Missing media", message: error.message, code: error.code });
