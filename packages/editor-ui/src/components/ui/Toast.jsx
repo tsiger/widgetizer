@@ -35,7 +35,8 @@ export default function Toast({
 				${animationClasses[phase] || animationClasses.visible}
 			`}
     >
-      <div>{message}</div>
+      {/* A file path or URL has no spaces to break at; let it wrap inside the box. */}
+      <div className="min-w-0 [overflow-wrap:anywhere]">{message}</div>
       {onDismiss && (
         <button
           className={`ml-4 ${

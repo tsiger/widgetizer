@@ -718,8 +718,10 @@ export async function updateProject(req, res) {
         return res.status(400).json({ error: "Folder Name can only contain lowercase letters, numbers, and hyphens" });
       }
 
-      // Check for duplicate folderNames (excluding current project)
-      if (projectRepo.projectFolderExists(newFolderName, id)) {
+      // Taken in the DB, or on disk: a folder left behind by a deletion that could
+      // not remove it would otherwise receive this project merged into its old
+      // content, and a failed rename's cleanup would delete it.
+      if (projectRepo.projectFolderExists(newFolderName, id) || (await fs.pathExists(getProjectDir(newFolderName)))) {
         return res.status(400).json({
           error: `A project with folder name "${newFolderName}" already exists. Please choose a different folder name.`,
         });
@@ -827,7 +829,9 @@ export async function updateProject(req, res) {
 }
 
 /**
- * Deletes a project and all its associated files including exports.
+ * Deletes a project and its associated files including exports. A project
+ * folder that cannot be fully removed is reported as `folderLeftBehind` rather
+ * than failing the deletion, which has already happened.
  * @param {import('express').Request} req - Express request object with project ID in params
  * @param {import('express').Response} res - Express response object
  * @returns {Promise<void>}
@@ -846,8 +850,11 @@ export async function deleteProject(req, res) {
 
     res.json({
       success: true,
-      message: `Project "${result.projectName}" and all associated files have been deleted successfully`,
+      message: result.folderLeftBehind
+        ? `Project "${result.projectName}" was deleted, but some of its files could not be removed from ${result.folderLeftBehind}`
+        : `Project "${result.projectName}" and all associated files have been deleted successfully`,
       activeProjectId: result.newActiveProjectId,
+      folderLeftBehind: result.folderLeftBehind,
     });
   } catch (error) {
     console.error("Error deleting project:", error);
@@ -872,7 +879,14 @@ export async function duplicateProject(req, res) {
 
     const allProjects = projectRepo.getAllProjects();
     const newName = generateCopyName(originalProject.name, allProjects.map((p) => p.name));
-    const newFolderName = await generateUniqueSlug(newName, (slug) => projectRepo.projectFolderExists(slug, null), { fallback: "project" });
+    // Free on disk as well as in the DB, like create and import: a folder left
+    // behind by a deletion that could not remove it would otherwise receive this
+    // copy merged into its old content, and a failed copy's cleanup would delete it.
+    const newFolderName = await generateUniqueSlug(
+      newName,
+      async (slug) => projectRepo.projectFolderExists(slug, null) || (await fs.pathExists(getProjectDir(slug))),
+      { fallback: "project" },
+    );
 
     // Create the new project metadata
     const newProject = {

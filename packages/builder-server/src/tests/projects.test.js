@@ -9,7 +9,7 @@
  * Run with: node --test server/tests/projects.test.js
  */
 
-import { describe, it, before, after, beforeEach } from "node:test";
+import { describe, it, before, after, beforeEach, mock } from "node:test";
 import assert from "node:assert/strict";
 import fs from "fs-extra";
 import path from "path";
@@ -1096,6 +1096,25 @@ describe("updateProject", () => {
     assert.match(res._json.error, /folder name.*already exists/i);
   });
 
+  it("refuses a folderName that only exists on disk, leaving both folders as they were", async () => {
+    // A folder left behind by a deletion that could not remove it is taken: the
+    // project must not merge into it, and nothing may delete it.
+    const leftover = getProjectDir("leftover-folder");
+    await fs.outputJson(path.join(leftover, "pages", "stray.json"), { name: "Stray" });
+    const currentDir = getProjectDir(project.folderName);
+
+    const res = await callController(updateProject, {
+      params: { id: project.id },
+      body: { name: "Original Name", folderName: "leftover-folder" },
+    });
+
+    assert.equal(res._status, 400);
+    assert.match(res._json.error, /folder name.*already exists/i);
+    assert.deepEqual(await fs.readdir(path.join(leftover, "pages")), ["stray.json"]);
+    assert.ok(await fs.pathExists(currentDir), "the project's own folder is untouched");
+    assert.equal(projectRepo.getProjectById(project.id).folderName, project.folderName);
+  });
+
   it("returns 404 for non-existent project", async () => {
     const res = await callController(updateProject, {
       params: { id: "non-existent-uuid" },
@@ -1340,6 +1359,37 @@ describe("deleteProject", () => {
     assert.match(res._json.message, /Named Project/);
   });
 
+  it("reports a folder it could not remove instead of failing the deletion", async () => {
+    // The row is already gone when the folder is removed, so a locked file
+    // (Windows) must not turn the deletion into a failure: the project has left
+    // the list either way.
+    const project = await createTestProject("Locked Files");
+    const dir = getProjectDir(project.folderName);
+    const realRemove = fs.remove;
+    const removeMock = mock.method(fs, "remove", async (target, ...rest) => {
+      if (path.resolve(target) === path.resolve(dir)) throw Object.assign(new Error("EBUSY"), { code: "EBUSY" });
+      return realRemove.call(fs, target, ...rest);
+    });
+    try {
+      const res = await callController(deleteProject, { params: { id: project.id } });
+
+      assert.equal(res._status, 200);
+      assert.equal(res._json.success, true);
+      assert.equal(res._json.folderLeftBehind, dir);
+      assert.match(res._json.message, /could not be removed/);
+      const data = await projectRepo.readProjectsData();
+      assert.equal(data.projects.length, 0);
+    } finally {
+      removeMock.mock.restore();
+    }
+  });
+
+  it("reports no folder left behind after a complete deletion", async () => {
+    const project = await createTestProject("Clean Delete");
+    const res = await callController(deleteProject, { params: { id: project.id } });
+    assert.equal(res._json.folderLeftBehind, null);
+  });
+
   it("cascades deletion to media metadata in SQLite", async () => {
     const project = await createTestProject("Media Delete");
     const mediaData = createTestMediaData();
@@ -1433,6 +1483,22 @@ describe("duplicateProject", () => {
 
     const data = await projectRepo.readProjectsData();
     assert.equal(data.projects.length, 2);
+  });
+
+  it("never copies into a folder left on disk by an earlier deletion", async () => {
+    // A folder left on disk by a deletion that could not remove it is taken, so
+    // the copy never merges into its old content.
+    const leftover = getProjectDir("original-project-copy");
+    await fs.outputJson(path.join(leftover, "pages", "stray.json"), { name: "Stray" });
+
+    const res = await callController(duplicateProject, { params: { id: original.id } });
+
+    assert.equal(res._status, 201);
+    assert.notEqual(res._json.folderName, "original-project-copy");
+    const copyDir = getProjectDir(res._json.folderName);
+    assert.ok(!(await fs.pathExists(path.join(copyDir, "pages", "stray.json"))), "copy has none of the leftover");
+    assert.deepEqual(await fs.readdir(leftover), ["pages"], "leftover folder is left as it was");
+    assert.ok(await fs.pathExists(path.join(leftover, "pages", "stray.json")));
   });
 
   it("returns 404 for non-existent project", async () => {

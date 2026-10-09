@@ -180,7 +180,8 @@ export async function updateProject(projectId, updates) {
 /**
  * Permanently delete a project and all its associated data.
  * @param {string} projectId - The ID of the project to delete
- * @returns {Promise<{success: boolean, message: string}>} Deletion confirmation
+ * @returns {Promise<{success: boolean, message: string, activeProjectId: string|null, folderLeftBehind: string|null}>}
+ *   Deletion confirmation; `folderLeftBehind` is the project folder's path when it could not be fully removed
  * @throws {Error} If the project cannot be deleted
  */
 export async function deleteProject(projectId) {

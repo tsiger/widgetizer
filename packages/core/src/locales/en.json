@@ -573,6 +573,7 @@
     },
     "toasts": {
       "deleteSuccess": "Project \"{{name}}\" was deleted successfully",
+      "deleteFolderLeftBehind": "Project \"{{name}}\" was deleted, but some of its files couldn't be removed from {{path}}",
       "deleteError": "Failed to delete project",
       "cannotDeleteActive": "Cannot delete the active project. Please set another project as active first.",
       "setActiveSuccess": "\"{{name}}\" is now the active project",
