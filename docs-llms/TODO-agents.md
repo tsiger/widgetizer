@@ -379,16 +379,6 @@ Recommended: on server start, check each project for a leftover `.theme-update-b
 
 **Start:** [themeUpdateService.js](../packages/builder-server/src/services/themeUpdateService.js), [server-common.js](../app/server-common.js). **Source:** 2026-10-05 code review of `48eef6f4..9e98dad7`; narrowed 2026-10-06.
 
-### DUPLICATE-FOLDER · Duplicating into an existing folder can merge into it and later delete it
-
-**Open · Low · Shared**
-
-Duplicate checks the new folder name against the database only (`projectController.js` ~851), unlike `resolveProjectIdentity`. A leftover folder with that name (e.g. from R6-DELETE) gets merged into by `fs.copy`, and if the duplicate then fails, the cleanup (`fs.remove(newDir)` / `discardHalfMadeProject`, ~879-893) deletes that pre-existing folder. Read only.
-
-**Done when:** Duplicate picks a folder name free on disk and in the DB, and cleanup only removes what it created.
-
-**Start:** [projectController.js](../packages/builder-server/src/controllers/projectController.js). **Source:** 2026-10-05 code review of `48eef6f4..9e98dad7`.
-
 ### MENU-MEDIA-USAGE · Count upload links in menus as media usage
 
 **Investigate · Low · Shared**
@@ -457,15 +447,15 @@ A theme save whose value the server corrects warns `"tTheme:global.colors.settin
 
 **Start:** [Settings.jsx](../packages/editor-ui/src/pages/Settings.jsx), [useThemeLocale.js](../packages/editor-ui/src/hooks/useThemeLocale.js). **Source:** 2026-10-07 browser regression pass on `theme-save-concurrency`.
 
-### SETTINGS-DISCARD · Site settings keeps a draft the user chose to discard
+### THEME-DISCARD-READBACK · An edit made while a discarded save reads back can bring the discarded value back
 
 **Open · Low · Shared**
 
-On Site settings with unsaved changes, leaving shows "You have unsaved changes. If you leave this page, they will be lost." with "Discard changes". Choosing it leaves, but `useFormNavigationGuard` (~84-92) only proceeds; nothing resets `themeStore`, and Settings' mount effect (~44-50) keeps a draft for the same project, so returning shows the "discarded" edits, still unsaved. The page editor's discard does reset (`saveStore.reset` → `discardDraft`).
+When a theme draft is discarded while its save is in flight and the save returns no theme (the whole-file fallback), `runSave` (`themeStore.js` ~108-116) reads the server back. If the user edits the theme during that read, `discardedNow` is false and the edits kept on top are `diffThemeSettings(sent, live)`. `sent` holds the discarded edit and `live` the reverted draft plus the new edit, so the reverted (pre-discard) value rides on top of the saved one as an unsaved edit, and the next save sends it. The window is one read-back request. Not introduced by `d9d0ce12`: the page editor's earlier read-back (`reconcileFromServer`) produced the same result. Found by the 2026-10-09 review of the SETTINGS-DISCARD fix.
 
-**Done when:** Discarding on Site settings drops the theme draft (or the dialog stops promising it will), with a test.
+**Done when:** Only edits made after the discard are kept on top of the read-back copy (for example, diff against the baseline the discard reverted to), with a test for an edit during the read-back.
 
-**Start:** [useFormNavigationGuard.js](../packages/editor-ui/src/hooks/useFormNavigationGuard.js), [Settings.jsx](../packages/editor-ui/src/pages/Settings.jsx). **Source:** 2026-10-07 browser regression pass on `theme-save-concurrency`.
+**Start:** [themeStore.js](../packages/editor-ui/src/stores/themeStore.js), [themeStore tests](../packages/editor-ui/src/stores/__tests__/themeStore.test.js). **Source:** 2026-10-09 review of `d9d0ce12`.
 
 ### UNDO-CLEAN · Undoing back to the saved state leaves Save enabled
 
@@ -739,16 +729,6 @@ Candidates: truncated ZIP, future formatVersion, valid JSON with invalid content
 
 **Start:** [projects.md](domain/operations/projects.md). **Source:** Domain review R8.
 
-### R6-DELETE · Clean up after a project deletion partly fails
-
-**Deferred · Medium · OSS**
-
-Project row deletion precedes directory removal. Establish retry/orphan policy before new recovery machinery; theme-update rollback is a separate completed change.
-
-**Done when:** Reported partial deletion has an honest outcome and bounded cleanup.
-
-**Start:** [projects.md](domain/operations/projects.md). **Source:** Domain review R6.
-
 ### QA-EXTRA · Choose extra checks when changing an area
 
 **Deferred · Low · Tests**
@@ -910,7 +890,7 @@ These are historical suggestions, not an active audit plan or proof that tests a
 | M5 | Block reference combinations if relevant; future nested values are R5-NESTED. |
 | M6 | Same rules through alternate write/render paths; explicit raw code versus richtext |
 | T1 | Library deletion in-use checks, invalid packages, cache refresh and independent project copies |
-| T2 | Database-version-write failure is an accepted limitation, not a new fix task. Project deletion recovery is R6-DELETE. |
+| T2 | Database-version-write failure is an accepted limitation, not a new fix task. Project deletion reports a folder it could not remove (`folderLeftBehind`). |
 | O1 | Full navigation assertions beyond C10's inspected additions: same slugs, collection prefixes, clean URLs, pagination and token expiry |
 | O2 | Output/record cleanup for failures; retained-version boundaries and export/delete concurrency |
 | O3 | Both real-project walkthroughs complete; no remaining task from this row. |

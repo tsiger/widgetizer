@@ -302,14 +302,6 @@ If the app crashes in the middle of a theme update, the project is left half-upd
 
 **Next:** Undo a half-finished update automatically when the app starts, or close this as covered by retrying the update.
 
-### DUPLICATE-FOLDER · Duplicating into an existing folder can merge into it and later delete it
-
-**Open · Low · Shared**
-
-If a stray folder already has the name a duplicate would use, the copy is merged into it, and if the duplicate fails the cleanup deletes that folder.
-
-**Next:** Choose a folder name that is free on disk, and only clean up what the duplicate created.
-
 ### MENU-MEDIA-USAGE · Count upload links in menus as media usage
 
 **Investigate · Low · Shared**
@@ -358,13 +350,13 @@ When a site setting is saved with an invalid value, the warning names it by an i
 
 **Next:** Show the setting's label in the user's language.
 
-### SETTINGS-DISCARD · Site settings keeps a draft the user chose to discard
+### THEME-DISCARD-READBACK · An edit made while a discarded save reads back can bring the discarded value back
 
 **Open · Low · Shared**
 
-Leaving Site settings with unsaved changes and choosing "Discard changes" still shows those changes, unsaved, when you come back, even though the dialog says they will be lost.
+In a very narrow case (discarding theme changes while a save is still finishing on an older server, then editing the theme within that moment), a value you discarded can come back as an unsaved change and be saved next time.
 
-**Next:** Make "Discard changes" really drop the changes, or change what the dialog promises.
+**Next:** Keep only the edits made after the discard.
 
 ### UNDO-CLEAN · Undoing back to the saved state leaves Save enabled
 
@@ -583,14 +575,6 @@ Current controls do not create nested links inside a setting value, but a future
 Real backups restore correctly; some unusual or damaged archive shapes have not been examined. Deliberately crafted backups are now refused (BACKUP-TRUST, completed).
 
 **Next:** Take a bounded case when reported or when changing the backup format.
-
-### R6-DELETE · Clean up after a project deletion partly fails
-
-**Deferred · Medium · OSS**
-
-A disk failure during deletion can leave files after the project disappears from the list.
-
-**Next:** Revisit if leftover folders are reported or recovery is added.
 
 ### QA-EXTRA · Choose extra checks when changing an area
 

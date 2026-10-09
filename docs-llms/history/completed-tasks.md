@@ -237,6 +237,46 @@ Settings allowed a save while another was pending and `themeStore.saveSettings()
 
 **Body at:** `b10a6774:docs-llms/TODO-agents.md`.
 
+### SETTINGS-DISCARD · Site settings keeps a draft the user chose to discard
+
+**Done · High · Shared · 2026-10-09**
+
+Leaving Site settings with unsaved changes and choosing "Discard changes" only let the navigation through (`useFormNavigationGuard`); the theme draft stayed in `themeStore`. Reproduced 2026-10-09: the page editor then opened with Save enabled, and its next save sent the theme drift, writing the discarded value to `theme.json`. Re-rated from Low to High as a source-data integrity bug.
+
+**Resolution:** the form navigation guard takes an optional `onDiscard`, run before the navigation proceeds (`useGuardedFormPage(dirty, { onDiscard })`); Site settings passes `themeStore.discardDraft`. A save in flight when the draft is discarded reads the server's copy back on the whole-file fallback too, rather than rebaselining to the sent values under the reverted draft. Reviewed by Codex and Fable; the remaining narrow read-back race is THEME-DISCARD-READBACK. Fix `d9d0ce12`.
+
+**Body at:** `d9d0ce12:docs-llms/TODO-agents.md`.
+
+### DUPLICATE-FOLDER · Duplicating into an existing folder can merge into it and later delete it
+
+**Done · Medium · Shared · 2026-10-09**
+
+`duplicateProject` checked the copy's folder name against the database only, unlike `resolveProjectIdentity` (create, import). A folder left on disk by a deletion that could not remove it received the copy merged into its old content (stray pages, items and uploads appeared in the new project), and a failed copy's cleanup removed the whole pre-existing folder. Reviews found the same gap in folder rename (`updateProject`). Re-rated from Low as a source-data integrity bug.
+
+**Resolution:** duplicate and folder rename treat a folder that exists on disk as taken (rename refuses it with the existing "already exists" message). Reviewed by Codex and Fable; the pre-existing rename failure that can delete the only complete copy is RENAME-PARTIAL-REMOVE. Fix `d9c99804`.
+
+**Body at:** `d9c99804:docs-llms/TODO-agents.md`.
+
+### R6-DELETE · Clean up after a project deletion partly fails
+
+**Done · Medium · OSS · 2026-10-09**
+
+Project deletion removes the row (and reassigns the active project) before removing the directory. A directory that could not be fully removed (a Windows file lock) made the API answer 500 although the project was already gone; the Projects screen showed a failure and kept the stale row, and the leftover folder could later be reused by duplicate or rename.
+
+**Resolution:** owner's choice: keep the order and report honestly. `deleteProjectById` catches the removal failure and returns `folderLeftBehind`; DELETE answers 200 with it; the Projects screen reloads and shows a warning with the path that stays until dismissed. Leftovers are not cleaned up automatically; every folder-allocating path treats them as taken (see DUPLICATE-FOLDER). Fix `d9c99804`.
+
+**Body at:** `d9c99804:docs-llms/TODO-agents.md`.
+
+### RENAME-PARTIAL-REMOVE · A failed folder rename can delete the only complete copy of a project
+
+**Done · High · OSS · 2026-10-09**
+
+Changing a project's folder name (`updateProject`) copied the folder, removed the old one, then updated the row, all in one try whose catch removed the new folder. `fs.remove` deletes entries one by one, so a removal stopped partway (a Windows file lock) had already deleted part of the old folder; the catch then deleted the new, complete copy, and the row kept naming the half-removed old folder. Found 2026-10-09 while reviewing the DUPLICATE-FOLDER fix.
+
+**Resolution:** the rename copies, points the row at the copy, then removes the old folder. A failed copy or row update removes only the copy (its destination is checked free on disk first), leaving the old folder as the project; an old folder that cannot be fully removed is reported as `folderLeftBehind`, and the project details screen shows a warning that stays until dismissed. Reviewed by Codex and Fable. Known limitations, judged not reachable in normal single-tab use: two renames of the same project to the same name at once (Save is disabled while saving), an upload or save still in flight when a rename finishes, and a deletion during a rename (the edit screen opens only for the active project, which cannot be deleted). Fix `77059a71`.
+
+**Body at:** `77059a71:docs-llms/TODO-agents.md`.
+
 ## Reconciliation decisions
 
 - GitHub #115, #122, #126, #133, #134 and #135 have implementation evidence. Their remaining local entries are review/documentation/integration work, not instructions to rebuild the features. GitHub statuses were left unchanged.
