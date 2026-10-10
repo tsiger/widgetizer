@@ -31,3 +31,5 @@ tmp/
 temp-webp/
 .obsidian/
 docs-entities/.trash/
+themes/widgetizer-saas-theme/
+/themes/__*/
