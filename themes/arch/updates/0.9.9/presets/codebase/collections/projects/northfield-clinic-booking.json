@@ -1,0 +1,12 @@
+{
+  "slug": "northfield-clinic-booking",
+  "schemaVersion": 1,
+  "settings": {
+    "title": "Appointment System for Northfield Dental",
+    "summary": "We built a self-serve booking and reminder system that cut no-shows and freed up the front desk.",
+    "description": "<p>Northfield's three clinics booked everything by phone, and the front desk spent most of the morning playing voicemail tag with patients. The phone line was busy when patients had a free minute to call, and the staff were calling back when patients were at work.</p><h2>The brief</h2><p>Northfield wanted patients to be able to book and reschedule on their own, without ever forcing them to. Plenty of their patients still prefer to call, so the new system had to sit alongside the phone rather than replace it.</p><h2>What we built</h2><p>We wrote a booking app tied directly to their practice calendar, so the slots a patient sees are the real openings, updated the moment a booking is made at any clinic. Patients pick a time, get a text reminder before the visit, and can tap a single link to reschedule if something comes up.</p><ul><li>Real-time slot availability across all three clinics</li><li>Self-serve booking that runs next to the existing phone line</li><li>Text reminders ahead of each appointment</li><li>A one-tap reschedule link</li></ul><p>The reschedule link did more than we expected. Before, a patient who could not make it would simply not show up, because cancelling meant another phone call. Giving them one tap to move the appointment turned a lot of no-shows into rebookings.</p><h2>The outcome</h2><p>No-shows fell by roughly a quarter, and the staff got back about two hours a day they used to spend on the phone. The front desk now spends that time with the patients who are actually in the building.</p>",
+    "client": "Northfield Dental Group",
+    "year": "2025",
+    "featured_image": "/uploads/images/codebase-projects-northfield-clinic-booking.webp"
+  }
+}

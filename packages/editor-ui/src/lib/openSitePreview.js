@@ -48,9 +48,10 @@ function openResolvedPreview(previewPath) {
  * click through the rest of the site.
  *
  * @param {string} pageId
+ * @param {string} [language] - which language's page; a slug is unique per language
  */
-export function openPagePreview(pageId) {
-  openResolvedPreview(getStandalonePreviewPath(pageId));
+export function openPagePreview(pageId, language) {
+  openResolvedPreview(getStandalonePreviewPath(pageId, language));
 }
 
 /**
@@ -61,7 +62,8 @@ export function openPagePreview(pageId) {
  *
  * @param {string} slugPrefix
  * @param {string} slug
+ * @param {string} [language] - which language's item
  */
-export function openCollectionItemPreview(slugPrefix, slug) {
-  openResolvedPreview(getStandaloneCollectionPreviewPath(slugPrefix, slug));
+export function openCollectionItemPreview(slugPrefix, slug, language) {
+  openResolvedPreview(getStandaloneCollectionPreviewPath(slugPrefix, slug, language));
 }

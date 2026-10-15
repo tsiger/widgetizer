@@ -1,5 +1,6 @@
 import path from "path";
 import { Hash } from "liquidjs";
+import { renderedLanguage, resolveMediaMetadata } from "../utils/mediaMetadata.js";
 
 export const ImageTag = {
   parse(tagToken) {
@@ -31,7 +32,7 @@ export const ImageTag = {
     if (!mediaFile) {
       if (output === "url" || output === "path") return `${imageBasePath}/${filename}`;
       const attrs = [`src="${imageBasePath}/${filename}"`];
-      if (alt) attrs.push(`alt="${alt.replace(/"/g, "&quot;")}"`);
+      attrs.push(`alt="${String(alt ?? "").replace(/"/g, "&quot;")}"`);
       if (cssClass) attrs.push(`class="${cssClass}"`);
       if (options.loading) attrs.push(`loading="${options.loading}"`);
       else if (lazy) attrs.push('loading="lazy"');
@@ -71,11 +72,16 @@ export const ImageTag = {
     const attrs = [];
     attrs.push(`src="${imageBasePath}/${path.basename(imageSize.path)}"`);
 
-    const finalAlt = alt || mediaFile.metadata?.alt || "";
+    // The library is shared across languages; only alt/title/caption vary, and
+    // only where someone translated them. An untranslated field inherits the
+    // default language, a deliberately empty one stays empty.
+    const metadata = resolveMediaMetadata(mediaFile, renderedLanguage(context));
+
+    const finalAlt = alt || metadata.alt || "";
     attrs.push(`alt="${finalAlt.replace(/"/g, "&quot;")}"`);
 
-    if (title || mediaFile.metadata?.title) {
-      const finalTitle = title || mediaFile.metadata?.title;
+    if (title || metadata.title) {
+      const finalTitle = title || metadata.title;
       attrs.push(`title="${finalTitle.replace(/"/g, "&quot;")}"`);
     }
 

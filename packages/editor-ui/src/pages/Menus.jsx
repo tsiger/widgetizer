@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Link, useNavigate, useLocation, useNavigationType } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { ListTree, Trash2, Pencil, CirclePlus, Copy, MoreVertical } from "lucide-react";
 
@@ -9,12 +9,16 @@ import Table from "../components/ui/Table";
 import Button, { IconButton } from "../components/ui/Button";
 import useConfirmationAction from "../hooks/useConfirmationAction";
 import useFormatDate from "../hooks/useFormatDate";
+import { hasIncompleteReferenceCleanup } from "../lib/referenceCleanupWarning";
 
 import { getAllMenus, deleteMenu, duplicateMenu } from "../queries/menuManager";
 import { sortItemsByCopyName } from "../utils/copyNameSort";
 
 import useToastStore from "../stores/toastStore";
-import useProjectStore from "../stores/projectStore";
+import useProjectStore, { useDefaultLanguage, useIsMultilang } from "../stores/projectStore";
+import LanguageTabs from "../components/content/LanguageTabs";
+import useListLanguage from "../hooks/useListLanguage";
+import { menuStructureHref, menuSettingsHref, menuAddHref } from "../lib/contentRoutes";
 import { useEditorPath } from "../lib/routeBase.jsx";
 
 export default function Menus() {
@@ -29,9 +33,17 @@ export default function Menus() {
   const { formatDate } = useFormatDate();
   const showToast = useToastStore((state) => state.showToast);
   const activeProject = useProjectStore((state) => state.activeProject);
+  const isMultilang = useIsMultilang();
+  const defaultLanguage = useDefaultLanguage();
+  const [activeLanguage, setActiveLanguage] = useListLanguage();
 
-  // Reload menus when navigating to this page or when active project changes
+  // Reload menus when navigating to this page or when active project changes.
+  // Choosing a language tab replaces the URL in place, which is not a new visit.
+  const navigationType = useNavigationType();
+  const loadedFor = useRef(null);
   useEffect(() => {
+    if (navigationType === "REPLACE" && loadedFor.current === activeProject?.id) return;
+    loadedFor.current = activeProject?.id;
     loadMenus();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.key, activeProject?.id]);
@@ -71,23 +83,29 @@ export default function Menus() {
   };
 
   const handleNewMenu = () => {
-    navigate(editorPath("/menus/add"));
+    // A new menu belongs to the language being looked at.
+    navigate(editorPath(menuAddHref(isMultilang ? activeLanguage : undefined)));
   };
 
   const handleDelete = async (data) => {
     try {
-      await deleteMenu(data.id);
-      setMenus(menus.filter((menu) => menu.id !== data.id));
-      showToast(t("menus.toasts.deleteSuccess", { name: data.name }), "success");
+      const result = await deleteMenu(data.id, data.language);
+      setMenus(menus.filter((menu) => !(menu.id === data.id && menu.language === data.language)));
+      showToast(
+        hasIncompleteReferenceCleanup(result)
+          ? t("menus.toasts.deleteLinksIncomplete", { name: data.name })
+          : t("menus.toasts.deleteSuccess", { name: data.name }),
+        hasIncompleteReferenceCleanup(result) ? "warning" : "success",
+      );
     } catch (error) {
       console.error("Failed to delete menu:", error);
       showToast(t("menus.toasts.deleteError"), "error");
     }
   };
 
-  const handleDuplicate = async (menuId) => {
+  const handleDuplicate = async (menuId, language) => {
     try {
-      const newMenu = await duplicateMenu(menuId);
+      const newMenu = await duplicateMenu(menuId, language);
       setMenus([...menus, newMenu]);
       showToast(t("menus.toasts.duplicateSuccess"), "success");
     } catch (error) {
@@ -98,14 +116,17 @@ export default function Menus() {
 
   const { confirm, confirmationModal } = useConfirmationAction(handleDelete);
 
-  const openDeleteConfirmation = (id, name) => {
+  const openDeleteConfirmation = (id, name, language) => {
     confirm({
       title: t("menus.deleteModal.title"),
       message: t("menus.deleteModal.message", { name }),
       confirmText: t("menus.deleteModal.confirm"),
       cancelText: t("menus.deleteModal.cancel"),
       variant: "danger",
-      data: { id, name },
+      data: { id, name, language },
+      // Opened from the row menu, which closes on the same click — hand focus
+      // back to its trigger, not to the menu item that is about to unmount.
+      returnFocusTo: menuRef.current?.querySelector('[aria-haspopup="menu"]'),
     });
   };
 
@@ -117,8 +138,17 @@ export default function Menus() {
     );
   }
 
-  const sortedMenus = sortItemsByCopyName(menus);
-  const hasMenus = sortedMenus.length > 0;
+  const menusInLanguage = isMultilang
+    ? menus.filter((menu) => (menu.language || defaultLanguage) === activeLanguage)
+    : menus;
+  const sortedMenus = sortItemsByCopyName(menusInLanguage);
+  // The tabs stay reachable even when the active one is empty, so a language
+  // whose menus were all deleted can still take a new one.
+  const hasMenus = menus.length > 0;
+
+  const languageTabs = (
+    <LanguageTabs value={activeLanguage} onChange={setActiveLanguage} label={t("menus.languages.tabsLabel")} />
+  );
 
   return (
     <PageLayout
@@ -133,6 +163,7 @@ export default function Menus() {
           : undefined
       }
     >
+      {languageTabs}
       {hasMenus ? (
         <div>
           <Table
@@ -150,7 +181,7 @@ export default function Menus() {
                 <>
                   <td className="py-3 px-4">
                     <Link
-                      to={editorPath(`/menus/${menu.id}/structure`)}
+                      to={editorPath(menuStructureHref(menu, isMultilang))}
                       className="block w-full min-w-0 rounded-sm font-semibold text-slate-900 transition-colors hover:text-pink-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pink-500 focus-visible:ring-offset-2"
                       title={menu.name}
                     >
@@ -181,7 +212,7 @@ export default function Menus() {
                       {openMenuId === menu.id && (
                         <div className="absolute right-0 top-full z-10 mt-1 w-60 rounded-md border border-slate-200 bg-white py-1 shadow-lg">
                           <Link
-                            to={editorPath(`/menus/${menu.id}/structure`)}
+                            to={editorPath(menuStructureHref(menu, isMultilang))}
                             onClick={() => setOpenMenuId(null)}
                             className={`${menuButtonClass} text-slate-700 hover:bg-slate-50`}
                           >
@@ -189,7 +220,7 @@ export default function Menus() {
                             {t("menus.actions.editStructure")}
                           </Link>
                           <Link
-                            to={editorPath(`/menus/edit/${menu.id}`)}
+                            to={editorPath(menuSettingsHref(menu, isMultilang))}
                             onClick={() => setOpenMenuId(null)}
                             className={`${menuButtonClass} text-slate-700 hover:bg-slate-50`}
                           >
@@ -200,7 +231,7 @@ export default function Menus() {
                             type="button"
                             onClick={() => {
                               setOpenMenuId(null);
-                              handleDuplicate(menu.id);
+                              handleDuplicate(menu.id, menu.language);
                             }}
                             className={`${menuButtonClass} text-slate-700 hover:bg-slate-50`}
                           >
@@ -212,7 +243,7 @@ export default function Menus() {
                             type="button"
                             onClick={() => {
                               setOpenMenuId(null);
-                              openDeleteConfirmation(menu.id, menu.name);
+                              openDeleteConfirmation(menu.id, menu.name, menu.language);
                             }}
                             className={`${menuButtonClass} text-red-600 hover:bg-red-50`}
                           >
@@ -233,11 +264,9 @@ export default function Menus() {
           <ListTree className="mx-auto mb-4 text-slate-400" size={48} />
           <h2 className="text-xl font-semibold mb-2">{t("menus.emptyTitle", "No menus yet")}</h2>
           <p className="text-slate-600 mb-4">{t("menus.emptyDescription", "Create your first menu")}</p>
-          <Link to={editorPath("/menus/add")}>
-            <Button onClick={handleNewMenu} variant="primary" icon={<CirclePlus size={18} />}>
-              {t("menus.newMenu")}
-            </Button>
-          </Link>
+          <Button onClick={handleNewMenu} variant="primary" icon={<CirclePlus size={18} />}>
+            {t("menus.newMenu")}
+          </Button>
         </div>
       )}
 

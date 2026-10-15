@@ -94,6 +94,36 @@ describe("resolvePresetPaths — collections", () => {
 });
 
 describe("seedPresetCollections", () => {
+  it("skips a preset item whose filename is the reserved item slug `index`, and seeds `home`", async () => {
+    await fs.outputJson(schemaPath(FOLDER, "posts"), {
+      type: "posts",
+      schemaVersion: 1,
+      displayName: "Post",
+      displayNamePlural: "Posts",
+      icon: "FileText",
+      hasItemPages: true,
+      slugPrefix: "blog",
+      settings: [{ type: "text", id: "title", label: "Title", required: true, usedAsTitle: true }],
+    });
+    const presetCollections = path.join(TEST_ROOT, "preset-collections-reserved");
+    await fs.outputJson(path.join(presetCollections, "posts", "index.json"), { settings: { title: "Idx" } });
+    await fs.outputJson(path.join(presetCollections, "posts", "home.json"), { settings: { title: "Home" } });
+    await fs.outputJson(path.join(presetCollections, "posts", "hello.json"), { settings: { title: "Hello" } });
+    await fs.outputJson(path.join(presetCollections, "posts", "_order.json"), { order: ["index", "home", "hello"] });
+
+    await seedPresetCollections(FOLDER, presetCollections);
+
+    // `index` would be reachable as /blog/ as well as /blog/index — the same
+    // rule the item API enforces on create/rename; the preset cannot bypass it.
+    assert.equal(await fs.pathExists(itemPath(FOLDER, "posts", "index")), false);
+    // `home` is only special for pages; as an item slug it is ordinary.
+    assert.equal((await fs.readJson(itemPath(FOLDER, "posts", "home"))).slug, "home");
+    assert.equal((await fs.readJson(itemPath(FOLDER, "posts", "hello"))).slug, "hello");
+    // The manual order carries over without the skipped slug.
+    const order = await fs.readJson(path.join(getProjectDir(FOLDER), "collections", "posts", "_order.json"));
+    assert.deepEqual(order.order, ["home", "hello"]);
+  });
+
   it("seeds item data with fresh uuids/timestamps and skips unknown types", async () => {
     // theme-owned schema (only "posts" is defined in the project's collection-types/)
     await fs.outputJson(schemaPath(FOLDER, "posts"), {

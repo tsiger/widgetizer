@@ -61,7 +61,7 @@ Footer scripts should follow the same pattern: theme scripts first, then `{% foo
 
 ### Required Placeholders
 
-Your layout must render the three content placeholders. They contain **pre-rendered HTML**, so each requires the `raw` filter (autoescaping is enabled globally; see [Autoescaping & the `raw` filter](theme-dev-liquid-assets.html#autoescaping-the-raw-filter)):
+Your layout must render the three content placeholders. They contain **pre-rendered HTML**, so each requires the `raw` filter (autoescaping is enabled globally; see [Autoescaping & the `raw` filter](theme-dev-liquid-assets.html#escaping-model)):
 
 - `{{ header | raw }}`: global header widget
 - `{{ main_content | raw }}`: the page's widgets

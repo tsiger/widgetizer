@@ -1,0 +1,19 @@
+<nav class="pagination" aria-label="{{ 'site.pagination.label' | t }}">
+  <ul class="pagination-list">
+    {%- if pagination.prevHref -%}
+      <li><a class="pagination-link pagination-step" href="{{ pagination.prevHref }}" rel="prev">{{ 'site.common.previous' | t }}</a></li>
+    {%- endif -%}
+    {%- for entry in pagination.pages -%}
+      <li>
+        {%- if entry.current -%}
+          <span class="pagination-link is-current" aria-current="page">{{ entry.number }}</span>
+        {%- else -%}
+          <a class="pagination-link" href="{{ entry.href }}">{{ entry.number }}</a>
+        {%- endif -%}
+      </li>
+    {%- endfor -%}
+    {%- if pagination.nextHref -%}
+      <li><a class="pagination-link pagination-step" href="{{ pagination.nextHref }}" rel="next">{{ 'site.common.next' | t }}</a></li>
+    {%- endif -%}
+  </ul>
+</nav>

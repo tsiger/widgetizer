@@ -21,6 +21,57 @@ const selectTemporalState = (state) => ({
   themeSettingsSnapshot: state.themeSettingsSnapshot,
 });
 
+const HISTORY_LIMIT = 150;
+const COALESCE_WINDOW_MS = 500;
+
+function changedLeafPaths(before, after, limit = Infinity, path = [], found = []) {
+  if (found.length >= limit || Object.is(before, after)) return found;
+  const comparable =
+    before !== null &&
+    after !== null &&
+    typeof before === "object" &&
+    typeof after === "object" &&
+    Array.isArray(before) === Array.isArray(after) &&
+    (!Array.isArray(before) || before.length === after.length);
+  if (!comparable) {
+    found.push(path);
+    return found;
+  }
+
+  for (const key of new Set([...Object.keys(before), ...Object.keys(after)])) {
+    changedLeafPaths(before[key], after[key], limit, [...path, key], found);
+    if (found.length >= limit) break;
+  }
+  return found;
+}
+
+const valueAt = (source, path) => path.reduce((node, key) => node?.[key], source);
+
+let lastEdit = null;
+
+/**
+ * Read a language's header/footer. Returns them rather than storing them: the
+ * caller decides whether its load is still the current one before committing.
+ */
+async function readGlobalWidgets(language) {
+  try {
+    const data = await getGlobalWidgets(language);
+    const shape = (type) =>
+      data[type]
+        ? {
+            type,
+            settings: data[type].settings || {},
+            blocks: data[type].blocks || {},
+            blocksOrder: data[type].blocksOrder || [],
+          }
+        : null;
+    return { header: shape("header"), footer: shape("footer") };
+  } catch (err) {
+    console.error("Failed to load global widgets:", err);
+    return { header: null, footer: null };
+  }
+}
+
 const usePageStore = create(
   temporal(
     (set, get) => ({
@@ -28,6 +79,13 @@ const usePageStore = create(
       page: null,
       originalPage: null,
       globalWidgets: { header: null, footer: null },
+      // Last-saved snapshot of globalWidgets, mirroring originalPage — lets
+      // hasUnsavedChanges() detect a header/footer edit by VALUE, not just by
+      // modifiedWidgets Set membership (a Set can't tell "still dirty from
+      // before a save" apart from "re-dirtied by a fresh edit during that
+      // save's in-flight window", since re-adding an id already present is a
+      // no-op).
+      originalGlobalWidgets: { header: null, footer: null },
 
       // Thin proxy snapshot — NOT the canonical copy. themeStore owns the truth.
       themeSettingsSnapshot: null,
@@ -38,7 +96,7 @@ const usePageStore = create(
       error: null,
 
       // Actions
-      loadPage: async (pageId) => {
+      loadPage: async (pageId, language) => {
         const projectId = getActiveProjectId();
         const nextLoadId = get().activeLoadId + 1;
         set({ activeLoadId: nextLoadId });
@@ -50,6 +108,7 @@ const usePageStore = create(
             page: null,
             originalPage: null,
             globalWidgets: { header: null, footer: null },
+            originalGlobalWidgets: { header: null, footer: null },
             themeSettingsSnapshot: null,
             loadedProjectId: projectId,
           });
@@ -63,12 +122,13 @@ const usePageStore = create(
           page: null,
           originalPage: null,
           globalWidgets: { header: null, footer: null },
+          originalGlobalWidgets: { header: null, footer: null },
           themeSettingsSnapshot: null,
         });
 
         try {
           // Load page data (clean, no global widgets mixed in)
-          const pageData = await getPage(pageId);
+          const pageData = await getPage(pageId, language);
 
           // Filter out any header/footer widgets that might exist in page data
           const cleanWidgets = {};
@@ -83,8 +143,10 @@ const usePageStore = create(
             widgets: cleanWidgets,
           };
 
-          // Load global widgets separately
-          await get().loadGlobalWidgets();
+          // In the language the page came back in — a default-language load passes
+          // no argument but still has a folder. Held until the guard below, so a
+          // superseded load cannot drop its header/footer on a newer page.
+          const globalWidgets = await readGlobalWidgets(pageData.language);
 
           // Load theme settings into themeStore (canonical owner).
           // Skip refetch only if themeStore already holds *valid* data for this
@@ -106,6 +168,8 @@ const usePageStore = create(
           set({
             page: cleanPageData,
             originalPage: JSON.parse(JSON.stringify(cleanPageData)),
+            globalWidgets,
+            originalGlobalWidgets: JSON.parse(JSON.stringify(globalWidgets)),
             themeSettingsSnapshot: themeSnapshot ? JSON.parse(JSON.stringify(themeSnapshot)) : null,
             loading: false,
             error: null,
@@ -124,6 +188,7 @@ const usePageStore = create(
             page: null,
             originalPage: null,
             globalWidgets: { header: null, footer: null },
+            originalGlobalWidgets: { header: null, footer: null },
             themeSettingsSnapshot: null,
             loadedProjectId: projectId,
           });
@@ -154,37 +219,6 @@ const usePageStore = create(
         const { themeSettingsSnapshot } = get();
         if (themeSettingsSnapshot) {
           useThemeStore.getState().setSettings(JSON.parse(JSON.stringify(themeSettingsSnapshot)));
-        }
-      },
-
-      // Load global widgets separately
-      loadGlobalWidgets: async () => {
-        try {
-          const globalWidgetsData = await getGlobalWidgets();
-
-          const globalWidgets = {
-            header: globalWidgetsData.header
-              ? {
-                  type: "header",
-                  settings: globalWidgetsData.header.settings || {},
-                  blocks: globalWidgetsData.header.blocks || {},
-                  blocksOrder: globalWidgetsData.header.blocksOrder || [],
-                }
-              : null,
-            footer: globalWidgetsData.footer
-              ? {
-                  type: "footer",
-                  settings: globalWidgetsData.footer.settings || {},
-                  blocks: globalWidgetsData.footer.blocks || {},
-                  blocksOrder: globalWidgetsData.footer.blocksOrder || [],
-                }
-              : null,
-          };
-
-          set({ globalWidgets });
-        } catch (err) {
-          console.error("Failed to load global widgets:", err);
-          set({ globalWidgets: { header: null, footer: null } });
         }
       },
 
@@ -221,6 +255,7 @@ const usePageStore = create(
           page: null,
           originalPage: null,
           globalWidgets: { header: null, footer: null },
+          originalGlobalWidgets: { header: null, footer: null },
           themeSettingsSnapshot: null,
           loadedProjectId: null,
           loading: false,
@@ -231,23 +266,122 @@ const usePageStore = create(
       setOriginalPage: (page) => {
         set({ originalPage: JSON.parse(JSON.stringify(page)) });
       },
+
+      // Rebaseline after a successful save, mirroring setOriginalPage — called
+      // with the ENTRY-time globalWidgets snapshot save() actually sent (not
+      // whatever the live state has become), so a further edit made while that
+      // save's request was still in flight is correctly detected as a new
+      // diff against this baseline.
+      setOriginalGlobalWidgets: (globalWidgets) => {
+        set({ originalGlobalWidgets: JSON.parse(JSON.stringify(globalWidgets)) });
+      },
+
+      /**
+       * After the server corrected theme values on save, swap each rejected value
+       * for its correction in every history entry that still holds it, so undoing
+       * an unrelated edit can't restore it. Entries holding an older, valid value
+       * keep it. The live snapshot is resynced from themeStore without a history step.
+       */
+      applyThemeCorrections: (sentSettings, savedSettings) => {
+        const corrections = changedLeafPaths(sentSettings, savedSettings).filter((path) => path.length > 0);
+        if (!corrections.length) return;
+
+        const correct = (snapshot) => {
+          let corrected = snapshot;
+          for (const path of corrections) {
+            if (!snapshot) break;
+            if (JSON.stringify(valueAt(corrected, path)) !== JSON.stringify(valueAt(sentSettings, path))) continue;
+            if (corrected === snapshot) corrected = JSON.parse(JSON.stringify(snapshot));
+            const parent = valueAt(corrected, path.slice(0, -1));
+            if (!parent || typeof parent !== "object") continue;
+            const next = valueAt(savedSettings, path);
+            if (next === undefined) delete parent[path.at(-1)];
+            else parent[path.at(-1)] = JSON.parse(JSON.stringify(next));
+          }
+          return corrected;
+        };
+        const rewrite = (entries) =>
+          entries.map((entry) => {
+            const themeSettingsSnapshot = correct(entry.themeSettingsSnapshot);
+            return themeSettingsSnapshot === entry.themeSettingsSnapshot ? entry : { ...entry, themeSettingsSnapshot };
+          });
+
+        const history = usePageStore.temporal.getState();
+        usePageStore.temporal.setState({
+          pastStates: rewrite(history.pastStates),
+          futureStates: rewrite(history.futureStates),
+        });
+
+        const liveSettings = useThemeStore.getState().settings;
+        history.pause();
+        set({ themeSettingsSnapshot: liveSettings ? JSON.parse(JSON.stringify(liveSettings)) : null });
+        history.resume();
+      },
+
+      /**
+       * themeStore took the server's copy of the theme. `expected` is what this
+       * client believed the server would hold, so whatever differs between it and
+       * `baseline` came from the server (a correction, or another screen's edits),
+       * never from this user's own undoable edits.
+       *
+       * A different theme version means the history holds snapshots of an older
+       * theme structure; undoing into one would bring that structure back on
+       * screen. The history is cleared then. Within one version the existing
+       * correction rewrite brings history and the live snapshot into step.
+       */
+      rebaseThemeHistory: (expected, baseline, draft) => {
+        if (expected?.version !== baseline?.version) {
+          const history = usePageStore.temporal.getState();
+          history.pause();
+          set({ themeSettingsSnapshot: draft ? JSON.parse(JSON.stringify(draft)) : null });
+          history.resume();
+          history.clear();
+          return;
+        }
+        get().applyThemeCorrections(expected, baseline);
+      },
     }),
     {
       // zundo options
-      limit: 50,
+      limit: HISTORY_LIMIT,
       partialize: selectTemporalState,
-      handleSet: (handleSet) => (state) => {
-        const currentState = usePageStore.getState();
-        if (currentState.page === null) return;
+      handleSet:
+        (handleSet) =>
+        (pastState, ...rest) => {
+          const currentState = usePageStore.getState();
+          if (currentState.page === null) return;
 
-        const currentSnapshot = selectTemporalState(currentState);
-        const nextSnapshot = selectTemporalState(state);
-        if (JSON.stringify(currentSnapshot) === JSON.stringify(nextSnapshot)) return;
+          const currentSnapshot = selectTemporalState(currentState);
+          if (JSON.stringify(currentSnapshot) === JSON.stringify(pastState)) return;
 
-        handleSet(state);
-      },
+          const changed = changedLeafPaths(pastState, currentSnapshot, 2);
+          const path = changed.length === 1 ? JSON.stringify(changed[0]) : null;
+          const now = Date.now();
+          // Undo, redo and clear all change the last history entry, so an edit after any of them starts a new step.
+          const lastEntry = usePageStore.temporal.getState().pastStates.at(-1);
+          if (
+            path &&
+            lastEdit?.path === path &&
+            lastEdit.entry === lastEntry &&
+            now - lastEdit.at < COALESCE_WINDOW_MS
+          ) {
+            lastEdit.at = now;
+            return;
+          }
+
+          handleSet(pastState, ...rest);
+          lastEdit = path ? { path, at: now, entry: usePageStore.temporal.getState().pastStates.at(-1) } : null;
+        },
     },
   ),
 );
+
+// Keep the undo history in step whenever themeStore takes the server's copy.
+// Guarded: suites that mock themeStore as a bare { getState } have no hook.
+if (typeof useThemeStore.onServerThemeAdopted === "function") {
+  useThemeStore.onServerThemeAdopted((expected, baseline, draft) =>
+    usePageStore.getState().rebaseThemeHistory(expected, baseline, draft),
+  );
+}
 
 export default usePageStore;

@@ -107,6 +107,8 @@ describe("isExcludedRelPath", () => {
     expect(isExcludedRelPath("updates/0.9.9/theme.json")).toBe(true);
     expect(isExcludedRelPath("latest/theme.json")).toBe(true);
     expect(isExcludedRelPath(".theme-package.json")).toBe(true);
+    // starter images resolve from the app seed at project creation — never delta'd
+    expect(isExcludedRelPath("preset-media/bedrock/images/hero.jpg")).toBe(true);
   });
 
   it("does not exclude real theme content", () => {

@@ -15,15 +15,23 @@ mechanics (registry, fallback, media seeding) see [theme-presets.md](theme-prese
 ## How preset media works
 
 **Preset media is packed once into the
-seed theme, not uploaded per project.** A preset ships its images and their
-metadata under `themes/arch/presets/<id>/media/`, and the backend seeds them
-automatically into every project created from that preset.
+seed theme, not uploaded per project.** Arch ships its preset images and their
+metadata in the theme-root pool `themes/arch/preset-media/<id>/`, and the
+backend seeds them automatically into every project created from that preset.
+The pool sits outside `presets/` so it never enters update deltas, runtime
+theme copies, or per-project theme copies — the images ship exactly once, in
+the app itself, and are read from the seed at project creation.
 
 ```
-themes/arch/presets/<id>/media/
+themes/arch/preset-media/<id>/
   images/          # image binaries (originals + pre-generated variants)
   manifest.json    # { files: [...] } — alt/title/caption/sizes per image
 ```
+
+(Uploaded/community themes typically use the per-preset layout instead —
+`presets/<id>/media/`, same inner structure — which is checked first; see
+[theme-preset-file-format.md](theme-preset-file-format.md) for the lookup
+order.)
 
 - At project creation, `projectController.seedPresetMedia`
   (`packages/builder-server/src/controllers/projectController.js`) copies
@@ -37,7 +45,7 @@ themes/arch/presets/<id>/media/
 - `scripts/pack-preset-media.js` does the reverse: it reads a finished project's
   media records from SQLite (`mediaRepository.getMediaFiles`), copies the image
   binaries from disk, and writes them plus a regenerated `manifest.json` back
-  into `themes/arch/presets/<id>/media/`. Run it via `npm run preset:media`.
+  into `themes/arch/preset-media/<id>/`. Run it via `npm run preset:media`.
 
 The practical consequence: you only touch image metadata (alt/title/caption)
 **once**, in the source project, then pack it. Every future project from the
@@ -62,9 +70,10 @@ preset inherits it.
    collection items, **and any already-packed starter media** applied.
 
 The project now lives at `data/projects/<folder>/` and is independent from the
-preset source files. If the preset already has packed media (a `media/` dir), the
-project opens with real photography instead of placeholders; if not, you'll
-generate and pack it in Steps 2–3 below.
+preset source files. If the preset already has packed media (a
+`preset-media/<id>/` dir at the theme root), the project opens with real
+photography instead of placeholders; if not, you'll generate and pack it in
+Steps 2–3 below.
 
 ---
 
@@ -103,9 +112,9 @@ The script (`scripts/pack-preset-media.js`):
 
 - copies every image binary (originals + variants) from
   `data/projects/<folder>/uploads/images/` into
-  `themes/arch/presets/<id>/media/images/` (clean slate each run, so removed
+  `themes/arch/preset-media/<id>/images/` (clean slate each run, so removed
   images don't linger),
-- regenerates `themes/arch/presets/<id>/media/manifest.json` from the project's
+- regenerates `themes/arch/preset-media/<id>/manifest.json` from the project's
   DB records, dropping project-specific fields (`id`/`uploaded`/`usedIn`) so
   `seedPresetMedia` can assign fresh project-scoped values.
 
@@ -170,7 +179,11 @@ npm run preset:sync -- --project <folder> --preset <preset-id> [--theme arch]  #
   mirror and exits — use this to publish a new preset/registry change to the
   project-creation picker. With `--project` it also mirrors shared theme files
   (CSS, JS, widgets, fonts) into the project and keeps watching `themes/<theme>/`.
-  The project folder must already exist.
+  The project folder must already exist. It never writes the theme's `menus/`
+  (nor `templates/`, `presets/`, `updates/`, `latest/`, `preset-media/`) into the
+  project: menus are project content after creation, stamped with the uuids the
+  widgets point at, and copying the theme's over would leave every menu setting
+  pointing at nothing.
 - **`preset:sync`** (`scripts/preset-sync.js`) additionally rebuilds the project's
   pages/menus from `themes/arch/presets/<id>/` when preset content
   (`preset.json`, `templates/`, `menus/`) changes — so settings overrides and
@@ -196,7 +209,9 @@ themes/arch/presets/<preset-id>/screenshot.png
    `/themes/arch/presets/<preset-id>/screenshot.png`.
 
 The UI displays these with `aspect-square object-cover` in both the Themes page
-and the project creation form. Until a real preview exists, the blank theme-root
+and the project creation form, so an image of any other shape is cropped to a
+square around its centre. A theme's own root `screenshot.png` is different:
+landscape, 1280x720. Until a real preview exists, the blank theme-root
 screenshot (`themes/arch/screenshot.png`) may be used as a placeholder — see
 the screenshot exception in [theme-preset-file-format.md](theme-preset-file-format.md).
 
@@ -229,8 +244,9 @@ an object with a `default` key and a `presets` array:
 - `default` names the preset selected by default in the creation form (currently
   `blank`).
 - The `blank` preset is registered here but ships **no** `templates/`, `menus/`,
-  or `media/` — it falls back to the theme root and produces an empty starter
-  site. It is the default and must stay in the registry.
+  or starter media (no `preset-media/<id>/` entry) — it falls back to the theme
+  root and produces an empty starter site. It is the default and must stay in
+  the registry.
 - `liveDemo` is optional — add it after the demo is deployed (Step 9). The URL
   convention is `https://demos.widgetizer.org/<preset-id>/` (note the trailing
   slash).
@@ -247,6 +263,15 @@ Sync the registry to the runtime location with `npm run theme:sync` (it mirrors
 3. Upload the exported files to `demos.widgetizer.org/<preset-id>/`.
 4. Verify the live demo is accessible.
 5. If not already set, add the `liveDemo` URL to `presets.json` (Step 8).
+
+### Rebuilding every demo before a release
+
+`npm run demos:release` (`scripts/release-demos.js`) rebuilds the demos in bulk against the running local server, after a `theme:sync`:
+
+- **Pass 1 (demos):** for every preset with a `liveDemo`, creates a fresh `DEMO: <name>` project, exports it, checks the export (placeholder text, missing files, HTML validation issues, export warnings) and compares it with the current demo (pages added or dropped, text only on one side, fewer images). Unless `--check` is passed, it replaces the demo in the demos folder (`--demos-dir` or `DEMOS_DIR`) and saves a project backup ZIP under `<backups>/<theme version>/` (`--backups-dir` or `DEMO_BACKUPS_DIR`).
+- **Pass 2 (upgrade):** applies the theme update to projects still on an older theme version and exports them, exercising the path existing users take; when none exist it offers to import backup ZIPs (`--import-from`). Nothing is copied.
+
+Options: `--theme` (default `arch`), `--only` / `--except` preset ids, `--replace` (delete earlier DEMO projects without asking), `--no-import`, `--skip-demos`, `--skip-upgrade`, `--api`. It ends with a summary of what needs a look.
 
 ---
 

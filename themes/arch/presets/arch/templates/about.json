@@ -6,7 +6,8 @@
       "type": "image-text",
       "settings": {
         "image_position": "end",
-        "color_scheme": "standard-primary"
+        "color_scheme": "standard-primary",
+        "image": "/uploads/images/callout.webp"
       },
       "blocks": {
         "about-eyebrow": {
@@ -68,7 +69,7 @@
         "title": "Trusted partners in growth",
         "description": "We focus on outcomes that compound over time.",
         "columns_desktop": 3,
-        "layout": "cards",
+        "layout": "grid",
         "animate": true,
         "color_scheme": "standard-primary"
       },
@@ -119,7 +120,8 @@
             "name": "Elena Morales",
             "role": "Managing Partner",
             "specialty": "Strategy & Growth",
-            "bio": "15+ years guiding B2B teams through strategic pivots and expansion."
+            "bio": "15+ years guiding B2B teams through strategic pivots and expansion.",
+            "photo": "/uploads/images/about1.webp"
           }
         },
         "profile-2": {
@@ -128,7 +130,8 @@
             "name": "Jordan Lee",
             "role": "Principal",
             "specialty": "Operations",
-            "bio": "Former VP Ops focused on scalable systems, process design, and execution."
+            "bio": "Former VP Ops focused on scalable systems, process design, and execution.",
+            "photo": "/uploads/images/about2.webp"
           }
         },
         "profile-3": {
@@ -137,7 +140,8 @@
             "name": "Priya Nandakumar",
             "role": "Engagement Lead",
             "specialty": "Transformation",
-            "bio": "Specializes in cross-functional alignment and digital enablement programs."
+            "bio": "Specializes in cross-functional alignment and digital enablement programs.",
+            "photo": "/uploads/images/about3.webp"
           }
         }
       },
@@ -149,7 +153,8 @@
         "height": "small",
         "alignment": "center",
         "color_scheme": "highlight-primary",
-        "fullwidth": true
+        "fullwidth": true,
+        "image": "/uploads/images/archhero02.webp"
       },
       "blocks": {
         "about-cta-heading": {

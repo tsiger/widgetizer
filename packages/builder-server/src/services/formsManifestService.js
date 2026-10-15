@@ -1,9 +1,12 @@
+import { handleize } from "@widgetizer/core";
+import { MAX_FORMS_PER_SITE } from "@widgetizer/core/adapters";
+import { languageFolder, pageOutputPath } from "@widgetizer/core/contentAddress";
+
 const FORM_WIDGET_TYPE = "core-form";
 const MANIFEST_SCHEMA_VERSION = 1;
 const GENERATOR_NAME = "widgetizer";
 const WIDGET_IDENTIFIER = "widgetizer/core-form";
 
-const MAX_FORMS_PER_SITE = 5;
 const MAX_FIELDS_PER_FORM = 30;
 const MAX_OPTIONS_PER_FIELD = 50;
 const MAX_OPTION_LENGTH = 200;
@@ -30,21 +33,10 @@ const DEFAULT_MAX_LENGTH = {
   radio: 500,
 };
 
-// Mirrors @widgetizer/core filters/handleizeFilter.js EXACTLY — no truncation. The Liquid template
-// applies its own truncation (64 for keys, 200 for option values) via the `truncate` filter
-// to match the hosted contract caps. Truncating here too would silently diverge from the
-// rendered HTML for long labels.
-function handleize(str) {
-  if (!str || typeof str !== "string") return "";
-  return str
-    .toLowerCase()
-    .trim()
-    .replace(/[^\w\s-]/g, "")
-    .replace(/[\s_]+/g, "-")
-    .replace(/-+/g, "-")
-    .replace(/^-|-$/g, "");
-}
-
+// `handleize` (imported from core) is the single source of truth for slug rules, so the manifest
+// keys and the rendered HTML — which calls the same filter in widget.liquid — can never diverge.
+// It transliterates non-Latin scripts and does NOT truncate; the caps below (and the Liquid
+// `truncate` filter) apply the hosted contract limits (64 for keys, 200 for option values).
 function handleizeKey(str) {
   return handleize(str).slice(0, MAX_KEY_LENGTH);
 }
@@ -87,21 +79,22 @@ function parseChoiceOptions(rawOptions, fieldPath, errors) {
 
   const seenValues = new Set();
   const options = [];
+  let optionIndex = 0;
 
   for (const line of rawOptions.split(/\r?\n/)) {
     const label = line.trim();
     if (!label) continue;
+    optionIndex++;
 
     if (label.length > MAX_OPTION_LENGTH) {
       errors.push(`${fieldPath}: option label "${label.slice(0, 30)}…" exceeds ${MAX_OPTION_LENGTH} characters`);
       continue;
     }
 
-    const value = handleizeOptionValue(label);
-    if (!value) {
-      errors.push(`${fieldPath}: option label "${label}" cannot be converted to an identifier (use letters and numbers)`);
-      continue;
-    }
+    // A label with no transliterable characters (e.g. CJK) slugs to "" — fall back to a
+    // positional value so the option still submits. optionIndex counts every non-blank line,
+    // matching the widget.liquid option loop so the rendered value and the manifest agree.
+    const value = handleizeOptionValue(label) || `option-${optionIndex}`;
     if (seenValues.has(value)) {
       errors.push(
         `${fieldPath}: two options ("${label}") produce the same value "${value}". Rename one of them.`,
@@ -115,7 +108,7 @@ function parseChoiceOptions(rawOptions, fieldPath, errors) {
   return options;
 }
 
-function buildField(block, widgetId, pageId, errors) {
+function buildField(block, widgetId, pageId, fieldIndex, errors) {
   const settings = block.settings || {};
   const label = settings.label;
   const fieldPath = `page "${pageId}" → widget "${widgetId}" → field "${label || "(missing label)"}"`;
@@ -129,15 +122,12 @@ function buildField(block, widgetId, pageId, errors) {
     return null;
   }
 
-  const key = handleizeKey(label);
-  if (!key) {
-    errors.push(
-      `${fieldPath}: label "${label}" cannot be converted to an identifier (use letters and numbers in the label)`,
-    );
-    return null;
-  }
+  // A label with no transliterable characters (e.g. CJK) slugs to "" — fall back to a positional
+  // key so the field still submits. fieldIndex counts field-bearing blocks (field/choice/consent)
+  // only, matching the widget.liquid loop so the rendered name and the manifest agree.
+  const key = handleizeKey(label) || `field-${fieldIndex}`;
   if (!KEY_PATTERN.test(key)) {
-    // Defensive — handleize output should already match KEY_PATTERN.
+    // Defensive — handleize output and the positional fallback should already match KEY_PATTERN.
     errors.push(`${fieldPath}: generated field key "${key}" is not valid`);
     return null;
   }
@@ -190,7 +180,7 @@ function buildField(block, widgetId, pageId, errors) {
   return field;
 }
 
-function buildFormFromWidget(widget, widgetId, pageId, pagePath, errors) {
+function buildFormFromWidget(widget, widgetId, pageId, pagePath, errors, langFolder = "") {
   const settings = widget.settings || {};
   const formName = (settings.form_name || "").trim() || "Contact";
   const path = `page "${pageId}" → widget "${widgetId}"`;
@@ -200,8 +190,9 @@ function buildFormFromWidget(widget, widgetId, pageId, pagePath, errors) {
     return null;
   }
 
-  const formKey = handleizeKey(formName) || "contact";
-  if (!KEY_PATTERN.test(formKey)) {
+  const handle = handleizeKey(formName) || "contact";
+  const formKey = langFolder ? `${langFolder}:${handle}` : handle;
+  if (!KEY_PATTERN.test(handle)) {
     errors.push(`${path}: generated form key "${formKey}" is not valid (use letters and numbers in the form name)`);
     return null;
   }
@@ -210,13 +201,15 @@ function buildFormFromWidget(widget, widgetId, pageId, pagePath, errors) {
   const blocks = widget.blocks || {};
   const fields = [];
   const seenKeys = new Map();
+  let fieldIndex = 0;
 
   for (const blockId of blockIds) {
     const block = blocks[blockId];
     if (!block) continue;
     if (block.type !== "field" && block.type !== "choice" && block.type !== "consent") continue;
 
-    const field = buildField(block, widgetId, pageId, errors);
+    fieldIndex++;
+    const field = buildField(block, widgetId, pageId, fieldIndex, errors);
     if (!field) continue;
 
     if (seenKeys.has(field.key)) {
@@ -260,11 +253,19 @@ function buildFormFromWidget(widget, widgetId, pageId, pagePath, errors) {
  *
  * @param {Array<{id: string, slug?: string, widgets?: object, widgetsOrder?: string[]}>} pagesDataArray
  * @param {string} generatorVersion - widgetizer app version
+ * @param {number} [maxForms] - Distinct-form ceiling, resolved by the caller from the
+ *                 limits adapter (OSS: Infinity). Defaults to the hosted-contract value
+ *                 so direct callers keep the historical behavior.
  * @returns {{manifest: object|null, warnings: string[]}}
  * @throws {Error} If any validation against the hosted contract fails. The error carries
  *                 a `formsErrors` array listing every problem (collected, not bailing on first).
  */
-export function buildFormsManifest(pagesDataArray, generatorVersion) {
+export function buildFormsManifest(
+  pagesDataArray,
+  generatorVersion,
+  maxForms = MAX_FORMS_PER_SITE,
+  { defaultLanguage = "" } = {},
+) {
   const errors = [];
   const warnings = [];
   const formsByKey = new Map();
@@ -273,8 +274,14 @@ export function buildFormsManifest(pagesDataArray, generatorVersion) {
     const pageId = pageData.id;
     if (!pageId) continue;
 
-    const outputFilename = pageId === "index" || pageId === "home" ? "index.html" : `${pageId}.html`;
-    const pagePath = `/${outputFilename}`;
+    // A translated copy of a form is its OWN form: the same widget copied into
+    // Greek collects Greek submissions, and merging the two streams would mean a
+    // partially translated site either mixes them or fails the export when the
+    // translated fields drift. The language qualifies the key, and the path is
+    // where the page is actually published.
+    const lang = { language: pageData.language, defaultLanguage };
+    const folder = languageFolder(lang);
+    const pagePath = `/${pageOutputPath(pageId, 1, lang)}`;
 
     const widgets = pageData.widgets || {};
     const order = Array.isArray(pageData.widgetsOrder) ? pageData.widgetsOrder : Object.keys(widgets);
@@ -283,7 +290,7 @@ export function buildFormsManifest(pagesDataArray, generatorVersion) {
       const widget = widgets[widgetId];
       if (!widget || widget.type !== FORM_WIDGET_TYPE) continue;
 
-      const form = buildFormFromWidget(widget, widgetId, pageId, pagePath, errors);
+      const form = buildFormFromWidget(widget, widgetId, pageId, pagePath, errors, folder);
       if (!form) continue;
 
       const existing = formsByKey.get(form.key);
@@ -302,9 +309,9 @@ export function buildFormsManifest(pagesDataArray, generatorVersion) {
     }
   }
 
-  if (formsByKey.size > MAX_FORMS_PER_SITE) {
+  if (formsByKey.size > maxForms) {
     errors.push(
-      `This site has ${formsByKey.size} distinct forms, more than the ${MAX_FORMS_PER_SITE} limit. ` +
+      `This site has ${formsByKey.size} distinct forms, more than the ${maxForms} limit. ` +
         `Reduce the number of unique form names used across pages.`,
     );
   }

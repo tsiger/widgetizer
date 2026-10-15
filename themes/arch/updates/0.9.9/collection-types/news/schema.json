@@ -1,0 +1,25 @@
+{
+  "type": "news",
+  "schemaVersion": 1,
+  "displayName": "Article",
+  "displayNamePlural": "News",
+  "description": "Articles, updates and announcements.",
+  "icon": "Newspaper",
+  "slugPrefix": "news",
+  "hasItemPages": true,
+  "sortable": false,
+  "defaultSort": "date_desc",
+  "settings": [
+    { "type": "header", "id": "content_header", "label": "Content" },
+    { "type": "text", "id": "title", "label": "Title", "required": true, "usedAsTitle": true },
+    { "type": "date", "id": "date", "label": "Publication date", "usedAsDate": true },
+    {
+      "type": "textarea",
+      "id": "excerpt",
+      "label": "Excerpt",
+      "description": "Short teaser shown in listings and at the top of the article."
+    },
+    { "type": "image", "id": "featured_image", "label": "Featured image" },
+    { "type": "richtext", "id": "body", "label": "Body", "allow_headings": true, "allow_images": true }
+  ]
+}

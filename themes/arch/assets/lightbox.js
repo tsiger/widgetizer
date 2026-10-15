@@ -4,6 +4,12 @@
  * Supports prev/next navigation, keyboard (Escape, ArrowLeft, ArrowRight), and focus trap.
  */
 (function () {
+  // The page carries the wording (see layout.liquid); the fallbacks are only
+  // for a page rendered before the theme shipped them.
+  function label(name, fallback) {
+    return (document.body && document.body.dataset[name]) || fallback;
+  }
+
   // --- Shared modal (created once) ---
   function getOrCreateModal() {
     let modal = document.getElementById('lightbox-modal');
@@ -15,20 +21,20 @@
     modal.setAttribute('role', 'dialog');
     modal.setAttribute('aria-modal', 'true');
     modal.setAttribute('aria-hidden', 'true');
-    modal.setAttribute('aria-label', 'Image preview');
+    modal.setAttribute('aria-label', label('tLightboxPreview', 'Image preview'));
     modal.innerHTML = `
       <div class="gallery-modal-content">
-        <button class="gallery-modal-nav is-prev" aria-label="Previous image" type="button">
+        <button class="gallery-modal-nav is-prev" type="button">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
         </button>
-        <button type="button" class="gallery-modal-close" aria-label="Close lightbox">
+        <button type="button" class="gallery-modal-close">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M18 6L6 18M6 6l12 12" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
         </button>
-        <button class="gallery-modal-nav is-next" aria-label="Next image" type="button">
+        <button class="gallery-modal-nav is-next" type="button">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M9 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
@@ -37,6 +43,13 @@
         <p class="gallery-modal-caption"></p>
       </div>
     `;
+    // Labels go on with setAttribute, never through innerHTML: `dataset` hands
+    // back the decoded text, so a word with a quote in it would be parsed as
+    // markup and swallow the rest of the tag.
+    modal.querySelector('.gallery-modal-nav.is-prev').setAttribute('aria-label', label('tLightboxPrevious', 'Previous image'));
+    modal.querySelector('.gallery-modal-close').setAttribute('aria-label', label('tLightboxClose', 'Close lightbox'));
+    modal.querySelector('.gallery-modal-nav.is-next').setAttribute('aria-label', label('tLightboxNext', 'Next image'));
+
     document.body.appendChild(modal);
 
     const modalImage = modal.querySelector('.gallery-modal-image');

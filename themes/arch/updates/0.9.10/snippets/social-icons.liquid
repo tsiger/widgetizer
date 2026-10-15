@@ -1,0 +1,135 @@
+{% comment %}
+  Renders social media icons. The project's profiles (Project details) win when any
+  are set; otherwise the theme's Social Media settings are used, as before.
+  Usage: {% render 'social-icons', social: theme.social, identity: project.identity %}
+{% endcomment %}
+
+{% if identity.hasProfiles %}
+  {% assign facebook = identity.profiles.facebook %}
+  {% assign instagram = identity.profiles.instagram %}
+  {% assign twitter = identity.profiles.twitter %}
+  {% assign linkedin = identity.profiles.linkedin %}
+  {% assign youtube = identity.profiles.youtube %}
+  {% assign tiktok = identity.profiles.tiktok %}
+  {% assign pinterest = identity.profiles.pinterest %}
+  {% assign github = identity.profiles.github %}
+  {% assign mastodon = identity.profiles.mastodon %}
+  {% assign bluesky = identity.profiles.bluesky %}
+  {% assign discord = identity.profiles.discord %}
+  {% assign reddit = identity.profiles.reddit %}
+  {% assign telegram = identity.profiles.telegram %}
+  {% assign threads = identity.profiles.threads %}
+  {% assign whatsapp = identity.profiles.whatsapp %}
+  {% assign mail = identity.email | default: social.mail_url %}
+{% else %}
+  {% assign facebook = social.facebook_url %}
+  {% assign instagram = social.instagram_url %}
+  {% assign twitter = social.twitter_url %}
+  {% assign linkedin = social.linkedin_url %}
+  {% assign youtube = social.youtube_url %}
+  {% assign tiktok = social.tiktok_url %}
+  {% assign pinterest = social.pinterest_url %}
+  {% assign github = social.github_url %}
+  {% assign mastodon = social.mastodon_url %}
+  {% assign bluesky = social.bluesky_url %}
+  {% assign discord = social.discord_url %}
+  {% assign reddit = social.reddit_url %}
+  {% assign telegram = social.telegram_url %}
+  {% assign threads = social.threads_url %}
+  {% assign whatsapp = social.whatsapp_url %}
+  {% assign mail = social.mail_url %}
+{% endif %}
+
+{% assign has_social = false %}
+{% if facebook != blank or instagram != blank or twitter != blank or linkedin != blank or youtube != blank or tiktok != blank or pinterest != blank or github != blank or mastodon != blank or bluesky != blank or discord != blank or reddit != blank or telegram != blank or threads != blank or whatsapp != blank or mail != blank %}
+  {% assign has_social = true %}
+{% endif %}
+
+{% unless has_social %}
+  <p class="social-empty-hint w-meta t-sm t-muted">Add your social profiles in Project details, or in Theme Settings &rsaquo; Social Media</p>
+{% endunless %}
+
+{% if facebook != blank %}
+  <a href="{{ facebook | safe_url }}" class="social-link" target="_blank" rel="noopener" aria-label="Facebook">
+    {% render 'icon', icon: 'facebook' %}
+  </a>
+{% endif %}
+{% if instagram != blank %}
+  <a href="{{ instagram | safe_url }}" class="social-link" target="_blank" rel="noopener" aria-label="Instagram">
+    {% render 'icon', icon: 'instagram' %}
+  </a>
+{% endif %}
+{% if twitter != blank %}
+  <a href="{{ twitter | safe_url }}" class="social-link" target="_blank" rel="noopener" aria-label="Twitter">
+    {% render 'icon', icon: 'twitter' %}
+  </a>
+{% endif %}
+{% if linkedin != blank %}
+  <a href="{{ linkedin | safe_url }}" class="social-link" target="_blank" rel="noopener" aria-label="LinkedIn">
+    {% render 'icon', icon: 'linkedin' %}
+  </a>
+{% endif %}
+{% if youtube != blank %}
+  <a href="{{ youtube | safe_url }}" class="social-link" target="_blank" rel="noopener" aria-label="YouTube">
+    {% render 'icon', icon: 'youtube' %}
+  </a>
+{% endif %}
+{% if tiktok != blank %}
+  <a href="{{ tiktok | safe_url }}" class="social-link" target="_blank" rel="noopener" aria-label="TikTok">
+    {% render 'icon', icon: 'tiktok' %}
+  </a>
+{% endif %}
+{% if pinterest != blank %}
+  <a href="{{ pinterest | safe_url }}" class="social-link" target="_blank" rel="noopener" aria-label="Pinterest">
+    {% render 'icon', icon: 'pinterest' %}
+  </a>
+{% endif %}
+{% if github != blank %}
+  <a href="{{ github | safe_url }}" class="social-link" target="_blank" rel="noopener" aria-label="GitHub">
+    {% render 'icon', icon: 'github' %}
+  </a>
+{% endif %}
+{% if mastodon != blank %}
+  <a href="{{ mastodon | safe_url }}" class="social-link" target="_blank" rel="noopener" aria-label="Mastodon">
+    {% render 'icon', icon: 'mastodon' %}
+  </a>
+{% endif %}
+{% if bluesky != blank %}
+  <a href="{{ bluesky | safe_url }}" class="social-link" target="_blank" rel="noopener" aria-label="Bluesky">
+    {% render 'icon', icon: 'bluesky' %}
+  </a>
+{% endif %}
+{% if discord != blank %}
+  <a href="{{ discord | safe_url }}" class="social-link" target="_blank" rel="noopener" aria-label="Discord">
+    {% render 'icon', icon: 'discord' %}
+  </a>
+{% endif %}
+{% if reddit != blank %}
+  <a href="{{ reddit | safe_url }}" class="social-link" target="_blank" rel="noopener" aria-label="Reddit">
+    {% render 'icon', icon: 'reddit' %}
+  </a>
+{% endif %}
+{% if telegram != blank %}
+  <a href="{{ telegram | safe_url }}" class="social-link" target="_blank" rel="noopener" aria-label="Telegram">
+    {% render 'icon', icon: 'telegram' %}
+  </a>
+{% endif %}
+{% if threads != blank %}
+  <a href="{{ threads | safe_url }}" class="social-link" target="_blank" rel="noopener" aria-label="Threads">
+    {% render 'icon', icon: 'threads' %}
+  </a>
+{% endif %}
+{% if whatsapp != blank %}
+  <a href="{{ whatsapp | safe_url }}" class="social-link" target="_blank" rel="noopener" aria-label="WhatsApp">
+    {% render 'icon', icon: 'whatsapp' %}
+  </a>
+{% endif %}
+{% if mail != blank %}
+  {% assign email_href = mail | strip %}
+  {% unless email_href contains 'mailto:' %}
+    {% assign email_href = 'mailto:' | append: email_href %}
+  {% endunless %}
+  <a href="{{ email_href | safe_url }}" class="social-link" aria-label="Email">
+    {% render 'icon', icon: 'mail' %}
+  </a>
+{% endif %}

@@ -266,7 +266,7 @@
         "wi-7": {
           "type": "item",
           "settings": {
-            "icon": "key",
+            "icon": "circle-key",
             "title": "Keyless entry option",
             "description": "Smart-lock codes, lockboxes, or doorperson drop-off."
           }

@@ -33,11 +33,16 @@ export function useStaleActiveProjectDetection() {
       try {
         const serverProject = await getActiveProject();
         if (cancelled) return;
-        const { markStale, clearStale } = useStaleProjectStore.getState();
+        const { markStale, clearProjectMismatch } = useStaleProjectStore.getState();
         if (isActiveProjectStale(getActiveProjectId(), serverProject)) {
           markStale(serverProject?.name ?? null);
         } else {
-          clearStale();
+          // This probe only answers "is this tab on the right project". A removed
+          // language is a different fact, and this check knows nothing about it —
+          // switching away and back must not clear a warning that is still true,
+          // leaving the editor apparently fine while every save fails.
+          // clearProjectMismatch keeps (or restores) the language warning.
+          clearProjectMismatch();
         }
       } catch {
         // transient probe failure — don't curtain on a network hiccup
@@ -47,6 +52,9 @@ export function useStaleActiveProjectDetection() {
     };
     // Entering the editor loads the current singleton active project, so start from
     // a clean slate; the listeners below re-establish staleness on the next focus.
+    // A language warning is not this hook's to clear (see the probe above), but a
+    // fresh mount genuinely is a fresh start: the editor is about to load whatever
+    // language it is now on.
     useStaleProjectStore.getState().clearStale();
     window.addEventListener("focus", check);
     document.addEventListener("visibilitychange", check);

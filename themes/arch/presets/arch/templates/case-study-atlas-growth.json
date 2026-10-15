@@ -6,7 +6,8 @@
       "type": "image-text",
       "settings": {
         "image_position": "end",
-        "color_scheme": "standard-primary"
+        "color_scheme": "standard-primary",
+        "image": "/uploads/images/cs01.webp"
       },
       "blocks": {
         "overview-eyebrow": {
@@ -50,7 +51,7 @@
         "title": "Results delivered",
         "description": "Measured changes after the repositioning and GTM relaunch.",
         "columns_desktop": 3,
-        "layout": "cards",
+        "layout": "grid",
         "animate": true,
         "color_scheme": "standard-primary"
       },
@@ -175,7 +176,8 @@
         "height": "small",
         "alignment": "center",
         "color_scheme": "highlight-primary",
-        "fullwidth": true
+        "fullwidth": true,
+        "image": "/uploads/images/archcta01.webp"
       },
       "blocks": {
         "case-cta-heading": {

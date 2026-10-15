@@ -22,12 +22,19 @@ export { default as errorHandler } from "./middleware/errorHandler.js";
 export { buildFormsManifest } from "./services/formsManifestService.js";
 export { buildSitemap, buildRobotsTxt } from "./services/seoArtifacts.js";
 export { sanitizeWidgetData, sanitizeThemeSettings } from "./services/sanitizationService.js";
+// Change-only theme-settings saves: an embedding route that saves theme settings
+// reads theme.json, merges with this inside its own write section, and writes.
+export { mergeThemeSettingChanges, readThemeSettingChanges } from "./services/themeSettingChanges.js";
 // Media-usage tracking for theme settings — hosted's theme-save route calls this
 // after writing theme.json so favicon/themed-image assets are recorded as used.
 // DB-only via the shared getDb() singleton, no scope/adapter needed.
 export { updateThemeSettingsMediaUsage } from "./services/mediaUsageService.js";
 export { preprocessThemeSettings } from "./utils/themeHelpers.js";
-export { buildRuntimeSiteIcons } from "./utils/siteIconHelpers.js";
+// Per-key async serialization (in-process). The OSS export operations use it to
+// serialize per project; embedding hosts can wrap their own long-running
+// per-site operations (their export/publish orchestration) with the same primitive.
+export { createKeyedSerializer } from "./utils/serializeByKey.js";
+export { buildRuntimeSiteIcons, generateExportSiteIcons } from "./utils/siteIconHelpers.js";
 export { CORE_WIDGETS_DIR, CORE_SNIPPETS_DIR, getThemesDir } from "./config.js";
 
 // Collection enumeration + item-page render for hosted's cloud render/export
@@ -69,7 +76,18 @@ export { refreshAllMediaUsageFromDir } from "./services/mediaUsageService.js";
 // dir. Hosted's create route calls it with the per-tenant dir; OSS wraps it as
 // enrichSeededRichtextLinks(folderName) inside seedPresetCollections.
 export { enrichSeededRichtextLinksFromDir } from "./utils/linkEnrichment.js";
-export { listThemes, listThemePresets, resolvePresetPaths } from "./controllers/themeController.js";
+export {
+  listThemes,
+  listThemePresets,
+  resolvePresetPaths,
+  ensureThemesDirectory,
+  buildLatestSnapshot,
+  getThemeSourceDir,
+} from "./controllers/themeController.js";
+// Theme-update pipeline (check/toggle/apply) for hosted's own theme-update UI —
+// dir-explicit and scope-free like the readers above, so hosted drives the same
+// update logic against its per-tenant working dir instead of forking it.
+export { checkForUpdates, toggleThemeUpdates, applyThemeUpdateToDir } from "./services/themeUpdateService.js";
 // Global app settings (image sizes, dev mode, export limits) — the editor's
 // client reads these via GET /api/settings; hosted exposes a read-only route.
 export { readAppSettingsFile } from "./controllers/appSettingsController.js";

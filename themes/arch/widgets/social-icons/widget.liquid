@@ -45,7 +45,7 @@
         class="social-links"
         style="justify-content: {% if widget.settings.heading_alignment == 'start' %}flex-start{% else %}center{% endif %};"
       >
-        {% render 'social-icons', social: theme.social %}
+        {% render 'social-icons', social: theme.social, identity: project.identity %}
       </div>
     </div>
   </div>

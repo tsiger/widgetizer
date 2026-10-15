@@ -18,7 +18,9 @@ import {
   deleteCollectionItem,
   bulkDeleteCollectionItems,
   reorderCollectionItems,
+  createItemLanguageVersion,
 } from "../queries/collectionManager";
+import { hasIncompleteReferenceCleanup } from "../lib/referenceCleanupWarning";
 import useCollections from "../hooks/useCollections";
 import useCollectionItems from "../hooks/useCollectionItems";
 import { invalidateMediaCache } from "../queries/mediaManager";
@@ -26,7 +28,12 @@ import { invalidateLinkTargetsCache } from "../hooks/useLinkTargets";
 import useConfirmationAction from "../hooks/useConfirmationAction";
 import useFormatDate from "../hooks/useFormatDate";
 import useToastStore from "../stores/toastStore";
-import useProjectStore from "../stores/projectStore";
+import useProjectStore, { useDefaultLanguage, useIsMultilang } from "../stores/projectStore";
+import useTranslationVersions from "../hooks/useTranslationVersions";
+import LanguageTabs from "../components/content/LanguageTabs";
+import useListLanguage from "../hooks/useListLanguage";
+import TranslationChips from "../components/content/TranslationChips";
+import { itemEditHref, itemAddHref } from "../lib/contentRoutes";
 import { resolveLucideIcon } from "../utils/lucideIcon";
 import { formatDateOnly, toDateOnlyFormat } from "@widgetizer/core/dateFormat";
 import PageLayout from "../components/layout/PageLayout";
@@ -36,7 +43,28 @@ import LoadingSpinner from "../components/ui/LoadingSpinner";
 import { openCollectionItemPreview } from "../lib/openSitePreview";
 import { useEditorPath } from "../lib/routeBase.jsx";
 
+/**
+ * One screen per collection. The route stays mounted when the user switches
+ * collection, so without the key the screen for A carried on under B: a refresh
+ * due after an edit on A loaded A's items into B's list, and a delete
+ * confirmation opened on A deleted from B by A's slug once confirmed there.
+ * The language being looked at lives in the URL, and the last one shown is held
+ * here, above the key: the sidebar's links to a collection carry no language,
+ * so it is what carries the tab over from one collection to the next.
+ */
 export default function CollectionItems() {
+  const { type } = useParams();
+  const [lastLanguage, setLastLanguage] = useState();
+  const [activeLanguage, setActiveLanguage] = useListLanguage(lastLanguage);
+  // Remembered as it changes, during render (React's pattern for state that tracks
+  // a value), so the next collection's first render already has it.
+  if (activeLanguage !== lastLanguage) setLastLanguage(activeLanguage);
+  return (
+    <CollectionItemsScreen key={type} activeLanguage={activeLanguage} setActiveLanguage={setActiveLanguage} />
+  );
+}
+
+function CollectionItemsScreen({ activeLanguage, setActiveLanguage }) {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { type } = useParams();
@@ -47,6 +75,8 @@ export default function CollectionItems() {
   const { schemas, loading: schemasLoading } = useCollections();
   const editorPath = useEditorPath();
   const { items, loading: itemsLoading, refetch: refetchItems } = useCollectionItems(type);
+  const isMultilang = useIsMultilang();
+  const defaultLanguage = useDefaultLanguage();
 
   const [searchTerm, setSearchTerm] = useState("");
   const [showInvalidOnly, setShowInvalidOnly] = useState(false);
@@ -63,13 +93,6 @@ export default function CollectionItems() {
   const displayNamePlural = schema?.displayNamePlural || displayName;
 
   // Reset transient UI state when switching collection types.
-  useEffect(() => {
-    setSearchTerm("");
-    setShowInvalidOnly(false);
-    setOpenMenuId(null);
-    setSelectedSlugs([]);
-  }, [type]);
-
   // Keep the local (drag-mutable) order in sync with fetched items.
   useEffect(() => {
     setOrderedItems(items);
@@ -95,9 +118,13 @@ export default function CollectionItems() {
     setSelectedSlugs((prev) => (prev.includes(slug) ? prev.filter((s) => s !== slug) : [...prev, slug]));
   };
 
-  const invalidCount = orderedItems.filter((item) => item.invalid).length;
+  const itemsInLanguage = isMultilang
+    ? orderedItems.filter((item) => (item.language || defaultLanguage) === activeLanguage)
+    : orderedItems;
 
-  const filteredItems = orderedItems
+  const invalidCount = itemsInLanguage.filter((item) => item.invalid).length;
+
+  const filteredItems = itemsInLanguage
     .filter((item) => (showInvalidOnly ? item.invalid : true))
     .filter((item) => {
       const term = searchTerm.toLowerCase();
@@ -129,12 +156,26 @@ export default function CollectionItems() {
   const handleDelete = async (data) => {
     try {
       if (data.isBulkDelete) {
-        await bulkDeleteCollectionItems(type, data.slugs);
-        showToast(t("collections.toasts.deleteBulkSuccess", { count: data.slugs.length }), "success");
-        setSelectedSlugs([]);
+        const result = await bulkDeleteCollectionItems(type, data.slugs, data.language);
+        const deletedSlugs = new Set(data.slugs);
+        setSelectedSlugs((prev) => prev.filter((slug) => !deletedSlugs.has(slug)));
+        showToast(
+          hasIncompleteReferenceCleanup(result)
+            ? t("collections.toasts.deleteBulkLinksIncomplete", { count: data.slugs.length })
+            : t("collections.toasts.deleteBulkSuccess", { count: data.slugs.length }),
+          hasIncompleteReferenceCleanup(result) ? "warning" : "success",
+        );
       } else {
-        await deleteCollectionItem(type, data.slug);
-        showToast(t("collections.toasts.deleteSuccess"), "success");
+        const result = await deleteCollectionItem(type, data.slug, data.language);
+        // The deleted item may also be checkbox-selected; drop it so the
+        // selection count and bulk actions don't keep referencing a gone slug.
+        setSelectedSlugs((prev) => prev.filter((s) => s !== data.slug));
+        showToast(
+          hasIncompleteReferenceCleanup(result)
+            ? t("collections.toasts.deleteLinksIncomplete")
+            : t("collections.toasts.deleteSuccess"),
+          hasIncompleteReferenceCleanup(result) ? "warning" : "success",
+        );
       }
       afterMutation();
     } catch (error) {
@@ -152,7 +193,10 @@ export default function CollectionItems() {
       confirmText: t("collections.deleteModal.confirm"),
       cancelText: t("collections.deleteModal.cancel"),
       variant: "danger",
-      data: { slug: item.slug, isBulkDelete: false },
+      data: { slug: item.slug, language: item.language, isBulkDelete: false },
+      // Opened from the row menu, which closes on the same click — hand focus
+      // back to its trigger, not to the menu item that is about to unmount.
+      returnFocusTo: menuRef.current?.querySelector('[aria-haspopup="menu"]'),
     });
   };
 
@@ -163,13 +207,13 @@ export default function CollectionItems() {
       confirmText: t("collections.deleteModal.confirmBulk", { count: selectedSlugs.length }),
       cancelText: t("collections.deleteModal.cancel"),
       variant: "danger",
-      data: { slugs: selectedSlugs, isBulkDelete: true },
+      data: { slugs: selectedSlugs, language: activeLanguage, isBulkDelete: true },
     });
   };
 
-  const handleDuplicate = async (slug) => {
+  const handleDuplicate = async (slug, language) => {
     try {
-      await duplicateCollectionItem(type, slug);
+      await duplicateCollectionItem(type, slug, language);
       showToast(t("collections.toasts.duplicateSuccess"), "success");
       afterMutation();
     } catch (error) {
@@ -181,11 +225,17 @@ export default function CollectionItems() {
   // Drag-reorder persists the new order; revert to server truth on failure.
   // (Only reachable when reorderActive, so filteredItems is the full order.)
   const handleReorder = async (reordered) => {
-    setOrderedItems(reordered); // optimistic
+    // Optimistic, and only over this language's block — the other languages keep
+    // the order their own `_order.json` gave them.
+    setOrderedItems((prev) => [
+      ...prev.filter((item) => isMultilang && (item.language || defaultLanguage) !== activeLanguage),
+      ...reordered,
+    ]);
     try {
       await reorderCollectionItems(
         type,
         reordered.map((item) => item.slug),
+        activeLanguage,
       );
     } catch (error) {
       console.error("Error reordering items:", error);
@@ -193,6 +243,21 @@ export default function CollectionItems() {
       refetchItems();
     }
   };
+
+  const itemEditPath = (item) => editorPath(itemEditHref(type, item, isMultilang));
+
+  // Every language came back in the one fetch, so a row's siblings are already in
+  // hand — the same shape as the pages list.
+  const { siblingsOf, createIn, pendingKey } = useTranslationVersions({
+    entries: items,
+    defaultLanguage,
+    createVersion: (item, targetLanguage) =>
+      createItemLanguageVersion(type, item.slug, { targetLanguage, sourceLanguage: item.language }),
+    onCreated: (created) => {
+      afterMutation();
+      navigate(itemEditPath(created));
+    },
+  });
 
   const loading = schemasLoading || itemsLoading;
 
@@ -217,7 +282,12 @@ export default function CollectionItems() {
     );
   }
 
-  const hasItems = orderedItems.length > 0;
+  // Of the active language: an empty one gets the empty state, whose button
+  // starts an item in it. The tabs sit above both branches either way, so a
+  // language with nothing in it yet is still reachable.
+  const hasItems = itemsInLanguage.length > 0;
+
+  const handleNewItem = () => navigate(editorPath(itemAddHref(type, isMultilang ? activeLanguage : undefined)));
   const SchemaIcon = resolveLucideIcon(schema?.icon);
 
   const renderRowActions = (item) => {
@@ -246,7 +316,7 @@ export default function CollectionItems() {
                 type="button"
                 onClick={() => {
                   setOpenMenuId(null);
-                  openCollectionItemPreview(schema.slugPrefix, item.slug);
+                  openCollectionItemPreview(schema.slugPrefix, item.slug, isMultilang ? item.language : undefined);
                 }}
                 className={`${menuButtonClass} text-slate-700 hover:bg-slate-50`}
               >
@@ -255,7 +325,7 @@ export default function CollectionItems() {
               </button>
             )}
             <Link
-              to={editorPath(`/collections/${type}/${item.slug}/edit`)}
+              to={itemEditPath(item)}
               onClick={() => setOpenMenuId(null)}
               className={`${menuButtonClass} text-slate-700 hover:bg-slate-50`}
             >
@@ -266,7 +336,7 @@ export default function CollectionItems() {
               type="button"
               onClick={() => {
                 setOpenMenuId(null);
-                handleDuplicate(item.slug);
+                handleDuplicate(item.slug, item.language);
               }}
               className={`${menuButtonClass} text-slate-700 hover:bg-slate-50`}
             >
@@ -315,7 +385,7 @@ export default function CollectionItems() {
       <td className="py-3 px-4">
         <div className="flex items-center gap-2 min-w-0">
           <Link
-            to={editorPath(`/collections/${type}/${item.slug}/edit`)}
+            to={itemEditPath(item)}
             className="block min-w-0 rounded-sm font-medium text-slate-900 transition-colors hover:text-pink-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pink-500 focus-visible:ring-offset-2"
           >
             <span className="block truncate">{item.title || item.slug}</span>
@@ -338,6 +408,17 @@ export default function CollectionItems() {
             : formatDate(item.updated)}
         </div>
       </td>
+      {isMultilang && (
+        <td className="py-3 px-4 whitespace-nowrap">
+          <TranslationChips
+            entry={item}
+            siblings={siblingsOf(item)}
+            hrefOf={itemEditPath}
+            onCreate={createIn}
+            pendingKey={pendingKey}
+          />
+        </td>
+      )}
       <td className="py-3 px-4 text-right">{renderRowActions(item)}</td>
     </>
   );
@@ -360,6 +441,7 @@ export default function CollectionItems() {
     </IconButton>,
     t("collections.headers.title"),
     dateField ? t("collections.headers.date") : t("collections.headers.updated"),
+    ...(isMultilang ? [t("collections.languages.header")] : []),
     t("collections.headers.actions"),
   ];
 
@@ -381,20 +463,29 @@ export default function CollectionItems() {
       buttonProps={
         hasItems
           ? {
-              onClick: () => navigate(editorPath(`/collections/${type}/add`)),
+              onClick: handleNewItem,
               children: t("collections.newItem", { name: displayName }),
               icon: <CirclePlus size={18} />,
             }
           : undefined
       }
     >
+      <LanguageTabs
+        value={activeLanguage}
+        label={t("collections.languages.tabsLabel")}
+        onChange={(code) => {
+          setActiveLanguage(code);
+          setSelectedSlugs([]);
+          setOpenMenuId(null);
+        }}
+      />
       {hasItems && (
         <>
           {/* Toolbar */}
           <div className="flex flex-wrap justify-between mb-4 items-center gap-2">
             <div className="flex items-center gap-2 flex-wrap">
               <span className="text-sm text-slate-600">
-                {t("collections.count", { count: orderedItems.length })}
+                {t("collections.count", { count: itemsInLanguage.length })}
               </span>
               {selectedSlugs.length > 0 && (
                 <>
@@ -454,11 +545,9 @@ export default function CollectionItems() {
           <SchemaIcon className="mx-auto mb-4 text-slate-400" size={48} />
           <h2 className="text-xl font-semibold mb-2">{t("collections.noItemsYet", { name: displayNamePlural })}</h2>
           <p className="text-slate-600 mb-4">{t("collections.createFirst", { name: displayName })}</p>
-          <Link to={editorPath(`/collections/${type}/add`)}>
-            <Button variant="primary" icon={<CirclePlus size={18} />}>
-              {t("collections.newItem", { name: displayName })}
-            </Button>
-          </Link>
+          <Button onClick={handleNewItem} variant="primary" icon={<CirclePlus size={18} />}>
+            {t("collections.newItem", { name: displayName })}
+          </Button>
         </div>
       )}
 

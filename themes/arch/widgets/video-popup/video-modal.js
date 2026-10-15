@@ -4,7 +4,13 @@
  * Opens a YouTube/Vimeo iframe with autoplay, closes on Escape or backdrop click.
  */
 (function () {
-  function getOrCreateModal() {
+  // The words come from the widget that opened this (see widget.liquid); the
+  // fallbacks are only for a page rendered before the theme shipped them.
+  function labelOf(widget, name, fallback) {
+    return (widget && widget.dataset[name]) || fallback;
+  }
+
+  function getOrCreateModal(widget) {
     let modal = document.getElementById('video-modal');
     if (modal) return modal;
 
@@ -14,10 +20,10 @@
     modal.setAttribute('role', 'dialog');
     modal.setAttribute('aria-modal', 'true');
     modal.setAttribute('aria-hidden', 'true');
-    modal.setAttribute('aria-label', 'Video player');
+    modal.setAttribute('aria-label', labelOf(widget, 'tPlayer', 'Video player'));
     modal.innerHTML = `
       <div class="video-modal-content">
-        <button type="button" class="video-modal-close" aria-label="Close video">
+        <button type="button" class="video-modal-close">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M18 6L6 18M6 6l12 12" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
@@ -37,6 +43,9 @@
     document.body.appendChild(modal);
 
     const closeBtn = modal.querySelector('.video-modal-close');
+    // Set, never interpolated: `dataset` hands back decoded text, so a word
+    // with a quote in it would be parsed as markup.
+    closeBtn.setAttribute('aria-label', labelOf(widget, 'tClose', 'Close video'));
     const iframe = modal.querySelector('.video-modal-iframe');
 
     modal._lastFocused = null;
@@ -106,7 +115,7 @@
     if (!embedUrl) return;
 
     const title = widget.dataset.videoTitle || 'Video';
-    const modal = getOrCreateModal();
+    const modal = getOrCreateModal(widget);
 
     function openVideo(e) {
       e.preventDefault();

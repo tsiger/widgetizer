@@ -6,13 +6,17 @@
 import fs from "fs-extra";
 import path from "path";
 import { randomUUID } from "crypto";
-import { getProjectDir, getProjectThemeJsonPath } from "../config.js";
+import { getProjectDir } from "../config.js";
 import { getProjectFolderName } from "../utils/projectHelpers.js";
 import * as projectRepo from "../db/repositories/projectRepository.js";
 import { getThemeSourceDir, readThemeSourceMetadata } from "../controllers/themeController.js";
+import { createKeyedSerializer } from "../utils/serializeByKey.js";
+import { isWithinDirectory } from "../utils/pathSecurity.js";
 import { refreshMediaUsageAfterStructuralChange } from "./mediaUsageService.js";
+import { withContentWriteLock } from "./contentCoordination.js";
 import { getUpdateStatus } from "../utils/updateStatus.js";
 import { processTemplatesRecursive } from "../utils/templateHelpers.js";
+import { findThemeSetting } from "@widgetizer/core/themeSettingChanges";
 
 /**
  * Updatable paths - these are copied from theme to project during updates.
@@ -82,9 +86,28 @@ export function mergeThemeSettings(userThemeJson, newThemeJson) {
   // Merge settings values
   if (userThemeJson.settings && newThemeJson.settings) {
     merged.settings = mergeSettingsObject(userThemeJson.settings, newThemeJson.settings);
+    carryMovedSettingValues(merged, userThemeJson);
   }
 
   return merged;
+}
+
+/**
+ * A setting the update moved to another group keeps the owner's value: the
+ * group-by-group merge cannot see it, so look it up the way the app reads it —
+ * the only setting with that id in the old file. The owner's value wins over
+ * one the new schema ships, as it does for a setting that stayed put.
+ */
+function carryMovedSettingValues(merged, userThemeJson) {
+  for (const [group, items] of Object.entries(merged.settings?.global || {})) {
+    if (!Array.isArray(items)) continue;
+    merged.settings.global[group] = items.map((item) => {
+      if (!item?.id || item.type === "header") return item;
+      const found = findThemeSetting(userThemeJson, { group, id: item.id });
+      if (!found?.item || found.group === group || found.item.value === undefined) return item;
+      return { ...item, value: JSON.parse(JSON.stringify(found.item.value)) };
+    });
+  }
 }
 
 /**
@@ -154,17 +177,279 @@ function mergeSettingsArray(userArray, newArray) {
       return newItem;
     }
 
-    // Preserve user's value if they have one
+    // Preserve user's value if they have one. Everything else — including a
+    // `default` the new schema removed — comes from the new item alone.
     const merged = { ...newItem };
     if (userItem.value !== undefined) {
       merged.value = userItem.value;
     }
-    if (userItem.default !== undefined && newItem.default === undefined) {
-      // Don't preserve default if new schema removed it
-    }
 
     return merged;
   });
+}
+
+// Transient working directories for an update, inside the project so every move
+// stays on one filesystem. Both start with a dot, which keeps them out of the
+// backup export's file walk.
+const STAGE_DIR = ".theme-update-stage";
+const BACKUP_DIR = ".theme-update-backup";
+// Written before the swap begins and removed once it finishes. It holds the
+// plan, because putting the previous state back needs more than the files moved
+// aside: an update also ADDS things, and a run that stops halfway has to have
+// those removed too. Its presence is what distinguishes a run killed mid-swap
+// from one killed just after finishing.
+const PLAN_FILE = ".in-progress";
+
+/** Move a path, creating the destination's parent first. */
+async function movePath(from, to) {
+  await fs.ensureDir(path.dirname(to));
+  await fs.move(from, to, { overwrite: true });
+}
+
+/**
+ * Remove one path a plan names, only when it lies inside the project. The plan is
+ * a file in the project folder, and a project can arrive from a backup made
+ * elsewhere, so an entry such as `../other-project` must not delete outside it.
+ */
+async function removeInsideProject(projectDir, rel) {
+  const root = path.resolve(projectDir);
+  const target = typeof rel === "string" && rel !== "" ? path.resolve(root, rel) : null;
+  if (!target || !isWithinDirectory(target, root)) {
+    console.warn(`[applyThemeUpdate] Skipped a recorded path outside the project: ${JSON.stringify(rel)}`);
+    return;
+  }
+  await fs.remove(target);
+}
+
+/**
+ * Put the project back the way it was before a swap: remove everything the
+ * update introduced, then move back everything it displaced.
+ *
+ * One function for both callers — the rollback inside a failed run and the
+ * recovery of a run that was killed — so the two cannot drift apart.
+ * Returns true when the previous state was fully restored.
+ */
+async function undoSwap({ projectDir, backupDir, plan }) {
+  try {
+    for (const rel of plan.added ?? []) {
+      await removeInsideProject(projectDir, rel);
+    }
+    // A path the update created where the project had none: putting the
+    // previous state back means it should not be there at all.
+    for (const rel of plan.placedWhereAbsent ?? []) {
+      await removeInsideProject(projectDir, rel);
+    }
+    for (const entry of await fs.readdir(backupDir)) {
+      if (entry === PLAN_FILE) continue;
+      await movePath(path.join(backupDir, entry), path.join(projectDir, entry));
+    }
+    return true;
+  } catch (error) {
+    console.error(`[applyThemeUpdate] Could not put the previous theme files back: ${error.message}`);
+    return false;
+  }
+}
+
+/**
+ * Finish an update that was interrupted, before starting a new one.
+ *
+ * A backup with no plan belonged to a run that had already completed its swap,
+ * so it is only cleaned up — restoring it would undo a good update.
+ */
+async function recoverInterruptedUpdate(projectDir) {
+  const backupDir = path.join(projectDir, BACKUP_DIR);
+  await fs.remove(path.join(projectDir, STAGE_DIR)).catch(() => {});
+  if (!(await fs.pathExists(backupDir))) return;
+
+  const planPath = path.join(backupDir, PLAN_FILE);
+  if (!(await fs.pathExists(planPath))) {
+    // The swap removes the plan as its last act, so a backup without one
+    // belonged to a run that finished. Restoring it would undo a good update.
+    await fs.remove(backupDir);
+    return;
+  }
+
+  // The plan is written atomically, so a present one is complete. A present but
+  // unreadable one is treated as interrupted anyway: the displaced files are
+  // put back, and the run is stopped rather than assumed finished.
+  let plan;
+  try {
+    plan = await fs.readJson(planPath);
+  } catch (error) {
+    console.error(`[applyThemeUpdate] The interrupted update's plan could not be read: ${error.message}`);
+    await undoSwap({ projectDir, backupDir, plan: {} });
+    // No claim about what the project now holds: this branch is exactly the one
+    // where that is not known. And nothing for the reader to go and inspect —
+    // the details are in the log, and the person seeing this is not reading it.
+    throw new Error("The theme update could not be completed. Please try again.");
+  }
+
+  const restored = await undoSwap({ projectDir, backupDir, plan });
+  if (!restored) {
+    // Left in place deliberately: the next attempt tries again, and deleting
+    // it would throw away the only copy of the files still missing.
+    // The undo did not finish, so what the project holds is not known — the one
+    // thing this must not do is claim it was left alone.
+    throw new Error("The theme update could not be completed. Please try again.");
+  }
+  await fs.remove(backupDir);
+  console.warn("[applyThemeUpdate] Undid an update that was interrupted partway through");
+}
+
+/**
+ * Apply a theme update to a project directory — the file-level core of an update.
+ *
+ * All of it, or none of it. The update is built off to the side first, and only
+ * once every piece is ready does anything in the project change; a failure
+ * during the swap puts back what was displaced and removes what was added.
+ * Replacing each path as it is read would be no better than the per-file catch
+ * it replaced: `assets` from the new theme beside `widgets` from the old one is
+ * a project that renders wrongly rather than one that failed to update.
+ *
+ * The updatable paths are replaced wholesale, which is how a theme deletes a
+ * file — it is absent from the new copy. New menus and new templates are added
+ * without overwriting the author's, and theme.json is merged.
+ *
+ * Callers must hold this project's update lock: the working directories are
+ * per project, so two overlapping runs would read each other's as their own.
+ *
+ * @param {object} params
+ * @param {string} params.themeSourceDir - Directory holding the theme source to apply
+ * @param {string} params.projectDir - The project's content directory
+ * @returns {Promise<{newVersion: string|null}>} The version from the theme source's theme.json, or null if unreadable
+ * @throws {Error} When the update could not be applied; the project is unchanged
+ */
+export async function applyThemeUpdateToDir({ themeSourceDir, projectDir }) {
+  const stageDir = path.join(projectDir, STAGE_DIR);
+  const backupDir = path.join(projectDir, BACKUP_DIR);
+
+  await recoverInterruptedUpdate(projectDir);
+
+  // ---- Prepare. Reads the theme, writes only into the staging directory. A
+  // failure here has touched nothing the project uses. ----
+  const staged = [];
+  const additions = [];
+  let mergedThemeJson = null;
+  const newThemeJsonPath = path.join(themeSourceDir, "theme.json");
+
+  try {
+    await fs.ensureDir(stageDir);
+
+    for (const itemPath of UPDATABLE_PATHS) {
+      const sourcePath = path.join(themeSourceDir, itemPath);
+      if (!(await fs.pathExists(sourcePath))) continue; // not in this theme
+      await fs.copy(sourcePath, path.join(stageDir, itemPath));
+      staged.push(itemPath);
+    }
+
+    const themeMenusDir = path.join(themeSourceDir, "menus");
+    if (await fs.pathExists(themeMenusDir)) {
+      for (const menuFile of await fs.readdir(themeMenusDir)) {
+        if (!menuFile.endsWith(".json")) continue;
+        const rel = path.join("menus", menuFile);
+        if (await fs.pathExists(path.join(projectDir, rel))) continue; // the author's, left alone
+        const menuContent = await fs.readJson(path.join(themeMenusDir, menuFile));
+        const now = new Date().toISOString();
+        additions.push({
+          rel,
+          content: {
+            ...menuContent,
+            id: path.parse(menuFile).name,
+            uuid: menuContent.uuid || randomUUID(),
+            created: now,
+            updated: now,
+          },
+        });
+      }
+    }
+
+    await processTemplatesRecursive(
+      path.join(themeSourceDir, "templates"),
+      path.join(projectDir, "pages"),
+      async (template, slug, targetPath) => {
+        if (await fs.pathExists(targetPath)) return; // the author's page
+        const now = new Date().toISOString();
+        additions.push({
+          rel: path.relative(projectDir, targetPath),
+          content: { ...template, id: slug, slug, created: now, updated: now },
+        });
+      },
+    );
+
+    mergedThemeJson = mergeThemeSettings(
+      await fs.readJson(path.join(projectDir, "theme.json")),
+      await fs.readJson(newThemeJsonPath),
+    );
+  } catch (error) {
+    await fs.remove(stageDir).catch(() => {});
+    console.error(`[applyThemeUpdate] Could not prepare the update: ${error.message}`);
+    throw new Error("The update could not be prepared, so nothing in the project was changed.");
+  }
+
+  // ---- Swap. The plan is written first and in full, so a run that dies at any
+  // point after this leaves behind everything needed to undo it. ----
+  const plan = {
+    added: additions.map((addition) => addition.rel),
+    placedWhereAbsent: [],
+  };
+  for (const itemPath of staged) {
+    if (!(await fs.pathExists(path.join(projectDir, itemPath)))) plan.placedWhereAbsent.push(itemPath);
+  }
+
+  let swapped = false;
+  try {
+    await fs.ensureDir(backupDir);
+    // Written aside and renamed into place: a plan truncated by a crash would
+    // be a recovery that cannot tell what it is recovering.
+    const planTmp = path.join(backupDir, `${PLAN_FILE}.tmp`);
+    await fs.writeJson(planTmp, plan);
+    await fs.move(planTmp, path.join(backupDir, PLAN_FILE), { overwrite: true });
+
+    for (const itemPath of staged) {
+      const target = path.join(projectDir, itemPath);
+      if (await fs.pathExists(target)) {
+        await movePath(target, path.join(backupDir, itemPath));
+      }
+      await movePath(path.join(stageDir, itemPath), target);
+    }
+
+    const projectThemeJsonPath = path.join(projectDir, "theme.json");
+    await movePath(projectThemeJsonPath, path.join(backupDir, "theme.json"));
+    await fs.writeJson(projectThemeJsonPath, mergedThemeJson, { spaces: 2 });
+
+    for (const { rel, content } of additions) {
+      await fs.outputJson(path.join(projectDir, rel), content, { spaces: 2 });
+    }
+
+    // Last: from here on the backup is spare, and a crash must not undo this.
+    await fs.remove(path.join(backupDir, PLAN_FILE));
+    swapped = true;
+  } catch (error) {
+    console.error(`[applyThemeUpdate] Could not apply the update: ${error.message}`);
+    const restored = await undoSwap({ projectDir, backupDir, plan });
+    await fs.remove(stageDir).catch(() => {});
+    if (!restored) {
+      // The backup and its plan stay on disk: they are the only copy of what is
+      // now missing, and the next attempt starts by trying the undo again.
+      throw new Error("The theme update could not be completed. Please try again.");
+    }
+    await fs.remove(backupDir).catch(() => {});
+    throw new Error("The update could not be applied, so the project was left as it was.");
+  }
+
+  if (swapped) {
+    await fs.remove(stageDir).catch(() => {});
+    await fs.remove(backupDir).catch(() => {});
+  }
+
+  let newVersion = null;
+  try {
+    newVersion = (await fs.readJson(newThemeJsonPath)).version ?? null;
+  } catch {
+    // Theme source theme.json missing or unreadable — caller decides what to do
+  }
+
+  return { newVersion };
 }
 
 /**
@@ -176,7 +461,27 @@ function mergeSettingsArray(userArray, newArray) {
  * @returns {Promise<{success: boolean, previousVersion: string, newVersion: string, message?: string}>} Update result
  * @throws {Error} If project not found
  */
+// One update at a time per project. The staging and backup directories are
+// named per project, so two overlapping runs would each read the other's as
+// their own — the second would take the first's backup for an interrupted
+// update and undo work that had just succeeded. Recovery, the swap and the
+// version write all have to be inside this.
+//
+// The content-write section goes inside it (that section is always innermost)
+// and covers the whole run, because an update rewrites theme.json across a long
+// interval: prep reads and merges the current file, the swap writes the merge,
+// and a failed swap restores the backup. A theme-settings save landing anywhere
+// in between would be overwritten or rolled back, so saves wait for the update
+// and then apply on top of what it left.
+const serializeThemeUpdates = createKeyedSerializer();
+
 export async function applyThemeUpdate(projectId) {
+  return serializeThemeUpdates(projectId, () =>
+    withContentWriteLock(projectId, () => applyThemeUpdateExclusively(projectId)),
+  );
+}
+
+async function applyThemeUpdateExclusively(projectId) {
   const project = projectRepo.getProjectById(projectId);
 
   if (!project) {
@@ -207,103 +512,19 @@ export async function applyThemeUpdate(projectId) {
     `[applyThemeUpdate] Updating project ${projectId} from ${previousVersion} to ${updateStatus.latestVersion}`,
   );
 
-  // 1. Copy updatable paths from theme to project
-  for (const itemPath of UPDATABLE_PATHS) {
-    const sourcePath = path.join(themeSourceDir, itemPath);
-    const targetPath = path.join(projectDir, itemPath);
-
-    try {
-      // Check if source exists
-      const sourceExists = await fs.pathExists(sourcePath);
-      if (!sourceExists) {
-        console.log(`[applyThemeUpdate] Skipping ${itemPath} - not in theme`);
-        continue;
-      }
-
-      // Remove existing target and copy fresh from theme
-      await fs.remove(targetPath);
-      await fs.copy(sourcePath, targetPath);
-      console.log(`[applyThemeUpdate] Updated ${itemPath}`);
-    } catch (error) {
-      console.warn(`[applyThemeUpdate] Failed to update ${itemPath}: ${error.message}`);
-      // Continue with other updates even if one fails
-    }
-  }
-
-  // 2. Add new menus from theme (don't overwrite existing user menus)
-  try {
-    const themeMenusDir = path.join(themeSourceDir, "menus");
-    const projectMenusDir = path.join(projectDir, "menus");
-
-    if (await fs.pathExists(themeMenusDir)) {
-      await fs.ensureDir(projectMenusDir);
-      const themeMenuFiles = await fs.readdir(themeMenusDir);
-
-      for (const menuFile of themeMenuFiles) {
-        if (!menuFile.endsWith(".json")) continue;
-
-        const projectMenuPath = path.join(projectMenusDir, menuFile);
-        const themeMenuPath = path.join(themeMenusDir, menuFile);
-
-        // Only add if it doesn't exist in project (preserve user menus)
-        if (!(await fs.pathExists(projectMenuPath))) {
-          const menuContent = await fs.readJson(themeMenuPath);
-          const menuSlug = path.parse(menuFile).name;
-
-          const enrichedMenu = {
-            ...menuContent,
-            id: menuSlug,
-            uuid: menuContent.uuid || randomUUID(),
-            created: new Date().toISOString(),
-            updated: new Date().toISOString(),
-          };
-
-          await fs.writeJson(projectMenuPath, enrichedMenu, { spaces: 2 });
-          console.log(`[applyThemeUpdate] Added new menu: ${menuFile}`);
-        }
-      }
-    }
-  } catch (error) {
-    console.warn(`[applyThemeUpdate] Failed to add new menus: ${error.message}`);
-  }
-
-  // 2b. Add new templates as pages (don't overwrite existing user pages)
-  try {
-    const themeTemplatesDir = path.join(themeSourceDir, "templates");
-    const projectPagesDir = path.join(projectDir, "pages");
-
-    await processTemplatesRecursive(themeTemplatesDir, projectPagesDir, async (template, slug, targetPath) => {
-      if (await fs.pathExists(targetPath)) return;
-      const newPage = {
-        ...template,
-        id: slug,
-        slug,
-        created: new Date().toISOString(),
-        updated: new Date().toISOString(),
-      };
-      await fs.writeJson(targetPath, newPage, { spaces: 2 });
-      console.log(`[applyThemeUpdate] Added new page from template: ${slug}`);
-    });
-  } catch (error) {
-    console.warn(`[applyThemeUpdate] Failed to add new templates: ${error.message}`);
-  }
-
-  // 3. Merge theme.json
-  try {
-    const projectThemeJsonPath = getProjectThemeJsonPath(projectFolderName);
-    const newThemeJsonPath = path.join(themeSourceDir, "theme.json");
-
-    const userThemeJson = await fs.readJson(projectThemeJsonPath);
-    const newThemeJson = await fs.readJson(newThemeJsonPath);
-
-    const mergedThemeJson = mergeThemeSettings(userThemeJson, newThemeJson);
-
-    await fs.writeJson(projectThemeJsonPath, mergedThemeJson, { spaces: 2 });
-    console.log(`[applyThemeUpdate] Merged theme.json`);
-  } catch (error) {
-    console.warn(`[applyThemeUpdate] Failed to merge theme.json: ${error.message}`);
-    // This is more critical, but we still continue
-  }
+  // The file-level update is all-or-nothing and throws when it could not be
+  // applied, having left the project as it was. The version is recorded only
+  // after it returns, so a failed update stays available to retry rather than
+  // reading as one that already happened.
+  //
+  // Deferred: the row write below is not covered by that rollback. If it fails,
+  // the project holds the new theme files while still recording the old
+  // version, and the next update re-applies the same files over themselves —
+  // wasteful but not damaging, because the updatable paths are replaced
+  // wholesale from the theme either way. Rolling the files back for it would
+  // mean holding the backup across a database write, which is more machinery
+  // than the outcome warrants.
+  await applyThemeUpdateToDir({ themeSourceDir, projectDir });
 
   // 4. Update project metadata
   projectRepo.updateProject(projectId, {

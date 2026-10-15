@@ -1,0 +1,43 @@
+{
+  "type": "footer",
+  "settings": {
+    "copyright": "© 2026 Olympic Gym. All rights reserved.",
+    "layout": "equal",
+    "color_scheme": "highlight-secondary"
+  },
+  "blocks": {
+    "logo_text_1": {
+      "type": "logo_text",
+      "settings": {
+        "text": "<p>Strength starts here. Portland's home for serious training, supportive coaching, and a community that pushes you forward.</p>",
+        "logo": "/uploads/images/olympiclight.png",
+        "logo_width": 170
+      }
+    },
+    "text_block_1": {
+      "type": "text_block",
+      "settings": {
+        "title": "Hours",
+        "text": "<p>Mon–Fri: 5 AM – 10 PM</p><p>Saturday: 7 AM – 8 PM</p><p>Sunday: 8 AM – 6 PM</p>"
+      }
+    },
+    "menu_block_1": {
+      "type": "menu_block",
+      "settings": {
+        "title": "Explore"
+      }
+    },
+    "social_block_1": {
+      "type": "social_block",
+      "settings": {
+        "title": "Follow Us"
+      }
+    }
+  },
+  "blocksOrder": [
+    "logo_text_1",
+    "text_block_1",
+    "menu_block_1",
+    "social_block_1"
+  ]
+}

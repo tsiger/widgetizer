@@ -1,0 +1,13 @@
+{
+  "slug": "twelve-week-transformation",
+  "schemaVersion": 1,
+  "settings": {
+    "title": "Twelve Week Progress Program",
+    "icon": "target-arrow",
+    "summary": "A full coaching block with training, simple nutrition guidance, and weekly check-ins for steady results.",
+    "description": "<h2>What is included</h2><p>This is our most complete option. You get two coached sessions a week, a written program for the days you train alone, and straightforward nutrition guidance you can follow without weighing every meal.</p><ul><li>Two coached sessions each week</li><li>A written program for your solo training days</li><li>Simple nutrition guidance and weekly check-ins</li></ul><h3>How the block runs</h3><p>Each week we review your numbers, your sleep, and how you are recovering, then adjust. <strong>Most people finish stronger, leaner, and clearer on how to keep going on their own.</strong> The weekly check-in is where we keep the plan honest, catching anything that is sliding before it costs you progress.</p><p>Twelve weeks is long enough to build real momentum and short enough to stay focused on. We treat it as a single arc, easing in at the start, pushing through the middle, and tightening things up toward the end.</p><h3>Who it suits</h3><p>It works for people who want structure and accountability across a defined block rather than open-ended training. You do not need a background in lifting, just a willingness to show up and follow the plan.</p><p>The nutrition side stays practical on purpose, built around habits you can keep rather than rigid rules you will abandon. By the end, the goal is that you understand the why behind the plan and can carry the work forward yourself.</p>",
+    "price": "$1100 for 12 weeks",
+    "duration": "60 min sessions",
+    "featured_image": "/uploads/images/ironform-services-twelve-week-transformation.webp"
+  }
+}

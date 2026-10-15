@@ -1,0 +1,1124 @@
+{
+  "files": [
+    {
+      "filename": "greenfield-news-meet-the-greenfield-crew.webp",
+      "originalName": "greenfield-news-meet-the-greenfield-crew.webp",
+      "type": "image/webp",
+      "size": 139794,
+      "path": "/uploads/images/greenfield-news-meet-the-greenfield-crew.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "Meet the Crew Behind the Greenfield Vans",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/greenfield-news-meet-the-greenfield-crew-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/greenfield-news-meet-the-greenfield-crew-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/greenfield-news-meet-the-greenfield-crew-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "greenfield-news-now-offering-native-meadow-installs.webp",
+      "originalName": "greenfield-news-now-offering-native-meadow-installs.webp",
+      "type": "image/webp",
+      "size": 120950,
+      "path": "/uploads/images/greenfield-news-now-offering-native-meadow-installs.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "We Now Install Native Wildflower Meadows",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/greenfield-news-now-offering-native-meadow-installs-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/greenfield-news-now-offering-native-meadow-installs-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/greenfield-news-now-offering-native-meadow-installs-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "greenfield-news-right-way-to-water-new-shrubs.webp",
+      "originalName": "greenfield-news-right-way-to-water-new-shrubs.webp",
+      "type": "image/webp",
+      "size": 128572,
+      "path": "/uploads/images/greenfield-news-right-way-to-water-new-shrubs.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "How to Water a New Shrub Without Drowning It",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/greenfield-news-right-way-to-water-new-shrubs-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/greenfield-news-right-way-to-water-new-shrubs-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/greenfield-news-right-way-to-water-new-shrubs-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "greenfield-news-spring-pruning-open-morning.webp",
+      "originalName": "greenfield-news-spring-pruning-open-morning.webp",
+      "type": "image/webp",
+      "size": 100236,
+      "path": "/uploads/images/greenfield-news-spring-pruning-open-morning.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "Free Pruning Morning at the Yard This March",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/greenfield-news-spring-pruning-open-morning-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/greenfield-news-spring-pruning-open-morning-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/greenfield-news-spring-pruning-open-morning-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "greenfield-news-ten-years-of-greenfield.webp",
+      "originalName": "greenfield-news-ten-years-of-greenfield.webp",
+      "type": "image/webp",
+      "size": 94616,
+      "path": "/uploads/images/greenfield-news-ten-years-of-greenfield.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "Ten Years, Forty Tonnes of Compost",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/greenfield-news-ten-years-of-greenfield-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/greenfield-news-ten-years-of-greenfield-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/greenfield-news-ten-years-of-greenfield-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "greenfield-projects-courtyard-for-a-narrow-terraced-house.webp",
+      "originalName": "greenfield-projects-courtyard-for-a-narrow-terraced-house.webp",
+      "type": "image/webp",
+      "size": 282700,
+      "path": "/uploads/images/greenfield-projects-courtyard-for-a-narrow-terraced-house.webp",
+      "width": 1600,
+      "height": 992,
+      "alt": "A Shaded Courtyard Turned Into a Green Room",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/greenfield-projects-courtyard-for-a-narrow-terraced-house-medium.webp",
+          "width": 1024,
+          "height": 635
+        },
+        "small": {
+          "path": "/uploads/images/greenfield-projects-courtyard-for-a-narrow-terraced-house-small.webp",
+          "width": 480,
+          "height": 298
+        },
+        "thumb": {
+          "path": "/uploads/images/greenfield-projects-courtyard-for-a-narrow-terraced-house-thumb.webp",
+          "width": 150,
+          "height": 93
+        }
+      }
+    },
+    {
+      "filename": "greenfield-projects-front-garden-gravel-and-grasses.webp",
+      "originalName": "greenfield-projects-front-garden-gravel-and-grasses.webp",
+      "type": "image/webp",
+      "size": 167688,
+      "path": "/uploads/images/greenfield-projects-front-garden-gravel-and-grasses.webp",
+      "width": 1600,
+      "height": 992,
+      "alt": "A Low-Maintenance Front Garden in Gravel and Grasses",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/greenfield-projects-front-garden-gravel-and-grasses-medium.webp",
+          "width": 1024,
+          "height": 635
+        },
+        "small": {
+          "path": "/uploads/images/greenfield-projects-front-garden-gravel-and-grasses-small.webp",
+          "width": 480,
+          "height": 298
+        },
+        "thumb": {
+          "path": "/uploads/images/greenfield-projects-front-garden-gravel-and-grasses-thumb.webp",
+          "width": 150,
+          "height": 93
+        }
+      }
+    },
+    {
+      "filename": "greenfield-projects-sandstone-patio-with-pergola.webp",
+      "originalName": "greenfield-projects-sandstone-patio-with-pergola.webp",
+      "type": "image/webp",
+      "size": 124592,
+      "path": "/uploads/images/greenfield-projects-sandstone-patio-with-pergola.webp",
+      "width": 1600,
+      "height": 992,
+      "alt": "A Sandstone Patio Built for Long Evenings",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/greenfield-projects-sandstone-patio-with-pergola-medium.webp",
+          "width": 1024,
+          "height": 635
+        },
+        "small": {
+          "path": "/uploads/images/greenfield-projects-sandstone-patio-with-pergola-small.webp",
+          "width": 480,
+          "height": 298
+        },
+        "thumb": {
+          "path": "/uploads/images/greenfield-projects-sandstone-patio-with-pergola-thumb.webp",
+          "width": 150,
+          "height": 93
+        }
+      }
+    },
+    {
+      "filename": "greenfield-projects-walled-garden-irrigation-and-borders.webp",
+      "originalName": "greenfield-projects-walled-garden-irrigation-and-borders.webp",
+      "type": "image/webp",
+      "size": 284482,
+      "path": "/uploads/images/greenfield-projects-walled-garden-irrigation-and-borders.webp",
+      "width": 1600,
+      "height": 992,
+      "alt": "A Walled Garden Replanted With Proper Irrigation",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/greenfield-projects-walled-garden-irrigation-and-borders-medium.webp",
+          "width": 1024,
+          "height": 635
+        },
+        "small": {
+          "path": "/uploads/images/greenfield-projects-walled-garden-irrigation-and-borders-small.webp",
+          "width": 480,
+          "height": 298
+        },
+        "thumb": {
+          "path": "/uploads/images/greenfield-projects-walled-garden-irrigation-and-borders-thumb.webp",
+          "width": 150,
+          "height": 93
+        }
+      }
+    },
+    {
+      "filename": "greenfield-projects-wildflower-meadow-on-a-paddock.webp",
+      "originalName": "greenfield-projects-wildflower-meadow-on-a-paddock.webp",
+      "type": "image/webp",
+      "size": 272906,
+      "path": "/uploads/images/greenfield-projects-wildflower-meadow-on-a-paddock.webp",
+      "width": 1600,
+      "height": 992,
+      "alt": "A Wildflower Meadow on an Old Paddock",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/greenfield-projects-wildflower-meadow-on-a-paddock-medium.webp",
+          "width": 1024,
+          "height": 635
+        },
+        "small": {
+          "path": "/uploads/images/greenfield-projects-wildflower-meadow-on-a-paddock-small.webp",
+          "width": 480,
+          "height": 298
+        },
+        "thumb": {
+          "path": "/uploads/images/greenfield-projects-wildflower-meadow-on-a-paddock-thumb.webp",
+          "width": 150,
+          "height": 93
+        }
+      }
+    },
+    {
+      "filename": "greenfieldlogolight.png",
+      "originalName": "greenfield_logo_light.png",
+      "type": "image/png",
+      "size": 8326,
+      "path": "/uploads/images/greenfieldlogolight.png",
+      "width": 783,
+      "height": 128,
+      "alt": "Greenfield leaf logo in green for dark backgrounds",
+      "title": "Greenfield logo light",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/greenfieldlogolight-small.png",
+          "width": 480,
+          "height": 78
+        },
+        "thumb": {
+          "path": "/uploads/images/greenfieldlogolight-thumb.png",
+          "width": 150,
+          "height": 25
+        }
+      }
+    },
+    {
+      "filename": "greenfieldlogodark.png",
+      "originalName": "greenfield_logo_dark.png",
+      "type": "image/png",
+      "size": 10990,
+      "path": "/uploads/images/greenfieldlogodark.png",
+      "width": 783,
+      "height": 128,
+      "alt": "Greenfield logo with leaf icon in dark green",
+      "title": "Greenfield logo",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/greenfieldlogodark-small.png",
+          "width": 480,
+          "height": 78
+        },
+        "thumb": {
+          "path": "/uploads/images/greenfieldlogodark-thumb.png",
+          "width": 150,
+          "height": 25
+        }
+      }
+    },
+    {
+      "filename": "why-us.webp",
+      "originalName": "why-us.webp",
+      "type": "image/webp",
+      "size": 66216,
+      "path": "/uploads/images/why-us.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Hands planting a flowering plant with garden tools, mulch, and hose nearby",
+      "title": "Attention to detail",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/why-us-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/why-us-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "step-maintain.webp",
+      "originalName": "step-maintain.webp",
+      "type": "image/webp",
+      "size": 76300,
+      "path": "/uploads/images/step-maintain.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Gardener in a sun hat pruning rose bushes in a formal garden",
+      "title": "Ongoing maintenance",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/step-maintain-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/step-maintain-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "step-install.webp",
+      "originalName": "step-install.webp",
+      "type": "image/webp",
+      "size": 53964,
+      "path": "/uploads/images/step-install.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Crew installing a flagstone patio with wheelbarrow and leveling tools at sunset",
+      "title": "Professional installation",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/step-install-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/step-install-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "step-design.webp",
+      "originalName": "step-design.webp",
+      "type": "image/webp",
+      "size": 61820,
+      "path": "/uploads/images/step-design.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Hand-drawn landscape plan with colored pencils, rulers, and a reference book on a wooden table",
+      "title": "Design plan",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/step-design-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/step-design-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "step-consult.webp",
+      "originalName": "step-consult.webp",
+      "type": "image/webp",
+      "size": 69930,
+      "path": "/uploads/images/step-consult.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Landscaper discussing backyard plans with a homeowner couple outdoors",
+      "title": "On-site consultation",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/step-consult-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/step-consult-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "service-irrigation.webp",
+      "originalName": "service-irrigation.webp",
+      "type": "image/webp",
+      "size": 96768,
+      "path": "/uploads/images/service-irrigation.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Sprinkler watering a lush lawn and rose garden in warm sunset light",
+      "title": "Irrigation systems",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/service-irrigation-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/service-irrigation-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "service-seasonal.webp",
+      "originalName": "service-seasonal.webp",
+      "type": "image/webp",
+      "size": 140032,
+      "path": "/uploads/images/service-seasonal.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Fall landscape with raked leaf piles, trimmed boxwoods, and autumn trees",
+      "title": "Seasonal cleanup",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/service-seasonal-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/service-seasonal-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "service-trees.webp",
+      "originalName": "service-trees.webp",
+      "type": "image/webp",
+      "size": 111906,
+      "path": "/uploads/images/service-trees.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Mulched tree and shrub planting in a tidy suburban yard",
+      "title": "Tree and shrub care",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/service-trees-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/service-trees-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "service-lawn.webp",
+      "originalName": "service-lawn.webp",
+      "type": "image/webp",
+      "size": 148322,
+      "path": "/uploads/images/service-lawn.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Freshly mowed striped front lawn in a suburban neighborhood",
+      "title": "Lawn care",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/service-lawn-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/service-lawn-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "service-hardscape.webp",
+      "originalName": "service-hardscape.webp",
+      "type": "image/webp",
+      "size": 93984,
+      "path": "/uploads/images/service-hardscape.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Patterned paver patio with retaining wall and surrounding flower beds at golden hour",
+      "title": "Hardscape installation",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/service-hardscape-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/service-hardscape-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "service-design.webp",
+      "originalName": "service-design.webp",
+      "type": "image/webp",
+      "size": 62388,
+      "path": "/uploads/images/service-design.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Hand-drawn landscape design on a wooden table with color swatches, ruler, and plant clippings",
+      "title": "Landscape design",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/service-design-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/service-design-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "after-2.webp",
+      "originalName": "after-2.webp",
+      "type": "image/webp",
+      "size": 109466,
+      "path": "/uploads/images/after-2.webp",
+      "width": 800,
+      "height": 496,
+      "alt": "Manicured front yard with flower beds, paver walkway, and trimmed edging",
+      "title": "After — front yard",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/after-2-small.webp",
+          "width": 480,
+          "height": 298
+        },
+        "thumb": {
+          "path": "/uploads/images/after-2-thumb.webp",
+          "width": 150,
+          "height": 93
+        }
+      }
+    },
+    {
+      "filename": "before-2.webp",
+      "originalName": "before-2.webp",
+      "type": "image/webp",
+      "size": 78458,
+      "path": "/uploads/images/before-2.webp",
+      "width": 800,
+      "height": 496,
+      "alt": "Weed-covered front yard with cracked concrete path and peeling house siding",
+      "title": "Before — front yard",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/before-2-small.webp",
+          "width": 480,
+          "height": 298
+        },
+        "thumb": {
+          "path": "/uploads/images/before-2-thumb.webp",
+          "width": 150,
+          "height": 93
+        }
+      }
+    },
+    {
+      "filename": "project-retaining.webp",
+      "originalName": "project-retaining.webp",
+      "type": "image/webp",
+      "size": 131926,
+      "path": "/uploads/images/project-retaining.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Tiered stone retaining wall with flower beds on a sloped property at sunset",
+      "title": "Retaining wall installation",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/project-retaining-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/project-retaining-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "project-commercial.webp",
+      "originalName": "project-commercial.webp",
+      "type": "image/webp",
+      "size": 120540,
+      "path": "/uploads/images/project-commercial.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Modern office plaza entrance with manicured flower beds and trimmed hedges",
+      "title": "Commercial landscape",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/project-commercial-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/project-commercial-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "project-native.webp",
+      "originalName": "project-native.webp",
+      "type": "image/webp",
+      "size": 132304,
+      "path": "/uploads/images/project-native.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Native forest understory with sword ferns and rhododendrons in misty light",
+      "title": "Native plantings",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/project-native-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/project-native-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "project-firepit.webp",
+      "originalName": "project-firepit.webp",
+      "type": "image/webp",
+      "size": 87826,
+      "path": "/uploads/images/project-firepit.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Stone fire pit ringed with Adirondack chairs and tall grasses at twilight",
+      "title": "Evening fire pit",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/project-firepit-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/project-firepit-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "project-backyard.webp",
+      "originalName": "project-backyard.webp",
+      "type": "image/webp",
+      "size": 124852,
+      "path": "/uploads/images/project-backyard.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Backyard deck with outdoor furniture and paver patio surrounded by plants at golden hour",
+      "title": "Backyard retreat",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/project-backyard-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/project-backyard-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "project-courtyard.webp",
+      "originalName": "project-courtyard.webp",
+      "type": "image/webp",
+      "size": 42436,
+      "path": "/uploads/images/project-courtyard.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Modern corporate courtyard with ornamental grasses, planters, reflecting pool, and accent lighting",
+      "title": "Corporate courtyard",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/project-courtyard-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/project-courtyard-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "team-3.webp",
+      "originalName": "team-3.webp",
+      "type": "image/webp",
+      "size": 11376,
+      "path": "/uploads/images/team-3.webp",
+      "width": 400,
+      "height": 400,
+      "alt": "Male team member in a Greenfield-branded green polo smiling outside",
+      "title": "Crew member",
+      "caption": "",
+      "sizes": {
+        "thumb": {
+          "path": "/uploads/images/team-3-thumb.webp",
+          "width": 150,
+          "height": 150
+        }
+      }
+    },
+    {
+      "filename": "team-2.webp",
+      "originalName": "team-2.webp",
+      "type": "image/webp",
+      "size": 12546,
+      "path": "/uploads/images/team-2.webp",
+      "width": 400,
+      "height": 400,
+      "alt": "Female team member with shoulder-length hair in a green shirt in a garden",
+      "title": "Designer",
+      "caption": "",
+      "sizes": {
+        "thumb": {
+          "path": "/uploads/images/team-2-thumb.webp",
+          "width": 150,
+          "height": 150
+        }
+      }
+    },
+    {
+      "filename": "team-1.webp",
+      "originalName": "team-1.webp",
+      "type": "image/webp",
+      "size": 12626,
+      "path": "/uploads/images/team-1.webp",
+      "width": 400,
+      "height": 400,
+      "alt": "Male team member in a green polo smiling in a garden setting",
+      "title": "Crew lead",
+      "caption": "",
+      "sizes": {
+        "thumb": {
+          "path": "/uploads/images/team-1-thumb.webp",
+          "width": 150,
+          "height": 150
+        }
+      }
+    },
+    {
+      "filename": "about-founder.webp",
+      "originalName": "about-founder.webp",
+      "type": "image/webp",
+      "size": 58472,
+      "path": "/uploads/images/about-founder.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Greenfield founder inspecting plants in a nursery greenhouse",
+      "title": "Our founder",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/about-founder-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/about-founder-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "about-team-group.webp",
+      "originalName": "about-team-group.webp",
+      "type": "image/webp",
+      "size": 266402,
+      "path": "/uploads/images/about-team-group.webp",
+      "width": 1920,
+      "height": 592,
+      "alt": "Greenfield crew in green polos posing with landscaping tools in front of a home",
+      "title": "Our team",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/about-team-group-medium.webp",
+          "width": 1024,
+          "height": 316
+        },
+        "small": {
+          "path": "/uploads/images/about-team-group-small.webp",
+          "width": 480,
+          "height": 148
+        },
+        "thumb": {
+          "path": "/uploads/images/about-team-group-thumb.webp",
+          "width": 150,
+          "height": 46
+        }
+      }
+    },
+    {
+      "filename": "testimonial-3.webp",
+      "originalName": "testimonial-3.webp",
+      "type": "image/webp",
+      "size": 14512,
+      "path": "/uploads/images/testimonial-3.webp",
+      "width": 400,
+      "height": 400,
+      "alt": "Older man smiling in a freshly landscaped backyard with a coiled hose",
+      "title": "Long-time client",
+      "caption": "",
+      "sizes": {
+        "thumb": {
+          "path": "/uploads/images/testimonial-3-thumb.webp",
+          "width": 150,
+          "height": 150
+        }
+      }
+    },
+    {
+      "filename": "testimonial-2.webp",
+      "originalName": "testimonial-2.webp",
+      "type": "image/webp",
+      "size": 18780,
+      "path": "/uploads/images/testimonial-2.webp",
+      "width": 400,
+      "height": 400,
+      "alt": "Couple relaxing on an outdoor patio with drinks at golden hour",
+      "title": "Satisfied clients",
+      "caption": "",
+      "sizes": {
+        "thumb": {
+          "path": "/uploads/images/testimonial-2-thumb.webp",
+          "width": 150,
+          "height": 150
+        }
+      }
+    },
+    {
+      "filename": "testimonial-1.webp",
+      "originalName": "testimonial-1.webp",
+      "type": "image/webp",
+      "size": 20694,
+      "path": "/uploads/images/testimonial-1.webp",
+      "width": 400,
+      "height": 400,
+      "alt": "Woman in a flower garden smiling, happy customer",
+      "title": "Happy customer",
+      "caption": "",
+      "sizes": {
+        "thumb": {
+          "path": "/uploads/images/testimonial-1-thumb.webp",
+          "width": 150,
+          "height": 150
+        }
+      }
+    },
+    {
+      "filename": "home-team.webp",
+      "originalName": "home-team.webp",
+      "type": "image/webp",
+      "size": 81630,
+      "path": "/uploads/images/home-team.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Greenfield crew planting shrubs and mulching a residential garden bed",
+      "title": "Our crew in action",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/home-team-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/home-team-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "after-1.webp",
+      "originalName": "after-1.webp",
+      "type": "image/webp",
+      "size": 75480,
+      "path": "/uploads/images/after-1.webp",
+      "width": 800,
+      "height": 496,
+      "alt": "Landscaped backyard with wood fence, raised flower beds, lawn, and flagstone patio",
+      "title": "After — backyard transformation",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/after-1-small.webp",
+          "width": 480,
+          "height": 298
+        },
+        "thumb": {
+          "path": "/uploads/images/after-1-thumb.webp",
+          "width": 150,
+          "height": 93
+        }
+      }
+    },
+    {
+      "filename": "before-1.webp",
+      "originalName": "before-1.webp",
+      "type": "image/webp",
+      "size": 106116,
+      "path": "/uploads/images/before-1.webp",
+      "width": 800,
+      "height": 496,
+      "alt": "Overgrown backyard with weeds, chain-link fence, and bare dirt before landscaping",
+      "title": "Before — backyard",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/before-1-small.webp",
+          "width": 480,
+          "height": 298
+        },
+        "thumb": {
+          "path": "/uploads/images/before-1-thumb.webp",
+          "width": 150,
+          "height": 93
+        }
+      }
+    },
+    {
+      "filename": "hero-slide-3.webp",
+      "originalName": "hero-slide-3.webp",
+      "type": "image/webp",
+      "size": 353252,
+      "path": "/uploads/images/hero-slide-3.webp",
+      "width": 1920,
+      "height": 1072,
+      "alt": "Modern backyard dining area with wood wall, planters, and paver patio",
+      "title": "Outdoor living spaces",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/hero-slide-3-medium.webp",
+          "width": 1024,
+          "height": 572
+        },
+        "small": {
+          "path": "/uploads/images/hero-slide-3-small.webp",
+          "width": 480,
+          "height": 268
+        },
+        "thumb": {
+          "path": "/uploads/images/hero-slide-3-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "hero-slide-2.webp",
+      "originalName": "hero-slide-2.webp",
+      "type": "image/webp",
+      "size": 506438,
+      "path": "/uploads/images/hero-slide-2.webp",
+      "width": 1920,
+      "height": 1072,
+      "alt": "Craftsman home with flagstone walkway and abundant flower garden in soft morning light",
+      "title": "Front yard transformation",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/hero-slide-2-medium.webp",
+          "width": 1024,
+          "height": 572
+        },
+        "small": {
+          "path": "/uploads/images/hero-slide-2-small.webp",
+          "width": 480,
+          "height": 268
+        },
+        "thumb": {
+          "path": "/uploads/images/hero-slide-2-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "hero-slide-1.webp",
+      "originalName": "hero-slide-1.webp",
+      "type": "image/webp",
+      "size": 471368,
+      "path": "/uploads/images/hero-slide-1.webp",
+      "width": 1920,
+      "height": 1072,
+      "alt": "Evening backyard with string lights, stone fire pit, and surrounding landscaped garden",
+      "title": "Custom landscapes that last",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/hero-slide-1-medium.webp",
+          "width": 1024,
+          "height": 572
+        },
+        "small": {
+          "path": "/uploads/images/hero-slide-1-small.webp",
+          "width": 480,
+          "height": 268
+        },
+        "thumb": {
+          "path": "/uploads/images/hero-slide-1-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    }
+  ]
+}

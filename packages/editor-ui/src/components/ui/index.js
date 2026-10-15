@@ -16,4 +16,5 @@ export { default as Toast } from "./Toast";
 export { default as ToastContainer } from "./ToastContainer";
 export { default as Tooltip } from "./Tooltip";
 export { default as ConfirmationModal } from "./ConfirmationModal";
+export { ConfirmProvider, useConfirm } from "./ConfirmProvider";
 export { default as Lightbox } from "./Lightbox";

@@ -165,7 +165,7 @@
         "heading_alignment": "start",
         "note": "Infant and toddler schedules follow each child's individual routine.",
         "sidebar_position": "end",
-        "week_start_day": 1,
+        "week_start_day": "1",
         "color_scheme": "standard-secondary"
       },
       "blocks": {

@@ -12,6 +12,11 @@ export const SLOT_NAMES = Object.freeze([
   "topbarBanner",
   "overlay",
   "publishConfirmation",
+  // Right-hand action area of the page-editor top bar (beside Preview/Save).
+  // Empty by default; a shell fills it with its own actions (e.g. hosted's
+  // Publish button). Distinct from `topbarRight`, which is the admin-shell
+  // Layout's top bar — a different region.
+  "pageEditorActions",
 ]);
 
 /**

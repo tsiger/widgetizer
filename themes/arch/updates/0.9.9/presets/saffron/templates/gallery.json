@@ -1,0 +1,229 @@
+{
+  "name": "Gallery",
+  "slug": "gallery",
+  "widgets": {
+    "gallery_hero": {
+      "type": "banner",
+      "settings": {
+        "height": "small",
+        "alignment": "center",
+        "color_scheme": "highlight-primary",
+        "fullwidth": true,
+        "top_spacing": "none",
+        "image": "/uploads/images/gallery-hero.webp"
+      },
+      "blocks": {
+        "hero-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Gallery",
+            "size": "5xl"
+          }
+        },
+        "hero-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>A glimpse inside Saffron — the food, the space, and the moments that make it all worthwhile.</p>",
+            "size": "lg"
+          }
+        }
+      },
+      "blocksOrder": [
+        "hero-heading",
+        "hero-text"
+      ]
+    },
+    "food_gallery": {
+      "type": "masonry-gallery",
+      "settings": {
+        "eyebrow": "The Food",
+        "title": "From Our Kitchen",
+        "heading_alignment": "center",
+        "columns_desktop": 3,
+        "gap": "medium",
+        "color_scheme": "standard-primary",
+        "alignment": "center"
+      },
+      "blocks": {
+        "food-1": {
+          "type": "item",
+          "settings": {
+            "title": "Roasted Beet & Burrata",
+            "category": "Seasonal",
+            "image": "/uploads/images/food-beet-burrata.webp"
+          }
+        },
+        "food-2": {
+          "type": "item",
+          "settings": {
+            "title": "Pan-Seared Halibut",
+            "category": "Signature",
+            "image": "/uploads/images/food-halibut.webp"
+          }
+        },
+        "food-3": {
+          "type": "item",
+          "settings": {
+            "title": "Braised Lamb Shank",
+            "category": "Signature",
+            "image": "/uploads/images/food-lamb-shank.webp"
+          }
+        },
+        "food-4": {
+          "type": "item",
+          "settings": {
+            "title": "Handmade Pappardelle",
+            "category": "Seasonal",
+            "image": "/uploads/images/food-pappardelle.webp"
+          }
+        },
+        "food-5": {
+          "type": "item",
+          "settings": {
+            "title": "Dark Chocolate Fondant",
+            "category": "Dessert",
+            "image": "/uploads/images/food-chocolate-fondant.webp"
+          }
+        },
+        "food-6": {
+          "type": "item",
+          "settings": {
+            "title": "Seasonal Cocktails",
+            "category": "Bar",
+            "image": "/uploads/images/food-cocktails.webp"
+          }
+        }
+      },
+      "blocksOrder": [
+        "food-1",
+        "food-2",
+        "food-3",
+        "food-4",
+        "food-5",
+        "food-6"
+      ]
+    },
+    "space_gallery": {
+      "type": "gallery",
+      "settings": {
+        "eyebrow": "The Space",
+        "title": "Inside Saffron",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 3,
+        "staggered": true,
+        "aspect_ratio": "4 / 3",
+        "color_scheme": "standard-secondary"
+      },
+      "blocks": {
+        "space-1": {
+          "type": "image",
+          "settings": {
+            "caption": "Main dining room",
+            "image": "/uploads/images/space-dining-room.webp"
+          }
+        },
+        "space-2": {
+          "type": "image",
+          "settings": {
+            "caption": "Open kitchen",
+            "image": "/uploads/images/space-kitchen.webp"
+          }
+        },
+        "space-3": {
+          "type": "image",
+          "settings": {
+            "caption": "Bar area",
+            "image": "/uploads/images/space-bar.webp"
+          }
+        },
+        "space-4": {
+          "type": "image",
+          "settings": {
+            "caption": "Outdoor patio",
+            "image": "/uploads/images/space-patio.webp"
+          }
+        },
+        "space-5": {
+          "type": "image",
+          "settings": {
+            "caption": "Private dining room",
+            "image": "/uploads/images/space-private-dining.webp"
+          }
+        },
+        "space-6": {
+          "type": "image",
+          "settings": {
+            "caption": "Chef's table",
+            "image": "/uploads/images/space-chefs-table.webp"
+          }
+        }
+      },
+      "blocksOrder": [
+        "space-1",
+        "space-2",
+        "space-3",
+        "space-4",
+        "space-5",
+        "space-6"
+      ]
+    },
+    "events_section": {
+      "type": "image-callout",
+      "settings": {
+        "image_position": "start",
+        "color_scheme": "standard-primary",
+        "image": "/uploads/images/private-event.webp"
+      },
+      "blocks": {
+        "events-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Host Your Next Gathering",
+            "size": "3xl"
+          }
+        },
+        "events-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>From intimate dinners to milestone celebrations, our private dining room and garden patio offer the perfect backdrop. We'll work with you to create a custom menu that fits the occasion — and the memory.</p>",
+            "size": "base"
+          }
+        },
+        "events-features": {
+          "type": "features",
+          "settings": {
+            "features": "+ Dedicated menu planning\n+ Flexible seating for 10–40 guests\n+ Sommelier-led wine pairing\n+ Indoor and outdoor spaces"
+          }
+        },
+        "events-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Inquire About Events",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": [
+        "events-heading",
+        "events-text",
+        "events-features",
+        "events-button"
+      ]
+    }
+  },
+  "widgetsOrder": [
+    "gallery_hero",
+    "food_gallery",
+    "space_gallery",
+    "events_section"
+  ],
+  "id": "gallery",
+  "created": "2026-04-17T13:40:23.910Z",
+  "updated": "2026-04-17T13:51:16.541Z"
+}

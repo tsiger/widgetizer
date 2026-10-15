@@ -1,14 +1,19 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useBlocker } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import { useConfirm } from "../components/ui/ConfirmProvider";
 
 /**
  * Navigation guard hook to prevent users from leaving pages with unsaved changes
  *
  * @param {boolean} hasUnsavedChanges - Whether there are unsaved changes
  * @param {React.RefObject<boolean>} skipRef - Optional ref to bypass the guard (for programmatic navigation after save)
+ * @param {() => void} [onDiscard] - Runs when the user confirms leaving, before the navigation proceeds. Needed by
+ *   pages whose draft lives in a store that outlives them: without it, "Discard changes" leaves the draft behind
+ *   for the next screen to save.
  *
  * Features:
- * - Blocks internal navigation (React Router) with confirmation dialog
+ * - Blocks internal navigation (React Router) with the in-app confirmation dialog
  * - Blocks external navigation (tab close, refresh) with browser dialog
  * - Consistent with PageEditor's useNavigationGuard pattern
  *
@@ -20,7 +25,16 @@ import { useBlocker } from "react-router-dom";
  * // Set skipRef.current = true before navigate() to bypass guard
  * ```
  */
-export default function useFormNavigationGuard(hasUnsavedChanges, skipRef = null) {
+export default function useFormNavigationGuard(hasUnsavedChanges, skipRef = null, onDiscard = null) {
+  const confirm = useConfirm();
+  const { t } = useTranslation();
+  // Read at answer time, so a new callback each render neither re-runs the
+  // prompt effect nor goes stale.
+  const onDiscardRef = useRef(onDiscard);
+  useEffect(() => {
+    onDiscardRef.current = onDiscard;
+  });
+
   // Layer 1: Browser navigation (beforeunload) - handles tab closing, URL changes, etc.
   useEffect(() => {
     const handleBeforeUnload = (e) => {
@@ -49,20 +63,50 @@ export default function useFormNavigationGuard(hasUnsavedChanges, skipRef = null
     return hasUnsavedChanges && isLocationChanging;
   });
 
-  // Handle blocked navigation with confirmation dialog
+  // react-router hands back a new blocker object on every render, so depending
+  // on `blocker` would re-run this effect — and its cleanup — while the prompt
+  // is still open. That cleanup sets `cancelled`, which races the user's answer:
+  // if React's effect flush beats the promise microtask, the answer is dropped
+  // and the navigation silently dies. Keying off `blocker.state` and reading the
+  // current blocker from a ref means the effect runs once per blocked
+  // navigation, so no cleanup can land between the click and the handler.
+  const blockerRef = useRef(blocker);
   useEffect(() => {
-    if (blocker.state === "blocked") {
-      const confirmed = window.confirm(
-        'You have unsaved changes. Are you sure you want to leave?\n\nClick "OK" to discard changes or "Cancel" to stay.',
-      );
+    blockerRef.current = blocker;
+  });
 
+  // Handle blocked navigation with the in-app confirmation dialog. Asking is
+  // async now (window.confirm blocked the thread; see ConfirmProvider for why
+  // it had to go), so the blocker simply stays "blocked" until the user answers.
+  useEffect(() => {
+    if (blocker.state !== "blocked") return;
+
+    let cancelled = false;
+    const pending = confirm({
+      title: t("common.leaveConfirm.title"),
+      message: t("common.leaveConfirm.message"),
+      confirmText: t("common.leaveConfirm.confirm"),
+      cancelText: t("common.leaveConfirm.cancel"),
+      variant: "warning",
+    });
+
+    pending.then((confirmed) => {
+      if (cancelled) return;
       if (confirmed) {
-        // Allow the navigation to proceed
-        blocker.proceed();
+        // The dialog promised the changes would be lost; make that true before
+        // the next screen can read the draft.
+        onDiscardRef.current?.();
+        blockerRef.current.proceed();
       } else {
         // Cancel the navigation
-        blocker.reset();
+        blockerRef.current.reset();
       }
-    }
-  }, [blocker]);
+    });
+
+    // Unmounting mid-prompt must not leave an orphaned dialog on screen.
+    return () => {
+      cancelled = true;
+      pending.cancel();
+    };
+  }, [blocker.state, confirm, t]);
 }

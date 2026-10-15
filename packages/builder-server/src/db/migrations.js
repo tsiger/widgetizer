@@ -128,6 +128,64 @@ const migrations = [
       db.exec("CREATE INDEX IF NOT EXISTS idx_projects_owner_id ON projects(owner_id)");
     },
   },
+  {
+    version: 5,
+    description: "Add clean_urls to projects",
+    up(db) {
+      // Whether the rendered site addresses pages without the .html extension:
+      // every uuid-resolved internal link, canonicals, sitemap and robots follow
+      // it (file names never change) — for hosts that serve extensionless paths.
+      if (!columnExists(db, "projects", "clean_urls")) {
+        db.exec("ALTER TABLE projects ADD COLUMN clean_urls INTEGER DEFAULT 0");
+      }
+    },
+  },
+  {
+    version: 6,
+    description: "Add site_identity to projects",
+    up(db) {
+      if (!columnExists(db, "projects", "site_identity")) {
+        db.exec("ALTER TABLE projects ADD COLUMN site_identity TEXT NOT NULL DEFAULT '{}'");
+      }
+    },
+  },
+  {
+    version: 7,
+    description: "Add site languages to projects",
+    up(db) {
+      // The site's own language, separate from the editor's UI language. Every
+      // project has a default; `languages` holds the ADDITIONAL codes, so an
+      // empty array means single-language and existing rows need no backfill.
+      if (!columnExists(db, "projects", "default_language")) {
+        db.exec("ALTER TABLE projects ADD COLUMN default_language TEXT NOT NULL DEFAULT 'en'");
+      }
+      if (!columnExists(db, "projects", "languages")) {
+        db.exec("ALTER TABLE projects ADD COLUMN languages TEXT NOT NULL DEFAULT '[]'");
+      }
+    },
+  },
+  {
+    version: 8,
+    description: "Add per-language media metadata",
+    up(db) {
+      // The existing media_files columns stay the default language, so nothing is
+      // backfilled. A column here is NULLABLE ON PURPOSE: NULL (or no row) means
+      // inherit the default language, while "" means deliberately blank — without
+      // that difference a decorative image could not have empty alt text in a
+      // translated language.
+      db.exec(`
+        CREATE TABLE IF NOT EXISTS media_file_translations (
+          media_file_id TEXT NOT NULL,
+          language TEXT NOT NULL,
+          alt TEXT,
+          title TEXT,
+          caption TEXT,
+          FOREIGN KEY (media_file_id) REFERENCES media_files(id) ON DELETE CASCADE,
+          PRIMARY KEY (media_file_id, language)
+        );
+      `);
+    },
+  },
 ];
 
 export const DEFAULT_TRACKING_TABLE = "_migrations";

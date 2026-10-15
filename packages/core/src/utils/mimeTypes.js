@@ -26,6 +26,9 @@ export const CONTENT_TYPES = {
   // Audio
   ".mp3": "audio/mpeg",
 
+  // Video
+  ".mp4": "video/mp4",
+
   // Fonts
   ".woff": "font/woff",
   ".woff2": "font/woff2",

@@ -1,0 +1,11 @@
+{
+  "slug": "24-hour-helpdesk",
+  "schemaVersion": 1,
+  "settings": {
+    "title": "Uplink Launches a Round-the-Clock Helpdesk",
+    "date": "2026-01-19",
+    "excerpt": "Support no longer stops at five, so a server problem at midnight gets a real person, not a voicemail.",
+    "body": "<p>Technology does not keep office hours, and neither should support for it. From this month, the Uplink helpdesk is staffed twenty-four hours a day, every day of the year.</p><p>That means an overnight outage or a weekend lockout reaches an engineer straight away rather than an answering service. Critical issues are now picked up within fifteen minutes, whatever the hour.</p><h2>What changes for you</h2><p>The practical difference is simple. When something goes wrong outside the working day, you now reach a person who can actually help rather than a recorded message promising a callback on Monday. For the problems that cannot wait, that gap was always the worst part.</p><p>Round-the-clock cover makes the most difference in a few common situations.</p><ul><li>A server or system goes down overnight</li><li>Someone is locked out ahead of an early start</li><li>An alert fires over the weekend that should not be ignored</li></ul><h3>Included for managed clients</h3><p>The change is included for all managed service clients at no extra cost. For businesses that run shifts or serve customers after dark, it removes a worry that should never have been theirs to carry.</p><p>There is nothing new to sign and no separate number to remember. If you already rely on us to keep your systems running, that cover now simply does not switch off at five. You reach us the same way you always have, only now the line is open whenever you need it.</p>",
+    "featured_image": "/uploads/images/uplink-news-24-hour-helpdesk.webp"
+  }
+}

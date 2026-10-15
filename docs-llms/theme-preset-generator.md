@@ -586,6 +586,10 @@ These are part of the preset's identity:
 
 Do not treat them as defaults. They help separate presets even before content loads.
 
+### 8.4 Sample social links
+
+Every preset also sets the six sample social links (`facebook_url`, `instagram_url`, `twitter_url`, `linkedin_url`, `youtube_url`, `tiktok_url`) to `"#"`, so the footer of a new project shows icons rather than the "add your social profiles" hint. See [theme-preset-file-format.md](theme-preset-file-format.md) §2.
+
 ---
 
 ## 9. Color Scheme Composition
@@ -691,7 +695,7 @@ Never use `none` as a generic "dock this under the hero" move — that's `small`
 
 ### 11.1 Presets ship their images
 
-> **Convention change (0.9.9).** Presets used to ship without imagery (image settings omitted, placeholder states everywhere). Since the packed-media system landed, presets ship real images: binaries + metadata live in `presets/<id>/media/` and are seeded into every project at creation (see [theme-preset-process.md](theme-preset-process.md)), so templates reference them directly.
+> **Convention change (0.9.9).** Presets used to ship without imagery (image settings omitted, placeholder states everywhere). Since the packed-media system landed, presets ship real images: binaries + metadata live in the theme-root pool `preset-media/<id>/` and are seeded into every project at creation (see [theme-preset-process.md](theme-preset-process.md)), so templates reference them directly.
 
 Every image setting in preset JSON is filled with an upload path derived from the Phase 2 prompt library:
 

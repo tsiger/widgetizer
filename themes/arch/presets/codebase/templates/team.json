@@ -66,7 +66,7 @@
         "description": "",
         "heading_alignment": "center",
         "image_style": "full",
-        "aspect_ratio": "3/4",
+        "aspect_ratio": "3 / 4",
         "columns_desktop": 4,
         "layout": "grid",
         "color_scheme": "standard-primary",

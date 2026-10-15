@@ -166,7 +166,7 @@
         "feature-2": {
           "type": "feature",
           "settings": {
-            "icon": "box",
+            "icon": "package",
             "title": "Mats & Props Provided",
             "description": "<p>We have mats, blocks, straps, and bolsters for everyone. Just bring yourself and a water bottle.</p>"
           }
@@ -182,7 +182,7 @@
         "feature-4": {
           "type": "feature",
           "settings": {
-            "icon": "droplet",
+            "icon": "droplets",
             "title": "Hydration Station Available",
             "description": "<p>Filtered water and herbal tea are always available in the lobby. Stay hydrated before and after your practice.</p>"
           }

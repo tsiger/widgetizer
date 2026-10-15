@@ -2,28 +2,67 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { Save, ChevronDown, Monitor, Smartphone, Eye, ArrowLeft, Undo2, Redo2, CirclePlus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { getAllPages } from "../../queries/pageManager";
+import { getAllPages, createPageLanguageVersion } from "../../queries/pageManager";
 import useAutoSave from "../../stores/saveStore";
+import useToastStore from "../../stores/toastStore";
 import usePageStore from "../../stores/pageStore";
+import { useDefaultLanguage, useIsMultilang } from "../../stores/projectStore";
+import useTranslationVersions from "../../hooks/useTranslationVersions";
+import LanguageMenu from "../content/LanguageMenu";
+import { pageEditorHref, pageAddHref, pagesListHref } from "../../lib/contentRoutes";
 import { useEditorPath } from "../../lib/routeBase.jsx";
 import { openPagePreview } from "../../lib/openSitePreview.js";
+import { SlotOutlet } from "../../extension/PluginProvider.jsx";
 
 export default function EditorTopBar({
   pageName,
   pageId,
+  pageLanguage,
   onPreviewModeChange, // Callback to notify parent of preview mode changes
   children,
 }) {
   const { t } = useTranslation();
-  const { hasUnsavedChanges, isSaving, save, stopAutoSave } = useAutoSave();
-  const [pages, setPages] = useState([]);
+  const { hasUnsavedChanges, hasUnsavedPageChanges, isSaving, save, stopAutoSave } = useAutoSave();
+
+  // A manual save that the server refused. Nothing was written and the editor still
+  // holds every edit, so the one thing that must not happen is failing silently —
+  // the refusal the user can act on is an image that has left the library.
+  const saveAndReport = useCallback(() => {
+    save(false)
+      .then((result) => {
+        // Saving was switched off (the language being edited was removed). The
+        // banner normally says so, but a click that does nothing must not rely on it.
+        if (result?.status === "suspended") {
+          useToastStore.getState().showToast(t("pageEditor.toolbar.saveSuspended"), "error");
+        }
+      })
+      .catch((err) => {
+        if (err?.code === "MEDIA_REFERENCE_MISSING") {
+          useToastStore.getState().showToast(t("pageEditor.mediaUsage.missing"), "error");
+        } else {
+          useToastStore.getState().showToast(t("pageEditor.toolbar.saveFailed"), "error");
+        }
+        console.error("Failed to save:", err);
+      });
+  }, [save, t]);
+  const [allPages, setAllPages] = useState([]);
+  // Whether `allPages` is the real list yet: the language menu must not offer to
+  // create a version that may already exist.
+  const [allPagesState, setAllPagesState] = useState("loading");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isLanguageMenuOpen, setIsLanguageMenuOpen] = useState(false);
   const [previewMode, setPreviewMode] = useState(() => {
     return localStorage.getItem("editorPreviewMode") || "desktop";
   });
   const dropdownRef = useRef(null);
+  const languageMenuRef = useRef(null);
   const navigate = useNavigate();
   const editorPath = useEditorPath();
+
+  const isMultilang = useIsMultilang();
+  const defaultLanguage = useDefaultLanguage();
+  const currentPage = usePageStore((state) => state.page);
+  const currentLanguage = pageLanguage || defaultLanguage;
 
   // Force re-render when undo/redo happens
   const [, forceUpdate] = useState(0);
@@ -48,6 +87,7 @@ export default function EditorTopBar({
       undo();
       // Push the restored theme snapshot back to themeStore (canonical owner)
       usePageStore.getState().syncThemeStoreFromSnapshot();
+      useAutoSave.getState().reconcileModifiedWidgets();
     }
   }, []);
 
@@ -56,15 +96,17 @@ export default function EditorTopBar({
     redo();
     // Push the restored theme snapshot back to themeStore (canonical owner)
     usePageStore.getState().syncThemeStoreFromSnapshot();
+    useAutoSave.getState().reconcileModifiedWidgets();
   }, []);
 
   useEffect(() => {
     const loadPages = async () => {
       try {
-        const allPages = await getAllPages();
-        setPages(allPages);
+        setAllPages(await getAllPages());
+        setAllPagesState("ready");
       } catch (error) {
         console.error("Failed to load pages:", error);
+        setAllPagesState("unknown");
       }
     };
     loadPages();
@@ -81,7 +123,7 @@ export default function EditorTopBar({
         e.preventDefault();
         // Prevent multiple simultaneous saves if one is already in progress
         if (hasUnsavedChanges() && !isSaving) {
-          save(false);
+          saveAndReport();
         }
       }
 
@@ -90,7 +132,8 @@ export default function EditorTopBar({
       // run instead and leave the field value stale). Ctrl/Cmd+S above still works.
       const el = e.target;
       const isEditableTarget =
-        !!el && (el.tagName === "INPUT" || el.tagName === "TEXTAREA" || el.tagName === "SELECT" || el.isContentEditable);
+        !!el &&
+        (el.tagName === "INPUT" || el.tagName === "TEXTAREA" || el.tagName === "SELECT" || el.isContentEditable);
       if (isEditableTarget) return;
 
       if ((e.ctrlKey || e.metaKey) && e.key === "z") {
@@ -110,7 +153,7 @@ export default function EditorTopBar({
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [safeUndo, safeRedo, save, hasUnsavedChanges, isSaving]);
+  }, [safeUndo, safeRedo, saveAndReport, hasUnsavedChanges, isSaving]);
 
   // Handle click outside to close dropdown
   useEffect(() => {
@@ -118,21 +161,37 @@ export default function EditorTopBar({
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setIsDropdownOpen(false);
       }
+      if (languageMenuRef.current && !languageMenuRef.current.contains(event.target)) {
+        setIsLanguageMenuOpen(false);
+      }
     };
 
-    if (isDropdownOpen) {
+    if (isDropdownOpen || isLanguageMenuOpen) {
       document.addEventListener("mousedown", handleClickOutside);
     }
 
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [isDropdownOpen]);
+  }, [isDropdownOpen, isLanguageMenuOpen]);
 
-  const handlePageChange = (pageId) => {
-    navigate(editorPath(`/page-editor?pageId=${pageId}`));
+  // A slug is unique per language, so switching pages stays inside the one being
+  // edited — the other languages are reached from the language menu.
+  const pages = pageLanguage ? allPages.filter((page) => page.language === pageLanguage) : allPages;
+
+  const openPage = (page) => {
+    navigate(editorPath(pageEditorHref(page, isMultilang)));
     setIsDropdownOpen(false);
+    setIsLanguageMenuOpen(false);
   };
+
+  const { siblingsOf, createIn, pendingKey } = useTranslationVersions({
+    entries: allPages,
+    defaultLanguage,
+    createVersion: (page, targetLanguage) =>
+      createPageLanguageVersion(page.id, { targetLanguage, sourceLanguage: page.language }),
+    onCreated: openPage,
+  });
 
   const handlePreviewModeChange = (mode) => {
     setPreviewMode(mode);
@@ -146,21 +205,32 @@ export default function EditorTopBar({
     // window in the desktop app, shared browser tab on the web; an embedding host can
     // override the route via setStandalonePreviewPath). That page hosts PreviewPanel
     // in an iframe and handles in-preview link navigation (NAVIGATE_PREVIEW).
-    openPagePreview(pageId);
-  }, [pageId]);
+    openPagePreview(pageId, isMultilang ? currentLanguage : undefined);
+  }, [pageId, isMultilang, currentLanguage]);
 
-  const hasMultiplePages = pages.length > 1;
-  
   const handleNewPage = () => {
-    navigate(editorPath("/pages/add"));
+    navigate(editorPath(pageAddHref(isMultilang ? currentLanguage : undefined)));
     setIsDropdownOpen(false);
   };
+
+  const languageMenu = (
+    <LanguageMenu
+      entry={currentPage}
+      language={currentLanguage}
+      siblings={siblingsOf(currentPage)}
+      onOpen={openPage}
+      onCreate={createIn}
+      pendingKey={pendingKey}
+      siblingsState={allPagesState}
+      label={t("pageEditor.languages.menuLabel")}
+    />
+  );
 
   return (
     <div className="bg-white text-slate-900 border-b border-slate-200 p-2 flex justify-between items-center">
       <div className="flex items-center gap-3">
         <button
-          onClick={() => navigate(editorPath("/pages"))}
+          onClick={() => navigate(editorPath(pagesListHref(isMultilang ? currentLanguage : undefined)))}
           className="flex items-center gap-2 px-3 h-9 rounded-sm text-sm bg-slate-200 hover:bg-slate-300 text-slate-800"
           title={t("pageEditor.toolbar.backToPages")}
         >
@@ -172,28 +242,19 @@ export default function EditorTopBar({
       <div className="flex items-center gap-3">
         <span className="text-sm font-medium text-slate-500">{t("navigation.pages")}:</span>
         <div className="relative" ref={dropdownRef}>
-          {hasMultiplePages ? (
-            <button
-              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-              className="font-medium px-4 py-2 rounded-md border border-slate-200 hover:bg-slate-100 flex items-center gap-2"
-            >
-              {pageName} {hasUnsavedChanges() && <div className="w-2 h-2 bg-pink-500 rounded-full"></div>}
-              <ChevronDown
-                size={16}
-                className={`transform transition-transform ${isDropdownOpen ? "rotate-180" : ""}`}
-              />
-            </button>
-          ) : (
-            <div className="font-medium px-4 py-2 flex items-center gap-2">
-              {pageName} {hasUnsavedChanges() && <div className="w-2 h-2 bg-pink-500 rounded-full"></div>}
-            </div>
-          )}
-          {isDropdownOpen && hasMultiplePages && (
+          <button
+            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+            className="font-medium px-4 py-2 rounded-md border border-slate-200 hover:bg-slate-100 flex items-center gap-2"
+          >
+            {pageName} {hasUnsavedPageChanges() && <div className="w-2 h-2 bg-pink-500 rounded-full"></div>}
+            <ChevronDown size={16} className={`transform transition-transform ${isDropdownOpen ? "rotate-180" : ""}`} />
+          </button>
+          {isDropdownOpen && (
             <div className="absolute top-full left-0 mt-1 w-64 max-h-96 overflow-y-auto bg-white border border-slate-200 rounded-md shadow-lg z-50">
               {pages.map((page) => (
                 <button
                   key={page.id}
-                  onClick={() => handlePageChange(page.id)}
+                  onClick={() => openPage(page)}
                   className={`w-full px-4 py-2 text-left flex items-center justify-between ${
                     page.id === pageId
                       ? "bg-pink-600 text-white hover:bg-pink-700"
@@ -201,19 +262,21 @@ export default function EditorTopBar({
                   }`}
                 >
                   <span>{page.name}</span>
-                  {page.id === pageId && hasUnsavedChanges() && (
+                  {page.id === pageId && hasUnsavedPageChanges() && (
                     <div className="w-2 h-2 bg-pink-500 rounded-full border border-white"></div>
                   )}
                 </button>
               ))}
               <button
-              onClick={handleNewPage} 
-              className="w-full px-4 py-2 text-left flex items-center gap-2 border-t border-slate-100 text-slate-800 hover:bg-slate-100">
+                onClick={handleNewPage}
+                className="w-full px-4 py-2 text-left flex items-center gap-2 border-t border-slate-100 text-slate-800 hover:bg-slate-100"
+              >
                 <CirclePlus size={16} /> {t("pages.newPage")}
               </button>
             </div>
           )}
         </div>
+        {languageMenu}
       </div>
 
       <div className="flex items-center gap-3">
@@ -277,7 +340,7 @@ export default function EditorTopBar({
         </div>
 
         <button
-          onClick={() => save(false)}
+          onClick={() => saveAndReport()}
           disabled={!hasUnsavedChanges() || isSaving}
           title={`${t("pageEditor.toolbar.save")} (Ctrl+S)`}
           className={`flex items-center justify-center gap-2 px-3 h-9 min-w-24 rounded-sm text-sm ${
@@ -289,6 +352,11 @@ export default function EditorTopBar({
           <Save size={18} />
           {isSaving ? t("pageEditor.toolbar.saving") : t("pageEditor.toolbar.save")}
         </button>
+
+        {/* Shell-provided actions (e.g. hosted's Publish button). Sits at the
+            far right as the primary action. Empty in the OSS app — the desktop
+            shell provides no node for this slot. */}
+        <SlotOutlet name="pageEditorActions" />
       </div>
     </div>
   );

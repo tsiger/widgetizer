@@ -10,11 +10,12 @@ All setting types share the following common properties:
 - `label` (string, required): Usually a `tTheme:` prefixed key that references a translation in the theme's locale files (e.g., `"tTheme:carousel.settings.title.label"`). The frontend resolves `tTheme:` values to human-readable strings at runtime. Direct strings like `"Title"` also work for small one-off themes, but `tTheme:` remains the recommended authoring convention.
 - `description` (string, optional): Usually a `tTheme:` prefixed key for help text displayed below the input (e.g., `"tTheme:carousel.settings.title.description"`). Direct strings are also supported.
 - `default` (any, optional): The default value for the setting if none is provided.
-- `outputAsCssVar` (boolean, optional): If set to `true`, the setting's value will be output as a CSS custom property (variable) in the page's `<head>`. This is the primary way to link theme settings to your theme's CSS.
+- `defaultKey` (string, optional, widget and block settings): Names a visitor-facing site string (`"site.news_grid.empty"`) whose wording, in the language of the page being rendered, is the starting value until the owner types one. Beside a literal `default`, the resolved word is instead written into the widget when it is added. A `defaultBlocks` entry names its words through a `defaultKeys` map (`{ "label": "site.core_form.name_field" }`). See [Visitor-facing text](theming.md#visitor-facing-text).
+- `outputAsCssVar` (boolean, optional): For a **global theme setting**, `true` makes `{% theme_settings %}` output its value as a CSS custom property. This flag does not automatically generate variables for widget/block settings; render those explicitly in the widget's scoped styling.
 
 ---
 
-> **Practical note:** Even if a theme uses direct strings instead of `tTheme:` keys, it should still include a minimal `locales/en.json` because projects now treat `locales/` as part of the copied theme package.
+> **Practical note:** Include `locales/en.json` as an authoring convention and for repository locale validation, even with direct control labels. Global setting groups need `global.<group>.name` entries. ZIP upload itself does not require locales.
 
 ---
 
@@ -133,11 +134,13 @@ A rich text editor (Tiptap/ProseMirror) with basic formatting (bold, italic, lin
 
 - Formatting toolbar with Bold, Italic, Link, Bullet List, and Numbered List buttons
 - **Unlink** button appears when the cursor is inside a link, to remove it
-- **Link to file** button (paperclip) opens the Media Library (`filterType="file"`) and links the selection to a file asset (e.g. a PDF). With nothing selected it inserts the file's name as the linked text. Stores the portable `/uploads/files/…` path
+- **Link to file** button (paperclip) opens the Media Library on all assets (`filterType="all"` with the in-drawer type filter, `showTypeFilter`) and links the selection to any asset (document, audio, or image). With nothing selected it inserts the file's name as the linked text. Stores the portable `/uploads/{files,images}/…` path
 - **Insert Image** button (when `allow_images` is set) inserts an inline Media Library image
 - Heading 2 / 3 / 4 buttons (when `allow_headings` is set)
 - Link editor with URL input — root-relative paths (`/uploads/files/x.pdf`, `/about.html`), anchors (`#section`), protocol-relative, and explicit `http(s)://`/`mailto:`/`tel:` URLs are kept verbatim; only a bare domain (`example.com`) gets `https://` prepended
-- **Internal target picker** — alongside the URL input, the link editor offers a page / collection-item picker in widget, block, global, and collection-item richtext (not theme-settings richtext). Selecting a target stores its uuid on the anchor (`data-page-uuid` / `data-collection-item-uuid`) so the link follows the target's renames and clears on delete, at parity with the structured `link` setting; the visible `href` is a fallback re-derived from the uuid at render. This is automatic per field location — there is no theme-author schema flag for it.
+- **Internal target picker** — alongside the URL input, the link editor offers a page / collection-item picker in every richtext field: widget, block, global, collection-item **and theme settings**. Selecting a target stores its uuid on the anchor (`data-page-uuid` / `data-collection-item-uuid`) so the link follows the target's renames and clears on delete, at parity with the structured `link` setting; the visible `href` is a fallback re-derived from the uuid at render. The uuid survives saving — theme richtext is sanitized when `theme.json` is saved, and both reference attributes are preserved. This is automatic per field location — there is no theme-author schema flag for it.
+
+  > The picker was previously withheld from theme-settings richtext, because at that time no pass maintained a reference stored there: it would have produced links that never resolved, never followed a rename and were never cleared when their target was deleted. Theme settings now go through the same resolution, seeding, duplication and cleanup as widget settings, so the restriction was lifted.
 - Expand button opens a larger modal for comfortable editing
 - Toolbar buttons highlight based on formatting at cursor position
 - Optional HTML source view for debugging or advanced editing
@@ -365,13 +368,15 @@ A specialized input with two dropdowns for selecting a font family and its corre
 }
 ```
 
-**Privacy Option**: When users select Google Fonts, they can optionally enable the "Use Privacy-Friendly Font CDN" setting (checkbox type, `use_bunny_fonts`) to serve fonts via Bunny Fonts instead of Google Fonts CDN. This provides GDPR compliance without tracking or data sharing with Google, while maintaining the same font selection and appearance.
+The family list is the shared catalogue in `packages/core/src/config/fonts.json` — system stacks plus about 210 Google Fonts (including Instrument Sans and STIX Two Text), each with its available weights. `{% fonts %}` loads a Google font for a `font_picker` in any global group whose `stack` matches a catalogue entry's stack string exactly, so presets and defaults must copy the stack verbatim; an unknown stack gets its CSS variables but no stylesheet. The editor's live preview loads the same fonts from the same CDN.
 
-**Smart Bold Loading**: For `body_font` font pickers, when the selected weight is 400 (normal), the system automatically loads an appropriate bold weight (700, or 600, or 500 if 700 is unavailable) to prevent browser faux-bold rendering. This ensures `<strong>`, `<b>`, and bold UI elements render with proper typography. For other selected weights (500, 600, 700, etc.), only the selected weight is loaded. The auto-loaded bold weight is available via the `--typography-body_font_bold-weight` CSS variable.
+**Privacy Option**: When users select Google Fonts, they can optionally enable the "Use Privacy-Friendly Font CDN" setting (checkbox type, `use_bunny_fonts`) to serve fonts via Bunny Fonts instead of Google Fonts CDN. This provides GDPR compliance without tracking or data sharing with Google, while maintaining the same font selection and appearance. `{% fonts %}` finds the checkbox by its id in whichever global settings group holds it, and honours its schema `default` until the project saves a value, so a theme can ship it switched on.
+
+**Smart Bold Loading**: For `body_font` font pickers, when the selected weight is 400 (normal), the system automatically loads an appropriate bold weight (700, or 600, or 500 if 700 is unavailable) to prevent browser faux-bold rendering. This ensures `<strong>`, `<b>`, and bold UI elements render with proper typography. For other selected weights (500, 600, 700, etc.), only the selected weight is loaded. `{% theme_settings %}` names the bold weight in a `--<group>-body_font_bold-weight` CSS variable (`--typography-body_font_bold-weight` when the picker is in `typography`).
 
 ### Icon
 
-An icon picker that renders a searchable grid of icons fetched from the project's `assets/icons.json`. The value is the icon name/identifier.
+An icon picker that renders a searchable grid of icons fetched from the project's `assets/icons.json`. The value is the icon name/identifier. `icons.json` is optional: a theme without it renders normally (the icon set is just empty) and logs no warning.
 
 **Additional Properties:**
 
@@ -395,6 +400,30 @@ An icon picker that renders a searchable grid of icons fetched from the project'
   "type": "icon",
   "label": "tTheme:my_widget.settings.card_icon.label",
   "allow_patterns": ["arrow-*", "check"]
+}
+```
+
+**Search behaviour (`packages/editor-ui/src/utils/iconSearch.js`)**
+
+The picker's search box matches far more than the icon name, and orders results by relevance (exact name → prefix → hyphen token → keyword → synonym → group). It draws on four sources:
+
+1. **The icon name** — including hyphen-separated tokens, so `left` finds `file-arrow-left`.
+2. **Per-icon `keywords`** — optional, supplied by the theme in `icons.json` (see below).
+3. **A curated synonym map** (`iconSynonyms.js`) mapping what users type to name fragments, so `delete` finds `trash` and `photo` finds `camera`. Fragments match on word boundaries only — a whole name, a `fragment-` prefix, or a full token — so short fragments cannot pull in accidental hits. Synonym terms also match while being typed (any term of 3+ characters matches every entry it prefixes), so results narrow steadily instead of blinking out between `pay` and `payment`.
+4. **The group name**, so typing `weather` surfaces that whole category.
+
+Multiple words are ANDed: `arrow left` requires both.
+
+**Adding keywords to an icon set.** Entries in `assets/icons.json` may carry an optional `keywords` array alongside `body`. This is for set-specific vocabulary the shared synonym map should not carry; the built-in synonyms already cover common English terms, so most themes need nothing here.
+
+```json
+{
+  "prefix": "tabler",
+  "groups": {
+    "System": {
+      "trash": { "body": "<path .../>", "keywords": ["bin", "rubbish", "wastebasket"] }
+    }
+  }
 }
 ```
 
@@ -451,13 +480,13 @@ An image uploader that includes a preview, the ability to replace the image, and
 
 ### File
 
-A file asset selector for downloadable documents and audio. The value is the storage path to the uploaded file (e.g. `/uploads/files/brochure.pdf`). Unlike the image input, this input is filename-oriented with no visual preview. Enabled file types in V1 are **PDF** and **MP3** (the shared "non-image" allowlist, `NON_IMAGE_ACCEPT` in `packages/editor-ui/src/utils/uploadValidation.js`); the model is allowlist-driven so more types can be added later via extension + MIME entries.
+A file asset selector for downloadable documents, audio and video. The value is the storage path to the uploaded file (e.g. `/uploads/files/brochure.pdf`). Unlike the image input, this input is filename-oriented with no visual preview. Enabled file types are **PDF**, **MP3** and **MP4** (the shared "non-image" allowlist, `NON_IMAGE_ACCEPT` in `packages/editor-ui/src/utils/uploadValidation.js`); the model is allowlist-driven so more types can be added later via extension + MIME entries.
 
 **Backed by the File Assets model:** files are first-class Media Library assets in the same project-scoped store as images (SQLite owns metadata/usage, the filesystem owns the binary). Uploads route to `uploads/files/` (no image processing), participate in usage tracking and deletion protection, and are copied into the static export (`assets/files/`). See [core-media.md](core-media.md) and [core-export.md](core-export.md).
 
 **Features:**
 
-- **Upload**: Direct file upload from the OS file picker (accepts PDF/MP3)
+- **Upload**: Direct file upload from the OS file picker (accepts PDF/MP3/MP4)
 - **Browse**: Opens `MediaSelectorDrawer` with `filterType="file"` to select from existing file assets
 - **Selected State**: Displays filename and extension badge with a clear button
 - **No Metadata Editing**: File assets do not have alt text or title metadata
@@ -506,6 +535,37 @@ File paths are resolved using the `filePath` context variable (set by the render
 ```
 
 Alternatively, users can copy a file URL from the Media Library and paste it into any generic link field (or use the **Link to file** button in a richtext field). The export controller rewrites `/uploads/files/` paths to `assets/files/` in the exported HTML.
+
+### Video
+
+An uploaded MP4 from the Media Library, for native playback. The value is the upload path (e.g. `/uploads/files/product-tour.mp4`) or `""`; it is never an external URL or a resolved preview URL. For YouTube/Vimeo use the [YouTube](#youtube) type or a text URL.
+
+**Features:**
+
+- `FileInput` in video mode: upload and Browse (`MediaSelectorDrawer` with `filterType="video"`) accept MP4 only; a PDF, MP3 or image selection is refused
+- Shares the `media.maxFileSizeMB` upload limit
+- Saved values are sanitized on render and on theme-settings save: anything but `/uploads/files/<name>.mp4` becomes `""` (a theme setting falls back to its default instead, unless explicitly cleared)
+
+```json
+{
+  "id": "video_file",
+  "type": "video",
+  "label": "Uploaded video (MP4)"
+}
+```
+
+**Template Usage:**
+
+Resolve the URL from `filePath` like a `file` setting. Leave `data-setting` off the `<video>`: the editor's live update would write the stored path into `src` unresolved, while the server re-render of the widget resolves it. Render nothing when the value is empty so the page never requests an empty `src`.
+
+```liquid
+{% if widget.settings.video_file != blank %}
+  {% assign video_name = widget.settings.video_file | split: '/' | last %}
+  <video src="{{ filePath | append: '/' | append: video_name }}" controls playsinline preload="metadata"></video>
+{% endif %}
+```
+
+Playback depends on the browser decoding the file (H.264/AAC is the safe choice); a `<video>` element's fallback content does not show on a decode error, so listen for the element's `error` event if the widget should explain a failure. Arch's `video-embed` does this.
 
 ### YouTube
 
@@ -580,7 +640,7 @@ A compound control for creating links. This is useful for buttons, banners, or a
 - **`text`** (string): The display text for the link (e.g., "Learn More").
 - **`target`** (string): The link target, either `_self` to open in the same tab or `_blank` to open in a new tab.
 - **`pageUuid`** (string, optional): For internal **page** links, stores the page's stable UUID. The system resolves the UUID to the current page slug at render time, so links survive renames.
-- **`collectionType`** + **`collectionItemUuid`** (strings, optional): For internal **collection-item** links, stores the item's collection type and stable UUID. Resolved to `slugPrefix/itemSlug.html` at render time. These three reference forms are mutually exclusive — selecting one clears the others.
+- **`collectionType`** + **`collectionItemUuid`** (strings, optional): For internal **collection-item** links, stores the item's collection type and stable UUID. Resolved at render time to `slugPrefix/itemSlug.html`, or the extensionless `slugPrefix/itemSlug` when the project's Clean URLs setting is on (the stored `href` keeps `.html`). These three reference forms are mutually exclusive — selecting one clears the others.
 
 The picker offers all pages plus the items of every `hasItemPages` collection, grouped (a "Pages" group + one group per collection); see `useLinkTargets` (`packages/editor-ui/src/hooks/useLinkTargets.js`).
 
@@ -596,11 +656,15 @@ The UUID system ensures links remain valid even when the target is renamed or de
 
 2. **User Selection**: When a user selects an internal target from the dropdown, the system stores both the stable reference (`pageUuid`, or `collectionType` + `collectionItemUuid`) and the current `href` (slug-based filename).
 
-3. **Rendering/Export**: The system resolves the stable reference to the current slug. If the target was renamed, links automatically point to the new filename.
+3. **Rendering/Export**: The system resolves the stable reference to the current slug and emits it in the shape the project's Clean URLs setting picks (`about.html` / `rooms/suite.html`, or `about` / `rooms/suite` with home as `./`). If the target was renamed, links automatically follow the new slug.
 
-4. **Deletion Cleanup**: When a page is deleted, all widget link settings referencing its `pageUuid` are automatically cleaned up — the link is cleared (`href: ""`) and the reference is removed from the JSON file. This applies to page widgets, global widgets (header/footer), and menu items.
+4. **Deletion Cleanup**: When a page is deleted, all link settings referencing its `pageUuid` are automatically cleaned up — the destination is cleared (`href: ""`) and the reference removed, while the link's `text` and `target` are kept. This applies to page widgets, global widgets (header/footer), menu items, collection items and theme settings.
 
-5. **Project Cloning**: When a project is cloned, all UUIDs are regenerated and all widget/menu references are updated to point to the new UUIDs.
+5. **Project Cloning**: When a project is cloned, all UUIDs are regenerated and every reference — widget, menu, collection item and theme setting — is updated to point to the new UUIDs.
+
+**These work the same way in `theme.json` as in a widget schema.** A `link`, `menu` or `richtext` setting declared among a theme's site-wide settings carries exactly the same references and gets exactly the same maintenance: resolved at render (including depth prefixes, Clean URLs and the site's default language), enriched at project creation, re-pointed when a project is duplicated, given the new identities when preset collection items are seeded, and cleared when a target is deleted. Read a resolved site-wide setting in a template as `{{ theme.<group>.<id> }}` — a link exposes the same `href`/`text`/`target`, a menu resolves to the menu object, and richtext needs `| raw` like any other.
+
+Only the reference-bearing types are ever rewritten. A `text`, `select` or any other setting is left exactly as authored, even when its value happens to read like a menu name.
 
 The UI for this setting type provides a choice between selecting from a list of existing pages/collection items or entering a custom URL, along with inputs for the link text and a toggle for the target.
 
@@ -686,7 +750,7 @@ Render with the `format_date` filter, which honours the theme's **Date format** 
 {{ item.settings.published_on | format_date: 'D MMM YYYY' }}
 ```
 
-Supported format tokens: `MMMM D, YYYY`, `D MMMM YYYY`, `MMM D, YYYY`, `D MMM YYYY`, `MM/DD/YYYY`, `DD/MM/YYYY`, `YYYY-MM-DD`. A blank or unrecognised value formats to `""`.
+Month names follow the page language; the format itself does not change. Supported format tokens: `MMMM D, YYYY`, `D MMMM YYYY`, `MMM D, YYYY`, `D MMM YYYY`, `MM/DD/YYYY`, `DD/MM/YYYY`, `YYYY-MM-DD`. A blank or unrecognised value formats to `""`.
 
 ### Gallery
 

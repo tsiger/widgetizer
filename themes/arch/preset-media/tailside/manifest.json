@@ -1,0 +1,554 @@
+{
+  "files": [
+    {
+      "filename": "tailside-news-a-day-with-our-nurses.webp",
+      "originalName": "tailside-news-a-day-with-our-nurses.webp",
+      "type": "image/webp",
+      "size": 35244,
+      "path": "/uploads/images/tailside-news-a-day-with-our-nurses.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "A Day in the Life of Our Nurses",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/tailside-news-a-day-with-our-nurses-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/tailside-news-a-day-with-our-nurses-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/tailside-news-a-day-with-our-nurses-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "tailside-news-spotting-pain-in-quiet-pets.webp",
+      "originalName": "tailside-news-spotting-pain-in-quiet-pets.webp",
+      "type": "image/webp",
+      "size": 59746,
+      "path": "/uploads/images/tailside-news-spotting-pain-in-quiet-pets.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "How to Spot Pain in a Pet That Hides It",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/tailside-news-spotting-pain-in-quiet-pets-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/tailside-news-spotting-pain-in-quiet-pets-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/tailside-news-spotting-pain-in-quiet-pets-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "tailside-news-spring-parasite-season.webp",
+      "originalName": "tailside-news-spring-parasite-season.webp",
+      "type": "image/webp",
+      "size": 100448,
+      "path": "/uploads/images/tailside-news-spring-parasite-season.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "Getting Ahead of Tick and Flea Season",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/tailside-news-spring-parasite-season-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/tailside-news-spring-parasite-season-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/tailside-news-spring-parasite-season-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "tailside-news-twenty-years-caring-for-pets.webp",
+      "originalName": "tailside-news-twenty-years-caring-for-pets.webp",
+      "type": "image/webp",
+      "size": 82824,
+      "path": "/uploads/images/tailside-news-twenty-years-caring-for-pets.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "Twenty Years of Caring for Local Pets",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/tailside-news-twenty-years-caring-for-pets-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/tailside-news-twenty-years-caring-for-pets-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/tailside-news-twenty-years-caring-for-pets-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "tailside-news-welcoming-our-new-vet.webp",
+      "originalName": "tailside-news-welcoming-our-new-vet.webp",
+      "type": "image/webp",
+      "size": 47530,
+      "path": "/uploads/images/tailside-news-welcoming-our-new-vet.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "Welcoming Dr Owusu to the Practice",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/tailside-news-welcoming-our-new-vet-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/tailside-news-welcoming-our-new-vet-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/tailside-news-welcoming-our-new-vet-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "tailside-services-dental-care.webp",
+      "originalName": "tailside-services-dental-care.webp",
+      "type": "image/webp",
+      "size": 49152,
+      "path": "/uploads/images/tailside-services-dental-care.webp",
+      "width": 1600,
+      "height": 992,
+      "alt": "Pet Dental Care",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/tailside-services-dental-care-medium.webp",
+          "width": 1024,
+          "height": 635
+        },
+        "small": {
+          "path": "/uploads/images/tailside-services-dental-care-small.webp",
+          "width": 480,
+          "height": 298
+        },
+        "thumb": {
+          "path": "/uploads/images/tailside-services-dental-care-thumb.webp",
+          "width": 150,
+          "height": 93
+        }
+      }
+    },
+    {
+      "filename": "tailside-services-diagnostic-lab-testing.webp",
+      "originalName": "tailside-services-diagnostic-lab-testing.webp",
+      "type": "image/webp",
+      "size": 29858,
+      "path": "/uploads/images/tailside-services-diagnostic-lab-testing.webp",
+      "width": 1600,
+      "height": 992,
+      "alt": "Diagnostic Lab Testing",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/tailside-services-diagnostic-lab-testing-medium.webp",
+          "width": 1024,
+          "height": 635
+        },
+        "small": {
+          "path": "/uploads/images/tailside-services-diagnostic-lab-testing-small.webp",
+          "width": 480,
+          "height": 298
+        },
+        "thumb": {
+          "path": "/uploads/images/tailside-services-diagnostic-lab-testing-thumb.webp",
+          "width": 150,
+          "height": 93
+        }
+      }
+    },
+    {
+      "filename": "tailside-services-emergency-and-urgent-care.webp",
+      "originalName": "tailside-services-emergency-and-urgent-care.webp",
+      "type": "image/webp",
+      "size": 64428,
+      "path": "/uploads/images/tailside-services-emergency-and-urgent-care.webp",
+      "width": 1600,
+      "height": 992,
+      "alt": "Emergency and Urgent Care",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/tailside-services-emergency-and-urgent-care-medium.webp",
+          "width": 1024,
+          "height": 635
+        },
+        "small": {
+          "path": "/uploads/images/tailside-services-emergency-and-urgent-care-small.webp",
+          "width": 480,
+          "height": 298
+        },
+        "thumb": {
+          "path": "/uploads/images/tailside-services-emergency-and-urgent-care-thumb.webp",
+          "width": 150,
+          "height": 93
+        }
+      }
+    },
+    {
+      "filename": "tailside-services-vaccinations.webp",
+      "originalName": "tailside-services-vaccinations.webp",
+      "type": "image/webp",
+      "size": 55548,
+      "path": "/uploads/images/tailside-services-vaccinations.webp",
+      "width": 1600,
+      "height": 992,
+      "alt": "Vaccinations",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/tailside-services-vaccinations-medium.webp",
+          "width": 1024,
+          "height": 635
+        },
+        "small": {
+          "path": "/uploads/images/tailside-services-vaccinations-small.webp",
+          "width": 480,
+          "height": 298
+        },
+        "thumb": {
+          "path": "/uploads/images/tailside-services-vaccinations-thumb.webp",
+          "width": 150,
+          "height": 93
+        }
+      }
+    },
+    {
+      "filename": "tailside-services-wellness-exam.webp",
+      "originalName": "tailside-services-wellness-exam.webp",
+      "type": "image/webp",
+      "size": 43302,
+      "path": "/uploads/images/tailside-services-wellness-exam.webp",
+      "width": 1600,
+      "height": 992,
+      "alt": "Wellness Exam",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/tailside-services-wellness-exam-medium.webp",
+          "width": 1024,
+          "height": 635
+        },
+        "small": {
+          "path": "/uploads/images/tailside-services-wellness-exam-small.webp",
+          "width": 480,
+          "height": 298
+        },
+        "thumb": {
+          "path": "/uploads/images/tailside-services-wellness-exam-thumb.webp",
+          "width": 150,
+          "height": 93
+        }
+      }
+    },
+    {
+      "filename": "new-patients-welcome.webp",
+      "originalName": "new-patients-welcome.webp",
+      "type": "image/webp",
+      "size": 59872,
+      "path": "/uploads/images/new-patients-welcome.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "Client seated in the Tailside waiting room with his golden retriever beside him and a pet carrier at his feet",
+      "title": "Waiting room welcome",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/new-patients-welcome-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/new-patients-welcome-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/new-patients-welcome-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "team-sam-patel.webp",
+      "originalName": "team-sam-patel.webp",
+      "type": "image/webp",
+      "size": 34058,
+      "path": "/uploads/images/team-sam-patel.webp",
+      "width": 960,
+      "height": 1280,
+      "alt": "Sam Patel in clinic scrubs with a cardigan, standing at the front of the Tailside clinic",
+      "title": "Sam Patel",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/team-sam-patel-small.webp",
+          "width": 480,
+          "height": 640
+        },
+        "thumb": {
+          "path": "/uploads/images/team-sam-patel-thumb.webp",
+          "width": 150,
+          "height": 200
+        }
+      }
+    },
+    {
+      "filename": "team-jordan-brooks.webp",
+      "originalName": "team-jordan-brooks.webp",
+      "type": "image/webp",
+      "size": 42724,
+      "path": "/uploads/images/team-jordan-brooks.webp",
+      "width": 960,
+      "height": 1280,
+      "alt": "Jordan Brooks in a white lab coat with a stethoscope standing beside a small terrier on the exam table",
+      "title": "Jordan Brooks",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/team-jordan-brooks-small.webp",
+          "width": 480,
+          "height": 640
+        },
+        "thumb": {
+          "path": "/uploads/images/team-jordan-brooks-thumb.webp",
+          "width": 150,
+          "height": 200
+        }
+      }
+    },
+    {
+      "filename": "team-maya-rivera.webp",
+      "originalName": "team-maya-rivera.webp",
+      "type": "image/webp",
+      "size": 31630,
+      "path": "/uploads/images/team-maya-rivera.webp",
+      "width": 960,
+      "height": 1280,
+      "alt": "Maya Rivera in clinic scrubs holding a patient clipboard, smiling in the treatment room",
+      "title": "Maya Rivera",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/team-maya-rivera-small.webp",
+          "width": 480,
+          "height": 640
+        },
+        "thumb": {
+          "path": "/uploads/images/team-maya-rivera-thumb.webp",
+          "width": 150,
+          "height": 200
+        }
+      }
+    },
+    {
+      "filename": "team-avery-chen.webp",
+      "originalName": "team-avery-chen.webp",
+      "type": "image/webp",
+      "size": 32716,
+      "path": "/uploads/images/team-avery-chen.webp",
+      "width": 960,
+      "height": 1280,
+      "alt": "Avery Chen in clinic scrubs with a stethoscope and Tailside name badge, standing in the exam room",
+      "title": "Avery Chen",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/team-avery-chen-small.webp",
+          "width": 480,
+          "height": 640
+        },
+        "thumb": {
+          "path": "/uploads/images/team-avery-chen-thumb.webp",
+          "width": 150,
+          "height": 200
+        }
+      }
+    },
+    {
+      "filename": "about-clinic-team.webp",
+      "originalName": "about-clinic-team.webp",
+      "type": "image/webp",
+      "size": 49816,
+      "path": "/uploads/images/about-clinic-team.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "Four Tailside team members in matching clinic scrubs standing together in the exam room, smiling at the camera",
+      "title": "The Tailside team",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/about-clinic-team-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/about-clinic-team-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/about-clinic-team-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "services-checkup.webp",
+      "originalName": "services-checkup.webp",
+      "type": "image/webp",
+      "size": 64624,
+      "path": "/uploads/images/services-checkup.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "Veterinarian carefully examining a grey tabby cat on the exam table while the cat’s owner stands nearby",
+      "title": "Wellness check",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/services-checkup-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/services-checkup-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/services-checkup-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "tailside-logo-light.png",
+      "originalName": "tailside-logo-light.png",
+      "type": "image/png",
+      "size": 24442,
+      "path": "/uploads/images/tailside-logo-light.png",
+      "width": 800,
+      "height": 252,
+      "alt": "Tailside Veterinary Care logo in a light color variant for use on dark backgrounds",
+      "title": "Tailside Veterinary Care logo (light)",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/tailside-logo-light-small.png",
+          "width": 480,
+          "height": 151
+        },
+        "thumb": {
+          "path": "/uploads/images/tailside-logo-light-thumb.png",
+          "width": 150,
+          "height": 47
+        }
+      }
+    },
+    {
+      "filename": "tailside-logo-dark.png",
+      "originalName": "tailside-logo-dark.png",
+      "type": "image/png",
+      "size": 30825,
+      "path": "/uploads/images/tailside-logo-dark.png",
+      "width": 800,
+      "height": 252,
+      "alt": "Tailside Veterinary Care logo with a dog and cat silhouette mark beside the Tailside wordmark",
+      "title": "Tailside Veterinary Care logo",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/tailside-logo-dark-small.png",
+          "width": 480,
+          "height": 151
+        },
+        "thumb": {
+          "path": "/uploads/images/tailside-logo-dark-thumb.png",
+          "width": 150,
+          "height": 47
+        }
+      }
+    },
+    {
+      "filename": "home-hero-exam-room.webp",
+      "originalName": "home-hero-exam-room.webp",
+      "type": "image/webp",
+      "size": 78872,
+      "path": "/uploads/images/home-hero-exam-room.webp",
+      "width": 1920,
+      "height": 1072,
+      "alt": "Veterinarian in teal scrubs gently examining a calm tan mixed-breed dog on an exam table in a warm, well-lit clinic room",
+      "title": "Gentle exam",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/home-hero-exam-room-medium.webp",
+          "width": 1024,
+          "height": 572
+        },
+        "small": {
+          "path": "/uploads/images/home-hero-exam-room-small.webp",
+          "width": 480,
+          "height": 268
+        },
+        "thumb": {
+          "path": "/uploads/images/home-hero-exam-room-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    }
+  ]
+}

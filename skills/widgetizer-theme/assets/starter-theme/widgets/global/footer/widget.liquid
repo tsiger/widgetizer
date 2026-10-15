@@ -1,0 +1,18 @@
+<footer id="{{ widget.id }}" class="widget site-footer" data-widget-id="{{ widget.id }}" data-widget-type="footer">
+  <div class="container site-footer__inner">
+    {% assign text_empty = widget.settings.text | rte_blank %}
+    {% unless text_empty %}
+      <div class="rte" data-setting="text">{{ widget.settings.text | raw }}</div>
+    {% endunless %}
+
+    {% comment %} The snippet prints nothing when no menu is chosen or it has no items. {% endcomment %}
+    {% assign nav_label = 'site.footer.nav' | t %}
+    {% render 'menu',
+      menu: widget.settings.navigation,
+      aria_label: nav_label,
+      class_nav: 'footer-nav',
+      class_list: 'footer-nav__list',
+      class_link: 'footer-nav__link'
+    %}
+  </div>
+</footer>

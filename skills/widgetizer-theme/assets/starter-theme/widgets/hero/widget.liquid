@@ -1,0 +1,48 @@
+{% enqueue_style src: 'hero.css' %}
+
+<section
+  id="{{ widget.id }}"
+  class="widget widget-hero{% if widget.settings.image_position == 'start' %} widget-hero--image-start{% endif %}"
+  data-widget-id="{{ widget.id }}"
+  data-widget-type="hero"
+>
+  <div class="container hero">
+    <div class="hero__content">
+      {% if widget.settings.heading != blank %}
+        {% comment %} The first widget on a page carries the page's h1. {% endcomment %}
+        {% if widget.index == 1 %}
+          <h1 class="hero__heading" data-setting="heading">{{ widget.settings.heading }}</h1>
+        {% else %}
+          <h2 class="hero__heading" data-setting="heading">{{ widget.settings.heading }}</h2>
+        {% endif %}
+      {% endif %}
+
+      {% assign text_empty = widget.settings.text | rte_blank %}
+      {% unless text_empty %}
+        <div class="hero__text rte" data-setting="text">{{ widget.settings.text | raw }}</div>
+      {% endunless %}
+
+      {% assign button_href = widget.settings.button.href | safe_url %}
+      {% if button_href != blank and widget.settings.button.text != blank %}
+        <a
+          class="button"
+          href="{{ button_href }}"
+          {% if widget.settings.button.target == '_blank' %}target="_blank" rel="noopener noreferrer"{% endif %}
+          data-setting="button"
+        >{{ widget.settings.button.text }}</a>
+      {% endif %}
+    </div>
+
+    <div class="hero__media">
+      {% if widget.settings.image != blank %}
+        {% if widget.index == 1 %}
+          {% image src: widget.settings.image, size: 'large', srcset: true, sizes: '(min-width: 750px) 50vw, 100vw', class: 'hero__image', loading: 'eager', fetchpriority: 'high' %}
+        {% else %}
+          {% image src: widget.settings.image, size: 'large', srcset: true, sizes: '(min-width: 750px) 50vw, 100vw', class: 'hero__image' %}
+        {% endif %}
+      {% else %}
+        {% placeholder_image aspect: 'landscape', class: 'hero__image', alt: '' %}
+      {% endif %}
+    </div>
+  </div>
+</section>

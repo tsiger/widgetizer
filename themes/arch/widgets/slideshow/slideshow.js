@@ -42,14 +42,18 @@
     const nextSlide = () => goToSlide(currentIndex + 1);
     const prevSlide = () => goToSlide(currentIndex - 1);
 
+    // The page carries the wording (see widget.liquid); the fallbacks are only
+    // for a slide rendered before the theme shipped them.
+    const label = (name, fallback) => widget.dataset[name] || fallback;
+
     let isAutoplaying = false;
     const startAutoplay = () => {
       if (autoplay) {
         autoplayInterval = setInterval(nextSlide, autoplaySpeed);
         isAutoplaying = true;
         toggleBtn?.setAttribute("aria-pressed", "false");
-        toggleBtn?.setAttribute("aria-label", "Pause autoplay");
-        if (toggleBtn) toggleBtn.textContent = "Pause";
+        toggleBtn?.setAttribute("aria-label", label("tPauseAutoplay", "Pause autoplay"));
+        if (toggleBtn) toggleBtn.textContent = label("tPause", "Pause");
       }
     };
 
@@ -57,8 +61,8 @@
       clearInterval(autoplayInterval);
       isAutoplaying = false;
       toggleBtn?.setAttribute("aria-pressed", "true");
-      toggleBtn?.setAttribute("aria-label", "Start autoplay");
-      if (toggleBtn) toggleBtn.textContent = "Play";
+      toggleBtn?.setAttribute("aria-label", label("tStartAutoplay", "Start autoplay"));
+      if (toggleBtn) toggleBtn.textContent = label("tPlay", "Play");
     };
 
     prevBtn?.addEventListener("click", () => {

@@ -13,8 +13,6 @@
 
       & .service-figure {
         margin: var(--space-xl) 0 0;
-        border-radius: var(--radius-lg);
-        overflow: hidden;
       }
 
       & .service-image {
@@ -23,6 +21,11 @@
         height: auto;
         aspect-ratio: 16 / 10;
         object-fit: cover;
+        border-radius: var(--radius-lg);
+      }
+
+      & .service-caption {
+        margin-block-start: var(--space-sm);
       }
 
       & .service-gallery {
@@ -34,6 +37,10 @@
         @media (min-width: 750px) {
           grid-template-columns: 1fr 1fr;
         }
+      }
+
+      & .service-gallery-item {
+        margin: 0;
       }
 
       & .service-gallery-img {
@@ -62,8 +69,12 @@
       {% endif %}
 
       {% if item.settings.featured_image != blank %}
+        {% assign featured_caption = item.settings.featured_image | media_meta: 'caption' %}
         <figure class="service-figure reveal reveal-up">
           {% image src: item.settings.featured_image, size: 'large', class: 'service-image', srcset: true, sizes: '(max-width: 800px) 100vw, 800px', alt: item.settings.title %}
+          {% if featured_caption != blank %}
+            <figcaption class="service-caption w-meta t-sm">{{ featured_caption }}</figcaption>
+          {% endif %}
         </figure>
       {% endif %}
 
@@ -76,7 +87,13 @@
         <div class="service-gallery reveal reveal-up">
           {% for img in gallery %}
             {% if img != blank %}
-              {% image src: img, size: 'medium', class: 'service-gallery-img', srcset: true, sizes: '(max-width: 750px) 100vw, 50vw' %}
+              {% assign caption = img | media_meta: 'caption' %}
+              <figure class="service-gallery-item">
+                {% image src: img, size: 'medium', class: 'service-gallery-img', srcset: true, sizes: '(max-width: 750px) 100vw, 50vw' %}
+                {% if caption != blank %}
+                  <figcaption class="service-caption w-meta t-sm">{{ caption }}</figcaption>
+                {% endif %}
+              </figure>
             {% endif %}
           {% endfor %}
         </div>

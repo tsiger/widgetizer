@@ -1,0 +1,162 @@
+{
+  "name": "Gallery",
+  "slug": "gallery",
+  "widgets": {
+    "hero": {
+      "type": "banner",
+      "settings": {
+        "image": "/uploads/images/gallery-hero.webp",
+        "height": "small",
+        "fullwidth": true,
+        "alignment": "center",
+        "vertical_alignment": "center",
+        "overlay_color": "#2a202480",
+        "color_scheme": "highlight-primary",
+        "top_spacing": "none",
+        "bottom_spacing": "none"
+      },
+      "blocks": {
+        "hero-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Gallery",
+            "size": "4xl"
+          }
+        }
+      },
+      "blocksOrder": [
+        "hero-heading"
+      ]
+    },
+    "gallery": {
+      "type": "gallery",
+      "settings": {
+        "eyebrow": "",
+        "title": "Inside Velvet Touch",
+        "description": "",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 3,
+        "staggered": false,
+        "aspect_ratio": "1 / 1",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "img-1": {
+          "type": "image",
+          "settings": {
+            "image": "/uploads/images/gallery-treatment-room.webp",
+            "caption": "Treatment room"
+          }
+        },
+        "img-2": {
+          "type": "image",
+          "settings": {
+            "image": "/uploads/images/gallery-oils.webp",
+            "caption": "Essential oils"
+          }
+        },
+        "img-3": {
+          "type": "image",
+          "settings": {
+            "image": "/uploads/images/gallery-lounge.webp",
+            "caption": "Relaxation lounge"
+          }
+        },
+        "img-4": {
+          "type": "image",
+          "settings": {
+            "image": "/uploads/images/gallery-stones.webp",
+            "caption": "Hot stone preparation"
+          }
+        },
+        "img-5": {
+          "type": "image",
+          "settings": {
+            "image": "/uploads/images/gallery-products.webp",
+            "caption": "Skincare products"
+          }
+        },
+        "img-6": {
+          "type": "image",
+          "settings": {
+            "image": "/uploads/images/treatments-couples-1.webp",
+            "caption": "Couples suite"
+          }
+        },
+        "img-7": {
+          "type": "image",
+          "settings": {
+            "image": "/uploads/images/gallery-candles.webp",
+            "caption": "Reception area"
+          }
+        },
+        "img-8": {
+          "type": "image",
+          "settings": {
+            "image": "/uploads/images/gallery-courtyard.webp",
+            "caption": "Candles and ambiance"
+          }
+        },
+        "img-9": {
+          "type": "image",
+          "settings": {
+            "image": "/uploads/images/gallery-therapist.webp",
+            "caption": "Garden courtyard"
+          }
+        }
+      },
+      "blocksOrder": [
+        "img-1",
+        "img-2",
+        "img-3",
+        "img-4",
+        "img-5",
+        "img-6",
+        "img-7",
+        "img-8",
+        "img-9"
+      ]
+    },
+    "cta": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight-primary"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Like What You See?",
+            "size": "2xl"
+          }
+        },
+        "cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Book a Treatment",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": [
+        "cta-heading",
+        "cta-button"
+      ]
+    }
+  },
+  "widgetsOrder": [
+    "hero",
+    "gallery",
+    "cta"
+  ],
+  "id": "gallery",
+  "created": "2026-04-19T11:19:49.751Z",
+  "updated": "2026-04-19T15:22:20.201Z"
+}

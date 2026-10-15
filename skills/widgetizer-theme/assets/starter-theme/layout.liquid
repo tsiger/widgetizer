@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="{{ page.language | default: 'en' }}" dir="{{ page.dir | default: 'ltr' }}">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    {% seo %}
+    {% fonts %}
+    {% render 'site-icons', site_icons: site_icons %}
+    {% theme_settings %}
+    {% asset src: 'base.css' %}
+    {% custom_css %}
+    {% custom_head_scripts %}
+    {% header_assets %}
+  </head>
+  <body class="{{ body_class }}">
+    {{ header | raw }}
+    <main id="main-content">
+      {{ main_content | raw }}
+    </main>
+    {{ footer | raw }}
+    {% asset src: 'theme.js', defer: true %}
+    {% footer_assets %}
+    {% custom_footer_scripts %}
+  </body>
+</html>

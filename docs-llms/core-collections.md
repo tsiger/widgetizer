@@ -22,6 +22,7 @@ A collection type is defined by `collection-types/{type}/schema.json` in the the
 | `hasItemPages` | `true` → each item renders a standalone page (requires a `template.liquid`). |
 | `defaultSort` | One of `manual`, `created_desc`, `created_asc`, `title_asc`, `title_desc`, `date_desc`, `date_asc`. |
 | `schemaVersion` | Carried onto items as-is (used for migration bookkeeping). |
+| `structuredData` | Optional mapping of item fields to a schema.org type core can build (§5c). |
 
 **Field rules:**
 
@@ -40,11 +41,13 @@ The service never builds absolute paths. It computes **relative keys** and hands
 ```js
 collection-types/{type}/schema.json      // type definition (theme-seeded)
 collection-types/{type}/template.liquid  // item-page template (when hasItemPages)
-collections/{type}/{slug}.json           // one file per item
+collections/{type}/{slug}.json           // one file per item (default language)
 collections/{type}/_order.json           // manual ordering (defaultSort: "manual")
+collections/{type}/{lang}/{slug}.json    // the same, for another site language
+collections/{type}/{lang}/_order.json    // each language folder keeps its own order
 ```
 
-Schemas and templates live on the **collection-type** path (seeded from the theme); authored item data lives on the **collections** path.
+Schemas and templates live on the **collection-type** path (seeded from the theme); authored item data lives on the **collections** path. The keys come from `itemKey` / `itemsDir` in `@widgetizer/core/contentAddress`, given `lang = { language, defaultLanguage }`: storage nests the language *under* the type so a type's items stay together, while output puts it first (`el/news/story.html`). Every item read/write in the service takes `lang` last (`readCollectionItem(storage, scope, type, slug, lang)`, `writeCollectionItem(…, previousSlug, lang)`, `listCollectionItems(…, options, lang)`, the reader's `sorted(type, options, lang)`); the controller resolves it with `requestLanguage(req, res)` from `?language=` / `body.language`. Slugs are unique per folder. The folder is the language's only record: a normalized item carries the resolved `language`, which is never written to disk. `translationGroupId` is stored: an item's own `uuid` on create and duplicate (a group of one), the source's group on a language version, and read as the `uuid` when an older file lacks it.
 
 **Item record shape** (`collections/{type}/{slug}.json`):
 
@@ -52,6 +55,7 @@ Schemas and templates live on the **collection-type** path (seeded from the them
 {
   "id": "…",
   "uuid": "stable-uuid",
+  "translationGroupId": "stable-uuid",
   "slug": "my-first-post",
   "schemaVersion": 1,
   "created": "2026-06-18T10:00:00.000Z",
@@ -71,11 +75,11 @@ Schemas and templates live on the **collection-type** path (seeded from the them
 
 **Schema reads** — `listCollectionSchemas(storage, scope)`, `getCollectionSchema(storage, scope, type)`, `loadCollectionTemplate(storage, scope, type)`. Pure validation: `validateCollectionSchema(schema, folderName)`, `validateThemeCollectionSchemas(themeSourceDir)` (theme-upload gate).
 
-**Item CRUD** — `listCollectionItems(storage, scope, type, { sort, limit, offset })`, `readCollectionItem(…)`, `readRawCollectionItem(…)` (preserves archived settings), `writeCollectionItem(storage, scope, type, item, previousSlug)` (create / update / rename), `deleteCollectionItem(…)`, `bulkDeleteCollectionItems(…)`, `duplicateCollectionItem(…)` (fresh uuid + timestamps), `discardArchivedCollectionItem(…)`.
+**Item CRUD** — `listCollectionItems(storage, scope, type, { sort, limit, offset })`, `readCollectionItem(…)`, `readRawCollectionItem(…)` (preserves archived settings), `writeCollectionItem(storage, scope, type, item, previousSlug)` (create / update / rename), `deleteCollectionItem(…)`, `bulkDeleteCollectionItems(…)`, `duplicateCollectionItem(…)` (fresh uuid + timestamps), `createItemLanguageVersion(storage, scope, type, slug, { fromLang, toLang, slug })` (copies settings into another language under a new uuid in the source's translation group; a custom `canonical_url` is cleared), `discardArchivedCollectionItem(…)`.
 
 **Validation / normalization (pure)** — `normalizeCollectionItem(rawItem, schema)` (adds `title`, `invalid`, `validationErrors`, `_archived`), `buildCollectionItemData(schema, input, existingItem)` (throws `CollectionValidationError` / `CollectionSlugConflictError`).
 
-**Render prep / links / order** — `prepareCollectionItemForRender(item, schema, pagesByUuid, outputPathPrefix, menuDeps, mediaBasePaths)` (resolve links/menus, sanitize, resolve richtext media), `resolveCollectionItemLinks(…)`, `loadCollectionItemsByUuid(storage, scope)` (uuid → `{ slugPrefix, slug }`), `reorderCollectionItems(storage, scope, type, order)`, `buildCollectionItemPageData(schema, item, siteUrl)`.
+**Render prep / links / order** — `prepareCollectionItemForRender(item, schema, pagesByUuid, outputPathPrefix, menuDeps, mediaBasePaths)` (resolve links/menus, sanitize, resolve richtext media), `resolveCollectionItemLinks(…)`, `loadCollectionItemsByUuid(storage, scope, reader, languageContexts)` (uuid → `translationSibling` shape — `{ uuid, translationGroupId, slug, language, slugPrefix, collectionType, seo: { robots } }` — over the given languages), `reorderCollectionItems(storage, scope, type, order)`, `buildCollectionItemPageData(schema, item, siteUrl)`. `menuDeps.cleanUrls` selects the emitted shape (`pageHref` / `itemHref` in `@widgetizer/core/internalHref`); custom hrefs are emitted as authored.
 
 `normalizeCollectionItem` separates any out-of-schema key into an in-memory `_archived` map and re-checks every `required` field, setting `invalid: true` plus a per-field `validationErrors` list — so the editor can surface stale data and missing values on read without rewriting the file. `listCollectionItems` additionally **recovers from duplicate-uuid rename crashes**: if two files share a `uuid` (the gap between writing the new slug and deleting the old one), the one with the newer `updated` wins and the loser is excluded from the listing but never deleted (a save cleans it up via `cleanupDuplicateUuidSiblings`).
 
@@ -99,9 +103,14 @@ Mounted in `setupBuilderServer.js` as `projectScopedRouter.use("/collections", c
 | POST | `/:collectionType/bulk-delete` | `{ itemSlugs: [] }` |
 | POST | `/:collectionType/:itemSlug/duplicate` | duplicate item |
 | POST | `/:collectionType/:itemSlug/discard-archived` | drop archived out-of-schema settings |
+| POST | `/:collectionType/:itemSlug/translations` | `{ targetLanguage, slug? }` — create the item's version in another language |
 | POST | `/:collectionType/reorder` | `{ order: [] }` (manual ordering) |
 
-**Status codes:** validation failure → `400` (`{ error, validationErrors }`); slug conflict on create/rename → `409` (`{ error, conflictingSlug }`); per-collection item cap exceeded → `422` (see §7). Writes set `Cache-Control: no-store`.
+Every route takes the language from `?language=` / `body.language` (default language when absent).
+
+**Status codes:** validation failure → `400` (`{ error, validationErrors }`); slug conflict on create/rename → `409` (`{ error, conflictingSlug }`); per-collection item cap exceeded → `422` (see §7); a language version that already exists in the target language → `409`; a write addressed to a language removed while it waited → `409` `LANGUAGE_REMOVED`; a write that newly references a media file just deleted → `409` `MEDIA_REFERENCE_MISSING` ([Media Library](core-media.md)). A write whose media-usage sync failed still succeeds, with a `MEDIA_USAGE_STALE` entry in `warnings`. Writes run inside the project's content-write section and set `Cache-Control: no-store`.
+
+**Deleting** an item (single or bulk) clears every reference to it across all languages — `link` settings and menu items lose their destination but keep their label, richtext anchors carrying its `data-collection-item-uuid` are unwrapped to plain text — through the same `clearDeletedReferencesInSection` walk page deletion uses. A hand-typed URL is never rewritten. A sweep that could not write some file still answers success, with a `REFERENCE_CLEANUP_INCOMPLETE` warning.
 
 ---
 
@@ -118,8 +127,125 @@ Mounted in `setupBuilderServer.js` as `projectScopedRouter.use("/collections", c
 
 - **Options:** `limit`, `offset`, `sort` (one of the `defaultSort` values).
 - **Returned item shape:** `{ id, uuid, slug, url, created, updated, settings }`. `settings` is already link-resolved and sanitized.
-- **`url`** is computed, not stored: `null` when `hasItemPages` is `false`; otherwise `` `${outputPathPrefix}${slugPrefix}/${slug}.html` `` so it is correct at whatever depth the current page renders.
+- **`url`** is computed, not stored: `null` when `hasItemPages` is `false`; otherwise `itemHref(slugPrefix, slug, { cleanUrls, outputPathPrefix, language, defaultLanguage })` — `` `${outputPathPrefix}${slugPrefix}/${slug}.html` ``, or the extensionless `` `${outputPathPrefix}${slugPrefix}/${slug}` `` when the project's Clean URLs setting is on — so it is correct at whatever depth the current page renders. Items come from the rendering page's language; for a non-default language the url includes that language's folder (`${outputPathPrefix}<lang>/${slugPrefix}/${slug}.html`).
 - **Purity:** the filter reads items via a `getCollectionItems(type, args)` loader injected on the render `globals`. Core/render-engine never import builder-server — the shell supplies the loader (`buildRenderDeps` in OSS, `buildCloudRenderDeps` in hosted), and the loader is the only thing bound to `{ storage, scope }`.
+- **Pagination slice:** while the page's paginating widget renders, `globals.collectionSlice` (`{ collectionType, offset, limit }`) overrides those two options for that collection only — see §5b.
+
+---
+
+## 5a. Listing pages and the anchor
+
+A widget that lists a collection declares it at the top of its `schema.json`:
+
+```json
+"collection": { "type": "news" }
+```
+
+The template already names the collection (`'news' | collection`), but only at
+render time — the declaration is what lets code outside the render know which
+pages list what. `indexListingPages` (`packages/core/src/utils/breadcrumbs.js`)
+walks every page's widgets against the widget schemas and returns, per collection,
+the pages that list it and which one is its **anchor**.
+
+The anchor is the `listing_anchor` boolean on the listing widget's settings,
+surfaced by the editor as *"Main {displayNamePlural} page"* on any widget whose
+schema declares a collection (the setting is injected by `SettingsPanel.jsx`, not
+declared per widget). It marks that page as the collection's home: breadcrumbs
+hang the collection's items under it. With no anchor and exactly one page listing
+the collection, that page is used; with two and no anchor the relationship is
+ambiguous and items sit directly under Home.
+
+**One anchor per collection.** Enforced server-side when a page is saved
+(`clearListingAnchorsElsewhere` in `pageController.js`), not when the checkbox is
+ticked: the editor holds the change until save, so clearing another page earlier
+would strip its anchor for an edit the user might discard. The save response
+carries `listingAnchorMovedFrom` with the names of the pages it cleared, which
+the editor announces. A duplicated page starts unclaimed — it is written directly
+and the sweep never sees it (duplicating or pasting a widget in the editor clears the flag too). A duplicated *project* keeps its anchors, since the
+whole hierarchy is copied and stays internally consistent. If data ever holds two
+anchors anyway, the first page by slug wins so every render agrees.
+
+Pagination leans on the anchor: a paginating widget always holds it, and when the
+sweep takes the anchor from a page it also turns that page's `paginate` off (§5b).
+
+---
+
+## 5b. Pagination
+
+Pagination belongs to a listing widget on an ordinary editable page. Dedicated theme archive pages would take that page's layout out of the author's control; client-side load-more alone would not provide the static, independently addressable pages needed for navigation and search engines. Numbered copies preserve the surrounding widgets and change only the listing's slice.
+
+A listing widget can split its page into numbered copies. The schema names the setting that holds items per page:
+
+```json
+"collection": { "type": "news", "perPageSetting": "limit" }
+```
+
+`SettingsPanel.jsx` then injects a **"Split into pages"** checkbox (`paginate`) beside the anchor checkbox. Turning it on also ticks the anchor, sets items per page to 12 when it was below 1, and refuses (a toast naming the holder) when another widget on the page already paginates. While it is on, items per page cannot drop below 1, and unticking the anchor turns it off.
+
+**Server rules** — `enforcePaginationRules` in `pageController.js`, run by `savePageContent` and by `updatePage` whenever widgets are sent. Items per page (the widget's value, else the schema default) must be a whole number ≥ 1, else `422`. A widget whose schema lacks `collection.type`, a string `perPageSetting` or an array `settings` has `paginate` switched off. Two paginating widgets on one page → `422`. A paginating widget gets `listing_anchor: true`; the anchor sweep then clears the anchor and `paginate` on other pages.
+
+**Planning** — `planPagination(deps, widgets, widgetsOrder, { pageSlug, currentPage })` in `render-engine` picks the first widget that can paginate, counts valid items through `deps.countCollectionItems`, and returns `{ widgetId, collectionType, perPage, totalItems, total, current, pageSlug }` — or `null` when nothing paginates or everything fits on one page, in which case output is unchanged. Callers put the plan on `sharedGlobals.paginationPlan`. Never name it `sharedGlobals.pagination`: render globals are visible to Liquid, so that name would hand a pager object to every widget.
+
+**What the theme gets.** Only the paginating widget's render context carries `pagination`; the layout gets the same object as `page.pagination`.
+
+| field | meaning |
+|---|---|
+| `current` | page being rendered, from 1 |
+| `total` | number of pages (≥ 2 whenever present) |
+| `perPage` | items per page |
+| `totalItems` | valid items in the collection |
+| `prevHref` / `nextHref` | links to the neighbouring pages, `null` at the ends — depth- and Clean-URLs-aware |
+| `pages` | `{ number, href, current }` for every page |
+
+The widget keeps calling `'news' | collection: limit: …`; the engine sets `globals.collectionSlice` around that one widget's render, and the filter applies the offset and limit (§5).
+
+**Addresses** — `packages/core/src/utils/contentAddress.js`. Page 1 is the page itself; copies are `<slug>/page/<n>.html`, or `page/<n>.html` for the homepage (`pageOutputPath`), linked with `pagedHref`. `page` is a reserved page and item slug (`isReservedPageSlug`, `isReservedItemSlug`). A collection `slugPrefix` of `page` stays allowed, but export refuses when the homepage paginates and a collection with item pages (`hasItemPages: true`) uses that prefix; a list-only collection never writes there.
+
+**SEO** — `SeoTag.js` gives page 2+ a `Blog - 2 - Site` title, its own absolute canonical (a custom `canonical_url` applies to page 1 only) and `rel="prev"` / `rel="next"` when a Site URL is set. Page 2+ publishes no `hreflang` alternates: its translations point at the base pages, which would leave the copy out of its own set, and another language may have a different number of copies. The sitemap omits them on copies for the same reason; the visitor language switcher still links each language's base page. Copies join the sitemap, and robots.txt when the page is noindex. Breadcrumbs on page 2+ end with a numbered crumb (`pageNumber`).
+
+**Preview** — page 2+ opens at `/preview/paged/:pageId/:pageNumber` (`app/src/previewRoutes.jsx`), and the page number travels to `/preview/token` as `pageNumber`. `getStandalonePreviewTarget` maps `…/page/<n>` links there, except a root `page/<n>` when a collection publishes under `page/`; the preview runtime receives those prefixes as `data-collection-prefixes`.
+
+**Consistent reads** — `createCollectionReader({ storage, scope, snapshot })` memoises each collection's read and sorted lists on a `snapshot` Map. One snapshot spans a whole export (validation, sitemap inputs, item links, item pages, listings, page counts) or one page or widget preview request, so an item edited mid-render can neither land on two copies nor be linked without its page being written. Sorts are total: ties fall back to newest `created`, then `uuid`. The collection item preview (`createCollectionPreviewToken`) does not use a snapshot yet: two differently sorted lists in an item preview can read the collection twice.
+
+---
+
+## 5c. Structured data (`structuredData` block)
+
+A collection type can tell core which of its fields carry the meaning of a schema.org type, and core then writes that node into the item page's JSON-LD (through `{% seo %}`, next to the site and page nodes — see [Site Exporting](core-export.md#structured-data-json-ld)). Themes never build JSON-LD in Liquid; they only declare the mapping. Arch's News type:
+
+```json
+"structuredData": {
+  "type": "BlogPosting",
+  "headline": "title",
+  "datePublished": "date",
+  "description": "excerpt",
+  "image": "featured_image",
+  "articleBody": "body"
+}
+```
+
+Each property names a setting id. The rules live in `packages/core/src/structuredData/collectionTypes.js` (`FIELD_RULES`):
+
+| type | property | setting types accepted |
+|---|---|---|
+| `BlogPosting` | `headline` (required) | `text` |
+| | `datePublished` | `date` |
+| | `description` | `text`, `textarea` |
+| | `image` | `image` |
+| | `articleBody` | `richtext`, `textarea` |
+
+**Validation.** `validateCollectionSchema` runs `validateCollectionStructuredData(block, settings)` whenever the key is present. The block must be an object, `type` must be a supported string, every other key must be a property of that type, and each value must name an existing non-`header` setting of an accepted type. A required property can't be missing. Errors make the schema invalid, with the usual consequences: `listCollectionSchemas` skips the collection with a warning, and a theme upload fails through `validateThemeCollectionSchemas`. A mapping can never point at a missing field.
+
+**Visible values only.** `buildCollectionItemPageData` puts `collectionItem { type, structuredData, settingTypes, settings }` on the item's page data. The settings are the prepared ones the template renders (links resolved, sanitized), so the markup matches what the visitor sees. `articleNode` (`packages/core/src/structuredData/articleNode.js`) builds the node from them, and never from `seo.description` or `seo.og_image`:
+
+- text values have whitespace collapsed; a `richtext` value goes through `htmlToText` (`htmlText.js`) — block boundaries and `<br>` become line breaks, inline markup joins its neighbours, comments and script/style content are dropped, entities are decoded;
+- `image` becomes an absolute published URL by the og:image rules (`publishedImageUrl`);
+- core adds `@id` (`<item address>#article`, on the item's own published address), `url`, `dateModified` from the item's `updated`, `isPartOf` the page's `#webpage` node, and `publisher` → the site's `#identity` node when a name resolves;
+- no headline (or no Site URL) → no node.
+
+**Reporting.** Export lists every item that leaves some of its mapped article fields empty as a `structuredData.warnings` entry `{ path, code: "emptyArticleFields", fields }` (core `emptyArticleFields` reads the fields the same way `articleNode` does), and every item whose collection no page lists (`noListingPage`) or several pages list without an anchor (`ambiguousListingPage`), by core `listingParentStatus`. Neither blocks the export; see `core-export.md` for how they are shown.
+
+**Adding a type** means a `FIELD_RULES` entry, a builder registered in `GRAPH_BUILDERS` (`builders.js`), and a content model that can actually supply the type's required fields. Existing projects keep their copied schema until they apply a theme update, so a new mapping ships to them through the theme's `updates/<version>/` folder, as Arch's News block does in `updates/0.9.10`.
 
 ---
 
@@ -127,13 +253,15 @@ Mounted in `setupBuilderServer.js` as `projectScopedRouter.use("/collections", c
 
 When `hasItemPages: true` and the type ships a `template.liquid`, each item renders a standalone page one directory deep, so `news/my-post.html` coexists with a root `about.html`.
 
-**Depth model.** Root pages render with `outputPathPrefix: ""`; item pages render with `outputPathPrefix: "../"`. The pure helper `prefixInternalHref(href, outputPathPrefix)` (`packages/core/src/utils/linkPrefixer.js`) prepends the prefix to **relative** internal hrefs only — it leaves any URI scheme, protocol-relative (`//…`), anchor (`#…`), query-only (`?…`), and root-absolute (`/…`) href untouched. Menu links resolve through the render-engine `menuResolver.js` with the same depth awareness. Asset paths are rewritten on export: `/uploads/images/ → ../assets/images/`, `/uploads/files/ → ../assets/files/`.
+**Depth model.** On export/publish, the prefix comes from each file's output path (`outputPathPrefixFor` in `linkPrefixer.js`): one `../` per folder level, a non-default language folder included — `""` for root pages, `../` for item pages and homepage copies (`page/2.html`) and for root pages in another language (`el/about.html`), `../../` for other paginated copies (`blog/page/2.html`) and another language's item pages; in-editor previews render every page — item pages included — at the preview root with `outputPathPrefix: ""`. The pure helper `prefixInternalHref(href, outputPathPrefix)` (`packages/core/src/utils/linkPrefixer.js`) prepends the prefix to **relative** internal hrefs only — it leaves any URI scheme, protocol-relative (`//…`), anchor (`#…`), query-only (`?…`), and root-absolute (`/…`) href untouched. Menu links resolve through the render-engine `menuResolver.js` with the same depth awareness. Theme Liquid that hand-writes an internal href goes through the `page_url` / `item_url` filters (`packages/core/src/filters/pageUrlFilter.js`), which read `globals.outputPathPrefix` and `globals.cleanUrls` (the project's Clean URLs setting, stamped on the shared globals before any widget template renders) and emit the right shape at the current depth — `{{ 'index' | page_url }}` is `./` / `../` when the setting is on and `index.html` / `../index.html` otherwise on a default-language page; it links within the rendering page's language, so on a Greek `el/about.html` it is `../el/` (or `../el/index.html`). Both globals stay readable for a link neither filter can build. Stored `/uploads/` paths are rewritten on export with the same prefix (`rewriteStoragePaths` in `exportController.js`), e.g. `/uploads/images/ → ../assets/images/` on an item page.
+
+**Link shape.** `packages/core/src/utils/internalHref.js` owns the two shapes: `rooms/suite.html`, or `rooms/suite` when Clean URLs is on; the clean home link is `./` at the root and `../` one level deep. Output file names are always `.html`. Both helpers take the target's `{ language, defaultLanguage }`: a non-default language's content lives under its code (`el/rooms/suite.html`, clean home `el/`), and since `outputPathPrefix` is the rendering page's own depth, folder included, a cross-language link is plain prefixing. Every storage key and output path is built by `packages/core/src/utils/contentAddress.js` the same way; no caller spells `pages/<lang>/` itself.
 
 **Page-shaped object** (`buildCollectionItemPageData`): `id = "{slugPrefix}-{slug}"`, `slug = "{slugPrefix}/{slug}"`, `name` from the `usedAsTitle` field, plus a per-item `seo` object at parity with page SEO. The five author-editable SEO fields are `description`, `og_title`, `og_image`, `canonical_url`, and `robots` (defaulting to `index,follow`); `shapeItemSeo` also fills the non-UI defaults `og_type: "article"` and `twitter_card: "summary"`. This lets item pages flow through the same layout, SEO, sitemap, and markdown-export paths as regular pages.
 
-**Render helpers** (`renderingService.js`): `buildCollectionRenderDeps({ storage, scope })` assembles the lazy collection capability (`buildCollectionItemsLoader`, `getCollectionSchemas`, `loadCollectionItemsByUuid`); `renderCollectionItemPageWithDeps(deps, args)` renders one item page (injecting `prepareItem: prepareCollectionItemForRender`, `buildItemPageData: buildCollectionItemPageData`). Export is fail-fast on a bad item; a multi-tenant host that streams publishes may instead warn-and-skip an invalid item (or a `hasItemPages` type with no template) so one bad record can't fail the whole publish.
+**Render helpers** (`renderingService.js`): `buildCollectionRenderDeps({ storage, scope })` assembles the lazy collection capability (`buildCollectionItemsLoader`, `getCollectionSchemas`, `loadCollectionItemsByUuid` — which spans every language, since a link may target an item in any of them, and whose entries carry `language`); `renderCollectionItemPageWithDeps(deps, args)` renders one item page (injecting `prepareItem: prepareCollectionItemForRender`, `buildItemPageData: buildCollectionItemPageData`). Export is fail-fast on a bad item; a multi-tenant host that streams publishes may instead warn-and-skip an invalid item (or a `hasItemPages` type with no template) so one bad record can't fail the whole publish.
 
-**Export output:** `{outputDir}/{slugPrefix}/{slug}.html` (+ an optional `{slug}.md` markdown alternate), included in the sitemap.
+**Export output:** `{outputDir}/{slugPrefix}/{slug}.html`, or `{outputDir}/{lang}/{slugPrefix}/{slug}.html` for a non-default language (+ an optional `{slug}.md` markdown alternate), included in the sitemap.
 
 ---
 
@@ -141,8 +269,10 @@ When `hasItemPages: true` and the type ships a `template.liquid`, each item rend
 
 **Limits** (via the `LimitsAdapter` over `scope`; OSS `LocalLimitsAdapter` returns `Infinity`, hosted `CloudLimitsAdapter` returns finite tier ceilings — see [Cross-Tenant Safety](core-security.md#11-cross-tenant-safety-multi-tenant-host-contract)):
 
-- **`MAX_COLLECTION_ITEMS`** — enforced in `createItem`: at or over the cap returns `422`. This is the per-collection DoS ceiling that bounds export-time enumeration.
+- **`MAX_COLLECTION_ITEMS`** — enforced on create, duplicate and language version, counting the collection's items across every language: at or over the cap returns `422`. This is the per-collection DoS ceiling that bounds export-time enumeration.
 - **`MAX_COLLECTIONS`** — a reserved per-project collection-type ceiling. Because types are theme-seeded (no create-type API), there is no creation endpoint to gate; the key exists for hosts that bound seeding/import.
+
+The item slug `index` is reserved (`rooms/index.html` would answer as the collection directory itself, `/rooms/`, as well as `/rooms/index`), and so is `page` (it would sit at `rooms/page` beside a paginated copy `rooms/page/2`); an existing item with either slug keeps saving in place. `home` is special only for pages (a site root) and is an ordinary item slug.
 
 **Sanitization** runs on every item write and again at render (`prepareCollectionItemForRender`), reusing the page pipeline: DOMPurify for `richtext`, `sanitizeImagePath` (strict `/uploads/images/…`) for each `gallery` entry and required-field image validation, `sanitizeImageSettingValue` for plain `image` fields, `sanitizeHref` for `link` fields, per-column sanitization for `table` (blank rows + undeclared keys dropped), and `YYYY-MM-DD` coercion for `date`. After sanitizing, `prepareCollectionItemForRender` calls `resolveRichtextMediaInSettings` (`packages/core/src/utils/richtextMedia.js`) with the render mode's `mediaBasePaths` so embedded `<img>`/file references in `richtext` fields resolve to the served base (preview → live media URL, publish → `assets/`) without the theme author wiring anything in the template. It then calls `resolveRichtextLinksInSettings` (`packages/core/src/utils/richtextLinks.js`) to resolve stable internal-link refs embedded in richtext anchors (`data-page-uuid` / `data-collection-item-uuid`) to their current slugs — depth-aware, clearing dangling refs — the richtext analogue of the structured `link` resolution above. See [Link & URL Safety](core-security.md#12-link--url-safety).
 

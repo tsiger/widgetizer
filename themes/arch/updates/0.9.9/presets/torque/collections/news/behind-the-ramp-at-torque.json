@@ -1,0 +1,11 @@
+{
+  "slug": "behind-the-ramp-at-torque",
+  "schemaVersion": 1,
+  "settings": {
+    "title": "Behind the Ramp With the Torque Team",
+    "date": "2026-04-09",
+    "excerpt": "The diagnostics that look like magic to a customer are usually one stubborn technician and a lot of patience.",
+    "body": "<p>Customers sometimes think a fault code tells us exactly what is wrong. It rarely does. It tells us where to start looking, like a smoke alarm tells you there is a fire somewhere in the building but not which room.</p><p>Last month an intermittent stall had us stumped for two days. Sam ended up driving the car himself, morning and evening, until it finally faltered with the diagnostic gear plugged in. A corroded connector, hidden behind a panel, was the answer. No code points straight at a green-crusted plug under a trim piece.</p><h2>The part nobody sees</h2><p>That is the part of the job nobody sees: the quiet, methodical hunting that turns a vague complaint into a fixed car. For every job that is a quick read-and-replace, there is one like the stall that only gives itself up to patience.</p><ul><li>When it happens: cold start, motorway, or stop-start traffic</li><li>What it sounds, smells, or feels like</li><li>Whether a warning light comes on at the same moment</li></ul><p>The reason those details matter is that an intermittent fault is only catchable when it actually happens. The more precisely you can describe the moment it goes wrong, the better our chance of being there, gear connected, when it does. A fault that shows up once a week is a different hunt from one that shows up every cold morning.</p><p>It is also why we would rather you tell us everything, even the detail that seems silly. The smell, the noise, the exact moment it happens. It all narrows the search, and the silly-sounding clue is often the one that cracks it.</p>",
+    "featured_image": "/uploads/images/torque-news-behind-the-ramp-at-torque.webp"
+  }
+}

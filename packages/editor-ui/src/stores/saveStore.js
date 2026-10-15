@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { isEqual } from "lodash";
 import { savePageContent } from "../queries/pageManager";
 import { saveGlobalWidget } from "../queries/previewManager";
 import { invalidateMediaCache } from "../queries/mediaManager";
@@ -13,39 +14,101 @@ import useStaleProjectStore from "./staleProjectStore";
  * Provides both manual and automatic (60-second debounced) saving capabilities.
  */
 
+const BASE_AUTOSAVE_DELAY_MS = 60000;
+const MAX_AUTOSAVE_DELAY_MS = 600000;
+
+function autosaveDelay(failureCount) {
+  return Math.min(BASE_AUTOSAVE_DELAY_MS * 2 ** failureCount, MAX_AUTOSAVE_DELAY_MS);
+}
+
+// The saved baselines (pageStore's originalPage / originalGlobalWidgets) are JSON
+// round trips, the same form a save sends. The live value is compared in that form
+// too: a key holding `undefined` is gone once saved, and lodash's isEqual would
+// otherwise count it as a difference that no save can ever clear.
+const asSaved = (value) => (value === undefined ? undefined : JSON.parse(JSON.stringify(value)));
+const matchesSaved = (current, saved) => isEqual(asSaved(current), saved);
+
 const useAutoSave = create((set, get) => ({
   // State
   isSaving: false,
   isAutoSaving: false,
   lastSaved: null,
+  // Set when a save moved a collection's listing anchor onto this page; read and
+  // cleared by a mounted component, which has the i18n provider this store does not.
+  listingAnchorMoved: null,
+  // Set when the server saved the content but could not update its image-usage
+  // records. The save SUCCEEDED — this is not a failure, and must not be shown as
+  // one; it only means the media library may label a file wrongly until a refresh.
+  // Announced by a mounted component, same as listingAnchorMoved.
+  mediaUsageStale: null,
+  // Saving is off until this editing session ends, because retrying cannot work:
+  // the language this editor is in no longer exists. Stopping the timer once is not
+  // enough — the autosave tick reschedules itself, and every edit re-arms it, so a
+  // stopped timer came straight back and hammered the server with doomed saves.
+  // Cleared when the editor loads a page (a new session) or on reset().
+  savingSuspended: false,
   modifiedWidgets: new Set(),
   structureModified: false,
   themeSettingsModified: false,
   autoSaveInterval: null,
+  runningSave: null,
+  queuedFollowUp: null,
+  saveGeneration: 0,
+  autoSaveFailureCount: 0,
+  // A theme save found the settings changed elsewhere; the edits were kept on
+  // top of the server's copy, still unsaved, and the next save sends them.
+  // Announced by a mounted component, same as listingAnchorMoved.
+  themeConflict: null,
 
   // Computed
-  hasUnsavedChanges: () => {
-    const { modifiedWidgets, structureModified, themeSettingsModified } = get();
+  // The PAGE's own dirtiness — its widgets, its structure, its header and
+  // footer. Theme settings are the site's, not this page's, so the marker
+  // beside a page name must not light up for them.
+  hasUnsavedPageChanges: () => {
+    const { modifiedWidgets, structureModified } = get();
 
     // Check explicit modification flags first (fast path)
-    if (modifiedWidgets.size > 0 || structureModified || themeSettingsModified) {
+    if (modifiedWidgets.size > 0 || structureModified) {
       return true;
     }
 
     // Check if page state differs from saved state (catches undo/redo changes)
     const pageStore = usePageStore.getState();
-    const { page, originalPage } = pageStore;
+    const { page, originalPage, globalWidgets, originalGlobalWidgets } = pageStore;
 
-    if (page && originalPage && JSON.stringify(page) !== JSON.stringify(originalPage)) {
+    if (page && originalPage && !matchesSaved(page, originalPage)) {
       return true;
     }
 
-    // Check theme settings via themeStore (canonical owner)
-    if (useThemeStore.getState().hasUnsavedThemeChanges()) {
+    // Same idea for header/footer — modifiedWidgets Set membership alone
+    // can't tell "still dirty from before a save" apart from "re-dirtied by a
+    // fresh edit while that save's request was still in flight" (re-adding an
+    // id already present is a no-op), so this value-based diff is the only
+    // reliable signal for that race.
+    if (
+      globalWidgets.header &&
+      originalGlobalWidgets.header &&
+      !matchesSaved(globalWidgets.header, originalGlobalWidgets.header)
+    ) {
+      return true;
+    }
+    if (
+      globalWidgets.footer &&
+      originalGlobalWidgets.footer &&
+      !matchesSaved(globalWidgets.footer, originalGlobalWidgets.footer)
+    ) {
       return true;
     }
 
     return false;
+  },
+
+  // Anything unsaved at all: what the Save button, auto-save and the
+  // leave-the-page guard ask about.
+  hasUnsavedChanges: () => {
+    if (get().hasUnsavedPageChanges() || get().themeSettingsModified) return true;
+    // Theme settings via themeStore (canonical owner)
+    return useThemeStore.getState().hasUnsavedThemeChanges();
   },
 
   // Actions
@@ -53,7 +116,7 @@ const useAutoSave = create((set, get) => ({
     const { modifiedWidgets, resetAutoSaveTimer } = get();
     const newSet = new Set(modifiedWidgets);
     newSet.add(widgetId);
-    set({ modifiedWidgets: newSet });
+    set({ modifiedWidgets: newSet, autoSaveFailureCount: 0 });
     resetAutoSaveTimer();
   },
 
@@ -64,9 +127,62 @@ const useAutoSave = create((set, get) => ({
     set({ modifiedWidgets: newSet });
   },
 
+  // Diffs the current page/global-widget content against the last-saved
+  // baseline and reconciles modifiedWidgets to match — the one place that
+  // handles dirtiness NOT introduced through markWidgetModified (undo/redo,
+  // called by EditorTopBar's safeUndo/safeRedo after the temporal jump).
+  // Unlike markWidgetModified, this can also CLEAR a widget's dirty flag
+  // (when undo reverts it back to exactly its saved state).
+  reconcileModifiedWidgets: () => {
+    const { page, originalPage, globalWidgets, originalGlobalWidgets } = usePageStore.getState();
+
+    // Built as one pass into a single Set + one set() call (rather than
+    // per-id markWidgetModified/markWidgetUnmodified round-trips, each of
+    // which would rebuild the Set and re-arm the autosave timer).
+    const next = new Set(get().modifiedWidgets);
+
+    const savedFormPage = page ? asSaved(page) : null;
+    if (savedFormPage && originalPage) {
+      const ids = new Set([...Object.keys(savedFormPage.widgets ?? {}), ...Object.keys(originalPage.widgets ?? {})]);
+      for (const id of ids) {
+        if (!isEqual(savedFormPage.widgets?.[id], originalPage.widgets?.[id])) {
+          next.add(id);
+        } else {
+          next.delete(id);
+        }
+      }
+    }
+
+    for (const key of ["header", "footer"]) {
+      if (!matchesSaved(globalWidgets[key], originalGlobalWidgets[key])) {
+        next.add(key);
+      } else {
+        next.delete(key);
+      }
+    }
+
+    set({ modifiedWidgets: next });
+
+    // Arm the autosave timer once, for ANY dirtiness this reconcile can see —
+    // not just the per-widget ledger. Differences that live outside any
+    // widget's content leave `next` untouched, yet hasUnsavedChanges()
+    // correctly reads them as dirty: structure-only page changes
+    // (widgetsOrder, page settings) via its whole-page diff, and theme
+    // settings via themeStore's canonical diff (undo/redo restores them
+    // through syncThemeStoreFromSnapshot). Without those, an undone/redone
+    // reorder or theme edit sits unsaved until the next content edit happens
+    // to re-arm the timer — save() persists both (hasPageDiff / hasThemeDrift).
+    const hasPageDiff = savedFormPage && originalPage && !isEqual(savedFormPage, originalPage);
+    if (next.size > 0 || hasPageDiff || useThemeStore.getState().hasUnsavedThemeChanges()) {
+      set({ autoSaveFailureCount: 0 });
+      get().resetAutoSaveTimer();
+    }
+  },
+
   setStructureModified: (modified) => {
     set({ structureModified: modified });
     if (modified) {
+      set({ autoSaveFailureCount: 0 });
       get().resetAutoSaveTimer();
     }
   },
@@ -74,115 +190,382 @@ const useAutoSave = create((set, get) => ({
   setThemeSettingsModified: (modified) => {
     set({ themeSettingsModified: modified });
     if (modified) {
+      set({ autoSaveFailureCount: 0 });
       get().resetAutoSaveTimer();
     }
   },
 
   save: async (isAuto = false) => {
-    const { modifiedWidgets, structureModified, themeSettingsModified, hasUnsavedChanges } = get();
-    const pageStore = usePageStore.getState();
-    const { page, globalWidgets } = pageStore;
-    const themeStore = useThemeStore.getState();
-    const themeSettings = themeStore.settings;
+    const { runningSave, queuedFollowUp } = get();
 
-    if (!hasUnsavedChanges()) return;
+    // A save is already executing: coalesce into a single queued follow-up
+    // instead of overlapping OR silently no-oping — every caller who arrives
+    // during this window awaits the SAME next run and gets its real outcome,
+    // rather than a repeated click racing the in-flight request or being
+    // dropped on the floor with no signal either way.
+    if (runningSave) {
+      if (queuedFollowUp) {
+        // A manual caller joining an already-queued follow-up upgrades its
+        // flavor to manual — the follow-up hasn't started yet (its `.isAuto`
+        // is read only when the running save settles), and a manual caller
+        // relies on the manual failure contract (a rejection reaching its
+        // .catch), which an autosave-flavored run would swallow into
+        // `{ status: "failed" }`. The reverse (an autosave joining a
+        // manual-flavored follow-up) keeps manual: the autosave tick maps a
+        // resulting throw back to "failed" itself (see resetAutoSaveTimer).
+        if (!isAuto) queuedFollowUp.isAuto = false;
+        return queuedFollowUp.promise;
+      }
+      const followUp = { isAuto };
+      // `followUp.isAuto` is read at execution time, not captured now — a
+      // later caller with manual flavor may have upgraded it (above).
+      followUp.promise = runningSave.then(
+        () => get().save(followUp.isAuto),
+        () => get().save(followUp.isAuto),
+      );
+      set({ queuedFollowUp: followUp });
+      return followUp.promise;
+    }
 
-    if (isAuto) {
-      set({ isAutoSaving: true });
+    // Nothing can be saved in a language that is gone; the curtain has already
+    // explained that. Refusing here keeps a retry from re-issuing a doomed request
+    // and keeps the failure counter and backoff out of it entirely.
+    if (get().savingSuspended) return { status: "suspended" };
+
+    if (!get().hasUnsavedChanges()) return { status: "clean" };
+
+    // Captured now so a reset() that fires while this save is in flight can
+    // be detected before any write-back below applies — see reset()'s comment.
+    const myGeneration = get().saveGeneration;
+
+    // Guards against a run that settles synchronously (e.g. the
+    // PROJECT_MISMATCH pre-check below throws before this IIFE's first real
+    // await, so its finally can execute before `set({ runningSave: run })`
+    // ever runs). Without this flag, that finally would clear `runningSave`
+    // first and the later `set({ runningSave: run })` would then wedge an
+    // already-settled promise into the slot forever — the next save()
+    // coalesces onto it and its follow-up resolves to itself, throwing.
+    let installed = false;
+    let settledBeforeInstall = false;
+
+    const run = (async () => {
+      const { modifiedWidgets, structureModified, themeSettingsModified } = get();
+      const pageStore = usePageStore.getState();
+      const { page, globalWidgets } = pageStore;
+      const themeStore = useThemeStore.getState();
+      const themeSettings = themeStore.settings;
+
+      try {
+        const activeProject = useProjectStore.getState().activeProject;
+        const loadedProjectId = pageStore.loadedProjectId;
+
+        if (activeProject && loadedProjectId && activeProject.id !== loadedProjectId) {
+          const mismatchError = new Error("Project mismatch");
+          mismatchError.code = "PROJECT_MISMATCH";
+          throw mismatchError;
+        }
+
+        // Phase 1: mismatch-guarded writes (page content + global widgets)
+        const guardedPromises = [];
+
+        // Set membership alone can miss a widget re-edited (to the SAME id)
+        // while its own prior save was still in flight — re-adding an id
+        // already present is a no-op, so the Set never reflects that a fresh
+        // edit landed. Gate on a value-diff too (mirroring hasPageDiff below),
+        // or that re-edit would silently never get sent.
+        const hasHeaderDiff =
+          globalWidgets.header && pageStore.originalGlobalWidgets.header
+            ? !matchesSaved(globalWidgets.header, pageStore.originalGlobalWidgets.header)
+            : false;
+        const hasFooterDiff =
+          globalWidgets.footer && pageStore.originalGlobalWidgets.footer
+            ? !matchesSaved(globalWidgets.footer, pageStore.originalGlobalWidgets.footer)
+            : false;
+
+        // Kept so their responses can be read: a header-only save carries its
+        // "saved, but image tracking is behind" warning here and nowhere else.
+        // Discarding these results lost that warning entirely for globals.
+        const globalSaves = [];
+
+        if (globalWidgets.header && (modifiedWidgets.has("header") || hasHeaderDiff)) {
+          const headerSave = saveGlobalWidget("header", globalWidgets.header, page?.language);
+          globalSaves.push(headerSave);
+          guardedPromises.push(headerSave);
+        }
+
+        if (globalWidgets.footer && (modifiedWidgets.has("footer") || hasFooterDiff)) {
+          const footerSave = saveGlobalWidget("footer", globalWidgets.footer, page?.language);
+          globalSaves.push(footerSave);
+          guardedPromises.push(footerSave);
+        }
+
+        const hasPageWidgetChanges = [...modifiedWidgets].some((id) => id !== "header" && id !== "footer");
+        const hasPageDiff = page && pageStore.originalPage ? !matchesSaved(page, pageStore.originalPage) : false;
+        // Kept separately from the fan-out so its response can be read: the
+        // server reports which page it took a listing anchor from, if any.
+        let pageSave = null;
+        if (page && (hasPageWidgetChanges || structureModified || hasPageDiff)) {
+          pageSave = savePageContent(page.id, page);
+          guardedPromises.push(pageSave);
+        }
+
+        await Promise.all(guardedPromises);
+        // Read the page response here, not after the generation check below:
+        // awaiting a settled promise still yields, and a reset landing in that
+        // gap would slip past the guard it is supposed to be caught by.
+        const pageSaveResult = pageSave ? await pageSave : null;
+        // Settled above by the same Promise.all, so these are already resolved.
+        const globalSaveResults = await Promise.all(globalSaves);
+
+        // A reset() (discard-and-leave) during Phase 1: the theme draft in force
+        // now is not the one this save was asked to send, so send none.
+        if (get().saveGeneration !== myGeneration) {
+          return { status: "abandoned" };
+        }
+
+        // Phase 2: theme settings via themeStore's canonical save path. It sends
+        // only the changed settings, takes the server's copy, and keeps the undo
+        // history in step with what the server stored.
+        const hasThemeDrift = themeStore.hasUnsavedThemeChanges();
+        let themeUsageStale = false;
+        let themeConflict = false;
+        let themeEditsDropped = false;
+        if ((themeSettingsModified || hasThemeDrift) && themeSettings && activeProject) {
+          const themeResult = await useThemeStore.getState().saveSettings(activeProject.id);
+          if (get().saveGeneration !== myGeneration) {
+            // Discarded mid-flight. The submitted values DID reach the server, and
+            // no local state can undo that. themeStore normally takes the server's
+            // copy in place of the discarded draft itself (reading it back when the
+            // whole-file fallback returns none). This is a safety net for a result
+            // it did not adopt: read the server back here — only while nothing has
+            // edited the theme since the discard, because the editor the user is
+            // now looking at stays editable throughout.
+            const themeNow = useThemeStore.getState();
+            if (
+              themeResult &&
+              !themeResult.adopted &&
+              themeNow.loadedProjectId === activeProject.id &&
+              themeNow.isDraftDiscarded?.()
+            ) {
+              await themeNow.reconcileFromServer(activeProject.id, themeNow.settings);
+            }
+          } else {
+            // "Image tracking is behind" changed nothing about the settings; it is
+            // announced, not treated as a correction.
+            themeUsageStale = !!themeResult?.warnings?.some((w) => w?.code === "MEDIA_USAGE_STALE");
+            themeConflict = !!themeResult?.conflict;
+            themeEditsDropped = !!themeResult?.warnings?.some(
+              (w) => w?.code === "SETTING_REMOVED" || w?.code === "SETTING_AMBIGUOUS",
+            );
+          }
+        }
+
+        // Invalidate media cache since page saves update media usage tracking
+        if (activeProject) {
+          invalidateMediaCache(activeProject.id);
+        }
+
+        // A reset() (discard-and-leave) fired while the above was in flight —
+        // the content just sent is exactly what the user chose to discard.
+        // Skip every write-back below; nothing here should apply.
+        if (get().saveGeneration !== myGeneration) {
+          return { status: "abandoned" };
+        }
+
+        // Clear only the widget ids this save actually attempted (the
+        // `modifiedWidgets` snapshot captured at entry), not whatever the live
+        // set holds now — an edit landing on a widget while the awaits above
+        // were still in flight isn't included in what was just saved, and must
+        // stay flagged dirty so hasUnsavedChanges() doesn't wrongly read clean
+        // (a caller gating on it — e.g. an embedding shell's save-and-publish
+        // flow — would otherwise publish without that edit).
+        set((state) => {
+          const remaining = new Set(state.modifiedWidgets);
+          for (const id of modifiedWidgets) remaining.delete(id);
+          return {
+            modifiedWidgets: remaining,
+            structureModified: false,
+            themeSettingsModified: false,
+            lastSaved: new Date(),
+            // One page per collection can be its listing anchor, and the server
+            // moves it on save. Recorded as data for a mounted component to
+            // announce: this store has no i18n provider and must never fail a
+            // completed save over a message.
+            listingAnchorMoved: pageSaveResult?.listingAnchorMovedFrom?.length
+              ? { pages: pageSaveResult.listingAnchorMovedFrom }
+              : state.listingAnchorMoved,
+            // Any of the three can carry it: a header-only save reports it on the
+            // global response, and theme settings on theirs.
+            mediaUsageStale: [pageSaveResult, ...globalSaveResults].some((result) =>
+              result?.warnings?.some((w) => w?.code === "MEDIA_USAGE_STALE"),
+            ) || themeUsageStale
+              ? { at: Date.now() }
+              : state.mediaUsageStale,
+            themeConflict: themeConflict ? { at: Date.now(), editsDropped: themeEditsDropped } : state.themeConflict,
+          };
+        });
+
+        if (page) {
+          pageStore.setOriginalPage(page);
+        }
+        // Rebaseline against the ENTRY-time globalWidgets snapshot (what this
+        // save actually sent), not the live pageStore state — if header/footer
+        // was edited again while the awaits above were in flight, the live
+        // state has already moved past this snapshot, so the next
+        // hasUnsavedChanges() check correctly sees a fresh diff instead of
+        // wrongly reading clean.
+        pageStore.setOriginalGlobalWidgets(globalWidgets);
+
+        // Not a failure: the theme edits are kept, still unsaved, and the next
+        // save sends them against the server's current copy.
+        return { status: themeConflict ? "conflict" : "success" };
+      } catch (err) {
+        // Mirrors the success path's generation check above: a reset() that
+        // fired while this save was in flight means the user has already
+        // discarded/moved on before this rejection even arrived. Whether the
+        // request ultimately succeeded or failed is now irrelevant — an
+        // abandoned generation's outcome must not touch current-generation
+        // state (no markStale, no stopAutoSave, no failure-count bump, no
+        // throw to a manual caller who has already moved past this save).
+        if (get().saveGeneration !== myGeneration) {
+          return { status: "abandoned" };
+        }
+        if (err.code === "PROJECT_MISMATCH") {
+          // Another tab took over the singleton active project. Surface the loud
+          // stale-project curtain (the OSS shell renders it) and stop hammering the
+          // server with doomed auto-saves. The tab recovers on reload, or when the
+          // user re-activates this project elsewhere (focus revalidation clears it).
+          useStaleProjectStore.getState().markStale();
+          get().stopAutoSave();
+          return { status: "mismatch" };
+        }
+        if (err.code === "LANGUAGE_REMOVED") {
+          // The language this editor is working in was removed from the site, so
+          // the server refused and wrote nothing. Same handling as the mismatch
+          // above and for the same reason: retrying cannot succeed, and the edits
+          // must not be discarded — nothing below this branch clears them. The
+          // curtain explains the one thing that differs, which is that there is
+          // nowhere left to save this work.
+          useStaleProjectStore.getState().markLanguageRemoved(err.data?.language ?? null);
+          set({ savingSuspended: true });
+          get().stopAutoSave();
+          return { status: "language-removed" };
+        }
+        // Manual saves rethrow so the caller can react to the failure —
+        // EditorTopBar's two manual-save callsites `.catch` the rejection and
+        // `console.error` it; autosave failures stay silent —
+        // interrupting the user mid-edit for a background retry would be
+        // worse than the failure itself — and are retried with backoff by
+        // resetAutoSaveTimer's tick instead.
+        if (!isAuto) throw err;
+        console.warn("[autosave] save failed, will retry:", err);
+        return { status: "failed", error: err };
+      } finally {
+        if (isAuto) {
+          set({ isAutoSaving: false });
+        } else {
+          set({ isSaving: false });
+        }
+        // Not identity-checked against `run`: nothing else can ever install a
+        // competing value here while this run is active — any other save()
+        // call during this window hits the coalescing branch above instead
+        // of creating an independent run — so `runningSave` can only ever be
+        // referring to this run by the time its own finally executes.
+        // Guarded on `installed`: if this finally is executing before the
+        // `set({ runningSave: run })` below has run at all (the synchronous-
+        // completion case), clearing here would just get overwritten by that
+        // pending installation — flag it instead and let the code right
+        // after `run`'s creation skip installing.
+        if (installed) {
+          set({ runningSave: null, queuedFollowUp: null });
+        } else {
+          settledBeforeInstall = true;
+        }
+      }
+    })();
+
+    if (settledBeforeInstall) {
+      // The run above already completed synchronously (its finally ran
+      // before we got here) — installing it now would wedge a settled
+      // promise in `runningSave` with nothing left to clear it.
+      set({ runningSave: null, queuedFollowUp: null });
     } else {
-      set({ isSaving: true });
-    }
-
-    try {
-      const activeProject = useProjectStore.getState().activeProject;
-      const loadedProjectId = pageStore.loadedProjectId;
-
-      if (activeProject && loadedProjectId && activeProject.id !== loadedProjectId) {
-        const mismatchError = new Error("Project mismatch");
-        mismatchError.code = "PROJECT_MISMATCH";
-        throw mismatchError;
-      }
-
-      // Phase 1: mismatch-guarded writes (page content + global widgets)
-      const guardedPromises = [];
-
-      if (globalWidgets.header && modifiedWidgets.has("header")) {
-        guardedPromises.push(saveGlobalWidget("header", globalWidgets.header));
-      }
-
-      if (globalWidgets.footer && modifiedWidgets.has("footer")) {
-        guardedPromises.push(saveGlobalWidget("footer", globalWidgets.footer));
-      }
-
-      const hasPageWidgetChanges = [...modifiedWidgets].some((id) => id !== "header" && id !== "footer");
-      const hasPageDiff =
-        page && pageStore.originalPage ? JSON.stringify(page) !== JSON.stringify(pageStore.originalPage) : false;
-      if (page && (hasPageWidgetChanges || structureModified || hasPageDiff)) {
-        guardedPromises.push(savePageContent(page.id, page));
-      }
-
-      await Promise.all(guardedPromises);
-
-      // Phase 2: theme settings via themeStore's canonical save path.
-      // This handles warning/correction reloads from the server automatically.
-      const hasThemeDrift = themeStore.hasUnsavedThemeChanges();
-      if ((themeSettingsModified || hasThemeDrift) && themeSettings && activeProject) {
-        await useThemeStore.getState().saveSettings(activeProject.id);
-      }
-
-      // Invalidate media cache since page saves update media usage tracking
-      if (activeProject) {
-        invalidateMediaCache(activeProject.id);
-      }
-
-      set({
-        modifiedWidgets: new Set(),
-        structureModified: false,
-        themeSettingsModified: false,
-        lastSaved: new Date(),
-      });
-
-      if (page) {
-        pageStore.setOriginalPage(page);
-      }
-
-      // Rebaseline undo history to the just-saved state (like page load does), so
-      // Undo can't step past the save into stale pre-save values and re-dirty the UI.
-      usePageStore.temporal.getState().clear();
-    } catch (err) {
-      if (err.code === "PROJECT_MISMATCH") {
-        // Another tab took over the singleton active project. Surface the loud
-        // stale-project curtain (the OSS shell renders it) and stop hammering the
-        // server with doomed auto-saves. The tab recovers on reload, or when the
-        // user re-activates this project elsewhere (focus revalidation clears it).
-        useStaleProjectStore.getState().markStale();
-        get().stopAutoSave();
-        return;
-      }
-      console.error("Failed to save:", err);
-    } finally {
+      installed = true;
+      set({ runningSave: run });
+      // The visible in-progress flag is set only AFTER `runningSave` is
+      // installed: zustand notifies .subscribe() listeners synchronously on
+      // set(), so a subscriber that reacted to isSaving/isAutoSaving by
+      // calling save() would re-enter right here — with the guard installed
+      // first, that re-entry hits the coalescing branch above instead of
+      // starting an independent, overlapping run. (Skipped entirely on the
+      // settledBeforeInstall path — the run's finally has already executed,
+      // so setting the flag now would wedge it true with nothing left to
+      // clear it.)
       if (isAuto) {
-        set({ isAutoSaving: false });
+        set({ isAutoSaving: true });
       } else {
-        set({ isSaving: false });
+        set({ isSaving: true });
       }
     }
+    return run;
   },
 
   resetAutoSaveTimer: () => {
-    const { autoSaveInterval } = get();
+    // One gate for all of them: markWidgetModified, setStructureModified,
+    // setThemeSettingsModified and the tick's own reschedule all arrive here, and
+    // each of them used to restart a timer that had deliberately been stopped.
+    if (get().savingSuspended) return;
+
+    const { autoSaveInterval, autoSaveFailureCount } = get();
 
     if (autoSaveInterval) {
       clearTimeout(autoSaveInterval);
     }
 
-    const timeout = setTimeout(() => {
-      const { hasUnsavedChanges } = get();
-      if (hasUnsavedChanges()) {
-        get().save(true);
-      }
+    const timeout = setTimeout(async () => {
+      // This timer already fired — nothing left to cancel for it
+      // specifically. Clear the tracked id immediately so a fresh edit's own
+      // resetAutoSaveTimer() call (which may run synchronously, or during
+      // the save() await below) can freely arm its own timer without any
+      // risk of this tick clobbering it afterward.
       set({ autoSaveInterval: null });
-    }, 60000);
+
+      if (get().hasUnsavedChanges()) {
+        let result;
+        try {
+          result = await get().save(true);
+        } catch (err) {
+          // The coalescing branch can hand this tick a manual-flavored
+          // follow-up (a user's own save was queued first, or upgraded the
+          // queued flavor), whose failure contract is a throw rather than
+          // `{ status: "failed" }`. Map it back so an inherited manual
+          // flavor can't become an unhandled rejection here, and the
+          // failure-count backoff below still advances.
+          result = { status: "failed", error: err };
+        }
+        if (result.status === "failed") {
+          set((s) => ({ autoSaveFailureCount: s.autoSaveFailureCount + 1 }));
+        } else if (result.status === "success" || result.status === "conflict") {
+          set({ autoSaveFailureCount: 0 });
+        } else if (
+          result.status === "mismatch" ||
+          result.status === "abandoned" ||
+          result.status === "language-removed" ||
+          result.status === "suspended"
+        ) {
+          // An intentional stop happened during this attempt (PROJECT_MISMATCH's
+          // own stopAutoSave(), or a reset() from discard-and-leave) — do not
+          // reschedule, that would defeat it.
+          return;
+        }
+      }
+
+      // Reschedule only if nothing else already armed a timer while the
+      // above was in flight (a fresh edit's own resetAutoSaveTimer() call).
+      if (get().autoSaveInterval == null && get().hasUnsavedChanges()) {
+        get().resetAutoSaveTimer();
+      }
+    }, autosaveDelay(autoSaveFailureCount));
 
     set({ autoSaveInterval: timeout });
   },
@@ -195,16 +578,57 @@ const useAutoSave = create((set, get) => ({
     }
   },
 
+  clearListingAnchorMoved: () => set({ listingAnchorMoved: null }),
+
+  clearMediaUsageStale: () => set({ mediaUsageStale: null }),
+
+  clearThemeConflict: () => set({ themeConflict: null }),
+
+  /**
+   * A new editing session: the editor has loaded a page, so saving applies again —
+   * and the banner saying it does not must go with it. The two are one fact, so
+   * they are cleared together; leaving the banner up over a page that saves fine is
+   * its own bug. A project-mismatch warning is deliberately untouched: that is about
+   * the tab, not this session.
+   */
+  resumeSaving: () => {
+    if (get().savingSuspended) set({ savingSuspended: false });
+    useStaleProjectStore.getState().clearLanguageRemoved();
+  },
+
   reset: () => {
-    const { stopAutoSave } = get();
+    const { stopAutoSave, saveGeneration } = get();
     stopAutoSave();
+    // Discard-and-leave ends the session too, so the language banner goes with it.
+    useStaleProjectStore.getState().clearLanguageRemoved();
+    // Put the theme draft back. Clearing the flags alone left the edited
+    // settings in the store, and a page load deliberately keeps a theme draft
+    // alive across navigations — so a discarded change came straight back the
+    // next time the editor opened. The page and its globals are refetched by
+    // the load itself, so this is the only draft that outlives the discard.
+    // discardDraft also marks the reverted draft, so a theme save still in
+    // flight takes the saved values rather than reverting them on top.
+    const themeStore = useThemeStore.getState();
+    if (typeof themeStore.discardDraft === "function") themeStore.discardDraft();
+    else themeStore.resetThemeSettings?.();
+    // isSaving/isAutoSaving/runningSave/queuedFollowUp are deliberately NOT
+    // force-cleared here. An in-flight save (if any) owns its own bookkeeping
+    // cleanup in its finally block regardless of generation — forcing them
+    // false while the real network request is still pending is what let a
+    // stale save race a fresh one. Bumping saveGeneration is what makes that
+    // in-flight save's eventual write-back a no-op; its own execution still
+    // runs to completion.
     set({
-      isSaving: false,
-      isAutoSaving: false,
+      saveGeneration: saveGeneration + 1,
       lastSaved: null,
+      listingAnchorMoved: null,
+      mediaUsageStale: null,
+      savingSuspended: false,
       modifiedWidgets: new Set(),
       structureModified: false,
       themeSettingsModified: false,
+      autoSaveFailureCount: 0,
+      themeConflict: null,
     });
   },
 }));

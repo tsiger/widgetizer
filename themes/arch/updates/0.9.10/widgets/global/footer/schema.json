@@ -1,0 +1,292 @@
+{
+  "type": "footer",
+  "displayName": "tTheme:footer.name",
+  "maxBlocks": 4,
+  "settings": [
+    {
+      "type": "header",
+      "id": "content_header",
+      "label": "tTheme:global.widgets.settings.content_header.label"
+    },
+    {
+      "type": "richtext",
+      "id": "copyright",
+      "label": "tTheme:footer.settings.copyright.label",
+      "default": "<p>© 2026 Widgetizer. All rights are yours to keep.</p>"
+    },
+    {
+      "type": "header",
+      "id": "display_header",
+      "label": "tTheme:global.widgets.settings.display_header.label"
+    },
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "tTheme:global.widgets.settings.layout.label",
+      "default": "first-featured",
+      "options": [
+        {
+          "value": "first-featured",
+          "label": "tTheme:contact_details.settings.layout.options.first_featured"
+        },
+        {
+          "value": "last-featured",
+          "label": "tTheme:contact_details.settings.layout.options.last_featured"
+        },
+        {
+          "value": "equal",
+          "label": "tTheme:contact_details.settings.layout.options.equal"
+        }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "color_scheme",
+      "label": "tTheme:global.widgets.settings.color_scheme.label",
+      "default": "highlight-primary",
+      "options": [
+        {
+          "value": "standard-primary",
+          "label": "tTheme:global.widgets.settings.color_scheme.options.standard_primary"
+        },
+        {
+          "value": "standard-secondary",
+          "label": "tTheme:global.widgets.settings.color_scheme.options.standard_secondary"
+        },
+        {
+          "value": "highlight-primary",
+          "label": "tTheme:global.widgets.settings.color_scheme.options.highlight_primary"
+        },
+        {
+          "value": "highlight-secondary",
+          "label": "tTheme:global.widgets.settings.color_scheme.options.highlight_secondary"
+        }
+      ]
+    }
+  ],
+  "blocks": [
+    {
+      "type": "logo_text",
+      "displayName": "tTheme:footer.blocks.logo_text.name",
+      "settings": [
+        {
+          "type": "text",
+          "id": "logo_text",
+          "label": "tTheme:footer.blocks.logo_text.settings.logo_text.label",
+          "default": "Widgetizer"
+        },
+        {
+          "type": "image",
+          "id": "logo",
+          "label": "tTheme:footer.blocks.logo_text.settings.logo.label"
+        },
+        {
+          "type": "range",
+          "id": "logo_width",
+          "label": "tTheme:footer.blocks.logo_text.settings.logo_width.label",
+          "min": 50,
+          "max": 300,
+          "step": 10,
+          "default": 100,
+          "unit": "px"
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "tTheme:footer.blocks.logo_text.settings.text.label",
+          "default": "<p>A leading company dedicated to delivering high-quality solutions.</p>"
+        }
+      ]
+    },
+    {
+      "type": "text_block",
+      "displayName": "tTheme:global.widgets.blocks.text_block.name",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "tTheme:global.widgets.blocks.text_block.settings.title.label",
+          "default": "Contact"
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "tTheme:global.widgets.blocks.text_block.settings.text.label",
+          "default": "<p>info@example.com</p><p>123 Main Street,<br>City, State 12345</p>"
+        }
+      ]
+    },
+    {
+      "type": "menu_block",
+      "displayName": "tTheme:global.widgets.blocks.menu_block.name",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "tTheme:global.widgets.blocks.menu_block.settings.title.label",
+          "default": "Links"
+        },
+        {
+          "type": "menu",
+          "id": "menu",
+          "label": "tTheme:global.widgets.blocks.menu_block.settings.menu.label",
+          "description": "tTheme:global.widgets.blocks.menu_block.settings.menu.description",
+          "default": "footer-menu"
+        }
+      ]
+    },
+    {
+      "type": "social_block",
+      "displayName": "tTheme:global.widgets.blocks.social_block.name",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "tTheme:global.widgets.blocks.social_block.settings.title.label",
+          "default": "Get in Touch"
+        }
+      ]
+    },
+    {
+      "type": "business_details",
+      "displayName": "tTheme:global.widgets.blocks.business_details.name",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "tTheme:global.widgets.blocks.business_details.settings.title.label",
+          "description": "tTheme:global.widgets.blocks.business_details.settings.title.description",
+          "default": "Visit Us"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_address",
+          "label": "tTheme:global.widgets.blocks.business_details.settings.show_address.label",
+          "default": true
+        },
+        {
+          "type": "checkbox",
+          "id": "show_contact",
+          "label": "tTheme:global.widgets.blocks.business_details.settings.show_contact.label",
+          "default": true
+        },
+        {
+          "type": "checkbox",
+          "id": "show_hours",
+          "label": "tTheme:global.widgets.blocks.business_details.settings.show_hours.label",
+          "default": true
+        }
+      ]
+    },
+    {
+      "type": "badges_block",
+      "displayName": "tTheme:footer.blocks.badges_block.name",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "tTheme:footer.blocks.badges_block.settings.title.label",
+          "default": "Certifications"
+        },
+        {
+          "type": "range",
+          "id": "max_height",
+          "label": "tTheme:footer.blocks.badges_block.settings.max_height.label",
+          "description": "tTheme:footer.blocks.badges_block.settings.max_height.description",
+          "min": 30,
+          "max": 80,
+          "step": 5,
+          "default": 50,
+          "unit": "px"
+        },
+        {
+          "type": "header",
+          "id": "badge_1_header",
+          "label": "tTheme:footer.blocks.badges_block.settings.badge_1_header.label"
+        },
+        {
+          "type": "image",
+          "id": "badge_1_image",
+          "label": "tTheme:footer.blocks.badges_block.settings.badge_image.label"
+        },
+        {
+          "type": "link",
+          "id": "badge_1_link",
+          "label": "tTheme:footer.blocks.badges_block.settings.badge_link.label"
+        },
+        {
+          "type": "header",
+          "id": "badge_2_header",
+          "label": "tTheme:footer.blocks.badges_block.settings.badge_2_header.label"
+        },
+        {
+          "type": "image",
+          "id": "badge_2_image",
+          "label": "tTheme:footer.blocks.badges_block.settings.badge_image.label"
+        },
+        {
+          "type": "link",
+          "id": "badge_2_link",
+          "label": "tTheme:footer.blocks.badges_block.settings.badge_link.label"
+        },
+        {
+          "type": "header",
+          "id": "badge_3_header",
+          "label": "tTheme:footer.blocks.badges_block.settings.badge_3_header.label"
+        },
+        {
+          "type": "image",
+          "id": "badge_3_image",
+          "label": "tTheme:footer.blocks.badges_block.settings.badge_image.label"
+        },
+        {
+          "type": "link",
+          "id": "badge_3_link",
+          "label": "tTheme:footer.blocks.badges_block.settings.badge_link.label"
+        },
+        {
+          "type": "header",
+          "id": "badge_4_header",
+          "label": "tTheme:footer.blocks.badges_block.settings.badge_4_header.label"
+        },
+        {
+          "type": "image",
+          "id": "badge_4_image",
+          "label": "tTheme:footer.blocks.badges_block.settings.badge_image.label"
+        },
+        {
+          "type": "link",
+          "id": "badge_4_link",
+          "label": "tTheme:footer.blocks.badges_block.settings.badge_link.label"
+        }
+      ]
+    }
+  ],
+  "defaultBlocks": [
+    {
+      "type": "logo_text",
+      "settings": {
+        "text": "<p>A leading company dedicated to delivering high-quality solutions.</p>"
+      }
+    },
+    {
+      "type": "text_block",
+      "settings": {
+        "title": "Contact",
+        "text": "<p>info@example.com</p><p>123 Main Street,<br>City, State 12345</p>"
+      }
+    },
+    {
+      "type": "menu_block",
+      "settings": {
+        "title": "Links"
+      }
+    },
+    {
+      "type": "social_block",
+      "settings": {
+        "title": "Get in Touch"
+      }
+    }
+  ]
+}

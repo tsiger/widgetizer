@@ -11,6 +11,7 @@ import useMediaState from "../useMediaState.js";
 const AUDIO = { id: "a", type: "audio/mpeg", originalName: "song.mp3", filename: "song.mp3" };
 const IMAGE = { id: "i", type: "image/png", originalName: "pic.png", filename: "pic.png" };
 const PDF = { id: "p", type: "application/pdf", originalName: "doc.pdf", filename: "doc.pdf" };
+const VIDEO = { id: "v", type: "video/mp4", originalName: "clip.mp4", filename: "clip.mp4" };
 
 afterEach(() => {
   localStorage.clear();
@@ -26,13 +27,22 @@ describe("useMediaState — type filter", () => {
     expect(result.current.filteredFiles).toEqual([AUDIO]);
   });
 
-  it("keeps 'file' meaning any non-image asset (audio + documents)", () => {
+  it("keeps 'file' meaning any non-image asset (audio + video + documents)", () => {
     const { result } = renderHook(() => useMediaState());
 
-    act(() => result.current.setFiles([AUDIO, IMAGE, PDF]));
+    act(() => result.current.setFiles([AUDIO, IMAGE, PDF, VIDEO]));
     act(() => result.current.setFilterType("file"));
 
-    expect(result.current.filteredFiles).toEqual([AUDIO, PDF]);
+    expect(result.current.filteredFiles).toEqual([AUDIO, PDF, VIDEO]);
+  });
+
+  it("filters to video-only when filterType is 'video'", () => {
+    const { result } = renderHook(() => useMediaState());
+
+    act(() => result.current.setFiles([AUDIO, IMAGE, PDF, VIDEO]));
+    act(() => result.current.setFilterType("video"));
+
+    expect(result.current.filteredFiles).toEqual([VIDEO]);
   });
 });
 

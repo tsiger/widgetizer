@@ -1,0 +1,13 @@
+{
+  "slug": "womens-cut-and-style",
+  "schemaVersion": 1,
+  "settings": {
+    "title": "Women's Cut and Style",
+    "icon": "razor",
+    "summary": "A consultation, cut, and finish shaped around your hair type and daily routine.",
+    "description": "<p>We talk through what you like and what you find fiddly before a single snip, then cut to suit your hair as it actually grows. The consultation matters as much as the cut, since it is where we learn how much time you really want to spend on your hair each morning.</p><h2>What is included</h2><p>Your appointment includes a wash, the cut itself, and a blow-dry so you leave with a finish you can copy at home. We shape the cut around your hair type, face, and daily routine rather than a one-size template.</p><ul><li>A consultation about your hair and your routine</li><li>A wash and a cut shaped to you</li><li>A blow-dry finish you can recreate</li></ul><p>As we blow-dry, we will show you how we are doing it, where to place the brush, which way to dry the roots, so the look is repeatable once you are home. If something feels hard to manage day to day, tell us and we will adjust the shape.</p><h3>Getting the most from it</h3><p>It suits all lengths and textures, from a simple trim to a fuller restyle. If you are growing your hair out, we can cut it so it stays tidy through the in-between stage rather than looking shapeless.</p><p>Bring a photo if you have one in mind, even a rough idea helps us picture what you are after. Most people come back every six to eight weeks to keep the shape, though that depends on your length and how fast your hair grows.</p>",
+    "price": "From $75",
+    "duration": "60 min",
+    "featured_image": "/uploads/images/shearline-services-womens-cut-and-style.webp"
+  }
+}

@@ -1,17 +1,48 @@
 import { useState, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { useForm } from "react-hook-form";
-import { ChevronDown, ChevronUp, ExternalLink, Check } from "lucide-react";
+import { ExternalLink, Check } from "lucide-react";
 import { apiFetch } from "@widgetizer/editor-ui/lib/apiFetch";
 import LoadingSpinner from "@widgetizer/editor-ui/components/ui/LoadingSpinner.jsx";
 import Button from "@widgetizer/editor-ui/components/ui/Button.jsx";
 import { formatSlug } from "@widgetizer/editor-ui/utils/slugUtils";
-import { isValidSiteUrl } from "@widgetizer/core/urlSafety";
+import { isValidSiteUrl, siteUrlHasQueryOrFragment } from "@widgetizer/core/urlSafety";
+import { identityKind } from "@widgetizer/core/siteIdentity";
+import { DEFAULT_LANGUAGE, SUPPORTED_LANGUAGES, nativeLanguageName, hreflangCase } from "@widgetizer/core/languages";
 import useToastStore from "@widgetizer/editor-ui/stores/toastStore";
 import { getThemePresets, getPresetScreenshotUrl } from "@widgetizer/editor-ui/queries/themeManager";
+import SiteIdentityFields from "./SiteIdentityFields.jsx";
+import LanguagesSection from "./LanguagesSection.jsx";
+import { identityToForm, formToIdentity, isBusinessIdentityError } from "./siteIdentityForm.js";
+
+const SHOW_FOLDER_NAME = false;
+
+const READINESS_TARGETS = {
+  siteUrl: { tab: "site", fieldId: "siteUrl" },
+  name: { tab: "identity", fieldId: "identity-publicName" },
+  logo: { tab: "identity", fieldId: "identity-logo" },
+  address: { tab: "business", fieldId: "identity-streetAddress" },
+};
+
+function toFormValues(initialData) {
+  return {
+    name: initialData.name || "",
+    folderName: initialData.folderName || initialData.id || "",
+    description: initialData.description || "",
+    siteTitle: initialData.siteTitle || "",
+    theme: initialData.theme || "",
+    siteUrl: initialData.siteUrl || "",
+    cleanUrls: initialData.cleanUrls || false,
+    defaultLanguage: initialData.defaultLanguage || DEFAULT_LANGUAGE,
+    receiveThemeUpdates: initialData.receiveThemeUpdates || false,
+    preset: "",
+    siteIdentity: identityToForm(initialData.siteIdentity),
+    logoFile: null,
+  };
+}
 
 export default function ProjectForm({
-  initialData = { name: "", description: "", siteTitle: "", theme: "", siteUrl: "" },
+  initialData = { name: "", description: "", siteTitle: "", theme: "", siteUrl: "", cleanUrls: false },
   onSubmit,
   isSubmitting,
   submitLabel = "Save",
@@ -23,8 +54,18 @@ export default function ProjectForm({
   const isNew = !initialData.id;
   const [themes, setThemes] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [showMoreSettings, setShowMoreSettings] = useState(false);
+  const [activeTab, setActiveTab] = useState("general");
   const showToast = useToastStore((state) => state.showToast);
+  const [identityErrors, setIdentityErrors] = useState([]);
+  // Not a form field: adding or removing a language writes content on the
+  // server the moment it is done, so it can neither wait for Save nor be
+  // undone by Cancel. Held here only to keep the section and the default
+  // language's lock in step with each other.
+  const [languages, setLanguages] = useState(initialData.languages || []);
+  // A language request in flight will decide whether the default is locked, and
+  // it answers about the language the SERVER holds — so the select stays put
+  // until it settles, or a change made in the meantime would be locked in.
+  const [languageBusy, setLanguageBusy] = useState(false);
 
   // Preset state
   const [presets, setPresets] = useState({ default: null, presets: [] });
@@ -39,16 +80,7 @@ export default function ProjectForm({
     watch,
     setValue,
   } = useForm({
-    defaultValues: {
-      name: initialData.name || "",
-      folderName: initialData.folderName || initialData.id || "",
-      description: initialData.description || "",
-      siteTitle: initialData.siteTitle || "",
-      theme: initialData.theme || "",
-      siteUrl: initialData.siteUrl || "",
-      receiveThemeUpdates: initialData.receiveThemeUpdates || false,
-      preset: "",
-    },
+    defaultValues: toFormValues(initialData),
   });
 
   // Watch name for auto-folder-name generation
@@ -89,7 +121,7 @@ export default function ProjectForm({
     });
     observer.observe(sentinel);
     return () => observer.disconnect();
-  }, [presets, themes, presetsLoading]);
+  }, [presets, themes, presetsLoading, activeTab]);
 
   // Track previous initialData to prevent infinite loops
   const prevInitialDataRef = useRef(JSON.stringify(initialData));
@@ -105,16 +137,7 @@ export default function ProjectForm({
   useEffect(() => {
     const currentInitialDataStr = JSON.stringify(initialData);
     if (prevInitialDataRef.current !== currentInitialDataStr) {
-      reset({
-        name: initialData.name || "",
-        folderName: initialData.folderName || initialData.id || "",
-        description: initialData.description || "",
-        siteTitle: initialData.siteTitle || "",
-        theme: initialData.theme || "",
-        siteUrl: initialData.siteUrl || "",
-        receiveThemeUpdates: initialData.receiveThemeUpdates || false,
-        preset: "",
-      });
+      reset(toFormValues(initialData));
       prevInitialDataRef.current = currentInitialDataStr;
     }
   });
@@ -183,31 +206,66 @@ export default function ProjectForm({
     }
   };
 
+  const identityValues = watch("siteIdentity");
+  const showBusinessTab =
+    identityKind({ category: identityValues?.category }) === "localBusiness" ||
+    identityErrors.some(isBusinessIdentityError);
+  const tabs = ["general", "site", "identity", ...(showBusinessTab ? ["business"] : [])];
+  const currentTab = tabs.includes(activeTab) ? activeTab : "identity";
+  const tabHasErrors = {
+    general: !!(errors.name || errors.theme || errors.folderName),
+    site: !!errors.siteUrl,
+    identity: identityErrors.some((error) => !isBusinessIdentityError(error)),
+    business: identityErrors.some(isBusinessIdentityError),
+  };
+
+  const goToField = (tab, fieldId) => {
+    setActiveTab(tab);
+    setTimeout(() => {
+      const field = document.getElementById(fieldId);
+      field?.scrollIntoView({ behavior: "smooth", block: "center" });
+      field?.focus();
+    });
+  };
+
+  const goToReadinessItem = (item) => {
+    const target = READINESS_TARGETS[item];
+    if (target) goToField(target.tab, target.fieldId);
+  };
+
+  const onInvalid = (formErrors) => {
+    if (formErrors.name || formErrors.theme || formErrors.folderName) setActiveTab("general");
+    else if (formErrors.siteUrl) setActiveTab("site");
+  };
+
   const onSubmitHandler = async (data) => {
     try {
+      const { siteIdentity: identityForm, logoFile, ...fields } = data;
       // Normalize siteUrl: trim and convert empty/whitespace to empty string
       const normalizedData = {
-        ...data,
+        ...fields,
         siteTitle: data.siteTitle && data.siteTitle.trim() !== "" ? data.siteTitle.trim() : "",
         siteUrl: data.siteUrl && data.siteUrl.trim() !== "" ? data.siteUrl.trim() : "",
       };
+
+      const { value, errors: identityProblems } = formToIdentity(identityForm);
+      setIdentityErrors(identityProblems);
+      if (identityProblems.length) {
+        setActiveTab(isBusinessIdentityError(identityProblems[0]) ? "business" : "identity");
+        showToast(t("forms.project.identity.errors.fixErrors"), "error");
+        return false;
+      }
+      normalizedData.siteIdentity = value;
+      if (isNew && logoFile) normalizedData.logoFile = logoFile;
 
       const result = await onSubmit(normalizedData);
 
       // If the parent component signals to reset the form
       if (result === true) {
-        reset({
-          name: "",
-          folderName: "",
-          description: "",
-          siteTitle: "",
-          theme: "",
-          siteUrl: "",
-          receiveThemeUpdates: false,
-          preset: "",
-        });
+        reset(toFormValues({}));
         setPresets({ default: null, presets: [] });
         setSelectedPreset(null);
+        setActiveTab("general");
       }
       return result;
     } catch (err) {
@@ -218,29 +276,228 @@ export default function ProjectForm({
 
   if (loading) return <LoadingSpinner message={t("forms.project.loadingThemes")} />;
 
-  return (
-    <form onSubmit={rhfHandleSubmit(onSubmitHandler)} className="space-y-6">
-      <input type="hidden" {...register("preset")} />
-      <div className="form-section">
-        <div className="max-w-xl space-y-4">
-          <div className="form-field">
-            <label htmlFor="name" className="form-label">
-              {t("forms.project.titleLabel")} <span className="text-pink-500">*</span>
-            </label>
-            <input
-              type="text"
-              id="name"
-              {...register("name", {
-                required: t("forms.project.titleRequired"),
-                validate: (value) => value.trim() !== "" || t("forms.project.nameNotEmpty"),
-              })}
-              className="form-input"
-            />
-            {errors.name && <p className="form-error">{errors.name.message}</p>}
-            <p className="form-description">{t("forms.project.titleHelp")}</p>
-          </div>
+  const nameField = (
+    <div className="form-field">
+      <label htmlFor="name" className="form-label">
+        {t("forms.project.titleLabel")} <span className="text-pink-500">*</span>
+      </label>
+      <input
+        type="text"
+        id="name"
+        {...register("name", {
+          required: t("forms.project.titleRequired"),
+          validate: (value) => value.trim() !== "" || t("forms.project.nameNotEmpty"),
+        })}
+        className="form-input"
+      />
+      {errors.name && <p className="form-error">{errors.name.message}</p>}
+      <p className="form-description">{t("forms.project.titleHelp")}</p>
+    </div>
+  );
 
-          {/* Theme field - shown for new projects before More Settings */}
+  const themeInfo = initialData.theme && (
+    <div className="form-field">
+      <label className="form-label">{t("forms.project.themeLabel")}</label>
+      <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+        <span className="font-medium">{initialData.themeName || initialData.theme}</span>
+        {initialData.themeVersion && (
+          <span className="px-2 py-0.5 bg-gray-100 dark:bg-gray-700 rounded text-xs">v{initialData.themeVersion}</span>
+        )}
+      </div>
+    </div>
+  );
+
+  const folderNameField = () => (
+    <div className="form-field">
+      <label htmlFor="folderName" className={isNew ? "form-label-optional" : "form-label"}>
+        {t("forms.project.folderNameLabel")} {!isNew && <span className="text-pink-500">*</span>}
+      </label>
+      <input
+        type="text"
+        id="folderName"
+        {...register("folderName", {
+          // A new project may leave it empty (e.g. a title with no Latin letters); the server picks one.
+          required: !isNew && t("forms.project.folderNameRequired"),
+          validate: (value) => isNew || value.trim() !== "" || t("forms.project.folderNameNotEmpty"),
+          pattern: {
+            value: /^[a-z0-9-]+$/,
+            message: t("forms.project.folderNamePattern"),
+          },
+        })}
+        className="form-input"
+      />
+      {errors.folderName && <p className="form-error">{errors.folderName.message}</p>}
+      <p className="form-description">{t("forms.project.folderNameHelp")}</p>
+    </div>
+  );
+
+  const notesField = () => (
+    <div className="form-field">
+      <label htmlFor="description" className="form-label-optional">
+        {t("forms.project.descriptionLabel")}
+      </label>
+      <textarea id="description" {...register("description")} rows="4" className="form-textarea" />
+      <p className="form-description">{t("forms.project.descriptionHelp")}</p>
+    </div>
+  );
+
+  const siteTitleField = () => (
+    <div className="form-field">
+      <label htmlFor="siteTitle" className="form-label-optional">
+        {t("forms.project.siteTitleLabel")}
+      </label>
+      <input type="text" id="siteTitle" {...register("siteTitle")} className="form-input" />
+      <p className="form-description">{t("forms.project.siteTitleHelp")}</p>
+    </div>
+  );
+
+  const siteUrlField = () => (
+    <div className="form-field">
+      <label htmlFor="siteUrl" className="form-label-optional">
+        {t("forms.project.siteUrlLabel")}
+      </label>
+      <input
+        type="text"
+        id="siteUrl"
+        {...register("siteUrl", {
+          validate: (value) =>
+            isValidSiteUrl(value) ||
+            // A query/fragment is the one rejection worth naming: the
+            // address is otherwise fine and the fix is to delete a bit.
+            (siteUrlHasQueryOrFragment(value)
+              ? t("forms.project.siteUrlNoQueryOrFragment")
+              : t("forms.project.siteUrlInvalid")) ||
+            "Please enter a valid URL (e.g., https://mysite.com)",
+        })}
+        className="form-input"
+        placeholder="https://mysite.com"
+      />
+      {errors.siteUrl && <p className="form-error">{errors.siteUrl.message}</p>}
+      <p className="form-description">{t("forms.project.siteUrlHelp")}</p>
+    </div>
+  );
+
+  const isMultilang = languages.length > 0;
+  const savedDefaultLanguage = initialData.defaultLanguage || DEFAULT_LANGUAGE;
+  // A stored regional code (pt-br) is valid but is not one of the offered base
+  // codes, and an option-less select would render blank.
+  const languageOptions = SUPPORTED_LANGUAGES.some(({ code }) => code === savedDefaultLanguage)
+    ? SUPPORTED_LANGUAGES
+    : [{ code: savedDefaultLanguage }, ...SUPPORTED_LANGUAGES];
+
+  const defaultLanguageField = () => (
+    <div className="form-field">
+      <label htmlFor="defaultLanguage" className="form-label">
+        {t("forms.project.languages.defaultLabel")}
+      </label>
+      <select
+        id="defaultLanguage"
+        {...register("defaultLanguage")}
+        className="form-select"
+        disabled={isMultilang || languageBusy}
+      >
+        {languageOptions.map(({ code }) => (
+          <option key={code} value={code}>
+            {nativeLanguageName(code)} ({hreflangCase(code)})
+          </option>
+        ))}
+      </select>
+    </div>
+  );
+
+  const checkboxField = (fieldName, labelKey, helpKey) => (
+    <div className="form-field">
+      <label className="flex items-center gap-3 cursor-pointer">
+        <input
+          type="checkbox"
+          {...register(fieldName)}
+          className="w-4 h-4 rounded border-gray-300 text-pink-500 focus:ring-pink-500"
+        />
+        <span className="form-label !mb-0">{t(labelKey)}</span>
+      </label>
+      <p className="form-description ml-7">{t(helpKey)}</p>
+    </div>
+  );
+
+  const identityProps = {
+    register,
+    watch,
+    setValue,
+    identityErrors,
+    project: initialData,
+    siteUrl: watch("siteUrl"),
+    siteTitle: watch("siteTitle"),
+    onGoTo: goToReadinessItem,
+    logoFile: watch("logoFile"),
+    onLogoFileChange: (file) => setValue("logoFile", file, { shouldDirty: true }),
+  };
+
+  const stickyBar = (
+    <>
+      <div
+        className={`sticky bottom-0 -mx-4 -mb-4 flex justify-end gap-2 border-t bg-white px-4 py-4 rounded-b-md z-10 transition-shadow duration-200 ${
+          isStickyBarStuck
+            ? "border-slate-200 shadow-[0_-12px_24px_-4px_rgba(15,23,42,0.18)] after:content-[''] after:absolute after:left-0 after:right-0 after:top-full after:h-10 after:bg-white"
+            : "border-transparent"
+        }`}
+      >
+        {onCancel && (
+          <Button type="button" onClick={onCancel} variant="secondary">
+            {t("forms.common.cancel")}
+          </Button>
+        )}
+        <Button type="submit" disabled={isSubmitting || !isDirtyProp} variant={isDirtyProp ? "dark" : "primary"}>
+          {isSubmitting ? t("forms.common.saving") : submitLabel}
+          {isDirtyProp && <span className="w-2 h-2 bg-pink-500 rounded-full -mt-2" />}
+        </Button>
+      </div>
+      <div ref={stickyBarSentinelRef} aria-hidden="true" className="h-px" />
+    </>
+  );
+
+  return (
+    <form onSubmit={rhfHandleSubmit(onSubmitHandler, onInvalid)} noValidate className="space-y-6">
+      {isNew && <input type="hidden" {...register("preset")} />}
+      <div
+        role="tablist"
+        aria-label={t("forms.project.tabs.label")}
+        className="flex flex-wrap gap-1 border-b border-slate-200"
+      >
+        {tabs.map((tab) => (
+          <button
+            key={tab}
+            type="button"
+            role="tab"
+            id={`project-tab-${tab}`}
+            aria-selected={currentTab === tab}
+            aria-controls={`project-panel-${tab}`}
+            onClick={() => setActiveTab(tab)}
+            className={`-mb-px flex items-center gap-2 border-b-2 px-4 py-2 text-sm font-medium transition-colors ${
+              currentTab === tab
+                ? "border-pink-500 text-pink-600"
+                : "border-transparent text-slate-600 hover:border-slate-300 hover:text-slate-800"
+            }`}
+          >
+            {t(`forms.project.tabs.${tab}`)}
+            {tabHasErrors[tab] && (
+              <span className="h-2 w-2 rounded-full bg-pink-500" title={t("forms.project.tabs.hasErrors")} />
+            )}
+          </button>
+        ))}
+      </div>
+
+      <div
+        role="tabpanel"
+        id="project-panel-general"
+        aria-labelledby="project-tab-general"
+        hidden={currentTab !== "general"}
+        className="form-section"
+      >
+        <div className="max-w-xl space-y-4">
+          {nameField}
+
+          {!isNew && themeInfo}
+
           {isNew && (
             <div className="form-field">
               <label htmlFor="theme" className="form-label">
@@ -249,7 +506,7 @@ export default function ProjectForm({
               <select
                 id="theme"
                 {...register("theme", {
-                  required: isNew ? t("forms.project.themeRequired") : false,
+                  required: t("forms.project.themeRequired"),
                 })}
                 className="form-select"
               >
@@ -266,7 +523,6 @@ export default function ProjectForm({
           )}
         </div>
 
-        {/* Preset selection - shown when theme has presets */}
         {isNew && presets.presets.length > 0 && (
           <div className="form-field">
             <label className="form-label">{t("forms.project.presetLabel")}</label>
@@ -310,7 +566,9 @@ export default function ProjectForm({
                     {preset.description && (
                       <p className="mt-2 text-center text-sm font-semibold leading-tight">{preset.description}</p>
                     )}
-                    <p className={`text-center text-xs text-slate-500 ${preset.description ? "" : "mt-2"}`}>{preset.name}</p>
+                    <p className={`text-center text-xs text-slate-500 ${preset.description ? "" : "mt-2"}`}>
+                      {preset.name}
+                    </p>
                     {preset.liveDemo && (
                       <a
                         href={preset.liveDemo}
@@ -336,125 +594,68 @@ export default function ProjectForm({
         )}
 
         <div className="max-w-xl space-y-4">
-          {/* Theme info for existing projects */}
-          {!isNew && initialData.theme && (
-            <div className="form-field">
-              <label className="form-label">{t("forms.project.themeLabel")}</label>
-              <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                <span className="font-medium">{initialData.themeName || initialData.theme}</span>
-                {initialData.themeVersion && (
-                  <span className="px-2 py-0.5 bg-gray-100 dark:bg-gray-700 rounded text-xs">
-                    v{initialData.themeVersion}
-                  </span>
-                )}
-              </div>
-            </div>
-          )}
-
-          {/* More Settings Toggle */}
-          <button
-            type="button"
-            onClick={() => setShowMoreSettings(!showMoreSettings)}
-            className="flex items-center gap-1 text-sm text-pink-500 hover:text-pink-700 mt-2 mb-4"
-          >
-            {showMoreSettings ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-            {t("forms.project.moreSettings")}
-          </button>
-
-          {/* Collapsible Settings */}
-          {showMoreSettings && (
-            <>
-              <div className="form-field">
-                <label htmlFor="folderName" className="form-label">
-                  {t("forms.project.folderNameLabel")} <span className="text-pink-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  id="folderName"
-                  {...register("folderName", {
-                    required: t("forms.project.folderNameRequired"),
-                    validate: (value) => value.trim() !== "" || t("forms.project.folderNameNotEmpty"),
-                    pattern: {
-                      value: /^[a-z0-9-]+$/,
-                      message: t("forms.project.folderNamePattern"),
-                    },
-                  })}
-                  className="form-input"
-                />
-                {errors.folderName && <p className="form-error">{errors.folderName.message}</p>}
-                <p className="form-description">{t("forms.project.folderNameHelp")}</p>
-              </div>
-
-              <div className="form-field">
-                <label htmlFor="description" className="form-label-optional">
-                  {t("forms.project.descriptionLabel")}
-                </label>
-                <textarea id="description" {...register("description")} rows="4" className="form-textarea" />
-                <p className="form-description">{t("forms.project.descriptionHelp")}</p>
-              </div>
-
-              <div className="form-field">
-                <label htmlFor="siteTitle" className="form-label-optional">
-                  {t("forms.project.siteTitleLabel")}
-                </label>
-                <input type="text" id="siteTitle" {...register("siteTitle")} className="form-input" />
-                <p className="form-description">{t("forms.project.siteTitleHelp")}</p>
-              </div>
-
-              <div className="form-field">
-                <label htmlFor="siteUrl" className="form-label-optional">
-                  {t("forms.project.siteUrlLabel")}
-                </label>
-                <input
-                  type="text"
-                  id="siteUrl"
-                  {...register("siteUrl", {
-                    validate: (value) =>
-                      isValidSiteUrl(value) ||
-                      t("forms.project.siteUrlInvalid") ||
-                      "Please enter a valid URL (e.g., https://mysite.com)",
-                  })}
-                  className="form-input"
-                  placeholder="https://mysite.com"
-                />
-                {errors.siteUrl && <p className="form-error">{errors.siteUrl.message}</p>}
-                <p className="form-description">{t("forms.project.siteUrlHelp")}</p>
-              </div>
-
-              <div className="form-field">
-                <label className="flex items-center gap-3 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    {...register("receiveThemeUpdates")}
-                    className="w-4 h-4 rounded border-gray-300 text-pink-500 focus:ring-pink-500"
-                  />
-                  <span className="form-label !mb-0">{t("forms.project.receiveThemeUpdatesLabel")}</span>
-                </label>
-                <p className="form-description ml-7">{t("forms.project.receiveThemeUpdatesHelp")}</p>
-              </div>
-            </>
+          {SHOW_FOLDER_NAME && folderNameField()}
+          {notesField()}
+          {checkboxField(
+            "receiveThemeUpdates",
+            "forms.project.receiveThemeUpdatesLabel",
+            "forms.project.receiveThemeUpdatesHelp",
           )}
         </div>
       </div>
 
       <div
-        className={`sticky bottom-0 -mx-4 -mb-4 flex justify-end gap-2 border-t bg-white px-4 py-4 rounded-b-md z-10 transition-shadow duration-200 ${
-          isStickyBarStuck
-            ? "border-slate-200 shadow-[0_-12px_24px_-4px_rgba(15,23,42,0.18)] after:content-[''] after:absolute after:left-0 after:right-0 after:top-full after:h-10 after:bg-white"
-            : "border-transparent"
-        }`}
+        role="tabpanel"
+        id="project-panel-site"
+        aria-labelledby="project-tab-site"
+        hidden={currentTab !== "site"}
+        className="max-w-xl form-section"
       >
-        {onCancel && (
-          <Button type="button" onClick={onCancel} variant="secondary">
-            {t("forms.common.cancel")}
-          </Button>
-        )}
-        <Button type="submit" disabled={isSubmitting || !isDirtyProp} variant={isDirtyProp ? "dark" : "primary"}>
-          {isSubmitting ? t("forms.common.saving") : submitLabel}
-          {isDirtyProp && <span className="w-2 h-2 bg-pink-500 rounded-full -mt-2" />}
-        </Button>
+        {siteTitleField()}
+        {siteUrlField()}
+        {checkboxField("cleanUrls", "forms.project.cleanUrlsLabel", "forms.project.cleanUrlsHelp")}
+
+        <div className="border-t border-gray-200 pt-6 dark:border-gray-700">
+          {defaultLanguageField()}
+          {/* A project has to exist before content can be copied into a new
+              language, so the list only appears once it does. */}
+          {!isNew && (
+            <LanguagesSection
+              defaultLanguage={savedDefaultLanguage}
+              languages={languages}
+              onChange={setLanguages}
+              // Adding a language locks the default on the SERVER, which still
+              // holds the saved one: acting now would lock a value the form is
+              // not showing and make the next Save fail.
+              blocked={watch("defaultLanguage") !== savedDefaultLanguage}
+              onBusyChange={setLanguageBusy}
+            />
+          )}
+        </div>
       </div>
-      <div ref={stickyBarSentinelRef} aria-hidden="true" className="h-px" />
+
+      <div
+        role="tabpanel"
+        id="project-panel-identity"
+        aria-labelledby="project-tab-identity"
+        hidden={currentTab !== "identity"}
+        className="max-w-xl form-section"
+      >
+        <SiteIdentityFields section="readiness" {...identityProps} />
+        <SiteIdentityFields section="identity" {...identityProps} />
+      </div>
+
+      <div
+        role="tabpanel"
+        id="project-panel-business"
+        aria-labelledby="project-tab-business"
+        hidden={currentTab !== "business"}
+        className="max-w-xl form-section"
+      >
+        <SiteIdentityFields section="business" {...identityProps} />
+      </div>
+
+      {stickyBar}
     </form>
   );
 }

@@ -68,7 +68,13 @@ export default function SettingsRenderer({
     );
   }
 
-  const currentValue = value !== undefined ? value : setting.default;
+  // A setting whose default is one of the theme's own words carries it as
+  // `resolvedDefault`, in the language being edited. It wins over the literal
+  // beside it, because that literal is the same word in the theme author's
+  // language — showing it would tell the owner their Greek page starts in
+  // English when it does not.
+  const effectiveDefault = setting.resolvedDefault !== undefined ? setting.resolvedDefault : setting.default;
+  const currentValue = value !== undefined ? value : effectiveDefault;
 
   const inputProps = {
     id,
@@ -134,6 +140,8 @@ export default function SettingsRenderer({
         return <TableInput {...inputProps} columns={setting.columns} />;
       case "file":
         return <FileInput {...inputProps} />;
+      case "video":
+        return <FileInput {...inputProps} filterType="video" />;
       case "link":
         return <LinkInput {...inputProps} setting={setting} />;
       case "youtube":
@@ -144,7 +152,7 @@ export default function SettingsRenderer({
             {...inputProps}
             options={setting.options} // Pass explicit options if any
             allow_patterns={setting.allow_patterns} // Pass patterns if any
-            defaultValue={setting.default} // Pass default to compare
+            defaultValue={effectiveDefault} // Pass default to compare
           />
         );
       default:

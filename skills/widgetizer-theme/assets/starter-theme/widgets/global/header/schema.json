@@ -1,0 +1,21 @@
+{
+  "type": "header",
+  "displayName": "Header",
+  "settings": [
+    { "type": "image", "id": "logo_image", "label": "Logo image", "default": "", "size": "narrow" },
+    {
+      "type": "text",
+      "id": "logo_text",
+      "label": "Logo text",
+      "description": "Shown when there is no logo image.",
+      "default": "Site name"
+    },
+    { "type": "menu", "id": "navigation", "label": "Navigation menu", "default": "main-menu" },
+    {
+      "type": "link",
+      "id": "button",
+      "label": "Button",
+      "default": { "href": "", "text": "", "target": "_self" }
+    }
+  ]
+}

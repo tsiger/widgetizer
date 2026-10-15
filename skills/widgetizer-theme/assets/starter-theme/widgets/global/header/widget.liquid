@@ -1,0 +1,59 @@
+<a class="skip-link" href="#main-content">{{ 'site.header.skip_link' | t }}</a>
+
+<header id="{{ widget.id }}" class="widget site-header" data-widget-id="{{ widget.id }}" data-widget-type="header">
+  <div class="container site-header__inner">
+    <a class="site-logo" href="{{ 'index' | page_url }}">
+      {% if widget.settings.logo_image != blank %}
+        {% image src: widget.settings.logo_image, size: 'medium', class: 'site-logo__image', lazy: false %}
+      {% else %}
+        <span data-setting="logo_text">{{ widget.settings.logo_text }}</span>
+      {% endif %}
+    </a>
+
+    <button type="button" class="nav-toggle" data-nav-toggle aria-expanded="false" aria-controls="site-nav-{{ widget.id }}">
+      {% render 'icon', icon: 'menu' %}
+      <span class="visually-hidden">{{ 'site.header.menu_toggle' | t }}</span>
+    </button>
+
+    <div class="site-header__menu" id="site-nav-{{ widget.id }}" data-nav>
+      {% comment %}
+        A menu setting stores a menu id, but arrives here as the menu itself.
+        The core 'menu' snippet renders it, up to three levels deep.
+      {% endcomment %}
+      {% assign nav_label = 'site.header.primary_nav' | t %}
+      {% render 'menu',
+        menu: widget.settings.navigation,
+        aria_label: nav_label,
+        class_nav: 'site-nav',
+        class_list: 'site-nav__list',
+        class_item: 'site-nav__item',
+        class_link: 'site-nav__link',
+        class_submenu: 'site-nav__submenu',
+        class_has_submenu: 'has-submenu'
+      %}
+
+      {% comment %} Empty on a single-language site. Always use the hrefs the app supplies. {% endcomment %}
+      {% if page.translations.size > 1 %}
+        <nav class="language-switcher" aria-label="{{ 'site.header.language' | t }}">
+          {% for translation in page.translations %}
+            <a
+              href="{{ translation.href }}"
+              lang="{{ translation.hreflang }}"
+              {% if translation.active %}aria-current="true"{% endif %}
+            >{{ translation.label }}</a>
+          {% endfor %}
+        </nav>
+      {% endif %}
+
+      {% assign button_href = widget.settings.button.href | safe_url %}
+      {% if button_href != blank and widget.settings.button.text != blank %}
+        <a
+          class="button"
+          href="{{ button_href }}"
+          {% if widget.settings.button.target == '_blank' %}target="_blank" rel="noopener noreferrer"{% endif %}
+          data-setting="button"
+        >{{ widget.settings.button.text }}</a>
+      {% endif %}
+    </div>
+  </div>
+</header>

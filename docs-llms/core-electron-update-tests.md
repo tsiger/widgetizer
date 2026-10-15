@@ -24,7 +24,7 @@ Set the version pair first:
 ```powershell
 $fromVersion = "0.9.8"
 $targetVersion = "0.9.9"
-$targetBranch = "experimentation"
+$targetBranch = "master"
 ```
 
 For a future test, only change those values, for example:
@@ -32,7 +32,7 @@ For a future test, only change those values, for example:
 ```powershell
 $fromVersion = "0.9.9"
 $targetVersion = "0.9.10"
-$targetBranch = "experimentation"
+$targetBranch = "master"
 ```
 
 Common paths:
@@ -477,6 +477,10 @@ Invoke-RestMethod "http://127.0.0.1:$port/api/projects" | ConvertTo-Json -Depth 
 ## Verify Theme Update Notification
 
 After the app has updated to `$targetVersion`, the user's existing data still contains Arch base `$fromVersion`. The packaged seed now contains `themes/arch/updates/$targetVersion`.
+
+The packaged `0.9.9`+ server binds a dynamic port, so the `3001` in the commands in this section and the next is only right when the app was launched with `$env:PORT = "3001"`. Otherwise substitute the port from the `Server reported ready on port <port>` log line.
+
+Only update folders newer than the installed base are layered into `latest/`. Folders at or below the base (such as an `updates/$fromVersion` the theme still ships) are kept as history and not applied, and when nothing newer exists no `latest/` is built.
 
 Check API state:
 

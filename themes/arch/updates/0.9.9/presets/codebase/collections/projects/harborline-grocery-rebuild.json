@@ -1,0 +1,12 @@
+{
+  "slug": "harborline-grocery-rebuild",
+  "schemaVersion": 1,
+  "settings": {
+    "title": "Headless Storefront for Harborline Grocers",
+    "summary": "We moved a regional grocery chain off a slow legacy cart onto a headless storefront that loads in under a second.",
+    "description": "<p>Harborline ran 14 stores and an online order page that took six seconds to load on a phone, which was costing them weekend pickup orders. Customers would start a cart, watch the page hang, and finish their shopping somewhere else.</p><h2>The problem</h2><p>The old platform tied the storefront, the catalog, and the checkout into one slow bundle. Nothing could be improved in isolation, and every change risked breaking the live cart. The chain also could not afford a freeze on sales while we worked, so whatever we did had to run alongside the old system until the day we switched over.</p><h2>Our approach</h2><p>We split the front end away from their old platform and rebuilt it headless. The new storefront talks to a product catalog that updates straight from their existing inventory feed, so prices and stock stay accurate without anyone re-keying them. We tuned the checkout specifically around curbside pickup, which is how most of their online orders are fulfilled.</p><ul><li>A headless storefront decoupled from the legacy platform</li><li>A catalog synced from the existing inventory feed</li><li>A checkout flow built around curbside pickup and store selection</li><li>A staged cutover that ran old and new in parallel</li></ul><p>We rolled the new front end out to two stores first, watched the order data for a couple of weeks, then expanded to the rest of the chain once we trusted the numbers.</p><h2>The outcome</h2><p>First-load time dropped from six seconds to under one. Online pickup orders climbed about 40 percent over the first quarter after launch, with the steepest gains on weekend mornings, which had been the worst time on the old site.</p>",
+    "client": "Harborline Grocers",
+    "year": "2024",
+    "featured_image": "/uploads/images/codebase-projects-harborline-grocery-rebuild.webp"
+  }
+}

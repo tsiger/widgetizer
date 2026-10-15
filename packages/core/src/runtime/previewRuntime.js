@@ -44,6 +44,21 @@ function getPreviewMode() {
 
 const PREVIEW_MODE = getPreviewMode();
 
+const COLLECTION_PREFIXES = (document.querySelector("script[data-preview-mode]")?.dataset?.collectionPrefixes || "")
+  .split(",")
+  .filter(Boolean);
+
+// A preview renders at the site root whatever page it is showing, so its links
+// are root-relative: `el/contact.html` is the Greek page, `contact.html` the
+// default language's. Reading that needs the site's languages, nothing more.
+const PREVIEW_SITE = (() => {
+  const data = document.querySelector("script[data-preview-mode]")?.dataset || {};
+  return {
+    languages: (data.languages || "").split(",").filter(Boolean),
+    defaultLanguage: data.defaultLanguage || "en",
+  };
+})();
+
 // ── CSS Variables + Fonts ───────────────────────────────────────────────────
 
 function updateCssVariables(variables) {
@@ -60,22 +75,16 @@ function updateCssVariables(variables) {
   styleTag.textContent = `:root {\n  ${cssString}\n}`;
 }
 
-function loadFonts(fontsMetadata) {
-  if (!fontsMetadata || typeof fontsMetadata !== "object" || Object.keys(fontsMetadata).length === 0) {
-    return;
-  }
+const FONT_STYLESHEET_HOSTS = ["https://fonts.googleapis.com/", "https://fonts.bunny.net/"];
 
-  const base = "https://fonts.googleapis.com/css2";
-  const families = Object.entries(fontsMetadata)
-    .map(([name, weights]) => {
-      const sortedWeights = weights.sort((a, b) => a - b);
-      return `family=${encodeURIComponent(name)}:wght@${sortedWeights.join(";")}`;
-    })
-    .join("&");
+function loadFonts(payload) {
+  const url = payload?.url;
+  if (typeof url !== "string" || !FONT_STYLESHEET_HOSTS.some((host) => url.startsWith(host))) return;
 
-  const url = `${base}?${families}&display=swap`;
-
-  let link = document.querySelector('link[rel="stylesheet"][href*="fonts.googleapis.com"]');
+  // Switching CDNs replaces the stylesheet the server rendered, whichever host it came from.
+  let link = document.querySelector(
+    FONT_STYLESHEET_HOSTS.map((host) => `link[rel="stylesheet"][href^="${host}"]`).join(", "),
+  );
   if (!link) {
     link = document.createElement("link");
     link.rel = "stylesheet";
@@ -568,7 +577,7 @@ function setupInteractionHandler() {
       if (linkElement) {
         if (PREVIEW_MODE === "standalone") {
           const href = linkElement.getAttribute("href");
-          const targetUrl = getStandalonePreviewTarget(href);
+          const targetUrl = getStandalonePreviewTarget(href, { collectionPrefixes: COLLECTION_PREFIXES, ...PREVIEW_SITE });
           event.preventDefault();
           event.stopPropagation();
 
@@ -597,7 +606,8 @@ function setupInteractionHandler() {
         return;
       }
 
-      const interactiveElement = event.target.closest('button, input, select, textarea, [role="button"]');
+      // Native media controls act in the element's default action, which a cancelled click never reaches.
+      const interactiveElement = event.target.closest('button, input, select, textarea, video, audio, [role="button"]');
       if (interactiveElement) {
         if (widgetEl) {
           postToParent({
@@ -674,14 +684,14 @@ function createOverlayContainer() {
   const style = document.createElement("style");
   style.textContent = `
     .wz-overlay { position: fixed; inset: 0; pointer-events: none; z-index: 99999; }
-    .wz-selection-box { position: absolute; border: 2px solid #f472b6; box-shadow: 0 0 12px rgba(236,72,153,0.25); pointer-events: none; }
-    .wz-hover-box { position: absolute; border: 1px solid #f9a8d4; background: rgba(236,72,153,0.05); pointer-events: none; }
+    .wz-selection-box { position: absolute; border: 2px solid #f63197; box-shadow: 0 0 12px rgba(236,72,153,0.25); pointer-events: none; }
+    .wz-hover-box { position: absolute; border: 1px solid #f96cb5; background: rgba(236,72,153,0.05); pointer-events: none; }
     .wz-block-selection { position: absolute; border: 2px solid #60a5fa; box-shadow: 0 0 8px rgba(59,130,246,0.2); pointer-events: none; }
     .wz-block-hover { position: absolute; border: 1px solid #93c5fd; background: rgba(59,130,246,0.05); pointer-events: none; }
-    .wz-widget-label { padding: 1px 8px; font-size: 11px; font-weight: 500; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; color: white; background: #ec4899; border-radius: 4px; white-space: nowrap; pointer-events: none; line-height: 18px; }
-    .wz-hover-label { position: absolute; transform: translateX(-50%); left: 50%; padding: 1px 6px; font-size: 11px; font-weight: 500; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; color: #db2777; background: #fce7f3; border-radius: 4px; white-space: nowrap; pointer-events: none; line-height: 18px; }
+    .wz-widget-label { padding: 1px 8px; font-size: 11px; font-weight: 500; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; color: white; background: #e0006d; border-radius: 4px; white-space: nowrap; pointer-events: none; line-height: 18px; }
+    .wz-hover-label { position: absolute; transform: translateX(-50%); left: 50%; padding: 1px 6px; font-size: 11px; font-weight: 500; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; color: #e0006d; background: #ffd6eb; border-radius: 4px; white-space: nowrap; pointer-events: none; line-height: 18px; }
     .wz-reorder-btn { pointer-events: auto; padding: 2px; border-radius: 4px; background: white; border: 1px solid #e2e8f0; box-shadow: 0 1px 2px rgba(0,0,0,0.05); cursor: pointer; display: flex; align-items: center; line-height: 0; }
-    .wz-reorder-btn:hover { background: #fdf2f8; border-color: #f9a8d4; }
+    .wz-reorder-btn:hover { background: #fff0f8; border-color: #f96cb5; }
     .wz-reorder-btn[disabled] { opacity: 0.3; cursor: not-allowed; }
     .wz-reorder-btn[disabled]:hover { background: white; border-color: #e2e8f0; }
     .wz-controls { position: absolute; transform: translateX(-50%); left: 50%; display: flex; align-items: center; gap: 4px; pointer-events: auto; }
@@ -1022,15 +1032,21 @@ function morphWidget(widgetId, newHtml) {
     }
 
     // Load enqueued styles/scripts that aren't already in the document
+    // Resolved against this document's <base>: the parsed fragment has none, so its own .src can point elsewhere.
+    const absolute = (url) => new URL(url, document.baseURI).href;
+    const loadedStyles = new Set([...document.querySelectorAll('link[rel="stylesheet"][href]')].map((l) => l.href));
+    const loadedScripts = new Set([...document.querySelectorAll("script[src]")].map((s) => s.src));
     for (const link of enqueuedLinks) {
-      if (!document.querySelector(`link[href="${link.getAttribute("href")}"]`)) {
+      if (!loadedStyles.has(absolute(link.getAttribute("href")))) {
         document.head.appendChild(link.cloneNode(true));
       }
     }
     for (const script of enqueuedScripts) {
-      if (!document.querySelector(`script[src="${script.getAttribute("src")}"]`)) {
+      const src = absolute(script.getAttribute("src"));
+      if (!loadedScripts.has(src)) {
+        loadedScripts.add(src);
         const s = document.createElement("script");
-        s.src = script.src;
+        s.src = src;
         if (script.defer) s.defer = true;
         if (script.async) s.async = true;
         document.body.appendChild(s);

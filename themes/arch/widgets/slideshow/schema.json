@@ -60,6 +60,18 @@
       "step": 1000,
       "default": 5000,
       "unit": "ms"
+    },
+    {
+      "type": "text",
+      "id": "pause_text",
+      "label": "tTheme:slideshow.settings.pause_text.label",
+      "defaultKey": "site.slideshow.pause"
+    },
+    {
+      "type": "text",
+      "id": "play_text",
+      "label": "tTheme:slideshow.settings.play_text.label",
+      "defaultKey": "site.slideshow.play"
     }
   ],
   "blocks": [

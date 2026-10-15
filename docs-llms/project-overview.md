@@ -27,7 +27,7 @@ Because your site is just a collection of files, you own your data. You can easi
 
 ### Projects
 
-A **Project** is a container for your website. It holds all the pages, media, menus, collections, and design settings specific to that site. You can manage multiple projects simultaneously, switching between them with a single click.
+A **Project** is a container for your website. It holds all the pages, media, menus, collections, and design settings specific to that site. You can manage multiple projects simultaneously, switching between them with a single click. A project can also publish its site in more than one language, and it records who is behind the site (name, logo, contact and business details) so exports can describe it to search engines.
 
 ### Themes
 
@@ -46,10 +46,10 @@ A **Collection** holds a set of structured, repeatable content items — think a
 
 ### Media Library
 
-The **Media Library** is your central hub for managing uploaded files — images, files (PDF), and audio.
+The **Media Library** is your central hub for managing uploaded files — images, files (PDF), audio (MP3) and video (MP4).
 
 - **Automatic Optimization**: When you upload an image, Widgetizer automatically creates different sizes to ensure your site loads instantly on both mobile and desktop.
-- **Usage Tracking**: The system knows exactly which page is using which file, protecting you from accidentally deleting something that's currently live on your site.
+- **Usage Tracking**: The system knows exactly which page is using which file, and refuses to delete a file that saved content still uses.
 
 ### Navigation Menus
 

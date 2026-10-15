@@ -128,7 +128,7 @@
         "card_layout": "flat",
         "alignment": "start",
         "image_position": "top",
-        "aspect_ratio": "4:3",
+        "aspect_ratio": "4 / 3",
         "color_scheme": "standard-primary"
       },
       "blocks": {
@@ -313,7 +313,7 @@
         "review-1": {
           "type": "quote",
           "settings": {
-            "text": "I tried three gyms before Olympic. The difference is the coaching. They actually watch your form, adjust your programming, and care about your progress. Down 30 pounds and deadlifting more than I ever thought possible.",
+            "quote": "I tried three gyms before Olympic. The difference is the coaching. They actually watch your form, adjust your programming, and care about your progress. Down 30 pounds and deadlifting more than I ever thought possible.",
             "name": "Marcus Chen",
             "title": "Member for 2 years",
             "rating": "5"
@@ -322,7 +322,7 @@
         "review-2": {
           "type": "quote",
           "settings": {
-            "text": "The HIIT classes are no joke. I was nervous walking in as a complete beginner, but the trainers scaled everything for me. Six months later, I'm keeping up with the advanced group.",
+            "quote": "The HIIT classes are no joke. I was nervous walking in as a complete beginner, but the trainers scaled everything for me. Six months later, I'm keeping up with the advanced group.",
             "name": "Rachel Torres",
             "title": "Member for 6 months",
             "rating": "5"
@@ -331,7 +331,7 @@
         "review-3": {
           "type": "quote",
           "settings": {
-            "text": "Best gym community in Portland. Everyone is focused but friendly. The early morning crew keeps me accountable five days a week. This place changed my routine and my life.",
+            "quote": "Best gym community in Portland. Everyone is focused but friendly. The early morning crew keeps me accountable five days a week. This place changed my routine and my life.",
             "name": "David Okafor",
             "title": "Member for 3 years",
             "rating": "5"

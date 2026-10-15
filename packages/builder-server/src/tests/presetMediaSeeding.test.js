@@ -2,8 +2,9 @@
  * Preset media seeding test suite.
  *
  * Covers the starter-image path used at project creation:
- *  - resolvePresetPaths returns mediaDir when the preset ships a media/ folder,
- *    and null when it doesn't.
+ *  - resolvePresetPaths returns mediaDir when the preset ships a media/ folder;
+ *    falls back to the theme-root preset-media/<presetId> layout (per-preset
+ *    media/ wins when both exist); null when neither exists.
  *  - seedPresetMedia copies the image binaries into the project's uploads/images
  *    and registers each manifest entry in the media DB with a fresh,
  *    project-scoped UUID (originals + their generated sizes).
@@ -52,13 +53,24 @@ after(async () => {
 });
 
 describe("resolvePresetPaths — media", () => {
+  // <themeDir>/presets/<preset> → up twice = theme root, where preset-media/ lives.
+  const themeRoot = path.dirname(path.dirname(getThemePresetDir("media-theme", "x")));
+
   before(async () => {
-    // preset WITH a media/ folder
+    // preset WITH a media/ folder (per-preset layout, the default concept)
     const withMedia = getThemePresetDir("media-theme", "withmedia");
     await fs.ensureDir(path.join(withMedia, "templates"));
     await fs.outputFile(path.join(withMedia, "media", "images", "a.jpg"), "x");
     // preset WITHOUT media/
     await fs.ensureDir(path.join(getThemePresetDir("media-theme", "plain"), "templates"));
+    // preset with THEME-ROOT preset-media/<id> only (the Arch layout)
+    await fs.ensureDir(path.join(getThemePresetDir("media-theme", "shelf"), "templates"));
+    await fs.outputFile(path.join(themeRoot, "preset-media", "shelf", "images", "b.jpg"), "x");
+    // preset with BOTH layouts — per-preset media/ must win
+    const both = getThemePresetDir("media-theme", "both");
+    await fs.ensureDir(path.join(both, "templates"));
+    await fs.outputFile(path.join(both, "media", "images", "c.jpg"), "x");
+    await fs.outputFile(path.join(themeRoot, "preset-media", "both", "images", "d.jpg"), "x");
   });
 
   it("returns mediaDir when the preset ships media/", async () => {
@@ -67,9 +79,20 @@ describe("resolvePresetPaths — media", () => {
     assert.ok(result.mediaDir.endsWith(path.join("withmedia", "media")));
   });
 
-  it("returns null mediaDir when the preset has none", async () => {
+  it("returns null mediaDir when the preset has none anywhere", async () => {
     const result = await resolvePresetPaths("media-theme", "plain");
     assert.equal(result.mediaDir, null);
+  });
+
+  it("falls back to theme-root preset-media/<id> when the preset ships no media/", async () => {
+    const result = await resolvePresetPaths("media-theme", "shelf");
+    assert.ok(result.mediaDir, "mediaDir should resolve from preset-media/");
+    assert.ok(result.mediaDir.endsWith(path.join("preset-media", "shelf")));
+  });
+
+  it("prefers the preset's own media/ over theme-root preset-media/<id>", async () => {
+    const result = await resolvePresetPaths("media-theme", "both");
+    assert.ok(result.mediaDir.endsWith(path.join("both", "media")), "per-preset media/ must win");
   });
 });
 

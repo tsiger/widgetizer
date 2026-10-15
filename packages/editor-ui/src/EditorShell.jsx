@@ -19,6 +19,7 @@ import MenuStructure from "./pages/MenuStructure.jsx";
 import Media from "./pages/Media.jsx";
 import Settings from "./pages/Settings.jsx";
 import ExportSite from "./pages/ExportSite.jsx";
+import { EMPTY_ARRAY, EMPTY_OBJECT } from "./lib/emptyValues.js";
 import CollectionItems from "./pages/CollectionItems.jsx";
 import CollectionItemAdd from "./pages/CollectionItemAdd.jsx";
 import CollectionItemEdit from "./pages/CollectionItemEdit.jsx";
@@ -48,8 +49,8 @@ export function EditorProvider({
   routeBase = "",
   project,
   scope,
-  plugins = [],
-  slots = {},
+  plugins = EMPTY_ARRAY,
+  slots = EMPTY_OBJECT,
   children,
 }) {
   const allPlugins = useMemo(() => [builtinNavPlugin, ...plugins], [plugins]);
@@ -76,6 +77,10 @@ export function EditorProvider({
 
   return (
     <PluginProvider plugins={allPlugins} slots={slots}>
+      {/* No ConfirmProvider here: the confirm dialog is one surface per window,
+          so the shell that owns the window mounts it — exactly like
+          ToastContainer. Every embedding shell mounts exactly one; the
+          navigation guards' useConfirm() throws if a shell forgets. */}
       <RouteBaseProvider base={routeBase}>{children}</RouteBaseProvider>
     </PluginProvider>
   );
@@ -89,8 +94,8 @@ export function EditorShell({
   routeBase,
   project,
   scope,
-  plugins = [],
-  slots = {},
+  plugins = EMPTY_ARRAY,
+  slots = EMPTY_OBJECT,
 }) {
   return (
     <EditorProvider
@@ -113,28 +118,32 @@ export function EditorShell({
 // editor-scoped stores reset on project switch. Both shells render the same
 // built-in set; plugin-contributed `routes` are merged into the same gated group
 // (so e.g. a hosted Forms/Analytics nav item has a route to render).
-function editorRouteChildren(plugins = []) {
+// `excludePaths` drops named children (by `path`) from this built-in set — see
+// `createEditorRoutes` JSDoc for why a host would use it.
+function editorRouteChildren(plugins = EMPTY_ARRAY, excludePaths = EMPTY_ARRAY) {
   const pluginRoutes = plugins.flatMap((p) => (Array.isArray(p?.routes) ? p.routes : []));
+  const children = [
+    { path: "pages", element: <Pages /> },
+    { path: "pages/add", element: <PagesAdd /> },
+    { path: "pages/:id/edit", element: <PagesEdit /> },
+    { path: "page-editor", element: <PageEditor /> },
+    { path: "menus", element: <Menus /> },
+    { path: "menus/add", element: <MenusAdd /> },
+    { path: "menus/edit/:id", element: <MenusEdit /> },
+    { path: "menus/:id/structure", element: <MenuStructure /> },
+    { path: "media", element: <Media /> },
+    { path: "collections/:type", element: <CollectionItems /> },
+    { path: "collections/:type/add", element: <CollectionItemAdd /> },
+    { path: "collections/:type/:slug/edit", element: <CollectionItemEdit /> },
+    { path: "settings", element: <Settings /> },
+    { path: "export-site", element: <ExportSite /> },
+    ...pluginRoutes,
+  ];
+  const visible = excludePaths?.length ? children.filter((c) => !excludePaths.includes(c.path)) : children;
   return [
     {
       element: <RequireActiveProject />,
-      children: [
-        { path: "pages", element: <Pages /> },
-        { path: "pages/add", element: <PagesAdd /> },
-        { path: "pages/:id/edit", element: <PagesEdit /> },
-        { path: "page-editor", element: <PageEditor /> },
-        { path: "menus", element: <Menus /> },
-        { path: "menus/add", element: <MenusAdd /> },
-        { path: "menus/edit/:id", element: <MenusEdit /> },
-        { path: "menus/:id/structure", element: <MenuStructure /> },
-        { path: "media", element: <Media /> },
-        { path: "collections/:type", element: <CollectionItems /> },
-        { path: "collections/:type/add", element: <CollectionItemAdd /> },
-        { path: "collections/:type/:slug/edit", element: <CollectionItemEdit /> },
-        { path: "settings", element: <Settings /> },
-        { path: "export-site", element: <ExportSite /> },
-        ...pluginRoutes,
-      ],
+      children: visible,
     },
   ];
 }
@@ -145,9 +154,18 @@ function editorRouteChildren(plugins = []) {
  * editor-ui can't import). EditorShell-specific props (apiBase/project/scope/
  * plugins/slots) flow into the layout element.
  *
+ * `excludePaths` is **route-only**: it omits the named built-in child routes
+ * (matched by their relative `path`, e.g. `"export-site"`) so the host's
+ * server can 404 the surface without a dead route still resolving client-side.
+ * It does NOT touch navigation — the built-in nav plugin (`builtinNav.js`)
+ * still advertises every built-in entry regardless of this option, so a host
+ * using the stock `Layout`/`Sidebar` must separately filter its nav or it will
+ * render a link to a route that no longer exists. Standalone OSS passes no
+ * `excludePaths` and is unaffected (default keeps every route).
+ *
  * @param {{ path?: string, errorElement?: React.ReactNode, apiBase?: string,
  *           project?: object, scope?: object, plugins?: Array<object>,
- *           slots?: Record<string, React.ReactNode> }} [options]
+ *           slots?: Record<string, React.ReactNode>, excludePaths?: string[] }} [options]
  * @returns {object} a react-router route object
  */
 export function createEditorRoutes({
@@ -160,8 +178,9 @@ export function createEditorRoutes({
   apiBase,
   project,
   scope,
-  plugins = [],
-  slots = {},
+  plugins = EMPTY_ARRAY,
+  slots = EMPTY_OBJECT,
+  excludePaths,
 } = {}) {
   return {
     path,
@@ -179,6 +198,6 @@ export function createEditorRoutes({
       />
     ),
     errorElement,
-    children: editorRouteChildren(plugins),
+    children: editorRouteChildren(plugins, excludePaths),
   };
 }

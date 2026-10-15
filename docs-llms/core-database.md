@@ -13,7 +13,7 @@ The backend (`@widgetizer/builder-server`) is **adapter-agnostic and scope-first
 
 SQLite backs metadata storage to provide:
 
-- atomic updates and concurrency safety
+- atomic updates and concurrency safety — where operations use correct transaction boundaries; see § Transactions & concurrency below
 - relational queries and cascade behavior
 - export/version bookkeeping
 - reliable startup migrations
@@ -42,6 +42,18 @@ Pragmas applied to the fallback connection:
 - `foreign_keys = ON`
 - `busy_timeout = 5000`
 
+### Transactions & concurrency
+
+The concurrency model, stated once so transaction-shape bugs don't keep being reintroduced:
+
+- **One synchronous better-sqlite3 connection per process** — that is the assumption, not exclusive ownership of the DB file. A second process (or worker thread) opening the same file is a supported-but-rare configuration, and the rules below are what keep it safe.
+- **In-process, statements never interleave — except across `await` gaps.** better-sqlite3 is synchronous, so a run of consecutive SQL calls with no `await` between them is effectively atomic against other requests in the same process. The moment an `await` separates a read from the write that depends on it, another request can run in the gap. **Never split a read-modify-write across an `await`;** do the whole sequence synchronously inside one `db.transaction`.
+- **Multi-statement writes are wrapped in `db.transaction`, self-wrapped in the repository helper** rather than left to callers. Nesting is safe: better-sqlite3 turns an inner transaction into a `SAVEPOINT` when one is already open (`insertMediaFile` under `writeMediaData` is the precedent). Transaction callbacks must be synchronous — better-sqlite3 rolls back and throws if the transaction callback itself returns a thenable, but it cannot see a thenable that an inner helper returns and the callback discards (e.g. a transform callback passed *into* the transaction) — such async work would silently run after commit, so guard those call sites explicitly (`atomicUpdateMediaFile` is the precedent).
+- **Acquire the write lock before taking a read snapshot.** A default `db.transaction` runs `BEGIN DEFERRED`: if its first statement is a read, it takes a read snapshot and only upgrades to the write lock at the first write — and that upgrade fails with `SQLITE_BUSY_SNAPSHOT` if another connection committed in between. `busy_timeout` does **not** wait this out (the snapshot is stale forever; SQLite returns immediately). So a transaction that writes must either make its **first statement a write** (fold the SELECT into the DELETE/UPDATE as a subquery) or be invoked via **`.immediate()`**.
+- **Multi-statement reads that need a consistent snapshot get a (default, deferred) read transaction.** Without one, each statement is its own snapshot and a concurrent writer on another connection can tear the result (e.g. a file row read before a delete, its sizes after).
+- **All writes serialize on one db-level lock.** SQLite has no row-level locking; "touches different rows" never means "safe in parallel" — parallel writers merely queue.
+- **Migrations** each run in their own transaction (including the tracking-table insert), but the applied-versions list is read once *outside* them — two processes cold-starting the same file can both decide a migration is pending. The loser fails loudly and rolls back — on non-idempotent DDL (e.g. v1's `CREATE TABLE`) or, at latest, on the tracking table's primary key; the database stays consistent either way, the startup just errors.
+
 ### Migration history
 
 Migrations live in `db/migrations.js` as an ordered list, each wrapped in a transaction and recorded in a tracking table. Applied versions are read once and any unrecorded migration runs in order:
@@ -50,6 +62,10 @@ Migrations live in `db/migrations.js` as an ordered list, each wrapped in a tran
 - **v2 — Add `owner_id` to `projects`.** `ALTER TABLE projects ADD COLUMN owner_id TEXT NOT NULL DEFAULT 'default'` plus `idx_projects_owner_id`. The value is an opaque owner string (no FK to a users table): OSS sets `'default'`, hosted sets the Clerk user id.
 - **v3 — Add `caption` to `media_files`.** Guarded `ALTER` (`columnExists` check), so it is a no-op on databases that already have the column.
 - **v4 — Backfill `projects.owner_id`.** Forward-only, idempotent: ensures `owner_id` (and its index, via `CREATE INDEX IF NOT EXISTS`) is present on every database.
+- **v5 — Add `clean_urls` to `projects`.** Guarded `ALTER TABLE projects ADD COLUMN clean_urls INTEGER DEFAULT 0`: the project's Clean URLs setting (extensionless internal links, canonicals, sitemap and robots).
+- **v6 — Add `site_identity` to `projects`.** Guarded `ALTER TABLE projects ADD COLUMN site_identity TEXT NOT NULL DEFAULT '{}'`: the project's site identity and business details as JSON, validated by `normalizeSiteIdentity` before every write. `projectRepository` parses it back to `siteIdentity`, and unreadable JSON reads as `{}`. Shape in [Project Management](core-projects.md#6-site-identity-and-business-details).
+- **v7 — Add site languages to `projects`.** Guarded `ALTER TABLE`s adding `default_language TEXT NOT NULL DEFAULT 'en'` and `languages TEXT NOT NULL DEFAULT '[]'`: the site's own language and the JSON array of additional codes. `projectRepository` reads them back as `defaultLanguage` / `languages`, and unreadable JSON reads as `[]`. Rules in [Project Management](core-projects.md#7-site-languages).
+- **v8 — Per-language media metadata.** Creates `media_file_translations` (`media_file_id`, `language`, `alt`, `title`, `caption`; primary key `(media_file_id, language)`, `ON DELETE CASCADE` from `media_files`). The `media_files` columns stay the default language, so nothing is backfilled. A NULL column (or no row) inherits the default language, while `""` is deliberately blank — so a decorative image can have empty alt text in a translated language.
 
 > The guarded `ALTER`s and the v4 backfill keep databases from different histories convergent on the same final schema.
 
@@ -77,8 +93,9 @@ SQLite does **not** replace project content files. Most small project-content fi
 - `data/projects/<folderName>/pages/global/footer.json`
 - `data/projects/<folderName>/menus/*.json`
 - `data/projects/<folderName>/collections/<type>/<slug>.json` (one file per collection item — see `core-collections.md`)
+- the same four shapes under a language folder for a non-default site language: `pages/<lang>/*.json`, `pages/<lang>/global/`, `menus/<lang>/`, `collections/<type>/<lang>/` (see `core-pages.md`)
 - `data/projects/<folderName>/theme.json` (and theme assets/templates/widgets)
-- `data/projects/<folderName>/uploads/images/*`
+- `data/projects/<folderName>/uploads/images/*` and `uploads/files/*` (PDF, MP3, MP4)
 
 ---
 
@@ -86,7 +103,7 @@ SQLite does **not** replace project content files. Most small project-content fi
 
 Controllers and services call repository/wrapper functions directly:
 
-- `getProjectById()`, `createProject()`, `updateProject()`, `deleteProject()` — project metadata (`db/repositories/projectRepository.js`)
+- `getProjectById()`, `createProject()`, `updateProject()`, `deleteProject()` — project metadata (`db/repositories/projectRepository.js`); `deleteProjectAndReassignActive()` deletes a row and moves the active project in one transaction
 - `readProjectsData()` / `writeProjectsData()` — bulk read/write (`projectRepository.js`, tests only)
 - `readMediaFile(projectId)` — media metadata (`services/mediaService.js`)
 - `writeMediaFile(projectId, data)` — media metadata wrapper (`controllers/mediaController.js`)

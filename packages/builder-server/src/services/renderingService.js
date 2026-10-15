@@ -23,10 +23,14 @@ import {
   renderCollectionItemPage as engineRenderCollectionItemPage,
   renderEnqueuedAssetTags,
   widgetSupportsTransparentHeader as engineWidgetSupportsTransparentHeader,
+  planPagination as enginePlanPagination,
   schemaHasMenuSetting,
 } from "@widgetizer/render-engine";
 
 import { schemaHasRichtextSetting } from "@widgetizer/core/richtextLinks";
+import { itemHref } from "@widgetizer/core/internalHref";
+import fs from "fs-extra";
+import path from "path";
 import { getProjectDir, CORE_WIDGETS_DIR, CORE_SNIPPETS_DIR } from "../config.js";
 import { readMediaFile } from "./mediaService.js";
 import * as projectRepo from "../db/repositories/projectRepository.js";
@@ -34,11 +38,12 @@ import { listPagesFromDir } from "../utils/projectContentFs.js";
 import { preprocessThemeSettings } from "../utils/themeHelpers.js";
 import { buildRuntimeSiteIcons } from "../utils/siteIconHelpers.js";
 import { getProjectFolderName } from "../utils/projectHelpers.js";
+import { projectLanguages, projectLanguageContexts } from "../utils/contentLanguage.js";
 import { sanitizeWidgetData } from "./sanitizationService.js";
+import { loadSiteStrings, readerFor } from "./siteStringsService.js";
 import {
   listCollectionSchemas,
-  listCollectionItems,
-  getCollectionSchema,
+  createCollectionReader,
   loadCollectionItemsByUuid,
   prepareCollectionItemForRender,
   buildCollectionItemPageData,
@@ -55,12 +60,17 @@ function schemaHasLinkSetting(schema) {
  * the same adapter as the API path) and over the live render `globals` +
  * mode-aware media base paths (passed in by the engine when it builds the render
  * context). Results are cached per (type, options) on `globals.collectionCache`.
- * @param {object} collectionDeps - { storage, scope }
+ * @param {{ storage: object, scope: object, reader: { read: Function, sorted: Function } }} collectionDeps
  */
-function makeCollectionItemsLoaderFactory({ storage, scope }) {
+function makeCollectionItemsLoaderFactory({ storage, scope, reader, languageContexts, defaultLanguage }) {
   return ({ globals, imageBasePath, fileBasePath }) =>
     async (collectionType, options = {}) => {
-      const cacheKey = `${collectionType}:${JSON.stringify(options ?? {})}`;
+      // A listing shows its own language's items (§9). The page being rendered
+      // is the only thing that knows which that is, and the cache key carries it
+      // because one render can outlive one language (an export reuses the bag
+      // for a page's globals).
+      const lang = { language: globals.currentPageData?.language || "", defaultLanguage };
+      const cacheKey = `${collectionType}:${lang.language}:${JSON.stringify(options ?? {})}`;
       if (globals.collectionCache && globals.collectionCache.has(cacheKey)) {
         return globals.collectionCache.get(cacheKey);
       }
@@ -69,10 +79,11 @@ function makeCollectionItemsLoaderFactory({ storage, scope }) {
       // invalid items — so `limit` counts valid items (an invalid item must not
       // consume a slot in the returned window).
       const { limit, offset, ...sortOptions } = options ?? {};
-      const [items, schema] = await Promise.all([
-        listCollectionItems(storage, scope, collectionType, sortOptions),
-        getCollectionSchema(storage, scope, collectionType),
+      const [items, loaded] = await Promise.all([
+        reader.sorted(collectionType, sortOptions, lang),
+        reader.read(collectionType, lang),
       ]);
+      const schema = loaded?.schema || null;
 
       const outputPathPrefix = globals.outputPathPrefix || "";
       const pagesByUuid = globals.pagesByUuid || new Map();
@@ -87,11 +98,16 @@ function makeCollectionItemsLoaderFactory({ storage, scope }) {
       // richtext-only item must load the item map too, not just menu/link items.
       if (schemaHasMenuSetting(schema) || schemaHasLinkSetting(schema) || schemaHasRichtextSetting(schema)) {
         if (!globals.collectionItemsByUuid) {
-          globals.collectionItemsByUuid = await loadCollectionItemsByUuid(storage, scope);
+          globals.collectionItemsByUuid = await loadCollectionItemsByUuid(storage, scope, reader, languageContexts);
         }
         menuDeps = {
           menuMaps: globals.menuMaps || { byUuid: new Map(), bySlug: new Map() },
           collectionItemsByUuid: globals.collectionItemsByUuid,
+          cleanUrls: globals.cleanUrls === true,
+          defaultLanguage,
+          // A bare menu slug on a listed item means the menu of the language the
+          // listing is being rendered in, as it does everywhere else.
+          language: lang.language,
         };
       }
 
@@ -114,7 +130,12 @@ function makeCollectionItemsLoaderFactory({ storage, scope }) {
           filePath: fileBasePath,
         });
         const url = schema?.hasItemPages
-          ? `${outputPathPrefix}${schema.slugPrefix}/${resolved.slug}.html`
+          ? itemHref(schema.slugPrefix, resolved.slug, {
+              cleanUrls: globals.cleanUrls === true,
+              outputPathPrefix,
+              language: resolved.language,
+              defaultLanguage,
+            })
           : null;
         return {
           id: resolved.id,
@@ -143,9 +164,20 @@ function makeCollectionItemsLoaderFactory({ storage, scope }) {
  * @param {{ storage: object, scope: object }} collectionDeps
  * @returns {{ buildCollectionItemsLoader: Function, getCollectionSchemas: Function, loadCollectionItemsByUuid: Function }}
  */
-function buildCollectionRenderDeps({ storage, scope }) {
+function buildCollectionRenderDeps({ storage, scope, snapshot = null }) {
+  // A link may target an item in any language, so the uuid map spans them all.
+  const project = projectRepo.getProjectById(scope.projectId);
+  const { defaultLanguage } = projectLanguages(project);
+  const languageContexts = projectLanguageContexts(project);
+  const reader = createCollectionReader({ storage, scope, snapshot, defaultLanguage });
   return {
-    buildCollectionItemsLoader: makeCollectionItemsLoaderFactory({ storage, scope }),
+    buildCollectionItemsLoader: makeCollectionItemsLoaderFactory({
+      storage,
+      scope,
+      reader,
+      languageContexts,
+      defaultLanguage,
+    }),
     // Schema enumeration for the export item-page pass (and any caller that needs
     // to know which collections declare item pages). Scope-aware, adapter-backed.
     getCollectionSchemas: () => listCollectionSchemas(storage, scope),
@@ -153,7 +185,12 @@ function buildCollectionRenderDeps({ storage, scope }) {
     // target a collection item (collectionItemUuid) resolve to its current page
     // URL at render time (#11 parity with pageUuid). The engine calls this lazily
     // and caches the result per render; non-collection callers leave it unset.
-    loadCollectionItemsByUuid: () => loadCollectionItemsByUuid(storage, scope),
+    loadCollectionItemsByUuid: () => loadCollectionItemsByUuid(storage, scope, reader, languageContexts),
+    // Counted in the language the listing is being rendered in, or the page
+    // count would come from another language's items.
+    countCollectionItems: async (collectionType, language = "") =>
+      ((await reader.read(collectionType, { language, defaultLanguage }))?.items || []).filter((item) => !item.invalid)
+        .length,
   };
 }
 
@@ -175,7 +212,20 @@ async function buildRenderDeps(projectId, collectionDeps = null) {
     coreSnippetsDir: CORE_SNIPPETS_DIR,
     getProjectData: () => projectRepo.getProjectById(projectId) || null,
     getMediaFiles: () => readMediaFile(projectId),
-    listPages: () => listPagesFromDir(getProjectDir(folderName)),
+    // The theme's visitor-facing strings, every language the project publishes.
+    // Read through the caller's adapter when there is one, so the words come
+    // from the same project directory its other content does.
+    loadSiteStrings: () => {
+      const project = projectRepo.getProjectById(projectId);
+      const { defaultLanguage, languages } = projectLanguages(project);
+      const read =
+        collectionDeps?.storage && collectionDeps?.scope
+          ? readerFor(collectionDeps.storage, collectionDeps.scope)
+          : (relPath) => fs.readFile(path.join(getProjectDir(folderName), relPath), "utf-8").catch(() => null);
+      return loadSiteStrings(read, [defaultLanguage, ...languages]);
+    },
+    listPages: () =>
+      listPagesFromDir(getProjectDir(folderName), { defaultLanguage: projectRepo.getProjectById(projectId)?.defaultLanguage }),
     sanitizeWidgetData,
     preprocessThemeSettings,
     buildRuntimeSiteIcons,
@@ -213,6 +263,12 @@ async function renderPageLayout(
 ) {
   const deps = await buildRenderDeps(projectId, collectionDeps);
   return engineRenderPageLayout(deps, contentSections, pageData, rawThemeSettings, renderMode, sharedGlobals);
+}
+
+async function planPagination(projectId, widgets, widgetsOrder, options, collectionDeps = null) {
+  if (!collectionDeps) return null;
+  const deps = await buildRenderDeps(projectId, collectionDeps);
+  return enginePlanPagination(deps, widgets, widgetsOrder, options);
 }
 
 async function widgetSupportsTransparentHeader(projectId, widgetType) {
@@ -265,6 +321,7 @@ export {
   renderCollectionItemPageWithDeps,
   renderEnqueuedAssetTags,
   widgetSupportsTransparentHeader,
+  planPagination,
   buildRenderDeps,
   buildCollectionRenderDeps,
 };

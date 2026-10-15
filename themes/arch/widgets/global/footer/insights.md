@@ -23,7 +23,8 @@ Up to **4 blocks** can be added. Column sizing is controlled by the `layout` set
 | `logo_text` | `logo` (image), `logo_text` (text fallback), `logo_width` (50-300 px), `text` (richtext) | Displays an image logo when provided; falls back to a styled text logo. The richtext area below is ideal for a tagline or short company description. Logo width slider prevents oversized logos from dominating the column |
 | `text_block` | `title`, `text` (richtext) | General-purpose column. Title renders as an h3 heading. Richtext supports paragraphs, links, line breaks. Good for contact info, hours, addresses |
 | `menu_block` | `title`, `menu` (menu reference, default `footer-menu`) | Pulls a site menu by name. Submenus are hidden by design, keeping the footer flat and scannable |
-| `social_block` | `title` | Renders social icons from the global `theme.social` config. No per-block icon selection; the icon set is site-wide |
+| `social_block` | `title` | Renders the project's social profiles (Project details) when any are set, otherwise the global `theme.social` config. No per-block icon selection; the icon set is site-wide |
+| `business_details` | `title`, `show_address`, `show_contact`, `show_hours` (checkboxes, all on by default) | Draws the address, phone, email and opening hours entered in Project details, so they stay in step with what search engines read. Consecutive days with the same hours collapse into one line ("Mon–Fri"). Renders nothing on the published site when no details are set |
 
 ---
 
@@ -89,6 +90,7 @@ Up to **4 blocks** can be added. Column sizing is controlled by the `layout` set
 
 - **Color scheme is the single biggest mood lever.** `highlight-primary` and `highlight-secondary` create a strong visual endpoint. `standard-primary` makes the footer nearly invisible, useful when the last content section already has a dark background.
 - **Omit the copyright text to get a compact footer.** When copyright is blank the widget switches to a symmetric 8 rem padding block. This works well for sites that handle legal text elsewhere or want a tidier bottom edge.
+- **Prefer business_details over a hand-typed text_block for address and hours.** The details come from Project details, so changing them there updates the footer and the structured data together.
 - **Use two text_blocks instead of one when contact info is complex.** Splitting hours and address into separate columns improves scannability on desktop and stacks cleanly on mobile.
 - **Logo width matters more than people expect.** A 50 px logo keeps the column compact and text-dominant; 200+ px turns the column into a visual brand anchor. Match the size to the footer's role: navigation-focused footers want a smaller logo, brand-focused footers want a larger one.
 - **The social_block pulls icons globally.** You cannot show different social icons per page. If a client needs platform-specific links (e.g., Yelp for a restaurant but Behance for a portfolio), configure the global theme social settings to include all relevant platforms.

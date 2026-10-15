@@ -9,11 +9,12 @@
  * Run with: node --test server/tests/projects.test.js
  */
 
-import { describe, it, before, after, beforeEach } from "node:test";
+import { describe, it, before, after, beforeEach, mock } from "node:test";
 import assert from "node:assert/strict";
 import fs from "fs-extra";
 import path from "path";
 import os from "os";
+import { randomUUID } from "node:crypto";
 
 // ============================================================================
 // Isolated test environment
@@ -32,6 +33,8 @@ process.env.NODE_ENV = "test";
 // Now import server modules — they'll use our overridden paths
 const { DATA_DIR, THEMES_SEED_DIR, getThemeDir, getProjectDir, getProjectPagesDir, getProjectMenusDir } =
   await import("../config.js");
+
+const { LocalAssetStorageAdapter, LocalStorageAdapter } = await import("@widgetizer/adapters-local");
 
 const {
   getAllProjects,
@@ -229,6 +232,13 @@ function mockReq({ params = {}, body = {}, file = null } = {}) {
     body,
     file,
     app: { locals: {} },
+    // setupBuilderServer attaches the adapter set to EVERY request reaching these
+    // routers, so handlers may use it without a scope-resolving middleware — the
+    // identity logo check does, to confirm a picked file still exists.
+    adapters: {
+      assetStorage: new LocalAssetStorageAdapter({ dataRoot: TEST_DATA_DIR }),
+      storage: new LocalStorageAdapter({ dataRoot: TEST_DATA_DIR }),
+    },
     // express-validator needs these to exist
     [Symbol.for("express-validator#contexts")]: [],
   };
@@ -304,7 +314,7 @@ function createTestMediaData() {
         sizes: {
           thumb: { path: "/uploads/images/photo-thumb.jpg", width: 150, height: 112 },
         },
-        usedIn: ["index"],
+        usedIn: ["page:index"],
       },
       {
         id: "test-media-2",
@@ -453,6 +463,10 @@ describe("readProjectsData / writeProjectsData", () => {
         preset: null,
         receiveThemeUpdates: false,
         siteUrl: "",
+        cleanUrls: false,
+        siteIdentity: { category: "bakery", text: { publicName: "Crumbly" } },
+        defaultLanguage: "en",
+        languages: [],
         created: now,
         updated: now,
       }],
@@ -652,6 +666,43 @@ describe("createProject", () => {
     assert.match(res._json.error, /receiveThemeUpdates.*boolean/i);
   });
 
+  it("stores cleanUrls flag (defaults to false)", async () => {
+    const defaulted = await createTestProject("Clean URLs Default");
+    assert.equal(defaulted.cleanUrls, false);
+    const enabled = await createTestProject("Clean URLs On", { cleanUrls: true });
+    assert.equal(enabled.cleanUrls, true);
+  });
+
+  it("rejects non-boolean cleanUrls on create", async () => {
+    const res = await callController(createProject, {
+      body: { name: "String Clean URLs", description: "", theme: TEST_THEME_ID, cleanUrls: "yes" },
+    });
+    assert.equal(res._status, 400);
+    assert.match(res._json.error, /cleanUrls.*boolean/i);
+  });
+
+  it("rejects a non-string description, siteTitle or siteUrl on create without scaffolding a folder", async () => {
+    for (const [field, value] of [["description", { text: "x" }], ["siteTitle", 42], ["siteUrl", 42]]) {
+      const res = await callController(createProject, {
+        body: { name: `Typed ${field}`, description: "", theme: TEST_THEME_ID, [field]: value },
+      });
+      assert.equal(res._status, 400);
+      assert.match(res._json.error, new RegExp(`${field}.*string`, "i"));
+    }
+    assert.equal(projectRepo.getAllProjects().length, 0);
+    assert.deepEqual(await fs.readdir(path.join(DATA_DIR, "projects")), []);
+  });
+
+  it("clears siteTitle when sent as null", async () => {
+    const project = await createTestProject("Null Title", { siteTitle: "Before" });
+    const res = await callController(updateProject, {
+      params: { id: project.id },
+      body: { name: "Null Title", siteTitle: null },
+    });
+    assert.equal(res._status, 200);
+    assert.equal(res._json.siteTitle, "");
+  });
+
   it("stores siteTitle", async () => {
     const project = await createTestProject("Site Title Project", { siteTitle: "Widgetizer Demo" });
     assert.equal(project.siteTitle, "Widgetizer Demo");
@@ -753,7 +804,7 @@ describe("createProject", () => {
       body: { name: "Bad URL Project", description: "", theme: TEST_THEME_ID, siteUrl: "not a url" },
     });
     assert.equal(res._status, 400);
-    assert.match(res._json.error, /website address|valid url/i);
+    assert.match(res._json.error, /site address|valid url/i);
   });
 
   it("accepts an empty siteUrl (optional field)", async () => {
@@ -967,6 +1018,102 @@ describe("updateProject", () => {
     assert.ok(await fs.pathExists(getProjectDir("renamed-folder")), "new directory should exist");
   });
 
+  it("keeps the renamed copy when the old folder can only be partly removed", async () => {
+    // Removal deletes entries one by one, so a locked file (Windows) stops it
+    // partway with part of the old folder already gone. The copy is then the only
+    // complete version of the project: the row must point at it, and nothing may
+    // remove it.
+    const oldDir = getProjectDir(project.folderName);
+    const newDir = getProjectDir("renamed-locked");
+    const realRemove = fs.remove;
+    const removeMock = mock.method(fs, "remove", async (target, ...rest) => {
+      if (path.resolve(target) === path.resolve(oldDir)) {
+        await realRemove.call(fs, path.join(oldDir, "theme.json"));
+        throw Object.assign(new Error("EBUSY"), { code: "EBUSY" });
+      }
+      return realRemove.call(fs, target, ...rest);
+    });
+    try {
+      const res = await callController(updateProject, {
+        params: { id: project.id },
+        body: { name: "Original Name", folderName: "renamed-locked" },
+      });
+
+      assert.equal(res._status, 200);
+      assert.equal(res._json.folderName, "renamed-locked");
+      assert.equal(res._json.folderLeftBehind, oldDir);
+      assert.equal(projectRepo.getProjectById(project.id).folderName, "renamed-locked");
+      assert.ok(await fs.pathExists(path.join(newDir, "theme.json")), "the copy is complete");
+      assert.ok(await fs.pathExists(path.join(newDir, "pages", "index.json")), "the copy keeps its pages");
+    } finally {
+      removeMock.mock.restore();
+    }
+  });
+
+  it("leaves the project as it was when the copy fails", async () => {
+    const oldDir = getProjectDir(project.folderName);
+    const newDir = getProjectDir("renamed-copy-fails");
+    const copyMock = mock.method(fs, "copy", async (_src, dest) => {
+      // A copy that fails partway leaves some of the destination behind.
+      await fs.outputJson(path.join(dest, "theme.json"), {});
+      throw Object.assign(new Error("ENOSPC"), { code: "ENOSPC" });
+    });
+    try {
+      const res = await callController(updateProject, {
+        params: { id: project.id },
+        body: { name: "Original Name", folderName: "renamed-copy-fails" },
+      });
+
+      assert.equal(res._status, 500);
+      assert.equal(projectRepo.getProjectById(project.id).folderName, project.folderName);
+      assert.ok(await fs.pathExists(path.join(oldDir, "theme.json")), "the old folder is untouched");
+      assert.ok(await fs.pathExists(path.join(oldDir, "pages", "index.json")));
+      assert.ok(!(await fs.pathExists(newDir)), "the unfinished copy is removed");
+    } finally {
+      copyMock.mock.restore();
+    }
+  });
+
+  it("removes the copy and keeps the old folder when the row cannot be updated", async () => {
+    // Until the row names the copy, the old folder is the project. Another row
+    // claiming the destination name makes the row update fail on the unique
+    // folder_name constraint.
+    const oldDir = getProjectDir(project.folderName);
+    const newDir = getProjectDir("renamed-row-fails");
+    const realCopy = fs.copy;
+    const copyMock = mock.method(fs, "copy", async (...args) => {
+      await realCopy.apply(fs, args);
+      projectRepo.createProject({
+        ...projectRepo.getProjectById(project.id),
+        id: randomUUID(),
+        name: "Claimer",
+        folderName: "renamed-row-fails",
+      });
+    });
+    try {
+      const res = await callController(updateProject, {
+        params: { id: project.id },
+        body: { name: "Original Name", folderName: "renamed-row-fails" },
+      });
+
+      assert.equal(res._status, 500);
+      assert.equal(projectRepo.getProjectById(project.id).folderName, project.folderName);
+      assert.ok(await fs.pathExists(path.join(oldDir, "theme.json")), "the old folder is untouched");
+      assert.ok(!(await fs.pathExists(newDir)), "the copy is removed");
+    } finally {
+      copyMock.mock.restore();
+    }
+  });
+
+  it("reports no folder left behind after a clean rename", async () => {
+    const res = await callController(updateProject, {
+      params: { id: project.id },
+      body: { name: "Original Name", folderName: "renamed-clean" },
+    });
+    assert.equal(res._status, 200);
+    assert.equal(res._json.folderLeftBehind, undefined);
+  });
+
   it("preserves project files after folder rename", async () => {
     const newFolderName = "renamed-files";
     const res = await callController(updateProject, {
@@ -1044,6 +1191,25 @@ describe("updateProject", () => {
     });
     assert.equal(res._status, 400);
     assert.match(res._json.error, /folder name.*already exists/i);
+  });
+
+  it("refuses a folderName that only exists on disk, leaving both folders as they were", async () => {
+    // A folder left behind by a deletion that could not remove it is taken: the
+    // project must not merge into it, and nothing may delete it.
+    const leftover = getProjectDir("leftover-folder");
+    await fs.outputJson(path.join(leftover, "pages", "stray.json"), { name: "Stray" });
+    const currentDir = getProjectDir(project.folderName);
+
+    const res = await callController(updateProject, {
+      params: { id: project.id },
+      body: { name: "Original Name", folderName: "leftover-folder" },
+    });
+
+    assert.equal(res._status, 400);
+    assert.match(res._json.error, /folder name.*already exists/i);
+    assert.deepEqual(await fs.readdir(path.join(leftover, "pages")), ["stray.json"]);
+    assert.ok(await fs.pathExists(currentDir), "the project's own folder is untouched");
+    assert.equal(projectRepo.getProjectById(project.id).folderName, project.folderName);
   });
 
   it("returns 404 for non-existent project", async () => {
@@ -1132,6 +1298,35 @@ describe("updateProject", () => {
     });
     assert.equal(res._status, 400);
     assert.match(res._json.error, /name.*required/i);
+  });
+
+  // Through the real route, because the route's input checks run before the
+  // controller: a check that fills in a field the request left out turns
+  // "not sent" into "set to empty". The new-project form saves a picked logo
+  // this way, after the project is created with its notes.
+  it("keeps the description when a partial update through the route leaves it out", async () => {
+    const { default: express } = await import("express");
+    const { default: projectsRouter } = await import("../routes/projects.js");
+    const app = express();
+    app.use((req, _res, next) => {
+      req.adapters = mockReq().adapters;
+      next();
+    });
+    app.use("/api/projects", projectsRouter);
+    const server = await new Promise((resolve) => {
+      const s = app.listen(0, () => resolve(s));
+    });
+    try {
+      const response = await fetch(`http://127.0.0.1:${server.address().port}/api/projects/${project.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: "Original Name", siteUrl: "https://example.com" }),
+      });
+      assert.equal(response.status, 200);
+      assert.equal(projectRepo.getProjectById(project.id).description, "A test project");
+    } finally {
+      await new Promise((resolve) => server.close(resolve));
+    }
   });
 });
 
@@ -1261,6 +1456,37 @@ describe("deleteProject", () => {
     assert.match(res._json.message, /Named Project/);
   });
 
+  it("reports a folder it could not remove instead of failing the deletion", async () => {
+    // The row is already gone when the folder is removed, so a locked file
+    // (Windows) must not turn the deletion into a failure: the project has left
+    // the list either way.
+    const project = await createTestProject("Locked Files");
+    const dir = getProjectDir(project.folderName);
+    const realRemove = fs.remove;
+    const removeMock = mock.method(fs, "remove", async (target, ...rest) => {
+      if (path.resolve(target) === path.resolve(dir)) throw Object.assign(new Error("EBUSY"), { code: "EBUSY" });
+      return realRemove.call(fs, target, ...rest);
+    });
+    try {
+      const res = await callController(deleteProject, { params: { id: project.id } });
+
+      assert.equal(res._status, 200);
+      assert.equal(res._json.success, true);
+      assert.equal(res._json.folderLeftBehind, dir);
+      assert.match(res._json.message, /could not be removed/);
+      const data = await projectRepo.readProjectsData();
+      assert.equal(data.projects.length, 0);
+    } finally {
+      removeMock.mock.restore();
+    }
+  });
+
+  it("reports no folder left behind after a complete deletion", async () => {
+    const project = await createTestProject("Clean Delete");
+    const res = await callController(deleteProject, { params: { id: project.id } });
+    assert.equal(res._json.folderLeftBehind, null);
+  });
+
   it("cascades deletion to media metadata in SQLite", async () => {
     const project = await createTestProject("Media Delete");
     const mediaData = createTestMediaData();
@@ -1356,6 +1582,22 @@ describe("duplicateProject", () => {
     assert.equal(data.projects.length, 2);
   });
 
+  it("never copies into a folder left on disk by an earlier deletion", async () => {
+    // A folder left on disk by a deletion that could not remove it is taken, so
+    // the copy never merges into its old content.
+    const leftover = getProjectDir("original-project-copy");
+    await fs.outputJson(path.join(leftover, "pages", "stray.json"), { name: "Stray" });
+
+    const res = await callController(duplicateProject, { params: { id: original.id } });
+
+    assert.equal(res._status, 201);
+    assert.notEqual(res._json.folderName, "original-project-copy");
+    const copyDir = getProjectDir(res._json.folderName);
+    assert.ok(!(await fs.pathExists(path.join(copyDir, "pages", "stray.json"))), "copy has none of the leftover");
+    assert.deepEqual(await fs.readdir(leftover), ["pages"], "leftover folder is left as it was");
+    assert.ok(await fs.pathExists(path.join(leftover, "pages", "stray.json")));
+  });
+
   it("returns 404 for non-existent project", async () => {
     const res = await callController(duplicateProject, { params: { id: "non-existent" } });
     assert.equal(res._status, 404);
@@ -1434,7 +1676,13 @@ describe("duplicateProject", () => {
     const banner = duplicateMedia.files.find((file) => file.filename === "banner.png");
 
     assert.deepEqual(photo.usedIn, ["global:theme-settings"]);
-    assert.deepEqual(banner.usedIn, ["index"]);
+    // The rebuild stamps a uuid on a page file that has none and keys the row by it,
+    // so read the persisted uuid and assert the exact source.
+    const copiedIndex = await fs.readJson(
+      path.join(getProjectDir(res._json.folderName), "pages", "index.json"),
+    );
+    assert.ok(copiedIndex.uuid, "the rebuild stamps a uuid on the copied page");
+    assert.deepEqual(banner.usedIn, [`page:${copiedIndex.uuid}`]);
   });
 });
 
@@ -1514,7 +1762,7 @@ describe("exportProject", () => {
     assert.equal(exported.files.length, 2);
     assert.equal(exported.files[0].filename, "photo.jpg");
     assert.equal(exported.files[0].type, "image/jpeg");
-    assert.deepEqual(exported.files[0].usedIn, ["index"]);
+    assert.deepEqual(exported.files[0].usedIn, ["page:index"]);
     assert.ok(exported.files[0].sizes.thumb, "Should include size variants");
     assert.equal(exported.files[1].filename, "banner.png");
   });
@@ -1873,7 +2121,220 @@ describe("importProject", () => {
     const banner = importedMedia.files.find((file) => file.filename === "banner.png");
 
     assert.deepEqual(photo.usedIn, ["global:theme-settings"]);
-    assert.deepEqual(banner.usedIn, ["index"]);
+    // The rebuild stamps a uuid on a page file that has none and keys the row by it,
+    // so read the persisted uuid and assert the exact source.
+    const copiedIndex = await fs.readJson(
+      path.join(getProjectDir(res._json.folderName), "pages", "index.json"),
+    );
+    assert.ok(copiedIndex.uuid, "the rebuild stamps a uuid on the copied page");
+    assert.deepEqual(banner.usedIn, [`page:${copiedIndex.uuid}`]);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Site languages
+// ---------------------------------------------------------------------------
+
+describe("site languages", () => {
+  beforeEach(async () => {
+    await resetProjects();
+  });
+
+  /** Update a project, asserting only on the language fields. */
+  // Languages are added and removed through the project-scoped endpoint, which
+  // seeds and cleans up content. These tests only need the row in a given state.
+  const setLanguages = (project, languages) => projectRepo.updateProject(project.id, { languages });
+
+  const update = (project, body) =>
+    callController(updateProject, { params: { id: project.id }, body: { name: project.name, ...body } });
+
+  it("defaults a new project to English with no other languages", async () => {
+    const project = await createTestProject("Default Language");
+    assert.equal(project.defaultLanguage, "en");
+    assert.deepEqual(project.languages, []);
+  });
+
+  it("stores a default language, lowercased", async () => {
+    const project = await createTestProject("Greek Site", { defaultLanguage: "EL" });
+    assert.equal(project.defaultLanguage, "el");
+    assert.equal(projectRepo.getProjectById(project.id).defaultLanguage, "el");
+  });
+
+  it("accepts a regional code", async () => {
+    const project = await createTestProject("Brazil", { defaultLanguage: "pt-br" });
+    assert.equal(project.defaultLanguage, "pt-br");
+  });
+
+  it("rejects a malformed code", async () => {
+    for (const code of ["eng", "e", "en_US", "", 42]) {
+      const res = await callController(createProject, {
+        body: { name: `Bad ${code}`, description: "", theme: TEST_THEME_ID, defaultLanguage: code },
+      });
+      assert.equal(res._status, 400, `expected a rejection for ${JSON.stringify(code)}`);
+    }
+    assert.equal(projectRepo.getAllProjects().length, 0);
+  });
+
+  it("rejects a right-to-left language, naming it", async () => {
+    const res = await callController(createProject, {
+      body: { name: "Arabic", description: "", theme: TEST_THEME_ID, defaultLanguage: "ar" },
+    });
+    assert.equal(res._status, 400);
+    assert.match(res._json.error, /right-to-left/i);
+  });
+
+  it("refuses to add or remove a language, because that moves content", async () => {
+    const project = await createTestProject("No Raw Adds");
+    const added = await update(project, { languages: ["el"] });
+    assert.equal(added._status, 400);
+    assert.match(added._json.error, /one at a time/i);
+    assert.deepEqual(projectRepo.getProjectById(project.id).languages, []);
+
+    setLanguages(project, ["el"]);
+    const removed = await update(project, { languages: [] });
+    assert.equal(removed._status, 400);
+    assert.deepEqual(projectRepo.getProjectById(project.id).languages, ["el"]);
+  });
+
+  it("refuses a new project that asks for more than one language", async () => {
+    const res = await callController(createProject, {
+      body: { name: "Born Multilingual", description: "", theme: TEST_THEME_ID, languages: ["el"] },
+    });
+    assert.equal(res._status, 400);
+    assert.match(res._json.error, /once it exists/i);
+  });
+
+  it("accepts the unchanged list, so saving the form is never blocked by it", async () => {
+    const project = await createTestProject("Resend");
+    setLanguages(project, ["el", "it"]);
+    const res = await update(project, { siteTitle: "Renamed", languages: ["it", "el"] });
+    assert.equal(res._status, 200);
+    assert.deepEqual([...res._json.languages].sort(), ["el", "it"]);
+  });
+
+  it("rejects a code whose shape hides its direction", async () => {
+    const project = await createTestProject("Odd Subtags");
+
+    // A four-character VARIANT is not a script, so Arabic stays right-to-left.
+    const variant = await update(project, { languages: ["ar-1994"] });
+    assert.equal(variant._status, 400);
+    assert.match(variant._json.error, /right-to-left/i);
+
+    // 586 is Pakistan, where Punjabi is right-to-left — refused rather than guessed at.
+    const numeric = await update(project, { languages: ["pa-586"] });
+    assert.equal(numeric._status, 400);
+    assert.match(numeric._json.error, /country code/i);
+
+    assert.deepEqual(projectRepo.getProjectById(project.id).languages, []);
+  });
+
+  it("rejects languages that are not an array", async () => {
+    const res = await callController(createProject, {
+      body: { name: "Bad Languages", description: "", theme: TEST_THEME_ID, languages: "el" },
+    });
+    assert.equal(res._status, 400);
+    assert.match(res._json.error, /array/i);
+  });
+
+  it("rejects a resent list that still contains the default language", async () => {
+    const project = await createTestProject("Duplicate Language");
+    setLanguages(project, ["en"]);
+    const res = await update(project, { languages: ["en"] });
+    assert.equal(res._status, 400);
+    assert.match(res._json.error, /already the site's default/i);
+  });
+
+  it("leaves the languages alone on an update that does not mention them", async () => {
+    const project = await createTestProject("Untouched");
+    await update(project, { defaultLanguage: "el" });
+    setLanguages(project, ["it"]);
+
+    const res = await update(project, { siteTitle: "Renamed" });
+    assert.equal(res._status, 200);
+    assert.equal(res._json.defaultLanguage, "el");
+    assert.deepEqual(res._json.languages, ["it"]);
+  });
+
+  it("lets the default language change while the site has one language", async () => {
+    const project = await createTestProject("Single Language");
+    const res = await update(project, { defaultLanguage: "el" });
+    assert.equal(res._status, 200);
+    assert.equal(res._json.defaultLanguage, "el");
+  });
+
+  it("locks the default language once another language exists", async () => {
+    const project = await createTestProject("Locked");
+    setLanguages(project, ["el"]);
+
+    const res = await update(project, { defaultLanguage: "it" });
+    assert.equal(res._status, 400);
+    assert.match(res._json.error, /one language/i);
+    assert.equal(projectRepo.getProjectById(project.id).defaultLanguage, "en");
+  });
+
+  it("accepts the unchanged default language while multilang", async () => {
+    const project = await createTestProject("Unchanged Default");
+    setLanguages(project, ["el"]);
+
+    const res = await update(project, { defaultLanguage: "en" });
+    assert.equal(res._status, 200);
+    assert.deepEqual(res._json.languages, ["el"]);
+  });
+
+  it("carries both fields through a duplicate", async () => {
+    const project = await createTestProject("Duplicate Me", { defaultLanguage: "el" });
+    setLanguages(project, ["it"]);
+
+    const res = await callController(duplicateProject, { params: { id: project.id } });
+    assert.equal(res._status, 201);
+    assert.equal(res._json.defaultLanguage, "el");
+    assert.deepEqual(res._json.languages, ["it"]);
+  });
+
+  it("carries both fields through export and import", async () => {
+    const original = await createTestProject("Travelling Site", { defaultLanguage: "el" });
+    setLanguages(original, ["it"]);
+
+    const { res: exportRes } = await exportTestProject(original.id);
+    assert.equal(exportRes._status, 200);
+    const importRes = await callController(importProject, { file: zipBufferToTempFile(exportRes.getBuffer()) });
+
+    assert.equal(importRes._status, 201);
+    assert.equal(importRes._json.defaultLanguage, "el");
+    assert.deepEqual(importRes._json.languages, ["it"]);
+  });
+
+  // Importing anyway used to "succeed" as a single English site, which put the
+  // backup's other-language pages, menus and items on disk with nothing listing
+  // them — a restore that silently returns part of a website.
+  it("refuses an import whose languages this version cannot restore, and creates nothing", async () => {
+    const before = projectRepo.getAllProjects().length;
+    const zipFile = buildImportZip(
+      {
+        formatVersion: "1.1",
+        project: { name: "Foreign Export", theme: TEST_THEME_ID, defaultLanguage: "ar", languages: ["nonsense"] },
+      },
+      { "theme.json": { name: "Test Theme", version: "1.0.0" }, "pages/index.json": { name: "Home", slug: "index", widgets: {} } },
+    );
+
+    const res = await callController(importProject, { file: zipFile });
+    assert.equal(res._status, 400, JSON.stringify(res._json));
+    assert.match(res._json.error, /cannot work with/i);
+    assert.match(res._json.error, /nothing has changed/i);
+    assert.equal(projectRepo.getAllProjects().length, before, "a refused import creates no project");
+  });
+
+  // A backup older than languages names none, and is a single-language site.
+  it("still imports a backup that names no languages at all", async () => {
+    const zipFile = buildImportZip(
+      { formatVersion: "1.0", project: { name: "Legacy Export", theme: TEST_THEME_ID } },
+      { "theme.json": { name: "Test Theme", version: "1.0.0" }, "pages/index.json": { name: "Home", slug: "index", widgets: {} } },
+    );
+
+    const res = await callController(importProject, { file: zipFile });
+    assert.equal(res._status, 201, JSON.stringify(res._json));
+    assert.equal(res._json.defaultLanguage, "en");
+    assert.deepEqual(res._json.languages, []);
   });
 });
 
@@ -1949,4 +2410,212 @@ describe("exportProject -> importProject round-trip", () => {
       assert.ok(!originalIds.has(file.id), "Imported media IDs should be regenerated");
     }
   });
+});
+
+describe("siteIdentity", () => {
+  const IDENTITY = {
+    category: "bakery",
+    logo: "/uploads/images/logo.png",
+    email: "hello@crumbly.example",
+    profiles: { instagram: "https://instagram.com/crumbly" },
+    locations: [
+      {
+        streetAddress: "1 Baker St",
+        addressLocality: "Athens",
+        addressCountry: "GR",
+        openingHours: { monday: [{ opens: "07:00", closes: "14:00" }], sunday: [] },
+      },
+    ],
+    text: { publicName: "Crumbly" },
+  };
+
+  beforeEach(async () => {
+    await resetProjects();
+  });
+
+  it("defaults to an empty identity", async () => {
+    const project = await createTestProject("Identity Default");
+    assert.deepEqual(project.siteIdentity, {});
+    assert.deepEqual(projectRepo.getProjectById(project.id).siteIdentity, {});
+  });
+
+  it("stores a valid identity on create", async () => {
+    const project = await createTestProject("Identity Create", { siteIdentity: IDENTITY });
+    assert.deepEqual(projectRepo.getProjectById(project.id).siteIdentity, IDENTITY);
+  });
+
+  it("refuses an invalid identity on create and names the fields", async () => {
+    const res = await callController(createProject, {
+      body: {
+        name: "Identity Bad",
+        description: "",
+        theme: TEST_THEME_ID,
+        siteIdentity: { category: "spaceport", email: "nope" },
+      },
+    });
+    assert.equal(res._status, 400);
+    assert.deepEqual(res._json.fields, [
+      { field: "category", code: "unknown" },
+      { field: "email", code: "invalid" },
+    ]);
+    assert.equal(projectRepo.getAllProjects().length, 0);
+  });
+
+  it("replaces the identity on update, strips tags, and keeps it when omitted", async () => {
+    const project = await createTestProject("Identity Update", { siteIdentity: IDENTITY });
+
+    const updated = await callController(updateProject, {
+      params: { id: project.id },
+      body: {
+        name: "Identity Update",
+        siteIdentity: {
+          category: "person",
+          locations: [{ streetAddress: "<i>1</i> Baker & Sons St", text: { label: "<b>Main</b>" } }],
+          text: { publicName: "<b>Jo</b> Baker" },
+        },
+      },
+    });
+    assert.equal(updated._status, 200);
+    assert.deepEqual(updated._json.siteIdentity, {
+      category: "person",
+      locations: [{ streetAddress: "1 Baker & Sons St", text: { label: "Main" } }],
+      text: { publicName: "Jo Baker" },
+    });
+
+    const untouched = await callController(updateProject, {
+      params: { id: project.id },
+      body: { name: "Identity Update Renamed" },
+    });
+    assert.deepEqual(untouched._json.siteIdentity, updated._json.siteIdentity);
+  });
+
+  it("refuses an invalid identity on update without changing the stored one", async () => {
+    const project = await createTestProject("Identity Update Bad", { siteIdentity: IDENTITY });
+    const res = await callController(updateProject, {
+      params: { id: project.id },
+      body: { name: "Identity Update Bad", siteIdentity: { logo: "https://cdn.example.com/logo.png" } },
+    });
+    assert.equal(res._status, 400);
+    assert.deepEqual(res._json.fields, [{ field: "logo", code: "invalid" }]);
+    assert.deepEqual(projectRepo.getProjectById(project.id).siteIdentity, IDENTITY);
+  });
+
+  it("copies the identity to a duplicate", async () => {
+    const project = await createTestProject("Identity Duplicate", { siteIdentity: IDENTITY });
+    const res = await callController(duplicateProject, { params: { id: project.id } });
+    assert.equal(res._status, 201);
+    assert.deepEqual(projectRepo.getProjectById(res._json.id).siteIdentity, IDENTITY);
+  });
+
+  it("round-trips the identity through export and import", async () => {
+    const project = await createTestProject("Identity Round Trip", { siteIdentity: IDENTITY });
+    const { res: exportRes, manifest } = await exportTestProject(project.id);
+    assert.equal(exportRes._status, 200);
+    assert.deepEqual(manifest.project.siteIdentity, IDENTITY);
+
+    const importRes = await callController(importProject, { file: zipBufferToTempFile(exportRes.getBuffer()) });
+    assert.equal(importRes._status, 201);
+    assert.deepEqual(projectRepo.getProjectById(importRes._json.id).siteIdentity, IDENTITY);
+  });
+
+  it("keeps only the valid part of an imported identity", async () => {
+    const zipFile = buildImportZip(
+      {
+        formatVersion: "1.1",
+        project: {
+          name: "Identity Import",
+          theme: TEST_THEME_ID,
+          siteIdentity: { category: "spaceport", email: "hello@crumbly.example", profiles: { myspace: "https://myspace.com/x" } },
+        },
+      },
+      { "theme.json": { name: "Test Theme", version: "1.0.0" } },
+    );
+    const res = await callController(importProject, { file: zipFile });
+    assert.equal(res._status, 201);
+    assert.deepEqual(projectRepo.getProjectById(res._json.id).siteIdentity, { email: "hello@crumbly.example" });
+  });
+
+  it("prunes a day with non-string times on import instead of failing", async () => {
+    const zipFile = buildImportZip(
+      {
+        formatVersion: "1.1",
+        project: {
+          name: "Identity Import Hours",
+          theme: TEST_THEME_ID,
+          siteIdentity: {
+            locations: [
+              {
+                addressLocality: "Athens",
+                openingHours: {
+                  monday: [{ opens: { toString: null }, closes: "17:00" }],
+                  tuesday: [{ opens: ["09:00"], closes: "17:00" }],
+                  friday: [{ opens: "09:00", closes: "17:00" }],
+                },
+              },
+            ],
+          },
+        },
+      },
+      { "theme.json": { name: "Test Theme", version: "1.0.0" } },
+    );
+    const res = await callController(importProject, { file: zipFile });
+    assert.equal(res._status, 201);
+    assert.deepEqual(projectRepo.getProjectById(res._json.id).siteIdentity, {
+      locations: [{ addressLocality: "Athens", openingHours: { friday: [{ opens: "09:00", closes: "17:00" }] } }],
+    });
+  });
+
+  it("refuses non-string times on create with a field error, not a crash", async () => {
+    const res = await callController(createProject, {
+      body: {
+        name: "Identity Bad Hours",
+        description: "",
+        theme: TEST_THEME_ID,
+        siteIdentity: { locations: [{ openingHours: { monday: [{ opens: { toString: null }, closes: "17:00" }] } }] },
+      },
+    });
+    assert.equal(res._status, 400);
+    assert.deepEqual(res._json.fields, [{ field: "locations.0.openingHours.monday.0", code: "invalid" }]);
+  });
+
+  it("stores a profile URL exactly as given, or refuses it — never rewrites it", async () => {
+    const project = await createTestProject("Identity Url");
+    const url = "https://example.com/profile?query=foo&ref=site";
+    const kept = await callController(updateProject, {
+      params: { id: project.id },
+      body: { name: "Identity Url", siteIdentity: { profiles: { facebook: url } } },
+    });
+    assert.equal(kept._status, 200);
+    assert.equal(projectRepo.getProjectById(project.id).siteIdentity.profiles.facebook, url);
+
+    const refused = await callController(updateProject, {
+      params: { id: project.id },
+      body: { name: "Identity Url", siteIdentity: { profiles: { facebook: "https://example.com/profile?query=<foo>&ref=site" } } },
+    });
+    assert.equal(refused._status, 400);
+    assert.deepEqual(refused._json.fields, [{ field: "profiles.facebook", code: "invalid" }]);
+    assert.equal(projectRepo.getProjectById(project.id).siteIdentity.profiles.facebook, url);
+  });
+
+  for (const [label, body] of [
+    ["invalid business details", { siteIdentity: { email: "nope" } }],
+    ["an invalid Site URL", { siteUrl: "not a url" }],
+    ["a non-boolean cleanUrls", { cleanUrls: "yes" }],
+    ["a non-string Site Title", { siteTitle: 42 }],
+    ["a non-string Site URL", { siteUrl: 42 }],
+    ["an object description", { description: { text: "x" } }],
+  ]) {
+    it(`leaves the folder and the row alone when a rename comes with ${label}`, async () => {
+      const project = await createTestProject(`Identity Rename ${label}`);
+      const oldDir = getProjectDir(project.folderName);
+      const res = await callController(updateProject, {
+        params: { id: project.id },
+        body: { name: project.name, folderName: `${project.folderName}-renamed`, ...body },
+      });
+      assert.equal(res._status, 400);
+      assert.ok(await fs.pathExists(oldDir), "the old directory should still exist");
+      assert.ok(!(await fs.pathExists(getProjectDir(`${project.folderName}-renamed`))), "no new directory");
+      assert.equal(projectRepo.getProjectById(project.id).folderName, project.folderName);
+    });
+  }
 });

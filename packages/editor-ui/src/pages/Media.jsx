@@ -215,6 +215,7 @@ export default function Media() {
         confirmText={mediaSelection.modalState.confirmText}
         cancelText={mediaSelection.modalState.cancelText}
         variant={mediaSelection.modalState.variant}
+        returnFocusTo={mediaSelection.modalState.returnFocusTo}
       />
 
       <MediaDrawer

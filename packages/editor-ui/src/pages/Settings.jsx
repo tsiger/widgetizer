@@ -11,15 +11,32 @@ import useThemeStore from "../stores/themeStore";
 import useProjectStore from "../stores/projectStore";
 import useGuardedFormPage from "../hooks/useGuardedFormPage";
 
+/** A save warning as text: each carries a `code`, and a correction may carry the server's own message. */
+function describeWarning(warning, t) {
+  switch (warning.code) {
+    case "MEDIA_USAGE_STALE":
+      return t("themeSettings.toasts.mediaUsageStale");
+    case "SETTING_REMOVED":
+    case "SETTING_AMBIGUOUS":
+      return t("themeSettings.toasts.settingRemoved");
+    default:
+      return warning.message || t("themeSettings.toasts.valueCorrected", { label: warning.label || warning.id || "" });
+  }
+}
+
 export default function Settings() {
   const { t } = useTranslation();
 
   const settings = useThemeStore((s) => s.settings);
   const loading = useThemeStore((s) => s.loading);
+  const saving = useThemeStore((s) => s.saving);
   const hasChanges = useThemeStore((s) => s.hasUnsavedThemeChanges());
-  const { loadSettings, updateThemeSetting, resetThemeSettings, saveSettings } = useThemeStore.getState();
+  const { loadSettings, updateThemeSetting, resetThemeSettings, saveSettings, clearConflict, discardDraft } =
+    useThemeStore.getState();
 
-  const { getDirtyTitle } = useGuardedFormPage(hasChanges);
+  // The draft lives in themeStore and outlives this page; left in place, the page
+  // editor's next save would send the edits the user just discarded.
+  const { getDirtyTitle } = useGuardedFormPage(hasChanges, { onDiscard: discardDraft });
   const showToast = useToastStore((state) => state.showToast);
   const activeProject = useProjectStore((state) => state.activeProject);
 
@@ -77,8 +94,15 @@ export default function Settings() {
       // Drop the response if the active project changed during the save
       if (useProjectStore.getState().activeProject?.id !== projectAtSaveStart.id) return;
 
-      if (result?.warnings?.length) {
-        showToast(result.warnings.join(" "), "warning");
+      if (!result || result.skipped || result.stale) return;
+      if (result.conflict) {
+        // The edits are kept on top of the current settings, still unsaved —
+        // except any for a setting the theme no longer has, which the warnings name.
+        const extra = (result.warnings ?? []).map((warning) => describeWarning(warning, t));
+        showToast([t("themeSettings.toasts.conflict"), ...extra].join(" "), "warning");
+        clearConflict();
+      } else if (result.warnings?.length) {
+        showToast(result.warnings.map((warning) => describeWarning(warning, t)).join(" "), "warning");
       } else {
         showToast(t("themeSettings.toasts.saveSuccess"), "success");
       }
@@ -111,7 +135,7 @@ export default function Settings() {
       }
       buttonProps={{
         onClick: handleSave,
-        disabled: loading || !settings || !hasChanges,
+        disabled: loading || saving || !settings || !hasChanges,
         variant: hasChanges ? "dark" : "primary",
         children: (
           <>
@@ -141,7 +165,7 @@ export default function Settings() {
           </Button>
           <Button
             onClick={handleSave}
-            disabled={loading || !settings || !hasChanges}
+            disabled={loading || saving || !settings || !hasChanges}
             variant={hasChanges ? "dark" : "primary"}
           >
             {t("common.save")}

@@ -254,6 +254,12 @@
           "label": "tTheme:global.widgets.settings.bottom_spacing.options.none"
         }
       ]
+    },
+    {
+      "type": "text",
+      "id": "empty_text",
+      "label": "tTheme:class_schedule.settings.empty_text.label",
+      "defaultKey": "site.class_schedule.empty"
     }
   ],
   "blocks": [
@@ -380,7 +386,11 @@
         "instructor": "Coach Sarah",
         "level": "all-levels",
         "description": "Progressive barbell training for all levels.",
-        "book_link": { "href": "", "text": "Book", "target": "_self" }
+        "book_link": {
+          "href": "",
+          "text": "Book",
+          "target": "_self"
+        }
       }
     },
     {
@@ -393,7 +403,11 @@
         "instructor": "Coach Marcus",
         "level": "intermediate",
         "description": "High-intensity intervals to break up your day.",
-        "book_link": { "href": "", "text": "Book", "target": "_self" }
+        "book_link": {
+          "href": "",
+          "text": "Book",
+          "target": "_self"
+        }
       }
     },
     {
@@ -406,7 +420,11 @@
         "instructor": "Coach Dre",
         "level": "beginner",
         "description": "Technical striking, footwork, and bag rounds.",
-        "book_link": { "href": "", "text": "Book", "target": "_self" }
+        "book_link": {
+          "href": "",
+          "text": "Book",
+          "target": "_self"
+        }
       }
     },
     {
@@ -419,7 +437,11 @@
         "instructor": "Coach Priya",
         "level": "all-levels",
         "description": "Vinyasa flow and targeted mobility work.",
-        "book_link": { "href": "", "text": "Book", "target": "_self" }
+        "book_link": {
+          "href": "",
+          "text": "Book",
+          "target": "_self"
+        }
       }
     },
     {
@@ -432,7 +454,11 @@
         "instructor": "Coach Marcus",
         "level": "intermediate",
         "description": "Team-based metcon for the weekend warrior.",
-        "book_link": { "href": "", "text": "Book", "target": "_self" }
+        "book_link": {
+          "href": "",
+          "text": "Book",
+          "target": "_self"
+        }
       }
     }
   ]

@@ -31,6 +31,10 @@ export function normalize(href) {
   return href.replace(LEADING_TRAILING_C0_OR_SPACE, "").replace(EMBEDDED_TAB_OR_NEWLINE, "");
 }
 
+export function outputPathPrefixFor(outputPath) {
+  return "../".repeat(outputPath.split("/").length - 1);
+}
+
 /**
  * Prefix a relative internal href with `outputPathPrefix`; pass everything else
  * through unchanged. Non-string input is returned as-is (never coerced).
@@ -71,6 +75,7 @@ export function prefixSiteIcons(siteIcons, outputPathPrefix) {
     ...siteIcons,
     primaryIconHref: prefixInternalHref(siteIcons.primaryIconHref, outputPathPrefix),
     legacyIconHref: prefixInternalHref(siteIcons.legacyIconHref, outputPathPrefix),
+    serpIconHref: prefixInternalHref(siteIcons.serpIconHref, outputPathPrefix),
     appleTouchIconHref: prefixInternalHref(siteIcons.appleTouchIconHref, outputPathPrefix),
     manifestHref: prefixInternalHref(siteIcons.manifestHref, outputPathPrefix),
   };

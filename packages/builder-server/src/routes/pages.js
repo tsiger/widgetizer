@@ -1,8 +1,9 @@
 import express from "express";
-import { body, param } from "express-validator";
+import { body } from "express-validator";
 import * as pageController from "../controllers/pageController.js";
-import { stripHtmlTags } from "../services/sanitizationService.js";
+import { stripHtmlToText } from "../services/sanitizationService.js";
 import { resolveActiveProject } from "../middleware/resolveActiveProject.js";
+import { segmentParam, segmentBody } from "../middleware/slugValidators.js";
 import { validateRequest } from "../middleware/validateRequest.js";
 
 import { standardJsonParser, editorJsonParser } from "../middleware/jsonParser.js";
@@ -17,17 +18,17 @@ router.use(resolveActiveProject);
 router.get("/", pageController.getAllPages);
 
 // Get a specific page
-router.get("/:id", [param("id").notEmpty().withMessage("Page ID is required.")], validateRequest, pageController.getPage);
+router.get("/:id", [segmentParam("id")], validateRequest, pageController.getPage);
 
 // Create a new page
 router.post(
   "/",
   standardJsonParser,
   [
-    body("name").trim().customSanitizer(stripHtmlTags).notEmpty().withMessage("Page name is required.").isLength({ max: 200 }).withMessage(`Page name must be at most ${200} characters.`),
-    body("seo.description").optional().trim().customSanitizer(stripHtmlTags),
-    body("seo.og_title").optional().trim().customSanitizer(stripHtmlTags),
-    body("seo.canonical_url").optional().trim().customSanitizer(stripHtmlTags),
+    body("name").trim().customSanitizer(stripHtmlToText).notEmpty().withMessage("Page name is required.").isLength({ max: 200 }).withMessage(`Page name must be at most ${200} characters.`),
+    body("seo.description").optional().trim().customSanitizer(stripHtmlToText),
+    body("seo.og_title").optional().trim().customSanitizer(stripHtmlToText),
+    body("seo.canonical_url").optional().trim().customSanitizer(stripHtmlToText),
   ],
   validateRequest,
   pageController.createPage,
@@ -38,24 +39,24 @@ router.put(
   "/:id",
   standardJsonParser,
   [
-    param("id").notEmpty().withMessage("Page ID is required."),
-    body("name").trim().customSanitizer(stripHtmlTags).notEmpty().withMessage("Page name is required.").isLength({ max: 200 }).withMessage(`Page name must be at most ${200} characters.`),
-    body("seo.description").optional().trim().customSanitizer(stripHtmlTags),
-    body("seo.og_title").optional().trim().customSanitizer(stripHtmlTags),
-    body("seo.canonical_url").optional().trim().customSanitizer(stripHtmlTags),
+    segmentParam("id"),
+    body("name").trim().customSanitizer(stripHtmlToText).notEmpty().withMessage("Page name is required.").isLength({ max: 200 }).withMessage(`Page name must be at most ${200} characters.`),
+    body("seo.description").optional().trim().customSanitizer(stripHtmlToText),
+    body("seo.og_title").optional().trim().customSanitizer(stripHtmlToText),
+    body("seo.canonical_url").optional().trim().customSanitizer(stripHtmlToText),
   ],
   validateRequest,
   pageController.updatePage,
 );
 
 // Delete a page
-router.delete("/:id", [param("id").notEmpty().withMessage("Page ID is required.")], validateRequest, pageController.deletePage);
+router.delete("/:id", [segmentParam("id")], validateRequest, pageController.deletePage);
 
 // Bulk delete pages
 router.post(
   "/bulk-delete",
   standardJsonParser,
-  [body("pageIds").isArray({ min: 1 }).withMessage("At least one page ID is required.")],
+  [body("pageIds").isArray({ min: 1 }).withMessage("At least one page ID is required."), segmentBody("pageIds.*")],
   validateRequest,
   pageController.bulkDeletePages,
 );
@@ -64,9 +65,21 @@ router.post(
 router.post(
   "/:id/duplicate",
   standardJsonParser,
-  [param("id").notEmpty().withMessage("Page ID is required.")],
+  [segmentParam("id")],
   validateRequest,
   pageController.duplicatePage,
+);
+
+// Create this page's version in another language
+router.post(
+  "/:id/translations",
+  standardJsonParser,
+  [
+    segmentParam("id"),
+    body("targetLanguage").isString().withMessage("A target language is required."),
+  ],
+  validateRequest,
+  pageController.createPageLanguageVersion,
 );
 
 // Page editor content saving — uses higher body limit for large widget JSON
@@ -74,10 +87,12 @@ router.post(
   "/:id/content",
   editorJsonParser,
   [
-    param("id").notEmpty().withMessage("Page ID is required."),
-    body("seo.description").optional().trim().customSanitizer(stripHtmlTags),
-    body("seo.og_title").optional().trim().customSanitizer(stripHtmlTags),
-    body("seo.canonical_url").optional().trim().customSanitizer(stripHtmlTags),
+    segmentParam("id"),
+    // The save can rename the page to this slug, so it is held to the same rule.
+    segmentBody("slug"),
+    body("seo.description").optional().trim().customSanitizer(stripHtmlToText),
+    body("seo.og_title").optional().trim().customSanitizer(stripHtmlToText),
+    body("seo.canonical_url").optional().trim().customSanitizer(stripHtmlToText),
   ],
   validateRequest,
   pageController.savePageContent,

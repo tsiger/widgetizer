@@ -5,10 +5,23 @@ import { useTranslation } from "react-i18next";
 import PageLayout from "@widgetizer/editor-ui/components/layout/PageLayout.jsx";
 import ProjectForm from "../components/projects/ProjectForm.jsx";
 import useToastStore from "@widgetizer/editor-ui/stores/toastStore";
-import { createProject, setActiveProject } from "@widgetizer/editor-ui/queries/projectManager";
+import { createProject, setActiveProject, updateProject } from "@widgetizer/editor-ui/queries/projectManager";
+import { uploadProjectMedia } from "@widgetizer/editor-ui/queries/mediaManager";
 import useProjectStore from "@widgetizer/editor-ui/stores/projectStore";
 import useGuardedFormPage from "@widgetizer/editor-ui/hooks/useGuardedFormPage";
 import { resolveWorkspaceDestination } from "@widgetizer/editor-ui/utils/projectNavigation";
+
+async function addLogo(project, file) {
+  try {
+    const { processedFiles } = await uploadProjectMedia(project.id, [file]);
+    const logo = processedFiles[0]?.path;
+    if (!logo) return false;
+    await updateProject(project.id, { name: project.name, siteIdentity: { ...project.siteIdentity, logo } });
+    return true;
+  } catch {
+    return false;
+  }
+}
 
 export default function ProjectsAdd() {
   const { t } = useTranslation();
@@ -29,10 +42,14 @@ export default function ProjectsAdd() {
     setIsSubmitting(true);
 
     try {
-      const newProject = await createProject(formData);
+      const { logoFile, ...projectData } = formData;
+      const newProject = await createProject(projectData);
       await setActiveProject(newProject.id);
+      // Uploads go to the active project, so the logo waits until the new project is active.
       await fetchActiveProject();
+      const logoAdded = !logoFile || (await addLogo(newProject, logoFile));
       showToast(t("projectsAdd.toasts.createActiveSuccess", { name: newProject.name }), "success");
+      if (!logoAdded) showToast(t("projectsAdd.toasts.logoError"), "warning");
 
       navigateSafely(workspaceDestination);
       return true;

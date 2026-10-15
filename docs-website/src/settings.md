@@ -51,7 +51,7 @@ These settings control the maximum file size allowed for uploads across all proj
 
 #### Maximum Image Upload Size
 
-Sets the maximum size for an individual uploaded file (images, PDFs, and MP3 audio).
+Sets the maximum size for an individual uploaded file (images, PDFs, MP3 audio, and MP4 video).
 
 - **Default:** 50 MB
 - **Range:** 1 MB to 100 MB

@@ -8,7 +8,8 @@
         "height": "medium",
         "alignment": "center",
         "color_scheme": "highlight-primary",
-        "fullwidth": true
+        "fullwidth": true,
+        "image": "/uploads/images/archhero03.webp"
       },
       "blocks": {
         "services-eyebrow": {
@@ -151,7 +152,7 @@
           "settings": {
             "subtitle": "Analytics",
             "title": "Performance Metrics",
-            "description": "<p>Card description text goes here.</p>",
+            "description": "<p>Clear measures that show what is working and what is not.</p>",
             "button_link": {
               "href": "",
               "text": "",
@@ -222,7 +223,8 @@
         "height": "small",
         "alignment": "center",
         "color_scheme": "highlight-primary",
-        "fullwidth": true
+        "fullwidth": true,
+        "image": "/uploads/images/archcta01.webp"
       },
       "blocks": {
         "services-cta-heading": {

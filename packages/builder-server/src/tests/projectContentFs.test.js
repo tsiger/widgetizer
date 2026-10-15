@@ -26,6 +26,7 @@ import { listPagesFromDir, readGlobalWidgetFromDir, readThemeDataFromDir } from 
 let root;
 let projectDir; // a fully-populated project working dir
 let emptyDir; // exists, but has no pages/ subdir and no theme.json
+let multiDir; // a project with a Greek folder beside the root pages
 
 before(async () => {
   root = await fs.mkdtemp(path.join(os.tmpdir(), "widgetizer-content-fs-"));
@@ -48,6 +49,14 @@ before(async () => {
   await fs.writeJSON(path.join(projectDir, "theme.json"), { settings: { global: { colors: [] } } });
 
   await fs.ensureDir(emptyDir);
+
+  multiDir = path.join(root, "multi");
+  await fs.outputJSON(path.join(multiDir, "pages", "index.json"), { name: "Home", widgets: {} });
+  await fs.outputJSON(path.join(multiDir, "pages", "el", "index.json"), { name: "Arxiki", widgets: {} });
+  await fs.outputJSON(path.join(multiDir, "pages", "el", "epikoinonia.json"), { name: "Epikoinonia", widgets: {} });
+  await fs.outputJSON(path.join(multiDir, "pages", "global", "header.json"), { widgetType: "header-en" });
+  await fs.outputJSON(path.join(multiDir, "pages", "el", "global", "header.json"), { widgetType: "header-el" });
+  await fs.outputJSON(path.join(multiDir, "pages", "drafts", "x.json"), { name: "Not a language" });
 });
 
 after(async () => {
@@ -116,5 +125,33 @@ describe("readThemeDataFromDir", () => {
       () => readThemeDataFromDir(emptyDir),
       (err) => err.message.includes("not found"),
     );
+  });
+});
+
+describe("language folders", () => {
+  it("lists every language folder beside the root, stamping the folder's language", async () => {
+    const pages = await listPagesFromDir(multiDir, { defaultLanguage: "en" });
+    assert.deepEqual(
+      pages.map((p) => [p.language, p.id]).sort(),
+      [
+        ["el", "epikoinonia"],
+        ["el", "index"],
+        ["en", "index"],
+      ],
+    );
+  });
+
+  it("stamps the project's own default on root pages, and en when none is given", async () => {
+    const [greekDefault] = (await listPagesFromDir(multiDir, { defaultLanguage: "el" })).filter((p) => p.name === "Home");
+    assert.equal(greekDefault.language, "el");
+    const [noDefault] = (await listPagesFromDir(multiDir)).filter((p) => p.name === "Home");
+    assert.equal(noDefault.language, "en");
+  });
+
+  it("reads a language's own global widget", async () => {
+    assert.equal((await readGlobalWidgetFromDir(multiDir, "header")).widgetType, "header-en");
+    const el = await readGlobalWidgetFromDir(multiDir, "header", { language: "el", defaultLanguage: "en" });
+    assert.equal(el.widgetType, "header-el");
+    assert.equal(await readGlobalWidgetFromDir(multiDir, "footer", { language: "el", defaultLanguage: "en" }), null);
   });
 });

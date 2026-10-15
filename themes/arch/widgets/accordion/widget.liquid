@@ -268,7 +268,7 @@
                 </div>
               {% elsif block.type == 'social' %}
                 <div class="social-links" data-block-id="{{ blockId }}">
-                  {% render 'social-icons', social: theme.social %}
+                  {% render 'social-icons', social: theme.social, identity: project.identity %}
                 </div>
               {% endif %}
             {% endfor %}

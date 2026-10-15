@@ -1,0 +1,32 @@
+{
+  "type": "hero",
+  "displayName": "Hero",
+  "aliases": ["banner", "intro", "welcome"],
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "A clear headline for this page" },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Text",
+      "default": "<p>One or two sentences that say what you offer and who it is for.</p>"
+    },
+    {
+      "type": "link",
+      "id": "button",
+      "label": "Button",
+      "default": { "href": "", "text": "", "target": "_self" }
+    },
+    { "type": "header", "id": "image_header", "label": "Image" },
+    { "type": "image", "id": "image", "label": "Image", "default": "" },
+    {
+      "type": "select",
+      "id": "image_position",
+      "label": "Image position",
+      "default": "end",
+      "options": [
+        { "value": "start", "label": "Start" },
+        { "value": "end", "label": "End" }
+      ]
+    }
+  ]
+}

@@ -25,6 +25,31 @@
    detection does not follow. */
 @source "..";
 
+/* Brand accent — remap Tailwind's default `pink` ramp to Widgetizer magenta
+   (#E0006D). The editor colours its accent with pink-* utilities in ~200 places
+   (buttons, focus rings, active states); overriding the ramp here recolours all
+   of them at once, in the one file every shell imports — so every editor shares
+   the brand magenta without touching a single component. Stops mirror the brand
+   design system's --magenta-* ramp; 900/950 extend it darker for Tailwind
+   parity. */
+@theme {
+  --color-pink-50:  #FFF0F8;
+  --color-pink-100: #FFD6EB;
+  --color-pink-200: #FFA3D3;
+  --color-pink-300: #F96CB5;
+  --color-pink-400: #F63197;
+  /* The editor uses pink-600 for primary buttons/active nav and pink-700 for
+     their hover; a shell may use -500 for the same. Keep 500 and 600 both on
+     the brand accent so every primary renders #E0006D, with the hover one stop
+     darker (#C0005A). */
+  --color-pink-500: #E0006D;
+  --color-pink-600: #E0006D;
+  --color-pink-700: #C0005A;
+  --color-pink-800: #99004F;
+  --color-pink-900: #4F0029;
+  --color-pink-950: #33001A;
+}
+
 @layer base {
   :root {
     --shell-inset: 18px;
@@ -32,6 +57,18 @@
     --shell-content-padding: 32px;
     --sidebar-width: 14rem;
     --sidebar-logo-width: 10rem;
+  }
+
+  /* Anti-flash for loading indicators (LoadingSpinner): invisible for the
+     first 200ms, so fast responses render content without a loader flicker;
+     slow ones fade the spinner in. */
+  @keyframes wz-loader-appear {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+  .wz-loader-appear {
+    opacity: 0;
+    animation: wz-loader-appear 200ms ease-out 200ms forwards;
   }
 
   button {

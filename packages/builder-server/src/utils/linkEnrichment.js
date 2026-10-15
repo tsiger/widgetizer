@@ -3,15 +3,32 @@ import path from "path";
 import { randomUUID } from "crypto";
 import { getProjectPagesDir, getProjectMenusDir, getProjectDir } from "../config.js";
 import { syncCollectionItemMediaUsageOnWrite } from "../services/mediaUsageService.js";
+import { cleanupRichtextLinkRefs, remapRichtextLinkRefs, enrichRichtextLinkRefs } from "@widgetizer/core/richtextLinks";
 import {
-  cleanupRichtextLinkRefs,
-  remapRichtextLinkRefs,
-  enrichRichtextLinkRefs,
-} from "@widgetizer/core/richtextLinks";
+  pagesDir,
+  pageKey,
+  globalKey,
+  menusDir,
+  menuKey,
+  itemsDir,
+  itemKey,
+  resolveLanguage,
+  translationGroupIdOf,
+} from "@widgetizer/core/contentAddress";
+import { languageFoldersIn } from "./contentLanguage.js";
+import { LANGUAGE_CODE_RE } from "@widgetizer/core/languages";
 
 /** The per-tenant collections root, a sibling of pages/ under the project dir. */
 function collectionsDirFor(projectFolderName) {
   return path.join(getProjectDir(projectFolderName), "collections");
+}
+
+/** A content directory and every language folder inside it, for the raw-fs walkers. */
+async function withLanguageDirs(dir) {
+  if (!(await fs.pathExists(dir))) return [];
+  const entries = await fs.readdir(dir, { withFileTypes: true });
+  const languageDirs = entries.filter((entry) => entry.isDirectory() && LANGUAGE_CODE_RE.test(entry.name));
+  return [dir, ...languageDirs.map((entry) => path.join(dir, entry.name))];
 }
 
 // ---------------------------------------------------------------------------
@@ -59,52 +76,56 @@ function transformWidgetSettings(widgetData, valueTransformer) {
  * write back pages that were modified. Skips header/footer types.
  */
 async function updatePageWidgets(pagesDir, widgetProcessor) {
-  if (!(await fs.pathExists(pagesDir))) return;
-  const pageFiles = await fs.readdir(pagesDir);
-  for (const pageFile of pageFiles) {
-    if (!pageFile.endsWith(".json")) continue;
+  for (const dir of await withLanguageDirs(pagesDir)) {
+    const pageFiles = await fs.readdir(dir);
+    for (const pageFile of pageFiles) {
+      if (!pageFile.endsWith(".json")) continue;
 
-    const pagePath = path.join(pagesDir, pageFile);
-    const content = await fs.readFile(pagePath, "utf8");
-    const page = JSON.parse(content);
+      const pagePath = path.join(dir, pageFile);
+      const content = await fs.readFile(pagePath, "utf8");
+      const page = JSON.parse(content);
 
-    if (page.type === "header" || page.type === "footer") continue;
+      if (page.type === "header" || page.type === "footer") continue;
 
-    let modified = false;
-    const processedWidgets = {};
+      let modified = false;
+      const processedWidgets = {};
 
-    for (const [widgetId, widget] of Object.entries(page.widgets || {})) {
-      const processed = widgetProcessor(widget);
-      processedWidgets[widgetId] = processed;
-      if (JSON.stringify(processed) !== JSON.stringify(widget)) {
-        modified = true;
+      for (const [widgetId, widget] of Object.entries(page.widgets || {})) {
+        const processed = widgetProcessor(widget);
+        processedWidgets[widgetId] = processed;
+        if (JSON.stringify(processed) !== JSON.stringify(widget)) {
+          modified = true;
+        }
       }
-    }
 
-    if (modified) {
-      page.widgets = processedWidgets;
-      await fs.outputFile(pagePath, JSON.stringify(page, null, 2));
+      if (modified) {
+        page.widgets = processedWidgets;
+        await fs.outputFile(pagePath, JSON.stringify(page, null, 2));
+      }
     }
   }
 }
 
 /**
- * Apply widgetProcessor to global widgets (header.json, footer.json).
+ * Apply widgetProcessor to global widgets (header.json, footer.json), in the
+ * root and in every language folder.
  */
 async function updateGlobalWidgets(pagesDir, widgetProcessor) {
-  const globalDir = path.join(pagesDir, "global");
-  if (!(await fs.pathExists(globalDir))) return;
+  for (const dir of await withLanguageDirs(pagesDir)) {
+    const globalDir = path.join(dir, "global");
+    if (!(await fs.pathExists(globalDir))) continue;
 
-  for (const widgetType of ["header", "footer"]) {
-    const widgetPath = path.join(globalDir, `${widgetType}.json`);
-    if (!(await fs.pathExists(widgetPath))) continue;
+    for (const widgetType of ["header", "footer"]) {
+      const widgetPath = path.join(globalDir, `${widgetType}.json`);
+      if (!(await fs.pathExists(widgetPath))) continue;
 
-    const content = await fs.readFile(widgetPath, "utf8");
-    const widget = JSON.parse(content);
-    const processed = widgetProcessor(widget);
+      const content = await fs.readFile(widgetPath, "utf8");
+      const widget = JSON.parse(content);
+      const processed = widgetProcessor(widget);
 
-    if (JSON.stringify(processed) !== JSON.stringify(widget)) {
-      await fs.outputFile(widgetPath, JSON.stringify(processed, null, 2));
+      if (JSON.stringify(processed) !== JSON.stringify(widget)) {
+        await fs.outputFile(widgetPath, JSON.stringify(processed, null, 2));
+      }
     }
   }
 }
@@ -156,16 +177,18 @@ async function updateCollectionItems(collectionsDir, itemTransformer) {
     if (!typeEntry.isDirectory()) continue;
     const type = typeEntry.name;
     const typeDir = path.join(collectionsDir, type);
-    let names;
+    const files = [];
     try {
-      names = await fs.readdir(typeDir);
+      for (const dir of await withLanguageDirs(typeDir)) {
+        files.push(...(await fs.readdir(dir)).map((name) => ({ dir, name })));
+      }
     } catch {
       continue;
     }
-    for (const name of names) {
+    for (const { dir, name } of files) {
       if (!name.endsWith(".json") || name === "_order.json") continue;
       const slug = name.replace(/\.json$/, "");
-      const itemPath = path.join(typeDir, name);
+      const itemPath = path.join(dir, name);
       try {
         const item = JSON.parse(await fs.readFile(itemPath, "utf8"));
         const { item: nextItem, changed } = itemTransformer(item, type, slug);
@@ -181,9 +204,335 @@ async function updateCollectionItems(collectionsDir, itemTransformer) {
   return touched;
 }
 
+// --- Storage-adapter walkers -----------------------------------------------
+// The delete-time scrubbers below run against live projects after arbitrary
+// user edits, so their writes must be adapter-visible: an embedding shell can
+// only observe content mutations that go through storage.write. The
+// create/duplicate/import-time enrichment helpers above keep the raw-fs
+// walkers — they run before a project is editable/publishable.
+
+// The walkers below take the language from the folder a file sits in, so they
+// need the project's default to key a folder correctly whatever it is called.
+
+/**
+ * Clear references inside every page's widgets, and repoint or drop a
+ * `parentPageUuid` naming any of the deleted pages. The deleted set is handled
+ * whole: scanning once per deleted uuid meant ten deleted pages read every
+ * surviving page eleven times.
+ *
+ * A language version keeps its source's parent, and the breadcrumb shows that
+ * parent's version in the page's own language. So a deleted parent whose
+ * translation survives is not gone for its children: the parent moves to the
+ * surviving version in the child's language, else in the site's default
+ * language. Only a child with neither loses its parent. A version in some third
+ * language is not used: the breadcrumb never shows a page in another language.
+ * Nor is a version that would make the child its own ancestor.
+ *
+ * Two passes. The first reads only what a parent choice needs (uuid, group,
+ * language, parent) for every page, so the whole site's content is never held at
+ * once; the second rewrites pages one at a time. A page the first pass cannot
+ * read might be the version a child should move to, or an ancestor that would
+ * make a candidate loop, so while any page is unreadable a child's parent is
+ * left as it is: a parent pointing at a deleted page still renders, and a wrong
+ * move or clear cannot be undone.
+ *
+ * A file that cannot be read or written is recorded in `failed` and the walk
+ * continues: one unwritable page must not stop the menus and items after it from
+ * being cleaned, and the caller needs to know what was left behind.
+ *
+ * @param {Map<string, string>} deletedPageGroups - deleted page uuid -> its
+ *   translation group, where known; a page whose group is not given is taken to
+ *   head its own (a page that was never translated, or a source).
+ */
+async function updatePagesViaStorage(
+  storage,
+  scope,
+  widgetProcessor,
+  deletedPageUuids,
+  deletedPageGroups,
+  defaultLanguage,
+  failed,
+) {
+  const defaultCode = resolveLanguage("", defaultLanguage);
+
+  // Pass one: who survives, in which group and language, and who their parents are.
+  const entries = [];
+  const byUuid = new Map();
+  const survivors = new Map();
+  let censusComplete = true;
+  for (const language of ["", ...(await languageFoldersIn(storage, scope, "pages"))]) {
+    const lang = { language, defaultLanguage };
+    const names = (await storage.list(scope, pagesDir(lang))).filter((name) => name.endsWith(".json"));
+    for (const name of names) {
+      const key = pageKey(name.replace(/\.json$/, ""), lang);
+      let page;
+      try {
+        const buf = await storage.read(scope, key);
+        if (buf == null) continue;
+        page = JSON.parse(buf.toString("utf8"));
+      } catch (error) {
+        censusComplete = false;
+        failed.push({ key, reason: error.message });
+        continue;
+      }
+      if (page.type === "header" || page.type === "footer") continue;
+      const entry = { key, language: language || defaultCode, uuid: page.uuid, parentPageUuid: page.parentPageUuid };
+      entries.push(entry);
+      if (!page.uuid) continue;
+      byUuid.set(page.uuid, entry);
+      const group = translationGroupIdOf(page);
+      if (!survivors.has(group)) survivors.set(group, new Map());
+      survivors.get(group).set(entry.language, page.uuid);
+    }
+  }
+
+  /** Whether `child` is reached walking up from `candidate`, by the parents as they now stand. */
+  const wouldLoop = (candidate, child) => {
+    const seen = new Set();
+    for (let uuid = candidate; uuid && !seen.has(uuid); uuid = byUuid.get(uuid)?.parentPageUuid) {
+      if (uuid === child) return true;
+      seen.add(uuid);
+    }
+    return false;
+  };
+
+  /**
+   * The parent a child of a deleted page moves to: a uuid, null to clear, or
+   * undefined to leave it. With a page unread, neither choice can be trusted: the
+   * unread page may be the version in the child's own language, or an ancestor
+   * that makes a candidate loop back to the child.
+   */
+  const replacementParent = (entry) => {
+    if (!censusComplete) return undefined;
+    const versions = survivors.get(deletedPageGroups.get(entry.parentPageUuid) ?? entry.parentPageUuid);
+    for (const language of [entry.language, defaultCode]) {
+      const candidate = versions?.get(language);
+      // A page without a uuid cannot be anyone's parent, so it cannot be in a loop.
+      if (candidate && (!entry.uuid || !wouldLoop(candidate, entry.uuid))) return candidate;
+    }
+    return null;
+  };
+
+  // Pass two: one page at a time.
+  for (const entry of entries) {
+    const { key } = entry;
+    try {
+      const buf = await storage.read(scope, key);
+      if (buf == null) continue;
+      const page = JSON.parse(buf.toString("utf8"));
+
+      let modified = false;
+      const processedWidgets = {};
+      for (const [widgetId, widget] of Object.entries(page.widgets || {})) {
+        const processed = widgetProcessor(widget);
+        processedWidgets[widgetId] = processed;
+        if (JSON.stringify(processed) !== JSON.stringify(widget)) modified = true;
+      }
+
+      // A child left pointing at a deleted parent still renders (the breadcrumb
+      // builder falls back), but the page picker would show a dangling selection.
+      let parentChanged = false;
+      if (page.parentPageUuid && deletedPageUuids.has(page.parentPageUuid)) {
+        const parent = replacementParent({ ...entry, parentPageUuid: page.parentPageUuid });
+        if (parent) page.parentPageUuid = parent;
+        else if (parent === null) delete page.parentPageUuid;
+        if (parent !== undefined) {
+          parentChanged = true;
+          modified = true;
+        } else {
+          failed.push({ key, reason: "its parent was deleted, and a page that could not be read may be its translation" });
+        }
+      }
+
+      if (modified) {
+        page.widgets = processedWidgets;
+        await storage.write(scope, key, JSON.stringify(page, null, 2));
+      }
+      // Later loop checks see this page's new parent only once it is on disk: a
+      // write that failed left the old one, which a later choice must not avoid.
+      if (parentChanged) entry.parentPageUuid = page.parentPageUuid;
+    } catch (error) {
+      failed.push({ key, reason: error.message });
+    }
+  }
+}
+
+async function updateGlobalWidgetsViaStorage(storage, scope, widgetProcessor, defaultLanguage, failed) {
+  for (const language of ["", ...(await languageFoldersIn(storage, scope, "pages"))]) {
+    for (const widgetType of ["header", "footer"]) {
+      const key = globalKey(widgetType, { language, defaultLanguage });
+      try {
+        const buf = await storage.read(scope, key);
+        if (buf == null) continue;
+        const widget = JSON.parse(buf.toString("utf8"));
+        const processed = widgetProcessor(widget);
+        if (JSON.stringify(processed) !== JSON.stringify(widget)) {
+          await storage.write(scope, key, JSON.stringify(processed, null, 2));
+        }
+      } catch (error) {
+        if (failed) failed.push({ key, reason: error.message });
+      }
+    }
+  }
+}
+
+async function updateCollectionItemsViaStorage(storage, scope, itemTransformer, defaultLanguage, failed) {
+  const touched = [];
+  // storage.list returns flat entry names with no file/dir discrimination;
+  // collection type directories are the extensionless entries. Listing a
+  // non-directory that slips through is tolerated the same way the fs walker
+  // tolerates an unreadable type dir: skip it.
+  let typeEntries = [];
+  try {
+    typeEntries = (await storage.list(scope, "collections")).filter((name) => !name.includes("."));
+  } catch (error) {
+    // Nothing under collections/ could be listed, so nothing in it was cleaned.
+    // Silently skipping made an unreadable collection indistinguishable from a
+    // project that has none.
+    if (failed) failed.push({ key: "collections", reason: error.message });
+    return touched;
+  }
+  for (const type of typeEntries) {
+    const files = [];
+    try {
+      for (const language of ["", ...(await languageFoldersIn(storage, scope, itemsDir(type)))]) {
+        const lang = { language, defaultLanguage };
+        const names = (await storage.list(scope, itemsDir(type, lang))).filter(
+          (name) => name.endsWith(".json") && name !== "_order.json",
+        );
+        files.push(...names.map((name) => ({ name, lang })));
+      }
+    } catch (error) {
+      // A collection whose folder cannot be listed keeps every reference it holds.
+      // Reported, not skipped: the caller is about to tell someone the sweep is done.
+      if (failed) failed.push({ key: itemsDir(type), reason: error.message });
+      continue;
+    }
+    for (const { name, lang } of files) {
+      const slug = name.replace(/\.json$/, "");
+      const key = itemKey(type, slug, lang);
+      try {
+        const buf = await storage.read(scope, key);
+        if (buf == null) continue;
+        const item = JSON.parse(buf.toString("utf8"));
+        const { item: nextItem, changed } = itemTransformer(item, type, slug);
+        if (changed) {
+          await storage.write(scope, key, JSON.stringify(nextItem, null, 2));
+          touched.push({ type, slug, item: nextItem, lang });
+        }
+      } catch (error) {
+        console.warn(`[linkEnrichment] Failed to process collection item ${type}/${name}: ${error.message}`);
+        if (failed) failed.push({ key, reason: error.message });
+      }
+    }
+  }
+  return touched;
+}
+
+async function cleanupMenusViaStorage(storage, scope, itemTransformer, defaultLanguage, failed) {
+  const keys = [];
+  for (const language of ["", ...(await languageFoldersIn(storage, scope, "menus"))]) {
+    const lang = { language, defaultLanguage };
+    const names = (await storage.list(scope, menusDir(lang))).filter((name) => name.endsWith(".json"));
+    keys.push(...names.map((name) => menuKey(name.replace(/\.json$/, ""), lang)));
+  }
+  for (const key of keys) {
+    try {
+      const buf = await storage.read(scope, key);
+      if (buf == null) continue;
+      const menu = JSON.parse(buf.toString("utf8"));
+      const cleanedItems = processMenuItems(menu.items, itemTransformer);
+      if (JSON.stringify(cleanedItems) !== JSON.stringify(menu.items)) {
+        menu.items = cleanedItems;
+        await storage.write(scope, key, JSON.stringify(menu, null, 2));
+      }
+    } catch (error) {
+      if (failed) failed.push({ key, reason: error.message });
+    }
+  }
+}
+
 // ---------------------------------------------------------------------------
 // Public API
 // ---------------------------------------------------------------------------
+
+
+/**
+ * Apply per-type handlers to every reference-bearing theme setting in a project's
+ * own theme.json.
+ *
+ * Dispatch by the DECLARED type, never by the shape of the value. These handlers
+ * recognise a menu selection by its bare string, so a single generic transformer
+ * applied to everything rewrote prose: a text setting reading "main-menu" became
+ * that menu's uuid, and then — once text was excluded but richtext was not — a
+ * richtext default merely CONTAINING those words was replaced wholesale by it.
+ * A menu setting gets menu handling, a link setting gets link handling, and
+ * richtext gets HTML-anchor handling. Nothing else is touched.
+ *
+ * Theme settings are `settings.global.<group>` — an array of `{ type, id, default,
+ * value? }`. The project's copy is its own file, so BOTH the chosen `value` and the
+ * `default` it started from are transformed: after a duplication, a default still
+ * holding the source project's page uuid would be a reference into another project,
+ * which is exactly what the rest of that pass exists to prevent.
+ *
+ * @param {object} themeData parsed theme.json, mutated in place
+ * @param {{ link?: Function, menu?: Function, richtext?: Function }} handlers
+ * @returns {boolean} whether anything changed
+ */
+function transformThemeSettings(themeData, handlers) {
+  const groups = themeData?.settings?.global;
+  if (!groups || typeof groups !== "object") return false;
+
+  let changed = false;
+  for (const items of Object.values(groups)) {
+    if (!Array.isArray(items)) continue;
+    for (const item of items) {
+      if (!item || typeof item !== "object") continue;
+      const handler = handlers?.[item.type];
+      if (typeof handler !== "function") continue;
+      for (const key of ["value", "default"]) {
+        if (item[key] === undefined) continue;
+        const next = handler(item[key]);
+        if (JSON.stringify(next) !== JSON.stringify(item[key])) {
+          item[key] = next;
+          changed = true;
+        }
+      }
+    }
+  }
+  return changed;
+}
+
+/**
+ * fs variant, for the seeding and duplication passes.
+ *
+ * Absent is ordinary and returns quietly. Anything else throws: a duplication
+ * whose site-wide link or menu was not re-pointed still names the ORIGINAL
+ * project's content, and swallowing that here turned a failed remap into a
+ * copy that looked finished.
+ */
+async function updateThemeSettingsFile(themeJsonPath, handlers) {
+  if (!(await fs.pathExists(themeJsonPath))) return;
+  const themeData = JSON.parse(await fs.readFile(themeJsonPath, "utf8"));
+  if (transformThemeSettings(themeData, handlers)) {
+    await fs.outputFile(themeJsonPath, JSON.stringify(themeData, null, 2));
+  }
+}
+
+/** Adapter variant, for the deletion sweep. Records its own failure like the rest. */
+async function updateThemeSettingsViaStorage(storage, scope, handlers, failed) {
+  const key = "theme.json";
+  try {
+    const buf = await storage.read(scope, key);
+    if (buf == null) return;
+    const themeData = JSON.parse(buf.toString("utf8"));
+    if (transformThemeSettings(themeData, handlers)) {
+      await storage.write(scope, key, JSON.stringify(themeData, null, 2));
+    }
+  } catch (error) {
+    if (failed) failed.push({ key, reason: error.message });
+  }
+}
 
 /**
  * Enrich a newly created project's references.
@@ -307,6 +656,14 @@ export async function enrichNewProjectReferences(pagesDir, menusDir) {
   try {
     await updatePageWidgets(pagesDir, widgetProcessor);
     await updateGlobalWidgets(pagesDir, widgetProcessor);
+    // A theme may ship a site-wide link or menu selection in its defaults; give it
+    // the same stable references the widget settings just got.
+    await updateThemeSettingsFile(path.join(pagesDir, "..", "theme.json"), {
+      link: (value) => (isLinkObject(value) ? enrichValue(value) : value),
+      menu: (value) => (typeof value === "string" && menuSlugToUuid.has(value) ? menuSlugToUuid.get(value) : value),
+      richtext: (value) =>
+        typeof value === "string" ? enrichRichtextLinkRefs(value, { pageSlugToUuid }) : value,
+    });
   } catch (error) {
     console.warn(`[linkEnrichment] Failed to enrich widget links: ${error.message}`);
   }
@@ -344,12 +701,14 @@ export async function remapDuplicatedProjectUuids(projectFolderName) {
     return { item: { ...item, uuid: newUuid }, changed: true };
   });
 
-  // Step 2: Regenerate page UUIDs and build mapping
-  const pageFiles = await fs.readdir(pagesDir);
-  for (const pageFile of pageFiles) {
-    if (!pageFile.endsWith(".json")) continue;
-
-    const pagePath = path.join(pagesDir, pageFile);
+  // Step 2: Regenerate page UUIDs and build mapping, in the root and every language folder
+  const pagePaths = [];
+  for (const dir of await withLanguageDirs(pagesDir)) {
+    for (const pageFile of await fs.readdir(dir)) {
+      if (pageFile.endsWith(".json")) pagePaths.push(path.join(dir, pageFile));
+    }
+  }
+  for (const pagePath of pagePaths) {
     const content = await fs.readFile(pagePath, "utf8");
     const page = JSON.parse(content);
 
@@ -364,12 +723,14 @@ export async function remapDuplicatedProjectUuids(projectFolderName) {
   }
 
   // Step 2: Regenerate menu UUIDs and update menu item pageUuids
-  if (await fs.pathExists(menusDir)) {
-    const menuFiles = await fs.readdir(menusDir);
-    for (const menuFile of menuFiles) {
-      if (!menuFile.endsWith(".json")) continue;
-
-      const menuPath = path.join(menusDir, menuFile);
+  const menuPaths = [];
+  for (const dir of await withLanguageDirs(menusDir)) {
+    for (const menuFile of await fs.readdir(dir)) {
+      if (menuFile.endsWith(".json")) menuPaths.push(path.join(dir, menuFile));
+    }
+  }
+  {
+    for (const menuPath of menuPaths) {
       const content = await fs.readFile(menuPath, "utf8");
       const menu = JSON.parse(content);
 
@@ -398,6 +759,29 @@ export async function remapDuplicatedProjectUuids(projectFolderName) {
     }
   }
 
+  // Step 3b: Point each page's parent and translation group at the duplicate's
+  // new uuids. A separate pass because Step 1 rewrites pages one at a time,
+  // before the uuid map is complete — a sibling later in the walk would not yet
+  // be in it.
+  for (const pagePath of pagePaths) {
+    const page = JSON.parse(await fs.readFile(pagePath, "utf8"));
+    if (page.type === "header" || page.type === "footer") continue;
+    if (!page.parentPageUuid && !page.translationGroupId) continue;
+    if (page.parentPageUuid) {
+      const newParentUuid = oldToNewUuid.get(page.parentPageUuid);
+      // An unknown parent belonged to another project; drop it rather than leave
+      // the duplicate pointing into the original.
+      if (newParentUuid) page.parentPageUuid = newParentUuid;
+      else delete page.parentPageUuid;
+    }
+    // A group is named by a member's uuid, but survives that member's deletion:
+    // an unknown name is kept as is, so the survivors stay together.
+    if (page.translationGroupId) {
+      page.translationGroupId = oldToNewUuid.get(page.translationGroupId) ?? page.translationGroupId;
+    }
+    await fs.outputFile(pagePath, JSON.stringify(page, null, 2));
+  }
+
   // Step 4: Remap widget references in pages and global widgets
   const remapValue = (value) => {
     if (isLinkObject(value)) {
@@ -424,158 +808,214 @@ export async function remapDuplicatedProjectUuids(projectFolderName) {
 
   await updatePageWidgets(pagesDir, widgetProcessor);
   await updateGlobalWidgets(pagesDir, widgetProcessor);
+  // Theme settings too: a duplicate whose site-wide link still names the source
+  // project's page uuid is a reference into another project.
+  await updateThemeSettingsFile(path.join(pagesDir, "..", "theme.json"), {
+    link: (value) => (isLinkObject(value) ? remapValue(value) : value),
+    menu: (value) => (typeof value === "string" && oldToNewMenuUuid.has(value) ? oldToNewMenuUuid.get(value) : value),
+    richtext: (value) =>
+      typeof value === "string"
+        ? remapRichtextLinkRefs(value, { pageMap: oldToNewUuid, itemMap: oldToNewItemUuid })
+        : value,
+  });
 
   // Step 5: Remap link references inside collection item settings (item uuids
-  // were already regenerated in Step 1; this only fixes pageUuid/menu/item refs).
-  await updateCollectionItems(collectionsDirFor(projectFolderName), (item) =>
-    transformItemSettings(item, remapValue),
-  );
+  // were already regenerated in Step 1; this only fixes pageUuid/menu/item refs)
+  // and point each item's translation group at the regenerated uuids.
+  await updateCollectionItems(collectionsDirFor(projectFolderName), (item) => {
+    const result = transformItemSettings(item, remapValue);
+    if (!item.translationGroupId) return result;
+    const translationGroupId = oldToNewItemUuid.get(item.translationGroupId) ?? item.translationGroupId;
+    if (translationGroupId === item.translationGroupId) return result;
+    return { item: { ...result.item, translationGroupId }, changed: true };
+  });
 }
 
 /**
- * Clean up all references to a deleted page across the project.
- * Removes orphaned pageUuid references from widget link settings (pages + globals)
- * and menu items, unwraps richtext anchors targeting the deleted page, writing back
- * only files that were actually modified.
+ * Clear every reference to content that has been CONFIRMED deleted — pages,
+ * collection items and menus — across all surviving content in every language,
+ * the default one included.
  *
- * Dir-explicit: operates on pages/, menus/, collections/ under the supplied `projectDir`
- * (hosted passes getProjectBase(scope); OSS passes getProjectDir(folderName)).
- * @param {object} args
- * @param {string} args.projectDir - The project working directory
- * @param {string} args.deletedPageUuid - The UUID of the deleted page
- * @param {string|null} [args.projectId=null] - When provided, refreshes media usage
- *   for any collection item whose link settings were cleared.
- */
-export async function cleanupDeletedPageReferencesFromDir({ projectDir, deletedPageUuid, projectId = null }) {
-  const pagesDir = path.join(projectDir, "pages");
-  const menusDir = path.join(projectDir, "menus");
-  const collectionsDir = path.join(projectDir, "collections");
-
-  // Clean widget link settings in pages and global widgets
-  const deletedPageUuids = new Set([deletedPageUuid]);
-  const cleanValue = (value) => {
-    if (isLinkObject(value) && value.pageUuid === deletedPageUuid) {
-      return { href: "", text: "", target: "_self" };
-    }
-    // Richtext anchors targeting the deleted page → unwrap to plain text.
-    if (typeof value === "string") {
-      return cleanupRichtextLinkRefs(value, { pageUuids: deletedPageUuids });
-    }
-    return value;
-  };
-
-  const widgetProcessor = (widget) => transformWidgetSettings(widget, cleanValue);
-
-  await updatePageWidgets(pagesDir, widgetProcessor);
-  await updateGlobalWidgets(pagesDir, widgetProcessor);
-
-  // Clean menu items
-  if (await fs.pathExists(menusDir)) {
-    const menuFiles = await fs.readdir(menusDir);
-    for (const menuFile of menuFiles) {
-      if (!menuFile.endsWith(".json")) continue;
-
-      const menuPath = path.join(menusDir, menuFile);
-      const content = await fs.readFile(menuPath, "utf8");
-      const menu = JSON.parse(content);
-
-      const cleanedItems = processMenuItems(menu.items, (item) => {
-        if (item.pageUuid === deletedPageUuid) {
-          item.link = "";
-          delete item.pageUuid;
-        }
-        return item;
-      });
-
-      if (JSON.stringify(cleanedItems) !== JSON.stringify(menu.items)) {
-        menu.items = cleanedItems;
-        await fs.outputFile(menuPath, JSON.stringify(menu, null, 2));
-      }
-    }
-  }
-
-  // Clean collection item link settings, then keep media usage in sync for each
-  // touched item (a cleared link may have removed an upload reference).
-  const touched = await updateCollectionItems(collectionsDir, (item) =>
-    transformItemSettings(item, cleanValue),
-  );
-  if (projectId) {
-    for (const { type, slug, item } of touched) {
-      try {
-        await syncCollectionItemMediaUsageOnWrite(projectId, type, slug, item, null);
-      } catch (error) {
-        console.warn(`[linkEnrichment] Failed to sync media usage for ${type}/${slug}: ${error.message}`);
-      }
-    }
-  }
-}
-
-/**
- * Clean up references to deleted collection item page(s) (#11) across the project:
- * menu items, widget/block `link` settings (pages + globals), and collection-item
- * `link` settings. Clears the link and drops the stable-ref fields
- * (`collectionItemUuid`/`collectionType`) on anything pointing at a deleted item.
- * Render-time resolution already clears dead refs; this prunes them from disk so
- * they never re-surface (parity with `cleanupDeletedPageReferencesFromDir`).
+ * One walk for all three kinds. Cleanup after a language removal would otherwise
+ * be one full walk of the project per deleted page and item, which for a language
+ * of any size is the whole project read and rewritten dozens of times.
  *
- * Dir-explicit: operates on pages/, menus/, collections/ under the supplied `projectDir`
- * (hosted passes getProjectBase(scope); OSS passes getProjectDir(folderName)).
- * @param {object} args
- * @param {string} args.projectDir - The project working directory
- * @param {string|string[]|Set<string>} args.deletedItemUuids - uuid(s) of deleted items
+ * ## What is cleared, and what is left alone
+ *
+ * Only EXPLICIT references to Widgetizer-managed content are touched:
+ * `pageUuid` / `collectionItemUuid` on link settings and menu items, the matching
+ * `data-…-uuid` attributes in richtext, `parentPageUuid`, and a `menu` setting
+ * holding a deleted menu's uuid. A hand-typed URL is not a reference to managed
+ * content and is never rewritten, even when it happens to point at a page that
+ * was just deleted — the author wrote it and it is theirs to fix.
+ *
+ * The destination goes; the surrounding content stays. A link keeps its text and
+ * target and loses only its href and ref, a menu item keeps its label, and
+ * richtext keeps the words and loses only the anchor around them. Nothing is
+ * substituted: no nearest page, no other menu, no guessing. The one exception is
+ * a page's parent, which moves to a surviving translation of the deleted parent
+ * (see updatePagesViaStorage): that is the same page in another language, not a
+ * guess.
+ *
+ * ## Confirmed, not assumed
+ *
+ * Callers pass only what they know is gone. A partial language removal clears
+ * references to the content it did delete and leaves the rest alone, because the
+ * targets that survived are still there and the ones it could not read may be —
+ * and the removal is retryable, so guessing would destroy live references.
+ *
+ * Takes no lock: it writes content, so callers run it inside the content-write
+ * section they already hold (see services/contentCoordination).
+ *
+ * Never throws for one unwritable file. A single page that cannot be written must
+ * not stop the menus and items behind it from being cleaned, and the caller must
+ * not be told the whole sweep succeeded — so the files it could not clean come back
+ * in `incomplete` for the caller to report.
+ *
+ * @param {object} storage
+ * @param {object} scope
+ * @param {{ pageUuids?: Iterable<string>, pageGroups?: Iterable<[string, string]>,
+ *           itemUuids?: Iterable<string>, menuUuids?: Iterable<string>,
+ *           defaultLanguage?: string }} targets - `pageGroups` maps a deleted
+ *   page's uuid to its translation group, so its children can move to a version
+ *   that survives
+ * @returns {Promise<{ incomplete: Array<{ key: string, reason: string }> }>}
  */
-export async function cleanupDeletedCollectionItemReferencesFromDir({ projectDir, deletedItemUuids }) {
-  const uuids =
-    deletedItemUuids instanceof Set
-      ? deletedItemUuids
-      : new Set(Array.isArray(deletedItemUuids) ? deletedItemUuids : [deletedItemUuids]);
-  if (uuids.size === 0) return;
+export async function clearDeletedReferencesInSection(
+  storage,
+  scope,
+  { pageUuids, pageGroups, itemUuids, menuUuids, defaultLanguage },
+) {
+  const pages = new Set(pageUuids || []);
+  const items = new Set(itemUuids || []);
+  const menus = new Set(menuUuids || []);
+  if (pages.size === 0 && items.size === 0 && menus.size === 0) return { incomplete: [] };
 
-  const pagesDir = path.join(projectDir, "pages");
-  const menusDir = path.join(projectDir, "menus");
-  const collectionsDir = path.join(projectDir, "collections");
+  const failed = [];
 
-  // Clear widget/block + collection-item `link` settings pointing at a deleted item.
   const cleanValue = (value) => {
-    if (isLinkObject(value) && value.collectionItemUuid && uuids.has(value.collectionItemUuid)) {
-      return { href: "", text: "", target: "_self" };
+    if (isLinkObject(value)) {
+      const hitsPage = value.pageUuid && pages.has(value.pageUuid);
+      const hitsItem = value.collectionItemUuid && items.has(value.collectionItemUuid);
+      if (!hitsPage && !hitsItem) return value;
+      // Keep what the author wrote — the label and where it opens. Only the
+      // destination and the now-dead reference go.
+      const { pageUuid, collectionItemUuid, collectionType, ...rest } = value;
+      void pageUuid;
+      void collectionItemUuid;
+      void collectionType;
+      return { ...rest, href: "" };
     }
-    // Richtext anchors targeting a deleted item → unwrap to plain text.
     if (typeof value === "string") {
-      return cleanupRichtextLinkRefs(value, { itemUuids: uuids });
+      // A menu setting stores the menu's uuid as a bare string. Matched by exact
+      // equality against a deleted uuid rather than by consulting each widget's
+      // schema: a uuid is unique enough that nothing else can hold that exact
+      // value, and reading every schema here would cost a second walk.
+      if (menus.size && menus.has(value)) return "";
+      return cleanupRichtextLinkRefs(value, { pageUuids: pages, itemUuids: items });
     }
     return value;
   };
   const widgetProcessor = (widget) => transformWidgetSettings(widget, cleanValue);
-  await updatePageWidgets(pagesDir, widgetProcessor);
-  await updateGlobalWidgets(pagesDir, widgetProcessor);
-  await updateCollectionItems(collectionsDir, (item) =>
-    transformItemSettings(item, cleanValue),
-  );
 
-  // Clear menu items pointing at a deleted item (keep the item, drop the ref).
-  if (!(await fs.pathExists(menusDir))) return;
-  const menuFiles = await fs.readdir(menusDir);
-  for (const menuFile of menuFiles) {
-    if (!menuFile.endsWith(".json")) continue;
+  // Widgets and parent refs in one pass over the pages, with the whole deleted set.
+  await updatePagesViaStorage(storage, scope, widgetProcessor, pages, new Map(pageGroups || []), defaultLanguage, failed);
+  await updateGlobalWidgetsViaStorage(storage, scope, widgetProcessor, defaultLanguage, failed);
 
-    const menuPath = path.join(menusDir, menuFile);
-    const menu = JSON.parse(await fs.readFile(menuPath, "utf8"));
-
-    const cleanedItems = processMenuItems(menu.items, (item) => {
-      if (item.collectionItemUuid && uuids.has(item.collectionItemUuid)) {
+  await cleanupMenusViaStorage(
+    storage,
+    scope,
+    (item) => {
+      // The label is the author's; only the destination is ours to clear.
+      if (item.pageUuid && pages.has(item.pageUuid)) {
+        item.link = "";
+        delete item.pageUuid;
+      }
+      if (item.collectionItemUuid && items.has(item.collectionItemUuid)) {
         item.link = "";
         delete item.collectionItemUuid;
         delete item.collectionType;
       }
       return item;
-    });
+    },
+    defaultLanguage,
+    failed,
+  );
 
-    if (JSON.stringify(cleanedItems) !== JSON.stringify(menu.items)) {
-      menu.items = cleanedItems;
-      await fs.outputFile(menuPath, JSON.stringify(menu, null, 2));
+  // Theme settings carry the same link and menu references widget settings do.
+  await updateThemeSettingsViaStorage(
+    storage,
+    scope,
+    {
+      link: (value) => (isLinkObject(value) ? cleanValue(value) : value),
+      menu: (value) => (typeof value === "string" && menus.has(value) ? "" : value),
+      richtext: (value) =>
+        typeof value === "string" ? cleanupRichtextLinkRefs(value, { pageUuids: pages, itemUuids: items }) : value,
+    },
+    failed,
+  );
+
+  const touched = await updateCollectionItemsViaStorage(
+    storage,
+    scope,
+    (item) => transformItemSettings(item, cleanValue),
+    defaultLanguage,
+    failed,
+  );
+  if (scope.projectId) {
+    for (const { type, slug, item, lang } of touched) {
+      try {
+        await syncCollectionItemMediaUsageOnWrite(scope.projectId, item, type, lang);
+      } catch (error) {
+        console.warn(`[linkEnrichment] Failed to sync media usage for ${type}/${slug}: ${error.message}`);
+      }
     }
   }
+
+  return { incomplete: failed };
+}
+
+/**
+ * The response shape for "the delete worked, the tidy-up after it did not".
+ * Carries a count for the UI to phrase and the paths for a log — the message a
+ * person reads must never contain a storage key.
+ */
+export function referenceCleanupWarnings(incomplete) {
+  if (!incomplete?.length) return undefined;
+  return [
+    {
+      code: "REFERENCE_CLEANUP_INCOMPLETE",
+      count: incomplete.length,
+      paths: incomplete.map((entry) => entry.key),
+    },
+  ];
+}
+
+/**
+ * One deleted page. Thin wrapper over the batch walk. `deletedPageGroup` is the
+ * page's translation group, needed when it was a version of another page.
+ */
+export async function cleanupDeletedPageReferences(storage, scope, { deletedPageUuid, deletedPageGroup, defaultLanguage }) {
+  return clearDeletedReferencesInSection(storage, scope, {
+    pageUuids: [deletedPageUuid],
+    pageGroups: deletedPageGroup ? [[deletedPageUuid, deletedPageGroup]] : [],
+    defaultLanguage,
+  });
+}
+
+/** One or more deleted collection items. Accepts a Set, an array, or a single uuid. */
+export async function cleanupDeletedCollectionItemReferences(storage, scope, { deletedItemUuids, defaultLanguage }) {
+  const uuids =
+    deletedItemUuids instanceof Set
+      ? deletedItemUuids
+      : new Set(Array.isArray(deletedItemUuids) ? deletedItemUuids : [deletedItemUuids]);
+  return clearDeletedReferencesInSection(storage, scope, { itemUuids: uuids, defaultLanguage });
+}
+
+/** One deleted menu: every widget or collection item that selected it loses the selection. */
+export async function cleanupDeletedMenuReferences(storage, scope, { deletedMenuUuid, defaultLanguage }) {
+  if (!deletedMenuUuid) return;
+  return clearDeletedReferencesInSection(storage, scope, { menuUuids: [deletedMenuUuid], defaultLanguage });
 }
 
 /**
@@ -638,9 +1078,15 @@ export async function remapCollectionItemLinkRefs(projectFolderName, oldToNewIte
   const widgetProcessor = (widget) => transformWidgetSettings(widget, remapValue);
   await updatePageWidgets(pagesDir, widgetProcessor);
   await updateGlobalWidgets(pagesDir, widgetProcessor);
-  await updateCollectionItems(collectionsDirFor(projectFolderName), (item) =>
-    transformItemSettings(item, remapValue),
-  );
+  // Items get fresh identities on seed, so a site-wide link to one has to follow
+  // them exactly as a widget link does. Missing this left a theme setting pointing
+  // at the preset's original article.
+  await updateThemeSettingsFile(path.join(pagesDir, "..", "theme.json"), {
+    link: (value) => (isLinkObject(value) ? remapValue(value) : value),
+    richtext: (value) =>
+      typeof value === "string" ? remapRichtextLinkRefs(value, { itemMap: oldToNewItemUuid }) : value,
+  });
+  await updateCollectionItems(collectionsDirFor(projectFolderName), (item) => transformItemSettings(item, remapValue));
 }
 
 /**
@@ -713,6 +1159,11 @@ export async function enrichSeededRichtextLinksFromDir({ projectDir }) {
 
   await updatePageWidgets(pagesDir, widgetProcessor);
   await updateGlobalWidgets(pagesDir, widgetProcessor);
+  // Theme richtext runs the same pass. This is the step that stamps ITEM refs,
+  // which cannot happen during the main seed because the collection items do not
+  // exist yet — so a theme's shipped article link would otherwise be the one
+  // reference in the project that never became stable.
+  await updateThemeSettingsFile(path.join(projectDir, "theme.json"), { richtext: enrichString });
   await updateCollectionItems(collectionsDir, (item) => transformItemSettings(item, enrichString));
 }
 

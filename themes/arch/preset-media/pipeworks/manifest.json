@@ -1,0 +1,678 @@
+{
+  "files": [
+    {
+      "filename": "pipeworks-news-a-day-in-the-pipeworks-van.webp",
+      "originalName": "pipeworks-news-a-day-in-the-pipeworks-van.webp",
+      "type": "image/webp",
+      "size": 93584,
+      "path": "/uploads/images/pipeworks-news-a-day-in-the-pipeworks-van.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "What a Day in the Pipeworks Van Actually Looks Like",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/pipeworks-news-a-day-in-the-pipeworks-van-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/pipeworks-news-a-day-in-the-pipeworks-van-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/pipeworks-news-a-day-in-the-pipeworks-van-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "pipeworks-news-fifteen-years-and-a-radiator-drive.webp",
+      "originalName": "pipeworks-news-fifteen-years-and-a-radiator-drive.webp",
+      "type": "image/webp",
+      "size": 28592,
+      "path": "/uploads/images/pipeworks-news-fifteen-years-and-a-radiator-drive.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "Fifteen Years On, We Are Fitting Free Radiators",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/pipeworks-news-fifteen-years-and-a-radiator-drive-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/pipeworks-news-fifteen-years-and-a-radiator-drive-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/pipeworks-news-fifteen-years-and-a-radiator-drive-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "pipeworks-news-find-your-stopcock-before-you-need-it.webp",
+      "originalName": "pipeworks-news-find-your-stopcock-before-you-need-it.webp",
+      "type": "image/webp",
+      "size": 26294,
+      "path": "/uploads/images/pipeworks-news-find-your-stopcock-before-you-need-it.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "Find Your Stopcock Before You Need It",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/pipeworks-news-find-your-stopcock-before-you-need-it-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/pipeworks-news-find-your-stopcock-before-you-need-it-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/pipeworks-news-find-your-stopcock-before-you-need-it-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "pipeworks-news-now-offering-same-day-leak-callouts.webp",
+      "originalName": "pipeworks-news-now-offering-same-day-leak-callouts.webp",
+      "type": "image/webp",
+      "size": 42874,
+      "path": "/uploads/images/pipeworks-news-now-offering-same-day-leak-callouts.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "We Now Offer Same-Day Leak Callouts",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/pipeworks-news-now-offering-same-day-leak-callouts-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/pipeworks-news-now-offering-same-day-leak-callouts-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/pipeworks-news-now-offering-same-day-leak-callouts-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "pipeworks-news-winter-frozen-pipe-checklist.webp",
+      "originalName": "pipeworks-news-winter-frozen-pipe-checklist.webp",
+      "type": "image/webp",
+      "size": 66442,
+      "path": "/uploads/images/pipeworks-news-winter-frozen-pipe-checklist.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "Your Cold-Snap Checklist for Frozen Pipes",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/pipeworks-news-winter-frozen-pipe-checklist-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/pipeworks-news-winter-frozen-pipe-checklist-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/pipeworks-news-winter-frozen-pipe-checklist-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "contact-banner.webp",
+      "originalName": "contact-banner.webp",
+      "type": "image/webp",
+      "size": 24850,
+      "path": "/uploads/images/contact-banner.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "A black corded desk phone, blank notepad and enamel mug on a wood office desk by a window.",
+      "title": "Call the shop",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/contact-banner-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/contact-banner-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/contact-banner-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "team-jamie.webp",
+      "originalName": "team-jamie.webp",
+      "type": "image/webp",
+      "size": 28960,
+      "path": "/uploads/images/team-jamie.webp",
+      "width": 960,
+      "height": 1280,
+      "alt": "Jamie Park, apprentice and dispatcher, holding a clipboard in front of the Pipeworks shop.",
+      "title": "Jamie Park",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/team-jamie-small.webp",
+          "width": 480,
+          "height": 640
+        },
+        "thumb": {
+          "path": "/uploads/images/team-jamie-thumb.webp",
+          "width": 150,
+          "height": 200
+        }
+      }
+    },
+    {
+      "filename": "team-reese.webp",
+      "originalName": "team-reese.webp",
+      "type": "image/webp",
+      "size": 35226,
+      "path": "/uploads/images/team-reese.webp",
+      "width": 960,
+      "height": 1280,
+      "alt": "Reese Okafor, drain-and-sewer technician, standing in front of the Pipeworks shop roll-up door.",
+      "title": "Reese Okafor",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/team-reese-small.webp",
+          "width": 480,
+          "height": 640
+        },
+        "thumb": {
+          "path": "/uploads/images/team-reese-thumb.webp",
+          "width": 150,
+          "height": 200
+        }
+      }
+    },
+    {
+      "filename": "team-dani.webp",
+      "originalName": "team-dani.webp",
+      "type": "image/webp",
+      "size": 33512,
+      "path": "/uploads/images/team-dani.webp",
+      "width": 960,
+      "height": 1280,
+      "alt": "Dani Alvarez, lead technician, with her toolbelt on, standing in front of the Pipeworks shop.",
+      "title": "Dani Alvarez",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/team-dani-small.webp",
+          "width": 480,
+          "height": 640
+        },
+        "thumb": {
+          "path": "/uploads/images/team-dani-thumb.webp",
+          "width": 150,
+          "height": 200
+        }
+      }
+    },
+    {
+      "filename": "team-marcus.webp",
+      "originalName": "team-marcus.webp",
+      "type": "image/webp",
+      "size": 31604,
+      "path": "/uploads/images/team-marcus.webp",
+      "width": 960,
+      "height": 1280,
+      "alt": "Marcus Chen, Pipeworks owner, standing in front of the shop roll-up door.",
+      "title": "Marcus Chen",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/team-marcus-small.webp",
+          "width": 480,
+          "height": 640
+        },
+        "thumb": {
+          "path": "/uploads/images/team-marcus-thumb.webp",
+          "width": 150,
+          "height": 200
+        }
+      }
+    },
+    {
+      "filename": "about-founder.webp",
+      "originalName": "about-founder.webp",
+      "type": "image/webp",
+      "size": 45520,
+      "path": "/uploads/images/about-founder.webp",
+      "width": 1024,
+      "height": 1280,
+      "alt": "Marcus Chen, Pipeworks owner and master plumber, holding an adjustable wrench in the workshop.",
+      "title": "Marcus Chen — owner",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/about-founder-small.webp",
+          "width": 480,
+          "height": 600
+        },
+        "thumb": {
+          "path": "/uploads/images/about-founder-thumb.webp",
+          "width": 150,
+          "height": 188
+        }
+      }
+    },
+    {
+      "filename": "about-banner.webp",
+      "originalName": "about-banner.webp",
+      "type": "image/webp",
+      "size": 112492,
+      "path": "/uploads/images/about-banner.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "Row of wrenches hung on a pegboard above a tidy workbench with a single enamel mug.",
+      "title": "The shop wall",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/about-banner-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/about-banner-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/about-banner-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "service-areas-banner.webp",
+      "originalName": "service-areas-banner.webp",
+      "type": "image/webp",
+      "size": 75476,
+      "path": "/uploads/images/service-areas-banner.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "A dark blue Pipeworks service van parked curbside outside a craftsman bungalow on a rainy Portland morning.",
+      "title": "On the road in Portland",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/service-areas-banner-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/service-areas-banner-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/service-areas-banner-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "services-banner.webp",
+      "originalName": "services-banner.webp",
+      "type": "image/webp",
+      "size": 73894,
+      "path": "/uploads/images/services-banner.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "Copper pipe fittings and a brass pipe wrench laid out on a maple workbench.",
+      "title": "Tools and parts, ready for the job",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/services-banner-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/services-banner-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/services-banner-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "testimonial-david.webp",
+      "originalName": "testimonial-david.webp",
+      "type": "image/webp",
+      "size": 20554,
+      "path": "/uploads/images/testimonial-david.webp",
+      "width": 512,
+      "height": 512,
+      "alt": "David G., repeat Pipeworks client, standing outside his Woodstock home at golden hour.",
+      "title": "David G., Woodstock",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/testimonial-david-small.webp",
+          "width": 480,
+          "height": 480
+        },
+        "thumb": {
+          "path": "/uploads/images/testimonial-david-thumb.webp",
+          "width": 150,
+          "height": 150
+        }
+      }
+    },
+    {
+      "filename": "testimonial-javier.webp",
+      "originalName": "testimonial-javier.webp",
+      "type": "image/webp",
+      "size": 15336,
+      "path": "/uploads/images/testimonial-javier.webp",
+      "width": 512,
+      "height": 512,
+      "alt": "Javier L., Pipeworks commercial client, in his Richmond restaurant kitchen.",
+      "title": "Javier L., Richmond",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/testimonial-javier-small.webp",
+          "width": 480,
+          "height": 480
+        },
+        "thumb": {
+          "path": "/uploads/images/testimonial-javier-thumb.webp",
+          "width": 150,
+          "height": 150
+        }
+      }
+    },
+    {
+      "filename": "testimonial-priya.webp",
+      "originalName": "testimonial-priya.webp",
+      "type": "image/webp",
+      "size": 22034,
+      "path": "/uploads/images/testimonial-priya.webp",
+      "width": 512,
+      "height": 512,
+      "alt": "Priya S., Pipeworks client, on a Hawthorne street corner in Portland.",
+      "title": "Priya S., Hawthorne",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/testimonial-priya-small.webp",
+          "width": 480,
+          "height": 480
+        },
+        "thumb": {
+          "path": "/uploads/images/testimonial-priya-thumb.webp",
+          "width": 150,
+          "height": 150
+        }
+      }
+    },
+    {
+      "filename": "testimonial-melissa.webp",
+      "originalName": "testimonial-melissa.webp",
+      "type": "image/webp",
+      "size": 23432,
+      "path": "/uploads/images/testimonial-melissa.webp",
+      "width": 512,
+      "height": 512,
+      "alt": "Melissa R., Pipeworks client, on the front porch of her Sellwood home.",
+      "title": "Melissa R., Sellwood",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/testimonial-melissa-small.webp",
+          "width": 480,
+          "height": 480
+        },
+        "thumb": {
+          "path": "/uploads/images/testimonial-melissa-thumb.webp",
+          "width": 150,
+          "height": 150
+        }
+      }
+    },
+    {
+      "filename": "testimonial-tom.webp",
+      "originalName": "testimonial-tom.webp",
+      "type": "image/webp",
+      "size": 14836,
+      "path": "/uploads/images/testimonial-tom.webp",
+      "width": 512,
+      "height": 512,
+      "alt": "Tom K., Pipeworks client, at home in his Eastmoreland kitchen.",
+      "title": "Tom K., Eastmoreland",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/testimonial-tom-small.webp",
+          "width": 480,
+          "height": 480
+        },
+        "thumb": {
+          "path": "/uploads/images/testimonial-tom-thumb.webp",
+          "width": 150,
+          "height": 150
+        }
+      }
+    },
+    {
+      "filename": "services-water-heaters.webp",
+      "originalName": "services-water-heaters.webp",
+      "type": "image/webp",
+      "size": 23422,
+      "path": "/uploads/images/services-water-heaters.webp",
+      "width": 1024,
+      "height": 768,
+      "alt": "Plumber's hand adjusting a brass valve on a newly installed grey water heater with red and blue PEX supply lines.",
+      "title": "Water heater install",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/services-water-heaters-small.webp",
+          "width": 480,
+          "height": 360
+        },
+        "thumb": {
+          "path": "/uploads/images/services-water-heaters-thumb.webp",
+          "width": 150,
+          "height": 112
+        }
+      }
+    },
+    {
+      "filename": "services-install.webp",
+      "originalName": "services-install.webp",
+      "type": "image/webp",
+      "size": 28694,
+      "path": "/uploads/images/services-install.webp",
+      "width": 1024,
+      "height": 768,
+      "alt": "Plumber tightening a brushed-bronze kitchen faucet onto a butcher-block counter with a ratchet wrench.",
+      "title": "New faucet install",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/services-install-small.webp",
+          "width": 480,
+          "height": 360
+        },
+        "thumb": {
+          "path": "/uploads/images/services-install-thumb.webp",
+          "width": 150,
+          "height": 112
+        }
+      }
+    },
+    {
+      "filename": "services-drain-sewer.webp",
+      "originalName": "services-drain-sewer.webp",
+      "type": "image/webp",
+      "size": 24988,
+      "path": "/uploads/images/services-drain-sewer.webp",
+      "width": 1024,
+      "height": 768,
+      "alt": "Plumber holding a drain-inspection camera monitor showing the inside of a sewer line, cable running into a garage clean-out.",
+      "title": "Drain camera inspection",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/services-drain-sewer-small.webp",
+          "width": 480,
+          "height": 360
+        },
+        "thumb": {
+          "path": "/uploads/images/services-drain-sewer-thumb.webp",
+          "width": 150,
+          "height": 112
+        }
+      }
+    },
+    {
+      "filename": "services-emergency.webp",
+      "originalName": "services-emergency.webp",
+      "type": "image/webp",
+      "size": 31484,
+      "path": "/uploads/images/services-emergency.webp",
+      "width": 1024,
+      "height": 768,
+      "alt": "Plumber kneeling at an open under-sink cabinet with a headlamp on, inspecting the drain plumbing.",
+      "title": "Emergency under-sink repair",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/services-emergency-small.webp",
+          "width": 480,
+          "height": 360
+        },
+        "thumb": {
+          "path": "/uploads/images/services-emergency-thumb.webp",
+          "width": 150,
+          "height": 112
+        }
+      }
+    },
+    {
+      "filename": "hero-home.webp",
+      "originalName": "hero-home.webp",
+      "type": "image/webp",
+      "size": 72414,
+      "path": "/uploads/images/hero-home.webp",
+      "width": 1920,
+      "height": 1080,
+      "alt": "Plumber testing a chrome kitchen faucet after service, pipe wrench in hand, in a modern grey-tiled kitchen.",
+      "title": "Service call in progress",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/hero-home-medium.webp",
+          "width": 1024,
+          "height": 576
+        },
+        "small": {
+          "path": "/uploads/images/hero-home-small.webp",
+          "width": 480,
+          "height": 270
+        },
+        "thumb": {
+          "path": "/uploads/images/hero-home-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "pipeworks-logo-white.png",
+      "originalName": "pipeworks-logo-white.png",
+      "type": "image/png",
+      "size": 5152,
+      "path": "/uploads/images/pipeworks-logo-white.png",
+      "width": 665,
+      "height": 192,
+      "alt": "Pipeworks logo — white wordmark variant for dark backgrounds.",
+      "title": "Pipeworks logo (white)",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/pipeworks-logo-white-small.png",
+          "width": 480,
+          "height": 139
+        },
+        "thumb": {
+          "path": "/uploads/images/pipeworks-logo-white-thumb.png",
+          "width": 150,
+          "height": 43
+        }
+      }
+    },
+    {
+      "filename": "pipeworks-logo-dark.png",
+      "originalName": "pipeworks-logo-dark.png",
+      "type": "image/png",
+      "size": 4862,
+      "path": "/uploads/images/pipeworks-logo-dark.png",
+      "width": 665,
+      "height": 192,
+      "alt": "Pipeworks logo — steel-blue wordmark with a faucet glyph, for light backgrounds.",
+      "title": "Pipeworks logo",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/pipeworks-logo-dark-small.png",
+          "width": 480,
+          "height": 139
+        },
+        "thumb": {
+          "path": "/uploads/images/pipeworks-logo-dark-thumb.png",
+          "width": 150,
+          "height": 43
+        }
+      }
+    }
+  ]
+}

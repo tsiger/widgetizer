@@ -118,12 +118,12 @@
       {% assign card_sizes = '(max-width: 749px) 100vw, (max-width: 989px) 50vw, ' | append: desktop_vw | append: 'vw' %}
       {% if widget.settings.layout == 'carousel' %}
         <div class="carousel-container reveal reveal-up">
-          <button type="button" class="carousel-btn carousel-btn-prev" aria-label="Previous">
+          <button type="button" class="carousel-btn carousel-btn-prev" aria-label="{{ 'site.common.previous' | t }}">
             <svg class="carousel-btn-icon" viewBox="0 0 24 24" aria-hidden="true">
               <path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round" />
             </svg>
           </button>
-          <button type="button" class="carousel-btn carousel-btn-next" aria-label="Next">
+          <button type="button" class="carousel-btn carousel-btn-next" aria-label="{{ 'site.common.next' | t }}">
             <svg class="carousel-btn-icon" viewBox="0 0 24 24" aria-hidden="true">
               <path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round" />
             </svg>
@@ -131,19 +131,21 @@
           <ul class="widget-card-grid carousel-track" style="--carousel-cols: {{ widget.settings.columns_desktop }}">
             {% for blockId in widget.blocksOrder %}
               {% assign block = widget.blocks[blockId] %}
+              {% assign media_caption = block.settings.image | media_meta: 'caption' %}
+              {% assign caption = block.settings.caption | default: media_caption %}
               <li
                 class="widget-card carousel-item"
                 data-block-id="{{ blockId }}"
-                data-caption="{{ block.settings.caption }}"
+                data-caption="{{ caption }}"
               >
                 {% if block.settings.image != blank %}
                   {% image src: block.settings.image, size: 'medium', srcset: true, sizes: card_sizes, class: 'widget-card-image' %}
                 {% else %}
                   {% placeholder_image aspect: 'landscape', class: 'widget-card-image' %}
                 {% endif %}
-                {% if block.settings.caption != blank %}
+                {% if caption != blank %}
                   <div class="gallery-overlay">
-                    <span class="gallery-caption w-meta t-sm" data-setting="caption">{{ block.settings.caption }}</span>
+                    <span class="gallery-caption w-meta t-sm" data-setting="caption">{{ caption }}</span>
                   </div>
                 {% endif %}
               </li>
@@ -157,20 +159,22 @@
         >
           {% for blockId in widget.blocksOrder %}
             {% assign block = widget.blocks[blockId] %}
+            {% assign media_caption = block.settings.image | media_meta: 'caption' %}
+            {% assign caption = block.settings.caption | default: media_caption %}
             <li
               class="widget-card reveal reveal-scale"
               style="--reveal-delay: {{ forloop.index0 }}"
               data-block-id="{{ blockId }}"
-              data-caption="{{ block.settings.caption }}"
+              data-caption="{{ caption }}"
             >
               {% if block.settings.image != blank %}
                 {% image src: block.settings.image, size: 'medium', srcset: true, sizes: card_sizes, class: 'widget-card-image' %}
               {% else %}
                 {% placeholder_image aspect: 'landscape', class: 'widget-card-image' %}
               {% endif %}
-              {% if block.settings.caption != blank %}
+              {% if caption != blank %}
                 <div class="gallery-overlay">
-                  <span class="gallery-caption w-meta t-sm" data-setting="caption">{{ block.settings.caption }}</span>
+                  <span class="gallery-caption w-meta t-sm" data-setting="caption">{{ caption }}</span>
                 </div>
               {% endif %}
             </li>

@@ -44,14 +44,21 @@ const {
 } = await import("../controllers/pageController.js");
 
 const projectRepo = await import("../db/repositories/projectRepository.js");
+const { withContentWriteLock } = await import("../services/contentCoordination.js");
+const { removeLanguage } = await import("../services/languageService.js");
 const { closeDb, getDb } = await import("../db/index.js");
-const { LocalStorageAdapter, LocalScopeResolver } = await import("@widgetizer/adapters-local");
+const { LocalStorageAdapter, LocalScopeResolver, LocalAssetStorageAdapter } = await import("@widgetizer/adapters-local");
 const { writeMediaFile } = await import("../controllers/mediaController.js");
-const { updateCollectionItemMediaUsage, getMediaUsage } = await import("../services/mediaUsageService.js");
+const { updateCollectionItemMediaUsage, syncPageMediaUsageOnWrite, getMediaUsage } = await import(
+  "../services/mediaUsageService.js"
+);
 
 // The page handlers operate on req.adapters.storage over req.scope. Use the real
 // OSS storage adapter against the isolated test data root, matching production.
 const pageStorage = new LocalStorageAdapter({ dataRoot: TEST_DATA_DIR });
+// Page writes validate that a newly referenced image still exists, so the asset
+// adapter is not optional here any more than it is in a real request.
+const pageAssetStorage = new LocalAssetStorageAdapter({ dataRoot: TEST_DATA_DIR });
 // resolveActiveProject now delegates scope resolution to the injected resolver.
 const scopeResolver = new LocalScopeResolver(getDb());
 
@@ -78,17 +85,18 @@ const PROJECT_FOLDER = "page-test-project";
 let activeProject;
 
 /** Build a mock Express req */
-function mockReq({ params = {}, body = {} } = {}) {
+function mockReq({ params = {}, body = {}, query = {} } = {}) {
   return {
     params,
     body,
+    query,
     activeProject,
     scope: {
       actor: { id: "default", kind: "local" },
       projectId: activeProject.id,
       folderName: activeProject.folderName,
     },
-    adapters: { storage: pageStorage },
+    adapters: { storage: pageStorage, assetStorage: pageAssetStorage },
     app: { locals: {} },
     [Symbol.for("express-validator#contexts")]: [],
   };
@@ -113,8 +121,8 @@ function mockRes() {
   return res;
 }
 
-async function callController(controllerFn, { params, body } = {}) {
-  const req = mockReq({ params, body });
+async function callController(controllerFn, { params, body, query } = {}) {
+  const req = mockReq({ params, body, query });
   const res = mockRes();
   await controllerFn(req, res);
   return res;
@@ -239,6 +247,15 @@ describe("createPage", () => {
 
     const third = await createTestPage("Services");
     assert.equal(third.slug, "services-2");
+  });
+
+  it("never creates a page named page", async () => {
+    const fromName = await createTestPage("Page");
+    assert.equal(fromName.slug, "page-1");
+
+    const fromSlug = await createTestPage("Something", { slug: "page" });
+    assert.equal(fromSlug.slug, "page-2");
+    assert.ok(!(await fs.pathExists(getPagePath(activeProject.folderName, "page"))));
   });
 
   it("preserves SEO data passed in body", async () => {
@@ -490,6 +507,33 @@ describe("updatePage", () => {
     assert.match(res._json.error, /slug already exists/i);
   });
 
+  it("refuses renaming a page to page", async () => {
+    const page = await createTestPage("Rename To Page");
+
+    const res = await callController(updatePage, {
+      params: { id: page.slug },
+      body: { name: "Rename To Page", slug: "page" },
+    });
+    assert.equal(res._status, 400);
+    assert.match(res._json.error, /reserved/i);
+    assert.ok(await fs.pathExists(getPagePath(activeProject.folderName, page.slug)));
+  });
+
+  it("still saves a page that was already named page", async () => {
+    const legacy = await createTestPage("Legacy");
+    const legacyPath = getPagePath(activeProject.folderName, legacy.slug);
+    const onDisk = await fs.readJson(legacyPath);
+    await fs.writeJson(getPagePath(activeProject.folderName, "page"), { ...onDisk, id: "page", slug: "page" });
+    await fs.remove(legacyPath);
+
+    const res = await callController(updatePage, {
+      params: { id: "page" },
+      body: { name: "Legacy Renamed", slug: "page" },
+    });
+    assert.equal(res._status, 200);
+    assert.equal(res._json.data.slug, "page");
+  });
+
   it("generates slug from name when slug is empty", async () => {
     const page = await createTestPage("Auto Slug");
 
@@ -584,6 +628,19 @@ describe("savePageContent", () => {
 
     assert.ok(!(await fs.pathExists(oldPath)), "old file should be removed");
     assert.ok(await fs.pathExists(getPagePath(activeProject.folderName, "new-slug")));
+  });
+
+  it("refuses a slug change to page", async () => {
+    const page = await createTestPage("Editor Rename");
+
+    const res = await callController(savePageContent, {
+      params: { id: page.slug },
+      body: { name: "Editor Rename", slug: "page", widgets: {} },
+    });
+    assert.equal(res._status, 400);
+    assert.match(res._json.error, /reserved/i);
+    assert.ok(await fs.pathExists(getPagePath(activeProject.folderName, page.slug)));
+    assert.ok(!(await fs.pathExists(getPagePath(activeProject.folderName, "page"))));
   });
 
   it("saves SEO data", async () => {
@@ -841,11 +898,12 @@ describe("duplicatePage", () => {
 // deletePage / bulkDeletePages — re-sync collection-item media usage
 //
 // Deleting a page clears collection-item links that point to it, and must
-// re-derive those items' media usage — but only if the controller threads
-// scope.projectId into cleanupDeletedPageReferencesFromDir. We make the re-sync
+// re-derive those items' media usage — but only if the controller calls
+// cleanupDeletedPageReferences(storage, scope, …), whose media-usage sync keys
+// off scope.projectId. We make the re-sync
 // observable with a collection-item link that carries BOTH the deleted page's
 // uuid AND a media href: clearing the link drops the media reference, so a
-// re-synced usage index goes from ["collection:portfolio/alpha"] -> []. The
+// re-synced usage index goes from ["collection:item-alpha"] -> []. The
 // link is cleared on disk regardless, but the usage INDEX only updates when
 // projectId is passed — so this asserts the caller-threading, not just the
 // function-level behaviour (which collectionLinkEnrichment.test.js covers).
@@ -878,13 +936,57 @@ async function seedItemLinkingToPage(pageUuid) {
     title: "Alpha",
     doc: { pageUuid, href: "/uploads/files/x.pdf", text: "Doc", target: "_self" },
   });
-  await updateCollectionItemMediaUsage(PROJECT_ID, "portfolio", "alpha", await readCollectionItem("portfolio", "alpha"));
+  await updateCollectionItemMediaUsage(PROJECT_ID, await readCollectionItem("portfolio", "alpha"));
   assert.deepEqual(
     (await getMediaUsage(PROJECT_ID, "f1")).usedIn,
-    ["collection:portfolio/alpha"],
+    ["collection:item-alpha"],
     "precondition: the media file is seeded as used by the collection item",
   );
 }
+
+describe("deletePage — a page with no uuid", () => {
+  beforeEach(async () => {
+    await resetPages();
+  });
+
+  /** Seed a page file written before uuids existed, plus its slug-keyed usage row. */
+  async function seedUuidlessPage(slug) {
+    await writeMediaFile(PROJECT_ID, {
+      files: [{ id: "f1", filename: "x.pdf", path: "/uploads/files/x.pdf", type: "application/pdf", usedIn: [] }],
+    });
+    const pageData = {
+      id: slug,
+      slug,
+      title: "Legacy",
+      widgets: { w1: { type: "text", settings: { doc: { href: "/uploads/files/x.pdf", text: "Doc", target: "_self" } } } },
+    };
+    await fs.outputJSON(path.join(getProjectPagesDir(activeProject.folderName), `${slug}.json`), pageData);
+    await syncPageMediaUsageOnWrite(PROJECT_ID, pageData);
+    assert.deepEqual(
+      (await getMediaUsage(PROJECT_ID, "f1")).usedIn,
+      [`page:slug:${slug}`],
+      "precondition: usage is keyed by the pending slug id",
+    );
+  }
+
+  it("clears the row recorded under its slug", async () => {
+    await seedUuidlessPage("legacy");
+
+    const res = await callController(deletePage, { params: { id: "legacy" } });
+    assert.equal(res._status, 200);
+
+    assert.deepEqual((await getMediaUsage(PROJECT_ID, "f1")).usedIn, [], "no orphaned usage row survives the delete");
+  });
+
+  it("clears it via bulkDeletePages too", async () => {
+    await seedUuidlessPage("legacy-bulk");
+
+    const res = await callController(bulkDeletePages, { body: { pageIds: ["legacy-bulk"] } });
+    assert.ok(res._json.results.deleted.includes("legacy-bulk"));
+
+    assert.deepEqual((await getMediaUsage(PROJECT_ID, "f1")).usedIn, []);
+  });
+});
 
 describe("deletePage — re-syncs collection-item media usage", () => {
   beforeEach(async () => {
@@ -910,5 +1012,859 @@ describe("deletePage — re-syncs collection-item media usage", () => {
     assert.ok(res._json.results.deleted.includes(page.id));
 
     assert.deepEqual((await getMediaUsage(PROJECT_ID, "f1")).usedIn, []);
+  });
+});
+
+// ============================================================================
+// Breadcrumb hierarchy: parent pages and the listing anchor
+// ============================================================================
+
+describe("parentPageUuid", () => {
+  before(async () => {
+    await resetPages();
+  });
+
+  it("round-trips through update and read", async () => {
+    const parent = await createTestPage("About Us");
+    const child = await createTestPage("Our Team");
+
+    const res = await callController(updatePage, {
+      params: { id: child.slug },
+      body: { name: child.name, slug: child.slug, parentPageUuid: parent.uuid },
+    });
+    assert.equal(res._status, 200, JSON.stringify(res._json));
+
+    const read = await callController(getPage, { params: { id: child.slug } });
+    assert.equal(read._json.parentPageUuid, parent.uuid);
+  });
+
+  it("drops the field when cleared", async () => {
+    const parent = await createTestPage("Parent To Clear");
+    const child = await createTestPage("Child To Clear");
+    await callController(updatePage, {
+      params: { id: child.slug },
+      body: { name: child.name, slug: child.slug, parentPageUuid: parent.uuid },
+    });
+
+    await callController(updatePage, {
+      params: { id: child.slug },
+      body: { name: child.name, slug: child.slug, parentPageUuid: "" },
+    });
+
+    const read = await callController(getPage, { params: { id: child.slug } });
+    assert.equal("parentPageUuid" in read._json, false);
+  });
+
+  // The picker never offers the page itself, but a direct API call must not be
+  // able to write a self-parent either.
+  it("refuses to store a page as its own parent", async () => {
+    const page = await createTestPage("Self Parent");
+    await callController(updatePage, {
+      params: { id: page.slug },
+      body: { name: page.name, slug: page.slug, parentPageUuid: page.uuid },
+    });
+
+    const read = await callController(getPage, { params: { id: page.slug } });
+    assert.equal("parentPageUuid" in read._json, false);
+  });
+
+  it("clears the pointer on pages whose parent is deleted", async () => {
+    const parent = await createTestPage("Doomed Parent");
+    const child = await createTestPage("Surviving Child");
+    await callController(updatePage, {
+      params: { id: child.slug },
+      body: { name: child.name, slug: child.slug, parentPageUuid: parent.uuid },
+    });
+
+    await callController(deletePage, { params: { id: parent.slug } });
+
+    const read = await callController(getPage, { params: { id: child.slug } });
+    assert.equal(read._status, 200);
+    assert.equal("parentPageUuid" in read._json, false);
+  });
+});
+
+describe("listing anchor (one page per collection)", () => {
+  const gridWidget = (anchor) => ({
+    w1: { type: "news-grid", settings: { listing_anchor: anchor } },
+  });
+
+  before(async () => {
+    await resetPages();
+    // The widget's schema is what says which collection it lists — without it
+    // nothing can hold an anchor.
+    await fs.outputFile(
+      path.join(getProjectDir(activeProject.folderName), "widgets", "news-grid", "schema.json"),
+      JSON.stringify({
+        type: "news-grid",
+        collection: { type: "news", perPageSetting: "limit" },
+        settings: [{ type: "number", id: "limit", default: 3 }],
+      }),
+    );
+  });
+
+  const saveWith = async (slug, name, widgets) =>
+    callController(savePageContent, {
+      params: { id: slug },
+      body: { name, slug, widgets, widgetsOrder: Object.keys(widgets) },
+    });
+
+  it("moves the anchor off the previous page and reports which", async () => {
+    const first = await createTestPage("Blog");
+    const second = await createTestPage("News Archive");
+
+    await saveWith(first.slug, first.name, gridWidget(true));
+    const res = await saveWith(second.slug, second.name, gridWidget(true));
+
+    assert.equal(res._status, 200);
+    assert.deepEqual(res._json.listingAnchorMovedFrom, ["Blog"]);
+
+    const firstRead = await callController(getPage, { params: { id: first.slug } });
+    assert.equal(firstRead._json.widgets.w1.settings.listing_anchor, false);
+    const secondRead = await callController(getPage, { params: { id: second.slug } });
+    assert.equal(secondRead._json.widgets.w1.settings.listing_anchor, true);
+  });
+
+  it("says nothing when the saved page claims no anchor", async () => {
+    const page = await createTestPage("Plain Listing");
+    const res = await saveWith(page.slug, page.name, gridWidget(false));
+    assert.equal("listingAnchorMovedFrom" in res._json, false);
+  });
+
+  // A duplicate is written directly, so the save-time sweep never sees it. Left
+  // alone, both pages would claim the collection and slug order would decide.
+  it("does not carry the anchor onto a duplicated page", async () => {
+    const original = await createTestPage("Anchored Original");
+    await saveWith(original.slug, original.name, gridWidget(true));
+
+    const dup = await callController(duplicatePage, { params: { id: original.slug } });
+    assert.equal(dup._status, 201, JSON.stringify(dup._json));
+
+    const copy = await callController(getPage, { params: { id: dup._json.slug } });
+    assert.equal(copy._json.widgets.w1.settings.listing_anchor, false);
+    // The original keeps it.
+    const kept = await callController(getPage, { params: { id: original.slug } });
+    assert.equal(kept._json.widgets.w1.settings.listing_anchor, true);
+  });
+
+  it("leaves a widget alone when its schema declares no collection", async () => {
+    await fs.outputFile(
+      path.join(getProjectDir(activeProject.folderName), "widgets", "plain-grid", "schema.json"),
+      JSON.stringify({ type: "plain-grid", settings: [] }),
+    );
+    const holder = await createTestPage("Holds Anchor");
+    const other = await createTestPage("Undeclared Widget");
+
+    await saveWith(holder.slug, holder.name, gridWidget(true));
+    await saveWith(other.slug, other.name, { w1: { type: "plain-grid", settings: { listing_anchor: true } } });
+
+    // The undeclared widget lists nothing, so it never took the news anchor away.
+    const holderRead = await callController(getPage, { params: { id: holder.slug } });
+    assert.equal(holderRead._json.widgets.w1.settings.listing_anchor, true);
+  });
+
+  it("makes a paginating widget its collection's anchor", async () => {
+    const holder = await createTestPage("Old Blog");
+    await saveWith(holder.slug, holder.name, gridWidget(true));
+
+    const page = await createTestPage("Paged Blog");
+    const res = await saveWith(page.slug, page.name, {
+      w1: { type: "news-grid", settings: { paginate: true, listing_anchor: false } },
+    });
+    assert.equal(res._status, 200);
+    assert.deepEqual(res._json.listingAnchorMovedFrom, ["Old Blog"]);
+
+    const read = await callController(getPage, { params: { id: page.slug } });
+    assert.equal(read._json.widgets.w1.settings.listing_anchor, true);
+  });
+
+  it("refuses a second paginating widget on the same page", async () => {
+    const page = await createTestPage("Two Pagers");
+    const res = await saveWith(page.slug, page.name, {
+      w1: { type: "news-grid", settings: { paginate: true } },
+      w2: { type: "news-grid", settings: { paginate: true } },
+    });
+    assert.equal(res._status, 422);
+    const read = await callController(getPage, { params: { id: page.slug } });
+    assert.deepEqual(read._json.widgets, {});
+  });
+
+  it("does not carry pagination onto a duplicated page", async () => {
+    const original = await createTestPage("Paged Original");
+    await saveWith(original.slug, original.name, { w1: { type: "news-grid", settings: { paginate: true } } });
+
+    const dup = await callController(duplicatePage, { params: { id: original.slug } });
+    const copy = await callController(getPage, { params: { id: dup._json.slug } });
+    assert.equal(copy._json.widgets.w1.settings.paginate, false);
+    assert.equal(copy._json.widgets.w1.settings.listing_anchor, false);
+  });
+
+  it("refuses items per page that are not a whole number of at least 1", async () => {
+    const page = await createTestPage("Bad Per Page");
+    for (const limit of [0, -2, 2.5, "abc", ""]) {
+      const res = await saveWith(page.slug, page.name, { w1: { type: "news-grid", settings: { paginate: true, limit } } });
+      assert.equal(res._status, 422, JSON.stringify(limit));
+    }
+  });
+
+  it("falls back to the schema default when items per page is missing", async () => {
+    const page = await createTestPage("Default Per Page");
+    const res = await saveWith(page.slug, page.name, { w1: { type: "news-grid", settings: { paginate: true } } });
+    assert.equal(res._status, 200);
+  });
+
+  it("turns pagination off on a widget whose schema cannot paginate", async () => {
+    await fs.outputFile(
+      path.join(getProjectDir(activeProject.folderName), "widgets", "plain-grid", "schema.json"),
+      JSON.stringify({ type: "plain-grid", settings: [] }),
+    );
+    const page = await createTestPage("Cannot Paginate");
+    const res = await saveWith(page.slug, page.name, { w1: { type: "plain-grid", settings: { paginate: true } } });
+    assert.equal(res._status, 200);
+
+    const read = await callController(getPage, { params: { id: page.slug } });
+    assert.equal(read._json.widgets.w1.settings.paginate, false);
+    assert.notEqual(read._json.widgets.w1.settings.listing_anchor, true);
+  });
+
+  it("turns pagination off on the page that loses the anchor", async () => {
+    const first = await createTestPage("Paged First");
+    const second = await createTestPage("Paged Second");
+    await saveWith(first.slug, first.name, { w1: { type: "news-grid", settings: { paginate: true } } });
+    await saveWith(second.slug, second.name, { w1: { type: "news-grid", settings: { paginate: true } } });
+
+    const firstRead = await callController(getPage, { params: { id: first.slug } });
+    assert.equal(firstRead._json.widgets.w1.settings.paginate, false);
+    assert.equal(firstRead._json.widgets.w1.settings.listing_anchor, false);
+    const secondRead = await callController(getPage, { params: { id: second.slug } });
+    assert.equal(secondRead._json.widgets.w1.settings.paginate, true);
+    assert.equal(secondRead._json.widgets.w1.settings.listing_anchor, true);
+  });
+
+  it("applies the same rules when widgets arrive through the page details update", async () => {
+    const page = await createTestPage("Details Update");
+    const twoPagers = {
+      w1: { type: "news-grid", settings: { paginate: true } },
+      w2: { type: "news-grid", settings: { paginate: true } },
+    };
+    const refused = await callController(updatePage, {
+      params: { id: page.slug },
+      body: { name: page.name, slug: page.slug, widgets: twoPagers },
+    });
+    assert.equal(refused._status, 422);
+
+    const holder = await createTestPage("Details Holder");
+    await saveWith(holder.slug, holder.name, { w1: { type: "news-grid", settings: { paginate: true } } });
+    const accepted = await callController(updatePage, {
+      params: { id: page.slug },
+      body: { name: page.name, slug: page.slug, widgets: { w1: { type: "news-grid", settings: { paginate: true } } } },
+    });
+    assert.equal(accepted._status, 200);
+    assert.equal(accepted._json.data.widgets.w1.settings.listing_anchor, true);
+    assert.deepEqual(accepted._json.listingAnchorMovedFrom, ["Details Holder"]);
+  });
+
+  it("does not fail on a malformed widget schema, and a later paginator still works", async () => {
+    await fs.outputFile(
+      path.join(getProjectDir(activeProject.folderName), "widgets", "broken-grid", "schema.json"),
+      JSON.stringify({ type: "broken-grid", collection: { type: "news", perPageSetting: "limit" }, settings: {} }),
+    );
+    const page = await createTestPage("Broken First");
+    const res = await saveWith(page.slug, page.name, {
+      w1: { type: "broken-grid", settings: { paginate: true, limit: 2 } },
+      w2: { type: "news-grid", settings: { paginate: true } },
+    });
+    assert.equal(res._status, 200, JSON.stringify(res._json));
+
+    const read = await callController(getPage, { params: { id: page.slug } });
+    assert.equal(read._json.widgets.w1.settings.paginate, false);
+    assert.equal(read._json.widgets.w2.settings.paginate, true);
+    assert.equal(read._json.widgets.w2.settings.listing_anchor, true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Languages: every page key goes through the addressing layer
+// ---------------------------------------------------------------------------
+
+describe("pages in another language", () => {
+  const EL = { language: "el" };
+  const projectDir = () => getProjectDir(activeProject.folderName);
+  const greekPagePath = (slug) => path.join(getProjectPagesDir(activeProject.folderName), "el", `${slug}.json`);
+
+  before(() => {
+    activeProject.defaultLanguage = "en";
+    activeProject.languages = ["el"];
+    // Persisted too, not just on the in-memory request object: the language check
+    // at each write re-reads the project row, which is what a real removal updates.
+    projectRepo.updateProject(activeProject.id, { defaultLanguage: "en", languages: ["el"] });
+  });
+
+  after(() => {
+    delete activeProject.defaultLanguage;
+    delete activeProject.languages;
+    projectRepo.updateProject(activeProject.id, { defaultLanguage: "en", languages: [] });
+  });
+
+  beforeEach(async () => {
+    await resetPages();
+    await fs.remove(path.join(getProjectPagesDir(activeProject.folderName), "el"));
+    await fs.remove(path.join(projectDir(), "menus"));
+  });
+
+  it("writes a Greek page in its folder, without a language field, in its own translation group", async () => {
+    const page = await createTestPage("Epikoinonia", EL);
+    assert.equal(page.language, "el");
+    assert.equal(page.translationGroupId, page.uuid);
+    const onDisk = await fs.readJson(greekPagePath("epikoinonia"));
+    assert.equal(onDisk.uuid, page.uuid);
+    assert.equal("language" in onDisk, false, "the folder says the language, the file never does");
+    assert.equal(onDisk.translationGroupId, page.uuid);
+  });
+
+  it("keeps the default language at the root and strips a language echoed back by the client", async () => {
+    const page = await createTestPage("Contact", { language: "en" });
+    assert.equal(page.language, "en");
+    const rootPath = getPagePath(activeProject.folderName, "contact");
+    assert.equal("language" in (await fs.readJson(rootPath)), false);
+
+    const saved = await callController(savePageContent, {
+      params: { id: "contact" },
+      body: { ...page, widgets: {} },
+    });
+    assert.equal(saved._status, 200, JSON.stringify(saved._json));
+    assert.equal("language" in (await fs.readJson(rootPath)), false);
+  });
+
+  it("lets the same slug exist once per language, and lists both with their language", async () => {
+    const en = await createTestPage("Gallery");
+    const el = await createTestPage("Gallery", EL);
+    assert.equal(en.slug, "gallery");
+    assert.equal(el.slug, "gallery", "no -1 suffix: uniqueness is per language folder");
+
+    const list = await callController(getAllPages);
+    const galleries = list._json.filter((p) => p.slug === "gallery").map((p) => p.language).sort();
+    assert.deepEqual(galleries, ["el", "en"]);
+
+    const read = await callController(getPage, { params: { id: "gallery" }, query: EL });
+    assert.equal(read._json.uuid, el.uuid);
+    assert.equal(read._json.language, "el");
+  });
+
+  it("refuses a root page slugged like an enabled language, but not the same slug inside a language", async () => {
+    const root = await callController(createPage, { body: { name: "Greek", slug: "el" } });
+    assert.equal(root._status, 201);
+    assert.equal(root._json.slug, "el-1", "the reserved slug is skipped, not taken");
+
+    const renamed = await callController(updatePage, { params: { id: "el-1" }, body: { name: "Greek", slug: "el" } });
+    assert.equal(renamed._status, 400);
+
+    const inside = await callController(createPage, { body: { name: "Italian", slug: "it", ...EL } });
+    assert.equal(inside._status, 201);
+    assert.equal(inside._json.slug, "it");
+  });
+
+  it("refuses a language the project has not enabled", async () => {
+    const created = await callController(createPage, { body: { name: "Bonjour", language: "fr" } });
+    assert.equal(created._status, 400);
+    assert.match(created._json.message, /"fr"/);
+    const read = await callController(getPage, { params: { id: "anything" }, query: { language: "fr" } });
+    assert.equal(read._status, 400);
+    const malformed = await callController(createPage, { body: { name: "Odd", language: "not-a-language" } });
+    assert.equal(malformed._status, 400, "a malformed code is refused, never handed to the path builder");
+    assert.equal(await fs.pathExists(path.join(getProjectPagesDir(activeProject.folderName), "not-a-language")), false);
+  });
+
+  it("updates, saves, duplicates and deletes inside the language folder", async () => {
+    const page = await createTestPage("Nea", EL);
+
+    const renamed = await callController(updatePage, {
+      params: { id: "nea" },
+      body: { name: "Nea", slug: "ta-nea", ...EL },
+    });
+    assert.equal(renamed._status, 200, JSON.stringify(renamed._json));
+    assert.equal(renamed._json.data.language, "el");
+    assert.equal(renamed._json.data.translationGroupId, page.uuid);
+    assert.equal(await fs.pathExists(greekPagePath("nea")), false);
+    assert.equal(await fs.pathExists(greekPagePath("ta-nea")), true);
+
+    const saved = await callController(savePageContent, {
+      params: { id: "ta-nea" },
+      body: { name: "Nea", slug: "ta-nea", widgets: { w1: { type: "text", settings: {} } }, ...EL },
+    });
+    assert.equal(saved._status, 200);
+    assert.equal((await fs.readJson(greekPagePath("ta-nea"))).translationGroupId, page.uuid);
+
+    const copy = await callController(duplicatePage, { params: { id: "ta-nea" }, query: EL });
+    assert.equal(copy._status, 201);
+    assert.equal(copy._json.language, "el");
+    assert.equal(copy._json.translationGroupId, copy._json.uuid, "a copy starts its own group");
+    assert.equal(await fs.pathExists(greekPagePath(copy._json.slug)), true);
+
+    const deleted = await callController(deletePage, { params: { id: "ta-nea" }, query: EL });
+    assert.equal(deleted._status, 200);
+    assert.equal(await fs.pathExists(greekPagePath("ta-nea")), false);
+
+    const bulk = await callController(bulkDeletePages, { body: { pageIds: [copy._json.slug], ...EL } });
+    assert.equal(bulk._status, 200);
+    assert.equal(await fs.pathExists(greekPagePath(copy._json.slug)), false);
+  });
+
+  it("clears references to a deleted page in every language's pages and menus", async () => {
+    const target = await createTestPage("Target");
+    const greek = await createTestPage("Greek Linker", EL);
+    await callController(savePageContent, {
+      params: { id: "greek-linker" },
+      body: {
+        ...greek,
+        widgets: { w1: { type: "cta", settings: { link: { href: "target.html", pageUuid: target.uuid } } } },
+      },
+    });
+    const menuPath = path.join(projectDir(), "menus", "el", "main.json");
+    await fs.outputJson(menuPath, {
+      id: "main",
+      uuid: "menu-el",
+      items: [{ id: "i1", label: "Target", link: "target.html", pageUuid: target.uuid }],
+    });
+
+    const deleted = await callController(deletePage, { params: { id: "target" } });
+    assert.equal(deleted._status, 200);
+
+    const linker = await fs.readJson(greekPagePath("greek-linker"));
+    assert.equal(linker.widgets.w1.settings.link.pageUuid, undefined);
+    assert.equal(linker.widgets.w1.settings.link.href, "");
+    const menu = await fs.readJson(menuPath);
+    assert.equal(menu.items[0].pageUuid, undefined);
+    assert.equal(menu.items[0].link, "");
+  });
+});
+
+// `index` and `home` both publish as the language's index.html, so one language
+// may hold only one of them.
+describe("one homepage per language", () => {
+  beforeEach(async () => {
+    await resetPages();
+    await createTestPage("Welcome", { slug: "index" });
+  });
+
+  it("a new page named Home does not take the home slug beside index", async () => {
+    const page = await createTestPage("Home");
+    assert.equal(page.slug, "home-1");
+  });
+
+  it("a new page asking for slug index does not take it beside home", async () => {
+    await resetPages();
+    await createTestPage("Home", { slug: "home" });
+    const page = await createTestPage("Start", { slug: "index" });
+    assert.equal(page.slug, "index-1");
+  });
+
+  it("renaming a page to home is refused while index exists", async () => {
+    const page = await createTestPage("About");
+    const res = await callController(updatePage, {
+      params: { id: page.slug },
+      body: { name: "About", slug: "home" },
+    });
+    assert.equal(res._status, 409);
+    assert.equal(await fs.pathExists(getPagePath(activeProject.folderName, "home")), false);
+  });
+
+  it("the homepage itself may switch between index and home", async () => {
+    const res = await callController(updatePage, {
+      params: { id: "index" },
+      body: { name: "Welcome", slug: "home" },
+    });
+    assert.equal(res._status, 200);
+    assert.equal(await fs.pathExists(getPagePath(activeProject.folderName, "home")), true);
+    assert.equal(await fs.pathExists(getPagePath(activeProject.folderName, "index")), false);
+  });
+
+  it("an editor save that renames a page onto another existing page is refused", async () => {
+    await resetPages();
+    await createTestPage("Home", { slug: "home" });
+    const page = await createTestPage("Contact");
+    const res = await callController(savePageContent, {
+      params: { id: page.slug },
+      body: { name: "Contact", slug: "home", widgets: {} },
+    });
+    assert.equal(res._status, 409);
+    assert.equal((await fs.readJson(getPagePath(activeProject.folderName, "home"))).name, "Home");
+    assert.equal(await fs.pathExists(getPagePath(activeProject.folderName, page.slug)), true);
+  });
+
+  it("an editor save that renames a page to home is refused while index exists", async () => {
+    const page = await createTestPage("Contact");
+    const res = await callController(savePageContent, {
+      params: { id: page.slug },
+      body: { name: "Contact", slug: "home", widgets: {} },
+    });
+    assert.equal(res._status, 409);
+    assert.equal(await fs.pathExists(getPagePath(activeProject.folderName, "home")), false);
+  });
+});
+
+// Each request picks its slug before it waits for the content-write section, so
+// two of them can pick the same free slug while the section is busy (an
+// autosave, say). Whichever wrote second used to replace the first page, and
+// both requests reported success.
+describe("two writes that pick the same slug while the section is busy", () => {
+  beforeEach(resetPages);
+
+  /** Run `start` while another write holds the section, then let it go. */
+  async function whileSectionBusy(start) {
+    let release;
+    const busy = withContentWriteLock(PROJECT_ID, () => new Promise((resolve) => (release = resolve)));
+    const pending = start();
+    // Long enough for every request to finish its early checks and queue.
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    release();
+    await busy;
+    return pending;
+  }
+
+  const pageFile = (slug) => getPagePath(activeProject.folderName, slug);
+
+  it("keeps both new pages, the second under the next free slug", async () => {
+    const [first, second] = await whileSectionBusy(() =>
+      Promise.all([
+        callController(createPage, { body: { name: "About", slug: "about" } }),
+        callController(createPage, { body: { name: "About us", slug: "about" } }),
+      ]),
+    );
+
+    assert.equal(first._status, 201);
+    assert.equal(second._status, 201);
+    assert.deepEqual([first._json.slug, second._json.slug].sort(), ["about", "about-1"]);
+    for (const res of [first, second]) {
+      assert.equal((await fs.readJson(pageFile(res._json.slug))).uuid, res._json.uuid);
+    }
+  });
+
+  it("keeps a duplicate and a new page that pick the same slug", async () => {
+    await createTestPage("Team");
+    const [created, duplicated] = await whileSectionBusy(() =>
+      Promise.all([
+        callController(createPage, { body: { name: "Team (Copy)" } }),
+        callController(duplicatePage, { params: { id: "team" } }),
+      ]),
+    );
+
+    assert.equal(created._status, 201);
+    assert.equal(duplicated._status, 201);
+    assert.notEqual(created._json.slug, duplicated._json.slug);
+    assert.equal((await fs.readJson(pageFile(created._json.slug))).uuid, created._json.uuid);
+    assert.equal((await fs.readJson(pageFile(duplicated._json.slug))).uuid, duplicated._json.uuid);
+  });
+
+  it("refuses a rename onto a page created meanwhile, and keeps both pages", async () => {
+    await createTestPage("Team");
+    const team = await fs.readJson(pageFile("team"));
+    const [created, renamed] = await whileSectionBusy(() =>
+      Promise.all([
+        callController(createPage, { body: { name: "Contact", slug: "contact" } }),
+        callController(savePageContent, {
+          params: { id: "team" },
+          body: { ...team, slug: "contact", widgets: {}, widgetsOrder: [] },
+        }),
+      ]),
+    );
+
+    assert.equal(created._status, 201);
+    assert.equal(renamed._status, 409);
+    assert.equal(renamed._json.code, "SLUG_TAKEN");
+    assert.equal((await fs.readJson(pageFile("contact"))).uuid, created._json.uuid);
+    assert.equal((await fs.readJson(pageFile("team"))).uuid, team.uuid);
+  });
+
+  it("refuses a page-details rename onto a page created meanwhile", async () => {
+    await createTestPage("Team");
+    const [created, renamed] = await whileSectionBusy(() =>
+      Promise.all([
+        callController(createPage, { body: { name: "Contact", slug: "contact" } }),
+        callController(updatePage, { params: { id: "team" }, body: { name: "Team", slug: "contact" } }),
+      ]),
+    );
+
+    assert.equal(created._status, 201);
+    assert.equal(renamed._status, 409);
+    assert.equal((await fs.readJson(pageFile("contact"))).uuid, created._json.uuid);
+    assert.equal(await fs.pathExists(pageFile("team")), true);
+  });
+
+  it("does not create a second homepage when index and home are created together", async () => {
+    const [index, home] = await whileSectionBusy(() =>
+      Promise.all([
+        callController(createPage, { body: { name: "Welcome", slug: "index" } }),
+        callController(createPage, { body: { name: "Home", slug: "home" } }),
+      ]),
+    );
+
+    // Whichever queued first keeps its slug; the other moves on, as if it had arrived later.
+    const slugs = [index._json.slug, home._json.slug].sort();
+    assert.ok(
+      JSON.stringify(slugs) === JSON.stringify(["home-1", "index"]) ||
+        JSON.stringify(slugs) === JSON.stringify(["home", "index-1"]),
+      `one homepage only, got ${slugs}`,
+    );
+    assert.equal((await fs.pathExists(pageFile("home"))) && (await fs.pathExists(pageFile("index"))), false);
+  });
+
+  it("refuses renaming to home when index was created meanwhile", async () => {
+    await createTestPage("About");
+    const [, renamed] = await whileSectionBusy(() =>
+      Promise.all([
+        callController(createPage, { body: { name: "Welcome", slug: "index" } }),
+        callController(updatePage, { params: { id: "about" }, body: { name: "About", slug: "home" } }),
+      ]),
+    );
+
+    assert.equal(renamed._status, 409);
+    assert.equal(renamed._json.code, "SECOND_HOMEPAGE");
+    assert.equal(await fs.pathExists(pageFile("home")), false);
+    assert.equal(await fs.pathExists(pageFile("about")), true);
+  });
+
+  it("does not let a save for a page that was gone write over a page created meanwhile", async () => {
+    // The editor still has "Team" open after it was deleted elsewhere; its save
+    // finds no file and would recreate the page, but a new page took the slug.
+    const [created, stale] = await whileSectionBusy(() =>
+      Promise.all([
+        callController(createPage, { body: { name: "Team", slug: "team" } }),
+        callController(savePageContent, {
+          params: { id: "team" },
+          body: { name: "Team", slug: "team", widgets: {}, widgetsOrder: [] },
+        }),
+      ]),
+    );
+
+    // Either order is fine as long as neither page replaces the other: the save
+    // queued first recreates "team" and the new page moves on, or the new page
+    // queued first and the save is refused.
+    assert.equal(created._status, 201);
+    assert.equal((await fs.readJson(pageFile(created._json.slug))).uuid, created._json.uuid);
+    if (stale._status === 200) assert.notEqual(created._json.slug, "team");
+    else assert.equal(stale._json.code, "SLUG_TAKEN");
+  });
+
+  it("still saves a page in place, and saves an ordinary rename", async () => {
+    await createTestPage("Team");
+    const team = await fs.readJson(pageFile("team"));
+    const [inPlace, renamed] = await whileSectionBusy(() =>
+      Promise.all([
+        callController(savePageContent, { params: { id: "team" }, body: { ...team, widgets: {}, widgetsOrder: [] } }),
+        callController(updatePage, { params: { id: "team" }, body: { name: "Crew", slug: "crew" } }),
+      ]),
+    );
+
+    assert.equal(inPlace._status, 200);
+    assert.equal(renamed._status, 200);
+    assert.equal(await fs.pathExists(pageFile("crew")), true);
+  });
+});
+
+// A language version keeps its source's parent, and the breadcrumb shows that
+// parent's version in the page's own language. Deleting one version of a parent
+// used to drop the parent from every child in every language, even where the
+// child's own language still had a version of it.
+describe("deleting a parent page that has translations", () => {
+  const pagesRoot = () => getProjectPagesDir(activeProject.folderName);
+  const fileOf = (language, slug) =>
+    language === "en" ? path.join(pagesRoot(), `${slug}.json`) : path.join(pagesRoot(), language, `${slug}.json`);
+  const write = (language, page) => fs.outputJson(fileOf(language, page.slug), { widgets: {}, ...page }, { spaces: 2 });
+  const parentOf = async (language, slug) => (await fs.readJson(fileOf(language, slug))).parentPageUuid;
+
+  before(() => {
+    activeProject.defaultLanguage = "en";
+    activeProject.languages = ["el", "de"];
+    projectRepo.updateProject(activeProject.id, { defaultLanguage: "en", languages: ["el", "de"] });
+  });
+
+  after(() => {
+    delete activeProject.defaultLanguage;
+    delete activeProject.languages;
+    projectRepo.updateProject(activeProject.id, { defaultLanguage: "en", languages: [] });
+  });
+
+  beforeEach(async () => {
+    await resetPages();
+    await fs.remove(path.join(pagesRoot(), "el"));
+    await fs.remove(path.join(pagesRoot(), "de"));
+    await fs.remove(path.join(pagesRoot(), "fr"));
+    // "About" in English heads the group; Team's versions all keep the English parent.
+    await write("en", { uuid: "about-en", slug: "about", name: "About" });
+    await write("en", { uuid: "team-en", slug: "team", name: "Team", parentPageUuid: "about-en" });
+    await write("el", { uuid: "team-el", slug: "team", name: "Omada", translationGroupId: "team-en", parentPageUuid: "about-en" });
+  });
+
+  const deleteIn = (language, slug) =>
+    callController(deletePage, { params: { id: slug }, query: language === "en" ? {} : { language } });
+
+  it("moves a child to its own language's version of the deleted parent", async () => {
+    await write("el", { uuid: "about-el", slug: "about", name: "Sxetika", translationGroupId: "about-en" });
+
+    assert.equal((await deleteIn("en", "about"))._status, 200);
+
+    assert.equal(await parentOf("el", "team"), "about-el");
+    assert.equal(await parentOf("en", "team"), undefined, "English has no version left");
+  });
+
+  it("falls back to the default language's version when the child's language has none", async () => {
+    // Greek Team's parent was picked in the Greek editor, as the Greek About.
+    await write("el", { uuid: "about-el", slug: "about", name: "Sxetika", translationGroupId: "about-en" });
+    await write("el", { uuid: "team-el", slug: "team", name: "Omada", translationGroupId: "team-en", parentPageUuid: "about-el" });
+
+    assert.equal((await deleteIn("el", "about"))._status, 200);
+
+    assert.equal(await parentOf("el", "team"), "about-en");
+    assert.equal(await parentOf("en", "team"), "about-en", "the English child never pointed at the Greek page");
+  });
+
+  it("does not move a child to a version in a third language", async () => {
+    await write("de", { uuid: "about-de", slug: "about", name: "Uber uns", translationGroupId: "about-en" });
+
+    assert.equal((await deleteIn("en", "about"))._status, 200);
+
+    assert.equal(await parentOf("el", "team"), undefined, "a Greek breadcrumb never shows a German page");
+  });
+
+  it("clears the parent once every version is deleted", async () => {
+    await write("el", { uuid: "about-el", slug: "about", name: "Sxetika", translationGroupId: "about-en" });
+    await deleteIn("el", "about");
+    await deleteIn("en", "about");
+
+    assert.equal(await parentOf("el", "team"), undefined);
+    assert.equal(await parentOf("en", "team"), undefined);
+  });
+
+  it("moves children when the parent goes in a bulk delete", async () => {
+    await write("el", { uuid: "about-el", slug: "about", name: "Sxetika", translationGroupId: "about-en" });
+
+    const res = await callController(bulkDeletePages, { body: { pageIds: ["about"] } });
+    assert.equal(res._status, 200, JSON.stringify(res._json));
+
+    assert.equal(await parentOf("el", "team"), "about-el");
+  });
+
+  it("does not move a child to a version that would make it its own ancestor", async () => {
+    // Greek Team sits under Greek About, while English About was put under Greek Team.
+    await write("en", { uuid: "about-en", slug: "about", name: "About", parentPageUuid: "team-el" });
+    await write("el", { uuid: "about-el", slug: "about", name: "Sxetika", translationGroupId: "about-en" });
+    await write("el", { uuid: "team-el", slug: "team", name: "Omada", translationGroupId: "team-en", parentPageUuid: "about-el" });
+
+    assert.equal((await deleteIn("el", "about"))._status, 200);
+
+    assert.equal(await parentOf("el", "team"), undefined, "English About is below Greek Team, so it cannot be above it");
+    assert.equal(await parentOf("en", "about"), "team-el");
+  });
+
+  it("leaves the parent alone while a page that may be its translation cannot be read", async () => {
+    await fs.outputFile(fileOf("el", "about"), "{ not json");
+
+    const res = await deleteIn("en", "about");
+    assert.equal(res._status, 200);
+    assert.equal(res._json.warnings?.[0]?.code, "REFERENCE_CLEANUP_INCOMPLETE");
+
+    assert.equal(await parentOf("el", "team"), "about-en", "a wrong clear could not be undone");
+  });
+
+  it("moves a default-language child off a deleted version in another language", async () => {
+    // English Team was put under the Greek About in the Greek editor's picker.
+    await write("el", { uuid: "about-el", slug: "about", name: "Sxetika", translationGroupId: "about-en" });
+    await write("en", { uuid: "team-en", slug: "team", name: "Team", parentPageUuid: "about-el" });
+
+    assert.equal((await deleteIn("el", "about"))._status, 200);
+
+    assert.equal(await parentOf("en", "team"), "about-en");
+  });
+
+  it("fixes both the parent and the links of the same page", async () => {
+    await write("el", { uuid: "about-el", slug: "about", name: "Sxetika", translationGroupId: "about-en" });
+    await write("el", {
+      uuid: "team-el",
+      slug: "team",
+      name: "Omada",
+      translationGroupId: "team-en",
+      parentPageUuid: "about-en",
+      widgets: { w1: { type: "cta", settings: { link: { href: "/about.html", pageUuid: "about-en" } } } },
+    });
+
+    assert.equal((await deleteIn("en", "about"))._status, 200);
+
+    const team = await fs.readJson(fileOf("el", "team"));
+    assert.equal(team.parentPageUuid, "about-el");
+    assert.equal("pageUuid" in team.widgets.w1.settings.link, false, "the link to the deleted page is cleared");
+  });
+
+  it("leaves the parent alone when the unreadable page is in a folder read after the child", async () => {
+    // Folders are read in name order, so Greek comes before French: when Greek
+    // Team is reached, nothing is wrong yet, and with no Greek About it would
+    // otherwise be cleared.
+    await fs.outputFile(path.join(pagesRoot(), "fr", "broken.json"), "{ not json");
+
+    const res = await deleteIn("en", "about");
+    assert.equal(res._status, 200);
+    assert.equal(res._json.warnings?.[0]?.code, "REFERENCE_CLEANUP_INCOMPLETE");
+
+    assert.equal(await parentOf("el", "team"), "about-en");
+  });
+
+  it("does not let two children's new parents form a loop together", async () => {
+    // X and Y head groups whose English versions are deleted together. Greek X's
+    // parent is English Y, Greek Y's parent is English X. Switching both to the
+    // Greek versions would put each under the other.
+    await write("en", { uuid: "x-en", slug: "x", name: "X" });
+    await write("en", { uuid: "y-en", slug: "y", name: "Y" });
+    await write("el", { uuid: "x-el", slug: "x", name: "X", translationGroupId: "x-en", parentPageUuid: "y-en" });
+    await write("el", { uuid: "y-el", slug: "y", name: "Y", translationGroupId: "y-en", parentPageUuid: "x-en" });
+
+    const res = await callController(bulkDeletePages, { body: { pageIds: ["x", "y"] } });
+    assert.equal(res._status, 200, JSON.stringify(res._json));
+
+    // Whichever is reached first moves; the other would close the loop, so it is cleared.
+    const parents = [await parentOf("el", "x"), await parentOf("el", "y")];
+    assert.ok(
+      JSON.stringify(parents) === JSON.stringify(["y-el", undefined]) ||
+        JSON.stringify(parents) === JSON.stringify([undefined, "x-el"]),
+      `one moves to the Greek version and the other is cleared, got ${parents}`,
+    );
+  });
+
+  it("does not move a child to a known version while another page cannot be read", async () => {
+    // The unreadable German page could be anything, including an ancestor that
+    // would make English About loop back to Greek Team.
+    await fs.outputFile(fileOf("de", "broken"), "{ not json");
+    await write("el", { uuid: "about-el", slug: "about", name: "Sxetika", translationGroupId: "about-en" });
+    await write("el", { uuid: "team-el", slug: "team", name: "Omada", translationGroupId: "team-en", parentPageUuid: "about-el" });
+
+    const res = await deleteIn("el", "about");
+    assert.equal(res._json.warnings?.[0]?.code, "REFERENCE_CLEANUP_INCOMPLETE");
+    assert.equal(await parentOf("el", "team"), "about-el", "left as it is, not moved to English About");
+  });
+
+  it("moves a child that has no uuid of its own", async () => {
+    await write("el", { uuid: "about-el", slug: "about", name: "Sxetika", translationGroupId: "about-en" });
+    await write("el", { slug: "team", name: "Omada", parentPageUuid: "about-en" });
+
+    assert.equal((await deleteIn("en", "about"))._status, 200);
+
+    assert.equal(await parentOf("el", "team"), "about-el");
+  });
+
+  it("moves children when the parent's language is removed", async () => {
+    // German Team was created from the Greek one, and kept its Greek parent.
+    await write("el", { uuid: "about-el", slug: "about", name: "Sxetika", translationGroupId: "about-en" });
+    await write("de", { uuid: "about-de", slug: "about", name: "Uber uns", translationGroupId: "about-en" });
+    await write("de", { uuid: "team-de", slug: "team", name: "Team", translationGroupId: "team-en", parentPageUuid: "about-el" });
+
+    await withContentWriteLock(activeProject.id, () =>
+      removeLanguage({
+        storage: pageStorage,
+        scope: mockReq().scope,
+        project: projectRepo.getProjectById(activeProject.id),
+        code: "el",
+      }),
+    );
+
+    assert.equal(await parentOf("de", "team"), "about-de");
   });
 });

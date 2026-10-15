@@ -124,10 +124,56 @@ describe("validateCollectionSchema (pure)", () => {
   });
 
   it("rejects a reserved slugPrefix when hasItemPages", () => {
-    const bad = { ...NEWS_SCHEMA, slugPrefix: "assets" };
-    const { valid, errors } = svc.validateCollectionSchema(bad, "news");
+    const { valid, errors } = svc.validateCollectionSchema({ ...NEWS_SCHEMA, slugPrefix: "assets" }, "news");
     assert.equal(valid, false);
     assert.ok(errors.some((e) => e.includes("reserved")));
+  });
+
+  it("still accepts page as a slugPrefix, which existing collections may use", () => {
+    assert.equal(svc.validateCollectionSchema({ ...NEWS_SCHEMA, slugPrefix: "page" }, "news").valid, true);
+  });
+
+  it("accepts a structuredData block and keeps it on the normalized schema", () => {
+    const block = { type: "BlogPosting", headline: "title", datePublished: "published", image: "hero", articleBody: "body" };
+    const { valid, errors, normalized } = svc.validateCollectionSchema({ ...NEWS_SCHEMA, structuredData: block }, "news");
+    assert.deepEqual(errors, []);
+    assert.equal(valid, true);
+    assert.deepEqual(normalized.structuredData, block);
+  });
+
+  it("refuses a structuredData block that maps a missing field or an unsupported type", () => {
+    const missing = svc.validateCollectionSchema(
+      { ...NEWS_SCHEMA, structuredData: { type: "BlogPosting", headline: "title", image: "cover" } },
+      "news",
+    );
+    assert.equal(missing.valid, false);
+    assert.ok(missing.errors.some((e) => e.includes('"cover", which is not a setting')), missing.errors.join("\n"));
+
+    const unsupported = svc.validateCollectionSchema({ ...NEWS_SCHEMA, structuredData: { type: "Recipe" } }, "news");
+    assert.equal(unsupported.valid, false);
+    assert.ok(unsupported.errors.some((e) => e.includes("must be one of: BlogPosting")));
+  });
+
+  it("refuses a non-string structuredData type without throwing", () => {
+    for (const type of [["BlogPosting"], { toString: null }]) {
+      const { valid, errors } = svc.validateCollectionSchema(
+        { ...NEWS_SCHEMA, structuredData: { type, headline: "title" } },
+        "news",
+      );
+      assert.equal(valid, false);
+      assert.ok(errors.some((e) => e.includes("must be one of: BlogPosting")), errors.join("\n"));
+    }
+  });
+
+  it("accepts the News schema Arch ships, and its 0.9.10 update copy matches it", async () => {
+    const repoRoot = new URL("../../../../", import.meta.url);
+    const base = await fs.readJson(new URL("themes/arch/collection-types/news/schema.json", repoRoot));
+    const update = await fs.readJson(new URL("themes/arch/updates/0.9.10/collection-types/news/schema.json", repoRoot));
+    const { valid, errors } = svc.validateCollectionSchema(base, "news");
+    assert.deepEqual(errors, []);
+    assert.equal(valid, true);
+    assert.equal(base.structuredData.type, "BlogPosting");
+    assert.deepEqual(update, base);
   });
 });
 
@@ -166,6 +212,35 @@ describe("listCollectionSchemas / getCollectionSchema", () => {
 // Item create / read / list
 // ---------------------------------------------------------------------------
 
+describe("listing order when sort keys tie", () => {
+  it("orders exact ties by uuid, whatever order storage lists the files in", async () => {
+    const created = "2026-03-01T00:00:00.000Z";
+    const tied = [
+      ["tie-zeta", "u-tie-1"],
+      ["tie-alpha", "u-tie-3"],
+      ["tie-mid", "u-tie-2"],
+    ];
+    for (const [slug, uuid] of tied) {
+      await storage.write(
+        scope,
+        `collections/news/${slug}.json`,
+        JSON.stringify({ id: slug, uuid, slug, schemaVersion: 1, created, updated: created, settings: { title: "Same" } }),
+      );
+    }
+    for (const sort of ["created_desc", "created_asc", "title_asc", "title_desc", "manual"]) {
+      const items = (await svc.listCollectionItems(storage, scope, "news", { sort })).filter((item) =>
+        item.slug.startsWith("tie-"),
+      );
+      assert.deepEqual(
+        items.map((item) => item.uuid),
+        ["u-tie-1", "u-tie-2", "u-tie-3"],
+        sort,
+      );
+    }
+    for (const [slug] of tied) await storage.delete(scope, `collections/news/${slug}.json`);
+  });
+});
+
 describe("create + read items", () => {
   it("creates an item, derives the slug from the title, and reads it back", async () => {
     const item = await createItem({ settings: { title: "Hello World", body: "<p>hi</p>" } });
@@ -197,8 +272,63 @@ describe("create + read items", () => {
     );
   });
 
+  it("accepts a video field and keeps its upload path through save and reload", async () => {
+    const schema = {
+      ...NEWS_SCHEMA,
+      settings: [...NEWS_SCHEMA.settings, { id: "clip", type: "video", required: true }],
+    };
+    assert.equal(svc.validateCollectionSchema(schema, "news").valid, true);
+    await seedSchema("news", schema);
+
+    const item = await createItem({ settings: { title: "Launch", clip: "/uploads/files/launch.mp4" } });
+    const raw = await svc.readRawCollectionItem(storage, scope, "news", item.slug);
+    assert.equal(raw.settings.clip, "/uploads/files/launch.mp4");
+    assert.equal((await svc.readCollectionItem(storage, scope, "news", item.slug)).invalid, false);
+
+    const saved = await svc.getCollectionSchema(storage, scope, "news");
+    for (const clip of ["", "/uploads/files/brochure.pdf", "https://cdn.example/launch.mp4"]) {
+      assert.throws(
+        () => svc.buildCollectionItemData(saved, { settings: { title: "No clip", clip } }, null),
+        (e) => e.code === "VALIDATION" && e.validationErrors.some((v) => v.fieldId === "clip"),
+        JSON.stringify(clip),
+      );
+    }
+  });
+
   it("returns null reading a missing item", async () => {
     assert.equal(await svc.readCollectionItem(storage, scope, "news", "ghost"), null);
+  });
+
+  // CollectionValidationError's message is the fixed "Collection item validation failed";
+  // the per-field detail lives on `err.validationErrors` — assert on that, never on the message.
+  const reserved = (err) => {
+    assert.equal(err.name, "CollectionValidationError");
+    assert.deepEqual(err.validationErrors, [{ fieldId: "slug", reason: "reserved slug" }]);
+    return true;
+  };
+
+  it("refuses index and page as item slugs on create", async () => {
+    await assert.rejects(() => createItem({ slug: "index", settings: { title: "Idx" } }), reserved);
+    // A title that slugifies to the reserved name is refused the same way.
+    await assert.rejects(() => createItem({ settings: { title: "Index" } }), reserved);
+    await assert.rejects(() => createItem({ slug: "page", settings: { title: "P" } }), reserved);
+    await assert.rejects(() => createItem({ settings: { title: "Page" } }), reserved);
+    // "home" is only special for pages (the site root); as an item slug it is ordinary.
+    const home = await createItem({ slug: "home", settings: { title: "H" } });
+    assert.equal(home.slug, "home");
+  });
+
+  it("refuses renaming an item onto a reserved slug, but still saves an existing reserved-slug item in place", async () => {
+    await createItem({ slug: "a", settings: { title: "A" } });
+    const a = await svc.readRawCollectionItem(storage, scope, "news", "a");
+    assert.throws(() => svc.buildCollectionItemData(NEWS_SCHEMA, { slug: "index", settings: { title: "A" } }, a), reserved);
+    // A pre-existing item named "index" (written before the rule): an in-place update keeps working.
+    const legacy = { ...a, slug: "index" };
+    const out = svc.buildCollectionItemData(NEWS_SCHEMA, { slug: "index", settings: { title: "A2" } }, legacy);
+    assert.equal(out.item.slug, "index");
+    // Renaming that legacy item away from "index" is allowed (the rule only guards the destination slug).
+    const renamed = svc.buildCollectionItemData(NEWS_SCHEMA, { slug: "home", settings: { title: "A2" } }, legacy);
+    assert.equal(renamed.item.slug, "home");
   });
 });
 
@@ -320,6 +450,45 @@ describe("normalize + render helpers (pure)", () => {
     assert.equal(out.settings.cta.href, "../about.html");
   });
 
+  it("prepareCollectionItemForRender emits extensionless page and item links when menuDeps.cleanUrls is on", () => {
+    const pages = new Map([["p1", { slug: "about" }], ["ph", { slug: "index" }]]);
+    const itemsByUuid = new Map([["i1", { slugPrefix: "news", slug: "beta" }]]);
+    const item = {
+      id: "a",
+      slug: "a",
+      settings: {
+        title: "A",
+        cta: { pageUuid: "p1", href: "x.html", text: "A", target: "_self" },
+        home: { pageUuid: "ph", href: "index.html", text: "H", target: "_self" },
+        other: { collectionItemUuid: "i1", href: "y.html", text: "B", target: "_self" },
+        typed: { href: "contact.html", text: "T", target: "_self" },
+      },
+    };
+    const schema = {
+      ...NEWS_SCHEMA,
+      settings: [...NEWS_SCHEMA.settings, { type: "link", id: "home" }, { type: "link", id: "other" }, { type: "link", id: "typed" }],
+    };
+    const out = svc.prepareCollectionItemForRender(item, schema, pages, "../", {
+      menuMaps: null,
+      collectionItemsByUuid: itemsByUuid,
+      cleanUrls: true,
+    });
+    assert.equal(out.settings.cta.href, "../about");
+    assert.equal(out.settings.home.href, "../");
+    assert.equal(out.settings.other.href, "../news/beta");
+    assert.equal(out.settings.typed.href, "../contact.html");
+  });
+
+  it("prepareCollectionItemForRender keeps .html when menuDeps.cleanUrls is absent", () => {
+    const pages = new Map([["p1", { slug: "about" }]]);
+    const item = { id: "a", slug: "a", settings: { title: "A", cta: { pageUuid: "p1", href: "x.html", text: "A", target: "_self" } } };
+    const out = svc.prepareCollectionItemForRender(item, NEWS_SCHEMA, pages, "", {
+      menuMaps: null,
+      collectionItemsByUuid: new Map(),
+    });
+    assert.equal(out.settings.cta.href, "about.html");
+  });
+
   it("buildCollectionItemPageData yields a page-shaped object with nested slug", () => {
     const page = svc.buildCollectionItemPageData(
       NEWS_SCHEMA,
@@ -329,6 +498,49 @@ describe("normalize + render helpers (pure)", () => {
     assert.equal(page.slug, "news/hello");
     assert.equal(page.name, "Hello");
     assert.equal(page.seo.canonical_url, "https://example.com/news/hello.html");
+  });
+
+  it("buildCollectionItemPageData drops the canonical .html extension with cleanUrls", () => {
+    const page = svc.buildCollectionItemPageData(
+      NEWS_SCHEMA,
+      { slug: "hello", uuid: "u", settings: { title: "Hello" }, seo: {} },
+      "https://example.com",
+      true,
+    );
+    assert.equal(page.seo.canonical_url, "https://example.com/news/hello");
+  });
+
+  // The item canonical shares the Site URL base helper with page canonicals, the
+  // sitemap and robots, so a subfolder Site URL survives here too — in either
+  // trailing-slash form.
+  const item = { slug: "hello", uuid: "u", settings: { title: "Hello" }, seo: {} };
+
+  it("buildCollectionItemPageData keeps a subfolder Site URL", () => {
+    for (const siteUrl of ["https://example.com/repo", "https://example.com/repo/"]) {
+      assert.equal(
+        svc.buildCollectionItemPageData(NEWS_SCHEMA, item, siteUrl).seo.canonical_url,
+        "https://example.com/repo/news/hello.html",
+      );
+      assert.equal(
+        svc.buildCollectionItemPageData(NEWS_SCHEMA, item, siteUrl, true).seo.canonical_url,
+        "https://example.com/repo/news/hello",
+      );
+    }
+  });
+
+  it("buildCollectionItemPageData omits the canonical when the Site URL is unusable", () => {
+    for (const siteUrl of ["", "not-a-url", "https://example.com/?utm=x", "https://example.com/#top"]) {
+      assert.equal(svc.buildCollectionItemPageData(NEWS_SCHEMA, item, siteUrl).seo.canonical_url, "");
+    }
+  });
+
+  it("buildCollectionItemPageData lets an explicit item canonical win", () => {
+    const page = svc.buildCollectionItemPageData(
+      NEWS_SCHEMA,
+      { ...item, seo: { canonical_url: "https://other.example.net/custom" } },
+      "https://example.com/repo/",
+    );
+    assert.equal(page.seo.canonical_url, "https://other.example.net/custom");
   });
 });
 
@@ -363,5 +575,73 @@ describe("tenant isolation (SLUG_RE guards + adapter confinement)", () => {
       () => svc.writeCollectionItem(storage, scope, "../../evil", { slug: "x", uuid: "u", settings: {} }, null),
       (e) => e.code === "VALIDATION",
     );
+  });
+});
+
+describe("items in another language", () => {
+  const EL = { language: "el", defaultLanguage: "en" };
+  const elDir = path.join(projectBase, "collections", "news", "el");
+
+  async function createIn(lang, input) {
+    const schema = await svc.getCollectionSchema(storage, scope, "news");
+    const { item, previousSlug } = svc.buildCollectionItemData(schema, input, null);
+    await svc.writeCollectionItem(storage, scope, "news", item, previousSlug, lang);
+    return item;
+  }
+
+  it("nests the language under the type, with its own order file, and the same slug per language", async () => {
+    const en = await createIn(undefined, { slug: "story", settings: { title: "Story" } });
+    const el = await createIn(EL, { slug: "story", settings: { title: "Istoria" } });
+    assert.notEqual(en.uuid, el.uuid);
+    assert.equal(await fs.pathExists(path.join(elDir, "story.json")), true);
+    assert.equal("language" in (await fs.readJson(path.join(elDir, "story.json"))), false);
+
+    await svc.reorderCollectionItems(storage, scope, "news", ["story"], EL);
+    assert.deepEqual((await fs.readJson(path.join(elDir, "_order.json"))).order, ["story"]);
+    assert.equal(await fs.pathExists(path.join(projectBase, "collections", "news", "_order.json")), false);
+  });
+
+  it("lists and reads per language, stamping the resolved language and translation group", async () => {
+    await createIn(undefined, { slug: "a", settings: { title: "A" } });
+    const el = await createIn(EL, { slug: "b", settings: { title: "B" } });
+
+    const root = await svc.listCollectionItems(storage, scope, "news");
+    assert.deepEqual(root.map((i) => [i.slug, i.language]), [["a", "en"]]);
+    const greek = await svc.listCollectionItems(storage, scope, "news", {}, EL);
+    assert.deepEqual(greek.map((i) => [i.slug, i.language]), [["b", "el"]]);
+    assert.equal(greek[0].translationGroupId, el.uuid);
+
+    assert.equal(await svc.readCollectionItem(storage, scope, "news", "b"), null);
+    const read = await svc.readCollectionItem(storage, scope, "news", "b", EL);
+    assert.equal(read.language, "el");
+    assert.equal((await svc.readRawCollectionItem(storage, scope, "news", "b", EL)).uuid, el.uuid);
+  });
+
+  it("renames, duplicates and deletes inside the language folder", async () => {
+    const el = await createIn(EL, { slug: "b", settings: { title: "B" } });
+    const schema = await svc.getCollectionSchema(storage, scope, "news");
+    const raw = await svc.readRawCollectionItem(storage, scope, "news", "b", EL);
+    const { item, previousSlug } = svc.buildCollectionItemData(schema, { slug: "c", settings: { title: "C" } }, raw);
+    await svc.writeCollectionItem(storage, scope, "news", item, previousSlug, EL);
+    assert.equal(item.translationGroupId, el.uuid);
+    assert.equal(await fs.pathExists(path.join(elDir, "b.json")), false);
+    assert.equal(await fs.pathExists(path.join(elDir, "c.json")), true);
+
+    const copy = await svc.duplicateCollectionItem(storage, scope, "news", "c", EL);
+    assert.equal(copy.translationGroupId, copy.uuid);
+    assert.equal(await fs.pathExists(path.join(elDir, `${copy.slug}.json`)), true);
+    assert.deepEqual((await fs.readJson(path.join(elDir, "_order.json"))).order, [copy.slug]);
+
+    const res = await svc.bulkDeleteCollectionItems(storage, scope, "news", ["c", copy.slug], EL);
+    assert.deepEqual(res.deleted, ["c", copy.slug]);
+    assert.deepEqual((await fs.readJson(path.join(elDir, "_order.json"))).order, []);
+  });
+
+  it("reads each language separately through the collection reader", async () => {
+    await createIn(undefined, { slug: "a", settings: { title: "A" } });
+    await createIn(EL, { slug: "b", settings: { title: "B" } });
+    const reader = svc.createCollectionReader({ storage, scope, snapshot: new Map() });
+    assert.deepEqual((await reader.sorted("news")).map((i) => i.slug), ["a"]);
+    assert.deepEqual((await reader.sorted("news", {}, EL)).map((i) => i.slug), ["b"]);
   });
 });

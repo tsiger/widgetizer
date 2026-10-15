@@ -28,6 +28,12 @@
     },
     "corner_style": "sharp",
     "spacing_density": "compact",
-    "button_shape": "sharp"
+    "button_shape": "sharp",
+    "facebook_url": "#",
+    "instagram_url": "#",
+    "twitter_url": "#",
+    "linkedin_url": "#",
+    "youtube_url": "#",
+    "tiktok_url": "#"
   }
 }

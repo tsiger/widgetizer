@@ -166,6 +166,6 @@
   background-color: transparent;
 
   & .slideshow-slide {
-    padding-block-start: var(--header-sticky-offset, 4.5rem);
+    padding-block-start: calc(var(--header-sticky-offset, 4.5rem) + var(--breadcrumbs-offset, 0px));
   }
 }

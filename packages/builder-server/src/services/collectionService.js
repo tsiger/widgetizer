@@ -23,20 +23,31 @@ import { randomUUID } from "node:crypto";
 
 import { isSupportedSettingType } from "@widgetizer/core/config/settingTypes";
 import { prefixInternalHref } from "@widgetizer/core/linkPrefixer";
+import { pageHref, itemHref } from "@widgetizer/core/internalHref";
+import { itemUrlAt } from "@widgetizer/core/publishedUrls";
 import { resolveRichtextMediaInSettings } from "@widgetizer/core/richtextMedia";
 import { resolveRichtextLinksInSettings } from "@widgetizer/core/richtextLinks";
 import { resolveMenuSettings } from "@widgetizer/render-engine";
 import { sanitizeSlug, generateUniqueSlug } from "../utils/slugHelpers.js";
 import {
+  isReservedItemSlug,
+  isReservedSlugPrefix,
+  itemsDir,
+  itemKey as itemStorageKey,
+  resolveLanguage,
+} from "@widgetizer/core/contentAddress";
+import { validateCollectionStructuredData } from "@widgetizer/core/structuredData";
+import { translationSibling } from "@widgetizer/core/translations";
+import {
   sanitizeCollectionItemData,
   sanitizeDateValue,
   sanitizeImagePath,
-  stripHtmlTags,
+  sanitizeVideoPath,
+  stripHtmlToText,
 } from "./sanitizationService.js";
 
 const SLUG_RE = /^[a-z0-9-]+$/;
 const ALLOWED_SORTS = ["manual", "created_desc", "created_asc", "title_asc", "title_desc", "date_desc", "date_asc"];
-const RESERVED_SLUG_PREFIXES = new Set(["assets"]);
 // v1 constructs that must be rejected, not silently ignored (Section 1).
 const DISALLOWED_SETTING_KEYS = ["multiple", "repeater", "blocks"];
 
@@ -55,9 +66,11 @@ const RESERVED_COLUMN_IDS = new Set(["__proto__", "constructor", "prototype"]);
 const collectionTypesRoot = () => "collection-types";
 const schemaKey = (collectionType) => `collection-types/${collectionType}/schema.json`;
 const templateKey = (collectionType) => `collection-types/${collectionType}/template.liquid`;
-const collectionDirKey = (collectionType) => `collections/${collectionType}`;
-const itemKey = (collectionType, slug) => `collections/${collectionType}/${slug}.json`;
-const orderKey = (collectionType) => `collections/${collectionType}/_order.json`;
+// `lang` is `{ language, defaultLanguage }`; items of another language sit in a
+// folder under the type, and each folder keeps its own `_order.json`.
+const collectionDirKey = (collectionType, lang) => itemsDir(collectionType, lang);
+const itemKey = (collectionType, slug, lang) => itemStorageKey(collectionType, slug, lang);
+const orderKey = (collectionType, lang) => `${itemsDir(collectionType, lang)}/_order.json`;
 
 /**
  * Read + parse a JSON file through the storage adapter. Returns null when the
@@ -182,6 +195,10 @@ export function validateCollectionSchema(schema, folderName) {
     errors.push("`usedAsDate` must be on a `date` setting.");
   }
 
+  if (schema.structuredData !== undefined && Array.isArray(schema.settings)) {
+    errors.push(...validateCollectionStructuredData(schema.structuredData, schema.settings));
+  }
+
   // --- defaultSort ---
   if (schema.defaultSort !== undefined && !ALLOWED_SORTS.includes(schema.defaultSort)) {
     errors.push(`\`defaultSort\` must be one of: ${ALLOWED_SORTS.join(", ")}.`);
@@ -195,7 +212,7 @@ export function validateCollectionSchema(schema, folderName) {
   if (schema.hasItemPages === true) {
     if (typeof slugPrefix !== "string" || !SLUG_RE.test(slugPrefix)) {
       errors.push("`slugPrefix` must match ^[a-z0-9-]+$ when `hasItemPages` is true.");
-    } else if (RESERVED_SLUG_PREFIXES.has(slugPrefix)) {
+    } else if (isReservedSlugPrefix(slugPrefix)) {
       errors.push(`\`slugPrefix\` "${slugPrefix}" is reserved and cannot be used.`);
     }
   }
@@ -402,6 +419,7 @@ function isMissingValue(value, type, columns) {
   if (type === "link") {
     return !value || typeof value.href !== "string" || value.href.trim() === "";
   }
+  if (type === "video") return sanitizeVideoPath(value) === "";
   if (value === undefined || value === null) return true;
   if (typeof value === "string") return value.trim() === "";
   return false; // numbers and booleans count as present (0 / false are valid)
@@ -427,7 +445,7 @@ export async function getCollectionSchema(storage, scope, collectionType) {
  * canonical_url, robots); `og_type`/`twitter_card` are non-UI defaults (items
  * are content, so `og_type` defaults to "article"). With `sanitize`, the
  * author-editable text fields are stripped of HTML — parity with the page SEO
- * save path (pageController runs the same `stripHtmlTags`).
+ * save path (pageController runs the same `stripHtmlToText`).
  *
  * @param {object} rawSeo - partial/raw seo object (may be undefined)
  * @param {{ sanitize?: boolean }} [opts]
@@ -437,7 +455,7 @@ export function shapeItemSeo(rawSeo, { sanitize = false } = {}) {
   const seo = rawSeo && typeof rawSeo === "object" ? rawSeo : {};
   const text = (v) => {
     const s = typeof v === "string" ? v : "";
-    return sanitize ? stripHtmlTags(s) : s;
+    return sanitize ? stripHtmlToText(s) : s;
   };
   const str = (v, fallback) => (typeof v === "string" && v ? v : fallback);
   return {
@@ -459,9 +477,10 @@ export function shapeItemSeo(rawSeo, { sanitize = false } = {}) {
  *
  * @param {object} rawItem - parsed item JSON
  * @param {object} schema - normalized schema
+ * @param {{ language?: string, defaultLanguage?: string }} [lang] - the folder the item was read from
  * @returns {object} normalized item with title/invalid/validationErrors/_archived
  */
-export function normalizeCollectionItem(rawItem, schema) {
+export function normalizeCollectionItem(rawItem, schema, lang) {
   const fieldSettings = (schema.settings || []).filter((s) => s.type !== HEADER_TYPE);
   const knownIds = new Set(fieldSettings.map((s) => s.id));
   const rawSettings = (rawItem && rawItem.settings) || {};
@@ -493,6 +512,8 @@ export function normalizeCollectionItem(rawItem, schema) {
   return {
     id: rawItem.id ?? rawItem.slug,
     uuid: rawItem.uuid,
+    translationGroupId: rawItem.translationGroupId ?? rawItem.uuid,
+    language: resolveLanguage(lang?.language, lang?.defaultLanguage),
     slug: rawItem.slug ?? rawItem.id,
     schemaVersion: schema.schemaVersion,
     created: rawItem.created,
@@ -516,11 +537,12 @@ function pickNewerItemFile(a, b) {
   return a.name > b.name ? a : b;
 }
 
-const byCreatedDesc = (a, b) => (Date.parse(b.created) || 0) - (Date.parse(a.created) || 0);
+const byIdentity = (a, b) => String(a.uuid ?? a.slug).localeCompare(String(b.uuid ?? b.slug));
+const byCreatedDesc = (a, b) => (Date.parse(b.created) || 0) - (Date.parse(a.created) || 0) || byIdentity(a, b);
 
-async function applyManualOrder(items, storage, scope, collectionType) {
+async function applyManualOrder(items, storage, scope, collectionType, lang) {
   let order = [];
-  const data = await readJson(storage, scope, orderKey(collectionType));
+  const data = await readJson(storage, scope, orderKey(collectionType, lang));
   if (Array.isArray(data?.order)) order = data.order;
 
   const bySlug = new Map(items.map((i) => [i.slug, i]));
@@ -561,16 +583,16 @@ function compareByDate(a, b, dateField, dir) {
   return byCreatedDesc(a, b);
 }
 
-async function sortItems(items, sort, storage, scope, collectionType, schema) {
+async function sortItems(items, sort, storage, scope, collectionType, schema, lang) {
   switch (sort) {
     case "manual":
-      return applyManualOrder(items, storage, scope, collectionType);
+      return applyManualOrder(items, storage, scope, collectionType, lang);
     case "created_asc":
-      return items.sort((a, b) => (Date.parse(a.created) || 0) - (Date.parse(b.created) || 0));
+      return items.sort((a, b) => (Date.parse(a.created) || 0) - (Date.parse(b.created) || 0) || byIdentity(a, b));
     case "title_asc":
-      return items.sort((a, b) => String(a.title).localeCompare(String(b.title)));
+      return items.sort((a, b) => String(a.title).localeCompare(String(b.title)) || byCreatedDesc(a, b));
     case "title_desc":
-      return items.sort((a, b) => String(b.title).localeCompare(String(a.title)));
+      return items.sort((a, b) => String(b.title).localeCompare(String(a.title)) || byCreatedDesc(a, b));
     case "date_asc":
     case "date_desc": {
       const dateField = (schema?.settings || []).find((s) => s.usedAsDate)?.id;
@@ -584,8 +606,8 @@ async function sortItems(items, sort, storage, scope, collectionType, schema) {
 }
 
 /** List item filenames in a collection dir (excludes _order.json). */
-async function listItemFileNames(storage, scope, collectionType) {
-  const names = await storage.list(scope, collectionDirKey(collectionType));
+async function listItemFileNames(storage, scope, collectionType, lang) {
+  const names = await storage.list(scope, collectionDirKey(collectionType, lang));
   return names.filter((n) => n.endsWith(".json") && n !== "_order.json");
 }
 
@@ -597,17 +619,33 @@ async function listItemFileNames(storage, scope, collectionType) {
  * @param {{ sort?: string, limit?: number, offset?: number }} [options]
  * @returns {Promise<object[]>}
  */
-export async function listCollectionItems(storage, scope, collectionType, options = {}) {
-  const schema = await getCollectionSchema(storage, scope, collectionType);
-  if (!schema) return [];
+export async function listCollectionItems(storage, scope, collectionType, options = {}, lang) {
+  const loaded = await readCollectionItems(storage, scope, collectionType, lang);
+  if (!loaded) return [];
+  return sortCollectionItems(storage, scope, collectionType, loaded, options, lang);
+}
 
-  const itemFileNames = await listItemFileNames(storage, scope, collectionType);
+export async function readCollectionItems(storage, scope, collectionType, lang) {
+  const schema = await getCollectionSchema(storage, scope, collectionType);
+  if (!schema) return null;
+
+  const itemFileNames = await listItemFileNames(storage, scope, collectionType, lang);
 
   const rawEntries = [];
   for (const name of itemFileNames) {
     try {
-      const raw = await readJson(storage, scope, `${collectionDirKey(collectionType)}/${name}`);
-      if (raw != null) rawEntries.push({ name, raw });
+      const raw = await readJson(storage, scope, `${collectionDirKey(collectionType, lang)}/${name}`);
+      if (raw == null) continue;
+      // The embedded slug names the item's page in every output path, so one that
+      // is not a plain slug (`../../elsewhere`, from a hand-edited file or a crafted
+      // backup) would publish outside the collection's folder; a missing one would
+      // publish as `undefined.html`. Writes only ever produce plain slugs.
+      const slug = raw.slug ?? raw.id;
+      if (typeof slug !== "string" || !SLUG_RE.test(slug)) {
+        console.warn(`[collections] Skipping item "${collectionType}/${name}": its slug is not a valid slug.`);
+        continue;
+      }
+      rawEntries.push({ name, raw });
     } catch (err) {
       console.warn(
         `[collections] Skipping unreadable item "${collectionType}/${name}": ${err.message}`,
@@ -636,15 +674,38 @@ export async function listCollectionItems(storage, scope, collectionType, option
     byUuid.set(uuid, winner);
   }
 
-  let items = [...byUuid.values()].map((e) => normalizeCollectionItem(e.raw, schema));
+  return { schema, items: [...byUuid.values()].map((e) => normalizeCollectionItem(e.raw, schema, lang)) };
+}
 
+export async function sortCollectionItems(storage, scope, collectionType, { schema, items }, options = {}, lang) {
   const sort = options.sort ?? schema.defaultSort ?? "manual";
-  items = await sortItems(items, sort, storage, scope, collectionType, schema);
+  let sorted = await sortItems([...items], sort, storage, scope, collectionType, schema, lang);
 
   const offset = options.offset ?? 0;
-  if (offset) items = items.slice(offset);
-  if (options.limit != null) items = items.slice(0, options.limit);
-  return items;
+  if (offset) sorted = sorted.slice(offset);
+  if (options.limit != null) sorted = sorted.slice(0, options.limit);
+  return sorted;
+}
+
+export function createCollectionReader({ storage, scope, snapshot = null, defaultLanguage = "" }) {
+  // Omitting `lang` reads the root folder, and the root folder IS the project's
+  // default language — so its items must be stamped with that code, not with `en`.
+  const rootLang = { language: defaultLanguage, defaultLanguage };
+  const remember = (key, load) => {
+    if (!snapshot) return load();
+    if (!snapshot.has(key)) snapshot.set(key, load());
+    return snapshot.get(key);
+  };
+  const read = (collectionType, lang = rootLang) =>
+    remember(`read:${collectionDirKey(collectionType, lang)}`, () =>
+      readCollectionItems(storage, scope, collectionType, lang),
+    );
+  const sorted = (collectionType, sortOptions = {}, lang = rootLang) =>
+    remember(`sorted:${collectionDirKey(collectionType, lang)}:${JSON.stringify(sortOptions)}`, async () => {
+      const loaded = await read(collectionType, lang);
+      return loaded ? sortCollectionItems(storage, scope, collectionType, loaded, sortOptions, lang) : [];
+    });
+  return { read, sorted };
 }
 
 /**
@@ -652,22 +713,22 @@ export async function listCollectionItems(storage, scope, collectionType, option
  * out-of-schema settings. Used by the update path so orphaned
  * preservation works. Returns null if the file does not exist.
  */
-export async function readRawCollectionItem(storage, scope, collectionType, itemSlug) {
+export async function readRawCollectionItem(storage, scope, collectionType, itemSlug, lang) {
   if (!SLUG_RE.test(collectionType) || !SLUG_RE.test(itemSlug)) return null;
-  return readJson(storage, scope, itemKey(collectionType, itemSlug));
+  return readJson(storage, scope, itemKey(collectionType, itemSlug, lang));
 }
 
 /**
  * Read and normalize a single item by slug. Returns null if the collection or
  * item file does not exist.
  */
-export async function readCollectionItem(storage, scope, collectionType, itemSlug) {
+export async function readCollectionItem(storage, scope, collectionType, itemSlug, lang) {
   if (!SLUG_RE.test(itemSlug)) return null;
   const schema = await getCollectionSchema(storage, scope, collectionType);
   if (!schema) return null;
-  const raw = await readJson(storage, scope, itemKey(collectionType, itemSlug));
+  const raw = await readJson(storage, scope, itemKey(collectionType, itemSlug, lang));
   if (raw == null) return null;
-  return normalizeCollectionItem(raw, schema);
+  return normalizeCollectionItem(raw, schema, lang);
 }
 
 /**
@@ -738,6 +799,9 @@ export function buildCollectionItemData(schema, input, existingItem = null) {
   if (!SLUG_RE.test(slug)) {
     throw new CollectionValidationError([{ fieldId: "slug", reason: "invalid slug" }]);
   }
+  if (isReservedItemSlug(slug) && existingItem?.slug !== slug) {
+    throw new CollectionValidationError([{ fieldId: "slug", reason: "reserved slug" }]);
+  }
 
   const settings = {};
   const validationErrors = [];
@@ -783,9 +847,11 @@ export function buildCollectionItemData(schema, input, existingItem = null) {
   // sanitized like page SEO, and only for collections that render item pages.
   // Carry forward existing seo when an update omits it.
   const rawSeo = input && input.seo !== undefined ? input.seo : existingItem?.seo;
+  const uuid = existingItem?.uuid ?? randomUUID();
   const item = {
     id: slug,
-    uuid: existingItem?.uuid ?? randomUUID(),
+    uuid,
+    translationGroupId: existingItem?.translationGroupId ?? uuid,
     slug,
     schemaVersion: schema.schemaVersion,
     created: existingItem?.created ?? nowIso(),
@@ -802,30 +868,30 @@ export function buildCollectionItemData(schema, input, existingItem = null) {
  * LocalStorageAdapter.write is atomic (temp-file + rename), so this service stays
  * adapter-agnostic and never does the temp-file dance itself.
  */
-async function rewriteOrder(storage, scope, collectionType, transform) {
+async function rewriteOrder(storage, scope, collectionType, transform, lang) {
   let order = [];
-  const data = await readJson(storage, scope, orderKey(collectionType));
+  const data = await readJson(storage, scope, orderKey(collectionType, lang));
   if (Array.isArray(data?.order)) order = data.order;
 
   const next = transform([...order]);
   const pruned = [];
   for (const slug of next) {
-    if (await storage.exists(scope, itemKey(collectionType, slug))) pruned.push(slug);
+    if (await storage.exists(scope, itemKey(collectionType, slug, lang))) pruned.push(slug);
   }
-  await storage.write(scope, orderKey(collectionType), JSON.stringify({ order: pruned }, null, 2));
+  await storage.write(scope, orderKey(collectionType, lang), JSON.stringify({ order: pruned }, null, 2));
 }
 
 /** Delete any sibling file sharing this item's uuid at a different slug — the
  *  user-driven half of duplicate-uuid rename-crash recovery (Section 15). */
-async function cleanupDuplicateUuidSiblings(storage, scope, collectionType, item) {
-  const names = await listItemFileNames(storage, scope, collectionType);
+async function cleanupDuplicateUuidSiblings(storage, scope, collectionType, item, lang) {
+  const names = await listItemFileNames(storage, scope, collectionType, lang);
   for (const name of names) {
     const slug = name.replace(/\.json$/, "");
     if (slug === item.slug) continue;
     try {
-      const other = await readJson(storage, scope, `${collectionDirKey(collectionType)}/${name}`);
+      const other = await readJson(storage, scope, `${collectionDirKey(collectionType, lang)}/${name}`);
       if (other?.uuid === item.uuid) {
-        await storage.delete(scope, itemKey(collectionType, slug));
+        await storage.delete(scope, itemKey(collectionType, slug, lang));
       }
     } catch {
       // ignore unreadable siblings
@@ -839,7 +905,7 @@ async function cleanupDuplicateUuidSiblings(storage, scope, collectionType, item
  *
  * @throws {CollectionSlugConflictError} on create/rename onto an existing slug
  */
-export async function writeCollectionItem(storage, scope, collectionType, item, previousSlug = null) {
+export async function writeCollectionItem(storage, scope, collectionType, item, previousSlug = null, lang) {
   if (!SLUG_RE.test(collectionType)) {
     throw new CollectionValidationError([{ fieldId: "collectionType", reason: "invalid collection type" }]);
   }
@@ -847,7 +913,7 @@ export async function writeCollectionItem(storage, scope, collectionType, item, 
     throw new CollectionValidationError([{ fieldId: "slug", reason: "invalid slug" }]);
   }
 
-  const targetKey = itemKey(collectionType, item.slug);
+  const targetKey = itemKey(collectionType, item.slug, lang);
   const isRename = Boolean(previousSlug) && previousSlug !== item.slug;
   const isCreate = !previousSlug;
 
@@ -856,16 +922,21 @@ export async function writeCollectionItem(storage, scope, collectionType, item, 
   }
 
   // storage.write creates parent directories as needed (no ensureDir).
-  await storage.write(scope, targetKey, JSON.stringify(item, null, 2));
+  const { language: _language, ...persisted } = item;
+  await storage.write(scope, targetKey, JSON.stringify(persisted, null, 2));
 
   if (isRename) {
-    await storage.delete(scope, itemKey(collectionType, previousSlug));
-    await rewriteOrder(storage, scope, collectionType, (order) =>
-      order.map((slug) => (slug === previousSlug ? item.slug : slug)),
+    await storage.delete(scope, itemKey(collectionType, previousSlug, lang));
+    await rewriteOrder(
+      storage,
+      scope,
+      collectionType,
+      (order) => order.map((slug) => (slug === previousSlug ? item.slug : slug)),
+      lang,
     );
   }
 
-  await cleanupDuplicateUuidSiblings(storage, scope, collectionType, item);
+  await cleanupDuplicateUuidSiblings(storage, scope, collectionType, item, lang);
 
   return item;
 }
@@ -878,10 +949,10 @@ export async function writeCollectionItem(storage, scope, collectionType, item, 
  * Returns the re-normalized item (now with an empty `_archived`), or null if the
  * collection type or item file is missing.
  */
-export async function discardArchivedCollectionItem(storage, scope, collectionType, itemSlug) {
+export async function discardArchivedCollectionItem(storage, scope, collectionType, itemSlug, lang) {
   const schema = await getCollectionSchema(storage, scope, collectionType);
   if (!schema) return null;
-  const raw = await readRawCollectionItem(storage, scope, collectionType, itemSlug);
+  const raw = await readRawCollectionItem(storage, scope, collectionType, itemSlug, lang);
   if (!raw) return null;
 
   const knownIds = new Set(
@@ -895,26 +966,33 @@ export async function discardArchivedCollectionItem(storage, scope, collectionTy
   // previousSlug === slug → update in place (not create/rename); timestamps and
   // uuid are carried through untouched, only the orphaned keys disappear.
   const updatedItem = { ...raw, settings };
-  await writeCollectionItem(storage, scope, collectionType, updatedItem, updatedItem.slug);
-  return normalizeCollectionItem(updatedItem, schema);
+  await writeCollectionItem(storage, scope, collectionType, updatedItem, updatedItem.slug, lang);
+  return normalizeCollectionItem(updatedItem, schema, lang);
 }
 
 /** Delete one item and prune it (and any stale slugs) from `_order.json`. */
-export async function deleteCollectionItem(storage, scope, collectionType, itemSlug) {
+export async function deleteCollectionItem(storage, scope, collectionType, itemSlug, lang) {
   if (!SLUG_RE.test(collectionType) || !SLUG_RE.test(itemSlug)) {
     return { deleted: false };
   }
-  const itemPathKey = itemKey(collectionType, itemSlug);
+  const itemPathKey = itemKey(collectionType, itemSlug, lang);
   const existed = await storage.exists(scope, itemPathKey);
   await storage.delete(scope, itemPathKey);
-  await rewriteOrder(storage, scope, collectionType, (order) =>
-    order.filter((slug) => slug !== itemSlug),
-  );
+  // The item file is already gone; the order file is bookkeeping that follows it.
+  // If that fails, the caller still has to know WHAT was deleted — otherwise the
+  // references to it are never cleared, and a retry cannot help because the item
+  // is no longer there to be found and deleted again.
+  try {
+    await rewriteOrder(storage, scope, collectionType, (order) => order.filter((slug) => slug !== itemSlug), lang);
+  } catch (orderError) {
+    orderError.deletedSlugs = existed ? [itemSlug] : [];
+    throw orderError;
+  }
   return { deleted: existed };
 }
 
 /** Bulk delete with partial-failure reporting; prunes all deleted slugs at once. */
-export async function bulkDeleteCollectionItems(storage, scope, collectionType, itemSlugs) {
+export async function bulkDeleteCollectionItems(storage, scope, collectionType, itemSlugs, lang) {
   const deleted = [];
   const notFound = [];
   const errors = [];
@@ -926,7 +1004,7 @@ export async function bulkDeleteCollectionItems(storage, scope, collectionType, 
       errors.push({ slug, message: "Invalid slug" });
       continue;
     }
-    const itemPathKey = itemKey(collectionType, slug);
+    const itemPathKey = itemKey(collectionType, slug, lang);
     try {
       if (await storage.exists(scope, itemPathKey)) {
         await storage.delete(scope, itemPathKey);
@@ -941,9 +1019,14 @@ export async function bulkDeleteCollectionItems(storage, scope, collectionType, 
 
   if (deleted.length > 0) {
     const removed = new Set(deleted);
-    await rewriteOrder(storage, scope, collectionType, (order) =>
-      order.filter((slug) => !removed.has(slug)),
-    );
+    // As in deleteCollectionItem: the files are gone whether or not the order
+    // file can be rewritten, so a failure here carries the list with it.
+    try {
+      await rewriteOrder(storage, scope, collectionType, (order) => order.filter((slug) => !removed.has(slug)), lang);
+    } catch (orderError) {
+      orderError.deletedSlugs = deleted;
+      throw orderError;
+    }
   }
 
   return { deleted, notFound, errors };
@@ -954,17 +1037,17 @@ export async function bulkDeleteCollectionItems(storage, scope, collectionType, 
  * timestamps, settings copied, inserted into `_order.json` right after the
  * source (Section 15). Returns null if the source does not exist.
  */
-export async function duplicateCollectionItem(storage, scope, collectionType, sourceSlug) {
+export async function duplicateCollectionItem(storage, scope, collectionType, sourceSlug, lang) {
   const schema = await getCollectionSchema(storage, scope, collectionType);
   if (!schema) throw new Error(`Unknown collection type "${collectionType}"`);
   if (!SLUG_RE.test(sourceSlug)) return null;
 
-  const source = await readJson(storage, scope, itemKey(collectionType, sourceSlug));
+  const source = await readJson(storage, scope, itemKey(collectionType, sourceSlug, lang));
   if (source == null) return null;
 
   const newSlug = await generateUniqueSlug(
     `${sourceSlug}-copy`,
-    (candidate) => storage.exists(scope, itemKey(collectionType, candidate)),
+    (candidate) => storage.exists(scope, itemKey(collectionType, candidate, lang)),
     { fallback: `${sourceSlug}-copy` },
   );
 
@@ -974,10 +1057,13 @@ export async function duplicateCollectionItem(storage, scope, collectionType, so
     settings[titleSetting.id] = `${settings[titleSetting.id]} (copy)`;
   }
 
+  // A copy is a new item in its own translation group, not a translation of the source.
   const now = nowIso();
+  const uuid = randomUUID();
   const item = {
     id: newSlug,
-    uuid: randomUUID(),
+    uuid,
+    translationGroupId: uuid,
     slug: newSlug,
     schemaVersion: schema.schemaVersion,
     created: now,
@@ -988,17 +1074,73 @@ export async function duplicateCollectionItem(storage, scope, collectionType, so
     settings,
   };
 
-  await storage.write(scope, itemKey(collectionType, newSlug), JSON.stringify(item, null, 2));
+  await storage.write(scope, itemKey(collectionType, newSlug, lang), JSON.stringify(item, null, 2));
 
-  await rewriteOrder(storage, scope, collectionType, (order) => {
-    const next = [...order];
-    const idx = next.indexOf(sourceSlug);
-    if (idx === -1) next.push(newSlug);
-    else next.splice(idx + 1, 0, newSlug);
-    return next;
-  });
+  await rewriteOrder(
+    storage,
+    scope,
+    collectionType,
+    (order) => {
+      const next = [...order];
+      const idx = next.indexOf(sourceSlug);
+      if (idx === -1) next.push(newSlug);
+      else next.splice(idx + 1, 0, newSlug);
+      return next;
+    },
+    lang,
+  );
 
   return item;
+}
+
+/**
+ * Create an item's version in another language: the same settings in the target
+ * language's folder under the same collection type, joined to the source's
+ * translation group, and appended to that folder's own order.
+ *
+ * @returns {Promise<{ item: object, groupId: string }|null>} null when the source is absent
+ */
+export async function createItemLanguageVersion(storage, scope, collectionType, sourceSlug, { fromLang, toLang, slug }) {
+  const schema = await getCollectionSchema(storage, scope, collectionType);
+  if (!schema) throw new Error(`Unknown collection type "${collectionType}"`);
+  if (!SLUG_RE.test(sourceSlug)) return null;
+
+  const source = await readJson(storage, scope, itemKey(collectionType, sourceSlug, fromLang));
+  if (source == null) return null;
+
+  // The caller refuses a source with no identity, so this never invents one: an
+  // invented group would differ on every request and join nothing.
+  const groupId = source.translationGroupId || source.uuid;
+  const desired = sanitizeSlug(slug || "") || source.slug || sourceSlug;
+  const newSlug = await generateUniqueSlug(
+    desired,
+    // `index` and `page` are addresses of their own, in every language folder.
+    (candidate) => isReservedItemSlug(candidate) || storage.exists(scope, itemKey(collectionType, candidate, toLang)),
+    { fallback: desired },
+  );
+
+  const now = nowIso();
+  const item = {
+    id: newSlug,
+    uuid: randomUUID(),
+    translationGroupId: groupId,
+    slug: newSlug,
+    schemaVersion: schema.schemaVersion,
+    created: now,
+    updated: now,
+    // A custom canonical names the source's address; the new version starts
+    // with its own automatic one instead.
+    ...(schema.hasItemPages ? { seo: { ...shapeItemSeo(source.seo), canonical_url: "" } } : {}),
+    settings: { ...(source.settings || {}) },
+  };
+
+  await storage.write(scope, itemKey(collectionType, newSlug, toLang), JSON.stringify(item, null, 2));
+  await rewriteOrder(storage, scope, collectionType, (order) => [...order, newSlug], toLang);
+
+  // The source is not rewritten to record the group: it already answers to its
+  // own uuid, and writing back a snapshot read earlier would undo an edit made
+  // while this version was being created.
+  return { item, groupId };
 }
 
 /**
@@ -1006,9 +1148,9 @@ export async function duplicateCollectionItem(storage, scope, collectionType, so
  * order is written verbatim, with stale slugs (whose item file no longer exists)
  * pruned.
  */
-export async function reorderCollectionItems(storage, scope, collectionType, order) {
+export async function reorderCollectionItems(storage, scope, collectionType, order, lang) {
   const desired = Array.isArray(order) ? order : [];
-  await rewriteOrder(storage, scope, collectionType, () => desired);
+  await rewriteOrder(storage, scope, collectionType, () => desired, lang);
   return { order: desired };
 }
 
@@ -1021,7 +1163,14 @@ function isLinkObject(value) {
   return value && typeof value === "object" && !Array.isArray(value) && "href" in value;
 }
 
-function resolveLink(linkValue, pagesByUuid, outputPathPrefix, collectionItemsByUuid = null) {
+function resolveLink(
+  linkValue,
+  pagesByUuid,
+  outputPathPrefix,
+  collectionItemsByUuid = null,
+  cleanUrls = false,
+  defaultLanguage = "",
+) {
   const { pageUuid, collectionItemUuid } = linkValue;
   // Stable reference to a collection item page (#11 parity): resolve its current
   // slug so renames follow and deletes clear the link.
@@ -1030,7 +1179,8 @@ function resolveLink(linkValue, pagesByUuid, outputPathPrefix, collectionItemsBy
     if (!entry) {
       return { href: "", text: "", target: "_self" }; // item deleted — clear the link
     }
-    return { ...linkValue, href: prefixInternalHref(`${entry.slugPrefix}/${entry.slug}.html`, outputPathPrefix) };
+    const itemOpts = { cleanUrls, outputPathPrefix, language: entry.language, defaultLanguage };
+    return { ...linkValue, href: itemHref(entry.slugPrefix, entry.slug, itemOpts) };
   }
   if (!pageUuid) {
     // Custom URL — depth-prefix internal-looking hrefs, leave the rest as-is.
@@ -1040,7 +1190,10 @@ function resolveLink(linkValue, pagesByUuid, outputPathPrefix, collectionItemsBy
   if (!page) {
     return { href: "", text: "", target: "_self" }; // page deleted — clear the link
   }
-  return { ...linkValue, href: prefixInternalHref(`${page.slug}.html`, outputPathPrefix) };
+  return {
+    ...linkValue,
+    href: pageHref(page.slug, { cleanUrls, outputPathPrefix, language: page.language, defaultLanguage }),
+  };
 }
 
 /**
@@ -1049,17 +1202,35 @@ function resolveLink(linkValue, pagesByUuid, outputPathPrefix, collectionItemsBy
  * Returns a deep clone; the input item is never mutated. v1 schemas are flat, so
  * a single pass over top-level settings suffices.
  *
+ * Resolved hrefs take the shape `pageHref` / `itemHref` pick for `cleanUrls`
+ * (`.html` file name, or extensionless); custom hrefs are emitted as authored.
  * @param {object} item - a collection item ({ settings })
  * @param {Map} pagesByUuid - uuid -> page ({ slug })
  * @param {string} outputPathPrefix - "" at root, "../" for nested item pages
+ * @param {Map} [collectionItemsByUuid] - item uuid -> { slugPrefix, slug }
+ * @param {boolean} [cleanUrls] - the project's Clean URLs setting; picks the href shape
  * @returns {object} resolved clone
  */
-export function resolveCollectionItemLinks(item, pagesByUuid, outputPathPrefix, collectionItemsByUuid = null) {
+export function resolveCollectionItemLinks(
+  item,
+  pagesByUuid,
+  outputPathPrefix,
+  collectionItemsByUuid = null,
+  cleanUrls = false,
+  defaultLanguage = "",
+) {
   if (!item?.settings) return item;
   const resolved = JSON.parse(JSON.stringify(item));
   for (const [key, value] of Object.entries(resolved.settings)) {
     if (isLinkObject(value)) {
-      resolved.settings[key] = resolveLink(value, pagesByUuid, outputPathPrefix, collectionItemsByUuid);
+      resolved.settings[key] = resolveLink(
+        value,
+        pagesByUuid,
+        outputPathPrefix,
+        collectionItemsByUuid,
+        cleanUrls,
+        defaultLanguage,
+      );
     }
   }
   return resolved;
@@ -1081,9 +1252,10 @@ export function resolveCollectionItemLinks(item, pagesByUuid, outputPathPrefix, 
  * @param {object} schema - Collection-type schema ({ settings })
  * @param {Map} pagesByUuid - uuid -> page ({ slug })
  * @param {string} outputPathPrefix - "" at root, "../" for nested item pages
- * @param {object} [menuDeps] - { menuMaps, collectionItemsByUuid } to resolve
- *   `menu`-type settings into menu objects. When omitted, menu
- *   settings pass through unresolved (back-compat).
+ * @param {object} [menuDeps] - { menuMaps, collectionItemsByUuid, cleanUrls } to resolve
+ *   `menu`-type settings into menu objects, and to pick the href shape of every
+ *   uuid-resolved link. When omitted, menu settings pass through unresolved
+ *   (back-compat) and links keep `.html`.
  * @returns {object} resolved + sanitized clone
  */
 export function prepareCollectionItemForRender(
@@ -1094,9 +1266,20 @@ export function prepareCollectionItemForRender(
   menuDeps = null,
   mediaBasePaths = null,
 ) {
+  // The project's Clean URLs setting travels with the render deps: the caller
+  // (the `| collection` filter, the item-page render) reads it off globals.
+  const cleanUrls = menuDeps?.cleanUrls === true;
+  const defaultLanguage = menuDeps?.defaultLanguage || "";
   // Forward the collection-item map so `link` settings that target another
   // collection item resolve (and clear on delete), parity with pageUuid (#11).
-  const resolved = resolveCollectionItemLinks(item, pagesByUuid, outputPathPrefix, menuDeps?.collectionItemsByUuid || null);
+  const resolved = resolveCollectionItemLinks(
+    item,
+    pagesByUuid,
+    outputPathPrefix,
+    menuDeps?.collectionItemsByUuid || null,
+    cleanUrls,
+    defaultLanguage,
+  );
   // Resolve menu-type settings the same way widgets do (shared menuResolver), so
   // an item template gets a full menu object instead of a raw UUID string.
   if (menuDeps && menuDeps.menuMaps && resolved && resolved.settings) {
@@ -1105,6 +1288,9 @@ export function prepareCollectionItemForRender(
       pagesByUuid,
       collectionItemsByUuid: menuDeps.collectionItemsByUuid || new Map(),
       outputPathPrefix,
+      cleanUrls,
+      defaultLanguage,
+      language: menuDeps.language || "",
     });
   }
   sanitizeCollectionItemData(resolved, schema);
@@ -1122,6 +1308,8 @@ export function prepareCollectionItemForRender(
       pagesByUuid,
       collectionItemsByUuid: menuDeps?.collectionItemsByUuid || null,
       outputPathPrefix,
+      cleanUrls,
+      defaultLanguage,
     });
   }
   return resolved;
@@ -1129,36 +1317,44 @@ export function prepareCollectionItemForRender(
 
 /**
  * Load every `hasItemPages` collection item and return a map of
- * item uuid -> { slugPrefix, slug }, for resolving stable collection-item menu
- * references (#11) to their current page URL. Cached per render by the caller.
- * @returns {Promise<Map>} Map of uuid -> { slugPrefix, slug }
+ * item uuid -> { slugPrefix, slug, language }, for resolving stable collection-item
+ * menu references (#11) to their current page URL. A link may target an item in
+ * any language, so every language folder is loaded. Cached per render by the caller.
+ * @param {Array<{ language?: string, defaultLanguage?: string }>} [languageContexts]
+ * @returns {Promise<Map>} Map of uuid -> { slugPrefix, slug, language }
  */
-export async function loadCollectionItemsByUuid(storage, scope) {
+export async function loadCollectionItemsByUuid(storage, scope, reader = null, languageContexts = [undefined]) {
   const map = new Map();
   try {
     const schemas = await listCollectionSchemas(storage, scope);
     for (const schema of schemas) {
       if (!schema.hasItemPages) continue;
-      const items = await listCollectionItems(storage, scope, schema.type);
-      for (const item of items) {
-        if (item.uuid) map.set(item.uuid, { slugPrefix: schema.slugPrefix, slug: item.slug });
+      for (const lang of languageContexts.length ? languageContexts : [undefined]) {
+        const items = reader
+          ? await reader.sorted(schema.type, {}, lang)
+          : await listCollectionItems(storage, scope, schema.type, {}, lang);
+        for (const item of items) {
+          if (!item.uuid) continue;
+          // uuid and group id come along because this map is also how a render
+          // finds an item's siblings — matching a translation group needs the
+          // identity, not just where the item ended up.
+          // Built through the shared sibling shape rather than field by field:
+          // this map is how a render sees an item's hreflang siblings, and the
+          // SEO builders see the whole item record, so anything the two must
+          // agree on has to be defined once. `slugPrefix` comes from the
+          // schema, not the item, and `collectionType` is for this map's other
+          // readers.
+          map.set(
+            item.uuid,
+            translationSibling(item, { collectionType: schema.type, slugPrefix: schema.slugPrefix }),
+          );
+        }
       }
     }
   } catch (error) {
     console.warn(`Could not load collection items for menu resolution: ${error.message}`);
   }
   return map;
-}
-
-/** True when `siteUrl` is a non-empty, parseable absolute URL. */
-function isValidSiteUrl(siteUrl) {
-  if (!siteUrl || !siteUrl.trim()) return false;
-  try {
-    new URL(siteUrl);
-    return true;
-  } catch {
-    return false;
-  }
 }
 
 /**
@@ -1174,31 +1370,42 @@ function isValidSiteUrl(siteUrl) {
  * @param {object} schema - normalized collection schema
  * @param {object} item - normalized (and link-resolved) collection item
  * @param {string} siteUrl - project siteUrl ("" when unset)
+ * @param {boolean} [cleanUrls=false] - drop the .html extension from the canonical
+ * @param {string} [defaultLanguage] - the project's default language, so a translated
+ *   item canonicalizes to its own folder rather than the root one's address
  * @returns {object} page-shaped object
  */
-export function buildCollectionItemPageData(schema, item, siteUrl) {
+export function buildCollectionItemPageData(schema, item, siteUrl, cleanUrls = false, defaultLanguage = "") {
   const fieldSettings = (schema.settings || []).filter((s) => s.type !== HEADER_TYPE);
   const titleField = fieldSettings.find((s) => s.usedAsTitle);
   const settings = item.settings || {};
   const titleValue = (titleField && settings[titleField.id]) || item.slug;
 
   const seo = shapeItemSeo(item.seo);
-  const validSiteUrl = isValidSiteUrl(siteUrl);
-  const canonicalBase = validSiteUrl ? siteUrl.replace(/\/$/, "") : "";
+  // One shared base, same as page canonicals and the sitemap; "" when the Site
+  // URL is unset or unusable, which leaves the canonical omitted.
   const canonical_url =
     seo.canonical_url && seo.canonical_url.trim()
       ? seo.canonical_url.trim()
-      : validSiteUrl
-        ? `${canonicalBase}/${schema.slugPrefix}/${item.slug}.html`
-        : "";
+      : itemUrlAt(schema.slugPrefix, item.slug, { siteUrl, cleanUrls, defaultLanguage }, { language: item.language });
 
   return {
     id: `${schema.slugPrefix}-${item.slug}`,
     slug: `${schema.slugPrefix}/${item.slug}`,
     uuid: item.uuid,
+    // An item page is a page: what reads `page.language` — media metadata,
+    // breadcrumbs, the theme — must get the same answer here as on a page.
+    language: item.language,
     name: titleValue,
     created: item.created,
     updated: item.updated,
     seo: { ...seo, canonical_url },
+    // What {% seo %} needs to build the item's article data from its visible fields.
+    collectionItem: {
+      type: schema.type,
+      structuredData: schema.structuredData,
+      settingTypes: Object.fromEntries(fieldSettings.map((setting) => [setting.id, setting.type])),
+      settings,
+    },
   };
 }

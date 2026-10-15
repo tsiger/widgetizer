@@ -12,7 +12,7 @@ The editor's interface is divided into three main columns: a component list on t
 
 The `PageEditor` is composed of several specialized child components, each with a distinct responsibility:
 
-- **`EditorTopBar`**: Located at the top of the page, this component displays the page name and provides global actions. It contains controls for manual saving, opening a live preview in a reusable browser tab (web) or dedicated preview window (Electron), changing the preview mode (e.g., desktop, tablet, mobile), and shows the current save status (e.g., "All changes saved", "Saving..."). Fully localized.
+- **`EditorTopBar`**: Located at the top of the page. Left to right: a back-to-pages button (to the list tab of the page's language); a page switcher dropdown listing the pages of the language being edited (with a pink dot on the current page when it has unsaved page changes, and a "New page" entry); the language menu (`LanguageMenu`, multilingual sites only) that opens this page's version in another language or creates a missing one through `useTranslationVersions`; the `ThemeSelector` (passed as `children`, a "Settings" dropdown of theme-setting groups with its own unsaved dot); a desktop/mobile preview switcher (persisted in `localStorage.editorPreviewMode`); the Preview button (a reusable browser tab on the web, a dedicated preview window in Electron); Undo/Redo; and the Save button, which reads "Saving..." while a save runs and is disabled when nothing is unsaved. A failed manual save shows an error toast (a dedicated message when an image it uses has left the media library), and a save refused because saving is suspended says so. A `pageEditorActions` slot at the far right takes shell-provided actions; the OSS app leaves it empty. Fully localized.
 
 - **`WidgetList`**: The left-hand panel that displays the hierarchical structure of all widgets and their inner blocks for the current page. It's the main interface for:
   - Selecting widgets or blocks for editing.
@@ -22,13 +22,15 @@ The `PageEditor` is composed of several specialized child components, each with 
 
 - **`PreviewPanel`**: The central panel that renders a live, interactive preview of the page. It works declaratively. Instead of being told _how_ to change, it simply receives the latest application state from the editor and uses a central `updatePreview` function to synchronize the `<iframe>`'s DOM. Link navigation is intercepted to avoid leaving the editor while still allowing widget/block selection. `PreviewPanel` is mounted **only** in the in-editor live preview; the standalone site preview uses a separate headless flow (`SitePreviewLayout` + `PagePreview` + `PreviewStage`, see "Previewing a Page" below).
 
-- **`SettingsPanel`**: The right-hand panel. When a widget or block is selected, this panel dynamically displays the relevant configuration options based on its schema. All changes made here are immediately applied to the selected component and reflected in the preview. Schema labels that use `tTheme:` prefixed keys are resolved at render time through the `useThemeLocale` hook's `tTheme()` function.
+- **`SettingsPanel`**: The right-hand panel. When a widget or block is selected, this panel dynamically displays the relevant configuration options based on its schema. All changes made here are immediately applied to the selected component and reflected in the preview. Schema labels that use `tTheme:` prefixed keys are resolved at render time through the `useThemeLocale` hook's `tTheme()` function. Link settings (`LinkInput`) and richtext settings (the `RichTextInput` internal-target picker, `allowInternalLinkTargets`) can point at any page or item page in any of the site's languages (`useLinkTargets`); the stored reference is a uuid, so it follows renames. The editor's `SettingsPanel` offers both for widget, block, header/footer and theme settings alike.
 
 - **`WidgetSelector`**: A modal dialog that opens when the user wants to add a new widget to the page. It presents a list of available widgets to choose from.
 
 - **`BlockSelector`**: Similar to the `WidgetSelector`, this modal allows the user to add a nested block (e.g., a slide in a carousel, a column in a grid) to a compatible widget.
 
-- **`ConfirmationModal`**: A generic modal used to confirm potentially destructive actions, ensuring the user doesn't accidentally delete content. It is used, for example, when deleting a widget. Localized messages and actions.
+- **`ThemeSelector`**: The top-bar "Settings" dropdown. Choosing a group sets `selectedThemeGroup` in `useWidgetStore`, and the `SettingsPanel` then edits that theme-settings group in place; theme edits share the page's undo history and save with it.
+
+Widget and block deletion (context menu or <kbd>Delete</kbd>/<kbd>Backspace</kbd> via `useDeleteKeyShortcut`) does not ask for confirmation — undo restores it.
 
 ## State Management and Data Flow
 
@@ -47,9 +49,11 @@ The `PageEditor` does not manage complex state internally. Instead, it relies on
 
 1.  The `PageEditor` mounts and reads the `pageId` from the URL search parameters.
 2.  A `useEffect` hook, dependent on the `pageId` and the current active-project identity, triggers the data loading functions from the relevant stores. Project switches are also handled one level higher: `RequireActiveProject` remounts the workspace subtree by project ID, and the OSS shell resets project-scoped singleton stores via `projectSwitchCoordinator`.
-3.  It calls `usePageStore.getState().loadPage(pageId)` to fetch the page structure.
-4. Simultaneously, it calls `useWidgetStore.getState().loadSchemas()`. `pageStore.loadPage()` fetches page data and global widgets, then ensures `themeStore` has theme settings for the same project before capturing a history snapshot for undo/redo. Project-switch store reset is coordinated by the OSS shell's `projectSwitchCoordinator`.
-5.  While data is being fetched, `LoadingSpinner` components are displayed to inform the user.
+3.  It calls `usePageStore.getState().loadPage(pageId, language)` to fetch the page structure, with `language` taken from the URL's `?language=`.
+4. Simultaneously, it calls `useWidgetStore.getState().loadSchemas(language)`. `pageStore.loadPage()` fetches page data and that page language's global widgets (`readGlobalWidgets`), then ensures `themeStore` has theme settings for the same project before capturing a history snapshot for undo/redo. Project-switch store reset is coordinated by the OSS shell's `projectSwitchCoordinator`.
+5.  Before loading, it calls `useAutoSave.getState().resumeSaving()`: a page load is a new editing session, so saving suspended by a removed language (see Saving Changes) is re-enabled and its banner cleared.
+6.  While data is being fetched, a `LoadingSpinner` is displayed.
+7.  The editor renders inside `EditingLanguageProvider` with the loaded page's language.
 
 ### Editing a Widget
 
@@ -71,7 +75,7 @@ The preview iframe communicates via `postMessage`. For non-structural changes, `
 |---------|------|-------------|
 | `MORPH_WIDGET` | Widget settings/blocks change | Fetches re-rendered widget HTML and replaces the DOM node |
 | `UPDATE_CSS_VARIABLES` | Theme colors/fonts/scales change | Updates `<style id="theme-settings-styles">` with new CSS variable values |
-| `LOAD_FONTS` | Font picker changes | Injects/updates Google Fonts `<link>` tag |
+| `LOAD_FONTS` | Font picker or CDN changes | Swaps the font stylesheet `<link>` to the URL the editor built (Google or Bunny, the same as the published page) |
 | `UPDATE_STYLE_CLASSES` | Theme style settings change (shapes, card style, spacing, etc.) | Swaps body classes (e.g., `corner-sharp` → `corner-rounded`) to activate different CSS rulesets |
 | `UPDATE_BODY_CLASS` | Header transparent setting changes | Toggles a CSS class on `<body>` (e.g., `transparent-header`) |
 | `UPDATE_WIDGET_SETTINGS` | Simple text/image changes | Optimistic instant feedback before morph completes |
@@ -85,21 +89,26 @@ Handlers live in `packages/core/src/runtime/previewRuntime.js` (injected into th
 The editor provides a way to see a true, live preview of the page, exactly as an end-user would see it, free of any editor UI.
 
 1.  The user clicks the **Preview** button in the `EditorTopBar`.
-2.  In the web app, this opens or reuses a named browser tab at the `/preview/:pageId` URL.
+2.  In the web app, this opens or reuses a named browser tab at `/preview/:pageId`; on a multilingual site the language is spelled out as `/preview/page/:lang/:pageId` (a bare `/preview/el/contact` could not tell a language from a collection prefix). All opens go through `openPagePreview` (`lib/openSitePreview.js`).
 3.  In Electron, the toolbar uses IPC to open or reuse a dedicated `BrowserWindow` for preview. New windows match the editor bounds with an offset; subsequent opens restore the window if minimized, then show and focus it.
-4.  The `/preview` route is a persistent `SitePreviewLayout` (separate from the main editor layout) that owns the toolbar + iframe stage; its children resolve a render for it. `PagePreview` handles `:pageId`; `CollectionItemPagePreview` handles `collection/:prefix/:slug`.
+4.  The `/preview` route is a persistent `SitePreviewLayout` (separate from the main editor layout) that owns the toolbar + iframe stage; its children resolve a render for it. `PagePreview` handles `:pageId`, `page/:lang/:pageId` and the numbered copies of a paginated listing page (`paged/:pageId/:pageNumber`, `page/:lang/:pageId/page/:pageNumber`); `CollectionItemPagePreview` handles `collection/:prefix/:slug` and `collection/:lang/:prefix/:slug` (`app/src/previewRoutes.jsx`).
 5. These children are **headless one-shot resolvers** (they render `null`): `PagePreview` fetches the page data, mints a render token, and reports the resulting render src up to the layout via outlet context. `PagePreview` uses the headless preview flow instead of the live-edit `PreviewPanel`.
 6.  `SitePreviewLayout` displays that src in a shared `PreviewStage` `<iframe>`, providing an accurate representation of the final published page. Because the layout is persistent, navigating page↔item never remounts the toolbar/iframe.
-7.  Internal `.html` links in the preview post `NAVIGATE_PREVIEW` up to `SitePreviewLayout`, which routes to other `/preview/:slug` pages, while external links remain disabled.
+7.  Internal links in the preview (`about.html`, `rooms/suite.html`, or their extensionless Clean-URLs forms `about`, `rooms/suite`, `./`) post `NAVIGATE_PREVIEW` up to `SitePreviewLayout`, which routes to the matching preview route (another page, a collection item, another language or a numbered listing page), while external links remain disabled.
 
 ### Saving Changes
 
 The editor is designed to save changes automatically, providing a seamless user experience.
 
 1.  Most actions that alter page data—such as editing a setting, adding a widget, or reordering the list—also call a corresponding function on the `useAutoSave` store (e.g., `markWidgetModified`, `setStructureModified`).
-2.  These functions set internal dirty flags and also rely on deep comparison between current and original page/theme state so the `EditorTopBar` reflects the real save state after undo/redo operations.
-3.  The `useAutoSave` store implements a **debounced auto-save** strategy. Instead of a fixed interval, a 60-second timer is reset on every modification. This ensures that auto-saving only occurs after a period of inactivity, providing a smoother experience.
+2.  These functions set internal dirty flags and also rely on deep comparison between current and original page/theme state so the `EditorTopBar` reflects the real save state after undo/redo operations. The saved copy is a JSON round trip, the form a save sends, and the current page and header/footer are compared in that same form, so a key holding `undefined` (which no save can store) never keeps the page dirty after a save or an undo/redo reconcile.
+3.  The `useAutoSave` store implements a **debounced auto-save** strategy. Instead of a fixed interval, a 60-second timer is reset on every modification. This ensures that auto-saving only occurs after a period of inactivity, providing a smoother experience. A failed autosave is retried silently with backoff (the delay doubles per consecutive failure, capped at 10 minutes); a new edit resets the count.
 4.  For immediate persistence, the user can also click the "Save" button in the `EditorTopBar` (or use the `Ctrl+S` / `Cmd+S` shortcut), which directly invokes the `save()` action.
+5.  One save runs at a time. A `save()` called while one is in flight joins a single queued follow-up that runs when it settles, and every caller gets that run's real outcome; a manual caller joining a queued autosave turns it manual, so its failure still reaches the caller.
+6.  A save writes in two phases: the page and any changed header/footer in parallel (header/footer to the page's language), then theme settings through `themeStore.saveSettings`, which sends only the changed settings, keeps one theme save in flight, and on a conflict keeps the edits on top of the server's copy (see Undo/Redo below).
+7.  Save results the store cannot show itself are set as flags and announced by `PageEditor` as toasts: `listingAnchorMoved` (the save moved a collection's listing anchor onto this page from the named pages), `mediaUsageStale` (saved, but image-usage records could not be updated — a warning, not a failure) and `themeConflict`.
+8.  Saving stops for good in two cases. A project mismatch (another tab changed the active project) raises the stale-project curtain. A `LANGUAGE_REMOVED` refusal (the language being edited was removed from the site) sets `savingSuspended`: autosave stops, `save()` returns `{ status: "suspended" }` without a request, and the editor Layout shows a removed-language banner (`StaleLanguageBanner`) in the page flow above the editor. Edits are kept but cannot be saved; loading a page (`resumeSaving()`) ends the suspension.
+9.  Leaving with unsaved changes and confirming the discard calls `reset()`, which also reverts the theme draft (`themeStore.discardDraft`). A save already in flight still lands; the saved values are then taken rather than reverted on top.
 
 ### Undo/Redo System
 
@@ -115,16 +124,20 @@ The Page Editor features a comprehensive undo/redo system powered by `zundo` (Zu
   - `Ctrl+Z` (or `Cmd+Z`): Undo
   - `Ctrl+Shift+Z` (or `Cmd+Shift+Z`) / `Ctrl+Y`: Redo
   - `Ctrl+S` (or `Cmd+S`): Save Changes
+  - Undo/redo shortcuts are ignored while focus is in an input, textarea, select or contenteditable, so the field's own undo runs instead; `Ctrl+S` still works there.
 - **History Management**:
-  - The history is cleared whenever a new page is loaded to prevent cross-page undoing.
-  - The system tracks up to 50 states by default.
+  - The history is cleared whenever a new page is loaded to prevent cross-page undoing. Saving (manual or autosave) keeps it: undoing past a save makes the page dirty again, and autosave re-saves it.
+  - Whenever `themeStore` takes the server's copy of the theme (a save response, a conflict refetch, a reconcile), it tells `pageStore.rebaseThemeHistory` what it expected the server to hold and what the server holds. Within one theme version, `applyThemeCorrections` swaps each value the server changed (a correction, or another screen's edit) into every history entry that still holds the expected value, so undoing an unrelated edit can't bring the old value back. A different theme version clears the history, because its snapshots describe an older theme structure.
+  - A theme save refused because the settings changed elsewhere keeps the edits on top of the current settings; the editor announces it (`themeConflict` in `saveStore`) and autosave sends them.
+  - Quick edits to one value — typing into a field, dragging a color or range — are one step. `pageStore`'s `handleSet` extends the last step instead of adding one when the change touches the same single value within 500 ms and nothing was undone, redone or cleared in between.
+  - The system tracks up to 150 steps.
   - It intelligently handles state snapshots to ensure that only relevant data changes (and not loading/error states) are recorded.
 
 ### Navigation Protection (`useNavigationGuard`)
 
 The page editor protects against accidental loss of unsaved changes when the user tries to leave the editor. The `PageEditor` activates this by calling `useNavigationGuard()` (in `packages/editor-ui/src/hooks/useNavigationGuard.js`); the hook operates entirely through side effects and returns nothing.
 
-It layers a `beforeunload` listener (tab close, URL change, browser back/forward) over React Router's `useBlocker` (in-app navigation), and only engages when the save store reports actual unsaved changes. On confirm-to-leave it resets the unsaved-changes state. For the full hook contract — both protection layers, the confirmation flow, and integration notes — see [Custom Hooks](core-hooks.md).
+It layers a `beforeunload` listener (tab close, URL change, browser back/forward — effective in web builds only; the Electron shell overrides it and closes without a prompt) over React Router's `useBlocker` (in-app navigation), and only engages when the save store reports actual unsaved changes. In-app navigation prompts through the app-level `useConfirm()` dialog rather than `window.confirm` (which breaks focus in the Electron/Windows build — see [Custom Hooks](core-hooks.md)); on confirm-to-leave it resets the unsaved-changes state. For the full hook contract — both protection layers, the confirmation flow, and integration notes — see [Custom Hooks](core-hooks.md).
 
 ### Editing Global Widgets
 
@@ -151,7 +164,7 @@ When a global widget is selected:
 
 Global widgets are managed through the `usePageStore`:
 
-- **Loading**: Global widgets are loaded separately from page data using `loadGlobalWidgets()`
+- **Loading**: `loadPage()` reads the page language's global widgets alongside the page (`readGlobalWidgets`)
 - **Storage**: Global widget data is stored in `pageStore.globalWidgets` object with `header` and `footer` properties (including `blocks` and `blocksOrder` when the widget schema defines block types)
 - **Updates**: Changes trigger `updateGlobalWidget()` which maintains separation from page widget data
 
@@ -167,10 +180,10 @@ Global widgets support blocks with the same `blocks`/`blocksOrder` data model as
 
 #### Key Differences from Page Widgets
 
-- **Persistence**: Global widget changes affect all pages that use the theme
+- **Persistence**: Global widget changes affect every page in the same language; each language has its own header and footer
 - **No Reordering**: Global widgets cannot be reordered or moved
 - **Fixed Position**: Header always appears first, footer always appears last
-- **Theme-wide**: Changes apply to the entire project, not just the current page
+- **Language-wide**: Changes apply to every page in that language, not just the current page
 - **Blocks**: Fully supported — same block add/edit/reorder/delete/duplicate capabilities as page widgets
 
 ---

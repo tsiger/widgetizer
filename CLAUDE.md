@@ -19,6 +19,7 @@ npm run electron:build:mac         # Build Mac installer (signed)
 npm run electron:build:win         # Build Windows installer (signed, run on Windows)
 npm run theme:sync                 # Mirror themes/ → runtime copy (one-shot); -- --project <folder> also syncs a project + watches
 npm run preset:sync                # Sync theme presets
+npm run validate:theme -- themes/arch   # App-owned static theme checks (LiquidJS + Widgetizer rules)
 ```
 
 ## Architecture
@@ -51,9 +52,11 @@ eslint-rules/           # local ESLint rules (e.g. require-scope-arg)
 data/                   # Runtime data (gitignored)
   widgetizer.db         # SQLite database (metadata)
   projects/<folder>/    # Per-project content
-    pages/*.json        # Page content
+    pages/*.json        # Page content (default language)
     pages/global/       # header.json, footer.json (global widgets)
-    collections/<type>/ # Collection item data (one JSON per item)
+    pages/<lang>/       # Another language's pages + its own global/ (languages are folders, never a stored field)
+    menus/              # Menus; menus/<lang>/ for another language
+    collections/<type>/ # Collection item data (one JSON per item); <type>/<lang>/ for another language
     uploads/            # Media binaries (images/, files/)
 ```
 
@@ -64,7 +67,7 @@ For the detailed file-by-file map (and the admin-shell vs site-workspace routing
 ### Content Model
 
 - **SQLite metadata**: projects, media metadata/usage, app settings, export history (`data/widgetizer.db`).
-- **Filesystem content**: pages (`data/projects/<folder>/pages/<slug>.json`), global widgets (`pages/global/header.json`, `footer.json`), menus, collection items (`collections/<type>/<slug>.json`), and theme files through the storage adapter; uploaded binaries through the asset storage adapter.
+- **Filesystem content**: pages (`data/projects/<folder>/pages/<slug>.json`), global widgets (`pages/global/header.json`, `footer.json`), menus, collection items (`collections/<type>/<slug>.json`), and theme files through the storage adapter; uploaded binaries through the asset storage adapter. Content in a non-default language lives in a folder named by its code (`pages/el/`, `pages/el/global/`, `menus/el/`, `collections/<type>/el/`); every key is built by `packages/core/src/utils/contentAddress.js`, and a request picks the language with `?language=` or `body.language`.
 - Repository layer in `packages/builder-server/src/db/repositories/` (project, media, settings, export).
 
 ### Rendering Pipeline
@@ -158,7 +161,7 @@ Output goes to `dist-electron/`.
 
 ### Auto-Updates
 
-- electron-updater checks GitHub releases 10 seconds after app start
+- electron-updater checks GitHub releases 5 seconds after app start
 - Compares the running app version against `latest-mac.yml` / `latest.yml`
 - If a newer version exists, the in-app update banner appears
 - Update flow: detect → user clicks Update → download with progress → user clicks Restart Now → install
@@ -171,4 +174,7 @@ Output goes to `dist-electron/`.
 - Vite dev server on port 3000, Express API on port 3001
 - `data/` directory is gitignored except for the `projects/` directory structure
 - Theme widgets define their schema in `schema.json` and template in `widget.liquid`; collection types in `themes/<theme>/collection-types/<type>/`
-- **Comments must earn their place** — document non-obvious logic, caveats, gotchas, and important relationships; don't restate the code or comment for its own sake. Never cite ephemeral planning docs from code (no `TODO.md` `§`-section refs or plan-file citations in comments) — put the reason inline instead.
+- **Premium theme design:** For Common and new themes in the Widgetizer premium collection, read and follow `skills/theme-collections/widgetizer-premium.json`. These collection-specific design rules accompany the design and technical skills; they do not apply to unrelated themes or change platform validation.
+- **Theme tooling must match the app.** The app-owned checker is `scripts/validate-theme.js`; the authoring skill is `skills/widgetizer-theme/`. When Liquid tags/filters, setting types, core widgets/snippets, fonts or collection rules change, update the corresponding skill reference and regenerate its catalog with `node scripts/build-theme-skill-contract.js`. `npm test` checks catalog freshness and the starter's import/export. See `skills/README.md`.
+- **Comments must earn their place** — document non-obvious logic, caveats, gotchas, and important relationships; don't restate the code or comment for its own sake. Never cite ephemeral planning docs from code (no task-register IDs or plan-file citations in comments) — put the reason inline instead.
+- **The task register — `docs-llms/TODO-agents.md` + `docs-llms/TODO-humans.md` — is ephemeral: write *to* it, never point *at* it.** The two files are one register in two views (technical / plain English); update IDs, status and scope in both together, and read the "Working rules" at the top of `TODO-agents.md` before editing. Each has two parts: the current GitHub milestone, whose status GitHub owns (board column, assignee; an entry retires when its issue closes), and unscheduled findings. A task may cite code, docs and commits freely, and the two files may link to each other; **nothing else may cite them** — no path reference, no task-ID citation, in code comments or docs — because entries get rewritten, closed and deleted and nothing catches the dangling pointer. **Reference scope: this repo only** — a task here must never cite `widgetizer-hosted/` or the umbrella repo, since the OSS builder ships standalone and must not document anything downstream of it; describe embedding requirements generically. Completed tasks are removed from both files and recorded in `docs-llms/history/completed-tasks.md` with the fix commit plus a commit where the full write-up is still readable. The retired single-file `docs-llms/TODO.md` is readable at `git show f10e20ce:docs-llms/TODO.md`.

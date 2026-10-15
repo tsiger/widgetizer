@@ -1,0 +1,23 @@
+{
+  "type": "header",
+  "settings": {
+    "logoText": "Everafter",
+    "contact_position": "menu",
+    "ctaButtonLink": {
+      "href": "contact.html",
+      "text": "Inquire",
+      "target": "_self"
+    },
+    "ctaButtonStyle": "primary",
+    "full_width": true,
+    "sticky": true,
+    "transparent_on_hero": true,
+    "color_scheme": "standard-primary",
+    "center_nav": true,
+    "logoImage": "/uploads/images/everafterdark.png",
+    "logoMaxWidth": 180,
+    "transparent_logo": "/uploads/images/everafterwhite.png"
+  },
+  "blocks": {},
+  "blocksOrder": []
+}

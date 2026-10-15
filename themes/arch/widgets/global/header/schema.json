@@ -114,6 +114,58 @@
     },
     {
       "type": "header",
+      "id": "languages_header",
+      "label": "tTheme:header.settings.languages_header.label"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_language_switcher",
+      "label": "tTheme:header.settings.show_language_switcher.label",
+      "description": "tTheme:header.settings.show_language_switcher.description",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "language_switcher_label",
+      "label": "tTheme:header.settings.language_switcher_label.label",
+      "description": "tTheme:header.settings.language_switcher_label.description",
+      "default": "Languages"
+    },
+    {
+      "type": "header",
+      "id": "labels_header",
+      "label": "tTheme:header.settings.labels_header.label"
+    },
+    {
+      "type": "text",
+      "id": "skip_link_text",
+      "label": "tTheme:header.settings.skip_link_text.label",
+      "description": "tTheme:header.settings.skip_link_text.description",
+      "default": "Skip to main content"
+    },
+    {
+      "type": "text",
+      "id": "nav_label",
+      "label": "tTheme:header.settings.nav_label.label",
+      "description": "tTheme:header.settings.nav_label.description",
+      "default": "Primary"
+    },
+    {
+      "type": "text",
+      "id": "menu_title",
+      "label": "tTheme:header.settings.menu_title.label",
+      "description": "tTheme:header.settings.menu_title.description",
+      "default": "Menu"
+    },
+    {
+      "type": "text",
+      "id": "menu_close_label",
+      "label": "tTheme:header.settings.menu_close_label.label",
+      "description": "tTheme:header.settings.menu_close_label.description",
+      "default": "Close menu"
+    },
+    {
+      "type": "header",
       "id": "display_header",
       "label": "tTheme:global.widgets.settings.display_header.label"
     },

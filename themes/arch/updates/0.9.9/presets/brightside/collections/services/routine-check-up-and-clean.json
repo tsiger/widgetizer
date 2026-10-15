@@ -1,0 +1,13 @@
+{
+  "slug": "routine-check-up-and-clean",
+  "schemaVersion": 1,
+  "settings": {
+    "title": "Routine Check-Up and Clean",
+    "icon": "dental",
+    "summary": "A thorough exam and professional clean to keep small problems from becoming big ones.",
+    "description": "<p>We recommend most patients come in twice a year, and this visit is the backbone of that. Regular check-ups let us spot small changes while they are still easy to manage, long before they turn into anything that needs major work.</p><h2>What the appointment covers</h2><p>We check teeth and gums, take any X-rays that are due, then remove the plaque and tartar a toothbrush cannot reach. The clean leaves teeth feeling smooth and fresh, and we polish to finish. You leave with a clear picture of where things stand and what, if anything, needs attention.</p><ul><li>A full look at teeth, gums, and existing fillings or crowns</li><li>X-rays when they are due, to check between and below the surface</li><li>A professional scale and polish to clear built-up tartar</li></ul><p>If we do find something, we explain it in plain terms and talk through your choices without any pressure. Often the answer is simply a small tweak to how you brush or floss at home.</p><h3>Who this suits</h3><p>This visit works for almost everyone, from people with healthy teeth who want to keep them that way to those managing gum issues who benefit from more frequent cleans. We will suggest how often to come back based on what we see.</p><p>A good check-up is as much about advice as treatment. We are happy to answer questions about sensitivity, staining, or anything you have been meaning to ask, so you leave feeling informed rather than lectured.</p>",
+    "price": "From $90",
+    "duration": "45 min",
+    "featured_image": "/uploads/images/brightside-services-routine-check-up-and-clean.webp"
+  }
+}

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { ChevronLeft } from "lucide-react";
 
@@ -15,10 +15,14 @@ import { getPage, updatePage } from "../queries/pageManager";
 import { invalidateMediaCache } from "../queries/mediaManager";
 import useGuardedFormPage from "../hooks/useGuardedFormPage";
 import { useEditorPath } from "../lib/routeBase.jsx";
+import { pagesListHref } from "../lib/contentRoutes";
 
 export default function PagesEdit() {
   const { t } = useTranslation();
   const { id } = useParams();
+  const [searchParams] = useSearchParams();
+  // A slug is unique per language, so the URL says which one is being edited.
+  const language = searchParams.get("language") || undefined;
   const navigate = useNavigate();
   const editorPath = useEditorPath();
   const [page, setPage] = useState(null);
@@ -36,11 +40,11 @@ export default function PagesEdit() {
     setLoading(true);
     loadPage();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id]);
+  }, [id, language]);
 
   const loadPage = async () => {
     try {
-      const pageData = await getPage(id);
+      const pageData = await getPage(id, language);
       setPage(pageData);
       setLoading(false);
     } catch (err) {
@@ -63,7 +67,10 @@ export default function PagesEdit() {
         const savedName = result.data?.name || formData.name;
         // Navigate with guard bypass if the slug changed
         if (formData.slug !== id) {
-          navigateSafely(editorPath(`/pages/${formData.slug}/edit`), { replace: true });
+          navigateSafely(
+            editorPath(`/pages/${formData.slug}/edit${language ? `?language=${language}` : ""}`),
+            { replace: true },
+          );
           showToast(t("pagesEdit.toasts.updateSuccessUrlChanged", { name: savedName }), "success");
         } else {
           showToast(t("pagesEdit.toasts.updateSuccess", { name: savedName }), "success");
@@ -107,7 +114,7 @@ export default function PagesEdit() {
     <PageLayout title={getDirtyTitle(t("pagesEdit.title"))}>
       {showSuccessActions && (
         <div className="mb-4 flex flex-wrap gap-3">
-          <Button variant="secondary" onClick={() => navigate(editorPath("/pages"))} icon={<ChevronLeft size={18} />}>
+          <Button variant="secondary" onClick={() => navigate(editorPath(pagesListHref(language)))} icon={<ChevronLeft size={18} />}>
             {t("pagesEdit.backToList")}
           </Button>
         </div>
@@ -119,7 +126,7 @@ export default function PagesEdit() {
           onSubmit={handleSubmit}
           isSubmitting={isSubmitting}
           submitLabel={t("pagesEdit.saveChanges")}
-          onCancel={() => navigateSafely(editorPath("/pages"))}
+          onCancel={() => navigateSafely(editorPath(pagesListHref(language)))}
           onDirtyChange={setIsDirty}
           isDirty={isDirty}
         />

@@ -192,3 +192,22 @@ describe("projectManager getAllProjects caching", () => {
     expect(apiFetchJson).toHaveBeenCalledTimes(2);
   });
 });
+
+describe("projectManager applyThemeUpdate", () => {
+  it("refreshes the project's theme labels only when the update applied", async () => {
+    vi.resetModules();
+    vi.doMock("../../hooks/useThemeLocale", () => ({ invalidateThemeLocale: vi.fn() }));
+    const { apiFetchJson } = await import("../../lib/apiFetch");
+    const { invalidateThemeLocale } = await import("../../hooks/useThemeLocale");
+    const { applyThemeUpdate } = await import("../projectManager");
+
+    apiFetchJson.mockResolvedValueOnce({ success: false, message: "No update available" });
+    await applyThemeUpdate("p1");
+    expect(invalidateThemeLocale).not.toHaveBeenCalled();
+
+    apiFetchJson.mockResolvedValueOnce({ success: true, previousVersion: "0.9.9", newVersion: "0.9.10" });
+    await applyThemeUpdate("p1");
+    expect(invalidateThemeLocale).toHaveBeenCalledWith("p1");
+    vi.doUnmock("../../hooks/useThemeLocale");
+  });
+});

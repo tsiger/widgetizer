@@ -18,6 +18,7 @@ import {
   applyThemeUpdate,
 } from "@widgetizer/editor-ui/queries/projectManager";
 import useProjectStore from "@widgetizer/editor-ui/stores/projectStore";
+import useThemeStore from "@widgetizer/editor-ui/stores/themeStore";
 import useGuardedFormPage from "@widgetizer/editor-ui/hooks/useGuardedFormPage";
 
 export default function ProjectsEdit() {
@@ -35,13 +36,19 @@ export default function ProjectsEdit() {
   const showToast = useToastStore((state) => state.showToast);
   const setActiveProject = useProjectStore((state) => state.setActiveProject);
   const activeProject = useProjectStore((state) => state.activeProject);
+  const activeProjectLoading = useProjectStore((state) => state.loading);
+  const isActiveProject = activeProject?.id === id;
 
   const { navigateSafely, getDirtyTitle } = useGuardedFormPage(isDirty);
 
   useEffect(() => {
-    loadProject();
+    if (!activeProjectLoading && !isActiveProject) navigate("/projects", { replace: true });
+  }, [activeProjectLoading, isActiveProject, navigate]);
+
+  useEffect(() => {
+    if (isActiveProject) loadProject();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id]);
+  }, [id, isActiveProject]);
 
   const loadProject = async () => {
     try {
@@ -72,6 +79,10 @@ export default function ProjectsEdit() {
     try {
       const result = await applyThemeUpdate(id);
       if (result.success) {
+        // The update rewrote theme.json. Site settings and the editor keep the
+        // copy they loaded until the project changes, so drop it: they load the
+        // updated settings next time instead of showing (and saving) the old ones.
+        if (useProjectStore.getState().activeProject?.id === id) useThemeStore.getState().invalidate();
         showToast(
           t("projectsEdit.toasts.updateApplied", {
             from: result.previousVersion,
@@ -95,7 +106,7 @@ export default function ProjectsEdit() {
     setIsSubmitting(true);
 
     try {
-      const updatedProject = await updateProject(id, {
+      const { folderLeftBehind, ...updatedProject } = await updateProject(id, {
         ...formData,
         theme: project.theme,
       });
@@ -108,7 +119,16 @@ export default function ProjectsEdit() {
           const refreshedActiveProject = await getActiveProject();
           setActiveProject(refreshedActiveProject);
         }
-        showToast(t("projectsEdit.toasts.updateSuccessRenamed", { name: updatedProject.name }), "success");
+        if (folderLeftBehind) {
+          showToast(
+            t("projectsEdit.toasts.updateRenamedFolderLeftBehind", { name: updatedProject.name, path: folderLeftBehind }),
+            "warning",
+            // Stays until dismissed: it names a folder the user may want to find.
+            { duration: null },
+          );
+        } else {
+          showToast(t("projectsEdit.toasts.updateSuccessRenamed", { name: updatedProject.name }), "success");
+        }
         // No need to navigate as ID is stable
       } else {
         // If this was the active project, refresh the active project state
@@ -130,7 +150,7 @@ export default function ProjectsEdit() {
     }
   };
 
-  if (loading)
+  if (loading || !isActiveProject)
     return (
       <PageLayout title={t("projectsEdit.title")}>
         <LoadingSpinner message={t("projectsEdit.loading")} />

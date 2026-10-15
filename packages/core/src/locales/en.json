@@ -35,8 +35,11 @@
     "toasts": {
       "loadError": "Failed to load items",
       "deleteSuccess": "Item deleted successfully",
+      "deleteLinksIncomplete": "Item deleted, but some links to it couldn't be updated. Check pages and menus that linked to it.",
       "deleteBulkSuccess": "Successfully deleted {{count}} item",
       "deleteBulkSuccess_other": "Successfully deleted {{count}} items",
+      "deleteBulkLinksIncomplete": "Deleted {{count}} item, but some links to it couldn't be updated. Check pages and menus that linked to it.",
+      "deleteBulkLinksIncomplete_other": "Deleted {{count}} items, but some links to them couldn't be updated. Check pages and menus that linked to them.",
       "deleteError": "Failed to delete item(s)",
       "duplicateSuccess": "Item duplicated successfully",
       "duplicateError": "Failed to duplicate item",
@@ -52,6 +55,11 @@
       "messageBulk_other": "Are you sure you want to delete {{count}} items? This action cannot be undone.",
       "confirmBulk": "Delete {{count}} item",
       "confirmBulk_other": "Delete {{count}} items"
+    },
+    "languages": {
+      "tabsLabel": "Filter items by language",
+      "header": "Languages",
+      "menuLabel": "This item's language"
     }
   },
   "collectionsForm": {
@@ -64,6 +72,7 @@
     "slugRequired": "Filename is required",
     "slugNotEmpty": "Filename cannot be empty",
     "slugInvalid": "Filename must contain at least one letter or number",
+    "slugReserved": "\"{{slug}}\" is reserved. Choose a different filename.",
     "create": "Create",
     "saveChanges": "Save changes",
     "backToList": "Back to list",
@@ -151,6 +160,12 @@
       "filenameRequired": "Filename is required",
       "filenameNotEmpty": "Filename cannot be empty",
       "filenameInvalid": "Filename must contain at least one letter or number",
+      "filenameReserved": "\"{{slug}}\" is reserved. Choose a different filename.",
+      "hierarchyTitle": "Page Hierarchy",
+      "parentPageLabel": "Parent page",
+      "parentPageNone": "None — this is a top-level page",
+      "parentPageMissing": "A page that no longer exists",
+      "parentPageHelp": "Used by breadcrumbs to show where this page sits, e.g. Home › About › Our Team. Leave as None unless this page belongs under another one.",
       "seoTitle": "SEO Settings",
       "metaDescription": "Meta Description",
       "metaDescriptionHelp": "A short summary shown in search results (150-160 characters).",
@@ -172,7 +187,7 @@
       }
     },
     "project": {
-      "titleLabel": "Title",
+      "titleLabel": "Project Title",
       "titleRequired": "Project name is required",
       "nameNotEmpty": "Name cannot be empty",
       "titleHelp": "The display name for your project.",
@@ -184,26 +199,197 @@
       "descriptionLabel": "Notes",
       "descriptionHelp": "Add notes about your project for your own reference.",
       "siteTitleLabel": "Site Title",
-      "siteTitleHelp": "Used in exported browser tab titles, such as \"Page Name - Site Title\".",
+      "siteTitleHelp": "Used in site's browser tab titles, such as \"Page Name - Site Title\".",
       "themeLabel": "Theme",
       "themeRequired": "Please select a theme",
       "themeHelp": "The theme determines the styling and available widgets for your site.",
       "selectTheme": "Select a theme",
-      "siteUrlLabel": "Website Address",
-      "siteUrlHelp": "The URL of your live website (e.g., https://mysite.com). Use this if you already know the domain where this site will be hosted.",
+      "siteUrlLabel": "Site Address",
+      "siteUrlHelp": "The URL of your live site (e.g., https://mysite.com). Use this if you already know the domain where this site will be hosted.",
+      "cleanUrlsLabel": "Clean URLs",
+      "cleanUrlsHelp": "Turn on if your host serves pages without .html (/about instead of /about.html). Not sure? Leave it off.",
+      "languages": {
+        "defaultLabel": "Default Language",
+        "listLabel": "Other Languages",
+        "none": "None yet. The site is published in {{name}} only.",
+        "defaultBadge": "Default",
+        "addLabel": "Add a Language",
+        "saveDefaultFirst": "Save the default language before adding or removing one, so the site and this form agree.",
+        "addPlaceholder": "Choose a language",
+        "addButton": "Add",
+        "adding": "Adding…",
+        "addSuccess": "{{name}} added.",
+        "addError": "The language could not be added.",
+        "immediateNote": "Adding and removing a language takes effect straight away, not when you save.",
+        "remove": "Remove",
+        "removeTitle": "Remove {{name}}?",
+        "removeIntro": "This permanently deletes everything written in {{name}}:",
+        "removePages_one": "{{count}} page",
+        "removePages_other": "{{count}} pages",
+        "removeItems_one": "{{count}} collection item",
+        "removeItems_other": "{{count}} collection items",
+        "removeMenus_one": "{{count}} menu",
+        "removeMenus_other": "{{count}} menus",
+        "removeGlobals": "its header and footer",
+        "removeShared": "Uploaded images are shared with the other languages and are not deleted.",
+        "removeUndone": "This cannot be undone.",
+        "removeConfirm": "Remove Language",
+        "removeSuccess": "{{name}} removed.",
+        "removedLinksIncomplete": "{{name}} was removed, but some links couldn't be updated. Check pages and menus that linked to it.",
+        "removeError": "The language could not be removed.",
+        "summaryError": "What this language contains could not be read, so it was not removed."
+      },
+      "tabs": {
+        "label": "Project details sections",
+        "general": "General",
+        "site": "Site",
+        "identity": "Identity",
+        "business": "Business Details",
+        "hasErrors": "This section has something to fix"
+      },
       "siteUrlInvalid": "Please enter a valid URL (e.g., https://mysite.com)",
+      "siteUrlNoQueryOrFragment": "Remove the ? query or # part — this is the address your site lives at, and page paths are added onto it (e.g., https://mysite.com or https://mysite.com/blog/)",
       "loadingThemes": "Loading themes...",
       "loadThemesError": "Failed to load themes. Please restart the application.",
       "moreSettings": "More settings",
       "presetLabel": "Style Preset",
       "presetHelp": "Choose a visual style and demo content layout.",
       "loadingPresets": "Loading presets...",
-      "receiveThemeUpdatesLabel": "Receive theme updates",
-      "receiveThemeUpdatesHelp": "Get notified when a new version of the theme is available."
+      "receiveThemeUpdatesLabel": "Receive Theme Updates",
+      "receiveThemeUpdatesHelp": "Get notified when a new version of the theme is available.",
+      "identity": {
+        "help": "Who is behind this site. Search engines read these details, and your theme can show them on the site.",
+        "readinessLabel": "Search engines can't see these details yet:",
+        "readinessItems": {
+          "siteUrl": "site address",
+          "name": "name",
+          "logo": "logo",
+          "address": "address"
+        },
+        "categoryLabel": "What best describes you?",
+        "categoryHelp": "Pick the closest match. A local business gets a Business Details tab for its address and opening hours.",
+        "categoryNone": "Choose one",
+        "categoryGroups": {
+          "general": "General",
+          "business": "Local business"
+        },
+        "categories": {
+          "organization": "Organization",
+          "person": "Person",
+          "local-business": "Other local business",
+          "accounting": "Accounting firm",
+          "auto-repair": "Auto repair shop",
+          "bakery": "Bakery",
+          "bed-and-breakfast": "Bed & breakfast",
+          "cleaning-service": "Cleaning service",
+          "coffee-shop": "Coffee shop",
+          "consulting": "Consulting firm",
+          "day-spa": "Day spa",
+          "daycare": "Daycare or preschool",
+          "dentist": "Dental practice",
+          "florist": "Flower shop",
+          "general-contractor": "General contractor",
+          "graphic-design": "Graphic design studio",
+          "gym": "Gym",
+          "hair-salon": "Hair salon",
+          "hotel": "Hotel",
+          "it-support": "IT support",
+          "landscaping": "Landscaping",
+          "law-firm": "Law firm",
+          "personal-trainer": "Personal trainer",
+          "pet-grooming": "Pet grooming",
+          "photographer": "Photographer",
+          "plumber": "Plumber",
+          "real-estate-agent": "Real estate agent",
+          "restaurant": "Restaurant",
+          "tattoo-studio": "Tattoo studio",
+          "veterinary-clinic": "Veterinary clinic",
+          "web-design": "Web design studio",
+          "wedding-planner": "Wedding planner",
+          "wine-bar": "Wine bar",
+          "yoga-studio": "Yoga studio"
+        },
+        "publicNameLabel": "Public Name",
+        "publicNameHelp": "The name people know you by. Leave empty to use the Site Title.",
+        "logoLabel": "Logo",
+        "logoHelp": "A square or wide logo works best. This is separate from the Site Icon.",
+        "useSiteIcon": "Use the Site Icon",
+        "removeLogo": "Remove logo",
+        "logoChoose": "Choose image",
+        "logoChange": "Change image",
+        "logoInvalidType": "Choose a JPG, PNG, GIF, WebP or SVG image.",
+        "emailLabel": "Email",
+        "descriptionLabel": "Short Description",
+        "descriptionHelp": "One or two sentences about what you do.",
+        "profilesTitle": "Social Profiles",
+        "profilesHelp": "Full addresses of your profiles, e.g. https://instagram.com/yourname.",
+        "addProfile": "Add a profile…",
+        "removeProfile": "Remove",
+        "networks": {
+          "facebook": "Facebook",
+          "instagram": "Instagram",
+          "twitter": "X (Twitter)",
+          "linkedin": "LinkedIn",
+          "youtube": "YouTube",
+          "tiktok": "TikTok",
+          "pinterest": "Pinterest",
+          "github": "GitHub",
+          "mastodon": "Mastodon",
+          "bluesky": "Bluesky",
+          "discord": "Discord",
+          "reddit": "Reddit",
+          "telegram": "Telegram",
+          "threads": "Threads",
+          "whatsapp": "WhatsApp"
+        },
+        "errors": {
+          "invalid": "Please check this value.",
+          "tooLong": "This is too long.",
+          "tooMany": "Too many entries.",
+          "unknown": "This value is not supported.",
+          "primaryRequired": "This site has other locations. Keep this one's details, or another location would take its place.",
+          "fixErrors": "Please fix the highlighted business details before saving."
+        }
+      },
+      "business": {
+        "help": "Where to find you and when you are open.",
+        "telephoneLabel": "Phone",
+        "priceRangeLabel": "Price Range",
+        "priceRangeHelp": "Optional, e.g. €€ or $10–30.",
+        "locationLabelLabel": "Location Name",
+        "locationLabelHelp": "Only if this location goes by a different name than the public name.",
+        "streetLabel": "Street Address",
+        "localityLabel": "City",
+        "regionLabel": "Region or State",
+        "postalCodeLabel": "Postal Code",
+        "countryLabel": "Country Code",
+        "countryHelp": "Two letters, e.g. GR, US or DE.",
+        "hoursTitle": "Opening Hours",
+        "hoursHelp": "Add a second range for split shifts. Leave a day as Not stated if you would rather not say.",
+        "days": {
+          "monday": "Monday",
+          "tuesday": "Tuesday",
+          "wednesday": "Wednesday",
+          "thursday": "Thursday",
+          "friday": "Friday",
+          "saturday": "Saturday",
+          "sunday": "Sunday"
+        },
+        "dayModes": {
+          "unset": "Not stated",
+          "closed": "Closed",
+          "open": "Open"
+        },
+        "opens": "Opens",
+        "closes": "Closes",
+        "addRange": "Add hours",
+        "removeRange": "Remove these hours"
+      }
     },
     "media": {
       "editTitle": "Edit {{type}} Metadata",
       "altLabel": "Alt Text (Required)",
+      "altTranslationLabel": "Alt Text",
       "altRequired": "Alt text is required",
       "altNotEmpty": "Alt text cannot be empty",
       "altHelp": "Describes the {{type}} for screen readers.",
@@ -211,6 +397,8 @@
       "titleHelp": "Sets the title attribute (often shown on hover).",
       "captionLabel": "Caption",
       "captionHelp": "Optional caption for this image. Shown where a theme displays it.",
+      "languagesLabel": "Language",
+      "inheritsHelp": "Leave empty to use the {{name}} text.",
       "save": "Save Changes",
       "saving": "Saving...",
       "types": {
@@ -232,11 +420,26 @@
     "error": "Error",
     "success": "Success",
     "unsavedChanges": "You have unsaved changes",
+    "leaveConfirm": {
+      "title": "Unsaved changes",
+      "message": "You have unsaved changes. If you leave this page, they will be lost.",
+      "confirm": "Discard changes",
+      "cancel": "Keep editing"
+    },
     "appTitle": "Widgetizer",
     "close": "Close",
     "aria": {
       "dismiss": "Dismiss",
       "close": "Close"
+    },
+    "languages": {
+      "open": "Open the {{name}} version",
+      "create": "Create the {{name}} version",
+      "creating": "Creating the {{name}} version…",
+      "created": "{{name}} version created.",
+      "createError": "The version could not be created.",
+      "checking": "Checking for a {{name}} version…",
+      "unknown": "Could not check for a {{name}} version"
     }
   },
   "components": {
@@ -252,6 +455,7 @@
       "all": "All",
       "images": "Images",
       "audio": "Audio",
+      "videos": "Videos",
       "files": "Files"
     },
     "mediaUploader": {
@@ -260,8 +464,9 @@
       "selectFiles": "Select Files",
       "supportedImages": "Images: JPG, PNG, GIF, WebP, SVG",
       "supportedAudio": "Audio: MP3",
-      "supportedFiles": "Files: PDF, MP3",
-      "supportedFormats": "Images: JPG, PNG, GIF, WebP, SVG | Audio: MP3 | Files: PDF",
+      "supportedVideo": "Video: MP4",
+      "supportedFiles": "Files: PDF, MP3, MP4",
+      "supportedFormats": "Images: JPG, PNG, GIF, WebP, SVG | Audio: MP3 | Video: MP4 | Files: PDF",
       "uploading": "Uploading..."
     },
     "fileUploader": {
@@ -275,9 +480,13 @@
       "uploadSuccess": "File uploaded successfully.",
       "uploadFailed": "Upload failed.",
       "selectFileOnly": "Please select a file, not an image.",
+      "selectVideoOnly": "Please select an MP4 video.",
       "remove": "Remove file",
       "uploading": "Uploading...",
       "importNew": "Upload a file",
+      "importNewVideo": "Upload a video",
+      "fileFormats": "PDF, MP3, MP4",
+      "videoFormats": "MP4",
       "browseLibrary": "Choose from library"
     },
     "mediaSelector": {
@@ -299,23 +508,6 @@
     "saveSuccess": "Settings saved successfully",
     "saveError": "Failed to save settings",
     "unsavedChanges": "You have unsaved changes"
-  },
-  "dashboard": {
-    "title": "Dashboard",
-    "loading": "Loading dashboard data...",
-    "projectCount": "Number of projects",
-    "readyToCreate": "Ready to create your first project!",
-    "projects": "Projects",
-    "getStarted": "Get started",
-    "activeProject": "Active project",
-    "createFirstProject": "Create your first project",
-    "noActiveProject": "No active project",
-    "createProjectBtn": "Create Project →",
-    "letsGetAtIt": "Let's get at it! →",
-    "createProjectLink": "Create a project →",
-    "magic": "It's magic!",
-    "generateSite": "Generate a site",
-    "todoDescription": "Coming soon"
   },
   "projects": {
     "title": "Projects",
@@ -343,7 +535,6 @@
       "currentActive": "Current project",
       "openProject": "Open project",
       "edit": "Edit project",
-      "editDetails": "Project details",
       "setActive": "Set as active project",
       "duplicate": "Duplicate project",
       "export": "Download backup",
@@ -353,7 +544,7 @@
     "import": "Import Backup",
     "importModal": {
       "title": "Import Backup",
-      "description": "Upload a project backup ZIP file previously downloaded from Widgetizer. The project will be imported with a new ID and can be used immediately.",
+      "description": "Upload a project backup ZIP file you downloaded earlier. The project will be imported with a new ID and can be used immediately.",
       "uploadTitle": "Drop backup ZIP file here",
       "uploadDescription": "Select a project backup ZIP file to import",
       "maxSize": "Maximum file size: {{max}}MB",
@@ -365,6 +556,7 @@
     },
     "toasts": {
       "deleteSuccess": "Project \"{{name}}\" was deleted successfully",
+      "deleteFolderLeftBehind": "Project \"{{name}}\" was deleted, but some of its files couldn't be removed from {{path}}",
       "deleteError": "Failed to delete project",
       "cannotDeleteActive": "Cannot delete the active project. Please set another project as active first.",
       "setActiveSuccess": "\"{{name}}\" is now the active project",
@@ -407,6 +599,10 @@
       "updated": "Updated",
       "actions": "Actions"
     },
+    "languages": {
+      "tabsLabel": "Filter pages by language",
+      "header": "Languages"
+    },
     "noPagesFound": "No pages found",
     "noPagesMatch": "No pages match \"{{term}}\". Try a different search term.",
     "noPagesAvailable": "No pages available",
@@ -421,7 +617,10 @@
     "toasts": {
       "deleteBulkSuccess": "Successfully deleted {{count}} page",
       "deleteBulkSuccess_other": "Successfully deleted {{count}} pages",
+      "deleteBulkLinksIncomplete": "Deleted {{count}} page, but some links to it couldn't be updated. Check pages and menus that linked to it.",
+      "deleteBulkLinksIncomplete_other": "Deleted {{count}} pages, but some links to them couldn't be updated. Check pages and menus that linked to them.",
       "deleteSuccess": "Page deleted successfully",
+      "deleteLinksIncomplete": "Page deleted, but some links to it couldn't be updated. Check pages and menus that linked to it.",
       "deleteError": "Failed to delete page(s)",
       "loadError": "Failed to load pages",
       "duplicateSuccess": "Page duplicated successfully",
@@ -460,6 +659,7 @@
     "toasts": {
       "loadError": "Failed to load menus",
       "deleteSuccess": "Menu \"{{name}}\" was deleted successfully",
+    "deleteLinksIncomplete": "Menu \"{{name}}\" was deleted, but some sections that used it couldn't be updated. Check the pages that showed it.",
       "deleteError": "Failed to delete menu",
       "duplicateSuccess": "Menu duplicated successfully",
       "duplicateError": "Failed to duplicate menu"
@@ -469,6 +669,9 @@
       "message": "Are you sure you want to delete \"{{name}}\"? This action cannot be undone.",
       "confirm": "Delete",
       "cancel": "Cancel"
+    },
+    "languages": {
+      "tabsLabel": "Filter menus by language"
     }
   },
   "menuStructure": {
@@ -492,6 +695,21 @@
     "error": "Error: {{message}}",
     "noPageSelected": "No page selected. Please select a page from the Pages list.",
     "noWidgetsFound": "No widgets found",
+    "paginate": {
+      "label": "Split into pages",
+      "description": "Shows this many items per page, with page links below the list. Makes this the main page for the collection.",
+      "onlyOne": "Only one list per page can be split into pages, and \"{{widget}}\" already is."
+    },
+    "listingAnchor": {
+      "label": "Main {{collection}} page",
+      "description": "Marks this page as the home of this collection. Its items show it in their breadcrumbs, e.g. Home › Blog › A post. Only one page per collection.",
+      "moved": "This is now the main page for that collection — moved from {{pages}}. If that page was split into pages, it no longer is."
+    },
+    "themeConflict": "Site settings were changed elsewhere since this editor opened. Your theme changes are kept on top of the current settings and will be saved.",
+    "mediaUsage": {
+      "stale": "Your page is saved. Widgetizer could not update its record of which images this page uses, so the media library may show one as unused until you press Refresh usage there.",
+      "missing": "Your changes were not saved: this page uses an image that is no longer in the media library. Choose a different image, or upload it again, then save."
+    },
     "widgetName": {
       "header": "Internal name",
       "label": "Widget Name",
@@ -524,7 +742,9 @@
       "undo": "Undo",
       "redo": "Redo",
       "saving": "Saving...",
-      "save": "Save"
+      "save": "Save",
+      "saveFailed": "Your changes could not be saved. They are still here — try again.",
+      "saveSuspended": "Saving is turned off for this page because its language was removed. Your changes are still here, but they cannot be saved."
     },
     "preview": {
       "loading": "Loading Preview...",
@@ -538,6 +758,9 @@
       "header": "Header",
       "footer": "Footer",
       "widgetSettings": "Widget Settings"
+    },
+    "languages": {
+      "menuLabel": "This page's language"
     }
   },
   "breadcrumb": {
@@ -598,7 +821,8 @@
     "toasts": {
       "createActiveSuccess": "Project \"{{name}}\" is ready to edit",
       "createSuccess": "Project \"{{name}}\" was created successfully!",
-      "createError": "Failed to create project"
+      "createError": "Failed to create project",
+      "logoError": "The project was created, but its logo couldn't be added. You can add it in Project details."
     }
   },
   "projectsEdit": {
@@ -619,6 +843,7 @@
       "notFound": "Project not found",
       "loadError": "Failed to load project",
       "updateSuccessRenamed": "Project \"{{name}}\" was updated successfully and folder was renamed.",
+      "updateRenamedFolderLeftBehind": "Project \"{{name}}\" was updated and now uses its new folder, but some files couldn't be removed from the old folder {{path}}",
       "updateSuccess": "Project \"{{name}}\" was updated successfully!",
       "updateError": "Failed to update project",
       "noActiveProject": "Please select or create a project to manage your projects",
@@ -635,6 +860,22 @@
       "exporting": "Exporting...",
       "successTitle": "Export version {{version}} created successfully!",
       "successCreated": "Created: {{date}}"
+    },
+    "structuredData": {
+      "title": "Search engines can't read everything about this site yet",
+      "missing": "Add in Project details: {{items}}.",
+      "items": {
+        "siteUrl": "site address",
+        "name": "name",
+        "logo": "logo",
+        "address": "address"
+      },
+      "emptyArticleFields": "{{count}} article page is missing some of its details, e.g. {{path}}.",
+      "emptyArticleFields_other": "{{count}} article pages are missing some of their details, e.g. {{path}}.",
+      "noListingPage": "{{count}} collection page isn't listed on any page, so its breadcrumb goes straight to Home, e.g. {{path}}.",
+      "noListingPage_other": "{{count}} collection pages aren't listed on any page, so their breadcrumbs go straight to Home, e.g. {{path}}.",
+      "ambiguousListingPage": "{{count}} collection page is listed on several pages but none is set as the main page, so its breadcrumb goes straight to Home, e.g. {{path}}.",
+      "ambiguousListingPage_other": "{{count}} collection pages are listed on several pages but none is set as the main page, so their breadcrumbs go straight to Home, e.g. {{path}}."
     },
     "history": {
       "title": "Export History",
@@ -680,6 +921,11 @@
       "exportSuccess": "Project exported successfully!",
       "exportError": "Exporting failed with an unknown issue.",
       "unknownError": "An unknown error occurred during exporting."
+    },
+    "languages": {
+      "skippedTitle": "Some languages were not exported",
+      "skipped_one": "{{languages}} has no homepage, so it was left out — and links pointing into it were removed from the exported pages. Create a page with the slug 'index' in it and export again.",
+      "skipped_other": "{{languages}} have no homepage, so they were left out — and links pointing into them were removed from the exported pages. Create a page with the slug 'index' in each and export again."
     }
   },
   "media": {
@@ -702,7 +948,11 @@
     "toasts": {
       "loadError": "Failed to load theme settings. Please try again.",
       "saveSuccess": "Theme settings saved successfully!",
-      "saveError": "Failed to save theme settings. Please try again."
+      "saveError": "Failed to save theme settings. Please try again.",
+      "conflict": "Some of these settings were changed elsewhere since this page opened. Your changes are kept on top of the current settings; review them and save again.",
+      "settingRemoved": "A setting you changed no longer exists in this theme, so that change was not saved.",
+      "valueCorrected": "\"{{label}}\" contained an invalid value and was reset.",
+      "mediaUsageStale": "Your settings are saved. Widgetizer could not update its record of which images they use, so the media library may show one as unused until you press Refresh usage there."
     }
   },
   "themes": {
@@ -787,7 +1037,7 @@
     "media": {
       "maxFileSizeMB": {
         "label": "Max Upload Size (MB)",
-        "description": "Set the maximum size for individual uploads (images, audio, documents) across all projects."
+        "description": "Set the maximum size for individual uploads (images, audio, video, documents) across all projects."
       },
       "imageProcessing": {
         "quality": {

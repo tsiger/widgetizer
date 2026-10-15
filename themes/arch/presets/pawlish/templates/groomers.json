@@ -123,7 +123,7 @@
             "role": "Lead groomer & founder",
             "specialty": "Doodles · hand-stripping · anxious dogs",
             "bio": "Twelve years in two other shops before opening Pawlish in 2017. Specializes in doodle teddy cuts, terrier hand-stripping, and the slow work nervous dogs need. NDGAA certified. The person to ask if your dog has been turned away elsewhere.",
-            "instagram": "pawlishgrooming",
+            "instagram": "https://instagram.com/",
             "photo": "/uploads/images/groomer-mara.webp"
           }
         },
@@ -134,7 +134,7 @@
             "role": "Senior groomer",
             "specialty": "Double coats · de-shed · large breeds",
             "bio": "Nine years grooming, four with Pawlish. Handles huskies, malamutes, shepherds, and large retrievers — the double coats nobody else wants. IPG certified. Strong, calm, patient with the big dogs.",
-            "instagram": "danigroomsdogs",
+            "instagram": "https://instagram.com/",
             "photo": "/uploads/images/groomer-dani.webp"
           }
         },
@@ -177,7 +177,7 @@
         "heading_alignment": "center",
         "layout": "grid",
         "columns_desktop": 4,
-        "card_layout": "outlined",
+        "card_layout": "box",
         "alignment": "center",
         "icon_style": "filled",
         "icon_size": "xl",

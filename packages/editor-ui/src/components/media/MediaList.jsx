@@ -81,7 +81,9 @@ export default function MediaList({
           file={file}
           isSelected={selectedFiles.includes(file.id)}
           onSelect={() => onFileSelect(file.id)}
-          onDelete={() => onFileDelete(file.id, file.originalName)}
+          // The row menu closes on the same click that opens the delete
+          // confirmation — pass its trigger so the dialog can hand focus back.
+          onDelete={() => onFileDelete(file.id, file.originalName, menuRef.current?.querySelector('[aria-haspopup="menu"]'))}
           onView={() => onFileView(file)}
           onEdit={() => onFileEdit(file)}
           onCopyUrl={() => onCopyUrl(file)}

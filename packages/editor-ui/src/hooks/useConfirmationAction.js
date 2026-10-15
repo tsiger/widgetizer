@@ -7,7 +7,8 @@ import ConfirmationModal from "../components/ui/ConfirmationModal";
  * modal-wiring boilerplate on list pages with destructive actions.
  *
  * Returns:
- * - `confirm(options)` — open the confirmation dialog (same options as openModal)
+ * - `confirm(options)` — open the confirmation dialog (same options as openModal,
+ *   including `returnFocusTo` for openers that unmount on the same click)
  * - `confirmationModal` — a ready-to-render <ConfirmationModal /> element
  *
  * Pages still own their mutation logic and localized copy.
@@ -27,6 +28,7 @@ export default function useConfirmationAction(onConfirm) {
     confirmText: modalState.confirmText,
     cancelText: modalState.cancelText,
     variant: modalState.variant,
+    returnFocusTo: modalState.returnFocusTo,
   });
 
   return { confirm: openModal, confirmationModal };

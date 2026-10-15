@@ -53,6 +53,15 @@
           transition: opacity 0.2s ease;
         }
       }
+
+      & .image-figure {
+        margin: 0;
+      }
+
+      & .image-caption {
+        padding: var(--space-sm) var(--section-padding-inline) 0;
+        text-align: center;
+      }
     }
   </style>
 
@@ -63,22 +72,28 @@
   <div class="widget-container">
     <div class="widget-content">
       {% if widget.settings.image != blank %}
-        {% if widget.settings.link.href != blank %}
-          <a
-            href="{{ widget.settings.link.href }}"
-            class="image-link reveal reveal-fade"
-            {% if widget.settings.link.target == '_blank' %}
-              target="_blank" rel="noopener"
-            {% endif %}
-            data-setting="link"
-          >
-            {% image src: widget.settings.image, size: 'large', srcset: true, sizes: image_sizes, class: 'widget-image' %}
-          </a>
-        {% else %}
-          <div class="image-wrapper reveal reveal-fade">
-            {% image src: widget.settings.image, size: 'large', srcset: true, sizes: image_sizes, class: 'widget-image' %}
-          </div>
-        {% endif %}
+        {% assign caption = widget.settings.image | media_meta: 'caption' %}
+        <figure class="image-figure">
+          {% if widget.settings.link.href != blank %}
+            <a
+              href="{{ widget.settings.link.href }}"
+              class="image-link reveal reveal-fade"
+              {% if widget.settings.link.target == '_blank' %}
+                target="_blank" rel="noopener"
+              {% endif %}
+              data-setting="link"
+            >
+              {% image src: widget.settings.image, size: 'large', srcset: true, sizes: image_sizes, class: 'widget-image' %}
+            </a>
+          {% else %}
+            <div class="image-wrapper reveal reveal-fade">
+              {% image src: widget.settings.image, size: 'large', srcset: true, sizes: image_sizes, class: 'widget-image' %}
+            </div>
+          {% endif %}
+          {% if caption != blank %}
+            <figcaption class="image-caption w-meta t-sm reveal reveal-fade">{{ caption }}</figcaption>
+          {% endif %}
+        </figure>
       {% else %}
         <div class="image-wrapper reveal reveal-fade">
           {% placeholder_image %}

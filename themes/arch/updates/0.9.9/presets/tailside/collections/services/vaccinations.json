@@ -1,0 +1,13 @@
+{
+  "slug": "vaccinations",
+  "schemaVersion": 1,
+  "settings": {
+    "title": "Vaccinations",
+    "icon": "vaccine",
+    "summary": "Core and lifestyle vaccines tailored to your pet's age and routine.",
+    "description": "<p>Vaccines guard against illnesses that are far easier to prevent than to treat. A short, routine appointment protects your pet from diseases that can otherwise be serious and costly to manage.</p><h2>Choosing the right vaccines</h2><p>We talk through which ones suit your pet based on age, breed, and how they spend their days. Core vaccines cover the illnesses every pet should be protected against, while lifestyle vaccines depend on things like boarding, time outdoors, or contact with other animals.</p><ul><li>Core vaccines recommended for all pets</li><li>Lifestyle vaccines based on your pet's routine and risks</li><li>A quick health check at the same visit</li></ul><p>Each visit is quick, and we keep a clear record so boosters never slip through the cracks. We will let you know when the next one is due and can send a reminder so it stays easy to keep on top of.</p><h3>After the appointment</h3><p>Most pets carry on as normal, though some are a little quiet or tender at the injection site for a day or so, which is nothing to worry about. A calm afternoon at home is usually all that is needed.</p><p>Puppies and kittens follow a short starter course to build protection, and we will map that out clearly at the first visit. If you are ever unsure what your pet is due for, just ask and we will check the record for you.</p>",
+    "price": "From $45",
+    "duration": "20 min",
+    "featured_image": "/uploads/images/tailside-services-vaccinations.webp"
+  }
+}

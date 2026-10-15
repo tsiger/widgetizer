@@ -1,3 +1,5 @@
+import { readThemeSetting } from "../utils/themeSettingChanges.js";
+
 /**
  * {% custom_head_scripts %} Liquid Tag
  *
@@ -23,22 +25,7 @@ export const CustomHeadScriptsTag = {
         return ""; // Return empty string if no settings found
       }
 
-      const advancedGroup = rawSettings.settings.global.advanced;
-
-      if (!Array.isArray(advancedGroup)) {
-        return "";
-      }
-
-      const customHeadScriptsSetting = advancedGroup.find((s) => s.id === "custom_head_scripts");
-
-      if (!customHeadScriptsSetting) {
-        return "";
-      }
-
-      const scriptsValue =
-        customHeadScriptsSetting.value !== undefined
-          ? customHeadScriptsSetting.value
-          : customHeadScriptsSetting.default;
+      const scriptsValue = readThemeSetting(rawSettings, { group: "advanced", id: "custom_head_scripts" });
 
       if (!scriptsValue || typeof scriptsValue !== "string" || scriptsValue.trim() === "") {
         return "";

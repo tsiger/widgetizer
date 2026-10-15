@@ -18,12 +18,12 @@ The setting catalog is defined declaratively in `packages/editor-ui/src/config/a
 
 ### General Settings
 
-- **Default Language** (`general.language`, default `en`): the UI language. The shipped UI exposes **English only**; the locale infrastructure remains in place for future re-expansion.
+- **Language** (`general.language`, default `en`): the UI language. The shipped UI exposes **English only**; the locale infrastructure remains in place for future re-expansion. This is unrelated to a site's own languages, which are per project ([Project Management](core-projects.md#7-site-languages)).
 - **Date Format** (`general.dateFormat`, default `MMMM D, YYYY h:mm A`, e.g. `December 31, 2024 2:15 PM`): how dates are displayed throughout the platform.
 
 ### Media Settings
 
-- **Maximum Image File Size** (`media.maxFileSizeMB`, default **50**, range 1–100): per-file upload size limit applied across all projects.
+- **Max Upload Size (MB)** (`media.maxFileSizeMB`, default **50**, range 1–100): per-file upload size limit for every media upload (images, PDF, MP3 and MP4) across all projects.
 - **Image Quality** (`media.imageProcessing.quality`, default **85**, range 1–100): single quality setting applied to all generated image sizes during Sharp processing.
 - **Image Sizes** (`media.imageProcessing.sizes.*`): each of `thumb` (150px), `small` (480px), `medium` (1024px), `large` (1920px) can be enabled/disabled and have its width customized.
 
@@ -35,8 +35,8 @@ When the active project's theme defines its own `imageSizes` in `theme.json`, th
 
 ### Export Management Settings
 
-- **Maximum Export Versions to Keep** (`export.maxVersionsToKeep`, default **10**, range 1–50): export versions retained per project; older exports are pruned when exceeded.
-- **Maximum Project Import Size** (`export.maxImportSizeMB`, default **500**, range 10–2000): max size for project import ZIPs, enforced on both client and server.
+- **Max Export Versions to Keep** (`export.maxVersionsToKeep`, default **10**, range 1–50): export versions retained per project; older exports are pruned when exceeded.
+- **Max Project Import Size (MB)** (`export.maxImportSizeMB`, default **500**, range 1–2000): max upload size for project backup ZIPs and theme ZIPs, enforced on both client and server. Separately, the server refuses a ZIP that unpacks to more than 100 times its own size (see [Platform Security](core-security.md)).
 
 Export versioning and import sizing are documented in [core-export.md](core-export.md).
 

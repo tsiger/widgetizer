@@ -9,12 +9,12 @@ This document provides a detailed overview of how projects are created, managed,
 The project management UI is primarily handled by three OSS-shell pages (`app/src/pages/`):
 
 1.  **`Projects.jsx`**: The main project listing page.
-2.  **`ProjectsAdd.jsx`**: The page for creating a new project.
-3.  **`ProjectsEdit.jsx`**: The page for modifying an existing project.
+2.  **`ProjectsAdd.jsx`**: The page for creating a new project (titled "New project").
+3.  **`ProjectsEdit.jsx`**: The page for modifying the active project (titled "Project details").
 
 These pages rely on shared components in `app/src/components/projects/`:
 
-- **`ProjectForm.jsx`**: A reusable form for both creating and editing project details (title, theme, folder name, description, site title, website address)
+- **`ProjectForm.jsx`**: A reusable form for both creating and editing project details (title, theme, notes, site title, site address, Clean URLs, site language). Both pages use the same General, Site, Identity and Business Details tabs; creating adds the theme picker and presets to General — see [Site Identity](#6-site-identity-and-business-details). The folder name field is not shown: it sits behind the `SHOW_FOLDER_NAME` constant (currently `false`), so on create the folder name follows the title and on edit it stays as it is.
   - Built on **react-hook-form** for validation and state management
   - Fully **localized** using `react-i18next` for all labels, errors, and help text
   - Exposes `isDirty` state to parent components for navigation guard integration
@@ -29,7 +29,7 @@ The application uses `react-router-dom` to handle navigation between these pages
 - `/`: Redirects to `/pages` when an active project exists, otherwise `/projects`
 - `/projects`: Renders the `Projects.jsx` page, showing the list of all projects.
 - `/projects/add`: Renders the `ProjectsAdd.jsx` page.
-- `/projects/edit/:id`: Renders the `ProjectsEdit.jsx` page, where `:id` is the unique ID of the project being edited.
+- `/projects/edit/:id`: Renders the `ProjectsEdit.jsx` page, where `:id` is the unique ID of the project being edited. Only the active project's details open: any other id redirects to `/projects`, and the Projects list has no link to this page (it opens from the admin menu).
 
 ### Admin vs Workspace Flow
 
@@ -67,9 +67,9 @@ This file contains functions that make API calls to the backend:
 
 1.  **Navigation**: The user clicks the "New project" button on the `Projects.jsx` page, which navigates them to `/projects/add`.
 2.  **Rendering**: The `ProjectsAdd.jsx` page is rendered. It contains the `ProjectForm.jsx` component.
-3.  **Navigation Guard**: The page integrates `useFormNavigationGuard` to prevent accidental navigation with unsaved changes.
+3.  **Navigation Guard**: The page uses `useGuardedFormPage` (built on `useFormNavigationGuard`) to prevent accidental navigation with unsaved changes.
 4.  **Theme Loading**: `ProjectForm.jsx` makes an API call via `/api/themes` to fetch the list of available themes and populates the "Theme" dropdown.
-5.  **User Input**: The user fills in the title and selects a theme. Additional fields (folder name, description, site title, website address) are available under "More settings". The "Theme" dropdown is only enabled during project creation.
+5.  **User Input**: The user fills in the title and selects a theme. The other tabs (Site, Identity, Business Details) are optional; the folder name is derived from the title (the field is hidden, see above), and the server makes both unique — a taken name gets a `(Copy)` suffix and a folder taken in SQLite or on disk gets a numbered slug. The "Theme" dropdown is only offered during project creation, and a logo chosen here is uploaded right after the project is created (see Site Identity).
 5b. **Preset Selection**: If the selected theme has presets, a visual card grid appears below the theme dropdown showing available presets (screenshot, name, description). The default preset is pre-selected. The user can click a different preset card to switch. Presets are fetched from `GET /api/themes/{themeId}/presets` via `getThemePresets()` in `themeManager.js`.
 6.  **Form Validation**: react-hook-form provides real-time validation with localized error messages.
 7.  **Submission**: The user clicks the "Create Project" button. `ProjectForm` automatically generates a URL-friendly folder name (slug) from the title and calls the `onSubmit` handler provided by `ProjectsAdd.jsx`.
@@ -80,6 +80,7 @@ This file contains functions that make API calls to the backend:
     - **Menus**: If the preset has its own `menus/` directory, the root menus already copied into the project are removed and replaced with the preset's menus. This happens before menu enrichment (step 10).
     - **Settings Overrides**: The preset's `preset.json` contains a flat map of `{ setting_id: value }` overrides. The system walks the project's `theme.json > settings.global` groups and updates the `default` field for any setting whose `id` matches a key in the overrides map. This applies colors, fonts, animations, and any other theme settings defined by the preset.
     - The selected preset ID is stored in the project metadata as `preset`.
+    - A missing optional part (no preset menus, no preset templates) is fine, but a part that is present and cannot be read fails the creation: the half-made folder and row are removed on a best-effort basis (a cleanup failure is logged and can leave remnants). Preset menus are staged before the theme's are replaced, so a failure never leaves a project with no menus.
 9c. **Theme Locale Ownership**: The editor locale API reads the project's copied `locales/` files, not the shared installed theme copy under `data/themes/`. This means locale changes follow the same per-project update boundary as other theme files.
 10. **Link Enrichment**: After copying theme files, the system enriches all internal page links with `pageUuid`:
     - **Menus**: All menu items that link to internal pages (e.g., `index.html`, `about.html`) are enriched with the corresponding page's `pageUuid`. This ensures menu links remain valid even if pages are renamed.
@@ -98,20 +99,20 @@ If a user navigates to any site-workspace route without an active project select
 3.  **Open Project / Set Active**: Clicking the project name opens that project. If it is not already active, `Projects.jsx` first calls `setActiveProject(id)`, refreshes `projectStore`, shows a success toast, and then navigates into the workspace destination (`/pages` by default, or preserved `next`).
 4.  **Visual Status**: The active project shows an "Active" badge. The theme column can also show a theme-update indicator when `hasThemeUpdate` is true.
 5.  **Actions Menu**: Each row exposes an overflow menu with:
-    - **Edit**: Navigates to `/projects/edit/:id`.
-    - **Duplicate**: Calls `duplicateProject(id)`. The duplication process includes UUID regeneration for all pages and automatic updating of all `pageUuid` references in widgets and menus to point to the new UUIDs. Duplicates are named with the suffix pattern `Project Name (Copy)`, `Project Name (Copy 2)`, etc., and the list sorting groups them after the original project.
-    - **Export**: Triggers project ZIP export.
-    - **Delete**: Opens a localized confirmation modal. The currently active project cannot be deleted.
+    - **Open project** and, for a non-active row, **Set as active project**. There is no Edit item and the "Update available" badge is a plain label: Project details opens only for the active project, from the admin menu.
+    - **Duplicate**: Calls `duplicateProject(id)`. The duplication process includes UUID regeneration for all pages and automatic updating of all `pageUuid` references in widgets and menus to point to the new UUIDs. Duplicates are named with the suffix pattern `Project Name (Copy)`, `Project Name (Copy 2)`, etc., and the list sorting groups them after the original project. If the copy, the UUID remap or the media-library copy fails, the duplicate is removed and the request fails, rather than returning a copy whose links still name the original's content.
+    - **Download backup**: Triggers project ZIP export.
+    - **Delete**: Opens a localized confirmation modal. The currently active project cannot be deleted. The row is removed first, then the folder; a folder that cannot be fully removed (a file locked by another program) still answers success, with `folderLeftBehind` naming the path, and the Projects screen shows a warning that stays until dismissed. Create, import, duplicate and folder rename all treat a folder left on disk as taken, so it is never reused.
 
 ### 3. Exporting a Project
 
 Projects can be exported as ZIP files for backup or transfer to another installation.
 
-1.  **Action**: The user clicks the "Export" icon on a project row in the `Projects.jsx` page.
+1.  **Action**: The user picks "Download backup" in a project row's menu in the `Projects.jsx` page.
 2.  **Loading Feedback**: A persistent toast notification immediately appears showing "Exporting project..." and remains visible throughout the export process.
 3.  **Backend Processing**: The `exportProject(id)` function sends a `POST` request to `/api/projects/:projectId/export`.
 4.  **ZIP Creation**: The backend creates a ZIP archive containing:
-    - **`project-export.json`**: A manifest file with `formatVersion: "1.1"`, `exportedAt`, `widgetizerVersion`, and a nested `project` object. That nested object includes project metadata such as `name`, `description`, `siteTitle`, `theme`, `themeVersion`, `receiveThemeUpdates`, `preset`, `siteUrl`, `created`, and `updated`.
+    - **`project-export.json`**: A manifest file with `formatVersion: "1.1"`, `exportedAt`, `widgetizerVersion`, and a nested `project` object. That nested object includes project metadata such as `name`, `description`, `siteTitle`, `theme`, `themeVersion`, `receiveThemeUpdates`, `preset`, `siteUrl`, `cleanUrls`, `siteIdentity`, `defaultLanguage`, `languages`, `created`, and `updated`.
     - **All project files**: Pages, menus, widgets, uploads, theme.json, collections, and other project assets.
 5.  **Download**: The ZIP file is streamed to the browser and automatically downloaded with a timestamped filename (e.g., `my-project-export-2024-01-15T10-30-00.zip`).
 6.  **Completion**: The loading toast is dismissed and replaced with a success toast.
@@ -120,22 +121,24 @@ Projects can be exported as ZIP files for backup or transfer to another installa
 
 Projects can be imported from ZIP files previously exported from Widgetizer.
 
-1.  **Action**: The user clicks the "Import Project" button in the page header, which opens the `ProjectImportModal`.
+1.  **Action**: The user clicks the "Import Backup" button in the page header, which opens the `ProjectImportModal`.
 2.  **File Selection**: The user selects or drag-and-drops a ZIP file. Client-side validation checks:
     - File type (must be `.zip` with proper MIME type)
     - File size (must not exceed the configurable `maxImportSizeMB` limit from App Settings)
 3.  **Upload**: The user clicks "Import Project" to upload the ZIP file via `POST /api/projects/import`.
 4.  **Server-Side Validation**: The backend validates:
     - ZIP structure contains `project-export.json` manifest
-    - Manifest contains required fields (name, theme)
+    - Manifest contains required fields (name, theme), and its project details are the kind the app writes: the theme and preset are single folder names, the name, title, notes and Site Address are text (a Site Address that is not a valid address is kept as it was, since older projects can hold one; output ignores it and export warns), and `receiveThemeUpdates`/`cleanUrls` are true or false. Markup is stripped from the name, title and notes, as on the create form.
     - Referenced theme exists in the installation
-5.  **Isolation**: Files are extracted to a temporary directory first for validation before any permanent changes.
+    - At most one `uploads/media.json` (an older backup that carries two copies is refused); the media library must be readable and hold a `files` list, or the import fails. Export always writes the library from SQLite, even for a project with no media, never from a file left in the folder.
+5.  **Isolation**: Files are extracted to a temporary directory first for validation before any permanent changes. Extraction refuses a ZIP that unpacks to more than 100 times its own size (a ZIP bomb), counting the bytes actually produced rather than the sizes the ZIP records (`utils/zipSafety.js`), and leaves out top-level dot entries such as a theme update's `.theme-update-backup`, which a backup never contains. Before anything is copied, the unpacked content is checked (`utils/backupContentChecks.js`): every media path is `/uploads/images/<name>` or `/uploads/files/<name>` (sizes under `images`), media translations name only the project's additional languages, and every collection item's stored slug matches `^[a-z0-9-]+$`.
+    - Any of these refuses the whole import with a 400 that names the problem; nothing is created and the unpacked copy is removed.
 6.  **Project Creation**:
     - A new UUID is generated for the imported project
     - A unique `folderName` is generated (checking existing project metadata in SQLite and existing directories)
     - Files are copied from the temp directory to the new project directory
     - Project metadata is written to SQLite only after successful file copy
-    - The imported manifest restores `siteTitle`, `receiveThemeUpdates`, `preset`, and `siteUrl` in addition to the core project fields
+    - The imported manifest restores `siteTitle`, `receiveThemeUpdates`, `preset`, `siteUrl`, `cleanUrls`, `siteIdentity` and the site languages in addition to the core project fields. An imported identity is never refused: only its valid part is kept. A language code this version cannot use refuses the import with a 400 telling the user to open the backup with a newer version.
 7.  **Cleanup**: Temporary files are removed on both success and failure.
 8.  **Feedback + Navigation**: A success toast is shown, the modal closes, and the imported project is immediately opened as the active project inside the site workspace.
 
@@ -143,31 +146,104 @@ Projects can be imported from ZIP files previously exported from Widgetizer.
 
 ### 5. Editing a Project
 
-1.  **Navigation**: From the project list, clicking the "Edit" icon navigates the user to `/projects/edit/:id`.
-2.  **Data Fetching**: `ProjectsEdit.jsx` loads. In its `useEffect` hook, it calls `getAllProjects()` and finds the specific project matching the `id` from the URL parameters to populate the form. Because that list query is cached, successful project mutations invalidate it so the editor reload path sees fresh project metadata instead of stale list data.
-3.  **Navigation Guard**: `useFormNavigationGuard` is integrated to prevent accidental navigation with unsaved changes.
+1.  **Navigation**: "Project details" in the admin menu navigates to `/projects/edit/:id` for the active project.
+2.  **Data Fetching**: `ProjectsEdit.jsx` waits for the active project to load and redirects any other id to `/projects` without loading it (media and theme requests are scoped to the active project, so another project's logo could not be picked). In its `useEffect` hook, it calls `getAllProjects()` and finds the specific project matching the `id` from the URL parameters to populate the form. Because that list query is cached, successful project mutations invalidate it so the editor reload path sees fresh project metadata instead of stale list data.
+3.  **Navigation Guard**: `useGuardedFormPage` is integrated to prevent accidental navigation with unsaved changes.
 4.  **Rendering**: The `ProjectForm.jsx` component is rendered with the `initialData` of the project being edited with several key features:
     - **Theme Restriction**: The "Theme" dropdown is disabled, as themes cannot be changed after creation to maintain consistency
-    - **Project Folder Name**: Editable field for the project's folder name, independent of the project title
+    - **Project Folder Name**: Hidden while `SHOW_FOLDER_NAME` is `false`; the API still accepts a `folderName` change
     - **Description Field**: Optional field for project description
     - **Site Title Field**: Optional field used for exported browser-tab titles and related site-level metadata
-    - **Website Address Field**: Optional field for setting the base URL for the project, used for generating absolute URLs in social media meta tags, SEO, and exported site metadata
+    - **Site Address Field**: Optional field for setting the base URL for the project, used for generating absolute URLs in social media meta tags, SEO, and exported site metadata
+    - **Clean URLs Checkbox**: Off by default. When on, rendered internal links, canonical tags, the sitemap and robots.txt address pages without the `.html` extension (`about`, `rooms/suite`, home `./`); exported file names are unchanged, so the host must serve `about.html` at `/about`
     - **Theme Update Banner**: If `checkThemeUpdates(id)` reports an available update, `ProjectsEdit.jsx` shows an inline banner with an "Apply Update" action
 5.  **Form Features**:
-    - **Independent Fields**: Project title and folder name can be edited independently
-    - **URL Validation**: The website address field is optional, but if provided, includes validation to ensure proper URL format (via react-hook-form)
+    - **Independent Fields**: Project title and folder name are independent (renaming the title never moves the folder)
+    - **Partial Updates**: `description` is optional on `PUT /api/projects/:id`; an update that leaves it out keeps the stored notes (the new-project logo save sends only name and identity)
+    - **URL Validation**: The site address field is optional, but if provided, includes validation to ensure proper URL format (via react-hook-form)
     - **Conditional Fields**: Theme selection only appears when creating new projects, not when editing existing ones
     - **Localized Validation**: All error messages and help text are fully localized
 6.  **Submission**: The user modifies the form and clicks "Save Changes":
-    - **Folder Renaming**: If the folder name changes, the system renames the project directory accordingly.
+    - **Folder Renaming**: If the folder name changes, every check that can reject the request (string types, Site Address, site identity, logo, languages, booleans) runs first. The rename then copies the folder, points the row at the copy, and only then removes the old folder. A failed copy or row update attempts to remove only the copy (a cleanup failure is logged and can leave it on disk), and the old folder stays the project; an old folder that cannot be fully removed is reported as `folderLeftBehind`, and Project details shows a warning that stays until dismissed.
     - **URL Persistence**: Since the project ID is stable, the user is **not** redirected; the API and frontend routes remain valid.
     - **State Synchronization**: Active project state is properly maintained as the ID remains constant.
 7.  **API Call**: The `handleSubmit` function calls `updateProject(id, formData)` using the `projectManager.js` utility functions for consistent API handling.
 8.  **State Updates**:
     - **Active Project Sync**: If the edited project is currently active, the global store is updated using `getActiveProject()` and `setActiveProject()` to maintain proper state
-    - **Windows Compatibility**: Project directory renaming uses a copy + remove approach for better Windows file system compatibility
+    - **Windows Compatibility**: Project directory renaming uses copy + remove rather than rename, for Windows file system compatibility
 9.  **Theme Update Apply Sync**: When the user applies a theme update from this screen, `applyThemeUpdate(id)` invalidates the cached projects list before `loadProject()` re-reads it. That keeps `themeVersion` and update-status metadata in sync immediately after the update.
 10. **Feedback**: Localized success toast notifications show the completion status, and navigation buttons allow returning to the project list.
+
+### 6. Site Identity and Business Details
+
+Business facts belong to the project, independently of theme presentation. Themes can display them in ordinary page or footer blocks, so authors maintain useful visible content rather than a second set of SEO-only fields. Core derives search metadata from those facts; category determines identity kind, and public name can default from Site Title. Reusing the Site Icon as the identity logo requires the author's confirmation.
+
+A project stores who is behind the site — the facts core publishes as structured data ([Site Exporting](core-export.md#structured-data-json-ld)) and themes read as `project.identity` ([Theming](theming.md)). It lives in the `site_identity` JSON column (migration v6, [Database](core-database.md)) and reaches controllers as `project.siteIdentity`.
+
+**Shape.** Owned, validated and resolved by `packages/core/src/utils/siteIdentity.js`. Values that will need translation sit under a `text` key; everything else never will.
+
+```json
+{
+  "category": "restaurant",
+  "logo": "/uploads/images/logo.png",
+  "email": "hello@example.com",
+  "telephone": "+30 210 123 4567",
+  "priceRange": "€€",
+  "profiles": { "instagram": "https://instagram.com/example" },
+  "locations": [
+    {
+      "streetAddress": "1 Main St", "addressLocality": "Athens", "addressRegion": "Attica",
+      "postalCode": "10558", "addressCountry": "GR",
+      "openingHours": { "monday": [{ "opens": "09:00", "closes": "17:00" }], "sunday": [] },
+      "text": { "label": "Plaka branch" }
+    }
+  ],
+  "text": { "publicName": "Example Taverna", "description": "Home cooking since 1980." }
+}
+```
+
+- **`category`** — an id from `SITE_IDENTITY_CATEGORIES`. Each row declares its schema.org type and its kind (`organization`, `person`, `localBusiness`); the kind is derived, never stored, and no category means organization. The list is Arch's preset business types plus Organization, Person and a generic local business. ProfessionalService is deliberately unused (deprecated) — businesses with no exact type map to `LocalBusiness`. Add a row when a new theme or preset brings a business type.
+- **`logo`** — an `/uploads/images/…` path, not a media id: duplicate and import give media files new ids.
+- **`profiles`** — one http(s) URL per network in `PROFILE_NETWORKS` (facebook, instagram, twitter, linkedin, youtube, tiktok, pinterest, github, mastodon, bluesky, discord, reddit, telegram, threads, whatsapp).
+- **`locations[]`** — up to 20; the first is the primary and the only one the UI edits. `addressCountry` is two letters, stored upper-case. `openingHours` is keyed by weekday: `[]` = closed, a list of `{ opens, closes }` (`HH:MM`, opens ≠ closes, at most 4, a range may cross midnight) = open, a missing day = not stated.
+- Text limits: 200 for names and street, 500 for the description (the rest are in `LIMITS`).
+
+**Validation.** `normalizeSiteIdentity(input)` returns `{ value, errors }`. `value` keeps only valid, non-empty fields; `errors` is one `{ field, code }` per rejected field, with dotted paths (`locations.0.openingHours.monday.1`) and code `invalid`, `tooLong`, `tooMany` or `unknown`. The form (`siteIdentityForm.js`) and the controller run the same function.
+
+**Controller** (`projectController.js`):
+
+- `createProject` accepts `siteIdentity` (the form sends it on create too, without the logo, which follows once the project exists), and `updateProject` validates it whenever it is sent. Any error → `400 { error: "Invalid business details.", fields }`, and nothing is written.
+- Before validation, `readSiteIdentity` tag-strips only human-readable text (public name, description, price range, street, locality, region, postcode, location label) with `stripHtmlToText`, which returns plain text with `&` kept as typed. URLs, email, telephone and the logo path are validated exactly as sent — a re-serialising sanitizer would rewrite a query string.
+- A save that sends the identity refreshes its media usage (`updateSiteIdentityMediaUsage`, source `global:site-identity`), so the library won't delete the logo and exports copy it. The full rescan includes it too.
+- Project ZIP export writes `siteIdentity` into the manifest; import keeps only the valid part (`normalizeSiteIdentity(...).value`) and never refuses a project for it; duplicate copies it with the rest of the row.
+
+**UI** (create and edit; `app/src/components/projects/SiteIdentityFields.jsx`, `OpeningHoursEditor.jsx`, `siteIdentityForm.js`, strings under `forms.project.identity` / `forms.project.business` in `packages/core/src/locales/en.json`):
+
+- **Tabs.** General (title, theme and presets on create, notes, theme updates; folder name only when `SHOW_FOLDER_NAME` is on), Site (Site Title, Site Address, Clean URLs, default language, and on edit the additional languages), Identity, Business Details. One Save covers all tabs; a blocked save opens the first tab with a problem, and tabs with errors carry a dot.
+- **Readiness line** at the top of *Identity*, only while something is missing — `identityReadiness` over the unsaved form values: site address, name, logo (not for a person), address (local business: street, city, country). Each missing item is a button that opens its tab and focuses the field.
+- **Identity** — category (grouped General / Local business), public name (Site Title as placeholder), logo, email, short description, profiles (only filled ones, plus an "Add a profile…" picker over the 15 networks).
+- **Business details** — a tab shown for a local-business category, or whenever one of its fields has an error so a switched category can't hide one: phone, price range, location name, address, and the opening-hours editor (per day Not stated / Closed / Open, up to four ranges, "Add hours" for split shifts).
+- **Logo.** Media and theme requests are scoped to the active project on the server. Editing is always the active project, so the field is the usual image picker plus "Use the Site Icon" (offered when a Site Icon exists and no logo is set). A new project has no media library yet, so the field (`LogoFileInput.jsx`) holds a local image file with a preview, checked against the image types and the media size limit. `ProjectsAdd` creates the project, makes it active, uploads the file with `uploadProjectMedia`, then saves the returned path with `updateProject(id, { name, siteIdentity: { …, logo } })`. If the upload or that save fails, the project is kept and a warning says the logo can be added in Project details.
+- Submit runs `formToIdentity`, which also refuses emptying the primary location while other locations exist (`primaryRequired`): the pruned primary would otherwise be replaced by the next, uneditable location. Any error blocks the save with a toast and per-field messages. The form is `noValidate` so core's rules own the errors, and `MediaDrawer` stops its own submit event, which React would otherwise bubble through the portal into the project form.
+
+---
+
+## 7. Site Languages
+
+A project stores the language its **site** is published in. This is unrelated to the language of the editor interface — setting a site to Greek never switches the admin UI. Two columns hold it (migration v7, [Database](core-database.md)):
+
+- `default_language` — the site's own language, `en` for existing and new projects. Reaches controllers as `project.defaultLanguage`.
+- `languages` — a JSON array of the **additional** codes, `[]` by default, read back as `project.languages`. Empty means single-language, so no existing project needed a backfill.
+
+**Rules** (`packages/core/src/utils/languages.js`, shared by the API and the form the way `urlSafety` is):
+
+- Codes are simple ISO 639-1 in the UI (`en`, `el`), but `LANGUAGE_CODE_RE` (`^[a-z]{2}(-[a-z0-9]{2,8})?$`) accepts a wider BCP 47 subset, so a regional code like `pt-br` needs no migration later. Stored lowercase; `hreflangCase` emits the canonical `pt-BR` for `lang` / `hreflang` output.
+- Right-to-left languages are refused by the API, not merely hidden from the picker — they need `dir="rtl"` plumbing and theme work that is not in this version. The *effective* script decides, so `pa` and `pa-in` are accepted while `pa-arab` and `pa-pk` are not — a region can imply a script the language does not default to (and the reverse: `sd` is refused, `sd-in` is not). A region written as a UN M.49 number (`pa-586`) is refused rather than guessed at.
+- The additional list is deduplicated and may not contain the default language.
+- **The default language can only be changed while the project has no additional languages.** Changing it later would move every page between the root and its language folder and change every public URL, which a static export cannot redirect.
+- `SUPPORTED_LANGUAGES` is the picker's list, each language in its own name (`nativeLanguageName`).
+
+**Where it applies.** `createProject` stores the default language only — a new project starts with one language, and an additional list is refused. `updateProject` can change the default while the site is single-language and accepts the current list resent unchanged, but refuses any change to it (any rejection → `400 { error }`, nothing written). Additional languages are added and removed one at a time with `POST /api/languages` and `DELETE /api/languages/:code`, which seed or clean up the language's content; the export manifest carries them; import refuses a backup whose languages this version cannot read (`400`, nothing written), and a backup with no language fields imports as a single English site; duplicate copies them with the rest of the row. In the editor, `projectStore` exposes `useDefaultLanguage()`, `useExtraLanguages()` and `useIsMultilang()` so language-aware UI gates on one selector.
 
 ---
 
@@ -187,7 +263,7 @@ When the user switches projects, the app must ensure no data from the previous p
 
 - **RequireActiveProject** is the central project-switch boundary for site-workspace routes. It clears singleton frontend stores on active-project changes and keys the route outlet by project ID so project-owned components remount cleanly.
 - **pageStore** uses an `activeLoadId` counter to discard stale async loads. Tracks `loadedProjectId` so `saveStore` can compare before saving.
-- **themeStore** is the canonical owner of theme settings across Settings and the editor. It uses `activeLoadId` to drop stale loads, and its `resetForProjectChange()` action is invoked by the shared route boundary on real project switches.
+- **themeStore** is the canonical owner of theme settings across Settings and the editor. It uses `activeLoadId` to drop stale loads, and its `resetForProjectChange()` action is invoked by the shared route boundary on real project switches. Applying a theme update calls its `invalidate()`, so Settings and the editor load the updated settings instead of keeping (and saving) the copy they loaded before; an unsaved Site settings draft is discarded with it.
 - **widgetStore** resets schemas and selection via `resetForProjectChange()`, reads the project ID internally via `getActiveProjectId()`, and now relies on the shared route boundary rather than page-local reset calls.
 - **saveStore** preserves edits when a stale save is rejected with `PROJECT_MISMATCH`, stops auto-save retries, and is reset centrally on project switches by the shared route boundary.
 - **Settings.jsx** reads/writes through `themeStore`; it still guards save completion against mid-flight project changes, but project-switch reset ownership now lives in the route boundary rather than the page component.

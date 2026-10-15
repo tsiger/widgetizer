@@ -122,12 +122,12 @@
     <div class="widget-content">
       {% if widget.settings.layout == 'carousel' %}
         <div class="carousel-container reveal reveal-up">
-          <button type="button" class="carousel-btn carousel-btn-prev" aria-label="Previous">
+          <button type="button" class="carousel-btn carousel-btn-prev" aria-label="{{ 'site.common.previous' | t }}">
             <svg class="carousel-btn-icon" viewBox="0 0 24 24" aria-hidden="true">
               <path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round" />
             </svg>
           </button>
-          <button type="button" class="carousel-btn carousel-btn-next" aria-label="Next">
+          <button type="button" class="carousel-btn carousel-btn-next" aria-label="{{ 'site.common.next' | t }}">
             <svg class="carousel-btn-icon" viewBox="0 0 24 24" aria-hidden="true">
               <path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round" />
             </svg>

@@ -5,7 +5,10 @@
     "youtube",
     "vimeo",
     "streaming",
-    "external video"
+    "external video",
+    "mp4",
+    "uploaded video",
+    "video file"
   ],
   "settings": [
     {
@@ -52,16 +55,28 @@
       "label": "tTheme:global.widgets.settings.content_header.label"
     },
     {
+      "type": "video",
+      "id": "video_file",
+      "label": "tTheme:global.widgets.settings.video_file.label",
+      "description": "tTheme:global.widgets.settings.video_file.description"
+    },
+    {
       "type": "text",
       "id": "video_url",
       "label": "tTheme:global.widgets.settings.video_url.label",
       "default": "https://www.youtube.com/watch?v=2PuFyjAs7JA"
     },
     {
+      "type": "image",
+      "id": "poster",
+      "label": "tTheme:global.widgets.settings.poster.label",
+      "description": "tTheme:global.widgets.settings.poster.description"
+    },
+    {
       "type": "text",
       "id": "video_title",
       "label": "tTheme:global.widgets.settings.video_title.label",
-      "default": "Video"
+      "defaultKey": "site.video_embed.default_title"
     },
     {
       "type": "header",

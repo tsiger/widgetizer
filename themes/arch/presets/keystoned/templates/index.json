@@ -7,7 +7,6 @@
       "settings": {
         "height": "large",
         "fullwidth": true,
-        "alignment": "center",
         "autoplay": true,
         "autoplay_speed": 6000
       },
@@ -16,7 +15,7 @@
           "type": "slide",
           "settings": {
             "image": "/uploads/images/hero-slide-1.webp",
-            "heading_text": "Very soon :)",
+            "heading_text": "42 Chestnut Street — Beacon Hill",
             "heading_size": "5xl",
             "text_content": "$3,200,000 · 4 Bed · 3.5 Bath · 3,400 sqft",
             "text_size": "lg",

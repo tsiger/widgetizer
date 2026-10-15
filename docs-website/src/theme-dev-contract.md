@@ -99,7 +99,7 @@ Autoescaping is on globally, so `{{ ... }}` is HTML-escaped by default. Add `| r
 - `richtext` settings: `{{ widget.settings.body | raw }}` (gate emptiness with `| rte_blank`)
 - SVG icon markup and embed codes
 
-See [Autoescaping & the `raw` filter](theme-dev-liquid-assets.html#autoescaping-the-raw-filter).
+See [Autoescaping & the `raw` filter](theme-dev-liquid-assets.html#escaping-model).
 
 # Accessibility Baseline
 

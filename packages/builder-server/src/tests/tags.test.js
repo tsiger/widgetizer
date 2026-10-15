@@ -403,6 +403,28 @@ describe("FontsTag", () => {
     assert.doesNotMatch(result, /googleapis/, "should not use Google Fonts when Bunny is enabled");
   });
 
+  it("asks Bunny for every weight in its own syntax, so bold is not served as regular", async () => {
+    const result = await render("{% fonts %}", {}, { themeSettingsRaw: fixtures.themeWithBunnyFonts });
+    assert.match(result, /fonts\.bunny\.net\/css\?family=Inter:400,700&/);
+  });
+
+  it("honours the Bunny Fonts switch in whichever settings group a theme files it under", async () => {
+    // Arch keeps the checkbox under "advanced"; a fixed "privacy" lookup left it doing nothing.
+    const { privacy, ...groups } = fixtures.themeWithBunnyFonts.settings.global;
+    const themeSettingsRaw = { settings: { global: { ...groups, advanced: privacy } } };
+    const result = await render("{% fonts %}", {}, { themeSettingsRaw });
+    assert.match(result, /href="https:\/\/fonts\.bunny\.net"/);
+    assert.doesNotMatch(result, /googleapis/);
+  });
+
+  it("loads fonts picked in any settings group", async () => {
+    const themeSettingsRaw = {
+      settings: { global: { brand: [{ id: "heading_font", type: "font_picker", value: { stack: '"Playfair Display", serif', weight: 700 } }] } },
+    };
+    const result = await render("{% fonts %}", {}, { themeSettingsRaw });
+    assert.match(result, /family=Playfair%20Display:wght@700/);
+  });
+
   it("includes display=swap for font loading", async () => {
     const result = await render("{% fonts %}", {}, { themeSettingsRaw: fixtures.themeWithGoogleFonts });
     assert.match(result, /display=swap/);
@@ -450,6 +472,21 @@ describe("AssetTag", () => {
     const result = await render("{% asset %}", {}, { renderMode: "preview" });
     assert.equal(result.trim(), "");
   });
+
+  it("renders an empty alt on an asset image by default", async () => {
+    const result = await render('{% asset src: "logo.svg" %}', {}, { renderMode: "preview" });
+    assert.match(result, /<img [^>]*alt=""/);
+  });
+
+  it("renders an explicit alt on an asset image, escaping quotes", async () => {
+    const result = await render('{% asset src: "logo.svg", alt: "Say \\"hi\\"" %}', {}, { renderMode: "preview" });
+    assert.match(result, /alt="Say &quot;hi&quot;"/);
+  });
+
+  it("escapes ampersands in an asset image alt so entity-shaped text stays literal", async () => {
+    const result = await render('{% asset src: "logo.svg", alt: "Type &copy; here" %}', {}, { renderMode: "preview" });
+    assert.match(result, /alt="Type &amp;copy; here"/);
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -462,6 +499,12 @@ describe("CustomCssTag", () => {
     assert.match(result, /<style/);
     assert.match(result, /body \{ background: red; \}/);
     assert.match(result, /<\/style>/);
+  });
+
+  it("reads custom CSS a theme files outside the advanced group", async () => {
+    const themeSettingsRaw = { settings: { global: { code: [{ id: "custom_css", value: "p { color: blue; }" }] } } };
+    const result = await render("{% custom_css %}", {}, { themeSettingsRaw });
+    assert.match(result, /p \{ color: blue; \}/);
   });
 
   it("returns empty when no custom CSS defined", async () => {
@@ -608,7 +651,19 @@ describe("ImageTag", () => {
   it("renders fallback img for missing media file", async () => {
     const result = await render('{% image src: "missing.jpg" %}', {}, { renderMode: "preview" });
     assert.match(result, /src="[^"]*missing\.jpg"/);
+    assert.match(result, /alt=""/);
     assert.match(result, /loading="lazy"/);
+  });
+
+  it("keeps an explicit alt on the fallback img for a missing media file", async () => {
+    const result = await render('{% image src: "missing.jpg", alt: "A cat" %}', {}, { renderMode: "preview" });
+    assert.match(result, /alt="A cat"/);
+  });
+
+  it("renders an empty alt when the fallback img receives a null alt", async () => {
+    const result = await render('{% image src: "missing.jpg", alt: unset_alt %}', { unset_alt: null }, { renderMode: "preview" });
+    assert.match(result, /alt=""/);
+    assert.doesNotMatch(result, /alt="null"/);
   });
 
   it("handles SVG images without sizes lookup", async () => {

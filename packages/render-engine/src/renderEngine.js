@@ -1,6 +1,7 @@
 import { Liquid } from "liquidjs";
 import fs from "fs/promises";
 import path from "path";
+import { resolveInside } from "./safePath.js";
 import {
   ThemeSettingsTag,
   AssetTag,
@@ -23,11 +24,29 @@ import {
   registerRteFilters,
   registerDateFilter,
   registerCollectionFilter,
+  registerPageUrlFilters,
+  registerSiteStringFilter,
+  resolveSiteString,
 } from "@widgetizer/core";
+import { escapeHtml } from "@widgetizer/core/escapeHtml";
 import { resolveRichtextMediaInWidgetData } from "@widgetizer/core/richtextMedia";
-import { resolveRichtextLinksInWidgetData, schemaHasRichtextSetting } from "@widgetizer/core/richtextLinks";
+import {
+  resolveRichtextLinksInWidgetData,
+  resolveRichtextLinksInSettings,
+  schemaHasRichtextSetting,
+} from "@widgetizer/core/richtextLinks";
 import { prefixInternalHref, prefixSiteIcons } from "@widgetizer/core/linkPrefixer";
+import { pageHref, itemHref } from "@widgetizer/core/internalHref";
+import { buildBreadcrumbs, indexListingPages } from "@widgetizer/core/breadcrumbs";
+import { pagedHref, pageOutputPath, resolveLanguage } from "@widgetizer/core/contentAddress";
+import { LANGUAGE_CODE_RE, languageDir } from "@widgetizer/core/languages";
+import { buildAssetUrl } from "@widgetizer/core/assetUrl";
+import { identityForTheme } from "@widgetizer/core/siteIdentity";
 import { resolveMenuSettings, schemaHasMenuSetting } from "./menuResolver.js";
+import { buildTranslations } from "@widgetizer/core/translations";
+import { readThemeSetting } from "@widgetizer/core/themeSettingChanges";
+// Without a loader the engine still has the built-in snippets' and widgets' English words.
+import coreSiteStringsEn from "@widgetizer/core/widgets/locales/en.json" with { type: "json" };
 
 /**
  * @typedef {object} RenderDeps
@@ -62,38 +81,43 @@ function getOrCreateEngine(projectDir, themeSnippetsDir, coreSnippetsDir) {
   }
 
   // Create a NEW engine instance with correct roots
-  const engine = new Liquid({
-    extname: ".liquid",
+  const engine = createLiquidEngine({
     cache: process.env.NODE_ENV === "production",
     root: [themeSnippetsDir, coreSnippetsDir],
     partials: [themeSnippetsDir, coreSnippetsDir],
-    outputEscape: "escape",
   });
-
-  configureLiquidEngine(engine);
 
   engineCache.set(cacheKey, engine);
   return engine;
 }
 
-// Configure LiquidJS engine helper
+// Authoring tools share the runtime dialect, with optional stricter diagnostics.
+export function createLiquidEngine(options = {}) {
+  const engine = new Liquid({ extname: ".liquid", outputEscape: "escape", ...options });
+  configureLiquidEngine(engine);
+  return engine;
+}
+
+export const widgetizerLiquidTags = Object.freeze({
+  theme_settings: ThemeSettingsTag,
+  asset: AssetTag,
+  fonts: FontsTag,
+  seo: SeoTag,
+  enqueue_style: EnqueueStyleTag,
+  enqueue_script: EnqueueScriptTag,
+  header_assets: RenderHeaderAssetsTag,
+  footer_assets: RenderFooterAssetsTag,
+  placeholder_image: PlaceholderImageTag,
+  custom_css: CustomCssTag,
+  custom_head_scripts: CustomHeadScriptsTag,
+  custom_footer_scripts: CustomFooterScriptsTag,
+  image: ImageTag,
+  youtube: YouTubeTag,
+  enqueue_preload: EnqueuePreloadTag,
+});
+
 function configureLiquidEngine(engine) {
-  // Register custom tags
-  engine.registerTag("theme_settings", ThemeSettingsTag);
-  engine.registerTag("asset", AssetTag);
-  engine.registerTag("fonts", FontsTag);
-  engine.registerTag("seo", SeoTag);
-  engine.registerTag("enqueue_style", EnqueueStyleTag);
-  engine.registerTag("enqueue_script", EnqueueScriptTag);
-  engine.registerTag("header_assets", RenderHeaderAssetsTag);
-  engine.registerTag("footer_assets", RenderFooterAssetsTag);
-  engine.registerTag("placeholder_image", PlaceholderImageTag);
-  engine.registerTag("custom_css", CustomCssTag);
-  engine.registerTag("custom_head_scripts", CustomHeadScriptsTag);
-  engine.registerTag("custom_footer_scripts", CustomFooterScriptsTag);
-  engine.registerTag("image", ImageTag);
-  engine.registerTag("youtube", YouTubeTag);
-  engine.registerTag("enqueue_preload", EnqueuePreloadTag);
+  for (const [name, tag] of Object.entries(widgetizerLiquidTags)) engine.registerTag(name, tag);
 
   // Register custom filters
   registerMediaMetaFilter(engine);
@@ -102,6 +126,8 @@ function configureLiquidEngine(engine) {
   registerRteFilters(engine);
   registerDateFilter(engine);
   registerCollectionFilter(engine);
+  registerPageUrlFilters(engine);
+  registerSiteStringFilter(engine);
 }
 
 /**
@@ -117,11 +143,84 @@ function getProjectData(deps) {
   }
 }
 
-function buildPageTitle(pageData, projectData) {
-  const pageTitle =
+function paginationContextFor(sharedGlobals) {
+  return sharedGlobals?.paginationPlan
+    ? buildPaginationContext(sharedGlobals.paginationPlan, {
+        cleanUrls: sharedGlobals.cleanUrls === true,
+        outputPathPrefix: sharedGlobals.outputPathPrefix || "",
+      })
+    : null;
+}
+
+function pageContextFor(pageData, breadcrumbs, pagination, translations = []) {
+  if (!pageData) return pageData;
+  return {
+    ...pageData,
+    breadcrumbs,
+    // The switcher contract (§7c). `dir` is here from day one so adding an RTL
+    // language never changes a shipped theme.
+    translations,
+    dir: languageDir(pageData.language),
+    ...(pagination ? { pagination } : {}),
+  };
+}
+
+/**
+ * The languages this page or item can be switched to, computed once per render
+ * and cached beside the breadcrumbs — header, footer, the layout and every
+ * widget must see the same array.
+ *
+ * @param {RenderDeps} deps
+ * @param {object|null} sharedGlobals
+ * @param {{current: object, kind?: string, slugPrefix?: string}} what
+ */
+async function ensureTranslations(deps, sharedGlobals, what) {
+  if (!sharedGlobals) return [];
+  if (sharedGlobals.translations) return sharedGlobals.translations;
+
+  const { defaultLanguage, languages } = await languageSettings(deps, sharedGlobals);
+  if (!languages.length || !what?.current) {
+    sharedGlobals.translations = [];
+    return sharedGlobals.translations;
+  }
+
+  if (!sharedGlobals.pagesByUuid) sharedGlobals.pagesByUuid = await loadPagesByUuid(deps);
+  const projectData = await getProjectData(deps);
+
+  sharedGlobals.translations = buildTranslations({
+    current: what.current,
+    kind: what.kind || "page",
+    slugPrefix: what.slugPrefix || "",
+    pages: [...sharedGlobals.pagesByUuid.values()],
+    items: sharedGlobals.collectionItemsByUuid ? [...sharedGlobals.collectionItemsByUuid.values()] : [],
+    languages: [defaultLanguage, ...languages],
+    defaultLanguage,
+    cleanUrls: sharedGlobals.cleanUrls === true,
+    outputPathPrefix: sharedGlobals.outputPathPrefix || "",
+    siteUrl: projectData?.siteUrl || "",
+  });
+  return sharedGlobals.translations;
+}
+
+// `{% seo %}` reads the canonical's shape from `project.cleanUrls`, so it must
+// carry the flag this render's links were emitted with (a caller-seeded or
+// first-use stamp on sharedGlobals), not the row just loaded: a toggle landing
+// between the two reads must not split a page's canonical from its links.
+function projectContextFor(projectData, sharedGlobals) {
+  if (!projectData) return projectData;
+  return {
+    ...projectData,
+    ...(sharedGlobals && sharedGlobals.cleanUrls !== undefined ? { cleanUrls: sharedGlobals.cleanUrls === true } : {}),
+    identity: identityForTheme(projectData.siteIdentity, projectData),
+  };
+}
+
+function buildPageTitle(pageData, projectData, pageNumber = 1) {
+  const baseTitle =
     pageData?.seo?.title && typeof pageData.seo.title === "string" && pageData.seo.title.trim()
       ? pageData.seo.title.trim()
       : pageData?.name || "";
+  const pageTitle = pageNumber > 1 ? `${baseTitle} - ${pageNumber}` : baseTitle;
   const siteTitle =
     projectData?.siteTitle && typeof projectData.siteTitle === "string" && projectData.siteTitle.trim()
       ? projectData.siteTitle.trim()
@@ -150,9 +249,18 @@ function schemaHasLinkSetting(schema) {
  * @param {Map} pagesByUuid - Map of uuid -> page data
  * @param {string} [outputPathPrefix] - "" at root, "../" for nested item pages
  * @param {Map} [collectionItemsByUuid] - Map of item uuid -> { slugPrefix, slug }
+ * @param {boolean} [cleanUrls] - The project's Clean URLs setting; picks the href shape
+ * @param {string} [defaultLanguage] - the project's default; the target's own language decides its folder
  * @returns {object} Resolved link object
  */
-function resolveLinkValue(linkValue, pagesByUuid, outputPathPrefix = "", collectionItemsByUuid = null) {
+function resolveLinkValue(
+  linkValue,
+  pagesByUuid,
+  outputPathPrefix = "",
+  collectionItemsByUuid = null,
+  cleanUrls = false,
+  defaultLanguage = "",
+) {
   if (!linkValue || typeof linkValue !== "object") {
     return linkValue;
   }
@@ -164,10 +272,8 @@ function resolveLinkValue(linkValue, pagesByUuid, outputPathPrefix = "", collect
   if (collectionItemUuid) {
     const entry = collectionItemsByUuid && collectionItemsByUuid.get(collectionItemUuid);
     if (entry) {
-      return {
-        ...linkValue,
-        href: prefixInternalHref(`${entry.slugPrefix}/${entry.slug}.html`, outputPathPrefix),
-      };
+      const opts = { cleanUrls, outputPathPrefix, language: entry.language, defaultLanguage };
+      return { ...linkValue, href: itemHref(entry.slugPrefix, entry.slug, opts) };
     }
     // Collection item was deleted - clear the link
     return { href: "", text: "", target: "_self" };
@@ -183,10 +289,8 @@ function resolveLinkValue(linkValue, pagesByUuid, outputPathPrefix = "", collect
 
   if (page) {
     // Page exists - update href to current slug, depth-aware for nested pages
-    return {
-      ...linkValue,
-      href: prefixInternalHref(`${page.slug}.html`, outputPathPrefix),
-    };
+    const opts = { cleanUrls, outputPathPrefix, language: page.language, defaultLanguage };
+    return { ...linkValue, href: pageHref(page.slug, opts) };
   } else {
     // Page was deleted - clear the link
     return {
@@ -205,7 +309,14 @@ function resolveLinkValue(linkValue, pagesByUuid, outputPathPrefix = "", collect
  * @param {Map} pagesByUuid - Map of uuid -> page data
  * @returns {object} Widget data with resolved links
  */
-function resolveWidgetPageLinks(widgetData, pagesByUuid, outputPathPrefix = "", collectionItemsByUuid = null) {
+function resolveWidgetPageLinks(
+  widgetData,
+  pagesByUuid,
+  outputPathPrefix = "",
+  collectionItemsByUuid = null,
+  cleanUrls = false,
+  defaultLanguage = "",
+) {
   const pagesEmpty = !pagesByUuid || pagesByUuid.size === 0;
   const itemsEmpty = !collectionItemsByUuid || collectionItemsByUuid.size === 0;
   if (!widgetData || (pagesEmpty && itemsEmpty)) {
@@ -219,7 +330,14 @@ function resolveWidgetPageLinks(widgetData, pagesByUuid, outputPathPrefix = "", 
   if (resolved.settings && typeof resolved.settings === "object") {
     for (const [key, value] of Object.entries(resolved.settings)) {
       if (isLinkObject(value)) {
-        resolved.settings[key] = resolveLinkValue(value, pagesByUuid, outputPathPrefix, collectionItemsByUuid);
+        resolved.settings[key] = resolveLinkValue(
+          value,
+          pagesByUuid,
+          outputPathPrefix,
+          collectionItemsByUuid,
+          cleanUrls,
+          defaultLanguage,
+        );
       }
     }
   }
@@ -230,7 +348,14 @@ function resolveWidgetPageLinks(widgetData, pagesByUuid, outputPathPrefix = "", 
       if (block && block.settings && typeof block.settings === "object") {
         for (const [key, value] of Object.entries(block.settings)) {
           if (isLinkObject(value)) {
-            resolved.blocks[blockId].settings[key] = resolveLinkValue(value, pagesByUuid, outputPathPrefix, collectionItemsByUuid);
+            resolved.blocks[blockId].settings[key] = resolveLinkValue(
+              value,
+              pagesByUuid,
+              outputPathPrefix,
+              collectionItemsByUuid,
+              cleanUrls,
+              defaultLanguage,
+            );
           }
         }
       }
@@ -268,13 +393,300 @@ async function loadPagesByUuid(deps) {
 }
 
 /**
- * Load all menus for a project and return maps for UUID and slug-based lookup.
+ * The project's language settings, cached per render beside the Clean URLs flag.
  * @param {RenderDeps} deps
- * @returns {Promise<{byUuid: Map, bySlug: Map}>} Maps for UUID and slug-based lookup
+ * @param {object|null} sharedGlobals
+ */
+/**
+ * The words the theme puts on the page, every language at once — the same shape
+ * `mediaFiles` uses, and for the same reason: whoever loads them does not know
+ * which page is coming, while the `t` filter reading them does. Cached on the
+ * render's globals beside the menu maps and the breadcrumbs.
+ */
+async function ensureSiteStrings(deps, globals) {
+  if (!globals) return null;
+  if (globals.siteStrings === undefined) {
+    globals.siteStrings =
+      typeof deps.loadSiteStrings === "function" ? await deps.loadSiteStrings() : { en: coreSiteStringsEn.site };
+  }
+  if (globals.defaultLanguage === undefined) {
+    globals.defaultLanguage = (await languageSettings(deps, globals)).defaultLanguage;
+  }
+  return globals.siteStrings;
+}
+
+/**
+ * A setting's starting value. `defaultKey` names a site string, so the default
+ * arrives in the language of the page rather than in the theme author's — which
+ * is what lets a site in one language read correctly with nothing filled in,
+ * while a value the owner types still wins over it.
+ */
+function settingDefault(setting, strings, language, defaultLanguage) {
+  if (typeof setting?.defaultKey === "string" && setting.defaultKey) {
+    const found = resolveSiteString(strings, setting.defaultKey, language, defaultLanguage);
+    if (found !== undefined) return found;
+  }
+  return setting?.default;
+}
+
+async function languageSettings(deps, sharedGlobals) {
+  if (sharedGlobals?.languageSettings) return sharedGlobals.languageSettings;
+  const projectData = await getProjectData(deps);
+  const settings = {
+    defaultLanguage: resolveLanguage("", projectData?.defaultLanguage),
+    languages: Array.isArray(projectData?.languages) ? projectData.languages : [],
+  };
+  if (sharedGlobals) sharedGlobals.languageSettings = settings;
+  return settings;
+}
+
+/**
+ * Index which pages list each collection, for collection-item breadcrumbs. Only
+ * the widget types actually placed on a page are read, so a project pays for its
+ * own widgets rather than the theme's whole catalogue. Cached per render.
+ * @param {RenderDeps} deps
+ * @param {Map} pagesByUuid
+ */
+async function loadListingIndex(deps, pagesByUuid) {
+  const types = new Set();
+  for (const page of pagesByUuid.values()) {
+    for (const widget of Object.values(page?.widgets || {})) {
+      if (widget?.type) types.add(widget.type);
+    }
+  }
+
+  const schemas = {};
+  await Promise.all(
+    [...types].map(async (type) => {
+      const schemaPath = await resolveInside(deps.projectDir, "widgets", type, "schema.json");
+      if (!schemaPath) return;
+      try {
+        schemas[type] = JSON.parse(await fs.readFile(schemaPath, "utf-8"));
+      } catch {
+        // A widget without a readable schema simply declares no collection.
+      }
+    }),
+  );
+
+  return indexListingPages(pagesByUuid.values(), schemas);
+}
+
+/**
+ * The breadcrumb trail for whatever is being rendered, computed once and cached
+ * on `sharedGlobals` so header, footer, every widget and the layout all read the
+ * same array.
+ *
+ * Pages resolve lazily from `currentCanonicalPath` — the caller renders the
+ * header before the engine ever sees the page. Collection items cannot: the
+ * trail needs the item's title, which the path does not carry, so
+ * `renderCollectionItemPage` seeds the trail itself before rendering the header.
+ *
+ * @param {RenderDeps} deps
+ * @param {object|null} sharedGlobals
+ * @returns {Promise<Array>}
+ */
+async function ensureBreadcrumbs(deps, sharedGlobals) {
+  if (!sharedGlobals) return [];
+  if (sharedGlobals.breadcrumbs) return sharedGlobals.breadcrumbs;
+
+  const canonicalPath = sharedGlobals.currentCanonicalPath || "";
+  if (!canonicalPath) {
+    sharedGlobals.breadcrumbs = [];
+    return sharedGlobals.breadcrumbs;
+  }
+
+  if (!sharedGlobals.pagesByUuid) sharedGlobals.pagesByUuid = await loadPagesByUuid(deps);
+  const pagesByUuid = sharedGlobals.pagesByUuid;
+  const { defaultLanguage, languages } = await languageSettings(deps, sharedGlobals);
+
+  // The canonical path is the file path, so it names the language folder too; a
+  // page is found by rebuilding that path rather than by matching a slug, which
+  // is no longer unique across languages.
+  const page =
+    [...pagesByUuid.values()].find(
+      (candidate) =>
+        candidate?.slug &&
+        pageOutputPath(candidate.slug, 1, { language: candidate.language, defaultLanguage }) === canonicalPath,
+    ) || null;
+
+  const shape = {
+    pagesByUuid,
+    cleanUrls: sharedGlobals.cleanUrls === true,
+    outputPathPrefix: sharedGlobals.outputPathPrefix || "",
+    defaultLanguage,
+  };
+
+  if (page) {
+    sharedGlobals.breadcrumbs = buildBreadcrumbs({
+      ...shape,
+      page,
+      language: page.language,
+      pageNumber: sharedGlobals.paginationPlan?.current || 1,
+    });
+    return sharedGlobals.breadcrumbs;
+  }
+
+  // Not a page: a collection item, whose path carries its language folder ahead
+  // of the collection prefix. Item pages normally seed the trail themselves in
+  // renderCollectionItemPage; this resolves the preview's single-widget morph,
+  // which re-renders a header in isolation and knows only the path.
+  const withoutExt = canonicalPath.endsWith(".html") ? canonicalPath.slice(0, -5) : canonicalPath;
+  const [maybeLanguage, ...rest] = withoutExt.split("/");
+  const itemLanguage = languages.includes(maybeLanguage) ? maybeLanguage : "";
+  const target = itemLanguage ? rest.join("/") : withoutExt;
+  if (!target.includes("/")) {
+    sharedGlobals.breadcrumbs = [];
+    return sharedGlobals.breadcrumbs;
+  }
+
+  const resolved = await resolveItemFromPath(deps, target);
+  if (!sharedGlobals.listingPages) {
+    sharedGlobals.listingPages = await loadListingIndex(deps, pagesByUuid);
+  }
+  sharedGlobals.breadcrumbs = resolved
+    ? buildBreadcrumbs({
+        ...shape,
+        item: { ...resolved.item, language: resolveLanguage(itemLanguage, defaultLanguage) },
+        collectionType: resolved.collectionType,
+        language: resolveLanguage(itemLanguage, defaultLanguage),
+        listingPages: sharedGlobals.listingPages,
+      })
+    : [];
+  return sharedGlobals.breadcrumbs;
+}
+
+/**
+ * Resolve `newsPrefix/story` to the collection type and the item's display
+ * title, by matching the path's first segment against each collection schema's
+ * `slugPrefix`.
+ *
+ * The path reaches here from a preview morph request body, so both segments go
+ * through `resolveInside` before touching the filesystem.
+ *
+ * @param {RenderDeps} deps
+ * @param {string} target - extension-stripped item path
+ * @returns {Promise<{collectionType: string, item: {slug: string, name: string, slugPrefix: string}}|null>}
+ */
+async function resolveItemFromPath(deps, target) {
+  const separator = target.indexOf("/");
+  const slugPrefix = target.slice(0, separator);
+  const slug = target.slice(separator + 1);
+  if (!slugPrefix || !slug || slug.includes("/")) return null;
+
+  let types;
+  try {
+    types = await fs.readdir(path.join(deps.projectDir, "collection-types"));
+  } catch {
+    return null;
+  }
+
+  for (const type of types) {
+    try {
+      const schemaPath = await resolveInside(deps.projectDir, "collection-types", type, "schema.json");
+      if (!schemaPath) continue;
+      const schema = JSON.parse(await fs.readFile(schemaPath, "utf-8"));
+      if (schema?.slugPrefix !== slugPrefix) continue;
+
+      const itemPath = await resolveInside(deps.projectDir, "collections", type, `${slug}.json`);
+      if (!itemPath) return null;
+      const item = JSON.parse(await fs.readFile(itemPath, "utf-8"));
+      const titleField = (schema.settings || []).find((setting) => setting.usedAsTitle);
+      return {
+        collectionType: schema.type || type,
+        item: {
+          slug,
+          name: (titleField && item?.settings?.[titleField.id]) || slug,
+          slugPrefix,
+        },
+      };
+    } catch {
+      // Unreadable schema or item: keep looking, then give up quietly.
+    }
+  }
+  return null;
+}
+
+async function planPagination(deps, widgets, widgetsOrder, { pageSlug, currentPage = 1, language = "" } = {}) {
+  if (typeof deps.countCollectionItems !== "function") return null;
+  // The plan carries the language because it outlives this call: every pager URL
+  // is built from it later, and a copy of a Greek page lives beside the Greek one.
+  const { defaultLanguage } = await languageSettings(deps, null);
+  const order = Array.isArray(widgetsOrder) && widgetsOrder.length > 0 ? widgetsOrder : Object.keys(widgets || {});
+
+  for (const widgetId of order) {
+    if (typeof widgetId !== "string") continue;
+    const widget = widgets?.[widgetId];
+    if (widget?.settings?.paginate !== true || typeof widget.type !== "string") continue;
+
+    const schemaPath = await resolveInside(deps.projectDir, "widgets", widget.type, "schema.json");
+    if (!schemaPath) continue;
+    let schema;
+    try {
+      schema = JSON.parse(await fs.readFile(schemaPath, "utf-8"));
+    } catch {
+      continue;
+    }
+
+    const collectionType = schema?.collection?.type;
+    const perPageSetting = schema?.collection?.perPageSetting;
+    if (!collectionType || typeof perPageSetting !== "string" || !Array.isArray(schema.settings)) continue;
+
+    const declared = schema.settings.find((setting) => setting?.id === perPageSetting);
+    const perPage = Number(widget.settings[perPageSetting] ?? declared?.default);
+    if (!Number.isInteger(perPage) || perPage < 1) continue;
+
+    const totalItems = await deps.countCollectionItems(collectionType, language);
+    const total = Math.ceil(totalItems / perPage);
+    if (total < 2) return null;
+
+    const current = Math.min(Math.max(Math.floor(Number(currentPage)) || 1, 1), total);
+    return { widgetId, collectionType, perPage, totalItems, total, current, pageSlug, language, defaultLanguage };
+  }
+  return null;
+}
+
+function buildPaginationContext(plan, { cleanUrls = false, outputPathPrefix = "" } = {}) {
+  const href = (pageNumber) =>
+    pagedHref(plan.pageSlug, pageNumber, {
+      cleanUrls,
+      outputPathPrefix,
+      language: plan.language || "",
+      defaultLanguage: plan.defaultLanguage,
+    });
+  const pages = [];
+  for (let number = 1; number <= plan.total; number += 1) {
+    pages.push({ number, href: href(number), current: number === plan.current });
+  }
+  return {
+    current: plan.current,
+    total: plan.total,
+    perPage: plan.perPage,
+    totalItems: plan.totalItems,
+    prevHref: plan.current > 1 ? href(plan.current - 1) : null,
+    nextHref: plan.current < plan.total ? href(plan.current + 1) : null,
+    pages,
+  };
+}
+
+/**
+ * Load all menus for a project and return maps for UUID and slug-based lookup.
+ *
+ * A uuid is globally unique, so `byUuid` spans every language. A bare SLUG is
+ * not: it means "this language's menu of that name", so the slug lookup is kept
+ * per language and the caller says which one it is rendering.
+ *
+ * @param {RenderDeps} deps
+ * @returns {Promise<{byUuid: Map, bySlug: Map<string, Map>}>}
  */
 async function loadMenuMaps(deps) {
   const byUuid = new Map();
   const bySlug = new Map();
+  // "" is the default language, which owns the root folder.
+  const slugsFor = (language) => {
+    if (!bySlug.has(language)) bySlug.set(language, new Map());
+    return bySlug.get(language);
+  };
+  slugsFor("");
 
   try {
     const menusDir = path.join(deps.projectDir, "menus");
@@ -289,15 +701,46 @@ async function loadMenuMaps(deps) {
     for (const file of files) {
       if (!file.endsWith(".json")) continue;
       try {
-        const content = await fs.readFile(path.join(menusDir, file), "utf8");
+        // `file` comes from readdir so it can't traverse, but it can be a
+        // symlink out of the project — resolveInside catches that. Base is the
+        // PROJECT dir, not menusDir: a symlinked menus/ would otherwise be
+        // validated against itself and pass.
+        const menuPath = await resolveInside(deps.projectDir, "menus", file);
+        if (!menuPath) continue;
+        const content = await fs.readFile(menuPath, "utf8");
         const menu = JSON.parse(content);
         if (menu.uuid) {
           byUuid.set(menu.uuid, menu);
         }
         const slugId = file.replace(".json", "");
-        bySlug.set(slugId, menu);
+        slugsFor("").set(slugId, menu);
       } catch {
         // Skip unreadable menu files
+      }
+    }
+
+    // Another language's menus: by uuid globally, and by slug under their own
+    // language, so a bare slug resolves to the menu of the language being
+    // rendered rather than always to the root one.
+    for (const entry of files) {
+      if (!LANGUAGE_CODE_RE.test(entry)) continue;
+      let languageFiles;
+      try {
+        languageFiles = await fs.readdir(path.join(menusDir, entry));
+      } catch {
+        continue;
+      }
+      for (const file of languageFiles) {
+        if (!file.endsWith(".json")) continue;
+        try {
+          const menuPath = await resolveInside(deps.projectDir, "menus", entry, file);
+          if (!menuPath) continue;
+          const menu = JSON.parse(await fs.readFile(menuPath, "utf8"));
+          if (menu.uuid) byUuid.set(menu.uuid, menu);
+          slugsFor(entry).set(file.replace(".json", ""), menu);
+        } catch {
+          // Skip unreadable menu files
+        }
       }
     }
   } catch (error) {
@@ -305,6 +748,129 @@ async function loadMenuMaps(deps) {
   }
 
   return { byUuid, bySlug };
+}
+
+/**
+ * Resolve the `link` and `menu` selections a theme declares in its site-wide
+ * settings, exactly as widget settings are resolved.
+ *
+ * Theme settings are edited with the same inputs widgets use, so a theme author can
+ * point a site-wide setting at a page, a collection item or a menu. Those selections
+ * used to store fine and then never resolve: the picker worked, the output did not.
+ *
+ * Gated on the schema, like the widget path — a theme declaring neither type pays
+ * nothing, which is every theme that has not adopted this.
+ *
+ * Mutates `processed` in place (the contract resolveMenuSettings already has).
+ *
+ * @param {object} processed preprocessed theme settings: { group: { id: value } }
+ * @param {object} rawThemeSettings theme.json, whose settings.global holds the schema
+ */
+export async function resolveThemeSettingReferences(processed, rawThemeSettings, deps, sharedGlobals, context) {
+  const groups = rawThemeSettings?.settings?.global;
+  if (!groups || !processed) return;
+
+  const groupEntries = Object.entries(groups).filter(([, items]) => Array.isArray(items));
+  const declares = (type) => groupEntries.some(([, items]) => items.some((item) => item?.type === type));
+  const hasMenu = declares("menu");
+  const hasLink = declares("link");
+  // Richtext too: seeding stamps stable refs into a theme's richtext anchors, and a
+  // reference that is never resolved is worse than none — the anchor keeps the
+  // address the theme shipped and silently stops following renames.
+  const hasRichtext = declares("richtext");
+  if (!hasMenu && !hasLink && !hasRichtext) return;
+
+  const globals = sharedGlobals || {};
+  if (!globals.pagesByUuid) globals.pagesByUuid = await loadPagesByUuid(deps);
+  const pagesByUuid = globals.pagesByUuid;
+
+  let collectionItemsByUuid = globals.collectionItemsByUuid || null;
+  if (!collectionItemsByUuid && typeof deps.loadCollectionItemsByUuid === "function") {
+    try {
+      collectionItemsByUuid = await deps.loadCollectionItemsByUuid();
+      globals.collectionItemsByUuid = collectionItemsByUuid;
+    } catch (err) {
+      console.warn(`Could not load collection items for theme setting resolution: ${err.message}`);
+    }
+  }
+  collectionItemsByUuid = collectionItemsByUuid || new Map();
+
+  // Clean URLs and the default language decide the SHAPE of every href resolved
+  // below — whether it ends in .html, and whether it carries a language folder.
+  // Reading them off sharedGlobals raw was wrong twice over: on a first render
+  // neither is stamped yet, and the default language never lived under that key at
+  // all. A Greek-default site got `el/about.html` for its own default language, and
+  // a layout-only render ignored Clean URLs entirely.
+  //
+  // So they are derived here the way the widget path derives them — stamped on
+  // first use and cached — while an explicit value from the caller still wins.
+  const ctx = context || {};
+  const outputPathPrefix = ctx.outputPathPrefix || "";
+  const language = ctx.language ?? sharedGlobals?.currentPageData?.language ?? "";
+
+  let cleanUrls;
+  if (ctx.cleanUrls !== undefined) {
+    cleanUrls = ctx.cleanUrls === true;
+  } else if (globals.cleanUrls !== undefined) {
+    cleanUrls = globals.cleanUrls === true;
+  } else {
+    const projectData = await getProjectData(deps);
+    cleanUrls = !!projectData?.cleanUrls;
+    if (sharedGlobals) globals.cleanUrls = cleanUrls;
+  }
+
+  const defaultLanguage =
+    ctx.defaultLanguage ?? (await languageSettings(deps, sharedGlobals)).defaultLanguage ?? "";
+
+  if (hasMenu) {
+    if (!globals.menuMaps) globals.menuMaps = await loadMenuMaps(deps);
+    const menuDeps = {
+      menuMaps: globals.menuMaps,
+      pagesByUuid,
+      collectionItemsByUuid,
+      outputPathPrefix,
+      cleanUrls,
+      defaultLanguage,
+      language,
+    };
+    for (const [group, items] of groupEntries) {
+      if (processed[group]) resolveMenuSettings(processed[group], items, menuDeps);
+    }
+  }
+
+  if (hasRichtext) {
+    // The same resolver widget richtext goes through, given this group's schema.
+    for (const [group, items] of groupEntries) {
+      if (!processed[group]) continue;
+      resolveRichtextLinksInSettings(processed[group], items, {
+        pagesByUuid,
+        collectionItemsByUuid,
+        outputPathPrefix,
+        cleanUrls,
+        defaultLanguage,
+      });
+    }
+  }
+
+  if (hasLink) {
+    for (const [group, items] of groupEntries) {
+      const values = processed[group];
+      if (!values) continue;
+      for (const item of items) {
+        if (item?.type !== "link" || !item.id) continue;
+        const value = values[item.id];
+        if (!isLinkObject(value)) continue;
+        values[item.id] = resolveLinkValue(
+          value,
+          pagesByUuid,
+          outputPathPrefix,
+          collectionItemsByUuid,
+          cleanUrls,
+          defaultLanguage,
+        );
+      }
+    }
+  }
 }
 
 /**
@@ -349,7 +915,15 @@ async function createBaseRenderContext(deps, rawThemeSettings, renderMode = "pre
   const fileBasePath =
     renderMode === "publish" ? `${outputPathPrefix}assets/files` : `${apiUrl}/api/media/projects/${projectId}/uploads/files`;
 
-  const siteIconSrc = processedThemeSettings?.general?.favicon || "";
+  // A theme may point a site-wide setting at a page, item or menu using the same
+  // inputs widgets use. Resolve those here, once, before anything reads them.
+  // Only the depth prefix is passed: Clean URLs and the default language are
+  // derived inside, because at this point in the render neither is stamped yet.
+  await resolveThemeSettingReferences(processedThemeSettings, rawThemeSettings, deps, sharedGlobals, {
+    outputPathPrefix,
+  });
+
+  const siteIconSrc = readThemeSetting(rawThemeSettings, { group: "general", id: "favicon" }) || "";
 
   // Load media metadata and create a useful map
   let mediaFiles = {};
@@ -374,19 +948,25 @@ async function createBaseRenderContext(deps, rawThemeSettings, renderMode = "pre
   // Check if icons need to be reloaded (new project, or file changed in preview mode)
   let shouldReloadIcons = !global.iconsCache.has(projectId);
 
-  const iconsPath = path.join(deps.projectDir, "assets", "icons.json");
+  // Fixed name; guarded so a symlinked icons.json can't pull JSON in from
+  // outside the project. null → the reads below fail and icons stay empty.
+  const iconsPath = await resolveInside(deps.projectDir, "assets", "icons.json");
 
   if (!shouldReloadIcons && renderMode === "preview") {
     // In preview mode, check if file has been modified since last cache
+    const cachedMtime = global.iconsCache.get(projectId)?.mtime;
     try {
       const stats = await fs.stat(iconsPath);
-      const cachedData = global.iconsCache.get(projectId);
-      if (!cachedData?.mtime || stats.mtimeMs > cachedData.mtime) {
+      if (!cachedMtime || stats.mtimeMs > cachedMtime) {
         shouldReloadIcons = true;
       }
     } catch (error) {
-      console.warn(`Failed to check icon file mtime for project ${projectId} in preview mode:`, error.message);
-      // File doesn't exist or can't be read, will handle below
+      // icons.json is optional: a missing file is only news if one was cached.
+      if (error.code !== "ENOENT") {
+        console.warn(`Failed to check icon file mtime for project ${projectId} in preview mode:`, error.message);
+      } else if (cachedMtime) {
+        shouldReloadIcons = true;
+      }
     }
   }
 
@@ -464,17 +1044,24 @@ async function createBaseRenderContext(deps, rawThemeSettings, renderMode = "pre
     globals.iconPrefix = projectIcons.prefix || "";
   }
 
+  await ensureSiteStrings(deps, globals);
+
   // Expose depth-aware path globals (defaults keep pages at the export root).
   // `outputPathPrefix` prefixes relative asset/link URLs; `currentCanonicalPath`
   // is the un-prefixed path of the page being rendered, used for menu
-  // active-state matching.
+  // active-state matching. `cleanUrls` — the project's Clean URLs setting;
+  // stamped by `renderWidget` on first use when absent.
   if (globals.outputPathPrefix === undefined) globals.outputPathPrefix = outputPathPrefix;
   if (globals.currentCanonicalPath === undefined) globals.currentCanonicalPath = "";
+  // A `{% render %}`'d snippet sees only the globals, and `{% image %}` / `media_meta` need both.
+  globals.mediaFiles = mediaFiles;
+  globals.imagePath = imageBasePath;
   // Published date format (theme-owned, set via the `date_format` theme setting).
   // Consumed by the `format_date` filter; when a theme defines no such setting the
   // filter falls back to its own default, so we only set this when present.
-  if (globals.dateFormat === undefined && processedThemeSettings?.general?.date_format) {
-    globals.dateFormat = processedThemeSettings.general.date_format;
+  const themeDateFormat = readThemeSetting(rawThemeSettings, { group: "general", id: "date_format" });
+  if (globals.dateFormat === undefined && themeDateFormat) {
+    globals.dateFormat = themeDateFormat;
   }
 
   // Collection items loader for the `| collection` filter. The shell supplies a
@@ -538,21 +1125,33 @@ async function renderWidget(
     // Determine if this is a core widget (prefixed with "core-")
     const isCoreWidget = type.startsWith("core-");
 
-    // Determine the correct path based on widget type
-    let widgetPath;
-    let schemaPath;
+    // Determine the correct base + folder for this widget type. `type` comes
+    // from page JSON and is NOT validated on save, so it is treated as hostile:
+    // every path below is resolved through resolveInside, which contains it
+    // within the base it belongs to. Without that, a type of "../../<other
+    // project>/widgets/hero" reads another project's template and renders it
+    // into this page — and "core-../.." satisfies the core-widget branch too.
+    let baseDir;
+    let widgetFolder;
     if (isCoreWidget) {
       // Core widget (folder structure)
-      widgetPath = path.join(deps.coreWidgetsDir, type, "widget.liquid");
-      schemaPath = path.join(deps.coreWidgetsDir, type, "schema.json");
+      baseDir = deps.coreWidgetsDir;
+      widgetFolder = [type];
     } else if (type === "header" || type === "footer") {
       // Global theme widget (folder structure)
-      widgetPath = path.join(projectDir, "widgets", "global", type, "widget.liquid");
-      schemaPath = path.join(projectDir, "widgets", "global", type, "schema.json");
+      baseDir = projectDir;
+      widgetFolder = ["widgets", "global", type];
     } else {
       // Regular theme widget (folder structure)
-      widgetPath = path.join(projectDir, "widgets", type, "widget.liquid");
-      schemaPath = path.join(projectDir, "widgets", type, "schema.json");
+      baseDir = projectDir;
+      widgetFolder = ["widgets", type];
+    }
+
+    const widgetPath = await resolveInside(baseDir, ...widgetFolder, "widget.liquid");
+    const schemaPath = await resolveInside(baseDir, ...widgetFolder, "schema.json");
+    if (!widgetPath) {
+      console.warn(`Widget type escapes its allowed directory, refusing to render: ${type}`);
+      return `<div class="widget-error">Widget template not found: ${escapeHtml(type)}.liquid</div>`;
     }
 
     // Read the widget template
@@ -562,7 +1161,7 @@ async function renderWidget(
     } catch (error) {
       // If template not found, return an informative error message instead of crashing
       console.warn(`Widget template not found at ${widgetPath}. Error: ${error.message}`);
-      return `<div class="widget-error">Widget template not found: ${type}.liquid</div>`;
+      return `<div class="widget-error">Widget template not found: ${escapeHtml(type)}.liquid</div>`;
     }
 
     // Load schema from schema.json file
@@ -579,10 +1178,18 @@ async function renderWidget(
     let templateForRender = template;
 
     // Create settings with defaults (using the extracted schema)
+    const namesSiteString = (list) => Array.isArray(list) && list.some((setting) => setting?.defaultKey);
+    const wantsSiteStrings =
+      namesSiteString(schema.settings) || (Array.isArray(schema.blocks) && schema.blocks.some((b) => namesSiteString(b?.settings)));
+    // Only loaded when a schema actually asks, so a theme using none pays nothing.
+    const siteStrings = wantsSiteStrings ? await ensureSiteStrings(deps, sharedGlobals) : null;
+    const settingLanguage = sharedGlobals?.currentPageData?.language;
+    const settingDefaultLanguage = sharedGlobals?.defaultLanguage;
+
     const enhancedSettings = {};
     if (Array.isArray(schema.settings)) {
       schema.settings.forEach((setting) => {
-        enhancedSettings[setting.id] = setting.default;
+        enhancedSettings[setting.id] = settingDefault(setting, siteStrings, settingLanguage, settingDefaultLanguage);
       });
     }
     Object.assign(enhancedSettings, settings); // Override with provided settings
@@ -602,7 +1209,7 @@ async function renderWidget(
         const currentBlockSchema = blockInstance && blockInstance.type ? blockSchemas[blockInstance.type] || [] : [];
         if (Array.isArray(currentBlockSchema)) {
           currentBlockSchema.forEach((setting) => {
-            blockDefaults[setting.id] = setting.default;
+            blockDefaults[setting.id] = settingDefault(setting, siteStrings, settingLanguage, settingDefaultLanguage);
           });
         }
         enhancedBlocks[blockId] = {
@@ -642,6 +1249,28 @@ async function renderWidget(
     // and all preview, "../" when rendering inside a nested collection item page).
     const outputPathPrefix = (sharedGlobals && sharedGlobals.outputPathPrefix) || "";
 
+    // The project's Clean URLs setting picks the shape of every uuid-resolved
+    // internal link this widget emits. Ordinary pages render header/widgets
+    // before the layout loads the project row, so the engine stamps the flag
+    // itself on first use and caches it on sharedGlobals like pagesByUuid —
+    // a caller may pre-set it; a render with no shared globals gets false.
+    let cleanUrls = false;
+    if (sharedGlobals) {
+      if (sharedGlobals.cleanUrls === undefined) {
+        const projectData = await getProjectData(deps);
+        sharedGlobals.cleanUrls = !!projectData?.cleanUrls;
+      }
+      cleanUrls = sharedGlobals.cleanUrls === true;
+    }
+    const { defaultLanguage } = await languageSettings(deps, sharedGlobals);
+
+    // Breadcrumbs reach header/footer through the globals bag, so a theme can
+    // draw the trail inside the header widget as well as in the layout. Built
+    // AFTER the Clean URLs stamp above: the trail is cached on the first widget
+    // that asks for it, and every crumb href is shaped by that flag. Export
+    // callers pre-seed it, so getting this order wrong only shows up in preview.
+    const breadcrumbs = await ensureBreadcrumbs(deps, sharedGlobals);
+
     // Whether the widget (or its blocks) declares any `menu` or `link` setting.
     // Both setting types can target a collection item (collectionItemUuid), so
     // either drives loading the item uuid -> { slugPrefix, slug } map (#11 parity
@@ -678,7 +1307,16 @@ async function renderWidget(
     // shared menuResolver — the single source of truth shared with collection-item
     // rendering: depth-aware links, collection-item targets (#11), and custom-link
     // sanitization. A missing/empty value or unknown menu yields { items: [] }.
-    const menuDeps = { menuMaps, pagesByUuid, collectionItemsByUuid: collectionItemsByUuid || new Map(), outputPathPrefix };
+    const menuDeps = {
+      menuMaps,
+      pagesByUuid,
+      collectionItemsByUuid: collectionItemsByUuid || new Map(),
+      outputPathPrefix,
+      cleanUrls,
+      defaultLanguage,
+      // A menu setting holding a bare slug means THIS language's menu.
+      language: sharedGlobals?.currentPageData?.language || "",
+    };
     resolveMenuSettings(enhancedSettings, schema.settings, menuDeps);
     for (const block of Object.values(enhancedBlocks)) {
       if (block && block.type && block.settings && Array.isArray(blockSchemas[block.type])) {
@@ -693,6 +1331,8 @@ async function renderWidget(
       pagesByUuid,
       outputPathPrefix,
       collectionItemsByUuid,
+      cleanUrls,
+      defaultLanguage,
     );
 
     // Sanitize settings based on schema types (text, richtext, link, etc.)
@@ -714,6 +1354,8 @@ async function renderWidget(
       pagesByUuid,
       collectionItemsByUuid,
       outputPathPrefix,
+      cleanUrls,
+      defaultLanguage,
     });
 
     // Create widget context for template
@@ -727,9 +1369,26 @@ async function renderWidget(
     };
 
     // Merge with widget-specific context
+    const paginationPlan = sharedGlobals?.paginationPlan?.widgetId === widgetId ? sharedGlobals.paginationPlan : null;
+    // `page` and `project` match what the layout sees, so a header or footer can
+    // read them. The page comes from `sharedGlobals.currentPageData`, set once per
+    // render by the caller (a morph without it gets no `page`).
+    const currentPageData = sharedGlobals?.currentPageData;
     const renderContext = {
       ...baseContext,
+      ...(sharedGlobals ? { project: projectContextFor(getProjectData(deps), sharedGlobals) } : {}),
+      ...(currentPageData
+        ? {
+            page: pageContextFor(
+              currentPageData,
+              breadcrumbs,
+              paginationContextFor(sharedGlobals),
+              await ensureTranslations(deps, sharedGlobals, { current: currentPageData }),
+            ),
+          }
+        : {}),
       widget: widgetContext,
+      ...(paginationPlan ? { pagination: buildPaginationContext(paginationPlan, { cleanUrls, outputPathPrefix }) } : {}),
     };
 
     // Get theme snippets directory for this project
@@ -738,21 +1397,36 @@ async function renderWidget(
     // Get or create cached engine
     const engine = getOrCreateEngine(projectDir, themeSnippetsDir, deps.coreSnippetsDir);
 
+    if (paginationPlan) {
+      sharedGlobals.collectionSlice = {
+        collectionType: paginationPlan.collectionType,
+        offset: (paginationPlan.current - 1) * paginationPlan.perPage,
+        limit: paginationPlan.perPage,
+      };
+    }
+
     // Render the template
-    let rendered = await engine.parseAndRender(templateForRender, renderContext, {
-      globals: renderContext.globals,
-    });
-    return rendered;
+    try {
+      return await engine.parseAndRender(templateForRender, renderContext, {
+        globals: renderContext.globals,
+      });
+    } finally {
+      if (paginationPlan) delete sharedGlobals.collectionSlice;
+    }
   } catch (error) {
     console.error(`Error rendering widget ${widgetId} (Project: ${deps.projectId}):`, error);
     // Return a more informative error message in the HTML
-    return `<div class="widget-error" data-widget-id="${widgetId}" data-widget-type="${widgetData?.type || "unknown"}">
+    // Everything interpolated here comes from page JSON (widget id and type are
+    // author-controlled keys/values) or from an error message that can quote it.
+    // Unescaped, a type carrying a quote would break out of the data-* attribute.
+    const safeType = escapeHtml(widgetData?.type) || "unknown";
+    return `<div class="widget-error" data-widget-id="${escapeHtml(widgetId)}" data-widget-type="${safeType}">
       <p><strong>Error rendering widget!</strong></p>
-      <p>Type: ${widgetData?.type || "unknown"}</p>
-      <p>ID: ${widgetId}</p>
-      <pre style="white-space: pre-wrap; word-wrap: break-word; background-color: #fdd; padding: 5px; border: 1px solid red;">${
-        error.message
-      }\n${error.stack}</pre>
+      <p>Type: ${safeType}</p>
+      <p>ID: ${escapeHtml(widgetId)}</p>
+      <pre style="white-space: pre-wrap; word-wrap: break-word; background-color: #fdd; padding: 5px; border: 1px solid red;">${escapeHtml(
+        error.message,
+      )}\n${escapeHtml(error.stack)}</pre>
     </div>`;
   }
 }
@@ -782,14 +1456,17 @@ async function renderPageLayout(
   try {
     // 1. Fetch layout.liquid for the project
     const projectDir = deps.projectDir;
-    const layoutPath = path.join(projectDir, "layout.liquid");
+    // Fixed name, so no traversal here — but a symlinked layout.liquid would
+    // still be read and rendered, so it goes through the same guard.
+    const layoutPath = await resolveInside(projectDir, "layout.liquid");
 
     let layoutTemplate;
     try {
+      if (!layoutPath) throw new Error("layout.liquid resolves outside the project directory");
       layoutTemplate = await fs.readFile(layoutPath, "utf-8");
     } catch (readErr) {
-      console.error(`Layout template not found at ${layoutPath}`);
-      return `<html><body><h1>Error: Layout template not found</h1><pre>${readErr.message}</pre></body></html>`;
+      console.error(`Layout template not readable under ${projectDir}`);
+      return `<html><body><h1>Error: Layout template not found</h1><pre>${escapeHtml(readErr.message)}</pre></body></html>`;
     }
 
     // 2. Create context for layout render (use shared globals)
@@ -798,6 +1475,11 @@ async function renderPageLayout(
     // 3. Load project data
     const projectData = await getProjectData(deps);
 
+    // Stamp Clean URLs here too: a layout whose own filters resolve internal
+    // links (`| collection`) runs without any widget having stamped the flag.
+    // A caller-set value still wins, as it does in renderWidget.
+    if (sharedGlobals && sharedGlobals.cleanUrls === undefined) sharedGlobals.cleanUrls = !!projectData?.cleanUrls;
+
     // 4. Add page-specific context with separated content sections
     const pageSlugClass = pageData?.slug ? `page-${pageData.slug}` : "";
     // A caller may pass `bodyClass` to REPLACE the page-{slug} default (collection
@@ -805,14 +1487,22 @@ async function renderPageLayout(
     // `extraBodyClasses` always appends (e.g. the transparent-header channel).
     const baseBodyClass = contentSections.bodyClass !== undefined ? contentSections.bodyClass : pageSlugClass;
     const bodyClasses = [baseBodyClass, contentSections.extraBodyClasses || ""].filter(Boolean).join(" ");
+    const breadcrumbs = await ensureBreadcrumbs(deps, sharedGlobals);
+    const pagination = paginationContextFor(sharedGlobals);
+
     const renderContext = {
       ...baseContext,
       header: contentSections.headerContent || "",
       main_content: contentSections.mainContent || "",
       footer: contentSections.footerContent || "",
-      page: pageData,
-      project: projectData,
-      page_title: buildPageTitle(pageData, projectData),
+      page: pageContextFor(
+        pageData,
+        breadcrumbs,
+        pagination,
+        await ensureTranslations(deps, sharedGlobals, { current: pageData }),
+      ),
+      project: projectContextFor(projectData, sharedGlobals),
+      page_title: buildPageTitle(pageData, projectData, pagination?.current),
       body_class: bodyClasses,
     };
 
@@ -828,7 +1518,7 @@ async function renderPageLayout(
     return renderedHtml;
   } catch (error) {
     console.error(`Error rendering page layout for project ${deps.projectId}:`, error);
-    return `<html><body><h1>Error rendering page</h1><pre>${error.message}</pre></body></html>`;
+    return `<html><body><h1>Error rendering page</h1><pre>${escapeHtml(error.message)}</pre></body></html>`;
   }
 }
 
@@ -886,9 +1576,19 @@ async function renderCollectionItemPage(
   // present. Menu maps are engine-internal (fs-based) — load them lazily if the
   // caller didn't supply them, so prep below sees the same maps the layout will.
   if (!sharedGlobals.menuMaps) sharedGlobals.menuMaps = await loadMenuMaps(deps);
+  // Item pages have the project row in hand, so the flag is stamped here rather
+  // than lazily as renderWidget does; a caller-set value still wins.
+  if (sharedGlobals.cleanUrls === undefined) sharedGlobals.cleanUrls = !!projectData?.cleanUrls;
+  const { defaultLanguage: itemDefaultLanguage } = await languageSettings(deps, sharedGlobals);
   const menuDeps =
     sharedGlobals.menuMaps || sharedGlobals.collectionItemsByUuid
-      ? { menuMaps: sharedGlobals.menuMaps, collectionItemsByUuid: sharedGlobals.collectionItemsByUuid }
+      ? {
+          menuMaps: sharedGlobals.menuMaps,
+          collectionItemsByUuid: sharedGlobals.collectionItemsByUuid,
+          cleanUrls: sharedGlobals.cleanUrls === true,
+          defaultLanguage: itemDefaultLanguage,
+          language: item?.language || "",
+        }
       : null;
 
   // Base context first: its mode-aware media bases (imagePath/filePath) resolve
@@ -901,6 +1601,51 @@ async function renderCollectionItemPage(
     filePath: baseContext.filePath,
   });
 
+  // Seed the trail before the header renders: an item's label comes from the item,
+  // which `ensureBreadcrumbs` cannot recover from the path alone.
+  if (!sharedGlobals.breadcrumbs) {
+    if (!sharedGlobals.pagesByUuid) sharedGlobals.pagesByUuid = await loadPagesByUuid(deps);
+    if (!sharedGlobals.listingPages) {
+      sharedGlobals.listingPages = await loadListingIndex(deps, sharedGlobals.pagesByUuid);
+    }
+    const titleField = (schema.settings || []).find((setting) => setting.usedAsTitle);
+    const itemLanguage = resolveLanguage(resolvedItem.language, itemDefaultLanguage);
+    sharedGlobals.breadcrumbs = buildBreadcrumbs({
+      item: {
+        slug: resolvedItem.slug,
+        name: (titleField && resolvedItem.settings?.[titleField.id]) || resolvedItem.slug,
+        slugPrefix: schema.slugPrefix,
+        language: itemLanguage,
+      },
+      collectionType: schema.type,
+      pagesByUuid: sharedGlobals.pagesByUuid,
+      listingPages: sharedGlobals.listingPages,
+      cleanUrls: sharedGlobals.cleanUrls === true,
+      outputPathPrefix: sharedGlobals.outputPathPrefix || "",
+      language: itemLanguage,
+      defaultLanguage: itemDefaultLanguage,
+    });
+  }
+
+  // Page-shaped object drives the layout title/SEO/body class, and is the `page`
+  // the header, footer and item template all see.
+  const itemPageData = buildItemPageData(
+    schema,
+    resolvedItem,
+    siteUrl,
+    sharedGlobals.cleanUrls === true,
+    itemDefaultLanguage,
+  );
+  // An item page gets the same switcher contract a page does (§9a), keyed by the
+  // item's own translation group rather than the page's.
+  itemPageData.translations = await ensureTranslations(deps, sharedGlobals, {
+    current: item,
+    kind: "item",
+    slugPrefix: schema.slugPrefix,
+  });
+  itemPageData.dir = languageDir(itemPageData.language);
+  sharedGlobals.currentPageData = itemPageData;
+
   // Render header/footer with the item's globals so their enqueued assets are
   // captured before the layout emits them.
   let headerContent = "";
@@ -912,11 +1657,6 @@ async function renderCollectionItemPage(
     footerContent = await renderWidget(deps, "footer", footerData, rawThemeSettings, renderMode, sharedGlobals, null);
   }
 
-  // Page-shaped object drives the layout title/SEO/body class. Built BEFORE the
-  // template render so the item template receives the page/collection/project
-  // context, not just item.
-  const itemPageData = buildItemPageData(schema, resolvedItem, siteUrl);
-
   // Render the collection type's template.liquid against the item context.
   const themeSnippetsDir = path.join(deps.projectDir, "snippets");
   const engine = getOrCreateEngine(deps.projectDir, themeSnippetsDir, deps.coreSnippetsDir);
@@ -925,7 +1665,7 @@ async function renderCollectionItemPage(
     item: resolvedItem,
     collection: schema,
     page: itemPageData,
-    project: projectData,
+    project: projectContextFor(projectData, sharedGlobals),
   };
   const mainContentHtml = await engine.parseAndRender(template, itemRenderContext, {
     globals: itemRenderContext.globals,
@@ -955,21 +1695,14 @@ async function renderCollectionItemPage(
  * are included in the morph response and picked up by the preview runtime.
  */
 function renderEnqueuedAssetTags(sharedGlobals) {
-  const apiUrl = sharedGlobals.apiUrl || "";
-  const projectId = sharedGlobals.projectId || "";
-  const renderMode = sharedGlobals.renderMode || "preview";
   let output = "";
 
-  function resolveUrl(filepath, opts) {
-    if (renderMode === "publish") {
-      const version = sharedGlobals.exportVersion;
-      return version ? `assets/${filepath}?v=${version}` : `assets/${filepath}`;
-    }
-    if (opts.source === "widget" && opts.widgetType) {
-      return `${apiUrl}/api/preview/assets/${projectId}/widgets/${opts.widgetType}/${filepath}`;
-    }
-    return `${apiUrl}/api/preview/assets/${projectId}/assets/${filepath}`;
-  }
+  const resolveUrl = (filepath, opts) =>
+    buildAssetUrl(filepath, {
+      globals: sharedGlobals,
+      source: opts.source,
+      widgetType: opts.widgetType,
+    });
 
   const styles = sharedGlobals.enqueuedStyles;
   if (styles?.size > 0) {
@@ -1011,12 +1744,12 @@ async function widgetSupportsTransparentHeader(deps, widgetType) {
     const projectDir = deps.projectDir;
     const isCoreWidget = widgetType.startsWith("core-");
 
-    let schemaPath;
-    if (isCoreWidget) {
-      schemaPath = path.join(deps.coreWidgetsDir, widgetType, "schema.json");
-    } else {
-      schemaPath = path.join(projectDir, "widgets", widgetType, "schema.json");
-    }
+    // Same untrusted `type` as renderWidget — contain it here too, or this
+    // read becomes the traversal that one closes.
+    const schemaPath = isCoreWidget
+      ? await resolveInside(deps.coreWidgetsDir, widgetType, "schema.json")
+      : await resolveInside(projectDir, "widgets", widgetType, "schema.json");
+    if (!schemaPath) return false;
 
     const schemaContent = await fs.readFile(schemaPath, "utf-8");
     const schema = JSON.parse(schemaContent);
@@ -1032,4 +1765,5 @@ export {
   renderCollectionItemPage,
   renderEnqueuedAssetTags,
   widgetSupportsTransparentHeader,
+  planPagination,
 };

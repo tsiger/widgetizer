@@ -1,16 +1,7 @@
 import { useState, useEffect, useRef } from "react";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import {
-  Trash2,
-  Pencil,
-  FolderOpen,
-  CirclePlus,
-  Copy,
-  Download,
-  MoreVertical,
-  Check,
-} from "lucide-react";
+import { Trash2, FolderOpen, CirclePlus, Copy, Download, MoreVertical, Check } from "lucide-react";
 
 import PageLayout from "@widgetizer/editor-ui/components/layout/PageLayout.jsx";
 import LoadingSpinner from "@widgetizer/editor-ui/components/ui/LoadingSpinner.jsx";
@@ -71,9 +62,18 @@ export default function Projects() {
 
   const handleDelete = async (data) => {
     try {
-      await deleteProject(data.projectId);
+      const result = await deleteProject(data.projectId);
       await loadProjects();
-      showToast(t("projects.toasts.deleteSuccess", { name: data.projectName }), "success");
+      if (result?.folderLeftBehind) {
+        showToast(
+          t("projects.toasts.deleteFolderLeftBehind", { name: data.projectName, path: result.folderLeftBehind }),
+          "warning",
+          // Stays until dismissed: it names a folder the user may want to find.
+          { duration: null },
+        );
+      } else {
+        showToast(t("projects.toasts.deleteSuccess", { name: data.projectName }), "success");
+      }
     } catch (error) {
       console.error("Failed to delete project:", error);
       showToast(t("projects.toasts.deleteError"), "error");
@@ -133,6 +133,9 @@ export default function Projects() {
       cancelText: t("projects.deleteModal.cancel"),
       variant: "danger",
       data: { projectId: id, projectName: name },
+      // Opened from the row menu, which closes on the same click — hand focus
+      // back to its trigger, not to the menu item that is about to unmount.
+      returnFocusTo: menuRef.current?.querySelector('[aria-haspopup="menu"]'),
     });
   };
 
@@ -279,12 +282,13 @@ export default function Projects() {
                       title={project.name}
                     >
                       <div className="min-w-0 flex-1">
-                        <div className="flex items-start gap-2">
+                        <div className="flex items-baseline gap-2">
                           <span className="block min-w-0 break-words font-semibold">{project.name}</span>
                           {showActiveBadge && (
                             <Badge
                               variant="success"
-                              className="inline-flex shrink-0 whitespace-nowrap px-3 py-0.5 text-[11px] font-semibold"
+                              size="sm"
+                              className="inline-flex shrink-0 items-center whitespace-nowrap"
                             >
                               {t("projects.badges.active")}
                             </Badge>
@@ -297,21 +301,23 @@ export default function Projects() {
                     <div className="flex flex-wrap items-center gap-2">
                       <div className="flex items-baseline gap-1.5 text-slate-600" title={themeLabel}>
                         <span className="text-sm">{themeLabel}</span>
-                        {project.themeVersion && <span className="shrink-0 text-xs text-slate-400">v{project.themeVersion}</span>}
+                        {project.themeVersion && (
+                          <span className="shrink-0 text-xs text-slate-400">v{project.themeVersion}</span>
+                        )}
                       </div>
                       {hasThemeUpdate && (
-                        <Link
-                          to={`/projects/edit/${project.id}`}
-                          className="inline-flex shrink-0 items-center whitespace-nowrap rounded-full border border-pink-200 bg-pink-50 px-2.5 py-0.5 text-xs font-semibold text-pink-700 transition-colors hover:border-pink-300 hover:bg-pink-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pink-500 focus-visible:ring-offset-2"
-                        >
+                        <span className="inline-flex shrink-0 items-center whitespace-nowrap rounded-full border border-pink-200 bg-pink-50 px-2.5 py-0.5 text-xs font-semibold text-pink-700">
                           {t("projects.badges.updateAvailable", "Update available")}
-                        </Link>
+                        </span>
                       )}
                     </div>
                   </td>
                   <td className="py-3 px-4 whitespace-nowrap text-slate-600">{formatDate(project.updated)}</td>
                   <td className="py-3 px-4 text-right">
-                    <div className="relative inline-flex items-center justify-end gap-1.5" ref={openMenuId === project.id ? menuRef : null}>
+                    <div
+                      className="relative inline-flex items-center justify-end gap-1.5"
+                      ref={openMenuId === project.id ? menuRef : null}
+                    >
                       <IconButton
                         onClick={(e) => toggleMenu(project.id, e)}
                         variant="neutral"
@@ -330,7 +336,7 @@ export default function Projects() {
 
                       {openMenuId === project.id && (
                         <div
-                          className={`absolute right-0 z-10 ${hasThemeUpdate ? "w-80" : "w-64"} rounded-md border border-slate-200 bg-white py-1 shadow-lg ${
+                          className={`absolute right-0 z-10 w-64 rounded-md border border-slate-200 bg-white py-1 shadow-lg ${
                             menuDirection === "up" ? "bottom-full mb-1" : "top-full mt-1"
                           }`}
                         >
@@ -359,21 +365,6 @@ export default function Projects() {
                             </button>
                           )}
                           <div className="my-1 border-t border-slate-200" />
-                          <Link
-                            to={`/projects/edit/${project.id}`}
-                            onClick={() => setOpenMenuId(null)}
-                            className={`${menuButtonClass} justify-between text-slate-700 hover:bg-slate-50`}
-                          >
-                            <span className="inline-flex items-center gap-2">
-                              <Pencil size={14} className="shrink-0" />
-                              <span>{t("projects.actions.editDetails", "Edit project details")}</span>
-                            </span>
-                            {hasThemeUpdate && (
-                              <span className="shrink-0 rounded-full border border-pink-200 bg-pink-50 px-2 py-0.5 text-[11px] font-semibold leading-none text-pink-700">
-                                {t("projects.badges.updateAvailable", "Update available")}
-                              </span>
-                            )}
-                          </Link>
                           <button
                             type="button"
                             onClick={() => {
@@ -395,7 +386,9 @@ export default function Projects() {
                             className={`${menuButtonClass} text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-white`}
                           >
                             <Download size={14} />
-                            {isExporting ? t("projects.actions.exporting", "Downloading...") : t("projects.actions.export")}
+                            {isExporting
+                              ? t("projects.actions.exporting", "Downloading...")
+                              : t("projects.actions.export")}
                           </button>
                           <div className="my-1 border-t border-slate-200" />
                           <button

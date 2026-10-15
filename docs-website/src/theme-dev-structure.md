@@ -155,7 +155,7 @@ If you want to understand a real theme, open these files in order:
 3. `themes/arch/assets/base.css`: shared tokens, utility classes, color schemes, spacing, buttons, forms, and layout primitives.
 4. `themes/arch/widgets/`: the widget library. Each widget has a `schema.json` for the editor and a `widget.liquid` template for rendering.
 5. `themes/arch/templates/`: default page structures and global header/footer widget instances.
-6. `themes/arch/presets/`: starter sites built from the same theme. A preset can override settings, templates, menus, collection items, and starter media.
+6. `themes/arch/presets/`: starter sites built from the same theme. A preset can override settings, templates, menus, collection items, and starter media. For your own theme, ship a preset's starter images inside the preset folder (`presets/<id>/media/` with `images/` and a `manifest.json`). Arch itself keeps its images in a theme-root `preset-media/<id>/` pool instead — same inner layout, used for themes with many media-heavy presets so the images stay out of theme updates. If you use the pool: never rename or delete a file in a later version, only add.
 7. `themes/arch/collection-types/`: theme-owned CMS types such as News, Projects, Services, and development/demo types.
 8. `themes/arch/snippets/` and `themes/arch/assets/icons.json`: shared Liquid helpers and icon data.
 9. `themes/arch/locales/`: translatable labels for theme settings, widget schemas, and editor UI text.

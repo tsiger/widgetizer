@@ -1,0 +1,91 @@
+{% comment %}
+  Business details from Project details: address, phone, email and opening hours.
+  Usage: {% render 'business-details', identity: project.identity, show_address: true, show_contact: true, show_hours: true %}
+{% endcomment %}
+
+{%- assign has_address = false -%}
+{%- if show_address and identity.address -%}
+  {%- assign has_address = true -%}
+{%- endif -%}
+
+{%- assign has_contact = false -%}
+{%- if show_contact -%}
+  {%- if identity.telephone != blank or identity.email != blank -%}
+    {%- assign has_contact = true -%}
+  {%- endif -%}
+{%- endif -%}
+
+{%- assign has_hours = false -%}
+{%- if show_hours and identity.openingHours.size > 0 -%}
+  {%- assign has_hours = true -%}
+{%- endif -%}
+
+{%- if has_address or has_contact or has_hours -%}
+  <div class="business-details w-body t-sm">
+    {%- if has_address -%}
+      {%- assign address = identity.address -%}
+      <address class="business-details-address">
+        {%- if address.label != blank -%}
+          <span class="business-details-label">{{ address.label }}</span><br>
+        {%- endif -%}
+        {%- if address.streetAddress != blank -%}
+          {{ address.streetAddress }}<br>
+        {%- endif -%}
+        {%- if address.postalCode != blank or address.addressLocality != blank -%}
+          {{ address.postalCode }}{% if address.postalCode != blank and address.addressLocality != blank %} {% endif %}{{ address.addressLocality }}<br>
+        {%- endif -%}
+        {%- if address.addressRegion != blank -%}
+          {{ address.addressRegion }}{% if address.addressCountry != blank %}, {% endif %}
+        {%- endif -%}
+        {{ address.addressCountry }}
+      </address>
+    {%- endif -%}
+
+    {%- if has_contact -%}
+      <p class="business-details-contact">
+        {%- if identity.telephone != blank -%}
+          <a href="{{ identity.telephoneHref | safe_url }}">{{ identity.telephone }}</a>
+        {%- endif -%}
+        {%- if identity.telephone != blank and identity.email != blank -%}<br>{%- endif -%}
+        {%- if identity.email != blank -%}
+          {%- assign email_href = 'mailto:' | append: identity.email -%}
+          <a href="{{ email_href | safe_url }}">{{ identity.email }}</a>
+        {%- endif -%}
+      </p>
+    {%- endif -%}
+
+    {%- if has_hours -%}
+      {%- assign day_ids = 'monday,tuesday,wednesday,thursday,friday,saturday,sunday' | split: ',' -%}
+      {%- comment -%} Captured unescaped; each name is escaped once where it is printed. {%- endcomment -%}
+      {%- capture day_names -%}
+        {{- 'site.business_details.days.monday' | t | raw }}|{{ 'site.business_details.days.tuesday' | t | raw }}|{{ 'site.business_details.days.wednesday' | t | raw }}|{{ 'site.business_details.days.thursday' | t | raw }}|{{ 'site.business_details.days.friday' | t | raw }}|{{ 'site.business_details.days.saturday' | t | raw }}|{{ 'site.business_details.days.sunday' | t | raw -}}
+      {%- endcapture -%}
+      {%- assign day_names = day_names | split: '|' -%}
+      <dl class="business-details-hours">
+        {%- for run in identity.openingHours -%}
+          {%- for day in day_ids -%}
+            {%- if day == run.firstDay -%}{%- assign first_day = day_names[forloop.index0] -%}{%- endif -%}
+            {%- if day == run.lastDay -%}{%- assign last_day = day_names[forloop.index0] -%}{%- endif -%}
+          {%- endfor -%}
+          <div class="business-details-hours-row">
+            <dt>
+              {{- first_day -}}
+              {%- if run.lastDay != run.firstDay %}–{{ last_day }}{% endif -%}
+            </dt>
+            <dd>
+              {%- if run.closed -%}
+                {{ 'site.business_details.closed' | t }}
+              {%- else -%}
+                {%- for range in run.ranges -%}
+                  {{ range.opens }}–{{ range.closes }}{% unless forloop.last %}, {% endunless %}
+                {%- endfor -%}
+              {%- endif -%}
+            </dd>
+          </div>
+        {%- endfor -%}
+      </dl>
+    {%- endif -%}
+  </div>
+{%- elsif renderMode == 'preview' -%}
+  <p class="business-details-empty-hint w-meta t-sm t-muted">Add your business details in Project details</p>
+{%- endif -%}

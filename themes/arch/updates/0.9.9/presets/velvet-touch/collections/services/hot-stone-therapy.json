@@ -1,0 +1,13 @@
+{
+  "slug": "hot-stone-therapy",
+  "schemaVersion": 1,
+  "settings": {
+    "title": "Hot Stone Therapy",
+    "icon": "sun",
+    "summary": "Warm basalt stones combined with massage to melt tension from tired muscles.",
+    "description": "<p>Smooth basalt stones are heated in water and placed along the back, then used as an extension of your therapist's hands. The warmth reaches deeper than fingers alone, so tight areas soften with less pressure and the whole body settles more quickly.</p><h2>During your session</h2><p>We begin by resting the warm stones along the spine and shoulders to let the heat sink in, then move into slower strokes that follow the muscle. The room stays dim and quiet throughout, and we adjust the stone temperature to what feels right for you at every stage.</p><ul><li>Heated basalt stones placed along the back and shoulders</li><li>Slow, warming massage strokes using the stones and hands</li><li>Temperature and pressure adjusted to your comfort</li></ul><p>A typical session runs around an hour. If at any point a stone feels too warm or the pressure too firm, a word is enough and we will change it; nothing about this treatment should feel like you are gritting your teeth through it.</p><h3>Who it suits</h3><p>It is a good fit for anyone who feels the cold, holds stiffness across the shoulders, or finds ordinary deep work a little too intense. The heat does much of the loosening, so the experience stays gentle even on stubborn knots.</p><p>One thing worth knowing: heat is not suitable in some cases, such as during pregnancy or with certain circulation conditions, so let us know your health history when you book. Afterwards, drink some water and give yourself a slow start before rushing off.</p>",
+    "price": "$120",
+    "duration": "75 min",
+    "featured_image": "/uploads/images/velvet-touch-services-hot-stone-therapy.webp"
+  }
+}

@@ -37,7 +37,7 @@
           "type": "text",
           "settings": {
             "text": "<p>$3,200,000</p>",
-            "size": "2xl"
+            "size": "lg"
           }
         }
       },
@@ -54,7 +54,6 @@
         "title": "",
         "description": "",
         "heading_alignment": "center",
-        "display_header": false,
         "layout": "grid",
         "columns_desktop": 4,
         "card_layout": "flat",
@@ -163,7 +162,6 @@
         "title": "Gallery",
         "description": "",
         "heading_alignment": "start",
-        "display_header": true,
         "layout": "grid",
         "columns_desktop": 3,
         "staggered": false,
@@ -231,14 +229,13 @@
         "title": "What Makes This Home",
         "description": "",
         "heading_alignment": "start",
-        "display_header": true,
         "layout": "grid",
         "columns_desktop": 3,
         "card_layout": "flat",
         "alignment": "start",
         "icon_style": "outline",
         "icon_size": "lg",
-        "icon_shape": "square-rounded",
+        "icon_shape": "rounded",
         "color_scheme": "standard-secondary"
       },
       "blocks": {

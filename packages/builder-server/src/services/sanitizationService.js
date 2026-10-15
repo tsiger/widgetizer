@@ -1,16 +1,39 @@
 import DOMPurify from "isomorphic-dompurify";
 import { sanitizeHref } from "@widgetizer/core/urlSafety";
 
+// Two passes settle every case seen so far; the cap only bounds crafted input.
+const MAX_STRIP_PASSES = 5;
+
+function stripHtmlOnce(value) {
+  // Escaping `&` first is what keeps this faithful: the parser decodes entities, so
+  // without it `?a=1&copy=2` would come back as `?a=1©=2` and a typed `&lt;b&gt;`
+  // would turn into a real `<b>`. Escaped first, entities in the input survive as the
+  // literal text they were, while actual tags are still parsed and stripped.
+  return DOMPurify.sanitize(value.replaceAll("&", "&amp;"), { ALLOWED_TAGS: [], RETURN_DOM_FRAGMENT: true })
+    .textContent;
+}
+
 /**
- * Strip all HTML tags from a string, keeping only the text content.
- * Used for plain-text fields (names, descriptions) to prevent stored XSS
- * without encoding special characters like & or ".
+ * Strip all HTML tags and return the plain text, with `&`, `<` and `>` kept as typed.
+ * Every plain-text field (names, descriptions, SEO text, menu labels, canonical URLs) goes
+ * through this, on the route validator and again in the controller — so the result must be
+ * one that sanitizing again cannot change.
  * @param {string} value - The input string
- * @returns {string} Text with all HTML tags removed
+ * @returns {string} Plain text with all HTML tags removed, stable under repeated passes
  */
-export function stripHtmlTags(value) {
+export function stripHtmlToText(value) {
   if (typeof value !== "string") return value;
-  return DOMPurify.sanitize(value, { ALLOWED_TAGS: [] });
+  // Sanitize to a fixed point. Removing a tag can splice its neighbours into NEW markup
+  // (`Use <<b>name</b>> here` -> `Use <name> here`), so one pass is not stable — and every
+  // field here is sanitized twice (route validator, then controller) and again on each save.
+  let text = value;
+  for (let pass = 0; pass < MAX_STRIP_PASSES; pass++) {
+    const next = stripHtmlOnce(text);
+    if (next === text) return text;
+    text = next;
+  }
+  // Pathological input that never settles: drop the angle brackets so no tag can form.
+  return text.replaceAll("<", "").replaceAll(">", "");
 }
 
 // Safe inline formatting tags/attrs produced by the Tiptap editor. Headings and `<img>`
@@ -85,8 +108,8 @@ function sanitizeLink(linkObj) {
 // `<img src="...">` with the value's basename UNescaped (src/core/tags/imageTag.js), so any
 // quote, `<`, `>`, whitespace, backslash, `:` or control char must never survive — otherwise a
 // value like `/uploads/images/x" onerror="alert(1).jpg` breaks out of the src attribute (XSS).
-// Upload filenames are `slugify(strict)` → `[a-z0-9-]` + extension, so this never blanks a real
-// upload; it also covers theme asset paths like `/assets/logo.svg`.
+// Upload filenames go through `normalizeUploadName` → `[a-z0-9-]` + a lower-case extension, so
+// this never blanks a real upload; it also covers theme asset paths like `/assets/logo.svg`.
 const SAFE_IMAGE_PATH_RE = /^\/[A-Za-z0-9._/-]+$/;
 
 /**
@@ -128,6 +151,21 @@ export function sanitizeImageSettingValue(value) {
   if (typeof value !== "string") return "";
   const v = value.trim();
   return isSafeImagePath(v) ? v : "";
+}
+
+const VIDEO_UPLOAD_PATH_RE = /^\/uploads\/files\/[A-Za-z0-9._-]+\.mp4$/i;
+
+/**
+ * Sanitize a `video` setting value: an MP4 in the project's file uploads, or "". Anything
+ * else (an external URL, another file type, a non-string, a resolved preview URL) is blanked,
+ * so templates can build the playable URL from the basename without re-checking it.
+ * @param {*} value
+ * @returns {string}
+ */
+export function sanitizeVideoPath(value) {
+  if (typeof value !== "string") return "";
+  const v = value.trim();
+  return VIDEO_UPLOAD_PATH_RE.test(v) && !v.includes("..") ? v : "";
 }
 
 /**
@@ -224,6 +262,7 @@ function sanitizeSettingValue(value, setting) {
   // so an image setting is always a safe string ("" or a valid path) everywhere.
   if (type === "gallery") return sanitizeGalleryValue(value);
   if (type === "image") return sanitizeImageSettingValue(value);
+  if (type === "video") return sanitizeVideoPath(value);
   if (type === "date") return sanitizeDateValue(value);
   if (value == null) return value;
 
@@ -327,7 +366,7 @@ function validateFontPicker(value) {
  * @param {object} schema - The full schema item (type, default, min, max, options, etc.)
  * @returns {{ value: *, corrected: boolean }} Validated/sanitized value and whether it was corrected
  */
-function sanitizeThemeSettingValue(value, schema) {
+export function sanitizeThemeSettingValue(value, schema) {
   // gallery is handled before the null guard so a null/undefined value still
   // normalizes to [] (parity with the widget/collection sanitizer).
   if (schema.type === "gallery") {
@@ -345,6 +384,15 @@ function sanitizeThemeSettingValue(value, schema) {
     else if (typeof value === "string" && value.trim() === "") img = "";
     else img = sanitizeImageSettingValue(schema.default);
     return { value: img, corrected: JSON.stringify(img) !== JSON.stringify(value) };
+  }
+  // Same fallback rules as image: keep a valid path or an explicit clear, else use the default.
+  if (schema.type === "video") {
+    const cleaned = sanitizeVideoPath(value);
+    let video;
+    if (cleaned !== "") video = cleaned;
+    else if (typeof value === "string" && value.trim() === "") video = "";
+    else video = sanitizeVideoPath(schema.default);
+    return { value: video, corrected: JSON.stringify(video) !== JSON.stringify(value) };
   }
   if (value === undefined || value === null) return { value, corrected: false };
 
@@ -390,7 +438,6 @@ function sanitizeThemeSettingValue(value, schema) {
     case "date":
       sanitized = sanitizeDateValue(value);
       break;
-    case "video":
     case "audio":
     case "icon":
     case "menu":

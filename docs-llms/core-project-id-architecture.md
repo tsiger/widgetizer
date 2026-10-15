@@ -25,8 +25,8 @@ The identity model is the foundation for the **scope-first** backend: every stor
 
 ### 2. Mutable filesystem path (Project FolderName)
 
-- Derived from the project name via the shared slug helpers (`generateUniqueSlug()` / `sanitizeSlug()` in `packages/builder-server/src/utils/slugHelpers.js`).
-- Changes when a project is renamed.
+- Derived from the project name at creation via the shared slug helpers (`generateUniqueSlug()` / `sanitizeSlug()` in `packages/builder-server/src/utils/slugHelpers.js`).
+- Independent of the title afterwards: renaming the project never moves it. It changes only when an update sends a new `folderName` (the form's folder name field is currently hidden, see [core-projects.md](core-projects.md)).
 - Stored as `project.folderName` in the SQLite `projects` table.
 - Used for directory names (`data/projects/{folderName}/`) and the `folderName` field of every `scope`.
 
@@ -126,10 +126,11 @@ Project resolution errors are centralized in `packages/builder-server/src/utils/
 
 Renaming is a directory move plus a metadata update — the UUID is untouched. In `projectController.updateProject()`:
 
-1. The new folderName is validated (`/^[a-z0-9-]+$/`) and checked for uniqueness against other projects (`projectRepo.projectFolderExists`).
-2. The directory is moved old → new. For Windows compatibility this is `fs.copy(oldDir, newDir)` then `fs.remove(oldDir)` (with cleanup of `newDir` if the remove fails), not `fs.rename`.
-3. `projectRepo.updateProject()` writes the new `folderName` to SQLite.
-4. The Project ID stays the same, so API routes, frontend URLs, and metadata references keep working.
+1. The new folderName is validated (`/^[a-z0-9-]+$/`) and must be free both in SQLite (`projectRepo.projectFolderExists`) and on disk, so a folder a failed deletion left behind is never reused. Every other check that can refuse the request runs before anything moves.
+2. `fs.copy(oldDir, newDir)` (copy + remove rather than `fs.rename`, for Windows). A failed copy attempts to remove only the copy; a cleanup failure is logged and can leave it on disk.
+3. `projectRepo.updateProject()` points the row at the new `folderName`. If that write fails, the same best-effort removal of the copy runs and the old folder stays the project.
+4. `fs.remove(oldDir)`. Once the row names the copy, the copy is never removed; an old folder that cannot be fully removed (a locked file) is returned as `folderLeftBehind` and the UI warns.
+5. The Project ID stays the same, so API routes, frontend URLs, and metadata references keep working.
 
 `duplicateProject()` and `importProject()` follow the same shape but generate a **new** UUID and a fresh unique folderName.
 
@@ -154,7 +155,7 @@ Bundles land at `data/publish/{folderName}-v{version}/`. The export read-back gu
 
 - **"Project not found"** — confirm the UUID exists in the SQLite `projects` table and the directory exists under the resolved folderName. Resolution failures surface as 404/500 (via `projectErrors.js`), never a silent fallback.
 - **Wrong directory / path errors** — for `projectDir`-based operations (render readers, lifecycle dir ops), confirm `getProjectFolderName()` resolved the expected folderName; everywhere else, the adapter owns the path, so check `req.scope.folderName`.
-- **FolderName conflicts** — `generateUniqueSlug()` appends a numeric suffix to guarantee uniqueness; rename/create both validate the `/^[a-z0-9-]+$/` format and check `projectFolderExists`.
+- **FolderName conflicts** — `generateUniqueSlug()` appends a numeric suffix to guarantee uniqueness; create, import, duplicate and rename all treat a folder name as taken if SQLite (`projectFolderExists`) or the disk has it, and rename validates the `/^[a-z0-9-]+$/` format.
 
 ## See also
 

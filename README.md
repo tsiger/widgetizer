@@ -20,7 +20,7 @@
 - **Hybrid Storage** - SQLite keeps project metadata reliable while pages, menus, themes, and uploads stay portable on disk
 - **Media Pipeline** - Upload once, get optimized image variants, metadata editing, and usage tracking built in
 - **Static Export** - Ship secure, high-performance static sites with clean output and no runtime dependency
-- **Desktop App** - Run Widgetizer as a native Electron app on Windows and macOS
+- **Desktop App** - Run Widgetizer Desktop, the native Electron app, on Windows and macOS
 
 ## Download
 

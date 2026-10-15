@@ -1,0 +1,165 @@
+{% enqueue_script src: "countdown.js", defer: true, theme: true %}
+<section
+  id="{{ widget.id }}"
+  class="widget widget-countdown widget-{{ widget.id }} color-scheme-{{ widget.settings.color_scheme }}{% if widget.settings.heading_alignment == 'start' %} widget-heading-align-left{% endif %}{% if widget.settings.top_spacing != 'auto' %} spacing-top-{{ widget.settings.top_spacing }}{% endif %}{% if widget.settings.bottom_spacing != 'auto' %} spacing-bottom-{{ widget.settings.bottom_spacing }}{% endif %}"
+  {% unless widget.settings.color_scheme == 'standard-primary' %}
+    style="--widget-bg-color: var(--bg-primary);"
+  {% endunless %}
+  data-widget-id="{{ widget.id }}"
+  data-widget-type="countdown"
+  {% if widget.index != null %}data-widget-index="{{ widget.index }}"{% endif %}
+>
+  <style>
+    .widget-{{ widget.id }} {
+      & .countdown-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+      }
+
+      & .countdown-unit {
+        min-width: 80px;
+      }
+
+      /* Cards style */
+      & .style-cards .countdown-unit {
+        background: var(--bg-primary);
+        border: var(--border-width-thin) solid var(--border-color);
+        border-radius: var(--radius-lg);
+        padding: var(--space-lg);
+      }
+
+      &.color-scheme-standard-secondary,
+      &.color-scheme-highlight-secondary {
+        & .style-cards .countdown-unit {
+          background: var(--bg-secondary);
+        }
+      }
+
+      /* Minimal style */
+      &.style-minimal .countdown-number {
+        font-size: calc(var(--font-size-5xl) * var(--heading-scale));
+      }
+
+      &.style-minimal .countdown-separator {
+        padding-block-start: var(--space-md);
+      }
+
+      & .countdown-text {
+        margin-block-start: var(--space-lg);
+      }
+
+      & .countdown-button {
+        margin-block-start: var(--space-md);
+      }
+
+      &.widget-heading-align-left .countdown-container {
+        align-items: flex-start;
+        text-align: start;
+      }
+
+      &.widget-heading-align-left.style-minimal .countdown-separator {
+        align-self: center;
+      }
+
+      @media (max-width: 749px) {
+        & .countdown-unit {
+          min-width: 60px;
+        }
+
+        &.style-cards .countdown-unit {
+          padding: var(--space-md);
+        }
+
+        &.style-minimal .countdown-number {
+          font-size: calc(var(--font-size-3xl) * var(--heading-scale));
+        }
+      }
+    }
+  </style>
+
+  <div class="widget-container {% unless widget.settings.color_scheme == 'standard-primary' %}widget-container-padded{% endunless %}">
+    {% if widget.settings.title != blank or widget.settings.description != blank or widget.settings.eyebrow != blank %}
+      <div class="widget-header{% if widget.settings.heading_alignment == 'start' %} widget-header--align-start{% endif %}">
+        {% assign header_delay = 0 %}
+        {% if widget.settings.eyebrow != blank %}
+          <span class="w-eyebrow{% if widget.settings.eyebrow_uppercase %} t-uppercase{% endif %} reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
+          {% assign header_delay = header_delay | plus: 1 %}
+        {% endif %}
+        {% if widget.settings.title != blank %}
+          {% if widget.index == 1 %}
+            <h1 class="w-headline reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="title">{{ widget.settings.title }}</h1>
+          {% else %}
+            <h2 class="w-headline reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="title">{{ widget.settings.title }}</h2>
+          {% endif %}
+          {% assign header_delay = header_delay | plus: 1 %}
+        {% endif %}
+        {% if widget.settings.description != blank %}
+          <p class="w-description reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="description">{{ widget.settings.description }}</p>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <div class="widget-content style-{{ widget.settings.style }}">
+      <div class="countdown-container">
+        <div
+          class="countdown-timer reveal reveal-scale"
+          data-target="{{ widget.settings.target_date }}"
+          data-expired-message="{{ widget.settings.expired_message }}"
+          data-show-seconds="{{ widget.settings.show_seconds }}"
+          data-style="{{ widget.settings.style }}"
+        >
+          <div class="countdown-unit">
+            <span class="countdown-number" data-unit="days">00</span>
+            <span class="countdown-label w-meta t-sm">Days</span>
+          </div>
+          {% if widget.settings.style == 'minimal' -%}
+            <span class="countdown-separator t-4xl t-muted">:</span>
+          {%- endif %}
+          <div class="countdown-unit">
+            <span class="countdown-number" data-unit="hours">00</span>
+            <span class="countdown-label w-meta t-sm">Hours</span>
+          </div>
+          {% if widget.settings.style == 'minimal' -%}
+            <span class="countdown-separator t-4xl t-muted">:</span>
+          {%- endif %}
+          <div class="countdown-unit">
+            <span class="countdown-number" data-unit="minutes">00</span>
+            <span class="countdown-label w-meta t-sm">Minutes</span>
+          </div>
+          {% if widget.settings.show_seconds %}
+            {% if widget.settings.style == 'minimal' -%}
+              <span class="countdown-separator t-4xl t-muted">:</span>
+            {%- endif %}
+            <div class="countdown-unit">
+              <span class="countdown-number" data-unit="seconds">00</span>
+              <span class="countdown-label w-meta t-sm">Seconds</span>
+            </div>
+          {% endif %}
+        </div>
+
+        {% unless widget.settings.text | rte_blank %}
+          <div class="countdown-text w-body w-rte t-base reveal reveal-up">
+            {{ widget.settings.text | raw }}
+          </div>
+        {% endunless %}
+
+        {% if widget.settings.button.text != blank %}
+          <div class="countdown-button">
+            <a
+              href="{{ widget.settings.button.href }}"
+              class="widget-button"
+              data-setting="button"
+              {% if widget.settings.button.target == '_blank' %}
+                target="_blank" rel="noopener"
+              {% endif %}
+            >
+              {{ widget.settings.button.text }}
+            </a>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>

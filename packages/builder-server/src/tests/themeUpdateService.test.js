@@ -47,6 +47,7 @@ const { buildLatestSnapshot, invalidateThemeSourceCache } = await import("../con
 const { checkForUpdates, applyThemeUpdate, mergeThemeSettings, toggleThemeUpdates } =
   await import("../services/themeUpdateService.js");
 const { closeDb } = await import("../db/index.js");
+const { withContentWriteLock } = await import("../services/contentCoordination.js");
 
 // ============================================================================
 // Test constants
@@ -595,7 +596,8 @@ describe("applyThemeUpdate", () => {
     const banner = media.files.find((file) => file.filename === "banner.png");
 
     assert.deepEqual(photo.usedIn, ["global:theme-settings"]);
-    assert.deepEqual(banner.usedIn, ["gallery"]);
+    const galleryPage = await fs.readJSON(path.join(getProjectDir(PROJECT_FOLDER), "pages", "gallery.json"));
+    assert.deepEqual(banner.usedIn, [`page:${galleryPage.uuid}`]);
   });
 
   it("updates project metadata in the projects table", async () => {
@@ -676,6 +678,81 @@ describe("mergeThemeSettings", () => {
 
     const accent = merged.settings.colors.find((s) => s.id === "accent");
     assert.equal(accent.value, "#green", "New setting should use default");
+  });
+
+  it("keeps the owner's value for a setting the update moved to another group", () => {
+    const userTheme = {
+      version: "1.0.0",
+      settings: { global: { advanced: [{ id: "custom_css", type: "code", value: "a{}" }] } },
+    };
+    const newTheme = {
+      version: "1.1.0",
+      settings: { global: { advanced: [], code: [{ id: "custom_css", type: "code", default: "" }] } },
+    };
+
+    const merged = mergeThemeSettings(userTheme, newTheme);
+    assert.equal(merged.settings.global.code[0].value, "a{}");
+  });
+
+  it("keeps a moved setting's saved value over a value the new schema ships, however falsy", () => {
+    for (const saved of ["", false, 0, null, "OWNER"]) {
+      const userTheme = { settings: { global: { advanced: [{ id: "x", type: "text", value: saved }] } } };
+      const newTheme = { settings: { global: { advanced: [], general: [{ id: "x", type: "text", value: "AUTHOR" }] } } };
+      assert.equal(mergeThemeSettings(userTheme, newTheme).settings.global.general[0].value, saved);
+    }
+  });
+
+  it("is not fooled by a header that shares the moved setting's id", () => {
+    const userTheme = {
+      settings: {
+        global: {
+          advanced: [{ id: "custom_css", type: "code", value: "OWNER" }],
+          code: [{ id: "custom_css", type: "header", content: "Code" }],
+        },
+      },
+    };
+    const newTheme = { settings: { global: { code: [{ id: "custom_css", type: "code", default: "" }] } } };
+    assert.equal(mergeThemeSettings(userTheme, newTheme).settings.global.code[0].value, "OWNER");
+  });
+
+  it("does not guess when the moved id was repeated in the old file", () => {
+    const userTheme = {
+      settings: { global: { a: [{ id: "x", type: "text", value: "A" }], b: [{ id: "x", type: "text", value: "B" }] } },
+    };
+    const newTheme = { settings: { global: { c: [{ id: "x", type: "text", default: "D" }] } } };
+    assert.equal(mergeThemeSettings(userTheme, newTheme).settings.global.c[0].value, undefined);
+  });
+
+  it("leaves both inputs untouched, so one new schema can serve several projects", () => {
+    const newTheme = { settings: { global: { advanced: [], code: [{ id: "custom_css", type: "code", default: "" }] } } };
+    const schemaBefore = JSON.stringify(newTheme);
+    const owner = (css) => ({ settings: { global: { advanced: [{ id: "custom_css", type: "code", value: css }], code: [] } } });
+    const ownerA = owner("A");
+    const ownerABefore = JSON.stringify(ownerA);
+
+    assert.equal(mergeThemeSettings(ownerA, newTheme).settings.global.code[0].value, "A");
+    assert.equal(mergeThemeSettings(owner("B"), newTheme).settings.global.code[0].value, "B");
+    assert.equal(JSON.stringify(newTheme), schemaBefore);
+    assert.equal(JSON.stringify(ownerA), ownerABefore);
+  });
+
+  it("does not resurrect a default the new schema removed", () => {
+    // The merged item starts as a copy of the NEW schema item, so a `default`
+    // the theme author removed must stay removed even when the user's stored
+    // copy still carries one (only the user's `value` is preserved).
+    const userTheme = {
+      version: "1.0.0",
+      settings: { colors: [{ id: "primary", value: "#custom", default: "#old-default" }] },
+    };
+    const newTheme = {
+      version: "1.1.0",
+      settings: { colors: [{ id: "primary", value: "#new" }] },
+    };
+
+    const merged = mergeThemeSettings(userTheme, newTheme);
+    const primary = merged.settings.colors.find((s) => s.id === "primary");
+    assert.equal(primary.value, "#custom", "User value should be preserved");
+    assert.equal("default" in primary, false, "Removed default must not be resurrected");
   });
 
   it("drops settings removed by theme author", () => {
@@ -774,5 +851,49 @@ describe("toggleThemeUpdates", () => {
         return true;
       },
     );
+  });
+});
+
+// ============================================================================
+// An update and a theme-settings save take turns
+// ============================================================================
+
+describe("applyThemeUpdate and concurrent content writes", () => {
+  beforeEach(async () => {
+    closeDb();
+    await fs.remove(TEST_DATA_DIR);
+    await fs.remove(TEST_THEMES_DIR);
+    invalidateThemeSourceCache();
+  });
+
+  // The update reads and merges theme.json while preparing, and writes the merge
+  // in its swap. A save landing in between used to be overwritten by the swap.
+  it("holds the content-write section, so a save started mid-update lands on top of it", async () => {
+    await createTheme("1.0.0", { updates: [{ version: "1.1.0" }] });
+    await buildLatestSnapshot(THEME_NAME);
+    await createProject("1.0.0");
+    const themeJsonPath = getProjectThemeJsonPath(PROJECT_FOLDER);
+    const stageDir = path.join(getProjectDir(PROJECT_FOLDER), ".theme-update-stage");
+
+    const update = applyThemeUpdate(PROJECT_ID);
+    // Wait until the update is preparing (its staging directory exists).
+    for (let i = 0; i < 500 && !(await fs.pathExists(stageDir)); i++) {
+      await new Promise((resolve) => setImmediate(resolve));
+    }
+    assert.ok(await fs.pathExists(stageDir), "the update had not started preparing; the test would prove nothing");
+    let sawUpdateInProgress = null;
+    const save = withContentWriteLock(PROJECT_ID, async () => {
+      sawUpdateInProgress = await fs.pathExists(stageDir);
+      const theme = await fs.readJson(themeJsonPath);
+      theme.settings.colors[0].value = "#123456";
+      await fs.writeJson(themeJsonPath, theme, { spaces: 2 });
+    });
+    const [result] = await Promise.all([update, save]);
+
+    assert.ok(result.success);
+    assert.equal(sawUpdateInProgress, false, "the save ran while the update was still in progress");
+    const saved = await fs.readJson(themeJsonPath);
+    assert.equal(saved.version, "1.1.0");
+    assert.equal(saved.settings.colors.find((s) => s.id === "primary_color").value, "#123456");
   });
 });

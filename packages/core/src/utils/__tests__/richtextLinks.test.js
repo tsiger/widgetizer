@@ -66,6 +66,23 @@ describe("resolveRichtextLinkRefs", () => {
     expect(resolveRichtextLinkRefs(null, deps)).toBe(null);
     expect(resolveRichtextLinkRefs("<p>no links</p>", deps)).toBe("<p>no links</p>");
   });
+
+  it("emits extensionless hrefs when deps.cleanUrls is true (page, item, home, depth)", () => {
+    const pages = new Map([["page-1", { slug: "about-us" }], ["page-home", { slug: "index" }]]);
+    const on = { pagesByUuid: pages, collectionItemsByUuid, outputPathPrefix: "", cleanUrls: true };
+    const onNested = { ...on, outputPathPrefix: "../" };
+    expect(resolveRichtextLinkRefs('<a href="x.html" data-page-uuid="page-1">x</a>', on)).toBe('<a href="about-us" data-page-uuid="page-1">x</a>');
+    expect(resolveRichtextLinkRefs('<a href="x.html" data-collection-item-uuid="item-1">y</a>', on)).toBe('<a href="news/hello-world" data-collection-item-uuid="item-1">y</a>');
+    expect(resolveRichtextLinkRefs('<a href="index.html" data-page-uuid="page-home">h</a>', on)).toBe('<a href="./" data-page-uuid="page-home">h</a>');
+    expect(resolveRichtextLinkRefs('<a href="index.html" data-page-uuid="page-home">h</a>', onNested)).toBe('<a href="../" data-page-uuid="page-home">h</a>');
+    expect(resolveRichtextLinkRefs('<a href="x.html" data-page-uuid="page-1">x</a>', onNested)).toBe('<a href="../about-us" data-page-uuid="page-1">x</a>');
+  });
+
+  it("still neutralises deleted refs and leaves external anchors alone with cleanUrls on", () => {
+    const on = { pagesByUuid, collectionItemsByUuid, outputPathPrefix: "", cleanUrls: true };
+    expect(resolveRichtextLinkRefs('<a href="gone.html" data-page-uuid="nope">x</a>', on)).toBe("<a>x</a>");
+    expect(resolveRichtextLinkRefs('<a href="https://e.com/a.html">x</a>', on)).toBe('<a href="https://e.com/a.html">x</a>');
+  });
 });
 
 describe("resolveRichtextLinksInWidgetData", () => {
@@ -171,5 +188,42 @@ describe("schemaHasRichtextSetting", () => {
   });
   it("returns false when no richtext setting exists", () => {
     expect(schemaHasRichtextSetting({ settings: [{ id: "t", type: "text" }], blocks: [] })).toBe(false);
+  });
+});
+
+describe("resolveRichtextLinkRefs — the target's language", () => {
+  const pages = new Map([
+    ["p-en", { slug: "about", language: "en" }],
+    ["p-el", { slug: "sxetika", language: "el" }],
+  ]);
+  const itemsByUuid = new Map([
+    ["i-en", { slugPrefix: "news", slug: "story", language: "en" }],
+    ["i-el", { slugPrefix: "news", slug: "istoria", language: "el" }],
+  ]);
+  const html =
+    '<a data-page-uuid="p-en" href="x.html">A</a><a data-page-uuid="p-el" href="x.html">B</a>' +
+    '<a data-collection-item-uuid="i-en" href="x.html">C</a><a data-collection-item-uuid="i-el" href="x.html">D</a>';
+
+  it("folders only the non-default language, at depth and under both shapes", () => {
+    const off = resolveRichtextLinkRefs(html, {
+      pagesByUuid: pages,
+      collectionItemsByUuid: itemsByUuid,
+      outputPathPrefix: "../",
+      defaultLanguage: "en",
+    });
+    expect(off).toContain('href="../about.html"');
+    expect(off).toContain('href="../el/sxetika.html"');
+    expect(off).toContain('href="../news/story.html"');
+    expect(off).toContain('href="../el/news/istoria.html"');
+
+    const on = resolveRichtextLinkRefs(html, {
+      pagesByUuid: pages,
+      collectionItemsByUuid: itemsByUuid,
+      cleanUrls: true,
+      defaultLanguage: "en",
+    });
+    expect(on).toContain('href="about"');
+    expect(on).toContain('href="el/sxetika"');
+    expect(on).toContain('href="el/news/istoria"');
   });
 });

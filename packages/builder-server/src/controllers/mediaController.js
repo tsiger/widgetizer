@@ -3,18 +3,21 @@ import path from "path";
 import { v4 as uuidv4 } from "uuid";
 import multer from "multer";
 import sharp from "sharp";
-import slugify from "slugify";
+import { normalizeUploadName } from "../utils/uploadFileName.js";
 import DOMPurify from "isomorphic-dompurify";
 import { getThemeJsonPath } from "../config.js";
 import { LIMIT_KEYS } from "@widgetizer/core/adapters";
-import { ALLOWED_MIME_TYPES, getContentType, getMediaCategory } from "../utils/mimeTypes.js";
+import { ALLOWED_MIME_TYPES, ALLOWED_UPLOAD_EXTENSIONS, getContentType, getMediaCategory } from "../utils/mimeTypes.js";
 import { getSetting } from "./appSettingsController.js";
-import { getMediaUsage, refreshAllMediaUsageFromDir } from "../services/mediaUsageService.js";
+import { getMediaUsage, refreshAllMediaUsageFromDir, ensureUsageSourceFormat } from "../services/mediaUsageService.js";
+import { withContentWriteLock, verifyFileUnused, recordDeletedMediaPaths } from "../services/contentCoordination.js";
 import { getProjectFolderName, getProjectDetails } from "../utils/projectHelpers.js";
 import { handleProjectResolutionError } from "../utils/projectErrors.js";
+import { requestLanguage } from "../utils/contentLanguage.js";
 import * as mediaRepo from "../db/repositories/mediaRepository.js";
+import { getDb } from "../db/index.js";
 
-import { stripHtmlTags } from "../services/sanitizationService.js";
+import { stripHtmlToText } from "../services/sanitizationService.js";
 import { readMediaFile } from "../services/mediaService.js";
 
 
@@ -85,6 +88,15 @@ function decodeFileName(filename) {
 // The adapter key for a media file (the original) and its sizes. The original
 // lives under its category subdir; generated sizes are always images. Mirrors
 // the historical disk layout, minus the `/uploads/` URL prefix.
+/** Every path this record can be referenced by: its own, plus each generated size. */
+function referencePathsOf(file) {
+  const paths = [file.path];
+  for (const size of Object.values(file.sizes || {})) {
+    if (size?.path) paths.push(size.path);
+  }
+  return paths.filter(Boolean);
+}
+
 function deleteMediaAssets(assetStorage, scope, file) {
   const subdir = getMediaCategory(file.type) === "file" ? "files" : "images";
   const keys = [`${subdir}/${file.filename}`];
@@ -94,6 +106,9 @@ function deleteMediaAssets(assetStorage, scope, file) {
       if (size && size.path) keys.push(`images/${path.basename(size.path)}`);
     }
   }
+  // A save that was queued behind this delete must not be allowed to reference
+  // what it just removed; only deletion knows which paths those are.
+  recordDeletedMediaPaths(scope.projectId, referencePathsOf(file));
   return Promise.all(
     keys.map((key) =>
       Promise.resolve(assetStorage.delete(scope, key)).catch((err) =>
@@ -116,19 +131,28 @@ export async function writeMediaFile(projectId, data) {
 }
 
 /**
- * Atomically reads media data, applies a transform function, and writes it back.
- * SQLite transactions handle atomicity natively — no write locks needed.
+ * Reads media data, applies a transform function, and writes it back inside a
+ * single immediate SQLite transaction, so the read-modify-write is atomic even
+ * against a second connection sharing the DB file. transformFn must be
+ * synchronous (mutate mediaData in place): the transaction cannot span an
+ * await, so a transformFn returning a thenable is rejected rather than
+ * silently committing pre-mutation state.
  * @param {string} projectId - The project UUID
- * @param {function(Object): void} transformFn - Function that receives mediaData and mutates it in place
-
+ * @param {function(Object): void} transformFn - Synchronous function that receives mediaData and mutates it in place
  * @returns {Promise<Object>} The transformed media data
  */
 export async function atomicUpdateMediaFile(projectId, transformFn) {
   await getProjectFolderName(projectId);
-  const mediaData = mediaRepo.getMediaFiles(projectId);
-  transformFn(mediaData);
-  mediaRepo.writeMediaData(projectId, mediaData);
-  return mediaData;
+  const db = getDb();
+  return db.transaction(() => {
+    const mediaData = mediaRepo.getMediaFiles(projectId);
+    const result = transformFn(mediaData);
+    if (result && typeof result.then === "function") {
+      throw new Error("atomicUpdateMediaFile requires a synchronous transformFn; async transforms cannot run inside the transaction");
+    }
+    mediaRepo.writeMediaData(projectId, mediaData);
+    return mediaData;
+  }).immediate();
 }
 
 // Files are buffered in memory (file.buffer); their bytes are persisted through
@@ -138,12 +162,23 @@ export async function atomicUpdateMediaFile(projectId, transformFn) {
 // uploadProjectMedia (it needs the adapter to dedup against the store).
 const storage = multer.memoryStorage();
 
-// Configure multer file filter
-const fileFilter = (req, file, cb) => {
-  if (ALLOWED_MIME_TYPES.includes(file.mimetype)) {
+// Configure multer file filter. Both signals must pass and agree: the declared
+// MIME is client-controlled, while the stored extension determines both the
+// response Content-Type and which processing/sanitization path is required.
+export const mediaUploadFileFilter = (req, file, cb) => {
+  const ext = path.extname(file.originalname || "").toLowerCase();
+  const extensionMime = getContentType(ext);
+  const mimeMatchesExtension = file.mimetype === extensionMime
+    || (ext === ".mp3" && file.mimetype === "audio/mp3");
+
+  if (
+    ALLOWED_MIME_TYPES.includes(file.mimetype)
+    && ALLOWED_UPLOAD_EXTENSIONS.includes(ext)
+    && mimeMatchesExtension
+  ) {
     cb(null, true);
   } else {
-    cb(new Error("Invalid file type. Supported types: images, audio (MP3), and PDF."), false);
+    cb(new Error("Invalid file type. Supported types: images, audio (MP3), video (MP4), and PDF."), false);
   }
 };
 
@@ -151,7 +186,7 @@ const fileFilter = (req, file, cb) => {
 // set here — it is applied per-request by uploadWithLimit from the limits adapter.
 export const upload = multer({
   storage,
-  fileFilter,
+  fileFilter: mediaUploadFileFilter,
 });
 
 // Platform fallback when no limits adapter is wired (kept in sync with hosted's
@@ -173,7 +208,7 @@ export async function uploadWithLimit(req, res, next) {
   try {
     const cap = await req.adapters?.limits?.getLimit?.(req.scope, LIMIT_KEYS.MAX_UPLOAD_SIZE_BYTES);
     const fileSize = Number.isFinite(cap) ? cap : DEFAULT_MAX_UPLOAD_BYTES;
-    multer({ storage, fileFilter, limits: { fileSize, files: 10 } }).array("files", 10)(req, res, next);
+    multer({ storage, fileFilter: mediaUploadFileFilter, limits: { fileSize, files: 10 } }).array("files", 10)(req, res, next);
   } catch (err) {
     next(err);
   }
@@ -197,6 +232,10 @@ export async function getProjectMedia(req, res) {
     // Validate the project exists + is owned (throws -> mapped below). Media
     // metadata comes from the DB and is keyed by projectId.
     await getProjectFolderName(projectId);
+
+    // Rows written by an older build are keyed by slug; rebuild them once per project,
+    // reading content from the adapter's working dir (see refreshMediaUsage below).
+    await ensureUsageSourceFormat({ projectId, projectDir: req.adapters.storage.getProjectBase(req.scope) });
 
     const mediaData = await readMediaFile(projectId);
     res.json(mediaData);
@@ -244,32 +283,36 @@ export async function uploadProjectMedia(req, res) {
     // dedup against the adapter's existing keys (+ names assigned this request).
     // Tests pass file.filename directly, bypassing this.
     const listedNames = {};
-    async function uniqueName(subdir, originalname) {
+    async function uniqueName(subdir, originalName) {
       if (!listedNames[subdir]) {
         const keys = await Promise.resolve(assetStorage.list(scope, `${subdir}/`)).catch(() => []);
-        listedNames[subdir] = new Set(keys.map((k) => path.basename(k)));
+        listedNames[subdir] = new Set(keys.map((k) => path.basename(k).toLowerCase()));
       }
       const taken = listedNames[subdir];
-      const decoded = decodeFileName(originalname);
-      const ext = path.extname(decoded);
-      let base = slugify(path.basename(decoded, ext), { lower: true, strict: true, trim: true }) || "file";
-      if (base.length > 100) base = base.slice(0, 100);
+      const normalized = normalizeUploadName(originalName, { fallback: subdir === "files" ? "file" : "image" });
+      const ext = path.extname(normalized);
+      const base = path.basename(normalized, ext);
       let name = `${base}${ext}`;
       let counter = 1;
-      while (taken.has(name)) name = `${base}-${counter++}${ext}`;
-      taken.add(name);
+      // Case-insensitively: on Windows/macOS a legacy `photo.JPG` IS `photo.jpg`, so a
+      // case-sensitive check would hand out a name that overwrites the existing file.
+      while (taken.has(name.toLowerCase())) name = `${base}-${counter++}${ext}`;
+      taken.add(name.toLowerCase());
       return name;
     }
 
     const prepared = [];
     for (const file of files) {
       const subdir = getMediaCategory(file.mimetype) === "file" ? "files" : "images";
-      const filename = file.filename || (await uniqueName(subdir, file.originalname));
-      prepared.push({ file, subdir, filename });
+      // Multer hands the name over as latin1 bytes; decode once so the stored
+      // "original name" is the real one, not mojibake.
+      const originalName = decodeFileName(file.originalname);
+      const filename = file.filename || (await uniqueName(subdir, originalName));
+      prepared.push({ file, subdir, filename, originalName });
     }
 
     // Process files in parallel instead of sequentially
-    const filePromises = prepared.map(async ({ file, subdir, filename }) => {
+    const filePromises = prepared.map(async ({ file, subdir, filename, originalName }) => {
       try {
         // Check file size against limit
         const maxSizeMB = maxImageSizeMB || 5;
@@ -279,7 +322,7 @@ export async function uploadProjectMedia(req, res) {
           return {
             success: false,
             file: {
-              originalName: file.originalname,
+              originalName,
               reason: `File size (${(file.size / 1024 / 1024).toFixed(2)}MB) exceeds limit of ${maxSizeMB}MB.`,
               sizeBytes: file.size,
             },
@@ -298,7 +341,7 @@ export async function uploadProjectMedia(req, res) {
         const fileInfo = {
           id: fileId,
           filename,
-          originalName: file.originalname,
+          originalName,
           type: file.mimetype,
           size: file.size,
           uploaded: new Date().toISOString(),
@@ -321,7 +364,7 @@ export async function uploadProjectMedia(req, res) {
             return {
               success: false,
               file: {
-                originalName: file.originalname,
+                originalName,
                 reason: `Image dimensions (${metadata.width}x${metadata.height}) exceed maximum of ${10_000}px.`,
                 sizeBytes: file.size,
               },
@@ -406,11 +449,11 @@ export async function uploadProjectMedia(req, res) {
           file: fileInfo,
         };
       } catch (error) {
-        console.error(`Failed to process file ${file.originalname}:`, error);
+        console.error(`Failed to process file ${originalName}:`, error);
         return {
           success: false,
           file: {
-            originalName: file.originalname,
+            originalName,
             reason: `Processing failed: ${error.message}`,
           },
         };
@@ -470,6 +513,8 @@ export async function uploadProjectMedia(req, res) {
  */
 export async function updateMediaMetadata(req, res) {
   try {
+    const lang = requestLanguage(req, res);
+    if (!lang) return;
 
     const { projectId, fileId } = req.params;
     // Bind the inner :projectId to the owner-resolved scope. This route is
@@ -482,9 +527,9 @@ export async function updateMediaMetadata(req, res) {
     if (req.scope && projectId !== req.scope.projectId) {
       return res.status(403).json({ error: "Project mismatch" });
     }
-    const alt = stripHtmlTags(req.body.alt);
-    const title = stripHtmlTags(req.body.title);
-    const caption = stripHtmlTags(req.body.caption);
+    const alt = stripHtmlToText(req.body.alt);
+    const title = stripHtmlToText(req.body.title);
+    const caption = stripHtmlToText(req.body.caption);
     // Validate project ownership
     await getProjectFolderName(projectId);
 
@@ -494,6 +539,24 @@ export async function updateMediaMetadata(req, res) {
       return res.status(404).json({ error: "File not found" });
     }
 
+    const isImage = file.type?.startsWith("image/");
+    // A translated language is edited against the default, so a field left out
+    // means "inherit" and is stored as NULL — only "" is a deliberate blank.
+    // The default language keeps its own rule: alt is required, and absent is
+    // not a thing it can express.
+    if (lang.language !== lang.defaultLanguage) {
+      const inheritable = (value) => (typeof value === "undefined" || value === null ? null : value);
+      mediaRepo.updateFileTranslation(projectId, fileId, lang.language, {
+        alt: inheritable(alt),
+        title: inheritable(title),
+        caption: isImage ? inheritable(caption) : null,
+      });
+      return res.json({
+        message: "Metadata updated successfully",
+        file: mediaRepo.getMediaFileById(projectId, fileId),
+      });
+    }
+
     // Validate input
     if (typeof alt === "undefined") {
       return res.status(400).json({ error: "Alt text is required for images" });
@@ -501,7 +564,7 @@ export async function updateMediaMetadata(req, res) {
 
     // Captions are an image-only concept; a caption sent for a non-image (e.g. a
     // PDF, via direct API) is stored as "" rather than text.
-    const captionForType = file.type?.startsWith("image/") ? caption || "" : "";
+    const captionForType = isImage ? caption || "" : "";
 
     // Update metadata in DB (alt, title, caption columns, scoped to project)
     mediaRepo.updateFileMetadata(projectId, fileId, { alt: alt || "", title: title || "", caption: captionForType });
@@ -534,30 +597,52 @@ export async function deleteProjectMedia(req, res) {
     const scope = req.scope;
     const { projectId } = scope;
     const assetStorage = req.adapters.assetStorage;
+    const projectDir = req.adapters.storage.getProjectBase(scope);
 
     // Validate project ownership
     await getProjectFolderName(projectId);
 
-    // Get the specific file from DB (scoped to project)
-    const fileToDelete = mediaRepo.getMediaFileById(projectId, fileId);
-    if (!fileToDelete) {
+    // Verify and delete in one section no content write can interleave with: the
+    // stored usage rows are best-effort, so they are re-derived here rather than
+    // trusted, and a save must not slip a new reference in between the two steps.
+    const outcome = await withContentWriteLock(projectId, async () => {
+      const fileToDelete = mediaRepo.getMediaFileById(projectId, fileId);
+      if (!fileToDelete) return { notFound: true };
+
+      const check = await verifyFileUnused({ projectId, projectDir, fileIds: [fileId] });
+      if (!check.verified) return { unverified: check };
+
+      const usedIn = check.usedInByFileId.get(fileId) || [];
+      if (usedIn.length > 0) return { inUse: { usedIn, filename: fileToDelete.filename } };
+
+      // Remove the original + every generated size through the storage adapter.
+      await deleteMediaAssets(assetStorage, scope, fileToDelete);
+
+      // Remove metadata from DB (cascade deletes sizes + usage, scoped to project)
+      mediaRepo.deleteMediaFile(projectId, fileId);
+      return { deleted: true };
+    });
+
+    if (outcome.notFound) {
       return res.status(404).json({ error: "File not found" });
     }
-
-    // Check if file is currently in use
-    if (fileToDelete.usedIn && fileToDelete.usedIn.length > 0) {
-      return res.status(400).json({
-        error: "Cannot delete file that is currently in use",
-        usedIn: fileToDelete.usedIn,
-        filename: fileToDelete.filename,
+    if (outcome.unverified) {
+      // Not "in use" and not "unused" — we could not tell. Deleting on an
+      // unreadable scan is exactly how an image in use gets lost.
+      return res.status(409).json({
+        error: "Cannot verify whether this file is still in use",
+        message: `The file was not deleted because ${outcome.unverified.reason}. Try again once the project content can be read.`,
+        code: "MEDIA_USAGE_UNVERIFIED",
+        skipped: outcome.unverified.skipped,
       });
     }
-
-    // Remove the original + every generated size through the storage adapter.
-    await deleteMediaAssets(assetStorage, scope, fileToDelete);
-
-    // Remove metadata from DB (cascade deletes sizes + usage, scoped to project)
-    mediaRepo.deleteMediaFile(projectId, fileId);
+    if (outcome.inUse) {
+      return res.status(400).json({
+        error: "Cannot delete file that is currently in use",
+        usedIn: outcome.inUse.usedIn,
+        filename: outcome.inUse.filename,
+      });
+    }
 
     res.json({ message: "File deleted successfully" });
   } catch (error) {
@@ -686,51 +771,74 @@ export async function bulkDeleteProjectMedia(req, res) {
     // Validate project ownership
     await getProjectFolderName(projectId);
 
-    // Read all media to check usage (needed for in-use validation)
-    const mediaData = mediaRepo.getMediaFiles(projectId);
+    const projectDir = req.adapters.storage.getProjectBase(scope);
 
-    const filesToDelete = [];
-    const filesInUse = [];
+    // One verification scan for the whole batch, then delete — all inside the media
+    // section, so no save can introduce a reference to any of these between the
+    // scan and the deletes it authorises.
+    const outcome = await withContentWriteLock(projectId, async () => {
+      const mediaData = mediaRepo.getMediaFiles(projectId);
+      const requested = mediaData.files.filter((file) => fileIds.includes(file.id));
+      if (requested.length === 0) return { noneFound: true };
 
-    // Separate files to delete from files in use
-    mediaData.files.forEach((file) => {
-      if (fileIds.includes(file.id)) {
-        if (file.usedIn && file.usedIn.length > 0) {
-          filesInUse.push({
-            id: file.id,
-            filename: file.filename,
-            usedIn: file.usedIn,
-          });
+      const check = await verifyFileUnused({
+        projectId,
+        projectDir,
+        fileIds: requested.map((file) => file.id),
+      });
+      if (!check.verified) return { unverified: check };
+
+      const filesToDelete = [];
+      const filesInUse = [];
+      for (const file of requested) {
+        const usedIn = check.usedInByFileId.get(file.id) || [];
+        if (usedIn.length > 0) {
+          filesInUse.push({ id: file.id, filename: file.filename, usedIn });
         } else {
           filesToDelete.push(file);
         }
       }
+
+      if (filesToDelete.length > 0) {
+        // Remove every original + size through the storage adapter.
+        await Promise.all(filesToDelete.map((file) => deleteMediaAssets(assetStorage, scope, file)));
+
+        // Batch delete from DB (cascade handles sizes + usage, scoped to project)
+        mediaRepo.deleteMediaFiles(projectId, filesToDelete.map((f) => f.id));
+      }
+
+      return { deleted: filesToDelete.length, filesInUse };
     });
 
-    // If all files are in use, return success with info (not an error - the request was valid)
-    if (filesToDelete.length === 0 && filesInUse.length > 0) {
-      return res.status(200).json({
-        message: "No files were deleted because they are all currently in use.",
-        deletedCount: 0,
-        filesInUse: filesInUse,
-      });
-    }
-
     // If no files found at all
-    if (filesToDelete.length === 0 && filesInUse.length === 0) {
+    if (outcome.noneFound) {
       return res.status(404).json({ error: "No matching files found to delete" });
     }
 
-    // Remove every original + size through the storage adapter.
-    await Promise.all(filesToDelete.map((file) => deleteMediaAssets(assetStorage, scope, file)));
+    if (outcome.unverified) {
+      return res.status(409).json({
+        error: "Cannot verify whether these files are still in use",
+        message: `Nothing was deleted because ${outcome.unverified.reason}. Try again once the project content can be read.`,
+        code: "MEDIA_USAGE_UNVERIFIED",
+        skipped: outcome.unverified.skipped,
+      });
+    }
 
-    // Batch delete from DB (cascade handles sizes + usage, scoped to project)
-    mediaRepo.deleteMediaFiles(projectId, filesToDelete.map((f) => f.id));
+    const { deleted, filesInUse } = outcome;
+
+    // If all files are in use, return success with info (not an error - the request was valid)
+    if (deleted === 0 && filesInUse.length > 0) {
+      return res.status(200).json({
+        message: "No files were deleted because they are all currently in use.",
+        deletedCount: 0,
+        filesInUse,
+      });
+    }
 
     // Build response message
     const response = {
-      message: `${filesToDelete.length} file${filesToDelete.length !== 1 ? "s" : ""} deleted successfully.`,
-      deletedCount: filesToDelete.length,
+      message: `${deleted} file${deleted !== 1 ? "s" : ""} deleted successfully.`,
+      deletedCount: deleted,
     };
 
     if (filesInUse.length > 0) {

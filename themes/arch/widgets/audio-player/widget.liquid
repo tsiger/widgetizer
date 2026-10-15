@@ -33,6 +33,11 @@
   {% unless widget.settings.color_scheme == 'standard-primary' %}style="--widget-bg-color: var(--bg-primary);"{% endunless %}
   data-widget-id="{{ widget.id }}"
   data-widget-type="audio-player"
+  data-t-play="{{ 'site.audio_player.play' | t }}"
+  data-t-pause="{{ 'site.audio_player.pause' | t }}"
+  data-t-mute="{{ 'site.audio_player.mute' | t }}"
+  data-t-unmute="{{ 'site.audio_player.unmute' | t }}"
+  data-t-speed="{{ 'site.audio_player.playback_speed_rate' | t: rate: 'RATE' }}"
   {% if widget.index != null %}data-widget-index="{{ widget.index }}"{% endif %}
 >
   <div class="widget-container {% unless widget.settings.color_scheme == 'standard-primary' %}widget-container-padded{% endunless %}">
@@ -78,7 +83,7 @@
           </div>
 
           <div class="ap-seek-row">
-            <input type="range" class="ap-seek" min="0" max="0" value="0" step="0.1" aria-label="Seek" disabled />
+            <input type="range" class="ap-seek" min="0" max="0" value="0" step="0.1" aria-label="{{ 'site.audio_player.seek' | t }}" disabled />
             <div class="ap-times">
               <span class="ap-time ap-time-current">0:00</span>
               <span class="ap-time-sep" aria-hidden="true">/</span>
@@ -87,33 +92,33 @@
           </div>
 
           <div class="ap-transport">
-            <button type="button" class="ap-btn ap-prev" aria-label="Previous track">
+            <button type="button" class="ap-btn ap-prev" aria-label="{{ 'site.audio_player.previous_track' | t }}">
               <svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M7 6h2v12H7zM20 6 11 12l9 6z" /></svg>
             </button>
-            <button type="button" class="ap-btn ap-btn--primary ap-play" aria-label="Play" aria-pressed="false">
+            <button type="button" class="ap-btn ap-btn--primary ap-play" aria-label="{{ 'site.audio_player.play' | t }}" aria-pressed="false">
               <svg class="ap-icon-play" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
               <svg class="ap-icon-pause" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z" /></svg>
             </button>
-            <button type="button" class="ap-btn ap-next" aria-label="Next track">
+            <button type="button" class="ap-btn ap-next" aria-label="{{ 'site.audio_player.next_track' | t }}">
               <svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M15 6h2v12h-2zM4 6l9 6-9 6z" /></svg>
             </button>
 
             {% if widget.settings.show_speed %}
-              <button type="button" class="ap-btn ap-speed" aria-label="Playback speed">1×</button>
+              <button type="button" class="ap-btn ap-speed" aria-label="{{ 'site.audio_player.playback_speed' | t }}">1×</button>
             {% endif %}
 
             {% if widget.settings.show_volume %}
               <div class="ap-volume-wrap">
-                <button type="button" class="ap-btn ap-mute" aria-label="Mute" aria-pressed="false">
+                <button type="button" class="ap-btn ap-mute" aria-label="{{ 'site.audio_player.mute' | t }}" aria-pressed="false">
                   <svg class="ap-icon-volume" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4z" /><path d="M15.5 8.5a5 5 0 0 1 0 7M18 6a9 9 0 0 1 0 12" /></svg>
                   <svg class="ap-icon-muted" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4z" /><path d="m16 9 5 6M21 9l-5 6" /></svg>
                 </button>
-                <input type="range" class="ap-volume" min="0" max="1" step="0.05" value="1" aria-label="Volume" />
+                <input type="range" class="ap-volume" min="0" max="1" step="0.05" value="1" aria-label="{{ 'site.audio_player.volume' | t }}" />
               </div>
             {% endif %}
 
             {% if widget.settings.show_download %}
-              <a class="ap-btn ap-download" download aria-label="Download current track"{% if first_url != blank %} href="{{ first_url }}"{% endif %}>
+              <a class="ap-btn ap-download" download aria-label="{{ 'site.audio_player.download' | t }}"{% if first_url != blank %} href="{{ first_url }}"{% endif %}>
                 <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11m0 0 4-4m-4 4-4-4M5 20h14" /></svg>
               </a>
             {% endif %}
@@ -142,7 +147,7 @@
                 data-title="{{ block.settings.title | escape }}"
                 data-artist="{{ block.settings.artist | escape }}"
                 data-cover="{{ t_cover }}"
-                aria-label="Play {{ block.settings.title | escape }}"
+                aria-label="{{ 'site.audio_player.play_track' | t: title: block.settings.title }}"
               >
                 <span class="ap-track-index" aria-hidden="true">{{ forloop.index }}</span>
                 {% if show_covers %}

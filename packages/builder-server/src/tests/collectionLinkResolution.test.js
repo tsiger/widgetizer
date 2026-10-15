@@ -26,8 +26,9 @@ process.env.THEMES_ROOT = path.join(TEST_ROOT, "themes");
 process.env.NODE_ENV = "test";
 
 const { getProjectDir } = await import("../config.js");
+const { listPagesFromDir } = await import("../utils/projectContentFs.js");
 const projectRepo = await import("../db/repositories/projectRepository.js");
-const { renderWidget } = await import("../services/renderingService.js");
+const { renderWidget, renderPageLayout, renderCollectionItemPage } = await import("../services/renderingService.js");
 const { closeDb } = await import("../db/index.js");
 const { LocalStorageAdapter } = await import("@widgetizer/adapters-local");
 
@@ -38,6 +39,11 @@ const RAW_THEME = { settings: { global: { general: [], colors: [] } } };
 const storage = new LocalStorageAdapter({ dataRoot: TEST_DATA_DIR });
 const scope = { actor: { id: "default", kind: "local" }, projectId: PROJECT_ID, folderName: PROJECT_FOLDER };
 const collectionDeps = { storage, scope };
+
+// The Clean URLs sibling project (its row carries cleanUrls: true).
+const CLEAN_PROJECT_ID = "colllink-clean-uuid";
+const CLEAN_PROJECT_FOLDER = "colllink-clean-project";
+const cleanScope = { actor: { id: "default", kind: "local" }, projectId: CLEAN_PROJECT_ID, folderName: CLEAN_PROJECT_FOLDER };
 
 const PORTFOLIO_SCHEMA = {
   type: "portfolio",
@@ -75,6 +81,7 @@ before(async () => {
   await projectRepo.writeProjectsData({
     projects: [
       { id: PROJECT_ID, folderName: PROJECT_FOLDER, name: "Coll Link", theme: "__t__", created: new Date().toISOString() },
+      { id: CLEAN_PROJECT_ID, folderName: CLEAN_PROJECT_FOLDER, name: "Coll Link Clean", theme: "__t__", cleanUrls: true, created: new Date().toISOString() },
     ],
     activeProjectId: PROJECT_ID,
   });
@@ -215,5 +222,336 @@ describe("widget menu resolution via the shared resolver", () => {
     assert.ok(html.includes("[portfolio/alpha.html]"), html); // collection-item target resolved
     assert.ok(html.includes("[https://example.com]"), html); // safe custom URL kept
     assert.ok(!html.includes("javascript:"), `dangerous menu link must be sanitized — got: ${html}`);
+  });
+});
+
+// --- Clean URLs: the engine stamps sharedGlobals.cleanUrls from the project row ---
+
+async function renderCleanLinkWidget(linkValue, sharedGlobals = {}) {
+  const dir = path.join(getProjectDir(CLEAN_PROJECT_FOLDER), "widgets", "link-widget");
+  await fs.ensureDir(dir);
+  await fs.writeFile(path.join(dir, "widget.liquid"), `<a href="{{ widget.settings.cta.href }}">{{ widget.settings.cta.text }}</a>`);
+  await fs.writeFile(path.join(dir, "schema.json"), JSON.stringify(LINK_WIDGET_SCHEMA));
+  return renderWidget(
+    CLEAN_PROJECT_ID,
+    "link-widget",
+    { type: "link-widget", settings: { cta: linkValue } },
+    RAW_THEME,
+    "publish",
+    sharedGlobals,
+    null,
+    { storage, scope: cleanScope },
+  );
+}
+
+describe("Clean URLs — link settings", () => {
+  before(async () => {
+    const dir = getProjectDir(CLEAN_PROJECT_FOLDER);
+    await fs.ensureDir(path.join(dir, "pages", "global"));
+    await fs.ensureDir(path.join(dir, "widgets"));
+    await fs.writeJson(path.join(dir, "pages", "about.json"), { id: "about", uuid: "u-about", slug: "about", name: "About", widgets: {}, widgetsOrder: [] });
+    await fs.writeJson(path.join(dir, "pages", "index.json"), { id: "index", uuid: "u-index", slug: "index", name: "Home", widgets: {}, widgetsOrder: [] });
+    // eslint-disable-next-line local/require-scope-arg -- the second project's own scope
+    await storage.write(cleanScope, "collection-types/portfolio/schema.json", JSON.stringify(PORTFOLIO_SCHEMA, null, 2));
+    // eslint-disable-next-line local/require-scope-arg -- the second project's own scope
+    await storage.write(
+      cleanScope,
+      "collections/portfolio/alpha.json",
+      JSON.stringify({ id: "alpha", uuid: "u-alpha", slug: "alpha", schemaVersion: 1, created: "2026-01-02T00:00:00.000Z", updated: "2026-01-02T00:00:00.000Z", settings: { title: "Alpha" } }),
+    );
+  });
+
+  it("emits an extensionless item href when the project's cleanUrls is on, with no caller-set flag", async () => {
+    const globals = {};
+    const html = await renderCleanLinkWidget({ collectionItemUuid: "u-alpha", href: "portfolio/stale.html", text: "Go", target: "_self" }, globals);
+    assert.ok(html.includes('href="portfolio/alpha"'), html);
+    assert.equal(globals.cleanUrls, true, "engine stamps the flag on sharedGlobals");
+  });
+
+  it("emits an extensionless page href and ./ for the home page", async () => {
+    const about = await renderCleanLinkWidget({ pageUuid: "u-about", href: "stale.html", text: "A", target: "_self" }, {});
+    assert.ok(about.includes('href="about"'), about);
+    const home = await renderCleanLinkWidget({ pageUuid: "u-index", href: "index.html", text: "H", target: "_self" }, {});
+    assert.ok(home.includes('href="./"'), home);
+  });
+
+  it("depth-prefixes: ../ home and ../portfolio/alpha inside an item page", async () => {
+    const home = await renderCleanLinkWidget({ pageUuid: "u-index", href: "index.html", text: "H", target: "_self" }, { outputPathPrefix: "../" });
+    assert.ok(home.includes('href="../"'), home);
+    const item = await renderCleanLinkWidget({ collectionItemUuid: "u-alpha", href: "x.html", text: "Go", target: "_self" }, { outputPathPrefix: "../" });
+    assert.ok(item.includes('href="../portfolio/alpha"'), item);
+  });
+
+  it("leaves a custom .html link exactly as typed", async () => {
+    const html = await renderCleanLinkWidget({ href: "contact.html", text: "C", target: "_self" }, {});
+    assert.ok(html.includes('href="contact.html"'), html);
+  });
+
+  it("a caller-set sharedGlobals.cleanUrls = false wins over the project row", async () => {
+    const html = await renderCleanLinkWidget({ pageUuid: "u-about", href: "stale.html", text: "A", target: "_self" }, { cleanUrls: false });
+    assert.ok(html.includes('href="about.html"'), html);
+  });
+
+  it("the original (flag-off) project still emits .html", async () => {
+    const html = await renderLinkWidget({ collectionItemUuid: "u-alpha", href: "portfolio/stale.html", text: "Go", target: "_self" }, {});
+    assert.ok(html.includes('href="portfolio/alpha.html"'), html);
+  });
+});
+
+// --- Clean URLs: the page layout stamps the flag even when no widget rendered ---
+
+// A layout that resolves internal links itself (`| collection`), with no widget
+// rendered before it — the render path that has no other chance to stamp.
+const CLEAN_LAYOUT = `<html><body>{% assign items = 'portfolio' | collection %}{% for i in items %}<a class="list" href="{{ i.url }}">{{ i.slug }}</a>{% endfor %}</body></html>`;
+
+describe("Clean URLs — page layout with no widgets", () => {
+  before(async () => {
+    await fs.writeFile(path.join(getProjectDir(CLEAN_PROJECT_FOLDER), "layout.liquid"), CLEAN_LAYOUT);
+  });
+
+  it("stamps cleanUrls from the project row, so layout-level listing urls are extensionless", async () => {
+    const globals = {};
+    const html = await renderPageLayout(
+      CLEAN_PROJECT_ID,
+      { mainContent: "" },
+      { id: "about", uuid: "u-about", slug: "about", name: "About" },
+      RAW_THEME,
+      "publish",
+      globals,
+      { storage, scope: cleanScope },
+    );
+    assert.equal(globals.cleanUrls, true, "the layout render stamps the flag on sharedGlobals");
+    assert.ok(html.includes('class="list" href="portfolio/alpha"'), html);
+  });
+
+  it("a caller-set sharedGlobals.cleanUrls = false still wins", async () => {
+    const globals = { cleanUrls: false };
+    const html = await renderPageLayout(
+      CLEAN_PROJECT_ID,
+      { mainContent: "" },
+      { id: "about", uuid: "u-about", slug: "about", name: "About" },
+      RAW_THEME,
+      "publish",
+      globals,
+      { storage, scope: cleanScope },
+    );
+    assert.equal(globals.cleanUrls, false);
+    assert.ok(html.includes('class="list" href="portfolio/alpha.html"'), html);
+  });
+});
+
+// --- Languages: the target's language decides its folder, the page's depth the prefix ---
+
+describe("link and menu resolution across languages", () => {
+  const EL_ITEM = "u-el-alpha";
+  const EL_PAGE = "u-el-about";
+
+  async function seedGreek(scope, folder) {
+    await storage.write(
+      scope,
+      "collections/portfolio/el/alpha.json",
+      JSON.stringify({
+        id: "alpha",
+        uuid: EL_ITEM,
+        slug: "alpha",
+        schemaVersion: 1,
+        created: "2026-01-02T00:00:00.000Z",
+        updated: "2026-01-02T00:00:00.000Z",
+        settings: { title: "Alpha EL" },
+      }),
+    );
+    await fs.outputJSON(path.join(getProjectDir(folder), "pages", "el", "about.json"), {
+      slug: "about",
+      uuid: EL_PAGE,
+      name: "Sxetika",
+      widgets: {},
+    });
+  }
+
+  async function clearGreek(scope, folder) {
+    await storage.delete(scope, "collections/portfolio/el/alpha.json");
+    await fs.remove(path.join(getProjectDir(folder), "pages", "el"));
+  }
+
+  before(async () => {
+    projectRepo.updateProject(PROJECT_ID, { languages: ["el"] });
+    projectRepo.updateProject(CLEAN_PROJECT_ID, { languages: ["el"] });
+    await seedGreek(scope, PROJECT_FOLDER);
+    await seedGreek(cleanScope, CLEAN_PROJECT_FOLDER);
+  });
+
+  after(async () => {
+    projectRepo.updateProject(PROJECT_ID, { languages: [] });
+    projectRepo.updateProject(CLEAN_PROJECT_ID, { languages: [] });
+    await clearGreek(scope, PROJECT_FOLDER);
+    await clearGreek(cleanScope, CLEAN_PROJECT_FOLDER);
+  });
+
+  it("puts a Greek item under its language folder and leaves the English sibling at the root", async () => {
+    const el = await renderLinkWidget({ collectionItemUuid: EL_ITEM, href: "stale.html", text: "Go", target: "_self" });
+    assert.ok(el.includes('href="el/portfolio/alpha.html"'), el);
+    const en = await renderLinkWidget({ collectionItemUuid: "u-alpha", href: "stale.html", text: "Go", target: "_self" });
+    assert.ok(en.includes('href="portfolio/alpha.html"'), en);
+  });
+
+  it("links a Greek page from an English one, and depth-prefixes it", async () => {
+    const root = await renderLinkWidget({ pageUuid: EL_PAGE, href: "stale.html", text: "Go", target: "_self" });
+    assert.ok(root.includes('href="el/about.html"'), root);
+    const nested = await renderLinkWidget(
+      { pageUuid: EL_PAGE, href: "stale.html", text: "Go", target: "_self" },
+      { outputPathPrefix: "../" },
+    );
+    assert.ok(nested.includes('href="../el/about.html"'), nested);
+  });
+
+  it("follows Clean URLs per language", async () => {
+    const item = await renderCleanLinkWidget({ collectionItemUuid: EL_ITEM, href: "stale.html", text: "Go", target: "_self" });
+    assert.ok(item.includes('href="el/portfolio/alpha"'), item);
+    const page = await renderCleanLinkWidget({ pageUuid: EL_PAGE, href: "stale.html", text: "Go", target: "_self" });
+    assert.ok(page.includes('href="el/about"'), page);
+  });
+
+  it("resolves both languages of a collection item targeted from one menu", async () => {
+    await fs.outputFile(
+      path.join(getProjectDir(PROJECT_FOLDER), "menus", "cross.json"),
+      JSON.stringify({
+        uuid: "menu-cross",
+        name: "Cross",
+        items: [
+          { collectionItemUuid: "u-alpha", label: "Alpha" },
+          { collectionItemUuid: EL_ITEM, label: "Alpha EL" },
+          { pageUuid: EL_PAGE, label: "Sxetika" },
+        ],
+      }),
+    );
+    const html = await renderWidget(
+      PROJECT_ID,
+      "nav-widget",
+      { type: "nav-widget", settings: { nav: "menu-cross" } },
+      RAW_THEME,
+      "publish",
+      null,
+      null,
+      collectionDeps,
+    );
+    assert.ok(html.includes("[portfolio/alpha.html]"), html);
+    assert.ok(html.includes("[el/portfolio/alpha.html]"), html);
+    assert.ok(html.includes("[el/about.html]"), html);
+  });
+});
+
+// A project whose default language is Greek: its root content IS Greek, so
+// nothing it links to may acquire a folder.
+describe("a project whose default language is not English", () => {
+  const EL_DEFAULT_ID = "colllink-eldefault-uuid";
+  const EL_DEFAULT_FOLDER = "colllink-eldefault-project";
+  const elScope = { actor: { id: "default", kind: "local" }, projectId: EL_DEFAULT_ID, folderName: EL_DEFAULT_FOLDER };
+  const ITEM_TEMPLATE = `<a href="{{ item.settings.cta.href }}">{{ item.settings.title }}</a>`;
+  const LAYOUT = `<!DOCTYPE html><html><head><title>{{ page.seo.title }}</title></head><body>{{ main_content | raw }}</body></html>`;
+
+  before(async () => {
+    projectRepo.createProject({
+      id: EL_DEFAULT_ID,
+      folderName: EL_DEFAULT_FOLDER,
+      name: "Greek Default",
+      theme: "__t__",
+      defaultLanguage: "el",
+      languages: [],
+      created: new Date().toISOString(),
+      updated: new Date().toISOString(),
+    });
+    const dir = getProjectDir(EL_DEFAULT_FOLDER);
+    await fs.ensureDir(path.join(dir, "pages", "global"));
+    await fs.writeFile(path.join(dir, "layout.liquid"), LAYOUT);
+    await fs.outputJSON(path.join(dir, "pages", "sxetika.json"), {
+      slug: "sxetika",
+      uuid: "u-el-default-about",
+      name: "Sxetika",
+      widgets: {},
+    });
+
+    await seedRootPortfolio(elScope);
+  });
+
+  async function loadPages(folder, defaultLanguage) {
+    const pages = await listPagesFromDir(getProjectDir(folder), { defaultLanguage });
+    return new Map(pages.filter((page) => page.uuid).map((page) => [page.uuid, page]));
+  }
+
+  async function seedRootPortfolio(scope) {
+    const schema = { ...PORTFOLIO_SCHEMA, settings: [...PORTFOLIO_SCHEMA.settings, { type: "link", id: "cta" }] };
+    await storage.write(scope, "collection-types/portfolio/schema.json", JSON.stringify(schema, null, 2));
+    await storage.write(scope, "collection-types/portfolio/template.liquid", ITEM_TEMPLATE);
+    await storage.write(
+      scope,
+      "collections/portfolio/alpha.json",
+      JSON.stringify({
+        id: "alpha",
+        uuid: "u-el-default-alpha",
+        slug: "alpha",
+        schemaVersion: 1,
+        created: "2026-01-02T00:00:00.000Z",
+        updated: "2026-01-02T00:00:00.000Z",
+        settings: {
+          title: "Alpha",
+          cta: { pageUuid: "u-el-default-about", href: "stale.html", text: "Go", target: "_self" },
+        },
+      }),
+    );
+  }
+
+  it("leaves a listing's item URLs at the root", async () => {
+    const dir = path.join(getProjectDir(EL_DEFAULT_FOLDER), "widgets", "list-widget");
+    await fs.ensureDir(dir);
+    await fs.writeFile(
+      path.join(dir, "widget.liquid"),
+      `{% assign rows = 'portfolio' | collection %}{% for r in rows %}[{{ r.url }}]{% endfor %}`,
+    );
+    await fs.writeFile(path.join(dir, "schema.json"), JSON.stringify({ type: "list-widget", settings: [] }));
+    const html = await renderWidget(
+      EL_DEFAULT_ID,
+      "list-widget",
+      { type: "list-widget", settings: {} },
+      RAW_THEME,
+      "publish",
+      null,
+      null,
+      { storage, scope: elScope },
+    );
+    assert.ok(html.includes("[portfolio/alpha.html]"), html);
+    assert.ok(!html.includes("el/portfolio"), html);
+  });
+
+  it("leaves an item page's own links at the root", async () => {
+    const schema = { ...PORTFOLIO_SCHEMA, settings: [...PORTFOLIO_SCHEMA.settings, { type: "link", id: "cta" }] };
+    const item = {
+      id: "alpha",
+      uuid: "u-el-default-alpha",
+      slug: "alpha",
+      settings: { title: "Alpha", cta: { pageUuid: "u-el-default-about", href: "stale.html", text: "Go", target: "_self" } },
+    };
+    const { html } = await renderCollectionItemPage(
+      EL_DEFAULT_ID,
+      {
+        schema,
+        item,
+        template: ITEM_TEMPLATE,
+        rawThemeSettings: RAW_THEME,
+        renderMode: "publish",
+        sharedGlobals: {
+          outputPathPrefix: "../",
+          currentCanonicalPath: "portfolio/alpha.html",
+          // The item render path takes the page map from its caller, as export does.
+          pagesByUuid: await loadPages(EL_DEFAULT_FOLDER, "el"),
+        },
+        headerData: null,
+        footerData: null,
+        projectData: projectRepo.getProjectById(EL_DEFAULT_ID),
+        siteUrl: "",
+      },
+      { storage, scope: elScope },
+    );
+    assert.ok(html.includes('href="../sxetika.html"'), html);
+    assert.ok(!html.includes("../el/"), html);
   });
 });

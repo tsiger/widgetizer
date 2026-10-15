@@ -3,6 +3,7 @@ import path from "path";
 import { randomUUID } from "crypto";
 import * as themeController from "../controllers/themeController.js";
 import { processTemplatesRecursive } from "./templateHelpers.js";
+import { isSafePathSegment } from "./pathSecurity.js";
 import { enrichNewProjectReferences } from "./linkEnrichment.js";
 
 /**
@@ -26,6 +27,11 @@ export async function scaffoldProjectContent({ projectDir, theme, preset }) {
   if (!theme) {
     throw new Error("Theme is required");
   }
+  // Checked here too, because embedding apps call this directly: the theme names
+  // the folder the project is copied from.
+  if (!isSafePathSegment(theme)) {
+    throw new Error(`Invalid theme name: ${JSON.stringify(theme)}`);
+  }
 
   const pagesDir = path.join(projectDir, "pages");
   const menusDir = path.join(projectDir, "menus");
@@ -44,17 +50,39 @@ export async function scaffoldProjectContent({ projectDir, theme, preset }) {
     throw new Error(`Failed to copy theme: ${error.message}`);
   }
 
-  // Resolve preset paths (templates, menus, settings overrides)
-  const { templatesDir, menusDir: presetMenusDir, settingsOverrides } =
-    await themeController.resolvePresetPaths(theme, preset);
+  // Resolve preset paths (templates, menus, settings overrides). This can fail
+  // on a preset whose settings file is present but unreadable, and the theme
+  // has already been copied by now — so the half-made directory goes with it.
+  let templatesDir;
+  let presetMenusDir;
+  let settingsOverrides;
+  try {
+    ({ templatesDir, menusDir: presetMenusDir, settingsOverrides } = await themeController.resolvePresetPaths(
+      theme,
+      preset,
+    ));
+  } catch (error) {
+    await fs.remove(projectDir);
+    console.error(`[projectScaffold] Reading the preset failed: ${error.message}`);
+    throw new Error("The project could not be created from this preset, so nothing was created.");
+  }
 
   // If preset has custom menus, replace root menus with preset menus
+  // The preset's menus replace the theme's. Staged first, because the old
+  // sequence removed the theme's menus and then copied — a failure between the
+  // two left a project with no menus at all, and said it was created fine.
   if (presetMenusDir) {
+    const stagedMenusDir = path.join(projectDir, ".preset-menus");
     try {
+      await fs.remove(stagedMenusDir);
+      await fs.copy(presetMenusDir, stagedMenusDir);
       await fs.remove(menusDir);
-      await fs.copy(presetMenusDir, menusDir);
+      await fs.move(stagedMenusDir, menusDir);
     } catch (error) {
-      console.warn(`[projectScaffold] Failed to apply preset menus: ${error.message}`);
+      await fs.remove(stagedMenusDir).catch(() => {});
+      await fs.remove(projectDir);
+      console.error(`[projectScaffold] Applying the preset's menus failed: ${error.message}`);
+      throw new Error("The project could not be created from this preset, so nothing was created.");
     }
   }
 
@@ -83,6 +111,8 @@ export async function scaffoldProjectContent({ projectDir, theme, preset }) {
   }
 
   // Apply preset settings overrides to the project's theme.json
+  // A preset's settings are the preset. Applying only some of them would give
+  // the project the preset's name and the theme's look.
   if (settingsOverrides) {
     try {
       const projectThemeJsonPath = path.join(projectDir, "theme.json");
@@ -101,7 +131,9 @@ export async function scaffoldProjectContent({ projectDir, theme, preset }) {
 
       await fs.writeFile(projectThemeJsonPath, JSON.stringify(themeJson, null, 2));
     } catch (error) {
-      console.warn(`[projectScaffold] Failed to apply preset settings overrides: ${error.message}`);
+      await fs.remove(projectDir);
+      console.error(`[projectScaffold] Applying the preset's settings failed: ${error.message}`);
+      throw new Error("The project could not be created from this preset, so nothing was created.");
     }
   }
 

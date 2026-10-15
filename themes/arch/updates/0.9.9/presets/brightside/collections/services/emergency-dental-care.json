@@ -1,0 +1,13 @@
+{
+  "slug": "emergency-dental-care",
+  "schemaVersion": 1,
+  "settings": {
+    "title": "Emergency Dental Care",
+    "icon": "emergency-bed",
+    "summary": "Same-day attention for sudden pain, a knocked-out tooth, or a lost filling.",
+    "description": "<p>Dental problems rarely wait for a convenient moment. When something goes wrong, call us and we will find you a slot as soon as we can, often the same day. Sudden pain, a knocked-out tooth, a lost filling, or a cracked tooth all count, and it is always worth ringing rather than waiting it out.</p><h2>What we deal with first</h2><p>Our first job is to settle the pain and work out what happened. We will take a careful look, ask how the problem started, and use an X-ray if we need a clearer picture. Once we understand the cause, we explain the options clearly, with no pressure, so you can decide on next steps.</p><ul><li>Toothache that is keeping you up or getting worse</li><li>A tooth that has been knocked out or pushed out of place</li><li>A lost or broken filling, crown, or cracked tooth</li></ul><p>Sometimes the fix is quick and we can sort it in one visit. Other times we settle things on the day and book you back for the full repair once any swelling has eased. Either way, you will leave knowing what is going on and what comes next.</p><h3>While you wait to be seen</h3><p>If a tooth has been knocked out, keep it moist, ideally in milk, and avoid touching the root. For pain or swelling, a cold compress against the cheek can help. Bring any broken pieces with you if you have them.</p><p>We would always rather you called early than tried to push through. Small problems are usually simpler and more comfortable to treat than ones left for days, so reach out as soon as something feels wrong.</p>",
+    "price": "From $120",
+    "duration": "30 min",
+    "featured_image": "/uploads/images/brightside-services-emergency-dental-care.webp"
+  }
+}

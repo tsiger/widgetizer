@@ -1,6 +1,6 @@
 import Tooltip from "../../components/ui/Tooltip";
 import { IconButton } from "../ui/Button";
-import { Search, Trash2, Check, Edit2, MoreVertical, FileText, Music, Copy } from "lucide-react";
+import { Search, Trash2, Check, Edit2, MoreVertical, FileText, Music, Film, Copy } from "lucide-react";
 import { API_URL } from "../../lib/config";
 import useFormatDate from "../../hooks/useFormatDate";
 import { formatFileSize } from "../../utils/formatFileSize";
@@ -68,6 +68,8 @@ export default function MediaListItem({
             />
           ) : file.type?.startsWith("audio/") ? (
             <Music className="text-slate-400" size={24} />
+          ) : file.type?.startsWith("video/") ? (
+            <Film className="text-slate-400" size={24} />
           ) : (
             <FileText className="text-slate-400" size={24} />
           )}

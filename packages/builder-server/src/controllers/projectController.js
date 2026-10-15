@@ -1,4 +1,7 @@
 import fs from "fs-extra";
+import { isSafePathSegment } from "../utils/pathSecurity.js";
+import { extractZipSafely, openZip, readZipEntry, UnsafeZipError } from "../utils/zipSafety.js";
+import { mediaLibraryProblem, collectionItemsProblem } from "../utils/backupContentChecks.js";
 import path from "path";
 import * as themeController from "./themeController.js";
 import archiver from "archiver";
@@ -13,11 +16,28 @@ import { randomUUID } from "crypto";
 import { ZIP_MIME_TYPES } from "../utils/mimeTypes.js";
 import { hasAvailableUpdate } from "../utils/updateStatus.js";
 import * as projectRepo from "../db/repositories/projectRepository.js";
+import { resolveSiteString } from "@widgetizer/core";
+import { loadSiteStrings, readerFor } from "../services/siteStringsService.js";
+import { requestLanguage } from "../utils/contentLanguage.js";
 import * as mediaRepo from "../db/repositories/mediaRepository.js";
-import { stripHtmlTags } from "../services/sanitizationService.js";
-import { isValidSiteUrl } from "@widgetizer/core/urlSafety";
-import { refreshMediaUsageAfterStructuralChange } from "../services/mediaUsageService.js";
-import { generateUniqueSlug } from "../utils/slugHelpers.js";
+import { stripHtmlToText } from "../services/sanitizationService.js";
+import { isReservedItemSlug } from "@widgetizer/core/contentAddress";
+import { isValidSiteUrl, siteUrlHasQueryOrFragment } from "@widgetizer/core/urlSafety";
+import { normalizeSiteIdentity } from "@widgetizer/core/siteIdentity";
+import {
+  DEFAULT_LANGUAGE,
+  hasNumericRegion,
+  isRtlLanguage,
+  isValidLanguageCode,
+  normalizeLanguageCode,
+} from "@widgetizer/core/languages";
+import {
+  refreshMediaUsageAfterStructuralChange,
+  updateSiteIdentityMediaUsage,
+  extractMediaPathsFromSiteIdentity,
+} from "../services/mediaUsageService.js";
+import { withContentWriteLock, assertIntroducedMediaExists } from "../services/contentCoordination.js";
+import { generateUniqueSlug, sanitizeSlug } from "../utils/slugHelpers.js";
 
 import { generateCopyName } from "../utils/namingHelpers.js";
 import {
@@ -38,6 +58,128 @@ async function ensureDirectories() {
 
 function isOptionalBoolean(value) {
   return value === undefined || typeof value === "boolean";
+}
+
+function isOptionalString(value) {
+  return value === undefined || value === null || typeof value === "string";
+}
+
+function sanitizeOptionalText(value) {
+  if (value === undefined) return undefined;
+  return value && value.trim() !== "" ? stripHtmlToText(value.trim()) : "";
+}
+
+/**
+ * Message for a rejected Site URL. A query or fragment gets its own wording
+ * because the address is otherwise fine and the fix is to delete a piece of it —
+ * the generic "enter a valid URL" sends the user hunting for the wrong problem.
+ * Mirrors the project form's inline validation.
+ */
+function siteUrlRejection(value) {
+  return siteUrlHasQueryOrFragment(value)
+    ? "Invalid Site Address. Remove the ? query or # part — this is the address your site lives at, and page paths are added onto it (e.g., https://mysite.com or https://mysite.com/blog/)."
+    : "Invalid Site Address. Please enter a valid URL (e.g., https://mysite.com).";
+}
+
+function stripTextFields(group, keys) {
+  if (!group || typeof group !== "object" || Array.isArray(group)) return group;
+  const stripped = { ...group };
+  for (const key of keys) {
+    if (typeof stripped[key] === "string") stripped[key] = stripHtmlToText(stripped[key]);
+  }
+  return stripped;
+}
+
+// Only human-readable text is tag-stripped. URLs, email, phone and the logo path
+// are left exactly as sent for core to accept or refuse: stripping re-serialises
+// through DOMPurify, which would silently rewrite a query string.
+function readSiteIdentity(raw) {
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) return normalizeSiteIdentity(raw);
+  const identity = stripTextFields(raw, ["priceRange"]);
+  identity.text = stripTextFields(raw.text, ["publicName", "description"]);
+  if (Array.isArray(raw.locations)) {
+    identity.locations = raw.locations.map((location) => {
+      const stripped = stripTextFields(location, ["streetAddress", "addressLocality", "addressRegion", "postalCode"]);
+      if (stripped !== location) stripped.text = stripTextFields(location.text, ["label"]);
+      return stripped;
+    });
+  }
+  return normalizeSiteIdentity(identity);
+}
+
+function siteIdentityRejection(errors) {
+  return { error: "Invalid business details.", fields: errors };
+}
+
+function languageRejection(raw) {
+  const code = normalizeLanguageCode(raw);
+  if (isRtlLanguage(code)) {
+    return `Right-to-left languages are not supported yet, so "${code}" cannot be used.`;
+  }
+  if (hasNumericRegion(code)) {
+    return `"${code}" names its country as a number. Use a country code instead, such as "pt-br".`;
+  }
+  const shown = typeof raw === "string" ? raw.trim() : JSON.stringify(raw);
+  return `${shown} is not a valid language code. Use a code like "en" or "pt-br".`;
+}
+
+/**
+ * Read and check the site's languages. `languages` holds only the ADDITIONAL
+ * codes, so an empty array means single-language. Pass `current` on update: the
+ * default language is editable only while the site has one language, because
+ * changing it later moves every page and rewrites every public URL — which a
+ * static export cannot redirect.
+ * `seeded` is for content that already exists — an import carries its language
+ * folders in the zip — and so may name a set the API would otherwise refuse to
+ * change here.
+ * @returns {{value?: {defaultLanguage?: string, languages?: string[]}, error?: string}}
+ */
+function readLanguages(updates, current = null, { seeded = false } = {}) {
+  let defaultLanguage;
+  if (updates.defaultLanguage !== undefined) {
+    defaultLanguage = normalizeLanguageCode(updates.defaultLanguage);
+    if (!defaultLanguage) return { error: "A default language is required." };
+    if (!isValidLanguageCode(defaultLanguage)) return { error: languageRejection(updates.defaultLanguage) };
+  }
+
+  let languages;
+  if (updates.languages !== undefined) {
+    if (!Array.isArray(updates.languages)) return { error: "languages must be an array of language codes." };
+    languages = [];
+    for (const raw of updates.languages) {
+      const code = normalizeLanguageCode(raw);
+      if (!isValidLanguageCode(code)) return { error: languageRejection(raw) };
+      if (!languages.includes(code)) languages.push(code);
+    }
+    // Adding or removing a language copies or deletes content, which needs the
+    // project's scope — these routes are actor-scoped. Resending the current
+    // list is fine, so saving the form never trips on it.
+    const before = [...(current?.languages ?? [])].sort().join();
+    if (!seeded && before !== [...languages].sort().join()) {
+      return {
+        error: current
+          ? "Languages are added and removed one at a time, so the site's content can be seeded or cleaned up. Use the site languages endpoint."
+          : "A new project starts with one language. Add the others once it exists.",
+      };
+    }
+  }
+
+  const nextDefault = defaultLanguage ?? current?.defaultLanguage ?? DEFAULT_LANGUAGE;
+  const nextLanguages = languages ?? current?.languages ?? [];
+
+  if (nextLanguages.includes(nextDefault)) {
+    return { error: `"${nextDefault}" is already the site's default language.` };
+  }
+
+  // Read against the CURRENT state, not the resulting one: while a project is
+  // single-language, one call may set a new default and add languages at once.
+  if (current && defaultLanguage && defaultLanguage !== current.defaultLanguage && (current.languages?.length ?? 0) > 0) {
+    return {
+      error: "The default language can only be changed while the site has one language. Remove the other languages first.",
+    };
+  }
+
+  return { value: { defaultLanguage, languages } };
 }
 
 /**
@@ -89,6 +231,17 @@ export async function seedPresetCollections(folderName, presetCollectionsDir) {
 
     for (const name of names) {
       const slug = name.replace(/\.json$/, "");
+      // The same gate the item API applies on create: a preset must not seed
+      // an item slug the API would refuse (an `index` item is reachable as the
+      // collection directory itself, so it can never own one address). Its
+      // uuid never enters oldToNewItemUuid, so preset menu/link refs to it
+      // resolve like refs to a deleted item (the link clears at render).
+      if (isReservedItemSlug(slug)) {
+        console.warn(
+          `[ProjectController] Skipping preset collection item "${type}/${name}": "${slug}" is a reserved item slug.`,
+        );
+        continue;
+      }
       const raw = await fs.readJSON(path.join(srcTypeDir, name));
       const now = new Date().toISOString();
       const newUuid = randomUUID();
@@ -97,10 +250,16 @@ export async function seedPresetCollections(folderName, presetCollectionsDir) {
       await fs.outputFile(path.join(destTypeDir, `${slug}.json`), JSON.stringify(seeded, null, 2));
     }
 
-    // Carry over a manual order file verbatim if the preset shipped one.
+    // Carry over a manual order file if the preset shipped one, minus any slug
+    // skipped above (the order rewriter prunes stale slugs on its next write
+    // anyway; this keeps the seeded project clean from the start).
     const orderSrc = path.join(srcTypeDir, "_order.json");
     if (await fs.pathExists(orderSrc)) {
-      await fs.copy(orderSrc, path.join(destTypeDir, "_order.json"));
+      const orderData = await fs.readJSON(orderSrc);
+      if (Array.isArray(orderData?.order)) {
+        orderData.order = orderData.order.filter((s) => !isReservedItemSlug(s));
+      }
+      await fs.outputFile(path.join(destTypeDir, "_order.json"), JSON.stringify(orderData, null, 2));
     }
   }
 
@@ -171,6 +330,28 @@ export async function seedPresetMedia(folderName, projectId, presetMediaDir) {
  * @param {string} [desiredFolder] - Optional folder slug; if absent, derived from name
  * @returns {Promise<{ name: string, folder: string }>}
  */
+/**
+ * Undo a project that was only partly made. Both halves are best-effort: the
+ * caller is already failing, and a leftover row or directory must not replace
+ * the reason it failed.
+ */
+async function discardHalfMadeProject(projectId, projectDir) {
+  if (projectId) {
+    try {
+      projectRepo.deleteProject(projectId);
+    } catch (error) {
+      console.warn(`[ProjectController] Could not remove the half-made project row: ${error.message}`);
+    }
+  }
+  if (projectDir) {
+    try {
+      await fs.remove(projectDir);
+    } catch (error) {
+      console.warn(`[ProjectController] Could not remove the half-made project directory: ${error.message}`);
+    }
+  }
+}
+
 async function resolveProjectIdentity(desiredName, desiredFolder) {
   const existingNames = projectRepo.getAllProjects().map((p) => p.name);
   const collides = existingNames.some((existing) => existing.toLowerCase() === desiredName.toLowerCase());
@@ -280,20 +461,45 @@ export async function getActiveProject(req, res) {
  */
 export async function createProject(req, res) {
   try {
-    const { name, folderName: providedFolderName, description, theme, siteTitle, siteUrl, receiveThemeUpdates, preset } = req.body;
+    const { name, folderName: providedFolderName, description, theme, siteTitle, siteUrl, cleanUrls, receiveThemeUpdates, preset } = req.body;
 
     // Defensive check: ensure name is not empty after sanitization
     if (!name || typeof name !== "string" || name.trim() === "") {
       return res.status(400).json({ error: "Project name is required." });
     }
 
+    for (const [field, value] of Object.entries({ description, siteTitle, siteUrl })) {
+      if (!isOptionalString(value)) return res.status(400).json({ error: `${field} must be a string.` });
+    }
+
     if (!isValidSiteUrl(siteUrl)) {
-      return res.status(400).json({ error: "Invalid Website Address. Please enter a valid URL (e.g., https://mysite.com)." });
+      return res.status(400).json({ error: siteUrlRejection(siteUrl) });
+    }
+
+    const { value: siteIdentity, errors: siteIdentityErrors } = readSiteIdentity(req.body.siteIdentity);
+    if (siteIdentityErrors.length) {
+      return res.status(400).json(siteIdentityRejection(siteIdentityErrors));
     }
 
     if (!isOptionalBoolean(receiveThemeUpdates)) {
       return res.status(400).json({ error: "receiveThemeUpdates must be a boolean." });
     }
+
+    if (!isOptionalBoolean(cleanUrls)) {
+      return res.status(400).json({ error: "cleanUrls must be a boolean." });
+    }
+
+    // Both name a folder the new project is built from, under the themes folder
+    // and the theme's presets folder, so neither may step outside it.
+    if (!isSafePathSegment(theme)) {
+      return res.status(400).json({ error: "This theme is not installed." });
+    }
+    if (preset && !isSafePathSegment(preset)) {
+      return res.status(400).json({ error: "This theme has no such preset." });
+    }
+
+    const { value: languageFields, error: languageError } = readLanguages(req.body);
+    if (languageError) return res.status(400).json({ error: languageError });
 
     // If a folder name is explicitly provided, validate its format. Collisions on
     // either name or folder are no longer hard errors — resolveProjectIdentity
@@ -325,13 +531,30 @@ export async function createProject(req, res) {
     // the theme via copyThemeToProject — never the preset).
     // Collection items are fs-only so they seed before the DB row; media files
     // register against the project_id, so that runs after createProject below.
-    const { collectionsDir: presetCollectionsDir, mediaDir: presetMediaDir } =
-      await themeController.resolvePresetPaths(theme, preset);
+    let presetCollectionsDir;
+    let presetMediaDir;
+    try {
+      ({ collectionsDir: presetCollectionsDir, mediaDir: presetMediaDir } = await themeController.resolvePresetPaths(
+        theme,
+        preset,
+      ));
+    } catch (error) {
+      await discardHalfMadeProject(null, projectDir);
+      console.error(`[ProjectController] Reading the preset failed: ${error.message}`);
+      throw new Error("The project could not be created from this preset, so nothing was created.");
+    }
+    // A preset the user picked and did not get is a failed creation, not a
+    // warning: the project would claim that preset while missing its content,
+    // and nothing afterwards would say so. An absent component is fine — the
+    // guard above is what distinguishes "this preset has no collections" from
+    // "this preset's collections could not be applied".
     if (presetCollectionsDir) {
       try {
         await seedPresetCollections(folderName, presetCollectionsDir);
       } catch (error) {
-        console.warn(`[ProjectController] Failed to seed preset collections: ${error.message}`);
+        await discardHalfMadeProject(null, projectDir);
+        console.error(`[ProjectController] Seeding preset collections failed: ${error.message}`);
+        throw new Error("The project could not be created from this preset, so nothing was created.");
       }
     }
 
@@ -340,12 +563,16 @@ export async function createProject(req, res) {
       folderName, // Folder identifier
       name: resolvedName,
       description,
-      siteTitle: siteTitle && siteTitle.trim() !== "" ? stripHtmlTags(siteTitle.trim()) : "",
+      siteTitle: siteTitle && siteTitle.trim() !== "" ? stripHtmlToText(siteTitle.trim()) : "",
       theme,
       themeVersion, // Version that was installed
       preset: preset || null, // Track which preset was used
       receiveThemeUpdates: receiveThemeUpdates ?? false, // Opt-in flag (default: off)
-      siteUrl: siteUrl && siteUrl.trim() !== "" ? stripHtmlTags(siteUrl.trim()) : "",
+      siteUrl: siteUrl && siteUrl.trim() !== "" ? stripHtmlToText(siteUrl.trim()) : "",
+      cleanUrls: cleanUrls ?? false, // internal links + SEO URLs without .html (extensionless hosts)
+      siteIdentity,
+      defaultLanguage: languageFields.defaultLanguage ?? DEFAULT_LANGUAGE,
+      languages: languageFields.languages ?? [],
       created: new Date().toISOString(),
       updated: new Date().toISOString(),
     };
@@ -363,7 +590,10 @@ export async function createProject(req, res) {
       try {
         await seedPresetMedia(folderName, newProject.id, presetMediaDir);
       } catch (error) {
-        console.warn(`[ProjectController] Failed to seed preset media: ${error.message}`);
+        // The row exists by now, so both halves have to go.
+        await discardHalfMadeProject(newProject.id, projectDir);
+        console.error(`[ProjectController] Seeding preset media failed: ${error.message}`);
+        throw new Error("The project could not be created from this preset, so nothing was created.");
       }
     }
 
@@ -444,7 +674,41 @@ export async function updateProject(req, res) {
       }
     }
 
-    // Check if folderName is being updated and if it would be different
+    for (const field of ["description", "siteTitle", "siteUrl"]) {
+      if (!isOptionalString(updates[field])) return res.status(400).json({ error: `${field} must be a string.` });
+    }
+
+    if (updates.siteUrl !== undefined && !isValidSiteUrl(updates.siteUrl)) {
+      return res.status(400).json({ error: siteUrlRejection(updates.siteUrl) });
+    }
+
+    let siteIdentity;
+    if (updates.siteIdentity !== undefined) {
+      const { value, errors } = readSiteIdentity(updates.siteIdentity);
+      if (errors.length) return res.status(400).json(siteIdentityRejection(errors));
+      siteIdentity = value;
+    }
+
+    if (!isOptionalBoolean(updates.receiveThemeUpdates)) {
+      return res.status(400).json({ error: "receiveThemeUpdates must be a boolean." });
+    }
+
+    if (!isOptionalBoolean(updates.cleanUrls)) {
+      return res.status(400).json({ error: "cleanUrls must be a boolean." });
+    }
+
+    // Checked here to refuse early, and again inside the write section below.
+    const { error: languageError } = readLanguages(updates, currentProject);
+    if (languageError) return res.status(400).json({ error: languageError });
+
+    const sanitizedSiteTitle = sanitizeOptionalText(updates.siteTitle);
+    const sanitizedSiteUrl = sanitizeOptionalText(updates.siteUrl);
+
+    // Only VALIDATED here; the move itself happens inside the media section below,
+    // after every check that can refuse this request. Moving first is what stranded
+    // a project whose logo was then rejected: directory renamed, row still naming
+    // the old folder.
+    let folderRename = null;
     if (updates.folderName && updates.folderName.trim() !== currentFolderName) {
       const newFolderName = updates.folderName.trim();
 
@@ -454,69 +718,142 @@ export async function updateProject(req, res) {
         return res.status(400).json({ error: "Folder Name can only contain lowercase letters, numbers, and hyphens" });
       }
 
-      // Check for duplicate folderNames (excluding current project)
-      if (projectRepo.projectFolderExists(newFolderName, id)) {
+      // Taken in the DB, or on disk: a folder left behind by a deletion that could
+      // not remove it would otherwise receive this project merged into its old
+      // content, and a failed rename's cleanup would delete it.
+      if (projectRepo.projectFolderExists(newFolderName, id) || (await fs.pathExists(getProjectDir(newFolderName)))) {
         return res.status(400).json({
           error: `A project with folder name "${newFolderName}" already exists. Please choose a different folder name.`,
         });
       }
 
-      // Rename the project directory
-      const oldDir = getProjectDir(currentFolderName);
-      const newDir = getProjectDir(newFolderName);
+      folderRename = { from: currentFolderName, to: newFolderName };
+    }
+
+    // The logo is a media reference like any other, so the row write and its usage
+    // sync are one media section. This route is actor-scoped (it edits a project by
+    // id, not the resolved one), so the scope for the asset check is built here.
+    //
+    // The folder rename happens INSIDE this section and AFTER the media check, not
+    // before it: a rejected logo used to leave the directory already moved while the
+    // row still named the old one, which strands the project. Everything that can
+    // refuse this request now refuses before anything on disk has moved.
+    const { updatedProject, usageStale, languageRefusal, folderLeftBehind } = await withContentWriteLock(id, async () => {
+      // Checked again against the row as it is NOW. Adding a language takes this
+      // section and records the code at its end, so the copy loaded before it can
+      // still show a single-language site: changing the default then would leave
+      // the new code as both the default and an additional language — a row no
+      // save, removal or default change can get out of again.
+      const languageCheck = readLanguages(updates, projectRepo.getProjectById(id));
+      if (languageCheck.error) return { languageRefusal: languageCheck.error };
+      const languageFields = languageCheck.value;
+
+      if (siteIdentity !== undefined) {
+        // Re-read the row HERE rather than comparing against the copy loaded before
+        // the lock. A baseline read earlier can still show a logo that another save
+        // has since removed and a delete has since acted on, which classifies the
+        // path as "already present" and skips the check — the same race that was
+        // fixed for pages and collection items.
+        const baseline = projectRepo.getProjectById(id);
+        // Checked against the folder the assets are STILL in — the rename below
+        // has not run yet.
+        await assertIntroducedMediaExists({
+          assetStorage: req.adapters.assetStorage,
+          scope: { projectId: id, folderName: currentFolderName },
+          previousPaths: extractMediaPathsFromSiteIdentity(baseline?.siteIdentity),
+          nextPaths: extractMediaPathsFromSiteIdentity(siteIdentity),
+        });
+      }
+
+      // A folder rename is copy, then repoint the row, then remove the old folder
+      // (copy + remove rather than rename, for Windows). Until the row names the
+      // new folder, the old one is the project and the copy is disposable: the
+      // copy's name was checked free on disk above, so removing it can only remove
+      // what this request made. Once the row names the copy, the copy is the
+      // project and must never be removed; an old folder that cannot be fully
+      // removed (a locked file) is reported, like a deletion's leftover.
+      const oldDir = folderRename ? getProjectDir(folderRename.from) : null;
+      const newDir = folderRename ? getProjectDir(folderRename.to) : null;
+      const discardCopy = async () => {
+        try {
+          await fs.remove(newDir);
+        } catch (cleanupError) {
+          console.warn(`[ProjectController] Failed to remove the unused copy ${newDir}: ${cleanupError.message}`);
+        }
+      };
+
+      if (folderRename) {
+        try {
+          await fs.copy(oldDir, newDir);
+        } catch (copyError) {
+          await discardCopy();
+          throw new Error(`Failed to rename project directory: ${copyError.message}`);
+        }
+      }
+
+      let saved;
+      try {
+        saved = projectRepo.updateProject(id, {
+          folderName: updates.folderName || currentFolderName,
+          name: updates.name,
+          description: updates.description,
+          siteTitle: sanitizedSiteTitle,
+          siteUrl: sanitizedSiteUrl,
+          cleanUrls: updates.cleanUrls,
+          siteIdentity,
+          defaultLanguage: languageFields.defaultLanguage,
+          languages: languageFields.languages,
+          receiveThemeUpdates: updates.receiveThemeUpdates,
+        });
+      } catch (rowError) {
+        if (folderRename) await discardCopy();
+        throw rowError;
+      }
+
+      let folderLeftBehind = null;
+      if (folderRename) {
+        // Windows can still hold handles from the copy for a moment.
+        await new Promise((resolve) => setTimeout(resolve, 100));
+        try {
+          await fs.remove(oldDir);
+        } catch (removeError) {
+          console.warn(`[ProjectController] Could not fully remove the old folder ${oldDir}: ${removeError.message}`);
+          folderLeftBehind = oldDir;
+        }
+      }
+
+      if (siteIdentity === undefined) return { updatedProject: saved, usageStale: false, folderLeftBehind };
 
       try {
-        // Use copy + remove instead of rename for better Windows compatibility
-        await fs.copy(oldDir, newDir);
-        await new Promise((resolve) => setTimeout(resolve, 100));
-        await fs.remove(oldDir);
-      } catch (renameError) {
-        // If copy succeeded but remove failed, try to clean up the new directory
-        try {
-          if (await fs.pathExists(newDir)) {
-            await fs.remove(newDir);
-          }
-        } catch (cleanupError) {
-          console.warn(`Failed to cleanup new directory after error: ${cleanupError.message}`);
-        }
-        throw new Error(`Failed to rename project directory: ${renameError.message}`);
+        await updateSiteIdentityMediaUsage(id, saved.siteIdentity);
+        return { updatedProject: saved, usageStale: false, folderLeftBehind };
+      } catch (error) {
+        // The details ARE saved; only the derived usage rows are behind.
+        console.warn(`[ProjectController] Failed to update business details media usage: ${error.message}`);
+        return { updatedProject: saved, usageStale: true, folderLeftBehind };
       }
-    }
-
-    if (updates.siteUrl !== undefined && !isValidSiteUrl(updates.siteUrl)) {
-      return res.status(400).json({ error: "Invalid Website Address. Please enter a valid URL (e.g., https://mysite.com)." });
-    }
-
-    if (!isOptionalBoolean(updates.receiveThemeUpdates)) {
-      return res.status(400).json({ error: "receiveThemeUpdates must be a boolean." });
-    }
-
-    // Sanitize site title and siteUrl if provided
-    const sanitizedSiteTitle = updates.siteTitle !== undefined
-      ? (updates.siteTitle && updates.siteTitle.trim() !== "" ? stripHtmlTags(updates.siteTitle.trim()) : "")
-      : undefined;
-    const sanitizedSiteUrl = updates.siteUrl !== undefined
-      ? (updates.siteUrl && updates.siteUrl.trim() !== "" ? stripHtmlTags(updates.siteUrl.trim()) : "")
-      : undefined;
-
-    const updatedProject = projectRepo.updateProject(id, {
-      folderName: updates.folderName || currentFolderName,
-      name: updates.name,
-      description: updates.description,
-      siteTitle: sanitizedSiteTitle,
-      siteUrl: sanitizedSiteUrl,
-      receiveThemeUpdates: updates.receiveThemeUpdates,
     });
 
-    res.json(updatedProject);
+    if (languageRefusal) return res.status(400).json({ error: languageRefusal });
+
+    res.json({
+      ...updatedProject,
+      ...(usageStale && { warnings: [{ code: "MEDIA_USAGE_STALE", path: "site-identity" }] }),
+      ...(folderLeftBehind && { folderLeftBehind }),
+    });
   } catch (error) {
+    if (error?.code === "MEDIA_REFERENCE_MISSING") {
+      return res.status(error.statusCode).json({ error: "Missing media", message: error.message, code: error.code });
+    }
     console.error("Error updating project:", error);
     res.status(500).json({ error: error.message || "Failed to update project" });
   }
 }
 
 /**
- * Deletes a project and all its associated files including exports.
+ * Deletes a project and its associated files including exports. A project
+ * folder that cannot be fully removed is reported as `folderLeftBehind` rather
+ * than failing the deletion, which has already happened.
  * @param {import('express').Request} req - Express request object with project ID in params
  * @param {import('express').Response} res - Express response object
  * @returns {Promise<void>}
@@ -535,8 +872,11 @@ export async function deleteProject(req, res) {
 
     res.json({
       success: true,
-      message: `Project "${result.projectName}" and all associated files have been deleted successfully`,
+      message: result.folderLeftBehind
+        ? `Project "${result.projectName}" was deleted, but some of its files could not be removed from ${result.folderLeftBehind}`
+        : `Project "${result.projectName}" and all associated files have been deleted successfully`,
       activeProjectId: result.newActiveProjectId,
+      folderLeftBehind: result.folderLeftBehind,
     });
   } catch (error) {
     console.error("Error deleting project:", error);
@@ -561,7 +901,14 @@ export async function duplicateProject(req, res) {
 
     const allProjects = projectRepo.getAllProjects();
     const newName = generateCopyName(originalProject.name, allProjects.map((p) => p.name));
-    const newFolderName = await generateUniqueSlug(newName, (slug) => projectRepo.projectFolderExists(slug, null), { fallback: "project" });
+    // Free on disk as well as in the DB, like create and import: a folder left
+    // behind by a deletion that could not remove it would otherwise receive this
+    // copy merged into its old content, and a failed copy's cleanup would delete it.
+    const newFolderName = await generateUniqueSlug(
+      newName,
+      async (slug) => projectRepo.projectFolderExists(slug, null) || (await fs.pathExists(getProjectDir(slug))),
+      { fallback: "project" },
+    );
 
     // Create the new project metadata
     const newProject = {
@@ -585,11 +932,14 @@ export async function duplicateProject(req, res) {
     try {
       await fs.copy(originalDir, newDir);
 
-      try {
-        await remapDuplicatedProjectUuids(newFolderName);
-      } catch (uuidUpdateError) {
-        console.warn(`[ProjectController] Failed to update UUIDs in cloned project: ${uuidUpdateError.message}`);
-      }
+      // Not a warning. The copy regenerates every page, item and menu identity
+      // and then re-points the links, menus, parents and translation groups that
+      // named the old ones; a failure between those two halves leaves a project
+      // whose references all name the ORIGINAL project's content, which renders
+      // as a site that has lost its internal links. Nothing of the user's is
+      // lost by removing a copy that was made seconds ago, so the copy goes and
+      // they can try again.
+      await remapDuplicatedProjectUuids(newFolderName);
     } catch (copyError) {
       try {
         await fs.remove(newDir);
@@ -598,13 +948,16 @@ export async function duplicateProject(req, res) {
           `[ProjectController] Failed to clean up new directory after copy failure: ${cleanupError.message}`,
         );
       }
-      throw new Error(`Failed to copy project files: ${copyError.message}`);
+      console.error(`[ProjectController] Duplication failed: ${copyError.message}`);
+      throw new Error("The project could not be duplicated, so no copy was made.");
     }
 
     // Save new project to DB
     projectRepo.createProject(newProject);
 
-    // Copy media metadata from original project to the duplicate in SQLite
+    // Copy media metadata from original project to the duplicate in SQLite. The
+    // library is part of the project: a copy that silently has none would show
+    // an empty Media page beside pages that still display the images.
     try {
       const originalMedia = mediaRepo.getMediaFiles(originalProjectId);
       if (originalMedia.files && originalMedia.files.length > 0) {
@@ -615,7 +968,9 @@ export async function duplicateProject(req, res) {
         mediaRepo.writeMediaData(newProject.id, originalMedia);
       }
     } catch (mediaError) {
-      console.warn("Could not duplicate media metadata:", mediaError.message);
+      await discardHalfMadeProject(newProject.id, newDir);
+      console.error(`[ProjectController] Duplicating the media library failed: ${mediaError.message}`);
+      throw new Error("The project could not be duplicated, so no copy was made.");
     }
 
     await refreshMediaUsageAfterStructuralChange(newProject.id, "project duplication");
@@ -633,6 +988,65 @@ export async function duplicateProject(req, res) {
  * @param {import('express').Response} res - Express response object
  * @returns {Promise<void>}
  */
+/**
+ * Fill in every `defaultKey` with the theme's word for it, in the language the
+ * editor is showing. Nothing is stored: this is a default like any other, and
+ * an owner's own value still overrides it.
+ */
+async function withResolvedDefaults(schemas, req, res) {
+  const names = (list) => Array.isArray(list) && list.some((setting) => setting?.defaultKey);
+  const startingBlocksName = (list) => Array.isArray(list) && list.some((block) => block?.defaultKeys);
+  const wanted = schemas.some(
+    (s) =>
+      names(s?.settings) ||
+      (Array.isArray(s?.blocks) && s.blocks.some((b) => names(b?.settings))) ||
+      startingBlocksName(s?.defaultBlocks),
+  );
+  if (!wanted) return schemas;
+
+  const lang = requestLanguage(req, res);
+  if (!lang) return null;
+
+  const { defaultLanguage, languages } = lang;
+  // Through the same adapter the schemas above came from, so both describe the
+  // same project whatever root that adapter is rooted at.
+  const strings = await loadSiteStrings(readerFor(req.adapters.storage, req.scope), [defaultLanguage, ...languages]);
+
+  // As `resolvedDefault`, NOT as `default`: a `default` is copied into a new
+  // widget's settings and saved, which would freeze one language's wording into
+  // content and follow a page into its translations. The editor shows this and
+  // stores nothing until the owner types.
+  const fill = (list) =>
+    !Array.isArray(list)
+      ? list
+      : list.map((setting) => {
+          if (!setting?.defaultKey) return setting;
+          const found = resolveSiteString(strings, setting.defaultKey, lang.language, defaultLanguage);
+          return found === undefined ? setting : { ...setting, resolvedDefault: found };
+        });
+
+  // A starting block names its words itself, one key per setting, because the
+  // blocks a widget opens with can differ while sharing one block schema.
+  const fillStartingBlock = (block) => {
+    if (!block?.defaultKeys) return block;
+    const resolvedDefaults = {};
+    for (const [settingId, key] of Object.entries(block.defaultKeys)) {
+      const found = resolveSiteString(strings, key, lang.language, defaultLanguage);
+      if (found !== undefined) resolvedDefaults[settingId] = found;
+    }
+    return Object.keys(resolvedDefaults).length ? { ...block, resolvedDefaults } : block;
+  };
+
+  return schemas.map((schema) => ({
+    ...schema,
+    settings: fill(schema.settings),
+    ...(Array.isArray(schema.blocks)
+      ? { blocks: schema.blocks.map((block) => ({ ...block, settings: fill(block?.settings) })) }
+      : {}),
+    ...(Array.isArray(schema.defaultBlocks) ? { defaultBlocks: schema.defaultBlocks.map(fillStartingBlock) } : {}),
+  }));
+}
+
 export async function getProjectWidgets(req, res) {
   try {
     const { scope } = req;
@@ -725,7 +1139,14 @@ export async function getProjectWidgets(req, res) {
     // Filter out nulls (files without schemas or errors)
     const validSchemas = allSchemas.filter((schema) => schema !== null);
 
-    res.json(validSchemas);
+    // A `defaultKey` names one of the theme's own words, which only the render
+    // knows how to read. The editor shows settings, not pages, so the value is
+    // resolved here in the language being edited — otherwise a field whose
+    // default comes from the theme looks empty while the canvas shows its text.
+    const resolved = await withResolvedDefaults(validSchemas, req, res);
+    // `requestLanguage` has already answered a bad language code.
+    if (resolved === null) return;
+    res.json(resolved);
   } catch (error) {
     // Broader catch for unexpected errors
     res.status(500).json({ error: `Failed to get project widgets: ${error.message}` });
@@ -807,14 +1228,37 @@ export async function exportProject(req, res) {
         receiveThemeUpdates: project.receiveThemeUpdates || false,
         preset: project.preset || null,
         siteUrl: project.siteUrl || "",
+        cleanUrls: project.cleanUrls || false,
+        siteIdentity: project.siteIdentity || {},
+        defaultLanguage: project.defaultLanguage || DEFAULT_LANGUAGE,
+        languages: project.languages || [],
+        // Optional provenance: when the theme was last updated, and to what.
+        // A backup written before these were carried simply has neither, and
+        // imports without them.
+        lastThemeUpdateAt: project.lastThemeUpdateAt || null,
+        lastThemeUpdateVersion: project.lastThemeUpdateVersion || null,
         created: project.created,
         updated: project.updated,
       },
     };
 
-    // Generate filename
+    // Media metadata is read BEFORE the response starts streaming. It is part of
+    // the backup, not a nicety, so a read failure has to be answerable with a
+    // status code — once `archive.pipe(res)` runs, the only thing left to send
+    // is a truncated ZIP that looks like a complete one.
+    let mediaData;
+    try {
+      mediaData = mediaRepo.getMediaFiles(project.id);
+    } catch (mediaError) {
+      return res.status(500).json({
+        error: `Could not read the media library for this project, so the backup would be incomplete: ${mediaError.message}`,
+      });
+    }
+
+    // Generate filename. sanitizeSlug transliterates non-Latin names (e.g. Greek) instead of
+    // rewriting every character to a dash the way a raw [^a-z0-9] strip would.
     const timestamp = new Date().toISOString().replace(/[:.]/g, "-").slice(0, -5);
-    const safeName = project.name.replace(/[^a-z0-9-]/gi, "-").toLowerCase();
+    const safeName = sanitizeSlug(project.name, "site");
     const zipFilename = `${safeName}-export-${timestamp}.zip`;
 
     // Set response headers
@@ -843,8 +1287,17 @@ export async function exportProject(req, res) {
     // Add all project files recursively
     // Exclude system files and directories
     const excludePatterns = [/^\./, /node_modules/, /\.git/];
+    // `uploads/media.json` is never taken from disk. Metadata lives in SQLite
+    // and is appended below under this exact name; archiving the file too would
+    // put two entries with one name in the ZIP, and an extractor keeps the
+    // first — so a leftover file (a project older than the move to SQLite, or a
+    // restore that failed and left its copy behind) would silently become the
+    // restored library. Excluded even when the live library is empty, so
+    // "this project has no media" restores as no media.
+    const MEDIA_METADATA_ENTRY = "uploads/media.json";
     const shouldExclude = (filePath) => {
       const relativePath = path.relative(projectDir, filePath);
+      if (relativePath.split(path.sep).join("/") === MEDIA_METADATA_ENTRY) return true;
       return excludePatterns.some((pattern) => pattern.test(relativePath));
     };
 
@@ -865,16 +1318,10 @@ export async function exportProject(req, res) {
 
     await addDirectory(projectDir);
 
-    // Serialize media metadata from SQLite into the ZIP
-    // (media metadata moved from uploads/media.json to SQLite, so it must be explicitly included)
-    try {
-      const mediaData = mediaRepo.getMediaFiles(project.id);
-      if (mediaData.files && mediaData.files.length > 0) {
-        archive.append(JSON.stringify(mediaData, null, 2), { name: "uploads/media.json" });
-      }
-    } catch (mediaError) {
-      console.warn("Could not export media metadata:", mediaError.message);
-    }
+    // Serialize media metadata from SQLite into the ZIP. Written even when the
+    // library is empty: the entry's presence is what tells a restore that this
+    // backup describes the library, rather than leaving it to guess.
+    archive.append(JSON.stringify({ files: mediaData.files || [] }, null, 2), { name: MEDIA_METADATA_ENTRY });
 
     // Finalize the archive
     await archive.finalize();
@@ -943,6 +1390,72 @@ export async function handleImportUpload(req, res, next) {
   }
 }
 
+/** A backup refused for what it contains, after it was unpacked. */
+class BackupRefusedError extends Error {
+  constructor(message) {
+    super(message);
+    this.statusCode = 400;
+  }
+}
+
+function refusedBackupMessage(problem) {
+  return `This backup cannot be imported: ${problem} A backup made by Widgetizer never contains this, so the file may have been changed. The project was not imported.`;
+}
+
+/**
+ * A yes/no setting from a backup: a boolean, or the 0/1 a database column holds
+ * when a writer passes it through unconverted. Null for anything else.
+ */
+function importedFlag(value) {
+  if (typeof value === "boolean") return value;
+  if (value === 0 || value === 1) return value === 1;
+  return null;
+}
+
+/**
+ * Why a backup's project details cannot be imported, or null.
+ * @param {object} project - `manifest.project`
+ * @returns {string|null}
+ */
+function importManifestProblem(project) {
+  if (!isSafePathSegment(project.theme)) return `its theme name ${JSON.stringify(project.theme)} is not a valid theme folder name.`;
+  if (project.preset != null && project.preset !== "" && !isSafePathSegment(project.preset)) {
+    return `its preset name ${JSON.stringify(project.preset)} is not a valid preset folder name.`;
+  }
+  if (typeof project.name !== "string") return "its project name is not text.";
+  for (const field of ["description", "siteTitle", "siteUrl"]) {
+    if (!isOptionalString(project[field])) return `its ${field} is not text.`;
+  }
+  // An unusable Site Address is not refused: projects saved before the address
+  // was checked can still hold one, and every use of it already ignores a value
+  // it cannot parse (no full URLs, no sitemap) while export warns about it.
+  for (const field of ["receiveThemeUpdates", "cleanUrls"]) {
+    if (project[field] != null && importedFlag(project[field]) === null) return `its ${field} setting is not true or false.`;
+  }
+  return null;
+}
+
+/**
+ * Why an unpacked backup's content cannot be imported, or null: its media
+ * library's paths and translation languages, and its collection item slugs.
+ * @param {string} dir - the unpacked backup
+ * @param {string[]} languages - the project's languages other than the default
+ */
+async function backupContentProblem(dir, languages) {
+  const mediaJsonPath = path.join(dir, "uploads", "media.json");
+  if (await fs.pathExists(mediaJsonPath)) {
+    let mediaData = null;
+    try {
+      mediaData = await fs.readJson(mediaJsonPath);
+    } catch {
+      // An unreadable library is refused further on, with its own message.
+    }
+    const problem = mediaLibraryProblem(mediaData, languages);
+    if (problem) return problem;
+  }
+  return collectionItemsProblem(dir);
+}
+
 /**
  * Imports a project from an uploaded ZIP archive.
  * Validates the archive structure and theme compatibility before import.
@@ -967,8 +1480,14 @@ export async function importProject(req, res) {
       });
     }
 
-    const AdmZip = await import("adm-zip");
-    const zip = new AdmZip.default(uploadedFilePath);
+    let zip;
+    try {
+      zip = await openZip(uploadedFilePath);
+    } catch (error) {
+      return res.status(400).json({ error: error.message });
+    }
+    // The unpacking budget is measured against the file as it is on disk.
+    const zipSize = (await fs.stat(uploadedFilePath)).size;
 
     // Safety: validate ZIP paths (prevent path traversal)
     for (const entry of zip.getEntries()) {
@@ -984,6 +1503,18 @@ export async function importProject(req, res) {
       return res.status(400).json({ error: "Uploaded ZIP file is empty" });
     }
 
+    // A backup made before media metadata became SQLite-only can carry two
+    // entries named `uploads/media.json` — the file that was on disk and the
+    // serialized library. They describe different libraries and nothing says
+    // which is current, so the import refuses rather than picking one.
+    const mediaMetadataEntries = zipEntries.filter((entry) => entry.entryName === "uploads/media.json");
+    if (mediaMetadataEntries.length > 1) {
+      return res.status(400).json({
+        error:
+          "This backup contains more than one media library (two copies of uploads/media.json), and there is no way to tell which one is current. Re-export the project with this version and import that backup instead.",
+      });
+    }
+
     // Find and validate manifest
     const manifestEntry = zipEntries.find((entry) => entry.entryName === "project-export.json");
     if (!manifestEntry) {
@@ -992,9 +1523,10 @@ export async function importProject(req, res) {
 
     let manifest;
     try {
-      const manifestContent = manifestEntry.getData().toString("utf8");
+      const manifestContent = (await readZipEntry(manifestEntry, zipSize)).toString("utf8");
       manifest = JSON.parse(manifestContent);
-    } catch {
+    } catch (error) {
+      if (error instanceof UnsafeZipError) return res.status(400).json({ error: error.message });
       return res.status(400).json({ error: "Invalid project export: corrupted manifest file" });
     }
 
@@ -1002,6 +1534,25 @@ export async function importProject(req, res) {
     if (!manifest.project || !manifest.project.name || !manifest.project.theme) {
       return res.status(400).json({ error: "Invalid project export: incomplete manifest" });
     }
+
+    // Language metadata is validated before a name, a folder or a row exists.
+    // A backup whose languages this version cannot read describes a site it
+    // cannot hold: importing it anyway would put the project's other-language
+    // pages, menus and items on disk with nothing listing them, which reads as
+    // a successful restore of a site that has quietly lost part of itself.
+    // A backup with no language fields at all is a single-language project from
+    // before languages existed, and imports on the ordinary defaults.
+    const languageCheck = readLanguages(manifest.project, null, { seeded: true });
+    if (languageCheck.error) {
+      return res.status(400).json({
+        error: `This backup uses a language this version of Widgetizer cannot work with: ${languageCheck.error} The project was not imported, so nothing has changed and your backup file is untouched. Open it with a newer version of Widgetizer.`,
+      });
+    }
+
+    // The project details a backup carries are held to what the app itself
+    // writes. The theme and preset name folders; the rest becomes the project row.
+    const manifestProblem = importManifestProblem(manifest.project);
+    if (manifestProblem) return res.status(400).json({ error: refusedBackupMessage(manifestProblem) });
 
     // Check if theme exists
     const themeDir = getThemeDir(manifest.project.theme);
@@ -1014,7 +1565,10 @@ export async function importProject(req, res) {
     // Resolve a unique name + folder pair using the same scheme as createProject.
     // If a project with the same name already exists, the imported one becomes
     // "X (Copy)" / "X (Copy N)" so the project switcher stays unambiguous.
-    const { name: resolvedName, folder: folderName } = await resolveProjectIdentity(manifest.project.name);
+    // Stripped of markup as the create form's name is.
+    const importedName = stripHtmlToText(manifest.project.name.trim());
+    if (!importedName) return res.status(400).json({ error: refusedBackupMessage("its project name is empty.") });
+    const { name: resolvedName, folder: folderName } = await resolveProjectIdentity(importedName);
     const projectDir = getProjectDir(folderName);
 
     // Create temporary extraction directory
@@ -1023,8 +1577,13 @@ export async function importProject(req, res) {
 
     let newProject = null;
     try {
-      // Extract ZIP to temporary directory
-      zip.extractAllTo(tempDir, true);
+      // Extract ZIP to temporary directory. Top-level dot entries are working
+      // files (a theme update's `.theme-update-backup`, its staging folder) that
+      // a backup never contains — export leaves every one of them out — and a
+      // planted one would be acted on by the next theme update.
+      await extractZipSafely(zip, zipSize, tempDir, {
+        skip: (entryName) => entryName.split("/")[0].startsWith("."),
+      });
 
       // Validate extracted structure
       const extractedManifestPath = path.join(tempDir, "project-export.json");
@@ -1047,21 +1606,36 @@ export async function importProject(req, res) {
         }
       }
 
+      const importedLanguages = languageCheck.value ?? {};
+
       // Create new project object (DB insert happens later, after directory setup)
       newProject = {
         id: randomUUID(),
         folderName,
         name: resolvedName,
-        description: manifest.project.description || "",
-        siteTitle: manifest.project.siteTitle || "",
+        description: sanitizeOptionalText(manifest.project.description) || "",
+        siteTitle: sanitizeOptionalText(manifest.project.siteTitle) || "",
         theme: manifest.project.theme,
         themeVersion,
-        receiveThemeUpdates: manifest.project.receiveThemeUpdates || false,
+        receiveThemeUpdates: importedFlag(manifest.project.receiveThemeUpdates) ?? false,
         preset: manifest.project.preset || null,
         siteUrl: manifest.project.siteUrl || "",
+        cleanUrls: importedFlag(manifest.project.cleanUrls) ?? false,
+        siteIdentity: readSiteIdentity(manifest.project.siteIdentity).value,
+        // An export from another install can carry anything; fall back to a
+        // single-language project rather than importing an unusable code.
+        defaultLanguage: importedLanguages.defaultLanguage ?? DEFAULT_LANGUAGE,
+        languages: importedLanguages.languages ?? [],
+        lastThemeUpdateAt: manifest.project.lastThemeUpdateAt || null,
+        lastThemeUpdateVersion: manifest.project.lastThemeUpdateVersion || null,
         created: new Date().toISOString(),
         updated: new Date().toISOString(),
       };
+
+      // What the backup names inside its files, checked before any of it is
+      // copied into the new project.
+      const contentProblem = await backupContentProblem(tempDir, importedLanguages.languages ?? []);
+      if (contentProblem) throw new BackupRefusedError(refusedBackupMessage(contentProblem));
 
       // Create project directory
       await fs.ensureDir(projectDir);
@@ -1091,11 +1665,29 @@ export async function importProject(req, res) {
       projectRepo.createProject(newProject);
 
       // Restore media metadata from the exported media.json into SQLite
+      // The media library is part of the project, so a restore that cannot read
+      // or write it fails the import rather than reporting a success that has
+      // quietly lost the library. The outer handler removes the row and the
+      // directory, so a refusal leaves nothing behind to clean up by hand.
       const mediaJsonPath = path.join(projectDir, "uploads", "media.json");
-      try {
-        if (await fs.pathExists(mediaJsonPath)) {
-          const mediaData = await fs.readJson(mediaJsonPath);
-          if (mediaData.files && mediaData.files.length > 0) {
+      if (await fs.pathExists(mediaJsonPath)) {
+        let mediaData;
+        try {
+          mediaData = await fs.readJson(mediaJsonPath);
+        } catch (mediaError) {
+          throw new Error(`This backup's media library could not be read (uploads/media.json): ${mediaError.message}`);
+        }
+        // A library with no files is a project that has none, and restores as
+        // none. A file that parses but is not a library at all — `{}`, or a
+        // `files` that is not a list — is not that: reading it as empty would
+        // report a restored project whose media the backup may well have held.
+        if (!mediaData || typeof mediaData !== "object" || !Array.isArray(mediaData.files)) {
+          throw new Error(
+            "This backup's media library is not in a form this version can read (uploads/media.json has no list of files). The project was not imported.",
+          );
+        }
+        try {
+          if (mediaData.files.length > 0) {
             // Regenerate media file IDs to avoid UNIQUE constraint conflicts
             // (the original project may still exist in the database)
             for (const file of mediaData.files) {
@@ -1103,19 +1695,19 @@ export async function importProject(req, res) {
             }
             mediaRepo.writeMediaData(newProject.id, mediaData);
           }
-          // Remove the media.json file after importing its metadata into SQLite.
-          await fs.remove(mediaJsonPath);
+        } catch (mediaError) {
+          throw new Error(`This backup's media library could not be restored: ${mediaError.message}`);
         }
-      } catch (mediaError) {
-        console.warn("Could not restore media metadata from export:", mediaError.message);
-        // Non-fatal: project is still usable, media files exist on disk
+        // Only now: the file is the restore's input, and deleting it after a
+        // failure would turn a recoverable one into a silent loss.
+        await fs.remove(mediaJsonPath);
       }
 
       await refreshMediaUsageAfterStructuralChange(newProject.id, "project import");
 
-      // Clean up temporary files (extraction dir + uploaded ZIP)
+      // Clean up the extraction directory; the uploaded ZIP is removed in the
+      // `finally` below, which every exit passes through.
       await fs.remove(tempDir);
-      if (uploadedFilePath) await fs.remove(uploadedFilePath).catch(() => {});
 
       res.status(201).json({
         ...newProject,
@@ -1146,10 +1738,16 @@ export async function importProject(req, res) {
       throw error;
     }
   } catch (error) {
-    // Always clean up the uploaded temp file
-    if (uploadedFilePath) await fs.remove(uploadedFilePath).catch(() => {});
+    // A refused backup is the file's problem, not the server's.
+    if (error.statusCode === 400) return res.status(400).json({ error: error.message });
     console.error("Error importing project:", error);
     res.status(500).json({ error: error.message || "Failed to import project" });
+  } finally {
+    // The server's own copy of the upload, not the user's backup file. Every
+    // refusal above returns early, so removing it anywhere but here leaves one
+    // behind for each rejected import — and this handler has several reasons to
+    // refuse before it reaches the work.
+    if (uploadedFilePath) await fs.remove(uploadedFilePath).catch(() => {});
   }
 }
 

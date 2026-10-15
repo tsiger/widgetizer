@@ -1,0 +1,29 @@
+{
+  "type": "accordion",
+  "displayName": "Accordion",
+  "aliases": ["faq", "questions", "collapsible"],
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Frequently asked questions" },
+    { "type": "checkbox", "id": "allow_multiple", "label": "Allow several open at once", "default": false }
+  ],
+  "blocks": [
+    {
+      "type": "item",
+      "displayName": "Item",
+      "settings": [
+        { "type": "text", "id": "question", "label": "Question", "default": "A question visitors often ask" },
+        {
+          "type": "richtext",
+          "id": "answer",
+          "label": "Answer",
+          "default": "<p>A short, direct answer.</p>"
+        }
+      ]
+    }
+  ],
+  "defaultBlocks": [
+    { "type": "item", "settings": { "question": "What do you offer?" } },
+    { "type": "item", "settings": { "question": "How do I get started?" } },
+    { "type": "item", "settings": { "question": "How can I reach you?" } }
+  ]
+}

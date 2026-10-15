@@ -28,12 +28,14 @@ export async function getAllPages() {
 /**
  * Permanently delete a page by its ID.
  * @param {string} pageId - The ID of the page to delete
+ * @param {string} [language] - which language's page; a slug is unique per language
  * @returns {Promise<{success: boolean, message: string}>} Deletion confirmation
  * @throws {Error} If the page cannot be deleted
  */
-export async function deletePage(pageId) {
+export async function deletePage(pageId, language) {
+  const query = language ? `?language=${encodeURIComponent(language)}` : "";
   try {
-    return await editorFetchJson(`/pages/${pageId}`, {
+    return await editorFetchJson(`/pages/${pageId}${query}`, {
       method: "DELETE",
     }, { fallbackMessage: "Failed to delete page" });
   } catch (error) {
@@ -44,17 +46,18 @@ export async function deletePage(pageId) {
 /**
  * Delete multiple pages in a single operation.
  * @param {string[]} pageIds - Array of page IDs to delete
+ * @param {string} [language] - which language's pages; a slug is unique per language
  * @returns {Promise<{success: boolean, deletedCount: number}>} Deletion result with count
  * @throws {Error} If the bulk delete operation fails
  */
-export async function bulkDeletePages(pageIds) {
+export async function bulkDeletePages(pageIds, language) {
   try {
     return await editorFetchJson("/pages/bulk-delete", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ pageIds }),
+      body: JSON.stringify({ pageIds, ...(language ? { language } : {}) }),
     }, { fallbackMessage: "Failed to bulk delete pages" });
   } catch (error) {
     rethrowQueryError(error, "Failed to bulk delete pages");
@@ -67,11 +70,11 @@ export async function bulkDeletePages(pageIds) {
  * @returns {Promise<Page>} The page object with full content
  * @throws {Error} If the page is not found or request fails
  */
-export async function getPage(id) {
+export async function getPage(id, language) {
+  const query = language ? `?language=${encodeURIComponent(language)}` : "";
   try {
-    return await editorFetchJson(`/pages/${id}`, {}, { fallbackMessage: "Failed to get page" });
+    return await editorFetchJson(`/pages/${id}${query}`, {}, { fallbackMessage: "Failed to get page" });
   } catch (error) {
-    console.error("Error getting page:", error);
     rethrowQueryError(error, "Failed to get page");
   }
 }
@@ -159,13 +162,38 @@ export async function savePageContent(pageId, pageData) {
  * @returns {Promise<Page>} The newly created duplicate page
  * @throws {Error} If duplication fails
  */
-export async function duplicatePage(pageId) {
+export async function duplicatePage(pageId, language) {
+  const query = language ? `?language=${encodeURIComponent(language)}` : "";
   try {
-    return await editorFetchJson(`/pages/${pageId}/duplicate`, {
+    return await editorFetchJson(`/pages/${pageId}/duplicate${query}`, {
       method: "POST",
     }, { fallbackMessage: "Failed to duplicate page" });
   } catch (error) {
     console.error("Error duplicating page:", error);
     rethrowQueryError(error, "Failed to duplicate page");
+  }
+}
+
+/**
+ * Create this page's version in another language, joined to its translation group.
+ * @param {string} pageId - the source page's slug
+ * @param {{ targetLanguage: string, sourceLanguage?: string, slug?: string }} options
+ * @returns {Promise<Page>} the created page
+ * @throws {Error} If the version cannot be created
+ */
+export async function createPageLanguageVersion(pageId, { targetLanguage, sourceLanguage, slug } = {}) {
+  const query = sourceLanguage ? `?language=${encodeURIComponent(sourceLanguage)}` : "";
+  try {
+    return await editorFetchJson(
+      `/pages/${pageId}/translations${query}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ targetLanguage, ...(slug ? { slug } : {}) }),
+      },
+      { fallbackMessage: "Failed to create the page version" },
+    );
+  } catch (error) {
+    rethrowQueryError(error, "Failed to create the page version");
   }
 }

@@ -1,0 +1,13 @@
+{
+  "slug": "facial-treatment",
+  "schemaVersion": 1,
+  "settings": {
+    "title": "Signature Facial",
+    "icon": "sparkles",
+    "summary": "A cleanse, exfoliation, and mask tailored to your skin on the day you visit.",
+    "description": "<p>We start by looking at your skin and asking how it has been behaving lately, then build the steps around that rather than working from a script. If your skin has been dry, oily, or a little reactive, we adjust the products and the pace to match.</p><h2>What to expect during the facial</h2><p>From there you can expect a double cleanse, gentle exfoliation, a mask suited to your skin that day, and a short facial massage to ease the jaw and brow. The room is dim and quiet, and most people find the massage the part they remember most.</p><ul><li>A double cleanse to clear the day off your skin</li><li>Gentle exfoliation and a mask chosen on the day</li><li>A short facial massage around the cheeks, jaw, and forehead</li></ul><p>The session runs around forty-five minutes to an hour. We talk you through each step as we go, but you are welcome to simply close your eyes and let it happen if you would rather not chat.</p><h3>Who it suits and a little aftercare</h3><p>It works for most skin types, including first-time visitors who are not sure where to begin. If you have a specific concern like congestion or tightness, mention it when you book so we can plan the right products.</p><p>Your skin feels clean and calm by the end, and we send you off with a couple of simple tips to keep at home. We suggest leaving any strong actives or scrubs for a day or two afterwards, and wearing sunscreen if you are heading out, since freshly exfoliated skin is a touch more sensitive.</p>",
+    "price": "From $95",
+    "duration": "60 min",
+    "featured_image": "/uploads/images/velvet-touch-services-facial-treatment.webp"
+  }
+}

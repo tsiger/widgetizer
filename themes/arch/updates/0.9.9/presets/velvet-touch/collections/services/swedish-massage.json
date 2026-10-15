@@ -1,0 +1,13 @@
+{
+  "slug": "swedish-massage",
+  "schemaVersion": 1,
+  "settings": {
+    "title": "Swedish Massage",
+    "icon": "massage",
+    "summary": "Gentle, flowing strokes to ease everyday stress and leave the whole body loose.",
+    "description": "<p>This is the treatment to book when you just want to switch off for an hour. Long, even strokes warm up the muscles and slow your breathing down, and the pace stays unhurried from start to finish.</p><h2>What the session is like</h2><p>Your therapist keeps the pressure light to medium and checks in as they go, so the work never tips into discomfort. We focus on the back, shoulders, arms, and legs, easing the everyday tension that builds up from sitting, standing, or carrying stress in the neck.</p><ul><li>Flowing, full-body strokes at a gentle pace</li><li>Light to medium pressure, adjusted to you</li><li>Quiet, dim surroundings to help you settle</li></ul><p>The room is kept warm and calm, and you are welcome to talk or stay silent, whichever helps you relax. Most people find their shoulders drop within the first few minutes and the rest of the hour simply drifts by.</p><h3>Who it suits</h3><p>It suits first-time visitors and anyone who finds deeper work too intense, as well as regulars who want a steady, restful reset rather than firm pressure. If you are not sure which massage to choose, this is a safe and easy place to start.</p><p>Before you arrive, try to eat something light rather than a heavy meal, and let us know about any sore spots or areas to avoid. Afterwards, a glass of water and an unhurried walk home will help the calm last.</p>",
+    "price": "From $85",
+    "duration": "60 min",
+    "featured_image": "/uploads/images/velvet-touch-services-swedish-massage.webp"
+  }
+}

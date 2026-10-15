@@ -23,7 +23,7 @@ Responsive image gallery with grid or carousel layout, lightbox viewing, optiona
 
 | Block | Key settings | Notes |
 |---|---|---|
-| image | `image` (image picker), `caption` (text) | The only block type. Each block is one gallery item. Caption appears on hover inside a dark gradient overlay at the bottom of the card. Images without a caption still open in the lightbox on click. Responsive srcset is generated automatically at medium size. |
+| image | `image` (image picker), `caption` (text) | The only block type. Each block is one gallery item. Caption appears on hover inside a dark gradient overlay at the bottom of the card and under the image in the lightbox. A blank caption falls back to the image's media-library caption. Images without a caption still open in the lightbox on click. Responsive srcset is generated automatically at medium size. |
 
 ## Layout recipes
 

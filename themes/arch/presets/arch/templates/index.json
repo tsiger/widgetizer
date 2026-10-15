@@ -6,7 +6,6 @@
       "type": "slideshow",
       "settings": {
         "height": "medium",
-        "alignment": "center",
         "autoplay": true,
         "autoplay_speed": 6000
       },
@@ -31,7 +30,8 @@
             },
             "button_style_2": "secondary",
             "button_size": "medium",
-            "color_scheme": "highlight-primary"
+            "color_scheme": "highlight-primary",
+            "image": "/uploads/images/archhero01.webp"
           }
         },
         "slide-2": {
@@ -54,7 +54,8 @@
             },
             "button_style_2": "secondary",
             "button_size": "medium",
-            "color_scheme": "highlight-primary"
+            "color_scheme": "highlight-primary",
+            "image": "/uploads/images/archhero02.webp"
           }
         }
       },
@@ -74,37 +75,43 @@
         "logo-1": {
           "type": "logo",
           "settings": {
-            "name": "Horizon Labs"
+            "name": "Horizon Labs",
+            "image": "/uploads/images/logo01.webp"
           }
         },
         "logo-2": {
           "type": "logo",
           "settings": {
-            "name": "BrightWave"
+            "name": "BrightWave",
+            "image": "/uploads/images/logo02.webp"
           }
         },
         "logo-3": {
           "type": "logo",
           "settings": {
-            "name": "Northwind"
+            "name": "Northwind",
+            "image": "/uploads/images/logo03.webp"
           }
         },
         "logo-4": {
           "type": "logo",
           "settings": {
-            "name": "Atlas Group"
+            "name": "Atlas Group",
+            "image": "/uploads/images/logo04.webp"
           }
         },
         "logo-5": {
           "type": "logo",
           "settings": {
-            "name": "Momentum"
+            "name": "Momentum",
+            "image": "/uploads/images/logo05.webp"
           }
         },
         "logo-6": {
           "type": "logo",
           "settings": {
-            "name": "Solstice"
+            "name": "Solstice",
+            "image": "/uploads/images/logo06.webp"
           }
         }
       },
@@ -117,7 +124,7 @@
         "title": "Real outcomes, not vanity metrics",
         "description": "Measurable wins across strategy, operations, and growth.",
         "columns_desktop": 4,
-        "layout": "cards",
+        "layout": "grid",
         "animate": true,
         "color_scheme": "standard-primary"
       },
@@ -165,7 +172,8 @@
       "type": "image-callout",
       "settings": {
         "image_position": "start",
-        "color_scheme": "standard-primary"
+        "color_scheme": "standard-primary",
+        "image": "/uploads/images/callout.webp"
       },
       "blocks": {
         "eyebrow-text": {
@@ -382,7 +390,8 @@
         "height": "small",
         "alignment": "center",
         "color_scheme": "highlight-primary",
-        "fullwidth": true
+        "fullwidth": true,
+        "image": "/uploads/images/archcta01.webp"
       },
       "blocks": {
         "cta-text": {

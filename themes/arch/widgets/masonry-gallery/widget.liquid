@@ -106,7 +106,8 @@
 
         {% for blockId in widget.blocksOrder %}
           {% assign block = widget.blocks[blockId] %}
-          <div class="widget-card reveal reveal-fade" style="--reveal-delay: {{ forloop.index0 }}" data-block-id="{{ blockId }}" data-caption="{{ block.settings.title }}">
+          {% assign media_caption = block.settings.image | media_meta: 'caption' %}
+          <div class="widget-card reveal reveal-fade" style="--reveal-delay: {{ forloop.index0 }}" data-block-id="{{ blockId }}" data-caption="{{ block.settings.title | default: media_caption }}">
             {% if block.settings.image != blank %}
               {% image src: block.settings.image, size: 'medium', srcset: true, sizes: card_sizes, class: 'widget-card-image' %}
             {% else %}

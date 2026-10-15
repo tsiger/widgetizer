@@ -1,0 +1,217 @@
+{
+  "type": "services-grid",
+  "displayName": "tTheme:services_grid.name",
+  "aliases": ["services", "offerings", "treatments", "what we do", "pricing"],
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "tTheme:global.widgets.settings.eyebrow.label"
+    },
+    {
+      "type": "checkbox",
+      "id": "eyebrow_uppercase",
+      "label": "tTheme:global.widgets.settings.eyebrow_uppercase.label",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "tTheme:global.widgets.settings.title.label",
+      "default": "Our Services"
+    },
+    {
+      "type": "text",
+      "id": "description",
+      "label": "tTheme:global.widgets.settings.description.label",
+      "default": "Everything we offer, at a glance."
+    },
+    {
+      "type": "select",
+      "id": "heading_alignment",
+      "label": "tTheme:global.widgets.settings.alignment.label",
+      "default": "center",
+      "options": [
+        { "value": "start", "label": "tTheme:global.widgets.settings.alignment.options.start" },
+        { "value": "center", "label": "tTheme:global.widgets.settings.alignment.options.center" }
+      ]
+    },
+    {
+      "type": "link",
+      "id": "view_all_link",
+      "label": "tTheme:services_grid.settings.view_all_link.label",
+      "default": { "text": "View all services", "href": "", "target": "_self" }
+    },
+    {
+      "type": "header",
+      "id": "display_header",
+      "label": "tTheme:global.widgets.settings.display_header.label"
+    },
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "tTheme:global.widgets.settings.layout.label",
+      "default": "card",
+      "options": [
+        { "value": "card", "label": "tTheme:global.widgets.settings.layout.options.card" },
+        { "value": "overlay", "label": "tTheme:global.widgets.settings.layout.options.overlay" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "text_display",
+      "label": "tTheme:global.widgets.settings.text_display.label",
+      "description": "tTheme:global.widgets.settings.text_display.description",
+      "default": "always",
+      "options": [
+        { "value": "hover", "label": "tTheme:global.widgets.settings.text_display.options.hover" },
+        { "value": "always", "label": "tTheme:global.widgets.settings.text_display.options.always" }
+      ]
+    },
+    {
+      "type": "number",
+      "id": "limit",
+      "label": "tTheme:services_grid.settings.limit.label",
+      "description": "tTheme:services_grid.settings.limit.description",
+      "default": 6,
+      "min": 0
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "label": "tTheme:global.widgets.settings.columns_desktop.label",
+      "default": 3,
+      "min": 2,
+      "max": 5,
+      "step": 1
+    },
+    {
+      "type": "header",
+      "id": "cards_header",
+      "label": "tTheme:global.widgets.settings.cards_header.label"
+    },
+    {
+      "type": "select",
+      "id": "aspect_ratio",
+      "label": "tTheme:global.widgets.settings.aspect_ratio.label",
+      "default": "4 / 3",
+      "options": [
+        { "value": "auto", "label": "tTheme:global.widgets.settings.aspect_ratio.options.auto" },
+        { "value": "1 / 1", "label": "tTheme:global.widgets.settings.aspect_ratio.options.1 / 1" },
+        { "value": "4 / 3", "label": "tTheme:global.widgets.settings.aspect_ratio.options.4 / 3" },
+        { "value": "3 / 2", "label": "tTheme:global.widgets.settings.aspect_ratio.options.3 / 2" },
+        { "value": "16 / 9", "label": "tTheme:global.widgets.settings.aspect_ratio.options.16 / 9" }
+      ]
+    },
+    {
+      "type": "checkbox",
+      "id": "show_icon",
+      "label": "tTheme:services_grid.settings.show_icon.label",
+      "description": "tTheme:global.widgets.settings.card_layout_only.description",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_summary",
+      "label": "tTheme:services_grid.settings.show_summary.label",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_price",
+      "label": "tTheme:services_grid.settings.show_price.label",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_duration",
+      "label": "tTheme:services_grid.settings.show_duration.label",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_read_more",
+      "label": "tTheme:services_grid.settings.show_read_more.label",
+      "description": "tTheme:global.widgets.settings.card_layout_only.description",
+      "default": true
+    },
+    {
+      "type": "header",
+      "id": "icon_header",
+      "label": "tTheme:global.widgets.settings.icon_header.label"
+    },
+    {
+      "type": "select",
+      "id": "icon_style",
+      "label": "tTheme:global.widgets.settings.icon_style.label",
+      "default": "plain",
+      "options": [
+        { "value": "plain", "label": "tTheme:global.widgets.settings.icon_style.options.plain" },
+        { "value": "outline", "label": "tTheme:global.widgets.settings.icon_style.options.outline" },
+        { "value": "filled", "label": "tTheme:global.widgets.settings.icon_style.options.filled" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "icon_size",
+      "label": "tTheme:global.widgets.settings.icon_size.label",
+      "default": "lg",
+      "options": [
+        { "value": "sm", "label": "tTheme:global.widgets.settings.icon_size.options.sm" },
+        { "value": "md", "label": "tTheme:global.widgets.settings.icon_size.options.md" },
+        { "value": "lg", "label": "tTheme:global.widgets.settings.icon_size.options.lg" },
+        { "value": "xl", "label": "tTheme:global.widgets.settings.icon_size.options.xl" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "icon_shape",
+      "label": "tTheme:global.widgets.settings.icon_shape.label",
+      "default": "circle",
+      "options": [
+        { "value": "sharp", "label": "tTheme:global.widgets.settings.icon_shape.options.sharp" },
+        { "value": "rounded", "label": "tTheme:global.widgets.settings.icon_shape.options.rounded" },
+        { "value": "circle", "label": "tTheme:global.widgets.settings.icon_shape.options.circle" }
+      ]
+    },
+    {
+      "type": "header",
+      "id": "appearance_header",
+      "label": "tTheme:global.widgets.settings.appearance_header.label"
+    },
+    {
+      "type": "select",
+      "id": "color_scheme",
+      "label": "tTheme:global.widgets.settings.color_scheme.label",
+      "default": "standard-primary",
+      "options": [
+        { "value": "standard-primary", "label": "tTheme:global.widgets.settings.color_scheme.options.standard_primary" },
+        { "value": "standard-secondary", "label": "tTheme:global.widgets.settings.color_scheme.options.standard_secondary" },
+        { "value": "highlight-primary", "label": "tTheme:global.widgets.settings.color_scheme.options.highlight_primary" },
+        { "value": "highlight-secondary", "label": "tTheme:global.widgets.settings.color_scheme.options.highlight_secondary" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "top_spacing",
+      "label": "tTheme:global.widgets.settings.top_spacing.label",
+      "default": "auto",
+      "options": [
+        { "value": "auto", "label": "tTheme:global.widgets.settings.top_spacing.options.auto" },
+        { "value": "small", "label": "tTheme:global.widgets.settings.top_spacing.options.small" },
+        { "value": "none", "label": "tTheme:global.widgets.settings.top_spacing.options.none" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "bottom_spacing",
+      "label": "tTheme:global.widgets.settings.bottom_spacing.label",
+      "default": "auto",
+      "options": [
+        { "value": "auto", "label": "tTheme:global.widgets.settings.bottom_spacing.options.auto" },
+        { "value": "small", "label": "tTheme:global.widgets.settings.bottom_spacing.options.small" },
+        { "value": "none", "label": "tTheme:global.widgets.settings.bottom_spacing.options.none" }
+      ]
+    }
+  ]
+}

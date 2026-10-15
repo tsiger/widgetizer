@@ -7,7 +7,6 @@
       "settings": {
         "height": "large",
         "fullwidth": true,
-        "alignment": "center",
         "autoplay": true,
         "autoplay_speed": 7000
       },

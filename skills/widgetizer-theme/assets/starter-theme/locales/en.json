@@ -1,0 +1,21 @@
+{
+  "global": {
+    "general": { "name": "General" },
+    "colors": { "name": "Colors" },
+    "typography": { "name": "Typography" },
+    "layout": { "name": "Layout" },
+    "privacy": { "name": "Privacy" },
+    "advanced": { "name": "Advanced" }
+  },
+  "site": {
+    "header": {
+      "skip_link": "Skip to main content",
+      "menu_toggle": "Menu",
+      "primary_nav": "Primary",
+      "language": "Language"
+    },
+    "footer": {
+      "nav": "Footer"
+    }
+  }
+}

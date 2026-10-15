@@ -40,7 +40,7 @@
         "title": "",
         "heading_alignment": "start",
         "image_style": "full",
-        "aspect_ratio": "3/4",
+        "aspect_ratio": "3 / 4",
         "columns_desktop": 3,
         "layout": "grid",
         "color_scheme": "standard-primary"

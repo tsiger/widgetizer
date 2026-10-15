@@ -31,4 +31,9 @@ describe("MediaToolbar — type filter", () => {
     const { container } = renderToolbar();
     expect(container.querySelector('option[value="audio"]')).not.toBeNull();
   });
+
+  it("offers a video option in the type filter", () => {
+    const { container } = renderToolbar();
+    expect(container.querySelector('option[value="video"]')).not.toBeNull();
+  });
 });

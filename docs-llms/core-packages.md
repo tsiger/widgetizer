@@ -10,11 +10,37 @@ The repo is an npm workspace (`"workspaces": ["packages/*"]` in the root `packag
 
 | Package | Role | Key exports | Depends on |
 | --- | --- | --- | --- |
-| `@widgetizer/core` | Shared FE/BE primitives: Liquid tags/filters/snippets, fonts config, 3 core widgets, browser helpers, **plus the adapter contracts, error types, `LIMIT_KEYS`, and runner-agnostic conformance suites** | `adapters.js`, `errors.js`, `test-helpers/*`, Liquid tags/filters, `config/fonts.json` | `liquidjs ^10.26.0` |
-| `@widgetizer/render-engine` | Scope-free LiquidJS rendering — functions take a per-project `deps` bag; never resolves projects or touches SQLite, and reads templates/schemas from paths supplied by `deps` | `renderWidget`, `renderPageLayout`, `renderEnqueuedAssetTags`, `widgetSupportsTransparentHeader` | `@widgetizer/core`, `liquidjs` |
-| `@widgetizer/builder-server` | Express 5 backend: routes/controllers/services/SQLite db layer | `setupBuilderServer`, `createEditorApp`, `initDb` | `@widgetizer/core`, `@widgetizer/render-engine` (**not** `@widgetizer/adapters-local`) |
+| `@widgetizer/core` | Shared FE/BE primitives: Liquid tags/filters/snippets, fonts config, 3 core widgets (`core-divider`, `core-form`, `core-spacer`) with their `site` locales, browser helpers, structured data, **plus the adapter contracts, error types, `LIMIT_KEYS`, and runner-agnostic conformance suites** | `adapters`, `errors`, `test-helpers/*`, Liquid tags/filters, the utility subpaths listed below, `config/fonts.json`, `config/settingTypes`, `locales/*` | `liquidjs ^10.26.0`, `slugify` |
+| `@widgetizer/render-engine` | Scope-free LiquidJS rendering — functions take a per-project `deps` bag; never resolves projects or touches SQLite, and reads templates/schemas from paths supplied by `deps` | `renderWidget`, `renderPageLayout`, `renderCollectionItemPage`, `renderEnqueuedAssetTags`, `widgetSupportsTransparentHeader`, `planPagination`, `createLiquidEngine` / `widgetizerLiquidTags` (the runtime Liquid dialect, reused by theme tooling), `resolveMenuSettings` / `schemaHasMenuSetting`, `resolveThemeSettingReferences` | `@widgetizer/core`, `liquidjs` |
+| `@widgetizer/builder-server` | Express 5 backend: routes/controllers/services/SQLite db layer | `setupBuilderServer`, `createEditorApp`, `initDb` / `getDb` / `closeDb`, `runMigrations`, `errorHandler`, plus scope-free render/export/scaffold/theme-update helpers for embedding hosts (see `packages/builder-server/src/index.js`); `./env` subpath | `@widgetizer/core`, `@widgetizer/render-engine` (**not** `@widgetizer/adapters-local`) |
 | `@widgetizer/editor-ui` | Mountable React editor library | Root exports: extension API plus `EditorShell`, `EditorProvider`, `createEditorRoutes`; host-facing stores/hooks/queries/API clients are exposed through explicit subpath exports | `@widgetizer/core`; peers: `react`/`react-dom` >=19, `react-router-dom` >=7 |
 | `@widgetizer/adapters-local` | OSS (local FS + SQLite) implementations of the adapter contracts | `LocalScopeResolver`, `LocalPreviewScopeResolver`, `LocalStorageAdapter`, `LocalAssetStorageAdapter`, `LocalPublishAdapter`, `LocalLimitsAdapter` | `@widgetizer/core` |
+
+### `@widgetizer/core` subpath exports
+
+Besides the root index, `packages/core/package.json` maps these subpaths (all under `src/utils/` unless noted). Front end and back end import the same files, so a rule lives in one place:
+
+| Subpath | Holds |
+| --- | --- |
+| `./adapters`, `./errors` | Adapter typedefs + `LIMIT_KEYS` / constants; `WidgetizerError` family |
+| `./test-helpers/{storage,asset-storage,publish,limits,scope-resolver}` | Conformance suites (in `test-helpers/`) |
+| `./contentAddress` | Every storage/preview/output key by language (`pageKey`, `globalKey`, `menusDir`, …), `isHomeSlug`, reserved-slug checks |
+| `./languages` | Language-code rules (right-to-left refused), `SUPPORTED_LANGUAGES`, `DEFAULT_LANGUAGE`, `hreflangCase` |
+| `./translations` | `buildTranslations` for `page.translations`, `translationSibling`, `isNoindex` |
+| `./internalHref` | `pageHref` / `itemHref` (clean URLs, language folders, output prefix), `absoluteSiteUrl` / `siteUrlBase` |
+| `./linkPrefixer` | `prefixInternalHref` / `outputPathPrefixFor` for pages rendered below the site root |
+| `./publishedUrls` | Canonical/self URLs for pages, paginated pages, items and published images |
+| `./breadcrumbs` | `buildBreadcrumbs` and listing-parent resolution |
+| `./structuredData` (`src/structuredData/`) | JSON-LD graph builders (`structuredDataScript`, `buildGraph`), collection structured-data types |
+| `./siteIdentity` | Site identity normalization, readiness and theme projection |
+| `./mediaMetadata` | Per-language alt/title/caption resolution |
+| `./themeSettingChanges` | Diff/apply helpers for change-only theme-settings saves |
+| `./dateFormat` | Date-only formatting in the page's language |
+| `./assetUrl` | Versioned theme/widget asset URLs |
+| `./urlSafety`, `./escapeHtml`, `./pathSecurity` | `sanitizeHref` / site-URL validation, HTML escaping, `isWithinDirectory` / `assertWithin` |
+| `./richtextLinks`, `./richtextMedia` | Stable-reference link and media path handling inside richtext |
+| `./mimeTypes`, `./youtube`, `./blockLimits` | Content types, YouTube embed helpers, block caps |
+| `./config/settingTypes`, `./config/fonts.json`, `./locales/*` | Setting-type registry, font list, core widget dictionaries |
 
 ### Shell directories (not packages)
 
@@ -65,9 +91,9 @@ The dual `projectId` (UUID, authz) / `folderName` (path-safe) split matches the 
 
 ### Limit keys & constants
 
-`LIMIT_KEYS` (the keys passed to `getLimit`): `MAX_UPLOAD_SIZE_BYTES`, `MAX_PAGES_PER_PROJECT`, `MAX_PROJECTS_PER_USER`, `MAX_MEDIA_BYTES`, `CUSTOM_DOMAIN_ALLOWED`, `ANALYTICS_TIER`, `FORM_SUBMISSIONS_PER_MONTH`, `MAX_WIDGETS_PER_PAGE`, `MAX_MENU_ITEMS`, `MAX_COLLECTION_ITEMS`, `MAX_COLLECTIONS`.
+`LIMIT_KEYS` (the keys passed to `getLimit`): `MAX_UPLOAD_SIZE_BYTES`, `MAX_PAGES_PER_PROJECT`, `MAX_PROJECTS_PER_USER`, `MAX_MEDIA_BYTES`, `CUSTOM_DOMAIN_ALLOWED`, `ANALYTICS_TIER`, `FORM_SUBMISSIONS_PER_MONTH`, `MAX_WIDGETS_PER_PAGE`, `MAX_MENU_ITEMS`, `MAX_COLLECTION_ITEMS`, `MAX_COLLECTIONS`, `MAX_FORMS_PER_SITE`.
 
-Exported constants: `MAX_WIDGETS_PER_PAGE = 5000`, `MAX_MENU_ITEMS = 1000`, `MAX_MENU_DEPTH = 32` (`MAX_MENU_DEPTH` is a hard structural cap, not a per-tenant limit key).
+Exported constants: `MAX_WIDGETS_PER_PAGE = 5000`, `MAX_MENU_ITEMS = 1000`, `MAX_FORMS_PER_SITE = 5` (the finite values a host returns for those keys), `MAX_MENU_DEPTH = 32` (`MAX_MENU_DEPTH` is a hard structural cap, not a per-tenant limit key).
 
 `MAX_COLLECTION_ITEMS` (per-collection item count) and `MAX_COLLECTIONS` (collection-type count per project) guard the collection write path and the export-time per-collection enumeration against unbounded growth.
 
@@ -107,7 +133,7 @@ const { actorScopedRouter, projectScopedRouter, previewRouter } = setupBuilderSe
 | Router | Mounts |
 | --- | --- |
 | `actorScopedRouter` | `/projects`, `/themes`, `/settings`, `/core` |
-| `projectScopedRouter` | `/pages`, `/menus`, `/media`, `/preview`, `/export`, `/widgets`, `/icons`, `/collections` |
+| `projectScopedRouter` | `/pages`, `/menus`, `/media`, `/preview`, `/export`, `/widgets`, `/icons`, `/collections`, `/languages`, `/translations` |
 | `previewRouter` | `GET /render/:token` |
 
 `req.adapters` is attached **per-router** (not app-wide), so each router is self-sufficient wherever it is mounted.
@@ -135,12 +161,17 @@ Lives in builder-server. It delegates to `req.adapters.scopeResolver.resolveScop
 
 ## The editor-ui library seams
 
-`@widgetizer/editor-ui` is a mountable library: the same editor runs in the OSS SPA and embedded in the hosted app. Three seams keep it host-agnostic.
+`@widgetizer/editor-ui` is a mountable library: the same editor runs in the OSS SPA and embedded in the hosted app. Four seams keep it host-agnostic.
 
 ### API base & fetch
 
 - `lib/apiBase.js` — module singleton `_apiBase` (default `/api`), with `setApiBase` / `getApiBase`.
 - `lib/apiFetch.js` — `editorFetch(path, opts)` calls `apiFetch(getApiBase() + path)` and injects the `X-Project-Id` header. Query managers pass project-relative paths; the base is resolved at call time.
+
+### Mutation-success notification
+
+- `subscribeMutationSuccess(handler)` (`lib/mutationEvents.js`, exported from the package root) — registers a listener called with `{ method, path }` after a successful modifying request; returns an unsubscribe function. Two announce points: `apiFetch` (any non-GET/HEAD/OPTIONS response that is `ok` and not a followed redirect; `path` as passed in, API base included for editor calls) and `uploadRequest` (XHR uploads, announced as `POST` on a 2xx unless the XHR followed a redirect).
+- "Success" means HTTP success, not a content change: read-shaped POSTs (preview render, export, media refresh-usage) and a `207` partial result are announced too, so subscribers filter for what they care about. A listener that throws or returns a rejecting promise is logged and never breaks the request.
 
 ### Route base
 
@@ -150,13 +181,14 @@ Lives in builder-server. It delegates to `req.adapters.scopeResolver.resolveScop
 
 - `EditorProvider({ apiBase, previewRenderBase, standalonePreviewPath, standaloneCollectionPreviewPath, routeBase, project, scope, plugins, slots })` — binds the singletons, seeds the project store, composes `[builtinNavPlugin, ...plugins]`, and wraps children in `PluginProvider` + `RouteBaseProvider`.
 - `EditorShell` — adds the editor's own `Layout` on top of `EditorProvider`.
-- `createEditorRoutes({ … })` — returns a react-router route object. `EditorShell` deliberately owns **no** router, so the host supplies a single data-router context (needed for `useBlocker`).
+- `createEditorRoutes({ … })` — returns a react-router route object. `EditorShell` deliberately owns **no** router, so the host supplies a single data-router context (needed for `useBlocker`). `excludePaths` (default: none, every route kept) drops child routes by their relative `path` (e.g. `"export-site"`), so a host can 404 a surface server-side without a dead client route. It is route-only: the built-in nav plugin still advertises every entry, so a host using the stock `Layout`/`Sidebar` must filter its navigation separately.
+- `ConfirmProvider` / `useConfirm`, `ToastContainer` — per-window surfaces the **host shell mounts once** above the router (EditorProvider mounts neither). The navigation guards prompt through `useConfirm()`, which throws without a `ConfirmProvider` above it; the toast store renders nowhere without a `ToastContainer`.
 
 ### Extension system (`packages/editor-ui/src/extension/`)
 
 - `buildRegistry(plugins)` — merges declarative `navItems` / `routes` / `commands` from all plugins.
 - `createHookRunner(plugins)` — runs the lifecycle `HOOK_EVENTS` defined in `packages/editor-ui/src/extension/hooks.js` (`before*` run sequentially and halt on the first `{ proceed: false }`; `after*` are fire-and-forget).
-- `SLOT_NAMES`: `sidebarHeader`, `sidebarFooter`, `topbarLeft`, `topbarRight`, `topbarBanner`, `overlay`, `publishConfirmation`.
+- `SLOT_NAMES`: `sidebarHeader`, `sidebarFooter`, `topbarLeft`, `topbarRight`, `topbarBanner`, `overlay`, `publishConfirmation`, `pageEditorActions` (the page-editor top bar beside Preview/Save, distinct from the admin `topbarRight`).
 - `builtinNavPlugin` — supplies the default nav with `NAV_GROUPS` `site` and `tools`.
 
 ### Tailwind v4 preset
@@ -169,11 +201,17 @@ Exported as `@widgetizer/editor-ui/tailwind-preset` → `packages/editor-ui/src/
 
 `@widgetizer/render-engine` never resolves projects or touches SQLite. Its functions take a `RenderDeps` bag that supplies both capabilities and filesystem roots; the engine reads templates, schemas, snippets, menus, and icons from those supplied paths rather than importing builder-server services or concrete storage adapters. The bag has these keys:
 
-`projectId`, `projectDir` (absolute), `coreWidgetsDir`, `coreSnippetsDir`, `getProjectData()`, `getMediaFiles()`, `listPages()`, `sanitizeWidgetData()`, `preprocessThemeSettings()`, `buildRuntimeSiteIcons()`.
+`projectId`, `projectDir` (absolute), `coreWidgetsDir`, `coreSnippetsDir`, `getProjectData()`, `getMediaFiles()`, `listPages()`, `sanitizeWidgetData()`, `preprocessThemeSettings()`, `buildRuntimeSiteIcons()`. Optional `loadSiteStrings()` supplies all configured languages' visitor dictionaries; the engine uses it when available and caches the result on render globals. Optional collection capabilities (`buildCollectionItemsLoader`, `getCollectionSchemas`, `loadCollectionItemsByUuid`, `countCollectionItems`) come from builder-server's `buildCollectionRenderDeps`; `planPagination` returns `null` without `countCollectionItems`. The engine does not resolve storage scope itself, and the widget, schema, collection, menu, icon and layout paths it opens go through `resolveInside` (`safePath.js`), which contains both `..` and symlink escapes inside the roots `deps` supplied.
 
 builder-server's `services/renderingService.js` is a **thin wrapper**: `buildRenderDeps(projectId)` resolves `folderName` (the project-resolution error boundary lives here), assembles the bag, and preserves the historical `(projectId, …)` call signatures so existing controllers are unchanged. Hosted assembles its own (cloud) deps bag and reuses the shared helpers re-exported from builder-server's index.
 
 ---
+
+## Language within a project
+
+Content language is a partition within `Scope.projectId`, not a new adapter or actor. Default content remains at root; additional pages/globals/menus use a language subfolder, and collection items use `collections/<type>/<code>/`. Shared `contentAddress` helpers build those keys and language-first published paths. Builder-server validates request language through `contentLanguage.requestLanguage(req, res)` (`?language=` or `body.language`) before reading/writing the partition. Code rules (right-to-left refused) and the picker list live in `@widgetizer/core/languages`; `@widgetizer/core/translations` builds `page.translations`. `/languages` adds/removes one language at a time (`languageService`); `POST /pages/:id/translations` and `POST /collections/:type/:slug/translations` create a version in another language, and `/translations/:groupId` lists a group's members (`translationService`). Content writes, media deletion and language removal share one per-project section (`services/contentCoordination.js` `withContentWriteLock`), which re-checks the language and referenced media inside the lock. Theme settings, assets and identity stay shared; media descriptions have per-language overrides.
+
+`GET /widgets?language=<code>` resolves schema `defaultKey` values from app-owned core dictionaries with project-theme overrides, returning `resolvedDefault` and starter-block `resolvedDefaults` for `defaultKeys`. Values with `defaultKey` alone remain runtime suggestions; a literal `default` alongside it requests a stored localized initial value (needed by form field definitions). Widget catalog loads track language and request generation. See [domain language contracts](domain/multilingual.md) and [settings defaults](domain/entities/settings.md#localized-defaults-and-dates).
 
 ## The `require-scope-arg` lint rule
 

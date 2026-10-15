@@ -144,7 +144,7 @@
         "icon_style": "outline",
         "icon_size": "xl",
         "icon_shape": "circle",
-        "alignment": "centered",
+        "alignment": "center",
         "show_dividers": false,
         "color_scheme": "highlight-primary",
         "top_spacing": "small",
@@ -162,7 +162,7 @@
         "why-2": {
           "type": "item",
           "settings": {
-            "icon": "hand-heart",
+            "icon": "heart-handshake",
             "title": "Expert Therapists",
             "text": "500+ hours certified"
           }

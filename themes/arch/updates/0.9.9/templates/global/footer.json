@@ -1,0 +1,25 @@
+{
+  "type": "footer",
+  "settings": {
+    "copyright": "<p>Built with Widgetizer</p>",
+    "layout": "equal",
+    "color_scheme": "highlight-primary"
+  },
+  "blocks": {
+    "logo_text_1": {
+      "type": "logo_text",
+      "settings": {
+        "logo_text": "Your Brand",
+        "text": "<p>Use this space for a short description of your site.</p>"
+      }
+    },
+    "text_block_1": {
+      "type": "text_block",
+      "settings": {
+        "title": "Contact",
+        "text": "<p>hello@example.com</p><p>123 Main Street<br>City, State</p>"
+      }
+    }
+  },
+  "blocksOrder": ["logo_text_1", "text_block_1"]
+}

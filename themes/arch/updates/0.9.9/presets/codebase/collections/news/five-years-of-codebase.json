@@ -1,0 +1,11 @@
+{
+  "slug": "five-years-of-codebase",
+  "schemaVersion": 1,
+  "settings": {
+    "title": "Five Years and Forty Launches",
+    "date": "2026-01-22",
+    "excerpt": "This month Codebase turns five, and we went back through every project to see what we learned.",
+    "body": "<p>Five years ago this was two people and a borrowed desk. Forty launches later, the lesson that keeps repeating is a simple one.</p><p>The sites that did best were never the flashiest. They were the ones where the client knew exactly who the page was for and what it should ask the visitor to do.</p><h2>What forty projects taught us</h2><p>We went back through the whole list, from the first one-page site to the storefronts we maintain today. The pattern was hard to miss. Clarity beat decoration every time, and the projects that struggled were almost always the ones where nobody could name the visitor we were building for.</p><p>A few habits showed up again and again in the work we were proudest of.</p><ul><li>One clear action per page, decided before we wrote any code.</li><li>Copy written for a real person, not a committee.</li><li>A build the client could update without calling us.</li></ul><p>The fortieth launch was a small bakery that needed three pages and a way to take pre-orders. It was not a big job, but it shipped clean and the owner has run it herself ever since. That is the kind of work we want more of.</p><h3>What the next five years look like</h3><p>We are staying small on purpose. The plan is not to grow the team but to keep getting better at the part that matters, which is understanding the business before we touch the design.</p><p>Thank you to every business that trusted a small studio with something this important. We are spending part of this anniversary giving free mentoring hours to two people learning to code in our area, because someone once did the same for us.</p>",
+    "featured_image": "/uploads/images/codebase-news-five-years-of-codebase.webp"
+  }
+}

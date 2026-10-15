@@ -1,0 +1,309 @@
+{
+  "type": "schedule-table",
+  "displayName": "tTheme:schedule_table.name",
+  "aliases": [
+    "agenda",
+    "time table",
+    "timetable",
+    "events schedule"
+  ],
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "tTheme:global.widgets.settings.eyebrow.label"
+    },
+    {
+      "type": "checkbox",
+      "id": "eyebrow_uppercase",
+      "label": "tTheme:global.widgets.settings.eyebrow_uppercase.label",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "tTheme:global.widgets.settings.title.label",
+      "default": "Opening Hours"
+    },
+    {
+      "type": "text",
+      "id": "description",
+      "label": "tTheme:global.widgets.settings.description.label"
+    },
+    {
+      "type": "select",
+      "id": "heading_alignment",
+      "label": "tTheme:global.widgets.settings.alignment.label",
+      "default": "center",
+      "options": [
+        {
+          "value": "start",
+          "label": "tTheme:global.widgets.settings.alignment.options.start"
+        },
+        {
+          "value": "center",
+          "label": "tTheme:global.widgets.settings.alignment.options.center"
+        }
+      ]
+    },
+    {
+      "type": "header",
+      "id": "content_header",
+      "label": "tTheme:global.widgets.settings.content_header.label"
+    },
+    {
+      "type": "text",
+      "id": "note",
+      "label": "tTheme:schedule_table.settings.note.label",
+      "default": "We are closed on public holidays"
+    },
+    {
+      "type": "header",
+      "id": "display_header",
+      "label": "tTheme:global.widgets.settings.display_header.label"
+    },
+    {
+      "type": "select",
+      "id": "sidebar_position",
+      "label": "tTheme:global.widgets.settings.sidebar_position.label",
+      "default": "end",
+      "options": [
+        {
+          "value": "start",
+          "label": "tTheme:global.widgets.settings.options.start"
+        },
+        {
+          "value": "end",
+          "label": "tTheme:global.widgets.settings.options.end"
+        }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "week_start_day",
+      "label": "tTheme:schedule_table.settings.week_start_day.label",
+      "options": [
+        {
+          "value": "0",
+          "label": "tTheme:schedule_table.settings.week_start_day.options.0"
+        },
+        {
+          "value": "1",
+          "label": "tTheme:schedule_table.settings.week_start_day.options.1"
+        }
+      ],
+      "default": "1"
+    },
+    {
+      "type": "checkbox",
+      "id": "highlight_today",
+      "label": "tTheme:schedule_table.settings.highlight_today.label",
+      "description": "tTheme:schedule_table.settings.highlight_today.description",
+      "default": true
+    },
+    {
+      "type": "header",
+      "id": "appearance_header",
+      "label": "tTheme:global.widgets.settings.appearance_header.label"
+    },
+    {
+      "type": "select",
+      "id": "color_scheme",
+      "label": "tTheme:global.widgets.settings.color_scheme.label",
+      "default": "standard-primary",
+      "options": [
+        {
+          "value": "standard-primary",
+          "label": "tTheme:global.widgets.settings.color_scheme.options.standard_primary"
+        },
+        {
+          "value": "standard-secondary",
+          "label": "tTheme:global.widgets.settings.color_scheme.options.standard_secondary"
+        },
+        {
+          "value": "highlight-primary",
+          "label": "tTheme:global.widgets.settings.color_scheme.options.highlight_primary"
+        },
+        {
+          "value": "highlight-secondary",
+          "label": "tTheme:global.widgets.settings.color_scheme.options.highlight_secondary"
+        }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "top_spacing",
+      "label": "tTheme:global.widgets.settings.top_spacing.label",
+      "default": "auto",
+      "options": [
+        {
+          "value": "auto",
+          "label": "tTheme:global.widgets.settings.top_spacing.options.auto"
+        },
+        {
+          "value": "small",
+          "label": "tTheme:global.widgets.settings.top_spacing.options.small"
+        },
+        {
+          "value": "none",
+          "label": "tTheme:global.widgets.settings.top_spacing.options.none"
+        }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "bottom_spacing",
+      "label": "tTheme:global.widgets.settings.bottom_spacing.label",
+      "default": "auto",
+      "options": [
+        {
+          "value": "auto",
+          "label": "tTheme:global.widgets.settings.bottom_spacing.options.auto"
+        },
+        {
+          "value": "small",
+          "label": "tTheme:global.widgets.settings.bottom_spacing.options.small"
+        },
+        {
+          "value": "none",
+          "label": "tTheme:global.widgets.settings.bottom_spacing.options.none"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "id": "closed_text",
+      "label": "tTheme:schedule_table.settings.closed_text.label",
+      "defaultKey": "site.schedule_table.closed"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "day",
+      "displayName": "tTheme:schedule_table.blocks.day.name",
+      "settings": [
+        {
+          "type": "header",
+          "id": "content_header",
+          "label": "tTheme:global.widgets.settings.content_header.label"
+        },
+        {
+          "type": "text",
+          "id": "day",
+          "label": "tTheme:schedule_table.blocks.day.settings.day.label",
+          "default": "Monday"
+        },
+        {
+          "type": "text",
+          "id": "hours",
+          "label": "tTheme:schedule_table.blocks.day.settings.hours.label",
+          "default": "9:00 AM - 5:00 PM"
+        },
+        {
+          "type": "header",
+          "id": "options_header",
+          "label": "tTheme:global.widgets.settings.options_header.label"
+        },
+        {
+          "type": "checkbox",
+          "id": "closed",
+          "label": "tTheme:schedule_table.blocks.day.settings.closed.label",
+          "default": false
+        }
+      ]
+    },
+    {
+      "type": "info",
+      "displayName": "tTheme:global.widgets.blocks.info.name",
+      "settings": [
+        {
+          "type": "header",
+          "id": "content_header",
+          "label": "tTheme:global.widgets.settings.content_header.label"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "tTheme:global.widgets.blocks.info.settings.title.label",
+          "default": "Contact Us"
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "tTheme:global.widgets.blocks.info.settings.text.label",
+          "default": "<p>hello@example.com</p>"
+        }
+      ]
+    },
+    {
+      "type": "social",
+      "displayName": "tTheme:global.widgets.blocks.social.name",
+      "settings": []
+    }
+  ],
+  "defaultBlocks": [
+    {
+      "type": "day",
+      "settings": {
+        "day": "Monday",
+        "hours": "9:00 AM - 9:00 PM",
+        "closed": false
+      }
+    },
+    {
+      "type": "day",
+      "settings": {
+        "day": "Tuesday",
+        "hours": "9:00 AM - 9:00 PM",
+        "closed": false
+      }
+    },
+    {
+      "type": "day",
+      "settings": {
+        "day": "Wednesday",
+        "hours": "9:00 AM - 9:00 PM",
+        "closed": false
+      }
+    },
+    {
+      "type": "day",
+      "settings": {
+        "day": "Thursday",
+        "hours": "9:00 AM - 9:00 PM",
+        "closed": false
+      }
+    },
+    {
+      "type": "day",
+      "settings": {
+        "day": "Friday",
+        "hours": "9:00 AM - 10:00 PM",
+        "closed": false
+      }
+    },
+    {
+      "type": "day",
+      "settings": {
+        "day": "Saturday",
+        "hours": "10:00 AM - 10:00 PM",
+        "closed": false
+      }
+    },
+    {
+      "type": "day",
+      "settings": {
+        "day": "Sunday",
+        "hours": "Closed",
+        "closed": true
+      }
+    },
+    {
+      "type": "info",
+      "settings": {
+        "title": "Contact Us",
+        "text": "<p>hello@example.com</p>"
+      }
+    }
+  ]
+}

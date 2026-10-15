@@ -11,13 +11,13 @@ This document is the authoritative **orientation map** for the Widgetizer codeba
 The repo is an npm workspace (`"workspaces": ["packages/*"]`). Five packages plus three thin shells:
 
 - **Packages:**
-  - `@widgetizer/core` (`packages/core/src/`) — shared FE/BE primitives + adapter **contracts** + error types + conformance suites. Also the single source of truth for the server-side Liquid filters/tags (`packages/core/src/filters/`, `packages/core/src/tags/`), `pathSecurity`, `mimeTypes`, and the adapter contract surface (`packages/core/src/adapters.js`).
+  - `@widgetizer/core` (`packages/core/src/`) — shared FE/BE primitives + adapter **contracts** + error types + conformance suites. Also the single source of truth for the server-side Liquid filters/tags (`packages/core/src/filters/`, `packages/core/src/tags/`), JSON-LD structured data (`packages/core/src/structuredData/`), the address/link/language rules both ends share (`contentAddress`, `internalHref`, `linkPrefixer`, `publishedUrls`, `breadcrumbs`, `languages`, `translations`, `siteIdentity`, `themeSettingChanges`), `pathSecurity`, `mimeTypes`, and the adapter contract surface (`packages/core/src/adapters.js`). The full subpath list is in [core-packages.md](core-packages.md#widgetizercore-subpath-exports).
   - `@widgetizer/render-engine` (`packages/render-engine/src/`) — scope-free LiquidJS rendering over a `deps` bag; no project resolution or SQLite access. It reads Liquid templates, schemas, menus, and icons from filesystem paths supplied in `deps`.
   - `@widgetizer/builder-server` (`packages/builder-server/src/`) — Express 5 backend (controllers/services/routes/db/SQLite/tests); **adapter-agnostic** and scope-first.
   - `@widgetizer/editor-ui` (`packages/editor-ui/src/`) — mountable React editor (the **site-workspace** FE: page editor, media, menus, pages, collections, export, settings).
   - `@widgetizer/adapters-local` (`packages/adapters-local/src/`) — OSS local-FS + SQLite adapter implementations.
 - **Shells:**
-  - `app/` — OSS frontend + server assembly. `app/server-common.js` builds the local adapters and calls `createEditorApp({ adapters })` / exposes `startOssServer`. `app/src/main.jsx` is the FE entry; `app/src/App.jsx` composes routes, contributing the **admin-shell** pages (`app/src/pages/` — Projects/Themes/AppSettings/Dashboard/previews) and splicing in the site-workspace routes via editor-ui's `createEditorRoutes`.
+  - `app/` — OSS frontend + server assembly. `app/server-common.js` builds the local adapters and calls `createEditorApp({ adapters })` / exposes `startOssServer`. `app/src/main.jsx` is the FE entry; `app/src/App.jsx` composes routes, contributing the **admin-shell** pages (`app/src/pages/` — Projects/Themes/AppSettings, plus the standalone preview pages under `/preview` from `app/src/previewRoutes.jsx`) and splicing in the site-workspace routes via editor-ui's `createEditorRoutes`.
   - `electron/` — desktop wrapper. `electron/main.js` forks `electron/server-bootstrap.js` (via `utilityProcess.fork`) → `startOssServer`. Build config lives in `electron/builder.config.mjs` (package.json has no `build` key).
   - `server.js` — repo-root web entry → `startOssServer`.
 - **Preview-iframe runtime:** the raw browser ES modules served to the preview iframe live in `@widgetizer/core` at `packages/core/src/runtime/` — `previewRuntime.js` (injected into the iframe) and its `standalonePreviewTarget.js` sibling (standalone-preview href mapper). They are served by path (`express.static(/runtime)`), never imported as package primitives.
@@ -28,10 +28,10 @@ Code is organized by concern across the workspace packages and the OSS shell:
 
 | Concern | Home |
 | ------- | ---- |
-| Admin-shell FE (Projects, Themes, App Settings, previews, dashboard) | `app/src/` |
+| Admin-shell FE (Projects, Themes, App Settings, standalone previews) | `app/src/` |
 | Site-workspace FE (Page Editor, Pages, Menus, Media, Collections, Export, Settings) | `packages/editor-ui/src/` |
 | Backend (controllers, services, routes, db, SQLite, tests) | `packages/builder-server/src/` |
-| Shared primitives, Liquid filters/tags, `pathSecurity`, `mimeTypes`, adapter contracts | `packages/core/src/` |
+| Shared primitives, Liquid filters/tags, structured data, address/link/language rules, `pathSecurity`, `mimeTypes`, adapter contracts | `packages/core/src/` |
 | Scope-free LiquidJS rendering | `packages/render-engine/src/` |
 | OSS local-FS + SQLite adapters | `packages/adapters-local/src/` |
 | Residual runtime assets | repo-root `src/` |
@@ -43,7 +43,7 @@ Code is organized by concern across the workspace packages and the OSS shell:
 `setupBuilderServer({ adapters, plugins })` (`packages/builder-server/src/setupBuilderServer.js`) returns three routers:
 
 - `actorScopedRouter` — `/projects`, `/themes`, `/settings`, `/core`
-- `projectScopedRouter` — `/pages`, `/menus`, `/media`, `/preview`, `/export`, `/widgets`, `/icons`, `/collections`
+- `projectScopedRouter` — `/pages`, `/menus`, `/media`, `/preview`, `/export`, `/widgets`, `/icons`, `/collections`, `/languages`, `/translations`
 - `previewRouter` — `GET /render/:token`
 
 `createEditorApp({ adapters, plugins })` (`packages/builder-server/src/createApp.js`) is the **single** editor app factory. It wires both scoped routers under `/api` and the preview router at `/`, plus helmet/cors/JSON-limits/error-handler. `initDb({ getConnection })` injects the SQLite connection. Required adapter keys: `scopeResolver`, `previewScopeResolver`, `storage`, `assetStorage`, `publish`, `limits`.
@@ -69,6 +69,7 @@ This admin-vs-site split is the main architectural consequence of the package la
 | `/projects`, `/projects/add`, `/projects/edit/:id` | `ProjectPickerLayout` (admin, `app/src/`) | Project administration |
 | `/themes`, `/app-settings` | `ProjectPickerLayout` (admin, `app/src/`) | Admin utilities |
 | `/pages`, `/menus`, `/media`, `/settings`, `/export-site`, collections | `Layout` + `RequireActiveProject` (site, `packages/editor-ui/src/`) | Active-project site workspace |
+| `/preview/...` | `SitePreviewLayout` (`app/src/`) | Standalone site preview: `page/:lang/:pageId` (+ `/page/:pageNumber`), `collection/:lang/:prefix/:slug`, and older routes without a language |
 
 `registerProjectStore(useProjectStore)` in `app/src/App.jsx` connects the active-project store to API header injection. `ProjectPickerLayout` is for choosing/managing projects, themes, and app-level settings; `Layout` is project-scoped (active project name, site sidebar, and the `AdminMenu` escape hatch back to the admin area).
 
@@ -91,6 +92,7 @@ Each subsystem has a dedicated doc. This map records only each subsystem's packa
 | Preview | `packages/builder-server/src/controllers/previewController.js`, `services/previewTokenStore.js`; runtime at `packages/core/src/runtime/previewRuntime.js` | `packages/editor-ui/src/components/preview/`, `app/src/pages/SitePreviewLayout.jsx`, `PagePreview.jsx`, `CollectionItemPagePreview.jsx` | (see [core-page-editor.md](core-page-editor.md) / [core-security.md](core-security.md)) |
 | Page Editor | — | `packages/editor-ui/src/pages/PageEditor.jsx`, `components/pageEditor/`, `stores/` | [core-page-editor.md](core-page-editor.md) |
 | Widgets (theme + core) | `packages/builder-server/src/controllers/projectController.js` (`/widgets`), core widget schemas under `packages/core/src/widgets/` | — | [core-widgets.md](core-widgets.md) |
+| Languages & translations | `packages/builder-server/src/controllers/languageController.js`, `translationController.js`, `services/languageService.js`, `translationService.js`, `services/siteStringsService.js` | `packages/editor-ui/src/components/content/` (`LanguageTabs`, `LanguageMenu`, `TranslationChips`), `hooks/useListLanguage.js`, `useTranslationVersions.js`; add/remove in `app/src/components/projects/LanguagesSection.jsx` | [domain/multilingual.md](domain/multilingual.md) |
 | Database / repositories | `packages/builder-server/src/db/` (repositories: project, media, settings, export) | — | [core-database.md](core-database.md) |
 
 ---
@@ -101,6 +103,14 @@ The actual LiquidJS rendering lives in the scope-free `@widgetizer/render-engine
 
 ---
 
+## Content language and theme visitor text
+
+A project keeps its default-language content at the existing root paths. Additional languages use `pages/<code>/`, `pages/<code>/global/`, `menus/<code>/`, and `collections/<type>/<code>/`; uploads, theme definitions/settings and site identity remain shared. A page/item UUID identifies one version, while `translationGroupId` relates versions. `@widgetizer/core/contentAddress` builds storage, preview and output addresses; builder-server's `utils/contentLanguage.js` validates the requested language against project configuration. This language selection is inside the resolved project scope, not another project/adapter boundary. `@widgetizer/core/languages` holds the code rules (right-to-left codes are refused), the picker list `SUPPORTED_LANGUAGES` and `DEFAULT_LANGUAGE`; `@widgetizer/core/translations` builds `page.translations` (`buildTranslations`). Languages are added and removed one at a time through `routes/languages.js` → `languageController` → `languageService` (`addLanguage` / `countLanguageContent` / `removeLanguage`), `POST /pages/:id/translations` and `POST /collections/:type/:slug/translations` create a version in another language, and `routes/translations.js` → `translationController` → `translationService` lists a translation group's members.
+
+The render shell supplies language-specific content and optional `loadSiteStrings()` to the scope-free engine. The latter reads visitor `site` dictionaries through `siteStringsService`: core words come from app-owned widget locales, with the installed project's `locales/<code>.json` layered above them in each language. Scoped callers use the storage adapter for theme words, while working-directory callers supply a filesystem reader. Missing translated keys fall back to merged English. The engine exposes page language/translations, resolves dictionary-backed widget defaults, and passes the language to date and theme-link filters. Arch consumes these contracts in its header, templates and browser labels.
+
+See [multilingual domain rules](domain/multilingual.md), [theme strings](domain/entities/theme.md#visitor-strings-and-arch), and [output behavior](domain/operations/output.md#multilingual-boundary-at-this-snapshot). The existing project-local ownership model remains unchanged.
+
 ## Shared Utilities
 
 ### Backend (`packages/builder-server/src/`)
@@ -109,7 +119,18 @@ The actual LiquidJS rendering lives in the scope-free `@widgetizer/render-engine
 | ---- | ---- |
 | `config.js` | Roots + path helpers (`DATA_DIR`, `APP_ROOT`, theme/locale/core-widget dirs, static dist) |
 | `utils/mimeTypes.js` | Thin wrapper over `@widgetizer/core/mimeTypes` (`ALLOWED_MIME_TYPES`, `getContentType()`, `getMediaCategory()`) |
-| `utils/pathSecurity.js` | Thin wrapper over `@widgetizer/core/pathSecurity` (`isWithinDirectory()`) |
+| `utils/pathSecurity.js` | Thin wrapper over `@widgetizer/core/pathSecurity` (`isWithinDirectory()`), plus `isSafePathSegment()` for request/file-sourced folder names (slugs, theme and preset names) |
+| `utils/zipSafety.js` | Bounded ZIP reading/extraction (`openZip`, `extractZipSafely`, `readZipEntry`, `UnsafeZipError`): refuses ZIP bombs by compression ratio and unpack budget |
+| `utils/backupContentChecks.js` | Refuses restored content an app-made backup never holds (`mediaLibraryProblem`, `collectionItemsProblem`) |
+| `utils/uploadFileName.js` | `normalizeUploadName()` — keeps the words of an uploaded file name, capped at `MAX_UPLOAD_NAME_LENGTH` |
+| `utils/contentLanguage.js` | `requestLanguage(req, res)` (`?language=` / `body.language`), `projectLanguages()`, `projectLanguageContexts()`, `languageFoldersIn()` |
+| `utils/serializeByKey.js` | `createKeyedSerializer()` — in-process per-key async serialization (export, translation ops) |
+| `utils/slugHelpers.js` | `sanitizeSlug()`, `generateUniqueSlug()` |
+| `utils/linkEnrichment.js` | Stable-reference enrichment, remapping on duplicate/clone, and cleanup of links to deleted pages/items/menus |
+| `utils/themeSeedRoots.js` | Resolves bundled seed theme folders (`resolveSeedThemeDir`, `listSeedThemeIds`) |
+| `services/contentCoordination.js` | `withContentWriteLock()` — the per-project section content writes, media deletion and language removal share; re-checks language (`assertLanguageStillEnabled`) and referenced media (`assertIntroducedMediaExists`, `verifyFileUnused`) inside it |
+| `services/themeSettingChanges.js` | `readThemeSettingChanges()` / `mergeThemeSettingChanges()` — change-only theme-settings saves |
+| `services/siteStringsService.js` | `loadSiteStrings()` — core + theme visitor dictionaries per language |
 | `utils/semver.js` | `parseVersion()`, `compareVersions()`, `isNewerVersion()`, `sortVersions()`, `getLatestVersion()` |
 | `utils/updateStatus.js` | `getUpdateStatus()`, `hasAvailableUpdate()` for theme/project update checks |
 | `utils/themeHelpers.js` | `preprocessThemeSettings()` |
@@ -121,7 +142,7 @@ The canonical source for `mimeTypes` and `pathSecurity` is `@widgetizer/core` (`
 
 ### Shared FE hooks & stores
 
-The site-workspace FE hooks/stores (`useAppSettings`, `useConfirmationModal`, `useFormatDate`, `useFormNavigationGuard`, `useThemeLocale`, `useToastStore`; `projectStore`, `toastStore`, `themeUpdateStore`, `iconsStore`, `themeStore`) live under `packages/editor-ui/src/hooks/` and `packages/editor-ui/src/stores/`. The canonical `themeStore` owns per-project theme settings for both the Settings page and the Page Editor save flow; `pageStore` keeps only a thin snapshot proxy for undo/redo. Project switches are coordinated from `RequireActiveProject`. See [core-hooks.md](core-hooks.md) and [core-page-editor.md](core-page-editor.md) for the per-store/per-hook tables.
+The site-workspace FE hooks/stores (`useAppSettings`, `useConfirmationModal`, `useFormatDate`, `useFormNavigationGuard`, `useThemeLocale`, `useListLanguage`, `useTranslationVersions`, `useLinkTargets`; `projectStore`, `pageListStore`, `toastStore`, `themeUpdateStore`, `iconsStore`, `themeStore`) live under `packages/editor-ui/src/hooks/` and `packages/editor-ui/src/stores/`. The canonical `themeStore` owns per-project theme settings for both the Settings page and the Page Editor save flow; `pageStore` keeps only a thin snapshot proxy for undo/redo. Project switches are coordinated from `RequireActiveProject`. See [core-hooks.md](core-hooks.md) and [core-page-editor.md](core-page-editor.md) for the per-store/per-hook tables.
 
 ---
 

@@ -1,0 +1,61 @@
+/**
+ * Editor routes for a piece of content. A slug is unique only per language, so
+ * every link into the page editor has to name both — built here so no call site
+ * can quietly drop the language and open the default language's page instead.
+ */
+export function pageEditorHref(page, isMultilang) {
+  if (!isMultilang) return `/page-editor?pageId=${page.id}`;
+  return `/page-editor?pageId=${page.slug || page.id}&language=${page.language}`;
+}
+
+export function pageSettingsHref(page, isMultilang) {
+  if (!isMultilang) return `/pages/${page.id}/edit`;
+  return `/pages/${page.id}/edit?language=${page.language}`;
+}
+
+export function pageAddHref(language) {
+  return language ? `/pages/add?language=${language}` : "/pages/add";
+}
+
+export function menuStructureHref(menu, isMultilang) {
+  const base = `/menus/${menu.id}/structure`;
+  return isMultilang ? `${base}?language=${menu.language}` : base;
+}
+
+export function menuSettingsHref(menu, isMultilang) {
+  const base = `/menus/edit/${menu.id}`;
+  return isMultilang ? `${base}?language=${menu.language}` : base;
+}
+
+export function menuAddHref(language) {
+  return language ? `/menus/add?language=${language}` : "/menus/add";
+}
+
+export function itemEditHref(type, item, isMultilang) {
+  const base = `/collections/${type}/${item.slug}/edit`;
+  return isMultilang ? `${base}?language=${item.language}` : base;
+}
+
+export function itemAddHref(type, language) {
+  const base = `/collections/${type}/add`;
+  return language ? `${base}?language=${language}` : base;
+}
+
+/**
+ * The lists, opened on a language tab. Every way back from a page, item or menu
+ * names the language it was in, so the list shows the tab the user came from
+ * instead of the default language's.
+ */
+const listHref = (base, language) => (language ? `${base}?language=${language}` : base);
+
+export function pagesListHref(language) {
+  return listHref("/pages", language);
+}
+
+export function menusListHref(language) {
+  return listHref("/menus", language);
+}
+
+export function itemsListHref(type, language) {
+  return listHref(`/collections/${type}`, language);
+}

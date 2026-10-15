@@ -1,0 +1,13 @@
+{
+  "slug": "treatment-and-blow-dry",
+  "schemaVersion": 1,
+  "settings": {
+    "title": "Treatment and Blow-Dry",
+    "icon": "sparkles",
+    "summary": "A deep conditioning treatment and a smooth blow-dry to revive tired hair.",
+    "description": "<p>A nourishing mask is worked through your hair and left to soak in while you relax. We choose the mask to suit your hair, whether it is dry from the sun, dull, or roughed up by regular heat styling.</p><h2>What to expect</h2><p>We rinse it out and finish with a blow-dry, so the hair feels softer and looks glossier straight away. The treatment goes on after a wash and is left to develop for several minutes, often with a little scalp massage while it works.</p><ul><li>A wash and a deep conditioning mask chosen for your hair</li><li>Time for the treatment to soak in</li><li>A smooth blow-dry to finish</li></ul><p>By the time we are done, the hair sits more smoothly and feels easier to manage. It is a nice pick-me-up between cuts, especially after summer or a stretch of heat styling, and it pairs well with a trim if you are due one.</p><h3>Who it suits and a tip</h3><p>It works for most hair types, and it is particularly welcome if your ends feel dry or your hair has lost its shine. Coloured hair tends to feel noticeably better afterwards, since colour can leave the cuticle a little thirsty.</p><p>To hold the smoothness for longer, ease off the hottest heat settings for a few days and use a gentle shampoo at home. If your hair is feeling especially tired, booking the treatment regularly through the warmer months keeps it in better shape.</p>",
+    "price": "$65",
+    "duration": "45 min",
+    "featured_image": "/uploads/images/shearline-services-treatment-and-blow-dry.webp"
+  }
+}

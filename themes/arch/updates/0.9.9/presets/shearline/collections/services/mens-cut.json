@@ -1,0 +1,13 @@
+{
+  "slug": "mens-cut",
+  "schemaVersion": 1,
+  "settings": {
+    "title": "Men's Cut",
+    "icon": "user",
+    "summary": "A sharp, tidy cut with a clean finish for any length or style.",
+    "description": "<p>Short on the sides or longer on top, we cut to a shape that grows out well between visits. We take a moment first to look at how your hair grows and falls, so the cut suits you rather than fighting your natural pattern.</p><h2>What the service includes</h2><p>The service covers a wash, the cut, and styling, finished with a tidy neckline and around the ears so it looks neat the moment you walk out. We will talk you through length and shape as we go and adjust to what you actually want.</p><ul><li>A wash before the cut</li><li>A cut shaped to your length and style</li><li>A clean finish around the neckline and ears</li></ul><p>If you like a scissor cut, a clipper fade, or something in between, we work to a finish you can keep up easily at home. If you are not certain what you want, we are happy to suggest something that fits your hair type and how much effort you like to put in.</p><h3>Keeping it sharp</h3><p>To keep the shape looking fresh, most people come back every four to six weeks, though tighter styles benefit from a slightly shorter gap. We can recommend a simple product or two if you want a little hold or texture without much fuss.</p><p>Bring a photo if you have a particular look in mind, and tell us about any cowlicks or sore spots before we start. It only takes a minute and it helps us get the cut right first time.</p>",
+    "price": "$45",
+    "duration": "30 min",
+    "featured_image": "/uploads/images/shearline-services-mens-cut.webp"
+  }
+}

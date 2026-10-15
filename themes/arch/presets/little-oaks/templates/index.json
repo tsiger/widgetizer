@@ -126,7 +126,7 @@
         "card_layout": "box",
         "alignment": "start",
         "image_position": "top",
-        "aspect_ratio": "4:3",
+        "aspect_ratio": "4 / 3",
         "color_scheme": "standard-primary"
       },
       "blocks": {

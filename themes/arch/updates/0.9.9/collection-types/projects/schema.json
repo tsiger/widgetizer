@@ -1,0 +1,34 @@
+{
+  "type": "projects",
+  "schemaVersion": 1,
+  "displayName": "Project",
+  "displayNamePlural": "Projects",
+  "description": "Case studies and project showcases.",
+  "icon": "Briefcase",
+  "slugPrefix": "projects",
+  "hasItemPages": true,
+  "sortable": true,
+  "defaultSort": "manual",
+  "settings": [
+    { "type": "header", "id": "content_header", "label": "Content" },
+    { "type": "text", "id": "title", "label": "Title", "required": true, "usedAsTitle": true },
+    {
+      "type": "textarea",
+      "id": "summary",
+      "label": "Summary",
+      "description": "Short teaser shown in listings and at the top of the project."
+    },
+    { "type": "image", "id": "featured_image", "label": "Featured image" },
+    { "type": "gallery", "id": "gallery", "label": "Gallery" },
+    { "type": "richtext", "id": "description", "label": "Description", "allow_headings": true, "allow_images": true },
+    { "type": "header", "id": "details_header", "label": "Details" },
+    { "type": "text", "id": "client", "label": "Client" },
+    { "type": "text", "id": "year", "label": "Year" },
+    {
+      "type": "link",
+      "id": "external_url",
+      "label": "Project link",
+      "default": { "href": "", "text": "Visit project", "target": "_self" }
+    }
+  ]
+}

@@ -1,4 +1,115 @@
 {
+  "site": {
+    "audio_player": {
+      "play": "Play",
+      "play_track": "Play {{ title }}",
+      "previous_track": "Previous track",
+      "next_track": "Next track",
+      "mute": "Mute",
+      "volume": "Volume",
+      "seek": "Seek",
+      "playback_speed": "Playback speed",
+      "download": "Download current track",
+      "pause": "Pause",
+      "unmute": "Unmute",
+      "playback_speed_rate": "Playback speed {{ rate }}x"
+    },
+    "business_details": {
+      "closed": "Closed",
+      "days": {
+        "monday": "Mon",
+        "tuesday": "Tue",
+        "wednesday": "Wed",
+        "thursday": "Thu",
+        "friday": "Fri",
+        "saturday": "Sat",
+        "sunday": "Sun"
+      }
+    },
+    "class_schedule": {
+      "empty": "No classes scheduled."
+    },
+    "common": {
+      "next": "Next",
+      "previous": "Previous"
+    },
+    "comparison_slider": {
+      "drag": "Drag to compare before and after images"
+    },
+    "comparison_table": {
+      "included": "Included",
+      "not_included": "Not included"
+    },
+    "content_switcher": {
+      "options": "Content options"
+    },
+    "countdown": {
+      "days": "Days",
+      "hours": "Hours",
+      "minutes": "Minutes",
+      "seconds": "Seconds"
+    },
+    "embed": {
+      "content": "Embedded content"
+    },
+    "icon_card_grid": {
+      "featured_image": "Featured image"
+    },
+    "image_hotspots": {
+      "close_tooltip": "Close tooltip"
+    },
+    "job_listing": {
+      "all_positions": "All Positions",
+      "filters": "Job filters"
+    },
+    "lightbox": {
+      "preview": "Image preview",
+      "previous": "Previous image",
+      "next": "Next image",
+      "close": "Close lightbox"
+    },
+    "map": {
+      "iframe_title": "Map showing {{ address }}"
+    },
+    "menu": {
+      "toggle_submenu": "Toggle submenu"
+    },
+    "news_grid": {
+      "empty": "No news items yet."
+    },
+    "pagination": {
+      "label": "Pagination"
+    },
+    "projects_grid": {
+      "empty": "No projects yet."
+    },
+    "schedule_table": {
+      "closed": "Closed"
+    },
+    "services_grid": {
+      "empty": "No services yet."
+    },
+    "slideshow": {
+      "previous_slide": "Previous slide",
+      "next_slide": "Next slide",
+      "go_to_slide": "Go to slide {{ number }}",
+      "pause": "Pause",
+      "pause_autoplay": "Pause autoplay",
+      "play": "Play",
+      "start_autoplay": "Start autoplay"
+    },
+    "testimonial_slider": {
+      "go_to": "Go to testimonial {{ number }}"
+    },
+    "video_embed": {
+      "default_title": "Video",
+      "playback_error": "This video can't be played in your browser."
+    },
+    "video_popup": {
+      "close": "Close video",
+      "player": "Video player"
+    }
+  },
   "global": {
     "general": {
       "name": "General",
@@ -19,6 +130,10 @@
         },
         "content_header": {
           "label": "Content"
+        },
+        "show_breadcrumbs": {
+          "label": "Show breadcrumbs",
+          "description": "Display the trail of parent pages above each page's content. Set a page's parent in its page settings."
         },
         "date_format": {
           "label": "Date format",
@@ -324,6 +439,9 @@
         "card_layout_only": {
           "description": "Applies to the card layout only."
         },
+        "read_more_text": {
+          "label": "Button text"
+        },
         "fullwidth": {
           "label": "Full width"
         },
@@ -363,8 +481,16 @@
             "fullwidth": "Fullwidth"
           }
         },
+        "video_file": {
+          "label": "Uploaded video (MP4)",
+          "description": "Plays instead of the video URL. Remove it to show the YouTube or Vimeo video again."
+        },
         "video_url": {
           "label": "Video URL (YouTube or Vimeo)"
+        },
+        "poster": {
+          "label": "Poster image",
+          "description": "Shown before an uploaded video starts playing."
         },
         "video_title": {
           "label": "Video title (for accessibility)"
@@ -671,6 +797,24 @@
             }
           }
         },
+        "business_details": {
+          "name": "Business Details",
+          "settings": {
+            "title": {
+              "label": "Title",
+              "description": "The address, phone, email and opening hours come from Project details."
+            },
+            "show_address": {
+              "label": "Show address"
+            },
+            "show_contact": {
+              "label": "Show phone and email"
+            },
+            "show_hours": {
+              "label": "Show opening hours"
+            }
+          }
+        },
         "features": {
           "name": "Features",
           "settings": {
@@ -892,6 +1036,9 @@
       },
       "view_all_link": {
         "label": "'View all' link"
+      },
+      "empty_text": {
+        "label": "Empty message"
       }
     }
   },
@@ -1361,6 +1508,36 @@
       "center_nav": {
         "label": "Center Navigation",
         "description": "Centers the navigation menu in the header with the logo on the left and CTA on the right (desktop only)"
+      },
+      "languages_header": {
+        "label": "Languages"
+      },
+      "show_language_switcher": {
+        "label": "Show language switcher",
+        "description": "Lets visitors move between this page's languages. Hidden on a site with one language."
+      },
+      "language_switcher_label": {
+        "label": "Language switcher name",
+        "description": "Read out by screen readers to say what the list of languages is."
+      },
+      "labels_header": {
+        "label": "Visitor-facing labels"
+      },
+      "skip_link_text": {
+        "label": "Skip link",
+        "description": "The first link on the page, for people who navigate by keyboard."
+      },
+      "nav_label": {
+        "label": "Navigation name",
+        "description": "Read out by screen readers to tell this menu apart from others on the page."
+      },
+      "menu_title": {
+        "label": "Menu title",
+        "description": "Shown above the navigation on small screens."
+      },
+      "menu_close_label": {
+        "label": "Close menu label",
+        "description": "Read out by screen readers for the button that closes the navigation."
       }
     }
   },
@@ -1487,6 +1664,9 @@
     "settings": {
       "show_filters": {
         "label": "Show department filters"
+      },
+      "all_positions_text": {
+        "label": "All positions label"
       }
     },
     "blocks": {
@@ -1820,6 +2000,9 @@
       },
       "view_all_link": {
         "label": "'View all' link"
+      },
+      "empty_text": {
+        "label": "Empty message"
       }
     }
   },
@@ -1847,6 +2030,9 @@
       },
       "view_all_link": {
         "label": "'View all' link"
+      },
+      "empty_text": {
+        "label": "Empty message"
       }
     }
   },
@@ -1902,6 +2088,9 @@
       "highlight_today": {
         "label": "Highlight current day",
         "description": "Emphasize today's row with an accent border and bold text"
+      },
+      "closed_text": {
+        "label": "Closed label"
       }
     },
     "blocks": {
@@ -1954,6 +2143,12 @@
           "medium": "Medium",
           "large": "Large"
         }
+      },
+      "pause_text": {
+        "label": "Pause label"
+      },
+      "play_text": {
+        "label": "Play label"
       }
     },
     "blocks": {
@@ -2213,7 +2408,7 @@
     }
   },
   "video_embed": {
-    "name": "YouTube/Vimeo",
+    "name": "Video",
     "settings": {}
   },
   "video_popup": {
@@ -2333,7 +2528,6 @@
   },
   "class_schedule": {
     "name": "Class schedule",
-    "empty": "No classes scheduled.",
     "settings": {
       "note": {
         "label": "Footer note",
@@ -2390,6 +2584,9 @@
       },
       "show_book_button": {
         "label": "Show book button"
+      },
+      "empty_text": {
+        "label": "Empty message"
       }
     },
     "blocks": {

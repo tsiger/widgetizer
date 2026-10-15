@@ -16,6 +16,12 @@
     return `${m}:${s < 10 ? "0" : ""}${s}`;
   };
 
+  // The page carries the wording (see widget.liquid); the fallbacks are only
+  // for a player rendered before the theme shipped them.
+  function labelOf(widget, name, fallback) {
+    return widget.dataset[name] || fallback;
+  }
+
   function initAudioPlayer(widget) {
     if (widget.dataset.initialized) return;
     widget.dataset.initialized = "true";
@@ -153,14 +159,14 @@
       ap.classList.add("is-playing");
       if (playBtn) {
         playBtn.setAttribute("aria-pressed", "true");
-        playBtn.setAttribute("aria-label", "Pause");
+        playBtn.setAttribute("aria-label", labelOf(widget, "tPause", "Pause"));
       }
     });
     audio.addEventListener("pause", () => {
       ap.classList.remove("is-playing");
       if (playBtn) {
         playBtn.setAttribute("aria-pressed", "false");
-        playBtn.setAttribute("aria-label", "Play");
+        playBtn.setAttribute("aria-label", labelOf(widget, "tPlay", "Play"));
       }
     });
 
@@ -211,7 +217,10 @@
         audio.muted = !audio.muted;
         ap.classList.toggle("is-muted", audio.muted);
         muteBtn.setAttribute("aria-pressed", audio.muted ? "true" : "false");
-        muteBtn.setAttribute("aria-label", audio.muted ? "Unmute" : "Mute");
+        muteBtn.setAttribute(
+          "aria-label",
+          audio.muted ? labelOf(widget, "tUnmute", "Unmute") : labelOf(widget, "tMute", "Mute"),
+        );
       });
     }
 
@@ -223,7 +232,7 @@
         const rate = rates[rateIndex];
         audio.playbackRate = rate;
         speedBtn.textContent = `${rate}×`;
-        speedBtn.setAttribute("aria-label", `Playback speed ${rate}x`);
+        speedBtn.setAttribute("aria-label", labelOf(widget, "tSpeed", "Playback speed RATEx").replace("RATE", rate));
       });
     }
 

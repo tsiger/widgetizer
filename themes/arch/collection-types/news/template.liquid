@@ -15,8 +15,6 @@
 
       & .news-figure {
         margin: var(--space-xl) 0 0;
-        border-radius: var(--radius-lg);
-        overflow: hidden;
       }
 
       & .news-image {
@@ -25,6 +23,11 @@
         height: auto;
         aspect-ratio: 16 / 9;
         object-fit: cover;
+        border-radius: var(--radius-lg);
+      }
+
+      & .news-caption {
+        margin-block-start: var(--space-sm);
       }
     }
   </style>
@@ -44,8 +47,12 @@
       {% endif %}
 
       {% if item.settings.featured_image != blank %}
+        {% assign featured_caption = item.settings.featured_image | media_meta: 'caption' %}
         <figure class="news-figure reveal reveal-up">
           {% image src: item.settings.featured_image, size: 'large', class: 'news-image', srcset: true, sizes: '(max-width: 800px) 100vw, 800px', alt: item.settings.title %}
+          {% if featured_caption != blank %}
+            <figcaption class="news-caption w-meta t-sm">{{ featured_caption }}</figcaption>
+          {% endif %}
         </figure>
       {% endif %}
 

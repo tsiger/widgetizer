@@ -1,6 +1,7 @@
 {
   "type": "header",
   "settings": {
+    "logoImage": "/uploads/images/arch-logo.svg",
     "logoMaxWidth": 90
   }
 }

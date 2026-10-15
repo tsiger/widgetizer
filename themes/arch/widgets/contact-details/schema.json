@@ -234,6 +234,42 @@
           "default": "Follow Us"
         }
       ]
+    },
+    {
+      "type": "business_details",
+      "displayName": "tTheme:global.widgets.blocks.business_details.name",
+      "settings": [
+        {
+          "type": "header",
+          "id": "content_header",
+          "label": "tTheme:global.widgets.settings.content_header.label"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "tTheme:global.widgets.blocks.business_details.settings.title.label",
+          "description": "tTheme:global.widgets.blocks.business_details.settings.title.description",
+          "default": "Visit Us"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_address",
+          "label": "tTheme:global.widgets.blocks.business_details.settings.show_address.label",
+          "default": true
+        },
+        {
+          "type": "checkbox",
+          "id": "show_contact",
+          "label": "tTheme:global.widgets.blocks.business_details.settings.show_contact.label",
+          "default": true
+        },
+        {
+          "type": "checkbox",
+          "id": "show_hours",
+          "label": "tTheme:global.widgets.blocks.business_details.settings.show_hours.label",
+          "default": true
+        }
+      ]
     }
   ],
   "defaultBlocks": [

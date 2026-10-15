@@ -1,0 +1,13 @@
+{
+  "slug": "body-scrub",
+  "schemaVersion": 1,
+  "settings": {
+    "title": "Sea Salt Body Scrub",
+    "icon": "droplets",
+    "summary": "A full-body exfoliation that lifts dull skin and leaves it soft and smooth.",
+    "description": "<p>Fine sea salt mixed with light oil is worked over the whole body to clear away dry, flaky skin. We start at the feet and move up in long, even sweeps, spending a little longer on rougher spots like elbows, knees, and heels.</p><h2>How the treatment runs</h2><p>Once the skin has been buffed, we rinse you off and finish with a layer of moisturiser so the skin feels supple rather than tight. The whole thing takes about thirty to forty minutes, and the room stays warm and dim throughout.</p><ul><li>A full-body buff with sea salt and a light carrier oil</li><li>A warm rinse to clear the salt away</li><li>A finishing moisturiser to seal the skin</li></ul><p>You can expect your skin to feel noticeably smoother straight away, with a faint glow that lasts a few days. We keep the pressure firm enough to lift the dull layer but gentle on more sensitive areas, and we check in as we go.</p><h3>Good to know before you book</h3><p>It is a sensible reset before a holiday or at the change of seasons, and it pairs nicely before a self-tan since the skin underneath is even. If you have shaved or waxed in the last day, let us know so we can adjust, and skip it on broken or sunburnt skin.</p><p>Afterwards, keep the skin moisturised over the next few days to hold the softness, and drink plenty of water. A small tip: book the scrub before a massage rather than after, so your skin is clear and the oils sink in better.</p>",
+    "price": "$90",
+    "duration": "50 min",
+    "featured_image": "/uploads/images/velvet-touch-services-body-scrub.webp"
+  }
+}

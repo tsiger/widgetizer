@@ -51,6 +51,7 @@
         "layout": "card",
         "text_display": "always",
         "limit": 12,
+        "listing_anchor": true,
         "columns_desktop": 3,
         "aspect_ratio": "4 / 3",
         "show_summary": true,

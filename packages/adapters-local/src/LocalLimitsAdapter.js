@@ -44,6 +44,7 @@ export class LocalLimitsAdapter {
       case LIMIT_KEYS.MAX_MENU_ITEMS:
       case LIMIT_KEYS.MAX_COLLECTION_ITEMS:
       case LIMIT_KEYS.MAX_COLLECTIONS:
+      case LIMIT_KEYS.MAX_FORMS_PER_SITE:
         return Infinity; // single-user OSS: unbounded
       case LIMIT_KEYS.CUSTOM_DOMAIN_ALLOWED:
         return true;

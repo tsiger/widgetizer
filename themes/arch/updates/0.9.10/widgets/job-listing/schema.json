@@ -1,0 +1,246 @@
+{
+  "type": "job-listing",
+  "displayName": "tTheme:job_listing.name",
+  "aliases": [
+    "careers",
+    "hiring",
+    "positions",
+    "vacancies"
+  ],
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "tTheme:global.widgets.settings.eyebrow.label",
+      "default": "Join Our Team"
+    },
+    {
+      "type": "checkbox",
+      "id": "eyebrow_uppercase",
+      "label": "tTheme:global.widgets.settings.eyebrow_uppercase.label",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "tTheme:global.widgets.settings.title.label",
+      "default": "Open Positions"
+    },
+    {
+      "type": "text",
+      "id": "description",
+      "label": "tTheme:global.widgets.settings.description.label"
+    },
+    {
+      "type": "select",
+      "id": "heading_alignment",
+      "label": "tTheme:global.widgets.settings.alignment.label",
+      "default": "center",
+      "options": [
+        {
+          "value": "start",
+          "label": "tTheme:global.widgets.settings.alignment.options.start"
+        },
+        {
+          "value": "center",
+          "label": "tTheme:global.widgets.settings.alignment.options.center"
+        }
+      ]
+    },
+    {
+      "type": "header",
+      "id": "display_header",
+      "label": "tTheme:global.widgets.settings.display_header.label"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_filters",
+      "label": "tTheme:job_listing.settings.show_filters.label",
+      "default": true
+    },
+    {
+      "type": "header",
+      "id": "appearance_header",
+      "label": "tTheme:global.widgets.settings.appearance_header.label"
+    },
+    {
+      "type": "select",
+      "id": "color_scheme",
+      "label": "tTheme:global.widgets.settings.color_scheme.label",
+      "default": "standard-primary",
+      "options": [
+        {
+          "value": "standard-primary",
+          "label": "tTheme:global.widgets.settings.color_scheme.options.standard_primary"
+        },
+        {
+          "value": "standard-secondary",
+          "label": "tTheme:global.widgets.settings.color_scheme.options.standard_secondary"
+        },
+        {
+          "value": "highlight-primary",
+          "label": "tTheme:global.widgets.settings.color_scheme.options.highlight_primary"
+        },
+        {
+          "value": "highlight-secondary",
+          "label": "tTheme:global.widgets.settings.color_scheme.options.highlight_secondary"
+        }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "top_spacing",
+      "label": "tTheme:global.widgets.settings.top_spacing.label",
+      "default": "auto",
+      "options": [
+        {
+          "value": "auto",
+          "label": "tTheme:global.widgets.settings.top_spacing.options.auto"
+        },
+        {
+          "value": "small",
+          "label": "tTheme:global.widgets.settings.top_spacing.options.small"
+        },
+        {
+          "value": "none",
+          "label": "tTheme:global.widgets.settings.top_spacing.options.none"
+        }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "bottom_spacing",
+      "label": "tTheme:global.widgets.settings.bottom_spacing.label",
+      "default": "auto",
+      "options": [
+        {
+          "value": "auto",
+          "label": "tTheme:global.widgets.settings.bottom_spacing.options.auto"
+        },
+        {
+          "value": "small",
+          "label": "tTheme:global.widgets.settings.bottom_spacing.options.small"
+        },
+        {
+          "value": "none",
+          "label": "tTheme:global.widgets.settings.bottom_spacing.options.none"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "id": "all_positions_text",
+      "label": "tTheme:job_listing.settings.all_positions_text.label",
+      "defaultKey": "site.job_listing.all_positions"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "job",
+      "displayName": "tTheme:job_listing.blocks.job.name",
+      "settings": [
+        {
+          "type": "header",
+          "id": "content_header",
+          "label": "tTheme:global.widgets.settings.content_header.label"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "tTheme:job_listing.blocks.job.settings.title.label",
+          "default": "Software Engineer"
+        },
+        {
+          "type": "text",
+          "id": "department",
+          "label": "tTheme:job_listing.blocks.job.settings.department.label",
+          "default": "Engineering"
+        },
+        {
+          "type": "text",
+          "id": "location",
+          "label": "tTheme:job_listing.blocks.job.settings.location.label",
+          "default": "Remote"
+        },
+        {
+          "type": "select",
+          "id": "type",
+          "label": "tTheme:job_listing.blocks.job.settings.type.label",
+          "default": "full-time",
+          "options": [
+            {
+              "value": "full-time",
+              "label": "tTheme:job_listing.blocks.job.settings.type.options.full-time"
+            },
+            {
+              "value": "part-time",
+              "label": "tTheme:job_listing.blocks.job.settings.type.options.part-time"
+            },
+            {
+              "value": "contract",
+              "label": "tTheme:job_listing.blocks.job.settings.type.options.contract"
+            },
+            {
+              "value": "internship",
+              "label": "tTheme:job_listing.blocks.job.settings.type.options.internship"
+            }
+          ]
+        },
+        {
+          "type": "link",
+          "id": "apply_link",
+          "label": "tTheme:job_listing.blocks.job.settings.apply_link.label",
+          "default": {
+            "text": "Apply Now",
+            "href": "#",
+            "target": "_self"
+          }
+        }
+      ]
+    }
+  ],
+  "defaultBlocks": [
+    {
+      "type": "job",
+      "settings": {
+        "title": "Senior Software Engineer",
+        "department": "Engineering",
+        "location": "Remote",
+        "type": "full-time",
+        "apply_link": {
+          "text": "Apply Now",
+          "href": "#",
+          "target": "_self"
+        }
+      }
+    },
+    {
+      "type": "job",
+      "settings": {
+        "title": "Product Designer",
+        "department": "Design",
+        "location": "San Francisco, CA",
+        "type": "full-time",
+        "apply_link": {
+          "text": "Apply Now",
+          "href": "#",
+          "target": "_self"
+        }
+      }
+    },
+    {
+      "type": "job",
+      "settings": {
+        "title": "Marketing Manager",
+        "department": "Marketing",
+        "location": "New York, NY",
+        "type": "full-time",
+        "apply_link": {
+          "text": "Apply Now",
+          "href": "#",
+          "target": "_self"
+        }
+      }
+    }
+  ]
+}

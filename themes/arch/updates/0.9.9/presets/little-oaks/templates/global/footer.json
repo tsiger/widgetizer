@@ -1,0 +1,43 @@
+{
+  "type": "footer",
+  "settings": {
+    "copyright": "© 2026 Little Oaks Learning Center. All rights reserved.",
+    "layout": "equal",
+    "color_scheme": "highlight-secondary"
+  },
+  "blocks": {
+    "logo_text_1": {
+      "type": "logo_text",
+      "settings": {
+        "text": "<p>A nurturing preschool and daycare where children learn through play, explore with curiosity, and grow with confidence.</p>",
+        "logo": "/uploads/images/little-oaks-green.png",
+        "logo_width": 170
+      }
+    },
+    "text_block_1": {
+      "type": "text_block",
+      "settings": {
+        "title": "Hours",
+        "text": "<p>Monday–Friday: 7 AM – 6 PM</p><p>Saturday–Sunday: Closed</p>"
+      }
+    },
+    "menu_block_1": {
+      "type": "menu_block",
+      "settings": {
+        "title": "Explore"
+      }
+    },
+    "social_block_1": {
+      "type": "social_block",
+      "settings": {
+        "title": "Stay Connected"
+      }
+    }
+  },
+  "blocksOrder": [
+    "logo_text_1",
+    "text_block_1",
+    "menu_block_1",
+    "social_block_1"
+  ]
+}

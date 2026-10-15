@@ -1,0 +1,45 @@
+{
+  "type": "services",
+  "schemaVersion": 1,
+  "displayName": "Service",
+  "displayNamePlural": "Services",
+  "description": "Services and offerings, each with its own detail page.",
+  "icon": "ConciergeBell",
+  "slugPrefix": "services",
+  "hasItemPages": true,
+  "sortable": true,
+  "defaultSort": "manual",
+  "settings": [
+    { "type": "header", "id": "content_header", "label": "Content" },
+    { "type": "text", "id": "title", "label": "Title", "required": true, "usedAsTitle": true },
+    {
+      "type": "icon",
+      "id": "icon",
+      "label": "Icon",
+      "description": "Optional — shown on service cards and at the top of the detail page."
+    },
+    {
+      "type": "textarea",
+      "id": "summary",
+      "label": "Summary",
+      "description": "Short teaser shown in listings and at the top of the service."
+    },
+    { "type": "image", "id": "featured_image", "label": "Featured image" },
+    { "type": "gallery", "id": "gallery", "label": "Gallery" },
+    { "type": "richtext", "id": "description", "label": "Description", "allow_headings": true, "allow_images": true },
+    { "type": "header", "id": "details_header", "label": "Details" },
+    {
+      "type": "text",
+      "id": "price",
+      "label": "Price",
+      "description": "Free text — e.g. \"From €80\" or \"Contact for quote\"."
+    },
+    { "type": "text", "id": "duration", "label": "Duration", "description": "Optional — e.g. \"60 min\"." },
+    {
+      "type": "link",
+      "id": "cta_link",
+      "label": "Call to action",
+      "default": { "href": "", "text": "Book now", "target": "_self" }
+    }
+  ]
+}

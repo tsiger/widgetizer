@@ -27,6 +27,22 @@ document.addEventListener("DOMContentLoaded", () => {
   const menuToggle = widgetElement.querySelector(".menu-toggle");
   const navCloseBtn = widgetElement.querySelector(".nav-close-btn");
   const headerNav = widgetElement.querySelector(".header-nav");
+  const languageDropdown = widgetElement.querySelector(".header-language-dropdown");
+  if (languageDropdown) {
+    document.addEventListener("click", (event) => {
+      if (!languageDropdown.contains(event.target)) languageDropdown.open = false;
+    });
+    languageDropdown.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && languageDropdown.open) {
+        event.stopPropagation();
+        languageDropdown.open = false;
+        languageDropdown.querySelector("summary").focus();
+      }
+    });
+    languageDropdown.addEventListener("focusout", (event) => {
+      if (!languageDropdown.contains(event.relatedTarget)) languageDropdown.open = false;
+    });
+  }
   // Select links within has-submenu items as toggles
   const submenuItems = widgetElement.querySelectorAll(".has-submenu");
 
@@ -145,7 +161,8 @@ document.addEventListener("DOMContentLoaded", () => {
     // Create the toggle button
     const toggleBtn = document.createElement("button");
     toggleBtn.className = "submenu-toggle";
-    toggleBtn.setAttribute("aria-label", "Toggle submenu");
+    // The page carries the wording (see layout.liquid).
+    toggleBtn.setAttribute("aria-label", document.body?.dataset.tMenuToggleSubmenu || "Toggle submenu");
     toggleBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6l-6 6"/></svg>`;
 
     // Insert toggle button after the link
@@ -354,9 +371,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Set header height offset (used by sticky columns, transparent header padding, etc.)
   if (isSticky || isTransparent) {
+    const breadcrumbs = isTransparent ? document.querySelector(".site-breadcrumbs") : null;
     const setHeaderOffset = () => {
       const h = widgetElement.offsetHeight;
       document.documentElement.style.setProperty("--header-sticky-offset", h + "px");
+      if (breadcrumbs) {
+        document.body.style.setProperty("--breadcrumbs-offset", breadcrumbs.offsetHeight + "px");
+      }
     };
     setHeaderOffset();
     window.addEventListener("resize", debounce(setHeaderOffset, 150));

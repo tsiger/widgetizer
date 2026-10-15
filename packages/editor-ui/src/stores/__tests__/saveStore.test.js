@@ -26,9 +26,52 @@ const mockThemeStoreState = {
   hasUnsavedThemeChanges: vi.fn(() => false),
   loadSettings: vi.fn().mockResolvedValue(undefined),
   saveSettings: vi.fn().mockResolvedValue({}),
+  reconcileFromServer: vi.fn().mockResolvedValue(null),
   updateThemeSetting: vi.fn(),
+  resetThemeSettings: vi.fn(),
+  discardDraft: vi.fn(),
+  isDraftDiscarded: vi.fn(() => false),
   resetForProjectChange: vi.fn(),
 };
+
+// The real themeStore rebaselines inside `saveSettings` and reverts the draft
+// inside `resetThemeSettings` — both invisible to a call-count assertion, and
+// both are what this interaction is about. Wiring the mock to do the same makes
+// the dirty state at the end of a discard readable.
+let mockServerTheme = null;
+
+function makeThemeStoreLive(saved, draft) {
+  const clone = (value) => (value ? JSON.parse(JSON.stringify(value)) : null);
+  mockThemeStoreState.originalSettings = clone(saved);
+  mockThemeStoreState.settings = clone(draft);
+  mockThemeStoreState.loadedProjectId = "test-project";
+  mockThemeStoreState.hasUnsavedThemeChanges.mockImplementation(
+    () => JSON.stringify(mockThemeStoreState.settings) !== JSON.stringify(mockThemeStoreState.originalSettings),
+  );
+  mockThemeStoreState.resetThemeSettings.mockImplementation(() => {
+    mockThemeStoreState.settings = clone(mockThemeStoreState.originalSettings);
+  });
+  // The real discardDraft marks the reverted draft; any later draft write (a new
+  // object here, as updateThemeSetting makes) unmarks it.
+  let discarded = null;
+  mockThemeStoreState.discardDraft.mockImplementation(() => {
+    mockThemeStoreState.resetThemeSettings();
+    discarded = mockThemeStoreState.settings;
+  });
+  mockThemeStoreState.isDraftDiscarded.mockImplementation(
+    () => discarded !== null && mockThemeStoreState.settings === discarded,
+  );
+  // The real reconcileFromServer: the baseline always follows the server, the
+  // draft only while nothing has touched it since it was captured.
+  mockThemeStoreState.reconcileFromServer.mockImplementation(async (projectId, expectedDraft) => {
+    if (mockThemeStoreState.loadedProjectId !== projectId) return null;
+    mockThemeStoreState.originalSettings = clone(mockServerTheme);
+    if (mockThemeStoreState.settings === expectedDraft) {
+      mockThemeStoreState.settings = clone(mockServerTheme);
+    }
+    return clone(mockServerTheme);
+  });
+}
 
 vi.mock("../themeStore", () => ({
   default: {
@@ -50,6 +93,7 @@ const { default: useAutoSave } = await import("../saveStore");
 const { default: usePageStore } = await import("../pageStore");
 const { default: useStaleProjectStore } = await import("../staleProjectStore.js");
 const { savePageContent } = await import("../../queries/pageManager");
+const { saveGlobalWidget } = await import("../../queries/previewManager");
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -57,11 +101,26 @@ const { savePageContent } = await import("../../queries/pageManager");
 
 function resetStores() {
   useAutoSave.getState().reset();
+  // reset() deliberately leaves isSaving/isAutoSaving/runningSave/
+  // queuedFollowUp alone in production (an in-flight save finishes on its
+  // own; only its write-back gets abandoned) — but a previous test can leave
+  // a dangling, still-pending run/follow-up chain (e.g. one using the
+  // default savePageContent mock, which resolves on its own schedule rather
+  // than being explicitly awaited by that test). Without a hard clear here,
+  // that stale `runningSave` reference leaks into the next test and makes
+  // its first save() call silently coalesce onto someone else's stale run.
+  useAutoSave.setState({
+    isSaving: false,
+    isAutoSaving: false,
+    runningSave: null,
+    queuedFollowUp: null,
+  });
 
   usePageStore.setState({
     page: null,
     originalPage: null,
     globalWidgets: { header: null, footer: null },
+    originalGlobalWidgets: { header: null, footer: null },
     themeSettingsSnapshot: null,
     loadedProjectId: null,
     activeLoadId: 0,
@@ -76,7 +135,10 @@ function resetStores() {
   mockThemeStoreState.setSettings.mockReset();
   mockThemeStoreState.markThemeSettingsSaved.mockReset();
   mockThemeStoreState.hasUnsavedThemeChanges.mockReset().mockReturnValue(false);
+  mockThemeStoreState.resetThemeSettings.mockReset();
   mockThemeStoreState.saveSettings.mockReset().mockResolvedValue({});
+  mockThemeStoreState.reconcileFromServer.mockReset().mockResolvedValue(null);
+  mockServerTheme = null;
 }
 
 function seedPageStore() {
@@ -125,10 +187,341 @@ describe("saveStore (useAutoSave)", () => {
       useAutoSave.getState().markWidgetModified("w-1"); // unsaved change + arms the auto-save timer
       expect(useAutoSave.getState().autoSaveInterval).not.toBe(null);
 
-      await expect(useAutoSave.getState().save(false)).resolves.toBeUndefined();
+      const result = await useAutoSave.getState().save(false);
+      expect(result).toEqual({ status: "mismatch" });
 
       expect(useStaleProjectStore.getState().isStale).toBe(true);
       expect(useAutoSave.getState().autoSaveInterval).toBe(null);
+    });
+
+    it("does not wedge runningSave for the next save after a mismatch (no chaining-cycle)", async () => {
+      // The PROJECT_MISMATCH path throws before the run body's first await, so
+      // (absent the fix) its finally clears runningSave before the outer
+      // `set({ runningSave: run })` installs it — leaving a settled promise
+      // wedged in the slot forever. Confirm the slot is clear after the
+      // mismatch save settles, then confirm a normal follow-up save actually runs
+      // (rather than coalescing onto — and cycling on — that stale promise).
+      seedPageStore();
+      usePageStore.setState({ loadedProjectId: "other-project" });
+      useAutoSave.getState().markWidgetModified("w-1");
+
+      const mismatchResult = await useAutoSave.getState().save(false);
+      expect(mismatchResult).toEqual({ status: "mismatch" });
+      expect(useAutoSave.getState().runningSave).toBe(null);
+
+      // Fix the mismatch and issue a genuinely new save.
+      usePageStore.setState({ loadedProjectId: "test-project" });
+      useAutoSave.getState().markWidgetModified("w-1");
+
+      const secondResult = await useAutoSave.getState().save(false);
+      expect(secondResult).toEqual({ status: "success" });
+      expect(savePageContent).toHaveBeenCalled();
+      expect(useAutoSave.getState().runningSave).toBe(null);
+    });
+  });
+
+  // --------------------------------------------------------------------------
+  // The language being edited was removed
+  // --------------------------------------------------------------------------
+
+  describe("a save refused because the language was removed", () => {
+    function rejectWithLanguageRemoved(code = "el") {
+      const err = new Error(`The language "${code}" was removed from this site`);
+      err.code = "LANGUAGE_REMOVED";
+      err.status = 409;
+      err.data = { code: "LANGUAGE_REMOVED", language: code };
+      savePageContent.mockRejectedValueOnce(err);
+    }
+
+    it("stops autosave and raises the curtain, without throwing at the caller", async () => {
+      // Same handling as PROJECT_MISMATCH and for the same reason: retrying cannot
+      // succeed, so hammering the server helps nobody, and an exception thrown at a
+      // manual save would surface as a generic failure toast instead of the
+      // explanation the curtain gives.
+      seedPageStore();
+      useAutoSave.getState().markWidgetModified("w-1");
+      expect(useAutoSave.getState().autoSaveInterval).not.toBe(null);
+      rejectWithLanguageRemoved();
+
+      const result = await useAutoSave.getState().save(false);
+
+      expect(result).toEqual({ status: "language-removed" });
+      expect(useAutoSave.getState().autoSaveInterval).toBe(null);
+      expect(useStaleProjectStore.getState().isStale).toBe(true);
+      expect(useStaleProjectStore.getState().reason).toBe("language");
+      expect(useStaleProjectStore.getState().removedLanguage).toBe("el");
+    });
+
+    it("keeps every edit and stays dirty, because reloading is the only way out", async () => {
+      // The curtain tells the user that reloading discards this work. That is only
+      // honest if the work is in fact still here until they choose to.
+      seedPageStore();
+      usePageStore.setState({
+        page: {
+          ...usePageStore.getState().page,
+          widgets: { "w-1": { type: "rich-text", settings: { text: "Written in Greek" } } },
+        },
+      });
+      useAutoSave.getState().markWidgetModified("w-1");
+      rejectWithLanguageRemoved();
+
+      await useAutoSave.getState().save(false);
+
+      expect(useAutoSave.getState().modifiedWidgets.has("w-1")).toBe(true);
+      expect(useAutoSave.getState().hasUnsavedChanges()).toBe(true);
+      expect(usePageStore.getState().page.widgets["w-1"].settings.text).toBe("Written in Greek");
+      expect(useAutoSave.getState().lastSaved).toBe(null);
+    });
+  });
+
+  describe("after a language-removal refusal, saving stays off", () => {
+    function rejectWithLanguageRemoved(code = "el") {
+      const err = new Error(`The language "${code}" was removed from this site`);
+      err.code = "LANGUAGE_REMOVED";
+      err.status = 409;
+      err.data = { code: "LANGUAGE_REMOVED", language: code };
+      savePageContent.mockRejectedValueOnce(err);
+    }
+
+    async function refuseOnce() {
+      seedPageStore();
+      useAutoSave.getState().markWidgetModified("w-1");
+      rejectWithLanguageRemoved();
+      await useAutoSave.getState().save(false);
+    }
+
+    it("does not re-arm the timer when the retained draft is edited further", async () => {
+      // Stopping the timer once was not enough: every edit runs through
+      // resetAutoSaveTimer, so typing into the draft the user was told to keep
+      // restarted the doomed saves immediately.
+      await refuseOnce();
+      expect(useAutoSave.getState().autoSaveInterval).toBe(null);
+
+      useAutoSave.getState().markWidgetModified("w-2");
+      expect(useAutoSave.getState().autoSaveInterval).toBe(null);
+
+      useAutoSave.getState().setStructureModified(true);
+      useAutoSave.getState().setThemeSettingsModified(true);
+      expect(useAutoSave.getState().autoSaveInterval).toBe(null);
+    });
+
+    it("refuses further saves outright instead of re-issuing a doomed request", async () => {
+      await refuseOnce();
+      savePageContent.mockClear();
+
+      const result = await useAutoSave.getState().save(false);
+
+      expect(result).toEqual({ status: "suspended" });
+      expect(savePageContent).not.toHaveBeenCalled();
+    });
+
+    it("keeps the draft while suspended", async () => {
+      await refuseOnce();
+      expect(useAutoSave.getState().hasUnsavedChanges()).toBe(true);
+      expect(useAutoSave.getState().modifiedWidgets.has("w-1")).toBe(true);
+    });
+
+    it("saves again once the editor starts a new session", async () => {
+      // A suspension that outlived its session would silently stop saving a page
+      // that is perfectly fine. PageEditor calls this when it loads a page.
+      await refuseOnce();
+      useAutoSave.getState().resumeSaving();
+
+      useAutoSave.getState().markWidgetModified("w-1");
+      expect(useAutoSave.getState().autoSaveInterval).not.toBe(null);
+
+      const result = await useAutoSave.getState().save(false);
+      expect(result).toEqual({ status: "success" });
+    });
+
+    it("also lifts on reset, the discard-and-leave path", async () => {
+      await refuseOnce();
+      useAutoSave.getState().reset();
+      expect(useAutoSave.getState().savingSuspended).toBe(false);
+    });
+
+    it("takes the banner down with it, so a fresh page does not inherit the warning", async () => {
+      // Saving resuming and the banner saying it cannot are one fact. Leaving the
+      // banner up over a page that saves perfectly well is its own bug.
+      await refuseOnce();
+      expect(useStaleProjectStore.getState().reason).toBe("language");
+
+      useAutoSave.getState().resumeSaving();
+
+      expect(useStaleProjectStore.getState().isStale).toBe(false);
+      expect(useStaleProjectStore.getState().reason).toBe(null);
+      expect(useStaleProjectStore.getState().removedLanguage).toBe(null);
+    });
+
+    it("leaves a project-mismatch warning alone, which is about the tab, not the session", async () => {
+      // Clearing it here would drop a warning nothing re-raises until the next focus
+      // probe, leaving the tab quietly editing the wrong project.
+      useStaleProjectStore.getState().markStale("Marketing Site");
+
+      useAutoSave.getState().resumeSaving();
+      useAutoSave.getState().reset();
+
+      expect(useStaleProjectStore.getState().isStale).toBe(true);
+      expect(useStaleProjectStore.getState().reason).toBe("project");
+      expect(useStaleProjectStore.getState().incomingName).toBe("Marketing Site");
+    });
+
+    it("refusal → discard and navigate away → open a valid page → saves, with no old banner", async () => {
+      // The whole lifecycle in one, because each step restored something the
+      // previous one had switched off and any of them could regress alone.
+      await refuseOnce();
+      expect(useStaleProjectStore.getState().isStale).toBe(true);
+      expect(useAutoSave.getState().savingSuspended).toBe(true);
+
+      // Discarding through ordinary navigation: the guard calls reset(), then lets
+      // the route change through.
+      useAutoSave.getState().reset();
+
+      // The editor opens a page in a language that is fine.
+      useAutoSave.getState().resumeSaving();
+      seedPageStore();
+      useAutoSave.getState().markWidgetModified("w-1");
+
+      const result = await useAutoSave.getState().save(false);
+
+      expect(result).toEqual({ status: "success" });
+      expect(useStaleProjectStore.getState().isStale).toBe(false);
+      expect(useAutoSave.getState().savingSuspended).toBe(false);
+      expect(useAutoSave.getState().hasUnsavedChanges()).toBe(false);
+    });
+  });
+
+  // --------------------------------------------------------------------------
+  // A save the server refused
+  // --------------------------------------------------------------------------
+
+  describe("a rejected save", () => {
+    /** The server refusing a page that references an image that has been deleted. */
+    function rejectWithMissingMedia() {
+      const err = new Error("This content refers to a file that is no longer in the media library");
+      err.code = "MEDIA_REFERENCE_MISSING";
+      err.status = 409;
+      savePageContent.mockRejectedValueOnce(err);
+      return err;
+    }
+
+    it("keeps the edit and stays dirty, so nothing the user typed is lost", async () => {
+      seedPageStore();
+      // An edit the server is about to refuse.
+      usePageStore.setState({
+        page: {
+          ...usePageStore.getState().page,
+          widgets: { "w-1": { type: "rich-text", settings: { text: "Edited, and refused" } } },
+        },
+      });
+      useAutoSave.getState().markWidgetModified("w-1");
+      rejectWithMissingMedia();
+
+      await expect(useAutoSave.getState().save(false)).rejects.toThrow(/no longer in the media library/);
+
+      // The whole point: a refusal writes nothing, so the editor must still hold
+      // the work and still know it is unsaved. A cleared flag here would let the
+      // user navigate away believing the page was saved.
+      expect(useAutoSave.getState().modifiedWidgets.has("w-1")).toBe(true);
+      expect(useAutoSave.getState().hasUnsavedChanges()).toBe(true);
+      expect(usePageStore.getState().page.widgets["w-1"].settings.text).toBe("Edited, and refused");
+      expect(useAutoSave.getState().lastSaved).toBe(null);
+    });
+
+    it("rethrows with its code, so the editor can name the reason", async () => {
+      seedPageStore();
+      useAutoSave.getState().markWidgetModified("w-1");
+      rejectWithMissingMedia();
+
+      // EditorTopBar distinguishes this from a generic failure on `code` alone.
+      await expect(useAutoSave.getState().save(false)).rejects.toMatchObject({
+        code: "MEDIA_REFERENCE_MISSING",
+      });
+    });
+
+    it("leaves the baseline alone, so the next save still sends the refused edit", async () => {
+      const page = seedPageStore();
+      useAutoSave.getState().markWidgetModified("w-1");
+      rejectWithMissingMedia();
+      await expect(useAutoSave.getState().save(false)).rejects.toThrow();
+
+      // Rebaselining on a failure would make the refused change invisible to the
+      // next save — it would look clean and never be sent again.
+      expect(usePageStore.getState().originalPage).toEqual(page);
+
+      savePageContent.mockResolvedValueOnce({});
+      const second = await useAutoSave.getState().save(false);
+      expect(second).toEqual({ status: "success" });
+      expect(savePageContent).toHaveBeenCalledTimes(2);
+    });
+  });
+
+  // --------------------------------------------------------------------------
+  // "Saved, but image tracking is behind"
+  // --------------------------------------------------------------------------
+
+  describe("a save whose media-usage sync failed server-side", () => {
+    it("is a success that records a warning, not a failure", async () => {
+      seedPageStore();
+      useAutoSave.getState().markWidgetModified("w-1");
+      savePageContent.mockResolvedValueOnce({ warnings: [{ code: "MEDIA_USAGE_STALE", path: "page-1" }] });
+
+      const result = await useAutoSave.getState().save(false);
+
+      // The content IS saved; only the derived usage rows are behind. Showing this
+      // as a failed save would be false, and would push the user to re-save work
+      // that is already stored.
+      expect(result).toEqual({ status: "success" });
+      expect(useAutoSave.getState().hasUnsavedChanges()).toBe(false);
+      expect(useAutoSave.getState().mediaUsageStale).not.toBe(null);
+    });
+
+    it("records nothing when the save carries no such warning", async () => {
+      seedPageStore();
+      useAutoSave.getState().markWidgetModified("w-1");
+
+      await useAutoSave.getState().save(false);
+
+      expect(useAutoSave.getState().mediaUsageStale).toBe(null);
+    });
+
+    it("notices it on a header-only save, whose response used to be discarded", async () => {
+      // Globals were fired into the fan-out and their results thrown away, so a
+      // save that touched only the header lost its warning entirely.
+      seedPageStore();
+      usePageStore.setState({
+        globalWidgets: { header: { type: "header", settings: { logo: "/uploads/images/a.png" } }, footer: null },
+        originalGlobalWidgets: { header: { type: "header", settings: { logo: "" } }, footer: null },
+      });
+      useAutoSave.getState().markWidgetModified("header");
+      saveGlobalWidget.mockResolvedValueOnce({ warnings: [{ code: "MEDIA_USAGE_STALE", path: "global:header" }] });
+
+      const result = await useAutoSave.getState().save(false);
+
+      expect(result).toEqual({ status: "success" });
+      expect(saveGlobalWidget).toHaveBeenCalled(); // not vacuous: the header really was saved
+      expect(useAutoSave.getState().mediaUsageStale).not.toBe(null);
+    });
+
+    it("notices it on a theme save without mistaking it for a settings correction", async () => {
+      // Theme warnings are not all one kind. A sanitization warning means the server
+      // stored something different and undo history must be rewritten; this one
+      // changed no setting, so treating it as a correction would rewrite history
+      // over a save the server took verbatim.
+      seedPageStore();
+      makeThemeStoreLive({ colors: { primary: "#fff" } }, { colors: { primary: "#000" } });
+      useAutoSave.getState().setThemeSettingsModified(true);
+      mockThemeStoreState.saveSettings.mockResolvedValueOnce({
+        warnings: [{ code: "MEDIA_USAGE_STALE", path: "theme.json" }],
+      });
+      const applyThemeCorrections = vi.spyOn(usePageStore.getState(), "applyThemeCorrections");
+
+      const result = await useAutoSave.getState().save(false);
+
+      expect(result).toEqual({ status: "success" });
+      expect(mockThemeStoreState.saveSettings).toHaveBeenCalled(); // not vacuous
+      expect(useAutoSave.getState().mediaUsageStale).not.toBe(null);
+      expect(applyThemeCorrections).not.toHaveBeenCalled();
     });
   });
 
@@ -213,6 +606,101 @@ describe("saveStore (useAutoSave)", () => {
     it("is a no-op for unknown widget IDs", () => {
       useAutoSave.getState().markWidgetUnmodified("w-999");
       expect(useAutoSave.getState().modifiedWidgets.size).toBe(0);
+    });
+  });
+
+  // --------------------------------------------------------------------------
+  // reconcileModifiedWidgets
+  // --------------------------------------------------------------------------
+
+  describe("reconcileModifiedWidgets", () => {
+    it("marks a widget modified when its content differs from the saved baseline", () => {
+      const page = seedPageStore();
+      usePageStore.setState({
+        page: { ...page, widgets: { ...page.widgets, "w-1": { ...page.widgets["w-1"], settings: { text: "changed" } } } },
+      });
+      useAutoSave.getState().reconcileModifiedWidgets();
+      expect(useAutoSave.getState().modifiedWidgets.has("w-1")).toBe(true);
+    });
+
+    it("clears a widget's modified flag when its content matches the saved baseline again (undo reverted it)", () => {
+      seedPageStore();
+      useAutoSave.getState().markWidgetModified("w-1"); // simulate a prior edit; content itself is unchanged from the seed baseline
+      useAutoSave.getState().reconcileModifiedWidgets();
+      expect(useAutoSave.getState().modifiedWidgets.has("w-1")).toBe(false);
+    });
+
+    it("re-arms the autosave timer when it marks a widget modified", () => {
+      const page = seedPageStore();
+      usePageStore.setState({
+        page: { ...page, widgets: { ...page.widgets, "w-1": { ...page.widgets["w-1"], settings: { text: "changed" } } } },
+      });
+      expect(useAutoSave.getState().autoSaveInterval).toBeNull();
+      useAutoSave.getState().reconcileModifiedWidgets();
+      expect(useAutoSave.getState().autoSaveInterval).not.toBeNull();
+    });
+
+    it("re-arms the autosave timer for a structure-only difference (undo/redo of a reorder)", () => {
+      const widget = { type: "rich-text", settings: { text: "Hi" } };
+      const page = {
+        id: "page-1",
+        title: "Test",
+        widgets: { "w-1": { ...widget }, "w-2": { ...widget } },
+        widgetsOrder: ["w-1", "w-2"],
+      };
+      usePageStore.setState({
+        page: JSON.parse(JSON.stringify(page)),
+        originalPage: JSON.parse(JSON.stringify(page)),
+        loadedProjectId: "test-project",
+        loading: false,
+      });
+      // Undo/redo of a reorder: every widget's content matches the baseline,
+      // only the page-level widgetsOrder differs.
+      usePageStore.setState({
+        page: { ...JSON.parse(JSON.stringify(page)), widgetsOrder: ["w-2", "w-1"] },
+      });
+
+      expect(useAutoSave.getState().autoSaveInterval).toBeNull();
+      useAutoSave.getState().reconcileModifiedWidgets();
+
+      // The per-widget ledger is correctly empty — nothing content-level changed —
+      // but the whole-page diff is dirty, so the timer must still be armed.
+      expect(useAutoSave.getState().modifiedWidgets.size).toBe(0);
+      expect(useAutoSave.getState().autoSaveInterval).not.toBeNull();
+    });
+
+    it("re-arms the autosave timer for a theme-settings-only difference (undo/redo of a theme edit)", () => {
+      // Undo/redo restores theme settings into themeStore (via
+      // syncThemeStoreFromSnapshot); the page itself matches its baseline, so
+      // only the canonical theme diff reads dirty.
+      seedPageStore();
+      mockThemeStoreState.hasUnsavedThemeChanges.mockReturnValue(true);
+
+      expect(useAutoSave.getState().autoSaveInterval).toBeNull();
+      useAutoSave.getState().reconcileModifiedWidgets();
+
+      expect(useAutoSave.getState().modifiedWidgets.size).toBe(0);
+      expect(useAutoSave.getState().autoSaveInterval).not.toBeNull();
+    });
+
+    it("leaves a widget clean, and the timer unarmed, when it differs only by a key holding undefined", () => {
+      const page = seedPageStore();
+      usePageStore.setState({
+        page: { ...page, widgets: { ...page.widgets, "w-1": { ...page.widgets["w-1"], extra: undefined } } },
+      });
+      useAutoSave.getState().reconcileModifiedWidgets();
+      expect(useAutoSave.getState().modifiedWidgets.size).toBe(0);
+      expect(useAutoSave.getState().autoSaveInterval).toBeNull();
+    });
+
+    it("reconciles header/footer against originalGlobalWidgets", () => {
+      const header = { type: "header", settings: { text: "v1" }, blocks: {}, blocksOrder: [] };
+      usePageStore.setState({
+        globalWidgets: { header: { ...header, settings: { text: "v2" } }, footer: null },
+        originalGlobalWidgets: { header, footer: null },
+      });
+      useAutoSave.getState().reconcileModifiedWidgets();
+      expect(useAutoSave.getState().modifiedWidgets.has("header")).toBe(true);
     });
   });
 
@@ -307,6 +795,41 @@ describe("saveStore (useAutoSave)", () => {
     it("returns false when page is null", () => {
       expect(useAutoSave.getState().hasUnsavedChanges()).toBe(false);
     });
+
+    // The saved copy is a JSON round trip, which drops a key holding undefined.
+    // Counting that key as a change would leave the editor dirty after every save.
+    it("does not count a key holding undefined, which the saved copy cannot carry, as a change", () => {
+      const page = seedPageStore();
+      usePageStore.setState({
+        page: { ...page, widgets: { ...page.widgets, "w-1": { ...page.widgets["w-1"], extra: undefined } } },
+      });
+      expect(useAutoSave.getState().hasUnsavedChanges()).toBe(false);
+    });
+
+    it("still detects a saved value cleared to undefined", () => {
+      const page = seedPageStore();
+      usePageStore.setState({
+        page: { ...page, widgets: { ...page.widgets, "w-1": { ...page.widgets["w-1"], settings: { text: undefined } } } },
+      });
+      expect(useAutoSave.getState().hasUnsavedChanges()).toBe(true);
+    });
+
+    it("does not count a header key holding undefined as a change", () => {
+      const header = { type: "header", settings: { text: "v1" }, blocks: {}, blocksOrder: [] };
+      usePageStore.setState({
+        globalWidgets: { header: { ...header, settings: { ...header.settings, link: undefined } }, footer: null },
+        originalGlobalWidgets: { header: JSON.parse(JSON.stringify(header)), footer: null },
+      });
+      expect(useAutoSave.getState().hasUnsavedChanges()).toBe(false);
+    });
+
+    it("does not report a diff when header/footer are rebuilt with the same values in a different key order", () => {
+      usePageStore.setState({
+        globalWidgets: { header: { type: "header", settings: { a: 1, b: 2 } }, footer: null },
+        originalGlobalWidgets: { header: { settings: { b: 2, a: 1 }, type: "header" }, footer: null },
+      });
+      expect(useAutoSave.getState().hasUnsavedChanges()).toBe(false);
+    });
   });
 
   // --------------------------------------------------------------------------
@@ -328,6 +851,126 @@ describe("saveStore (useAutoSave)", () => {
 
       expect(second).not.toBe(first);
     });
+
+    it("does not defeat save()'s own stopAutoSave() (PROJECT_MISMATCH) by rescheduling anyway once the tick's save resolves", async () => {
+      seedPageStore();
+      usePageStore.setState({ loadedProjectId: "other-project" }); // mismatch vs the mocked active project
+      useAutoSave.getState().markWidgetModified("w-1"); // unsaved change + arms the timer
+
+      await vi.advanceTimersByTimeAsync(60000); // the tick fires; save(true) hits PROJECT_MISMATCH and stops autosave
+
+      expect(useStaleProjectStore.getState().isStale).toBe(true);
+      expect(useAutoSave.getState().autoSaveInterval).toBeNull(); // stayed stopped, not silently re-armed
+      expect(vi.getTimerCount()).toBe(0);
+    });
+
+    it("does not double-schedule when a fresh edit already re-armed the timer while the tick's own save was in flight", async () => {
+      seedPageStore();
+      useAutoSave.getState().markWidgetModified("w-1");
+
+      let resolveSave;
+      savePageContent.mockImplementationOnce(() => new Promise((resolve) => { resolveSave = resolve; }));
+
+      await vi.advanceTimersByTimeAsync(60000); // tick fires, its own save(true) hangs mid-flight
+      expect(useAutoSave.getState().isAutoSaving).toBe(true);
+
+      useAutoSave.getState().markWidgetModified("w-2"); // re-arms its own timer while the tick's save is still in flight
+      const rearmedTimer = useAutoSave.getState().autoSaveInterval;
+
+      resolveSave({});
+      await vi.advanceTimersByTimeAsync(0); // let the tick's save() resolve and its reschedule-check run
+
+      expect(useAutoSave.getState().autoSaveInterval).toBe(rearmedTimer); // untouched — not clobbered, not doubled
+      expect(vi.getTimerCount()).toBe(1);
+    });
+
+    it("does not reschedule after the tick's own autosave is abandoned by a reset() mid-flight (discard-and-leave)", async () => {
+      seedPageStore();
+      useAutoSave.getState().markWidgetModified("w-1"); // unsaved change + arms the timer
+
+      let resolveSave;
+      savePageContent.mockImplementationOnce(() => new Promise((resolve) => { resolveSave = resolve; }));
+
+      await vi.advanceTimersByTimeAsync(60000); // tick fires; its own save(true) hangs mid-flight
+      expect(useAutoSave.getState().isAutoSaving).toBe(true);
+
+      useAutoSave.getState().reset(); // user confirms "discard changes" while the tick's own autosave is still in flight
+
+      resolveSave({});
+      await vi.advanceTimersByTimeAsync(0); // let the tick's save() resolve to 'abandoned' and its reschedule-check run
+
+      expect(useAutoSave.getState().autoSaveInterval).toBeNull(); // stayed stopped — an intentional stop happened mid-flight, rescheduling would defeat it
+      expect(vi.getTimerCount()).toBe(0);
+    });
+  });
+
+  describe("resetAutoSaveTimer — backoff", () => {
+    it("increases the delay after a failed autosave attempt and resets it after a success", async () => {
+      seedPageStore();
+      useAutoSave.getState().markWidgetModified("w-1");
+
+      savePageContent.mockRejectedValueOnce(new Error("down"));
+      const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+      try {
+        await vi.advanceTimersByTimeAsync(60000); // base delay
+        expect(useAutoSave.getState().autoSaveFailureCount).toBe(1);
+
+        savePageContent.mockRejectedValueOnce(new Error("still down"));
+        await vi.advanceTimersByTimeAsync(120000); // backed off for failureCount=1
+        expect(useAutoSave.getState().autoSaveFailureCount).toBe(2);
+
+        savePageContent.mockResolvedValueOnce({});
+        await vi.advanceTimersByTimeAsync(240000); // backed off for failureCount=2
+        expect(useAutoSave.getState().autoSaveFailureCount).toBe(0);
+      } finally {
+        warnSpy.mockRestore();
+      }
+    });
+
+    it("maps a manual-flavored throw from a coalesced follow-up back to a failed attempt — backoff still advances, no unhandled rejection", async () => {
+      seedPageStore();
+      useAutoSave.getState().markWidgetModified("w-1");
+
+      let resolveFirst;
+      savePageContent.mockImplementationOnce(() => new Promise((resolve) => { resolveFirst = resolve; }));
+      const first = useAutoSave.getState().save(false); // manual save in flight
+      const second = useAutoSave.getState().save(false); // queues a MANUAL-flavored follow-up
+
+      // The tick fires while the manual save is still in flight: its
+      // save(true) joins the queued manual-flavored follow-up, whose failure
+      // contract is a throw — which the tick must map back to "failed".
+      await vi.advanceTimersByTimeAsync(60000);
+
+      // Dirty the page WITHOUT markWidgetModified — that would arm a fresh
+      // base-delay timer and reset the failure count, and the tick's
+      // reschedule-check preserves an existing timer, which would mask the
+      // backed-off reschedule this test exists to prove. A raw page edit
+      // keeps the follow-up from short-circuiting to "clean" while leaving
+      // the tick's own reschedule as the only timer.
+      usePageStore.setState((state) => ({ page: { ...state.page, title: "edited mid-flight" } }));
+      savePageContent.mockRejectedValueOnce(new Error("network down")); // the follow-up's own request fails
+
+      resolveFirst({});
+      await expect(first).resolves.toEqual({ status: "success" });
+      await expect(second).rejects.toThrow("network down"); // the manual caller's own contract, untouched
+      await vi.advanceTimersByTimeAsync(0); // let the tick's catch/bookkeeping run
+
+      expect(useAutoSave.getState().autoSaveFailureCount).toBe(1); // the throw was counted as a failed attempt
+      expect(useAutoSave.getState().autoSaveInterval).not.toBeNull(); // and the tick rescheduled
+
+      // ...with the backed-off delay (120s for failureCount=1), not the base 60s.
+      savePageContent.mockClear();
+      await vi.advanceTimersByTimeAsync(60000);
+      expect(savePageContent).not.toHaveBeenCalled(); // base delay elapsed — the backed-off tick hasn't fired yet
+      await vi.advanceTimersByTimeAsync(60000);
+      expect(savePageContent).toHaveBeenCalledTimes(1); // fires at the 120s backoff
+    });
+
+    it("resets the failure count on a fresh edit, not just on success", () => {
+      useAutoSave.setState({ autoSaveFailureCount: 3 });
+      useAutoSave.getState().markWidgetModified("w-1");
+      expect(useAutoSave.getState().autoSaveFailureCount).toBe(0);
+    });
   });
 
   describe("stopAutoSave", () => {
@@ -348,6 +991,25 @@ describe("saveStore (useAutoSave)", () => {
   // reset
   // --------------------------------------------------------------------------
 
+  // The marker beside a page name answers "is THIS page unsaved", so a site
+  // setting must not light it.
+  describe("hasUnsavedPageChanges", () => {
+    it("ignores theme settings that hasUnsavedChanges counts", () => {
+      useAutoSave.getState().setThemeSettingsModified(true);
+      mockThemeStoreState.hasUnsavedThemeChanges.mockReturnValue(true);
+
+      expect(useAutoSave.getState().hasUnsavedPageChanges()).toBe(false);
+      expect(useAutoSave.getState().hasUnsavedChanges()).toBe(true);
+    });
+
+    it("reports a modified widget, as hasUnsavedChanges does", () => {
+      useAutoSave.getState().markWidgetModified("w-1");
+
+      expect(useAutoSave.getState().hasUnsavedPageChanges()).toBe(true);
+      expect(useAutoSave.getState().hasUnsavedChanges()).toBe(true);
+    });
+  });
+
   describe("reset", () => {
     it("clears all modification flags", () => {
       useAutoSave.getState().markWidgetModified("w-1");
@@ -361,12 +1023,191 @@ describe("saveStore (useAutoSave)", () => {
       expect(useAutoSave.getState().themeSettingsModified).toBe(false);
     });
 
-    it("clears saving flags", () => {
+    // Discard has to discard. Clearing the flags alone left the edited theme
+    // in the store, and a page load keeps a theme draft alive on purpose, so
+    // the change came straight back the next time the editor opened.
+    it("puts the theme draft back", () => {
+      useAutoSave.getState().setThemeSettingsModified(true);
+      mockThemeStoreState.hasUnsavedThemeChanges.mockReturnValue(true);
+
+      useAutoSave.getState().reset();
+
+      expect(mockThemeStoreState.resetThemeSettings).toHaveBeenCalledTimes(1);
+    });
+
+    // The generation guard covers saveStore's own write-backs, but themeStore
+    // writes its baseline from inside `saveSettings`, before that guard runs —
+    // so the discarded values became the thing everything else was compared to.
+    // A theme save that is already on its way cannot be recalled, so the
+    // discard cannot make the site match the screen. Inventing a local
+    // baseline would only make this store agree with itself.
+    function startDiscardedThemeSave() {
+      const SAVED = { settings: { global: { typography: [{ id: "font", value: "Inter" }] } } };
+      const EDITED = { settings: { global: { typography: [{ id: "font", value: "Georgia" }] } } };
+      makeThemeStoreLive(SAVED, EDITED);
+
+      seedPageStore();
+      useAutoSave.getState().setThemeSettingsModified(true);
+
+      let resolveTheme;
+      mockThemeStoreState.saveSettings.mockImplementationOnce(() => {
+        // The real saveSettings captures the draft it submits BEFORE awaiting,
+        // then makes THAT the baseline — which is the whole problem: by the
+        // time it lands, the draft on screen may be the reverted one.
+        const submitted = JSON.parse(JSON.stringify(mockThemeStoreState.settings));
+        return new Promise((resolve) => {
+          resolveTheme = () => {
+            mockThemeStoreState.originalSettings = submitted;
+            resolve({});
+          };
+        });
+      });
+
+      const saving = useAutoSave.getState().save();
+      return { SAVED, EDITED, saving, land: () => resolveTheme() };
+    }
+
+    it("reads the server back when a discarded save lands, and leaves nothing empty", async () => {
+      const { EDITED, saving, land } = startDiscardedThemeSave();
+      // The discarded values are what actually reached the server.
+      mockServerTheme = EDITED;
+      await vi.advanceTimersByTimeAsync(0);
+
+      useAutoSave.getState().reset();
+      expect(useAutoSave.getState().hasUnsavedChanges()).toBe(false);
+
+      land();
+      expect(await saving).toEqual({ status: "abandoned" });
+
+      expect(mockThemeStoreState.reconcileFromServer).toHaveBeenCalledTimes(1);
+      // The editor the user landed on is already mounted and nothing else
+      // reloads the theme, so it must be left holding the server's copy.
+      expect(mockThemeStoreState.settings).toEqual(EDITED);
+      expect(useAutoSave.getState().hasUnsavedChanges()).toBe(false);
+    });
+
+    // An editor stays editable while the reconciling request is in flight, and
+    // the newest thing the user typed outranks anything this save knows.
+    it("keeps an edit made while the reconciling request was in flight", async () => {
+      const { EDITED, saving, land } = startDiscardedThemeSave();
+      mockServerTheme = EDITED;
+      await vi.advanceTimersByTimeAsync(0);
+
+      useAutoSave.getState().reset();
+
+      const LATER = { settings: { global: { typography: [{ id: "font", value: "Futura" }] } } };
+      mockThemeStoreState.reconcileFromServer.mockImplementationOnce(async (projectId, expectedDraft) => {
+        // The edit lands mid-request, exactly as a keystroke would.
+        mockThemeStoreState.settings = LATER;
+        mockThemeStoreState.originalSettings = JSON.parse(JSON.stringify(mockServerTheme));
+        return mockThemeStoreState.settings === expectedDraft ? null : JSON.parse(JSON.stringify(mockServerTheme));
+      });
+
+      land();
+      expect(await saving).toEqual({ status: "abandoned" });
+
+      expect(mockThemeStoreState.settings).toBe(LATER);
+    });
+
+    // Undo must not resurrect the theme the destination page happened to load
+    // with. The reconcile is told the draft the destination editor was showing,
+    // which themeStore hands to the history rebase (see undoThemeCorrection.test).
+    it("reconciles against the discarded draft", async () => {
+      const { SAVED, EDITED, saving, land } = startDiscardedThemeSave();
+      mockServerTheme = EDITED;
+      await vi.advanceTimersByTimeAsync(0);
+
+      useAutoSave.getState().reset();
+      const discardedDraft = mockThemeStoreState.settings;
+      expect(discardedDraft).toEqual(SAVED);
+
+      land();
+      expect(await saving).toEqual({ status: "abandoned" });
+
+      expect(mockThemeStoreState.reconcileFromServer).toHaveBeenCalledWith("test-project", discardedDraft);
+    });
+
+    // A server that returns its copy: themeStore already took it in place of
+    // the discarded draft, so there is nothing to read back.
+    it("does not read back when the store already holds the server's copy", async () => {
+      makeThemeStoreLive({ settings: { global: {} } }, { settings: { global: { a: [] } } });
+      seedPageStore();
+      useAutoSave.getState().setThemeSettingsModified(true);
+      let land;
+      mockThemeStoreState.saveSettings.mockImplementationOnce(
+        () => new Promise((resolve) => (land = () => resolve({ warnings: [], adopted: true }))),
+      );
+
+      const saving = useAutoSave.getState().save();
+      await vi.advanceTimersByTimeAsync(0);
+      useAutoSave.getState().reset();
+      land();
+
+      expect(await saving).toEqual({ status: "abandoned" });
+      expect(mockThemeStoreState.reconcileFromServer).not.toHaveBeenCalled();
+    });
+
+    it("leaves the theme in place when the user has already landed on another page", async () => {
+      const { EDITED, saving, land } = startDiscardedThemeSave();
+      mockServerTheme = EDITED;
+      await vi.advanceTimersByTimeAsync(0);
+
+      useAutoSave.getState().reset();
+      // Another page of the SAME project: loadPage keeps a valid theme cache
+      // rather than refetching, so the settings object survives the navigation
+      // and the identity guard still passes.
+      seedPageStore();
+
+      land();
+      expect(await saving).toEqual({ status: "abandoned" });
+
+      expect(mockThemeStoreState.settings).not.toBeNull();
+      expect(mockThemeStoreState.settings).toEqual(EDITED);
+    });
+
+    it("leaves another project's theme alone", async () => {
+      const { saving, land } = startDiscardedThemeSave();
+      await vi.advanceTimersByTimeAsync(0);
+
+      useAutoSave.getState().reset();
+      // The editor moved on: another project's theme is loaded now.
+      const OTHER = { settings: { global: { typography: [{ id: "font", value: "Futura" }] } } };
+      mockThemeStoreState.settings = OTHER;
+      mockThemeStoreState.originalSettings = OTHER;
+      mockThemeStoreState.loadedProjectId = "other-project";
+
+      land();
+      expect(await saving).toEqual({ status: "abandoned" });
+
+      expect(mockThemeStoreState.loadSettings).not.toHaveBeenCalled();
+      expect(mockThemeStoreState.settings).toBe(OTHER);
+    });
+
+    it("leaves a theme edit made after the discard alone", async () => {
+      const { saving, land } = startDiscardedThemeSave();
+      await vi.advanceTimersByTimeAsync(0);
+
+      useAutoSave.getState().reset();
+      // A fresh edit after discarding: a new object, as updateThemeSetting makes.
+      const FRESH = { settings: { global: { typography: [{ id: "font", value: "Futura" }] } } };
+      mockThemeStoreState.settings = FRESH;
+
+      land();
+      expect(await saving).toEqual({ status: "abandoned" });
+
+      expect(mockThemeStoreState.loadSettings).not.toHaveBeenCalled();
+      expect(mockThemeStoreState.settings).toBe(FRESH);
+    });
+
+    it("does not force-clear isSaving/isAutoSaving — an in-flight save's own completion does that, not reset()", () => {
       useAutoSave.setState({ isSaving: true, isAutoSaving: true });
       useAutoSave.getState().reset();
 
-      expect(useAutoSave.getState().isSaving).toBe(false);
-      expect(useAutoSave.getState().isAutoSaving).toBe(false);
+      // Deliberately unchanged: forcing these false while a real save is
+      // still in flight was the actual bug this redesign fixes (see
+      // saveGeneration and reset()'s own comment).
+      expect(useAutoSave.getState().isSaving).toBe(true);
+      expect(useAutoSave.getState().isAutoSaving).toBe(true);
     });
 
     it("clears lastSaved", () => {
@@ -387,6 +1228,44 @@ describe("saveStore (useAutoSave)", () => {
   // --------------------------------------------------------------------------
 
   describe("save", () => {
+    // A link value carrying undefined refs, as the link picker once wrote it.
+    const pickedLink = {
+      href: "about.html",
+      text: "About",
+      target: "_self",
+      pageUuid: "p-about",
+      collectionType: undefined,
+      collectionItemUuid: undefined,
+    };
+
+    it("leaves the editor clean after saving a value that carries undefined keys", async () => {
+      const page = seedPageStore();
+      usePageStore.setState({
+        page: { ...page, widgets: { ...page.widgets, "w-1": { type: "rich-text", settings: { link: pickedLink } } } },
+      });
+      useAutoSave.getState().markWidgetModified("w-1");
+
+      expect(await useAutoSave.getState().save(false)).toEqual({ status: "success" });
+      expect(useAutoSave.getState().hasUnsavedChanges()).toBe(false);
+      expect(await useAutoSave.getState().save(true)).toEqual({ status: "clean" });
+      expect(savePageContent).toHaveBeenCalledTimes(1);
+    });
+
+    it("leaves the editor clean after saving a header value that carries undefined keys", async () => {
+      seedPageStore();
+      const header = { type: "header", settings: { text: "v1" }, blocks: {}, blocksOrder: [] };
+      usePageStore.setState({
+        globalWidgets: { header: { ...header, settings: { link: pickedLink } }, footer: null },
+        originalGlobalWidgets: { header: JSON.parse(JSON.stringify(header)), footer: null },
+      });
+      useAutoSave.getState().markWidgetModified("header");
+
+      expect(await useAutoSave.getState().save(false)).toEqual({ status: "success" });
+      expect(useAutoSave.getState().hasUnsavedChanges()).toBe(false);
+      expect(await useAutoSave.getState().save(true)).toEqual({ status: "clean" });
+      expect(saveGlobalWidget).toHaveBeenCalledTimes(1);
+    });
+
     it("sets isSaving during a manual save", async () => {
       seedPageStore();
       useAutoSave.getState().markWidgetModified("w-1");
@@ -409,17 +1288,487 @@ describe("saveStore (useAutoSave)", () => {
       expect(useAutoSave.getState().isAutoSaving).toBe(false);
     });
 
+    it("coalesces a repeated manual save call into one follow-up instead of overlapping", async () => {
+      seedPageStore();
+      useAutoSave.getState().markWidgetModified("w-1");
+
+      let resolveFirst;
+      savePageContent.mockImplementationOnce(() => new Promise((resolve) => { resolveFirst = resolve; }));
+      const first = useAutoSave.getState().save(false);
+
+      const second = useAutoSave.getState().save(false); // a repeated trigger (held Ctrl+S) while isSaving is already true
+      resolveFirst({});
+      const [firstResult, secondResult] = await Promise.all([first, second]);
+
+      expect(firstResult).toEqual({ status: "success" });
+      expect(secondResult).toEqual({ status: "clean" }); // the coalesced follow-up found nothing left to do, not a silent drop
+      expect(savePageContent).toHaveBeenCalledTimes(1);
+    });
+
+    it("coalesces a third save() call arriving while a follow-up is already queued (3+ rapid Ctrl+S keydown repeats)", async () => {
+      seedPageStore();
+      useAutoSave.getState().markWidgetModified("w-1");
+
+      let resolveFirst;
+      savePageContent.mockImplementationOnce(() => new Promise((resolve) => { resolveFirst = resolve; }));
+      const first = useAutoSave.getState().save(false);
+
+      const second = useAutoSave.getState().save(false); // queues the follow-up (queuedFollowUp was null)
+      const queuedAfterSecond = useAutoSave.getState().queuedFollowUp;
+
+      const third = useAutoSave.getState().save(false); // arrives while queuedFollowUp is already set — must hit the `if (queuedFollowUp) return queuedFollowUp;` branch, not queue a second follow-up
+      const queuedAfterThird = useAutoSave.getState().queuedFollowUp;
+
+      // `save` is itself an async function, so every call returns a freshly
+      // wrapped Promise even when it resolves by adopting the SAME underlying
+      // value — so the stored `queuedFollowUp` (not the async call's own return
+      // value) is what actually proves the third call didn't queue a second,
+      // independent follow-up chain.
+      expect(queuedAfterThird).toBe(queuedAfterSecond);
+
+      resolveFirst({});
+      const [firstResult, secondResult, thirdResult] = await Promise.all([first, second, third]);
+
+      expect(firstResult).toEqual({ status: "success" });
+      expect(secondResult).toEqual({ status: "clean" });
+      expect(thirdResult).toEqual({ status: "clean" });
+      expect(savePageContent).toHaveBeenCalledTimes(1); // only the first save's own request — no overlapping/duplicate writes from the 2nd or 3rd call
+    });
+
+    it("coalesces a repeated autosave call into one follow-up instead of overlapping", async () => {
+      seedPageStore();
+      useAutoSave.getState().markWidgetModified("w-1");
+
+      let resolveFirst;
+      savePageContent.mockImplementationOnce(() => new Promise((resolve) => { resolveFirst = resolve; }));
+      const first = useAutoSave.getState().save(true);
+
+      const second = useAutoSave.getState().save(true);
+      resolveFirst({});
+      const [firstResult, secondResult] = await Promise.all([first, second]);
+
+      expect(firstResult).toEqual({ status: "success" });
+      expect(secondResult).toEqual({ status: "clean" });
+      expect(savePageContent).toHaveBeenCalledTimes(1);
+    });
+
+    it("coalesces a fresh edit that lands mid-flight into a follow-up that actually sends it, not a silent no-op", async () => {
+      seedPageStore();
+      useAutoSave.getState().markWidgetModified("w-1");
+
+      let resolveFirst;
+      savePageContent.mockImplementationOnce(() => new Promise((resolve) => { resolveFirst = resolve; }));
+      const first = useAutoSave.getState().save(false);
+      expect(useAutoSave.getState().isSaving).toBe(true);
+
+      useAutoSave.getState().markWidgetModified("w-2"); // not part of the first save's entry-time snapshot
+      savePageContent.mockResolvedValueOnce({}); // the coalesced follow-up's own request
+
+      const second = useAutoSave.getState().save(false);
+      resolveFirst({});
+      const [firstResult, secondResult] = await Promise.all([first, second]);
+
+      expect(firstResult).toEqual({ status: "success" });
+      expect(secondResult).toEqual({ status: "success" });
+      expect(savePageContent).toHaveBeenCalledTimes(2); // the first save's own request, then the follow-up's
+      expect(useAutoSave.getState().hasUnsavedChanges()).toBe(false);
+    });
+
+    it("does not let the 60s autosave timer's own save(true) call start while a manual save is in flight — coalesces into one follow-up instead", async () => {
+      seedPageStore();
+      useAutoSave.getState().markWidgetModified("w-1");
+      usePageStore.temporal.setState({ pastStates: [{}, {}], futureStates: [{}] });
+      const clearSpy = vi.spyOn(usePageStore.temporal.getState(), "clear");
+
+      try {
+        let resolveManual;
+        savePageContent.mockImplementationOnce(() => new Promise((resolve) => { resolveManual = resolve; }));
+        const manualSave = useAutoSave.getState().save(false);
+        expect(useAutoSave.getState().isSaving).toBe(true);
+
+        const autoAttempt = useAutoSave.getState().save(true); // simulates resetAutoSaveTimer's tick calling get().save(true) directly
+
+        resolveManual({});
+        const [manualResult, autoResult] = await Promise.all([manualSave, autoAttempt]);
+
+        expect(manualResult).toEqual({ status: "success" });
+        expect(autoResult).toEqual({ status: "clean" });
+        expect(savePageContent).toHaveBeenCalledTimes(1);
+        expect(clearSpy).not.toHaveBeenCalled();
+      } finally {
+        clearSpy.mockRestore();
+      }
+    });
+
+    it("does not let a manual save start while the 60s autosave timer's own save is already in flight (the reverse firing order) — coalesces into one follow-up instead", async () => {
+      seedPageStore();
+      useAutoSave.getState().markWidgetModified("w-1");
+      usePageStore.temporal.setState({ pastStates: [{}, {}], futureStates: [{}] });
+      const clearSpy = vi.spyOn(usePageStore.temporal.getState(), "clear");
+
+      try {
+        let resolveAuto;
+        savePageContent.mockImplementationOnce(() => new Promise((resolve) => { resolveAuto = resolve; }));
+        const autoSave = useAutoSave.getState().save(true);
+        expect(useAutoSave.getState().isAutoSaving).toBe(true);
+
+        const manualAttempt = useAutoSave.getState().save(false);
+
+        resolveAuto({});
+        const [autoResult, manualResult] = await Promise.all([autoSave, manualAttempt]);
+
+        expect(autoResult).toEqual({ status: "success" });
+        expect(manualResult).toEqual({ status: "clean" });
+        expect(savePageContent).toHaveBeenCalledTimes(1);
+        expect(clearSpy).not.toHaveBeenCalled();
+      } finally {
+        clearSpy.mockRestore();
+      }
+    });
+
+    it("rejects to a manual caller who joined an autosave-flavored queued follow-up, when that follow-up fails (flavor upgrade)", async () => {
+      seedPageStore();
+      useAutoSave.getState().markWidgetModified("w-1");
+
+      let resolveFirst;
+      savePageContent.mockImplementationOnce(() => new Promise((resolve) => { resolveFirst = resolve; }));
+      const first = useAutoSave.getState().save(false);
+
+      const autoJoin = useAutoSave.getState().save(true); // queues an autosave-flavored follow-up
+      expect(useAutoSave.getState().queuedFollowUp.isAuto).toBe(true);
+
+      const manualJoin = useAutoSave.getState().save(false); // manual caller joins → upgrades the queued flavor
+      expect(useAutoSave.getState().queuedFollowUp.isAuto).toBe(false);
+
+      useAutoSave.getState().markWidgetModified("w-2"); // keeps the follow-up from short-circuiting to "clean"
+      savePageContent.mockRejectedValueOnce(new Error("network down")); // the follow-up's own request fails
+
+      resolveFirst({});
+      await expect(first).resolves.toEqual({ status: "success" });
+      // Without the upgrade, the follow-up would run autosave-flavored and
+      // resolve { status: "failed" } — silently bypassing the manual caller's
+      // rejection-based error handling.
+      await expect(manualJoin).rejects.toThrow("network down");
+      await expect(autoJoin).rejects.toThrow("network down"); // same underlying run; the production auto caller (the tick) maps this back itself
+    });
+
+    it("keeps a re-entrant save() from a synchronous isSaving subscriber inside the single-flight guard (no overlapping run)", async () => {
+      seedPageStore();
+      useAutoSave.getState().markWidgetModified("w-1");
+
+      let resolveFirst;
+      savePageContent.mockImplementationOnce(() => new Promise((resolve) => { resolveFirst = resolve; }));
+
+      // A subscriber that reacts to isSaving flipping true by calling save()
+      // itself — zustand notifies synchronously, so this re-enters save()
+      // during the original call's own stack. It must hit the coalescing
+      // branch (runningSave installed before the flag is set), not start an
+      // independent second run.
+      const reentrant = [];
+      const unsubscribe = useAutoSave.subscribe((state, prev) => {
+        if (state.isSaving && !prev.isSaving) {
+          reentrant.push(useAutoSave.getState().save(false));
+        }
+      });
+
+      try {
+        const first = useAutoSave.getState().save(false);
+        expect(reentrant).toHaveLength(1); // the subscriber did fire and re-enter
+        expect(useAutoSave.getState().queuedFollowUp).not.toBeNull(); // ...and was coalesced into a follow-up
+
+        resolveFirst({});
+        const [firstResult, reentrantResult] = await Promise.all([first, ...reentrant]);
+
+        expect(firstResult).toEqual({ status: "success" });
+        expect(reentrantResult).toEqual({ status: "clean" });
+        expect(savePageContent).toHaveBeenCalledTimes(1); // exactly one run's request — no overlap
+      } finally {
+        unsubscribe();
+      }
+    });
+
+    // The server tells a save which page it took a listing anchor from. Reading
+    // that response AFTER the generation check would add a yield point past the
+    // guard, letting a discarded save still record the move and write back.
+    it("records a moved listing anchor on a save that completes", async () => {
+      seedPageStore();
+      useAutoSave.getState().markWidgetModified("w-1");
+      savePageContent.mockResolvedValueOnce({ success: true, listingAnchorMovedFrom: ["Blog"] });
+
+      const result = await useAutoSave.getState().save(false);
+
+      expect(result).toEqual({ status: "success" });
+      expect(useAutoSave.getState().listingAnchorMoved?.pages).toEqual(["Blog"]);
+    });
+
+    it("does not record a moved listing anchor when reset() discards the save mid-flight", async () => {
+      seedPageStore();
+      useAutoSave.getState().markWidgetModified("w-1");
+
+      let resolveSave;
+      savePageContent.mockImplementationOnce(() => new Promise((resolve) => { resolveSave = resolve; }));
+      const savePromise = useAutoSave.getState().save(false);
+
+      useAutoSave.getState().reset(); // user confirms "discard changes" mid-flight
+      resolveSave({ success: true, listingAnchorMovedFrom: ["Blog"] });
+
+      expect(await savePromise).toEqual({ status: "abandoned" });
+      expect(useAutoSave.getState().listingAnchorMoved).toBe(null);
+    });
+
+    // The narrow window: a reset that lands after the generation check but while
+    // an await is still yielding. Reading the page response after that check
+    // reopens it — the save is abandoned yet still writes back. The thenable
+    // fires reset on its SECOND await (Promise.all consumes the first), which is
+    // exactly where a post-check read would sit.
+    it("leaves no window for a reset between the discard check and the write-back", async () => {
+      seedPageStore();
+      useAutoSave.getState().markWidgetModified("w-1");
+
+      let awaited = 0;
+      savePageContent.mockImplementationOnce(() => ({
+        then(onFulfilled, onRejected) {
+          awaited += 1;
+          if (awaited === 2) useAutoSave.getState().reset();
+          return Promise.resolve({ success: true, listingAnchorMovedFrom: ["Blog"] }).then(onFulfilled, onRejected);
+        },
+      }));
+
+      const result = await useAutoSave.getState().save(false);
+
+      expect(result).toEqual({ status: "abandoned" });
+      expect(useAutoSave.getState().listingAnchorMoved).toBe(null);
+    });
+
+    it("abandons its write-back if reset() fires while the save is still in flight (discard-and-leave)", async () => {
+      seedPageStore();
+      useAutoSave.getState().markWidgetModified("w-1");
+      const setOriginalPageSpy = vi.spyOn(usePageStore.getState(), "setOriginalPage");
+      const clearSpy = vi.spyOn(usePageStore.temporal.getState(), "clear");
+
+      try {
+        let resolveSave;
+        savePageContent.mockImplementationOnce(() => new Promise((resolve) => { resolveSave = resolve; }));
+        const savePromise = useAutoSave.getState().save(false);
+
+        useAutoSave.getState().reset(); // user confirms "discard changes" mid-flight
+
+        resolveSave({});
+        const result = await savePromise;
+
+        expect(result).toEqual({ status: "abandoned" });
+        expect(setOriginalPageSpy).not.toHaveBeenCalled();
+        expect(clearSpy).not.toHaveBeenCalled();
+      } finally {
+        setOriginalPageSpy.mockRestore();
+        clearSpy.mockRestore();
+      }
+    });
+
+    it("abandons a rejected save (plain network error) if reset() fires mid-flight — no failure-count bump, no reschedule", async () => {
+      seedPageStore();
+      useAutoSave.getState().markWidgetModified("w-1");
+
+      let rejectSave;
+      savePageContent.mockImplementationOnce(() => new Promise((_resolve, reject) => { rejectSave = reject; }));
+      const savePromise = useAutoSave.getState().save(true); // as an autosave, so a "failed" status would bump autoSaveFailureCount
+
+      useAutoSave.getState().reset(); // user confirms "discard changes" mid-flight
+
+      rejectSave(new Error("network down"));
+      const result = await savePromise;
+
+      expect(result).toEqual({ status: "abandoned" });
+      expect(useAutoSave.getState().autoSaveFailureCount).toBe(0);
+    });
+
+    it("abandons a rejected PROJECT_MISMATCH if reset() fires mid-flight — no markStale, no stopAutoSave", async () => {
+      seedPageStore();
+      useAutoSave.getState().markWidgetModified("w-1");
+      useAutoSave.getState().resetAutoSaveTimer();
+      const timerBeforeReset = useAutoSave.getState().autoSaveInterval;
+
+      let rejectSave;
+      savePageContent.mockImplementationOnce(() => new Promise((_resolve, reject) => { rejectSave = reject; }));
+      const savePromise = useAutoSave.getState().save(false);
+
+      useAutoSave.getState().reset(); // bumps saveGeneration; also stops the OLD timer
+      // Simulate a freshly-armed timer for the new generation (what the app does after reset()).
+      useAutoSave.getState().resetAutoSaveTimer();
+      const newTimer = useAutoSave.getState().autoSaveInterval;
+      expect(newTimer).not.toBe(timerBeforeReset);
+
+      const mismatchError = new Error("Project mismatch");
+      mismatchError.code = "PROJECT_MISMATCH";
+      rejectSave(mismatchError);
+      const result = await savePromise;
+
+      expect(result).toEqual({ status: "abandoned" });
+      expect(useStaleProjectStore.getState().isStale).toBe(false); // no spurious stale curtain over the new project
+      expect(useAutoSave.getState().autoSaveInterval).toBe(newTimer); // the newly-armed timer survives, not killed
+    });
+
+    it("still marks stale and stops auto-save for a CURRENT-generation PROJECT_MISMATCH rejection (non-regression)", async () => {
+      seedPageStore();
+      useAutoSave.getState().markWidgetModified("w-1");
+      useAutoSave.getState().resetAutoSaveTimer();
+
+      let rejectSave;
+      savePageContent.mockImplementationOnce(() => new Promise((_resolve, reject) => { rejectSave = reject; }));
+      const savePromise = useAutoSave.getState().save(false);
+
+      const mismatchError = new Error("Project mismatch");
+      mismatchError.code = "PROJECT_MISMATCH";
+      rejectSave(mismatchError);
+      const result = await savePromise;
+
+      expect(result).toEqual({ status: "mismatch" });
+      expect(useStaleProjectStore.getState().isStale).toBe(true);
+      expect(useAutoSave.getState().autoSaveInterval).toBeNull();
+    });
+
+    it("rejects on a manual save failure so the caller's error handling fires", async () => {
+      seedPageStore();
+      useAutoSave.getState().markWidgetModified("w-1");
+      savePageContent.mockRejectedValueOnce(new Error("network down"));
+
+      await expect(useAutoSave.getState().save(false)).rejects.toThrow("network down");
+      expect(useAutoSave.getState().isSaving).toBe(false);
+      expect(useAutoSave.getState().hasUnsavedChanges()).toBe(true); // nothing cleared — safe to retry
+    });
+
+    it("does not reject on an autosave failure — resolves failed and stays retriable, logged not thrown", async () => {
+      seedPageStore();
+      useAutoSave.getState().markWidgetModified("w-1");
+      savePageContent.mockRejectedValueOnce(new Error("network down"));
+      const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+      try {
+        const result = await useAutoSave.getState().save(true);
+        expect(result.status).toBe("failed");
+        expect(result.error.message).toBe("network down");
+        expect(useAutoSave.getState().isAutoSaving).toBe(false);
+        expect(useAutoSave.getState().hasUnsavedChanges()).toBe(true);
+      } finally {
+        warnSpy.mockRestore();
+      }
+    });
+
     it("clears all modification flags after saving", async () => {
       seedPageStore();
       useAutoSave.getState().markWidgetModified("w-1");
       useAutoSave.getState().setStructureModified(true);
       useAutoSave.getState().setThemeSettingsModified(true);
 
-      await useAutoSave.getState().save();
+      const result = await useAutoSave.getState().save();
 
+      expect(result).toEqual({ status: "success" });
       expect(useAutoSave.getState().modifiedWidgets.size).toBe(0);
       expect(useAutoSave.getState().structureModified).toBe(false);
       expect(useAutoSave.getState().themeSettingsModified).toBe(false);
+    });
+
+    it("preserves a widget modified while this save's requests are still in flight (a concurrent edit must not be silently dropped from dirty-tracking)", async () => {
+      seedPageStore();
+      useAutoSave.getState().markWidgetModified("w-1");
+
+      let resolveSave;
+      savePageContent.mockImplementationOnce(() => new Promise((resolve) => { resolveSave = resolve; }));
+
+      const savePromise = useAutoSave.getState().save();
+
+      // A concurrent edit lands while this save's page-content request is
+      // still pending — it was never part of the snapshot this save decided
+      // to send, so it must survive the post-save clear.
+      useAutoSave.getState().markWidgetModified("header");
+
+      resolveSave({});
+      await savePromise;
+
+      expect(useAutoSave.getState().modifiedWidgets.has("w-1")).toBe(false); // this save's own widget: cleared
+      expect(useAutoSave.getState().modifiedWidgets.has("header")).toBe(true); // concurrent edit: preserved
+      expect(useAutoSave.getState().hasUnsavedChanges()).toBe(true);
+    });
+
+    it("detects a re-edit of the SAME widget made while its own save request is still in flight (Set membership alone can't tell this apart from 'still dirty from before')", async () => {
+      seedPageStore();
+      const originalHeader = { type: "header", settings: { text: "v1" }, blocks: {}, blocksOrder: [] };
+      usePageStore.setState({
+        globalWidgets: { header: originalHeader, footer: null },
+        originalGlobalWidgets: { header: JSON.parse(JSON.stringify(originalHeader)), footer: null },
+      });
+      useAutoSave.getState().markWidgetModified("header");
+
+      let resolveSave;
+      saveGlobalWidget.mockImplementationOnce(() => new Promise((resolve) => { resolveSave = resolve; }));
+
+      const savePromise = useAutoSave.getState().save();
+
+      // A fresh edit to the SAME widget lands while this save's own request
+      // for it is still pending. markWidgetModified("header") is a no-op
+      // (already in the Set), so only a value-based diff against the
+      // entry-time snapshot can catch this.
+      const reEditedHeader = { ...originalHeader, settings: { text: "v2" } };
+      usePageStore.setState((state) => ({
+        globalWidgets: { ...state.globalWidgets, header: reEditedHeader },
+      }));
+      useAutoSave.getState().markWidgetModified("header");
+
+      resolveSave({});
+      await savePromise;
+
+      expect(usePageStore.getState().originalGlobalWidgets.header).toEqual(originalHeader); // rebaselined to what was actually sent, not the live re-edit
+      expect(useAutoSave.getState().hasUnsavedChanges()).toBe(true);
+    });
+
+    it("actually resends a same-widget re-edit on the NEXT save, not just flags it dirty (the re-edit's own modifiedWidgets entry was consumed by the first save's clear)", async () => {
+      seedPageStore();
+      const originalHeader = { type: "header", settings: { text: "v1" }, blocks: {}, blocksOrder: [] };
+      usePageStore.setState({
+        globalWidgets: { header: originalHeader, footer: null },
+        originalGlobalWidgets: { header: JSON.parse(JSON.stringify(originalHeader)), footer: null },
+      });
+      useAutoSave.getState().markWidgetModified("header");
+
+      let resolveSave;
+      saveGlobalWidget.mockImplementationOnce(() => new Promise((resolve) => { resolveSave = resolve; }));
+      const savePromise = useAutoSave.getState().save();
+
+      const reEditedHeader = { ...originalHeader, settings: { text: "v2" } };
+      usePageStore.setState((state) => ({
+        globalWidgets: { ...state.globalWidgets, header: reEditedHeader },
+      }));
+      useAutoSave.getState().markWidgetModified("header"); // no-op on the Set — "header" was already in it
+
+      resolveSave({});
+      await savePromise;
+
+      // At this point modifiedWidgets no longer contains "header" (the first
+      // save's clear removed it) — only the value-diff against
+      // originalGlobalWidgets still flags the re-edit as dirty. A second save
+      // (e.g. the next autosave tick) must still resend it.
+      saveGlobalWidget.mockClear();
+      await useAutoSave.getState().save();
+
+      expect(saveGlobalWidget).toHaveBeenCalledWith("header", reEditedHeader, undefined);
+      expect(usePageStore.getState().originalGlobalWidgets.header).toEqual(reEditedHeader);
+      expect(useAutoSave.getState().hasUnsavedChanges()).toBe(false);
+    });
+
+    // Each language has its own header/footer; without the page's language the
+    // edit would land on the default language's file.
+    it("saves the globals into the language of the page being edited", async () => {
+      seedPageStore();
+      usePageStore.setState((state) => ({
+        page: { ...state.page, language: "el" },
+        globalWidgets: { header: { type: "header", settings: {}, blocks: {}, blocksOrder: [] }, footer: null },
+        originalGlobalWidgets: { header: null, footer: null },
+      }));
+      useAutoSave.getState().markWidgetModified("header");
+
+      await useAutoSave.getState().save();
+
+      expect(saveGlobalWidget).toHaveBeenCalledWith("header", expect.anything(), "el");
     });
 
     it("updates lastSaved timestamp", async () => {
@@ -432,8 +1781,9 @@ describe("saveStore (useAutoSave)", () => {
 
     it("is a no-op when there are no unsaved changes", async () => {
       seedPageStore();
-      await useAutoSave.getState().save();
+      const result = await useAutoSave.getState().save();
 
+      expect(result).toEqual({ status: "clean" });
       // lastSaved should still be null because nothing was saved
       expect(useAutoSave.getState().lastSaved).toBeNull();
     });
@@ -478,18 +1828,35 @@ describe("saveStore (useAutoSave)", () => {
       expect(mockThemeStoreState.saveSettings).toHaveBeenCalledWith("test-project");
     });
 
-    it("clears undo history after a successful save (EDIT-045)", async () => {
+    it("keeps undo history after a successful save", async () => {
       seedPageStore();
       useAutoSave.getState().markWidgetModified("w-1");
-      // Simulate accumulated undo/redo history before the save.
       usePageStore.temporal.setState({ pastStates: [{}, {}], futureStates: [{}] });
-      expect(usePageStore.temporal.getState().pastStates.length).toBeGreaterThan(0);
 
       await useAutoSave.getState().save();
 
-      // Save rebaselines history so Undo can't step past the saved state.
-      expect(usePageStore.temporal.getState().pastStates).toHaveLength(0);
-      expect(usePageStore.temporal.getState().futureStates).toHaveLength(0);
+      expect(usePageStore.temporal.getState().pastStates).toHaveLength(2);
+      expect(usePageStore.temporal.getState().futureStates).toHaveLength(1);
+    });
+
+    it("lets Undo step back past a save, leaving the page dirty so it saves again", async () => {
+      const page = seedPageStore();
+      usePageStore.temporal.getState().clear();
+      usePageStore.getState().setPage({
+        ...page,
+        widgets: { ...page.widgets, "w-1": { ...page.widgets["w-1"], settings: { text: "Changed" } } },
+      });
+      useAutoSave.getState().markWidgetModified("w-1");
+
+      await useAutoSave.getState().save();
+      expect(useAutoSave.getState().hasUnsavedChanges()).toBe(false);
+
+      usePageStore.temporal.getState().undo();
+      useAutoSave.getState().reconcileModifiedWidgets();
+
+      expect(usePageStore.getState().page.widgets["w-1"].settings.text).toBe("Hi");
+      expect(useAutoSave.getState().modifiedWidgets.has("w-1")).toBe(true);
+      expect(useAutoSave.getState().hasUnsavedChanges()).toBe(true);
     });
 
     it("aborts before saving when the loaded page belongs to another project", async () => {
@@ -531,6 +1898,119 @@ describe("saveStore (useAutoSave)", () => {
 
       // Auto-save should be stopped to prevent repeated failed save attempts
       expect(useAutoSave.getState().autoSaveInterval).toBeNull();
+    });
+  });
+
+  // --------------------------------------------------------------------------
+  // undo/redo racing an in-flight save
+  // --------------------------------------------------------------------------
+
+  describe("undo/redo racing an in-flight save", () => {
+    it("rebaselines originalPage to the entry-time (pre-undo) snapshot actually sent, so an undo mid-flight correctly leaves the page dirty against the server's new state", async () => {
+      const page = seedPageStore(); // page.widgets["w-1"].settings.text === "Hi"; originalPage matches
+      const editedPage = {
+        ...page,
+        widgets: { ...page.widgets, "w-1": { ...page.widgets["w-1"], settings: { text: "Changed" } } },
+      };
+      usePageStore.setState({ page: editedPage });
+      useAutoSave.getState().markWidgetModified("w-1");
+
+      let resolveSave;
+      savePageContent.mockImplementationOnce(() => new Promise((resolve) => { resolveSave = resolve; }));
+      // save() synchronously captures this "Changed" page (and the modifiedWidgets
+      // snapshot) at entry, before the request below is even sent.
+      const savePromise = useAutoSave.getState().save(false);
+
+      // While that save's request is still in flight, the user hits Ctrl+Z:
+      // EditorTopBar's safeUndo reverts pageStore's `page` back to the saved
+      // baseline ("Hi") and then calls reconcileModifiedWidgets() right after
+      // the temporal jump — reproduced here directly against the store.
+      usePageStore.setState({ page: JSON.parse(JSON.stringify(page)) });
+      useAutoSave.getState().reconcileModifiedWidgets();
+      expect(useAutoSave.getState().modifiedWidgets.has("w-1")).toBe(false); // undo reverted it back to exactly the baseline
+
+      resolveSave({});
+      const result = await savePromise;
+
+      expect(result).toEqual({ status: "success" });
+      // The in-flight save actually sent "Changed" (what it captured at entry) to
+      // the server. The write-back rebaselines originalPage to THAT captured snapshot, not to
+      // whatever pageStore's live `page` has become — because that's genuinely
+      // what the server now holds, regardless of a later local undo.
+      expect(usePageStore.getState().originalPage.widgets["w-1"].settings.text).toBe("Changed");
+      // The live page (post-undo, "Hi") now differs from that server-truth
+      // baseline — hasUnsavedChanges() must report dirty again even though
+      // modifiedWidgets itself is empty (the undo's reconcile cleared it) — only
+      // the value-based diff fallback catches this, which is exactly why it exists.
+      expect(useAutoSave.getState().modifiedWidgets.has("w-1")).toBe(false);
+      expect(useAutoSave.getState().hasUnsavedChanges()).toBe(true);
+    });
+  });
+  describe("theme save outcomes", () => {
+    it("sends no theme save when the user discarded during the page save", async () => {
+      seedPageStore();
+      makeThemeStoreLive({ colors: { primary: "#fff" } }, { colors: { primary: "#000" } });
+      usePageStore.getState().setPage({
+        ...usePageStore.getState().page,
+        title: "Edited",
+      });
+      useAutoSave.getState().setThemeSettingsModified(true);
+      let landPage;
+      savePageContent.mockImplementationOnce(() => new Promise((resolve) => (landPage = () => resolve({}))));
+
+      const saving = useAutoSave.getState().save(false);
+      await vi.advanceTimersByTimeAsync(0);
+      useAutoSave.getState().reset();
+      landPage();
+
+      expect(await saving).toEqual({ status: "abandoned" });
+      expect(mockThemeStoreState.saveSettings).not.toHaveBeenCalled();
+    });
+
+    it("reports a theme conflict as its own status, not a failure, and records the notice", async () => {
+      seedPageStore();
+      makeThemeStoreLive({ colors: { primary: "#fff" } }, { colors: { primary: "#000" } });
+      useAutoSave.getState().setThemeSettingsModified(true);
+      mockThemeStoreState.saveSettings.mockResolvedValueOnce({ warnings: [], conflict: true, adopted: true });
+
+      const result = await useAutoSave.getState().save(false);
+
+      expect(result).toEqual({ status: "conflict" });
+      expect(useAutoSave.getState().themeConflict).toMatchObject({ editsDropped: false });
+      useAutoSave.getState().clearThemeConflict();
+      expect(useAutoSave.getState().themeConflict).toBe(null);
+    });
+
+    it("records that a conflict dropped an edit to a setting the theme no longer has", async () => {
+      seedPageStore();
+      makeThemeStoreLive({ colors: { primary: "#fff" } }, { colors: { primary: "#000" } });
+      useAutoSave.getState().setThemeSettingsModified(true);
+      mockThemeStoreState.saveSettings.mockResolvedValueOnce({
+        warnings: [{ id: "old", code: "SETTING_REMOVED" }],
+        conflict: true,
+        adopted: true,
+      });
+
+      await useAutoSave.getState().save(false);
+
+      expect(useAutoSave.getState().themeConflict).toMatchObject({ editsDropped: true });
+    });
+
+    it("resets the autosave backoff after a conflict and keeps autosaving the kept edits", async () => {
+      seedPageStore();
+      makeThemeStoreLive({ colors: { primary: "#fff" } }, { colors: { primary: "#000" } });
+      // Armed first: setThemeSettingsModified resets the count itself, so the
+      // count has to be set after it for the tick's own reset to be what clears it.
+      useAutoSave.getState().setThemeSettingsModified(true);
+      useAutoSave.setState({ autoSaveFailureCount: 3 });
+      mockThemeStoreState.saveSettings.mockResolvedValueOnce({ warnings: [], conflict: true, adopted: true });
+
+      await vi.advanceTimersByTimeAsync(120000);
+
+      expect(mockThemeStoreState.saveSettings).toHaveBeenCalled();
+      expect(useAutoSave.getState().autoSaveFailureCount).toBe(0);
+      // The theme is still dirty, so another tick is armed.
+      expect(useAutoSave.getState().autoSaveInterval).not.toBe(null);
     });
   });
 });

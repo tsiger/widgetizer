@@ -1,0 +1,13 @@
+{
+  "slug": "fitness-assessment",
+  "schemaVersion": 1,
+  "settings": {
+    "title": "Fitness Assessment",
+    "icon": "activity",
+    "summary": "A measured starting point for new members who want to track progress properly.",
+    "description": "<p>Before you set goals it helps to know where you stand. We run through strength, mobility, and basic cardio markers, then put real numbers against them so your starting point is something concrete rather than a guess.</p><h2>What we measure</h2><p>The assessment gives us a rounded snapshot rather than a single score. We look at how you move as much as what you can lift, since both shape sensible targets and a plan that fits where your body is now.</p><ul><li>Strength across a few key movements</li><li>Mobility and how freely you move</li><li>Basic cardio markers to gauge your engine</li></ul><p>You walk away with a clear baseline and a short set of targets to work toward. Having those numbers written down turns vague intentions into something you can actually aim at and measure against.</p><h3>Tracking progress over time</h3><p>Repeat it every few months and you will see exactly how far you have come. Progress is rarely linear, so revisiting the same markers is the surest way to know your training is working, even on the weeks it does not feel like it.</p><p>This suits new members who want to start with a clear picture, as well as anyone returning after a break who wants an honest read on where they are. Come ready to move and we will keep the whole thing straightforward.</p>",
+    "price": "$35 one off",
+    "duration": "45 min",
+    "featured_image": "/uploads/images/olympic-services-fitness-assessment.webp"
+  }
+}

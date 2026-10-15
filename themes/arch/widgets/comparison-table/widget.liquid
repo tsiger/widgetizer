@@ -238,7 +238,7 @@
                   {% assign value = values[col_index] | strip %}
                   <td class="comparison-table-td {% if col.settings.featured %}comparison-table-td-featured{% endif %}">
                     {% if value == '✓' or value == 'yes' or value == 'Yes' or value == 'true' %}
-                      <span class="comparison-table-check" aria-label="Included">
+                      <span class="comparison-table-check" aria-label="{{ 'site.comparison_table.included' | t }}">
                         {% render 'icon', icon: 'check', class: 'comparison-table-icon' %}
                       </span>
                     {% elsif value == '✗'
@@ -248,13 +248,13 @@
                       or value == 'x'
                       or value == 'X'
                     %}
-                      <span class="comparison-table-cross" aria-label="Not included">
+                      <span class="comparison-table-cross" aria-label="{{ 'site.comparison_table.not_included' | t }}">
                         {% render 'icon', icon: 'x', class: 'comparison-table-icon' %}
                       </span>
                     {% elsif value != blank %}
                       <span class="comparison-table-value w-body">{{ value }}</span>
                     {% else %}
-                      <span class="comparison-table-cross" aria-label="Not included">
+                      <span class="comparison-table-cross" aria-label="{{ 'site.comparison_table.not_included' | t }}">
                         {% render 'icon', icon: 'x', class: 'comparison-table-icon' %}
                       </span>
                     {% endif %}

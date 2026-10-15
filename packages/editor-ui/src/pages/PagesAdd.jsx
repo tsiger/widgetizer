@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 import PageLayout from "../components/layout/PageLayout";
@@ -10,11 +11,15 @@ import { invalidateMediaCache } from "../queries/mediaManager";
 import { invalidateLinkTargetsCache } from "../hooks/useLinkTargets";
 import useGuardedFormPage from "../hooks/useGuardedFormPage";
 import { useEditorPath } from "../lib/routeBase.jsx";
+import { pagesListHref } from "../lib/contentRoutes";
 
 export default function PagesAdd() {
   const { t } = useTranslation();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
+  const [searchParams] = useSearchParams();
+  // A new page belongs to the language tab it was started from.
+  const language = searchParams.get("language") || undefined;
 
   const showToast = useToastStore((state) => state.showToast);
   const editorPath = useEditorPath();
@@ -25,7 +30,7 @@ export default function PagesAdd() {
     setIsSubmitting(true);
 
     try {
-      const newPage = await createPage(formData);
+      const newPage = await createPage({ ...formData, ...(language ? { language } : {}) });
       showToast(t("pagesAdd.toasts.createSuccess", { name: newPage.name }), "success");
 
       // Invalidate media cache since SEO images may have been set
@@ -36,7 +41,7 @@ export default function PagesAdd() {
         invalidateLinkTargetsCache(activeProject.id);
       }
 
-      navigateSafely(editorPath("/pages"));
+      navigateSafely(editorPath(pagesListHref(language)));
       return true;
     } catch (err) {
       showToast(err.message || t("pagesAdd.toasts.createError"), "error");
@@ -52,9 +57,10 @@ export default function PagesAdd() {
         onSubmit={handleSubmit}
         isSubmitting={isSubmitting}
         submitLabel={t("pagesAdd.create")}
-        onCancel={() => navigateSafely(editorPath("/pages"))}
+        onCancel={() => navigateSafely(editorPath(pagesListHref(language)))}
         onDirtyChange={setIsDirty}
         isDirty={isDirty}
+        language={language}
       />
     </PageLayout>
   );

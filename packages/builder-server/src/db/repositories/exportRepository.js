@@ -66,17 +66,14 @@ export function getExports(projectId) {
  */
 export function deleteExportRecord(projectId, version) {
   const db = getDb();
+  // Single DELETE … RETURNING statement: the returned record provably matches
+  // the row that was deleted (a separate SELECT could diverge under a
+  // concurrent writer on a second connection).
   const row = db.prepare(
-    "SELECT output_dir FROM exports WHERE project_id = ? AND version = ?"
+    "DELETE FROM exports WHERE project_id = ? AND version = ? RETURNING output_dir"
   ).get(projectId, version);
 
-  if (!row) return null;
-
-  db.prepare(
-    "DELETE FROM exports WHERE project_id = ? AND version = ?"
-  ).run(projectId, version);
-
-  return { outputDir: row.output_dir };
+  return row ? { outputDir: row.output_dir } : null;
 }
 
 /**
@@ -86,11 +83,10 @@ export function deleteExportRecord(projectId, version) {
  */
 export function deleteAllExports(projectId) {
   const db = getDb();
+  // Single DELETE … RETURNING statement — see deleteExportRecord.
   const rows = db.prepare(
-    "SELECT output_dir FROM exports WHERE project_id = ?"
+    "DELETE FROM exports WHERE project_id = ? RETURNING output_dir"
   ).all(projectId);
-
-  db.prepare("DELETE FROM exports WHERE project_id = ?").run(projectId);
 
   return rows.map((row) => ({ outputDir: row.output_dir }));
 }
@@ -104,22 +100,17 @@ export function deleteAllExports(projectId) {
  */
 export function trimExports(projectId, maxToKeep) {
   const db = getDb();
+  // Single DELETE … RETURNING statement driven by a subquery (newest first,
+  // skip the first maxToKeep) — see deleteExportRecord for why.
+  const deleted = db.prepare(`
+    DELETE FROM exports
+    WHERE project_id = ? AND version IN (
+      SELECT version FROM exports WHERE project_id = ? ORDER BY version DESC LIMIT -1 OFFSET ?
+    )
+    RETURNING version, output_dir
+  `).all(projectId, projectId, maxToKeep);
 
-  // Find exports beyond the limit (ordered newest first, skip the first maxToKeep)
-  const toDelete = db.prepare(
-    "SELECT version, output_dir FROM exports WHERE project_id = ? ORDER BY version DESC LIMIT -1 OFFSET ?"
-  ).all(projectId, maxToKeep);
-
-  if (toDelete.length === 0) return [];
-
-  // Delete them in a single statement
-  const versions = toDelete.map((r) => r.version);
-  const placeholders = versions.map(() => "?").join(",");
-  db.prepare(
-    `DELETE FROM exports WHERE project_id = ? AND version IN (${placeholders})`
-  ).run(projectId, ...versions);
-
-  return toDelete.map((row) => ({
+  return deleted.map((row) => ({
     version: row.version,
     outputDir: row.output_dir,
   }));

@@ -1,0 +1,172 @@
+{
+  "name": "Smile Gallery",
+  "slug": "smile-gallery",
+  "widgets": {
+    "hero": {
+      "type": "banner",
+      "settings": {
+        "image": "/uploads/images/smile-gallery-hero.webp",
+        "height": "small",
+        "fullwidth": true,
+        "alignment": "center",
+        "vertical_alignment": "center",
+        "overlay_color": "#0f1d2e80",
+        "color_scheme": "highlight-primary",
+        "top_spacing": "none",
+        "bottom_spacing": "none"
+      },
+      "blocks": {},
+      "blocksOrder": []
+    },
+    "before_after": {
+      "type": "comparison-slider",
+      "settings": {
+        "eyebrow": "",
+        "title": "Whitening Transformation",
+        "description": "",
+        "heading_alignment": "center",
+        "before_image": "/uploads/images/smile-gallery-before.webp",
+        "after_image": "/uploads/images/smile-gallery-after.webp",
+        "before_label": "Before",
+        "after_label": "After",
+        "orientation": "horizontal",
+        "initial_position": 30,
+        "show_labels": false,
+        "color_scheme": "standard-primary"
+      }
+    },
+    "gallery": {
+      "type": "gallery",
+      "settings": {
+        "eyebrow": "",
+        "title": "Patient Results",
+        "description": "",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 3,
+        "staggered": false,
+        "aspect_ratio": "3 / 2",
+        "color_scheme": "standard-secondary"
+      },
+      "blocks": {
+        "img-1": {
+          "type": "image",
+          "settings": {
+            "image": "/uploads/images/smile-gallery-result-1.webp",
+            "caption": "Teeth whitening — 3 shades brighter"
+          }
+        },
+        "img-2": {
+          "type": "image",
+          "settings": {
+            "image": "/uploads/images/smile-gallery-result-2.webp",
+            "caption": "Invisalign — 12-month result"
+          }
+        },
+        "img-3": {
+          "type": "image",
+          "settings": {
+            "image": "/uploads/images/smile-gallery-result-3.webp",
+            "caption": "Porcelain veneers — full smile makeover"
+          }
+        },
+        "img-4": {
+          "type": "image",
+          "settings": {
+            "image": "/uploads/images/smile-gallery-result-4.webp",
+            "caption": "Dental implant — single tooth replacement"
+          }
+        },
+        "img-5": {
+          "type": "image",
+          "settings": {
+            "image": "/uploads/images/smile-gallery-result-5.webp",
+            "caption": "Crown restoration — cracked molar"
+          }
+        },
+        "img-6": {
+          "type": "image",
+          "settings": {
+            "image": "/uploads/images/smile-gallery-result-6.webp",
+            "caption": "Composite bonding — chipped front tooth"
+          }
+        },
+        "img-7": {
+          "type": "image",
+          "settings": {
+            "image": "/uploads/images/smile-gallery-result-7.webp",
+            "caption": "Invisalign — gap closure"
+          }
+        },
+        "img-8": {
+          "type": "image",
+          "settings": {
+            "image": "/uploads/images/smile-gallery-result-8.webp",
+            "caption": "Bridge — three-tooth restoration"
+          }
+        },
+        "img-9": {
+          "type": "image",
+          "settings": {
+            "image": "/uploads/images/smile-gallery-result-9.webp",
+            "caption": "Whitening — coffee stain removal"
+          }
+        }
+      },
+      "blocksOrder": [
+        "img-1",
+        "img-2",
+        "img-3",
+        "img-4",
+        "img-5",
+        "img-6",
+        "img-7",
+        "img-8",
+        "img-9"
+      ]
+    },
+    "cta": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight-primary",
+        "top_spacing": "small",
+        "bottom_spacing": "small"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Want Results Like These?",
+            "size": "2xl"
+          }
+        },
+        "cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Book a Consultation",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": [
+        "cta-heading",
+        "cta-button"
+      ]
+    }
+  },
+  "widgetsOrder": [
+    "hero",
+    "before_after",
+    "gallery",
+    "cta"
+  ],
+  "id": "smile-gallery",
+  "created": "2026-04-16T12:01:48.320Z",
+  "updated": "2026-04-16T13:08:32.697Z"
+}

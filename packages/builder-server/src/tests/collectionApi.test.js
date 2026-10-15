@@ -199,6 +199,35 @@ describe("item mutations", () => {
     assert.equal(res._status, 404);
   });
 
+  // The cap applied to New item and to Create version but not to Duplicate, so
+  // whoever pressed the third button had no limit at all.
+  it("refuses a duplicate at the item cap, creating nothing", async () => {
+    await createNews({ settings: { title: "Only" } });
+    const before = (await storage.list(scope, "collections/news")).filter((n) => n.endsWith(".json")).length;
+    itemLimit = 1;
+
+    const res = await call(collectionController.duplicateItem, {
+      params: { collectionType: "news", itemSlug: "only" },
+    });
+
+    assert.equal(res._status, 422);
+    assert.equal(res._json.error, "This collection has reached its item limit (1).", "the same words as New item");
+    const after = (await storage.list(scope, "collections/news")).filter((n) => n.endsWith(".json")).length;
+    assert.equal(after, before, "a refused duplicate writes nothing");
+  });
+
+  it("allows a duplicate below the item cap", async () => {
+    await createNews({ settings: { title: "Only" } });
+    itemLimit = 2;
+
+    const res = await call(collectionController.duplicateItem, {
+      params: { collectionType: "news", itemSlug: "only" },
+    });
+
+    assert.equal(res._status, 201, JSON.stringify(res._json));
+    assert.equal(res._json.slug, "only-copy");
+  });
+
   it("duplicates (201), reorders, deletes (200), then 404s re-delete", async () => {
     await createNews({ settings: { title: "Src" } });
     const dup = await call(collectionController.duplicateItem, {
@@ -233,5 +262,137 @@ describe("item mutations", () => {
     assert.equal(res._status, 207);
     assert.deepEqual(res._json.deleted, ["a"]);
     assert.deepEqual(res._json.notFound, ["missing"]);
+  });
+
+  // Best-effort reference-cleanup: a storage error during cleanup (e.g. a
+  // non-ENOENT `list` failure) must not turn an already-committed delete into
+  // a 500 — the item is gone either way, so the response must still say so.
+  function makeThrowingListStorage() {
+    // Delegates everything to the real adapter except `list`, which throws —
+    // aliased so the `local/require-scope-arg` lint rule (which pattern-matches
+    // the literal `storage` identifier) doesn't misread this pass-through
+    // wrapper as an unscoped adapter call.
+    const realAdapter = storage;
+    return {
+      read: (...args) => realAdapter.read(...args),
+      write: (...args) => realAdapter.write(...args),
+      delete: (...args) => realAdapter.delete(...args),
+      exists: (...args) => realAdapter.exists(...args),
+      stat: (...args) => realAdapter.stat(...args),
+      getProjectBase: (...args) => realAdapter.getProjectBase(...args),
+      list: async () => {
+        throw Object.assign(new Error("EIO: storage listing failed"), { code: "EIO" });
+      },
+    };
+  }
+
+  it("deleteItem still returns success when reference cleanup throws a non-ENOENT error", async () => {
+    await createNews({ settings: { title: "Cleanup Boom" } });
+    const res = mockRes();
+    await collectionController.deleteItem(
+      {
+        params: { collectionType: "news", itemSlug: "cleanup-boom" },
+        body: {},
+        query: {},
+        activeProject,
+        scope,
+        adapters: { storage: makeThrowingListStorage(), limits },
+      },
+      res,
+    );
+    // The item IS deleted, so this stays a success — but the sweep could not list
+    // the collections it needed to clean, and saying nothing made an unreadable
+    // folder look identical to a project with nothing to clean.
+    assert.equal(res._status, 200);
+    assert.equal(res._json.success, true);
+    assert.equal(res._json.slug, "cleanup-boom");
+    assert.equal(res._json.warnings[0].code, "REFERENCE_CLEANUP_INCOMPLETE");
+  });
+
+  it("bulkDeleteItems still reports deletions when reference cleanup throws a non-ENOENT error", async () => {
+    await createNews({ settings: { title: "Bulk Cleanup Boom" } });
+    const res = mockRes();
+    await collectionController.bulkDeleteItems(
+      {
+        params: { collectionType: "news" },
+        body: { itemSlugs: ["bulk-cleanup-boom"] },
+        query: {},
+        activeProject,
+        scope,
+        adapters: { storage: makeThrowingListStorage(), limits },
+      },
+      res,
+    );
+    assert.equal(res._status, 200);
+    assert.deepEqual(res._json.deleted, ["bulk-cleanup-boom"]);
+    assert.equal(res._json.warnings[0].code, "REFERENCE_CLEANUP_INCOMPLETE");
+  });
+});
+
+describe("items in another language (API)", () => {
+  before(() => {
+    activeProject.defaultLanguage = "en";
+    activeProject.languages = ["el"];
+    // Persisted too, not just on the in-memory request object: the language check
+    // at each write re-reads the project row, which is what a real removal updates.
+    projectRepo.updateProject(activeProject.id, { defaultLanguage: "en", languages: ["el"] });
+  });
+
+  after(() => {
+    delete activeProject.defaultLanguage;
+    delete activeProject.languages;
+    projectRepo.updateProject(activeProject.id, { defaultLanguage: "en", languages: [] });
+  });
+
+  // Items count physically across every language, the way New item counts them.
+  it("counts another language's items against the cap when duplicating", async () => {
+    await createNews({ settings: { title: "Only" } });
+    const version = await call(collectionController.createItemLanguageVersion, {
+      params: { collectionType: "news", itemSlug: "only" },
+      body: { targetLanguage: "el" },
+    });
+    assert.equal(version._status, 201, JSON.stringify(version._json));
+    itemLimit = 2; // one English item plus its Greek version
+
+    const res = await call(collectionController.duplicateItem, {
+      params: { collectionType: "news", itemSlug: "only" },
+    });
+
+    assert.equal(res._status, 422, JSON.stringify(res._json));
+  });
+
+  it("creates, lists and reads Greek items in their folder", async () => {
+    const en = await createNews({ slug: "story", settings: { title: "Story" } });
+    const el = await createNews({ slug: "story", settings: { title: "Istoria" }, language: "el" });
+    assert.equal(el._status, 201, JSON.stringify(el._json));
+    assert.equal(el._json.language, "el");
+    assert.equal(el._json.translationGroupId, el._json.uuid);
+    assert.notEqual(el._json.uuid, en._json.uuid);
+    assert.equal(await fs.pathExists(path.join(projectBase, "collections", "news", "el", "story.json")), true);
+
+    const list = await call(collectionController.getAllItems, {
+      params: { collectionType: "news" },
+      query: { language: "el" },
+    });
+    assert.deepEqual(list._json.map((i) => [i.slug, i.title, i.language]), [["story", "Istoria", "el"]]);
+
+    const read = await call(collectionController.getItem, {
+      params: { collectionType: "news", itemSlug: "story" },
+      query: { language: "el" },
+    });
+    assert.equal(read._json.uuid, el._json.uuid);
+  });
+
+  it("refuses a language the project has not enabled", async () => {
+    const res = await createNews({ settings: { title: "Bonjour" }, language: "fr" });
+    assert.equal(res._status, 400);
+  });
+
+  it("counts the item cap across every language of the collection", async () => {
+    itemLimit = 1;
+    const en = await createNews({ slug: "only", settings: { title: "Only" } });
+    assert.equal(en._status, 201);
+    const el = await createNews({ slug: "mono", settings: { title: "Mono" }, language: "el" });
+    assert.equal(el._status, 422, "the Greek item is the second item of the collection, not the first of a folder");
   });
 });

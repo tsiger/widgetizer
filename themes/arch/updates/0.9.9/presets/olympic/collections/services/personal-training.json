@@ -1,0 +1,13 @@
+{
+  "slug": "personal-training",
+  "schemaVersion": 1,
+  "settings": {
+    "title": "Personal Training",
+    "icon": "user",
+    "summary": "One-to-one coaching with a dedicated trainer for members who want a plan and accountability.",
+    "description": "<p>Pair up with a coach who learns your goals, your limits, and what keeps you motivated. Each session is planned around you and adjusted as you progress, so the training keeps pace with where you actually are.</p><h2>What you get</h2><p>We program your training, check your technique, and keep you honest between sessions. Having someone watching your form and holding you to the plan is often what turns good intentions into steady, repeatable progress.</p><ul><li>Sessions planned around your goals and schedule</li><li>Hands-on technique coaching on every lift</li><li>Accountability and check-ins between sessions</li></ul><p>Members usually book one or two slots a week alongside their own training, which is enough to keep technique sharp and the plan moving forward. Your coach gives you work to get on with on the days you train alone.</p><h3>Who it suits</h3><p>This works for members who want a clear plan and someone in their corner, whether they are starting out or pushing past a sticking point. If you have aches or a history worth working around, your coach will factor that in.</p><p>Come ready to share an honest picture of your training, your week, and anything that has been bothering you. The more your coach knows, the better they can build something that fits and lasts.</p>",
+    "price": "From $50 per session",
+    "duration": "60 min",
+    "featured_image": "/uploads/images/olympic-services-personal-training.webp"
+  }
+}

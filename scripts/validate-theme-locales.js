@@ -2,7 +2,7 @@
  * Validates shared core-widget locales and theme-owned locales separately.
  *
  * Ownership model:
- *   1. Core widget tTheme: keys live in src/core/widgets/locales/
+ *   1. Core widget tTheme: keys live in packages/core/src/widgets/locales/
  *   2. Theme widget + theme.json tTheme: keys live in each theme's locales/
  *   3. Theme locale APIs merge core + theme locales at runtime
  *
@@ -12,7 +12,7 @@
  */
 
 import { readFileSync, readdirSync, existsSync } from "node:fs";
-import { join, basename } from "node:path";
+import { join, basename, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
   flattenKeys,
@@ -25,6 +25,8 @@ const rootDir = join(__dirname, "..");
 // Core widget locale definitions are read from the shared core package.
 const coreWidgetsDir = join(rootDir, "packages", "core", "src", "widgets");
 const coreLocalesDir = join(coreWidgetsDir, "locales");
+// The core dictionary also serves the app's own snippets (breadcrumbs).
+const coreSnippetsDir = join(rootDir, "packages", "core", "src", "snippets");
 
 /** Resolve the effective theme directory, preferring source themes during local dev. */
 function resolveThemeDir(themeName) {
@@ -64,7 +66,79 @@ function collectSchemaKeysFromDir(dir) {
   return schemaKeys;
 }
 
-function validateLocaleSet(label, localesDir, schemaKeys, ignoredExtraKeys = new Set()) {
+/**
+ * Every `site.*` key a theme actually asks for: `| t` in its templates, and
+ * `defaultKey` in its schemas. A key nobody wrote renders its own last segment
+ * — `site.nope.not.here` reads as "here" — which looks like copy rather than
+ * like a mistake, so it has to be caught before it ships rather than spotted
+ * on a page.
+ */
+function collectSiteKeyUses(dir) {
+  const uses = new Map(); // key -> where it was seen
+  if (!existsSync(dir)) return uses;
+
+  const note = (key, where) => {
+    // `site.` is how a template reads, and what is stored IS the site block, so
+    // the filter accepts either; normalize the same way it does.
+    const normalized = key.startsWith("site.") ? key : `site.${key}`;
+    if (!uses.has(normalized)) uses.set(normalized, where);
+  };
+
+  const walk = (current) => {
+    for (const entry of readdirSync(current, { withFileTypes: true })) {
+      const full = join(current, entry.name);
+      if (entry.isDirectory()) {
+        if (entry.name === "updates" || entry.name === "node_modules") continue;
+        walk(full);
+        continue;
+      }
+      if (entry.name.endsWith(".liquid")) {
+        const source = readFileSync(full, "utf-8");
+        for (const [, key] of source.matchAll(/['"]([a-zA-Z0-9_.]+)['"]\s*\|\s*t\b/g)) {
+          note(key, relative(dir, full));
+        }
+      } else if (entry.name === "schema.json") {
+        try {
+          const schema = JSON.parse(readFileSync(full, "utf-8"));
+          const fromList = (list) => {
+            if (!Array.isArray(list)) return;
+            for (const setting of list) if (setting?.defaultKey) note(setting.defaultKey, relative(dir, full));
+          };
+          fromList(schema.settings);
+          if (Array.isArray(schema.blocks)) for (const block of schema.blocks) fromList(block?.settings);
+          // A starting block names its own words, one key per setting.
+          if (Array.isArray(schema.defaultBlocks)) {
+            for (const block of schema.defaultBlocks) {
+              for (const key of Object.values(block?.defaultKeys || {})) note(key, relative(dir, full));
+            }
+          }
+        } catch {
+          // A malformed schema is already reported by the key collection above.
+        }
+      }
+    }
+  };
+
+  walk(dir);
+  return uses;
+}
+
+/**
+ * @param inheritedSite - what this locale set gets for free from the one under
+ *   it. A theme renders over the built-in widgets' dictionary, so a key core
+ *   defines resolves in a theme template that never wrote it, and a key core's
+ *   own templates ask for is not an orphan when a theme rewords it. Validation
+ *   has to see the same two directions the renderer does or it reports as
+ *   broken what works.
+ */
+function validateLocaleSet(
+  label,
+  localesDir,
+  schemaKeys,
+  ignoredExtraKeys = new Set(),
+  siteKeyUses = new Map(),
+  inheritedSite = { defined: new Set(), used: new Set() },
+) {
   if (!existsSync(localesDir)) {
     console.error(`  No locales/ directory found.`);
     return false;
@@ -80,8 +154,14 @@ function validateLocaleSet(label, localesDir, schemaKeys, ignoredExtraKeys = new
   const schemaKeySet = new Set(uniqueSchemaKeys);
   const en = JSON.parse(readFileSync(enPath, "utf-8"));
   const allEnKeys = flattenKeys(en);
-  const ownedEnKeys = allEnKeys.filter((k) => !ignoredExtraKeys.has(k));
+  // `site.*` is what a VISITOR reads on the published page. No schema points at
+  // it — a template asks for it by key — so it is counted on its own rather
+  // than reported as orphaned editor labels.
+  const isSiteKey = (k) => k === "site" || k.startsWith("site.");
+  const ownedEnKeys = allEnKeys.filter((k) => !ignoredExtraKeys.has(k) && !isSiteKey(k));
   const ownedEnKeySet = new Set(ownedEnKeys);
+  const siteEnKeys = allEnKeys.filter(isSiteKey);
+  const siteEnKeySet = new Set(siteEnKeys);
 
   let hasErrors = false;
 
@@ -109,6 +189,29 @@ function validateLocaleSet(label, localesDir, schemaKeys, ignoredExtraKeys = new
     );
   }
 
+  if (siteEnKeys.length > 0) {
+    console.log(`  ✓ ${siteEnKeys.length} site string(s) for visitors`);
+  }
+
+  const askedForNothing = [...siteKeyUses].filter(
+    ([key]) => getNested(en, key) === undefined && !inheritedSite.defined.has(key),
+  );
+  if (askedForNothing.length > 0) {
+    hasErrors = true;
+    console.error(`  ✗ ${askedForNothing.length} site string(s) asked for but never written:`);
+    for (const [key, where] of askedForNothing) {
+      console.error(`    - ${key}  (${where})`);
+    }
+  }
+
+  const neverAsked = siteEnKeys.filter((key) => !siteKeyUses.has(key) && !inheritedSite.used.has(key));
+  if (neverAsked.length > 0) {
+    console.warn(`  ⚠ ${neverAsked.length} site string(s) nothing asks for:`);
+    for (const key of neverAsked) {
+      console.warn(`    + ${key}`);
+    }
+  }
+
   const extraInEn = ownedEnKeys.filter((k) => !schemaKeySet.has(k));
   if (extraInEn.length > 0) {
     console.warn(
@@ -128,27 +231,33 @@ function validateLocaleSet(label, localesDir, schemaKeys, ignoredExtraKeys = new
   for (const file of localeFiles) {
     const lang = basename(file, ".json");
     const data = JSON.parse(readFileSync(join(localesDir, file), "utf-8"));
-    const langKeys = new Set(flattenKeys(data).filter((k) => !ignoredExtraKeys.has(k)));
+    const allLangKeys = flattenKeys(data).filter((k) => !ignoredExtraKeys.has(k));
+    const langKeys = new Set(allLangKeys.filter((k) => !isSiteKey(k)));
+    const langSiteKeys = new Set(allLangKeys.filter(isSiteKey));
 
-    const missing = [...ownedEnKeySet].filter((k) => !langKeys.has(k));
+    // Editor labels are only expected in another language when that file
+    // carries any; a translation of the visitor strings alone is the normal
+    // shape, because the editor stays English.
+    const missing = langKeys.size > 0 ? [...ownedEnKeySet].filter((k) => !langKeys.has(k)) : [];
     const extra = [...langKeys].filter((k) => !ownedEnKeySet.has(k));
+    const missingSite = [...siteEnKeySet].filter((k) => !langSiteKeys.has(k));
+    const extraSite = [...langSiteKeys].filter((k) => !siteEnKeySet.has(k));
 
-    if (missing.length > 0) {
-      console.warn(`  ⚠ [${lang}] Missing ${missing.length} key(s):`);
-      for (const k of missing) {
-        console.warn(`    - ${k}`);
+    for (const [what, keys, sign] of [
+      ["Missing", missing, "-"],
+      ["Extra", extra, "+"],
+      ["Missing site string", missingSite, "-"],
+      ["Extra site string", extraSite, "+"],
+    ]) {
+      if (keys.length === 0) continue;
+      console.warn(`  ⚠ [${lang}] ${what} ${keys.length} key(s):`);
+      for (const k of keys) {
+        console.warn(`    ${sign} ${k}`);
       }
     }
 
-    if (extra.length > 0) {
-      console.warn(`  ⚠ [${lang}] Extra ${extra.length} key(s):`);
-      for (const k of extra) {
-        console.warn(`    + ${k}`);
-      }
-    }
-
-    if (missing.length === 0 && extra.length === 0) {
-      console.log(`  ✓ [${lang}] OK — all ${ownedEnKeySet.size} keys present`);
+    if (missing.length === 0 && extra.length === 0 && missingSite.length === 0 && extraSite.length === 0) {
+      console.log(`  ✓ [${lang}] OK — ${langSiteKeys.size} site string(s), ${langKeys.size} editor key(s)`);
     }
   }
 
@@ -158,7 +267,9 @@ function validateLocaleSet(label, localesDir, schemaKeys, ignoredExtraKeys = new
 function validateCoreLocales() {
   console.log(`\n━━ core widgets (packages/core/src/widgets) ━━`);
   const schemaKeys = collectSchemaKeysFromDir(coreWidgetsDir);
-  return validateLocaleSet("core widgets", coreLocalesDir, schemaKeys);
+  // The built-in widgets own their visitor words the way a theme owns its own,
+  // so a key nobody wrote has to fail here for the same reason it does there.
+  return validateLocaleSet("core widgets", coreLocalesDir, schemaKeys, new Set(), coreSiteKeyUses());
 }
 
 function validateTheme(themeName, coreKeySet) {
@@ -189,10 +300,31 @@ function validateTheme(themeName, coreKeySet) {
     join(dir, "locales"),
     schemaKeys,
     coreKeySet,
+    collectSiteKeyUses(dir),
+    coreSite(),
   );
 }
 
 // ── Main ──────────────────────────────────────────────────────────────
+
+/** Where the core dictionary's words are asked for: the built-in widgets and the app's snippets. */
+function coreSiteKeyUses() {
+  return new Map([...collectSiteKeyUses(coreSnippetsDir), ...collectSiteKeyUses(coreWidgetsDir)]);
+}
+
+/** The built-in widgets' visitor words: what they define, and what they ask for. */
+let _coreSite = null;
+function coreSite() {
+  if (!_coreSite) {
+    const enPath = join(coreLocalesDir, "en.json");
+    const en = existsSync(enPath) ? JSON.parse(readFileSync(enPath, "utf-8")) : {};
+    _coreSite = {
+      defined: new Set(flattenKeys(en).filter((k) => k === "site" || k.startsWith("site."))),
+      used: new Set(coreSiteKeyUses().keys()),
+    };
+  }
+  return _coreSite;
+}
 
 const requestedTheme = process.argv[2];
 const coreSchemaKeys = collectSchemaKeysFromDir(coreWidgetsDir);
@@ -205,8 +337,11 @@ if (requestedTheme) {
   process.exit(allOk ? 0 : 1);
 } else {
   const themesDir = join(rootDir, "themes");
-  const themes = readdirSync(themesDir).filter((d) =>
-    existsSync(join(themesDir, d, "theme.json")),
+  // A `__`-prefixed theme is a local scratch one — gitignored, often broken on
+  // purpose. Validate it by name when you want to; never as part of the sweep
+  // that runs before the dev server starts.
+  const themes = readdirSync(themesDir).filter(
+    (d) => !d.startsWith("__") && existsSync(join(themesDir, d, "theme.json")),
   );
 
   if (themes.length === 0) {

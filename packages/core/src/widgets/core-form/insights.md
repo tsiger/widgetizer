@@ -1,21 +1,21 @@
 # Form Widget Insights
 
-A configurable contact/inquiry form built for the Widgetizer Hosted forms service. Renders the markup contract the hosted Worker recognises (`data-widgetizer-form`, honeypot, Turnstile placeholder, status element) and pairs with the export-time `widgetizer.forms.json` manifest emitter.
+A configurable contact/inquiry form built for Widgetizer Hosting's form handling. Renders the markup contract its form handler recognises (`data-widgetizer-form`, honeypot, Turnstile placeholder, status element) and pairs with the export-time `widgetizer.forms.json` manifest emitter.
 
-This widget is **only useful when the exported site is deployed to Widgetizer Hosting** — the platform Worker is what intercepts submissions and stores them. On any other static host the form will POST to a 404.
+This widget is **only useful when the exported site is deployed to Widgetizer Hosting** — its form handler is what intercepts submissions and stores them. On any other static host the form will POST to a 404.
 
 ---
 
 ## Identifier model — what the user does NOT configure
 
-To keep the editor friendly for non-technical users, the widget does not expose form keys or field keys directly. The hosted service still needs them, so the export pipeline derives them silently:
+To keep the editor friendly for non-technical users, the widget does not expose form keys or field keys directly. The form handler still needs them, so the export pipeline derives them silently:
 
 - The **form identifier** comes from the form name (`"Contact"` → `contact`, `"Quote Request"` → `quote-request`). Two forms with the same name on different pages are treated as the same form in the hosting dashboard.
 - The **field identifier** comes from each field's label (`"Email address"` → `email-address`). Two fields with the same label inside a single form would collide and fail the export with a clear error asking the user to rename one of them.
 - The **option value** for select/radio fields comes from each option line (`"General inquiry"` → `general-inquiry`).
 - The **max length** for each field is set silently by type (text/tel/url 500, email 320, textarea 5000) to match the platform caps.
 
-All identifiers are validated at export time against the hosted contract (`/^[a-z0-9_-]{1,64}$/`). Errors are friendly and reference the form name or field label, not the derived key.
+Each derived handle is validated at export time against the form handler's contract (`/^[a-z0-9_-]{1,64}$/`); a form on another language's page is keyed with its language folder in front (`el:contact`). Errors are friendly and reference the form name or field label, not the derived key.
 
 ---
 
@@ -53,12 +53,12 @@ All identifiers are validated at export time against the hosted contract (`/^[a-
 
 When the project is exported:
 
-1. The widget renders the form markup with the required `data-widgetizer-*` attributes, an off-screen honeypot named `website`, an empty Turnstile placeholder, and a status element. None of these include theme-specific styling that would conflict with the hosted Worker's injection.
+1. The widget renders the form markup with the required `data-widgetizer-*` attributes, an off-screen honeypot named `website`, an empty Turnstile placeholder, and a status element. None of these include theme-specific styling that would conflict with what the form handler injects.
 2. The export controller walks every page, finds every `core-form` widget, and emits `widgetizer.forms.json` at the export root.
 3. Forms sharing a derived form key (same name) across pages are deduped — the first page's field definitions win. If two widgets share a name but differ in field shape, the export still succeeds but a warning is logged.
 4. Validation errors (missing labels, label collisions within a form, > 5 unique forms per site, > 30 fields per form, > 50 options per choice field, labels that produce empty identifiers) fail the export with a clear message naming the offending form name and field label.
 
-The widget does **not** include any Cloudflare Turnstile site key or script tag — the hosted Worker injects both at serve time, per the platform contract.
+The widget does **not** include any Cloudflare Turnstile site key or script tag — the form handler injects both at serve time.
 
 ---
 
@@ -167,7 +167,7 @@ The widget does **not** include any Cloudflare Turnstile site key or script tag 
 ## Differentiation Tips
 
 - **Form name = dashboard name = identifier.** "Contact" on two pages = one shared form in the hosting dashboard receiving submissions from both. Two distinct intents (e.g. newsletter signup and full inquiry) need two distinct names.
-- **The honeypot is hardcoded.** The platform Worker rejects any submission where the `website` field is non-empty. The widget bakes this in — don't try to override it from settings.
+- **The honeypot is hardcoded.** The form handler rejects any submission where the `website` field is non-empty. The widget bakes this in — don't try to override it from settings.
 - **Use `consent` blocks for binary opt-ins**, not extra checkboxes inside a richtext label. Consent blocks get a real required-validation hook and emit a proper boolean to the manifest.
 - **Choice options are one label per line.** Keep labels short and human — values get auto-generated for you. Two options that produce the same identifier (e.g. "Sales" and "sales") will fail the export with a clear message.
 - **`underlined` style is for editorial inline placements.** It pairs well with content-heavy pages where a bordered card would feel like a marketing pop-up. `outlined` is the safer default for standalone contact pages.

@@ -1,0 +1,222 @@
+{
+  "name": "Gallery",
+  "slug": "gallery",
+  "widgets": {
+    "gallery_hero": {
+      "type": "banner",
+      "settings": {
+        "height": "small",
+        "alignment": "center",
+        "color_scheme": "highlight-primary",
+        "fullwidth": true,
+        "top_spacing": "none",
+        "bottom_spacing": "none",
+        "image": "/uploads/images/gallery-hero.webp"
+      },
+      "blocks": {
+        "hero-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Gallery",
+            "size": "5xl"
+          }
+        },
+        "hero-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Latte art, morning light, and the details that make Brewline feel like home.</p>",
+            "size": "lg"
+          }
+        }
+      },
+      "blocksOrder": [
+        "hero-heading",
+        "hero-text"
+      ]
+    },
+    "coffee_gallery": {
+      "type": "gallery",
+      "settings": {
+        "eyebrow": "The Coffee",
+        "title": "Every Cup, a Small Work of Art",
+        "heading_alignment": "center",
+        "layout": "carousel",
+        "columns_desktop": 3,
+        "aspect_ratio": "4 / 3",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "img-1": {
+          "type": "image",
+          "settings": {
+            "caption": "Morning pour over ritual",
+            "image": "/uploads/images/gallery-pourover.webp"
+          }
+        },
+        "img-2": {
+          "type": "image",
+          "settings": {
+            "caption": "Latte art in progress",
+            "image": "/uploads/images/gallery-latteart.webp"
+          }
+        },
+        "img-3": {
+          "type": "image",
+          "settings": {
+            "caption": "Single-origin espresso",
+            "image": "/uploads/images/gallery-espresso.webp"
+          }
+        },
+        "img-4": {
+          "type": "image",
+          "settings": {
+            "caption": "Cold brew on tap",
+            "image": "/uploads/images/gallery-coldbrew-tap.webp"
+          }
+        },
+        "img-5": {
+          "type": "image",
+          "settings": {
+            "caption": "Fresh roast cooling",
+            "image": "/uploads/images/gallery-roasting.webp"
+          }
+        },
+        "img-6": {
+          "type": "image",
+          "settings": {
+            "caption": "Seasonal lavender latte",
+            "image": "/uploads/images/gallery-lavender.webp"
+          }
+        }
+      },
+      "blocksOrder": [
+        "img-1",
+        "img-2",
+        "img-3",
+        "img-4",
+        "img-5",
+        "img-6"
+      ]
+    },
+    "space_gallery": {
+      "type": "masonry-gallery",
+      "settings": {
+        "eyebrow": "The Space",
+        "title": "Where the Magic Happens",
+        "heading_alignment": "center",
+        "columns_desktop": 3,
+        "gap": "medium",
+        "color_scheme": "standard-secondary",
+        "alignment": "center"
+      },
+      "blocks": {
+        "space-1": {
+          "type": "item",
+          "settings": {
+            "title": "The counter",
+            "category": "Interior",
+            "image": "/uploads/images/space-counter.webp"
+          }
+        },
+        "space-2": {
+          "type": "item",
+          "settings": {
+            "title": "Window seating",
+            "category": "Interior",
+            "image": "/uploads/images/space-window.webp"
+          }
+        },
+        "space-3": {
+          "type": "item",
+          "settings": {
+            "title": "The roaster",
+            "category": "Behind the scenes",
+            "image": "/uploads/images/step-roast-1.webp"
+          }
+        },
+        "space-4": {
+          "type": "item",
+          "settings": {
+            "title": "Back patio",
+            "category": "Outdoor",
+            "image": "/uploads/images/space-patio.webp"
+          }
+        },
+        "space-5": {
+          "type": "item",
+          "settings": {
+            "title": "Community table",
+            "category": "Interior",
+            "image": "/uploads/images/space-community-table.webp"
+          }
+        },
+        "space-6": {
+          "type": "item",
+          "settings": {
+            "title": "Bean display wall",
+            "category": "Details",
+            "image": "/uploads/images/space-beans-wall.webp"
+          }
+        }
+      },
+      "blocksOrder": [
+        "space-1",
+        "space-2",
+        "space-3",
+        "space-4",
+        "space-5",
+        "space-6"
+      ]
+    },
+    "community": {
+      "type": "image-text",
+      "settings": {
+        "image_position": "start",
+        "color_scheme": "standard-primary",
+        "image": "/uploads/images/community.webp"
+      },
+      "blocks": {
+        "comm-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "More Than a Coffee Shop",
+            "size": "3xl"
+          }
+        },
+        "comm-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Brewline is a gathering place. We host weekly cupping sessions, local art shows, and the occasional acoustic set on Saturday mornings. Whether you're here for a quick espresso or a slow afternoon, you're always welcome.</p>",
+            "size": "base"
+          }
+        },
+        "comm-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Get in Touch",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": [
+        "comm-heading",
+        "comm-text",
+        "comm-button"
+      ]
+    }
+  },
+  "widgetsOrder": [
+    "gallery_hero",
+    "coffee_gallery",
+    "space_gallery",
+    "community"
+  ],
+  "id": "gallery",
+  "created": "2026-04-16T10:30:13.560Z",
+  "updated": "2026-04-16T10:45:17.251Z"
+}

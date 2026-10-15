@@ -31,7 +31,8 @@ const { getProjectDir, getProjectPagesDir, getProjectMenusDir } = await import("
 
 const projectRepo = await import("../db/repositories/projectRepository.js");
 const { writeMediaFile } = await import("../controllers/mediaController.js");
-const { renderWidget, renderPageLayout } = await import("../services/renderingService.js");
+const { renderWidget, renderPageLayout, buildRenderDeps } = await import("../services/renderingService.js");
+const { renderWidget: engineRenderWidget } = await import("@widgetizer/render-engine");
 const { closeDb } = await import("../db/index.js");
 
 // ============================================================================
@@ -138,6 +139,7 @@ before(async () => {
 <head>
   <title>{{ page.name }}</title>
   {% if site_icons.primaryIconHref != blank %}<link rel="icon" href="{{ site_icons.primaryIconHref }}" {% if site_icons.primaryIconType != blank %}type="{{ site_icons.primaryIconType }}"{% endif %}{% if site_icons.primaryIconSizes != blank %} sizes="{{ site_icons.primaryIconSizes }}"{% endif %}>{% endif %}
+  {% if site_icons.serpIconHref != blank %}<link rel="icon" href="{{ site_icons.serpIconHref }}" type="image/png" sizes="192x192">{% endif %}
   {% if site_icons.appleTouchIconHref != blank %}<link rel="apple-touch-icon" href="{{ site_icons.appleTouchIconHref }}" sizes="180x180">{% endif %}
   {% seo %}
 </head>
@@ -564,6 +566,41 @@ describe("renderWidget — render modes", () => {
 });
 
 // ============================================================================
+// renderWidget — optional icon set
+// ============================================================================
+
+describe("renderWidget — optional icon set", () => {
+  const iconsFile = () => path.join(getProjectDir(PROJECT_FOLDER), "assets", "icons.json");
+  const renderIcon = () =>
+    renderWidget(PROJECT_ID, "icon-1", { type: "test-icon", settings: {} }, RAW_THEME_SETTINGS, "preview", null, null);
+
+  before(async () => {
+    const widgetDir = path.join(getProjectDir(PROJECT_FOLDER), "widgets", "test-icon");
+    await fs.ensureDir(widgetDir);
+    await fs.writeFile(path.join(widgetDir, "widget.liquid"), `<i>{{ icons.star.body }}</i>`);
+    await fs.writeFile(path.join(widgetDir, "schema.json"), JSON.stringify({ type: "test-icon", settings: [] }));
+  });
+
+  it("does not warn in preview when the project has no icons.json", async (t) => {
+    const warn = t.mock.method(console, "warn", () => {});
+
+    await renderIcon();
+    await renderIcon();
+
+    const iconWarnings = warn.mock.calls.filter((call) => String(call.arguments[0]).includes("icon"));
+    assert.deepEqual(iconWarnings, []);
+  });
+
+  it("picks up an icons.json added, then removed, between preview renders", async () => {
+    await fs.outputFile(iconsFile(), JSON.stringify({ icons: { star: { body: "STAR" } } }));
+    assert.ok((await renderIcon()).includes("<i>STAR</i>"));
+
+    await fs.remove(iconsFile());
+    assert.ok((await renderIcon()).includes("<i></i>"));
+  });
+});
+
+// ============================================================================
 // renderWidget — shared globals
 // ============================================================================
 
@@ -612,6 +649,76 @@ describe("renderWidget — shared globals", () => {
   });
 });
 
+describe("renderWidget — global widgets see page and project", () => {
+  const FOOTER = { type: "footer", settings: {} };
+
+  before(async () => {
+    const footerDir = path.join(getProjectDir(PROJECT_FOLDER), "widgets", "global", "footer");
+    await fs.outputFile(path.join(footerDir, "schema.json"), JSON.stringify({ type: "footer", settings: [] }));
+    await fs.outputFile(
+      path.join(footerDir, "widget.liquid"),
+      `<footer data-slug="{{ page.slug }}" data-name="{{ page.name }}" data-site="{{ project.siteUrl }}" data-clean="{{ project.cleanUrls }}" data-identity="{{ project.identity.name }}" data-tel="{{ project.identity.telephoneHref }}"></footer>`,
+    );
+  });
+
+  const globalsFor = (extra = {}) => ({
+    projectId: PROJECT_ID,
+    apiUrl: "",
+    renderMode: "publish",
+    themeSettingsRaw: RAW_THEME_SETTINGS,
+    enqueuedStyles: new Map(),
+    enqueuedScripts: new Map(),
+    ...extra,
+  });
+
+  it("reads page.slug and project.siteUrl", async () => {
+    const html = await renderWidget(
+      PROJECT_ID,
+      "footer",
+      FOOTER,
+      RAW_THEME_SETTINGS,
+      "publish",
+      globalsFor({ currentPageData: { slug: "about-us", name: "About Us" } }),
+      null,
+    );
+    assert.ok(html.includes('data-slug="about-us"'), html);
+    assert.ok(html.includes('data-name="About Us"'), html);
+    assert.ok(html.includes('data-site="https://example.com"'), html);
+  });
+
+  it("gives project.cleanUrls the render's stamped flag, not the row", async () => {
+    const html = await renderWidget(
+      PROJECT_ID,
+      "footer",
+      FOOTER,
+      RAW_THEME_SETTINGS,
+      "publish",
+      globalsFor({ cleanUrls: true, currentPageData: { slug: "about-us" } }),
+      null,
+    );
+    assert.ok(html.includes('data-clean="true"'), html);
+  });
+
+  it("gives themes the business details as project.identity", async () => {
+    projectRepo.updateProject(PROJECT_ID, {
+      siteIdentity: { category: "bakery", telephone: "+30 210 123", text: { publicName: "Crumbly" } },
+    });
+    try {
+      const html = await renderWidget(PROJECT_ID, "footer", FOOTER, RAW_THEME_SETTINGS, "publish", globalsFor(), null);
+      assert.ok(html.includes('data-identity="Crumbly"'), html);
+      assert.ok(html.includes('data-tel="tel:+30210123"'), html);
+    } finally {
+      projectRepo.updateProject(PROJECT_ID, { siteIdentity: {} });
+    }
+  });
+
+  it("leaves page empty when the caller supplies none", async () => {
+    const html = await renderWidget(PROJECT_ID, "footer", FOOTER, RAW_THEME_SETTINGS, "publish", globalsFor(), null);
+    assert.ok(html.includes('data-slug=""'), html);
+    assert.ok(html.includes('data-site="https://example.com"'), html);
+  });
+});
+
 // ============================================================================
 // renderPageLayout
 // ============================================================================
@@ -655,6 +762,21 @@ describe("renderPageLayout", () => {
     assert.ok(
       html.includes(`rel="apple-touch-icon" href="/api/media/projects/${PROJECT_ID}/uploads/images/site-icon.svg"`),
     );
+    // Derived sizes (icon-192 etc.) exist only in exports — runtime must not link them.
+    assert.ok(!html.includes('sizes="192x192"'));
+  });
+
+  it("finds the site icon in whichever group the theme files it", async () => {
+    const html = await renderPageLayout(
+      PROJECT_ID,
+      { headerContent: "", mainContent: "<p>Content</p>", footerContent: "" },
+      { name: "Icon Page", slug: "icon-page" },
+      { settings: { global: { branding: RAW_THEME_SETTINGS.settings.global.general } } },
+      "preview",
+      null,
+    );
+
+    assert.ok(html.includes(`rel="icon" href="/api/media/projects/${PROJECT_ID}/uploads/images/site-icon.svg"`));
   });
 
   it("injects header, main content, and footer", async () => {
@@ -899,5 +1021,39 @@ describe("renderPageLayout", () => {
       activeProjectId: PROJECT_ID,
     });
     await fs.remove(noLayoutDir);
+  });
+});
+
+describe("renderWidget — the theme's date format", () => {
+  before(async () => {
+    const widgetDir = path.join(getProjectDir(PROJECT_FOLDER), "widgets", "test-date");
+    await fs.ensureDir(widgetDir);
+    await fs.writeFile(path.join(widgetDir, "widget.liquid"), `<time>{{ '2026-01-05' | format_date }}</time>`);
+    await fs.writeFile(path.join(widgetDir, "schema.json"), JSON.stringify({ type: "test-date", settings: [] }));
+  });
+
+  it("reads date_format from whichever group the theme files it", async () => {
+    const theme = { settings: { global: { dates: [{ id: "date_format", type: "select", value: "YYYY-MM-DD" }] } } };
+    const html = await renderWidget(PROJECT_ID, "date-1", { type: "test-date", settings: {} }, theme, "preview", null, null);
+    assert.ok(html.includes("<time>2026-01-05</time>"), html);
+  });
+});
+
+describe("renderWidget — the built-in words without a site-strings loader", () => {
+  before(async () => {
+    const widgetDir = path.join(getProjectDir(PROJECT_FOLDER), "widgets", "test-core-words");
+    await fs.ensureDir(widgetDir);
+    await fs.writeFile(
+      path.join(widgetDir, "widget.liquid"),
+      `<p>{{ 'site.breadcrumbs.label' | t }}|{{ 'site.breadcrumbs.page' | t }}</p>`,
+    );
+    await fs.writeFile(path.join(widgetDir, "schema.json"), JSON.stringify({ type: "test-core-words", settings: [] }));
+  });
+
+  it("still reads the app's English words when the host supplies no loader", async () => {
+    const { loadSiteStrings, ...deps } = await buildRenderDeps(PROJECT_ID);
+    assert.equal(typeof loadSiteStrings, "function");
+    const html = await engineRenderWidget(deps, "words-1", { type: "test-core-words", settings: {} }, RAW_THEME_SETTINGS, "preview");
+    assert.ok(html.includes("<p>Breadcrumb|Page</p>"), html);
   });
 });

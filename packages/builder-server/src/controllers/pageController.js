@@ -1,10 +1,95 @@
 import { randomUUID } from "crypto";
-import { syncPageMediaUsageOnDelete, syncPageMediaUsageOnWrite } from "../services/mediaUsageService.js";
-import { cleanupDeletedPageReferencesFromDir } from "../utils/linkEnrichment.js";
-import { stripHtmlTags } from "../services/sanitizationService.js";
+import { ConflictError } from "@widgetizer/core/errors";
+import {
+  syncPageMediaUsageOnDelete,
+  syncPageMediaUsageOnWrite,
+  extractMediaPathsFromPage,
+} from "../services/mediaUsageService.js";
+import {
+  withContentWriteLock,
+  assertIntroducedMediaExists,
+  assertLanguageStillEnabled,
+  withCurrentLanguages,
+} from "../services/contentCoordination.js";
+import { clearDeletedReferencesInSection, referenceCleanupWarnings } from "../utils/linkEnrichment.js";
+import { stripHtmlToText } from "../services/sanitizationService.js";
 import { LIMIT_KEYS, MAX_WIDGETS_PER_PAGE } from "@widgetizer/core/adapters";
 import { sanitizeSlug, generateUniqueSlug } from "../utils/slugHelpers.js";
 import { generateCopyName } from "../utils/namingHelpers.js";
+import { isHomeSlug, isReservedPageSlug, pageKey, pagesDir } from "@widgetizer/core/contentAddress";
+import { requestLanguage, projectLanguageContexts, withoutLanguage } from "../utils/contentLanguage.js";
+import {
+  assertHasIdentity,
+  assertLanguageFree,
+  findPageInGroup,
+  groupIdOf,
+  resolveTargetLanguage,
+  serializeTranslationOps,
+} from "../services/translationService.js";
+
+// `index` and `home` both publish as the language's index.html, so a language
+// may hold only one of them. `ownSlug` is the page being renamed, which does not
+// clash with itself.
+async function homeSlugClash(storage, scope, slug, lang, ownSlug) {
+  if (!isHomeSlug(slug)) return false;
+  const other = slug === "index" ? "home" : "index";
+  return other !== ownSlug && storage.exists(scope, pageKey(other, lang));
+}
+
+const pageSlugTaken = (storage, scope, lang, ownSlug) => async (slug) =>
+  isReservedPageSlug(slug, lang) ||
+  (await storage.exists(scope, pageKey(slug, lang))) ||
+  homeSlugClash(storage, scope, slug, lang, ownSlug);
+
+async function listPageFiles(storage, scope, lang) {
+  return (await storage.list(scope, pagesDir(lang))).filter((name) => name.endsWith(".json"));
+}
+
+function reservedPageSlug(res, slug) {
+  return res.status(400).json({
+    error: "Reserved slug",
+    message: `"${slug}" is reserved and cannot be used as a page filename.`,
+  });
+}
+
+function secondHomepage(res, slug) {
+  return res.status(409).json({
+    error: "Slug already exists",
+    message: `"${slug}" would be a second homepage: this language already has one. Please choose a different slug.`,
+  });
+}
+
+async function readWidgetSchema(storage, scope, type) {
+  if (typeof type !== "string" || !type) return null;
+  try {
+    const buf = await storage.read(scope, `widgets/${type}/schema.json`);
+    return buf == null ? null : JSON.parse(buf.toString("utf8"));
+  } catch {
+    return null;
+  }
+}
+
+async function enforcePaginationRules({ scope, storage, widgets }) {
+  const paginators = [];
+  for (const widget of Object.values(widgets || {})) {
+    if (widget?.settings?.paginate !== true) continue;
+    const schema = await readWidgetSchema(storage, scope, widget.type);
+    const perPageSetting = schema?.collection?.perPageSetting;
+    if (!schema?.collection?.type || typeof perPageSetting !== "string" || !Array.isArray(schema.settings)) {
+      widget.settings.paginate = false;
+      continue;
+    }
+    const declared = schema.settings.find((setting) => setting?.id === perPageSetting);
+    const perPage = Number(widget.settings[perPageSetting] ?? declared?.default);
+    if (!Number.isInteger(perPage) || perPage < 1) {
+      return "Items per page must be a whole number of at least 1 when a list is split into pages.";
+    }
+    paginators.push(widget);
+  }
+  if (paginators.length > 1) return "Only one widget per page can split the page into pages.";
+  for (const widget of paginators) widget.settings.listing_anchor = true;
+  return null;
+}
 
 // Page/global-widget reads moved to the dir-explicit reader family
 // (utils/projectContentFs.js: listPagesFromDir / readGlobalWidgetFromDir) — the
@@ -12,35 +97,234 @@ import { generateCopyName } from "../utils/namingHelpers.js";
 // the request boundary (getAllPages below, getPage, etc.) reads through the
 // scope-aware storage adapter. No folderName-based fs readers live here anymore.
 
-async function persistPageWithMediaTracking({ scope, storage, pageId, pageData, previousPageId = null }) {
-  await storage.write(scope, `pages/${pageId}.json`, JSON.stringify(pageData, null, 2));
+/**
+ * A write refused inside the section: it would introduce a reference to a media
+ * file that has been deleted, its language was removed, or a language added
+ * meanwhile reserved its slug. Nothing was written, so the editor keeps the work
+ * and can name the reason — which a generic 500 cannot. Every caller of the
+ * persist helper needs this, or the specific reason is lost behind "Failed to ...".
+ * @returns {boolean} true when it answered
+ */
+const SLUG_REFUSALS = {
+  RESERVED_SLUG: "Reserved slug",
+  SLUG_TAKEN: "Slug already exists",
+  SECOND_HOMEPAGE: "Slug already exists",
+};
 
-  if (previousPageId && previousPageId !== pageId) {
-    try {
-      if (await storage.exists(scope, `pages/${previousPageId}.json`)) {
-        await storage.delete(scope, `pages/${previousPageId}.json`);
+function respondMissingMedia(res, error) {
+  if (SLUG_REFUSALS[error?.code]) {
+    // Another write took the slug while this one waited. Nothing was written.
+    res.status(error.statusCode).json({ error: SLUG_REFUSALS[error.code], message: error.message, code: error.code });
+    return true;
+  }
+  if (error?.code === "LANGUAGE_REMOVED") {
+    // Nothing was written. The editor keeps the work and stops retrying; it cannot
+    // be saved anywhere, because the language it belongs to is gone.
+    res.status(error.statusCode).json({ error: "Language removed", message: error.message, code: error.code, language: error.language });
+    return true;
+  }
+  if (error?.code !== "MEDIA_REFERENCE_MISSING") return false;
+  res.status(error.statusCode).json({ error: "Missing media", message: error.message, code: error.code });
+  return true;
+}
+
+/**
+ * The slug this write may use, decided inside the section.
+ *
+ * A request picks its slug before it waits for the section, so two requests can
+ * pick the same free slug and the second would write over the first, or a
+ * language added meanwhile can reserve it. Both requests would report success
+ * and a page would be gone. So the slug is checked again here, against the files
+ * and the project row as they are now:
+ *
+ * - a new page (no `previousPageId`) moves on to a free slug, numbered from the
+ *   one it picked (`about-1` taken meanwhile becomes `about-1-1`).
+ *   `pageData.id`/`slug` are updated to match, so the caller's response names
+ *   the slug that was written;
+ * - a rename, or a save to a page whose file is gone, is refused if the slug was
+ *   taken: the user chose that slug, so it is not swapped for another;
+ * - a save to the page's own existing file keeps its slug.
+ *
+ * @returns {Promise<string>} the slug to write
+ * @throws {ConflictError} RESERVED_SLUG, SLUG_TAKEN or SECOND_HOMEPAGE
+ */
+async function claimPageSlug({ scope, storage, pageId, pageData, previousPageId, lang }) {
+  if (previousPageId === pageId) {
+    const buf = await storage.read(scope, pageKey(pageId, lang));
+    if (buf != null) {
+      // The file is this page's own unless it carries another page's uuid: a save
+      // that found no file when it started (and so made up a uuid) must not write
+      // over a page created under that slug since. An unreadable file, or one
+      // from before pages had uuids, is treated as the page's own, as before.
+      let onDisk = null;
+      try {
+        onDisk = JSON.parse(buf.toString("utf8")).uuid;
+      } catch {
+        // Unreadable: nothing says it belongs to another page.
       }
-    } catch (unlinkError) {
-      console.warn(`Failed to delete old page file ${previousPageId} after slug change: ${unlinkError.message}`);
+      if (onDisk && pageData.uuid && onDisk !== pageData.uuid) {
+        throw new ConflictError(`A page with the slug "${pageId}" already exists. Please choose a different slug.`, {
+          code: "SLUG_TAKEN",
+        });
+      }
+      return pageId;
     }
   }
 
-  try {
-    await syncPageMediaUsageOnWrite(scope.projectId, pageId, pageData, previousPageId);
-  } catch (usageError) {
-    console.warn(`Failed to update media usage tracking for page ${pageId}:`, usageError);
+  const current = withCurrentLanguages(scope.projectId, lang);
+  if (!previousPageId) {
+    const slug = await generateUniqueSlug(pageId, pageSlugTaken(storage, scope, current), { fallback: "page" });
+    if (slug !== pageId) Object.assign(pageData, { id: slug, slug });
+    return slug;
+  }
+
+  if (isReservedPageSlug(pageId, current)) {
+    throw new ConflictError(`"${pageId}" is reserved and cannot be used as a page filename.`, { code: "RESERVED_SLUG" });
+  }
+  if (await storage.exists(scope, pageKey(pageId, lang))) {
+    throw new ConflictError(`A page with the slug "${pageId}" already exists. Please choose a different slug.`, {
+      code: "SLUG_TAKEN",
+    });
+  }
+  if (await homeSlugClash(storage, scope, pageId, lang, previousPageId)) {
+    throw new ConflictError(
+      `"${pageId}" would be a second homepage: this language already has one. Please choose a different slug.`,
+      { code: "SECOND_HOMEPAGE" },
+    );
+  }
+  return pageId;
+}
+
+// The write and its usage sync are one media section: media deletion verifies and
+// deletes inside the same section, so it cannot see this page between the two and
+// conclude an image it just started using is unused. See services/contentCoordination.
+/**
+ * The body of a page write, WITHOUT taking the section — the caller holds it.
+ *
+ * Split out because a save is rarely one write: `savePageContent` also sweeps the
+ * listing anchor off other pages, and that sweep used to run after this function had
+ * released the section. A removal landing in between then deleted the language while
+ * the sweep was still going, and the sweep wrote a Greek page straight back. Related
+ * writes have to share one section, so the lock belongs at the controller edge.
+ */
+async function persistPageInSection({ scope, storage, pageId, pageData, previousPageId = null, lang, assetStorage }) {
+  // Required, not optional. It used to default to null and skip the check, which
+  // meant a caller that simply forgot to pass it lost the protection silently —
+  // the page-details save did exactly that, and could store a deleted image as the
+  // page's social-sharing image. Failing loudly is the only way a missing
+  // dependency stays visible.
+  if (!assetStorage) {
+    throw new Error("persistPageInSection requires assetStorage: media validation must not be skipped");
+  }
+  {
+    // The language this page is addressed to may have been removed while this write
+    // waited for the section. Writing anyway recreates a page in a language the
+    // project no longer has — invisible to the editor and to export, but visible to
+    // the media usage rebuild, where it can hold an image hostage.
+    assertLanguageStillEnabled(scope.projectId, lang);
+    pageId = await claimPageSlug({ scope, storage, pageId, pageData, previousPageId, lang });
+
+    // Refuse to introduce a reference to a file that is gone — the save queued
+    // behind a delete, which the lock orders but cannot make safe on its own.
+    // References the page already carried are left alone: a dangling path is
+    // tolerated everywhere else, and a save is the wrong place to start rejecting it.
+    //
+    // Read INSIDE the section: a baseline captured before the lock can still show a
+    // reference another save has since removed, which would wrongly classify the
+    // image as already present and skip the check.
+    let previousPaths = [];
+    try {
+      const buf = await storage.read(scope, pageKey(previousPageId || pageId, lang));
+      if (buf != null) previousPaths = extractMediaPathsFromPage(JSON.parse(buf.toString("utf8")));
+    } catch {
+      // A new page, or one we cannot read: nothing is known to be pre-existing.
+    }
+    await assertIntroducedMediaExists({
+      assetStorage,
+      scope,
+      previousPaths,
+      nextPaths: extractMediaPathsFromPage(pageData),
+    });
+
+    await storage.write(scope, pageKey(pageId, lang), JSON.stringify(withoutLanguage(pageData), null, 2));
+
+    if (previousPageId && previousPageId !== pageId) {
+      try {
+        if (await storage.exists(scope, pageKey(previousPageId, lang))) {
+          await storage.delete(scope, pageKey(previousPageId, lang));
+        }
+      } catch (unlinkError) {
+        console.warn(`Failed to delete old page file ${previousPageId} after slug change: ${unlinkError.message}`);
+      }
+    }
+
+    try {
+      await syncPageMediaUsageOnWrite(scope.projectId, pageData, lang);
+      return { usageStale: false };
+    } catch (usageError) {
+      // The page IS saved; only the derived usage rows are behind. Reporting a
+      // failed save would be false. The caller surfaces this as a warning instead,
+      // and media deletion re-derives usage anyway rather than trusting the rows.
+      console.warn(`Failed to update media usage tracking for page ${pageId}:`, usageError);
+      return { usageStale: true };
+    }
   }
 }
 
-async function deletePageWithMediaTracking({ scope, storage, pageId }) {
-  await storage.delete(scope, `pages/${pageId}.json`);
+/** Take the section and do one page write in it. For callers with nothing else to do. */
+async function persistPageWithMediaTracking(args) {
+  return withContentWriteLock(args.scope.projectId, () => persistPageInSection(args));
+}
 
-  try {
-    await syncPageMediaUsageOnDelete(scope.projectId, pageId);
-  } catch (usageError) {
-    console.warn(`Failed to update media usage tracking for deleted page ${pageId}:`, usageError);
+/** The delete itself, WITHOUT taking the section — the caller holds it. */
+async function deletePageInSection({ scope, storage, pageId, lang }) {
+  {
+    // Usage rows are keyed by uuid, so read it while the file still exists. A page with
+    // no uuid was recorded under its slug, which the service resolves from the slug below.
+    let pageUuid = null;
+    try {
+      const buf = await storage.read(scope, pageKey(pageId, lang));
+      if (buf != null) pageUuid = JSON.parse(buf.toString("utf8"))?.uuid ?? null;
+    } catch (readError) {
+      console.warn(`Could not read page ${pageId} before delete for media usage: ${readError.message}`);
+    }
+
+    await storage.delete(scope, pageKey(pageId, lang));
+
+    try {
+      await syncPageMediaUsageOnDelete(scope.projectId, { uuid: pageUuid, slug: pageId }, lang);
+    } catch (usageError) {
+      console.warn(`Failed to update media usage tracking for deleted page ${pageId}:`, usageError);
+    }
   }
 }
+
+/**
+ * Clear references to pages this request has deleted. One walk for the whole set:
+ * the bulk path used to run a full project walk per page, so deleting twenty pages
+ * read and rewrote every page, global, menu and item twenty times.
+ *
+ * Call inside the section holding the deletes. A failure is logged rather than
+ * thrown — the pages ARE deleted, and a dangling reference renders as a dead link
+ * rather than a wrong one.
+ */
+async function clearRefsToDeletedPages(storage, scope, deleted, lang) {
+  const known = deleted.filter((page) => page?.uuid);
+  if (known.length === 0) return [];
+  const pageUuids = known.map((page) => page.uuid);
+  try {
+    const { incomplete } = await clearDeletedReferencesInSection(storage, scope, {
+      pageUuids,
+      pageGroups: known.map((page) => [page.uuid, groupIdOf(page)]),
+      defaultLanguage: lang.defaultLanguage,
+    });
+    return incomplete;
+  } catch (cleanupError) {
+    console.warn(`Failed to clear references for deleted pages ${pageUuids.join(", ")}:`, cleanupError.message);
+    return [{ key: "*", reason: cleanupError.message }];
+  }
+}
+
 
 /**
  * Retrieves a single page by its slug from the active project.
@@ -53,14 +337,14 @@ export async function getPage(req, res) {
     const { id } = req.params; // This is the slug
     const { scope } = req;
     const { storage } = req.adapters;
+    const lang = requestLanguage(req, res);
+    if (!lang) return;
 
-    // Try to find the page in the project's pages directory
-    const pageData = await storage.read(scope, `pages/${id}.json`);
-    // Check if page exists
+    const pageData = await storage.read(scope, pageKey(id, lang));
     if (pageData == null) {
       return res.status(404).json({ error: "Page not found" });
     }
-    return res.json(JSON.parse(pageData.toString("utf8")));
+    return res.json({ ...JSON.parse(pageData.toString("utf8")), language: lang.language });
   } catch (error) {
     console.error("Error getting page:", error);
     res.status(500).json({ error: "Failed to get page" });
@@ -81,13 +365,15 @@ export async function updatePage(req, res) {
 
     // Defensive sanitization for SEO fields
     if (pageData.seo) {
-      if (pageData.seo.description != null) pageData.seo.description = stripHtmlTags(pageData.seo.description);
-      if (pageData.seo.og_title != null) pageData.seo.og_title = stripHtmlTags(pageData.seo.og_title);
-      if (pageData.seo.canonical_url != null) pageData.seo.canonical_url = stripHtmlTags(pageData.seo.canonical_url);
+      if (pageData.seo.description != null) pageData.seo.description = stripHtmlToText(pageData.seo.description);
+      if (pageData.seo.og_title != null) pageData.seo.og_title = stripHtmlToText(pageData.seo.og_title);
+      if (pageData.seo.canonical_url != null) pageData.seo.canonical_url = stripHtmlToText(pageData.seo.canonical_url);
     }
 
     const { scope } = req;
     const { storage } = req.adapters;
+    const lang = requestLanguage(req, res);
+    if (!lang) return;
 
     // Fallback: If slug is missing/empty, generate from name
     if (!desiredNewSlug || typeof desiredNewSlug !== "string" || desiredNewSlug.trim() === "") {
@@ -98,10 +384,7 @@ export async function updatePage(req, res) {
       console.warn(
         `Missing/empty slug in update request for oldSlug '${oldSlug}', generating from name: '${pageData.name}'`,
       );
-      desiredNewSlug = await generateUniqueSlug(
-        pageData.name,
-        (slug) => storage.exists(scope, `pages/${slug}.json`),
-      );
+      desiredNewSlug = await generateUniqueSlug(pageData.name, pageSlugTaken(storage, scope, lang, oldSlug));
     } else {
       // Sanitize the provided slug through the shared helper
       desiredNewSlug = sanitizeSlug(desiredNewSlug);
@@ -118,12 +401,14 @@ export async function updatePage(req, res) {
     if (oldSlug !== desiredNewSlug) {
       // For explicit slug changes, check if the new slug already exists (conflict)
       if (pageData.slug && typeof pageData.slug === "string" && pageData.slug.trim() !== "") {
-        if (await storage.exists(scope, `pages/${desiredNewSlug}.json`)) {
+        if (isReservedPageSlug(desiredNewSlug, lang)) return reservedPageSlug(res, desiredNewSlug);
+        if (await storage.exists(scope, pageKey(desiredNewSlug, lang))) {
           return res.status(409).json({
             error: "Slug already exists",
             message: `A page with the slug "${desiredNewSlug}" already exists. Please choose a different slug.`,
           });
         }
+        if (await homeSlugClash(storage, scope, desiredNewSlug, lang, oldSlug)) return secondHomepage(res, desiredNewSlug);
         finalNewSlug = desiredNewSlug;
       } else {
         finalNewSlug = desiredNewSlug; // Already unique from generateUniqueSlug fallback
@@ -133,16 +418,23 @@ export async function updatePage(req, res) {
       finalNewSlug = oldSlug;
     }
 
+    if (pageData.widgets) {
+      const paginationError = await enforcePaginationRules({ scope, storage, widgets: pageData.widgets });
+      if (paginationError) return res.status(422).json({ error: paginationError });
+    }
+
     // Read old file first to preserve original creation date and uuid
     let originalCreationDate = new Date().toISOString();
     let existingUuid = null;
+    let existingGroupId = null;
     let existingWidgets = {};
     try {
-      const oldBuf = await storage.read(scope, `pages/${oldSlug}.json`);
+      const oldBuf = await storage.read(scope, pageKey(oldSlug, lang));
       if (oldBuf != null) {
         const oldData = JSON.parse(oldBuf.toString("utf8"));
         originalCreationDate = oldData.created || originalCreationDate;
         existingUuid = oldData.uuid || null; // Preserve stable uuid across renames
+        existingGroupId = oldData.translationGroupId || null;
         existingWidgets = oldData.widgets || {}; // Preserve widgets if not included in request
       }
       // If old file doesn't exist (e.g. first save after create error, or manual rename), allow creation
@@ -151,9 +443,23 @@ export async function updatePage(req, res) {
     }
 
     // Construct the final page data for saving
+    const resolvedUuid = existingUuid || randomUUID();
+    // A page cannot be its own parent. The picker never offers it, and the
+    // breadcrumb builder would drop the loop anyway, but a direct API call
+    // should not be able to write it.
+    const parentPageUuid =
+      typeof pageData.parentPageUuid === "string" &&
+      pageData.parentPageUuid.trim() &&
+      pageData.parentPageUuid !== resolvedUuid
+        ? pageData.parentPageUuid.trim()
+        : undefined;
+
     const finalUpdatedPageData = {
       ...pageData, // Start with submitted data
-      uuid: existingUuid || randomUUID(), // Preserve existing uuid or generate new one if missing
+      parentPageUuid, // undefined drops the key entirely when cleared
+      uuid: resolvedUuid, // Preserve existing uuid or generate new one if missing
+      translationGroupId: existingGroupId || resolvedUuid,
+      language: lang.language,
       id: finalNewSlug, // Use the final unique slug as ID
       slug: finalNewSlug, // Use the final unique slug
       name: pageData.name || `Page ${finalNewSlug}`, // Ensure name exists
@@ -162,16 +468,38 @@ export async function updatePage(req, res) {
       updated: new Date().toISOString(), // Set new update timestamp
     };
 
-    await persistPageWithMediaTracking({
-      scope,
-      storage,
-      pageId: finalNewSlug,
-      pageData: finalUpdatedPageData,
-      previousPageId: oldSlug,
+    // Both writes in one section, for the same reason as savePageContent below:
+    // the sweep writes other pages in this language and must not outlive the
+    // section that checked the language still exists.
+    const movedFrom = await withContentWriteLock(scope.projectId, async () => {
+      await persistPageInSection({
+        scope,
+        storage,
+        pageId: finalNewSlug,
+        pageData: finalUpdatedPageData,
+        previousPageId: oldSlug,
+        lang,
+        assetStorage: req.adapters.assetStorage,
+      });
+
+      return pageData.widgets
+        ? clearListingAnchorsElsewhere({
+            scope,
+            storage,
+            keepPageId: finalNewSlug,
+            widgets: finalUpdatedPageData.widgets,
+            lang,
+          })
+        : [];
     });
 
-    res.json({ success: true, data: finalUpdatedPageData });
+    res.json({
+      success: true,
+      data: finalUpdatedPageData,
+      ...(movedFrom.length ? { listingAnchorMovedFrom: movedFrom } : {}),
+    });
   } catch (error) {
+    if (respondMissingMedia(res, error)) return;
     console.error("Error updating page:", error);
     res.status(500).json({
       success: false,
@@ -199,21 +527,23 @@ export async function getAllPages(req, res) {
     // `global/` subdir is skipped because it isn't a `.json` entry. (The render
     // path reads the same files via the dir-explicit listPagesFromDir, which runs
     // without req.adapters against the project working directory.)
-    const pageFiles = (await storage.list(scope, "pages")).filter((name) => name.endsWith(".json"));
-    const pages = (
-      await Promise.all(
+    const pages = [];
+    for (const lang of projectLanguageContexts(req.activeProject)) {
+      const pageFiles = await listPageFiles(storage, scope, lang);
+      const loaded = await Promise.all(
         pageFiles.map(async (name) => {
           const pageId = name.replace(/\.json$/, "");
           try {
-            const buf = await storage.read(scope, `pages/${name}`);
-            return buf == null ? null : { ...JSON.parse(buf.toString("utf8")), id: pageId };
+            const buf = await storage.read(scope, pageKey(pageId, lang));
+            return buf == null ? null : { ...JSON.parse(buf.toString("utf8")), id: pageId, language: lang.language };
           } catch (readError) {
             console.error(`Error reading or parsing page file ${name}:`, readError);
             return null;
           }
         }),
-      )
-    ).filter((page) => page !== null);
+      );
+      pages.push(...loaded.filter((page) => page !== null));
+    }
 
     res.json(pages);
   } catch (error) {
@@ -235,39 +565,33 @@ export async function deletePage(req, res) {
     const { storage } = req.adapters;
 
     const pageId = req.params.id;
+    const lang = requestLanguage(req, res);
+    if (!lang) return;
 
-    // Read the page (existence + UUID for reference cleanup) before deleting
-    const pageBuf = await storage.read(scope, `pages/${pageId}.json`);
-    if (pageBuf == null) {
-      return res.status(404).json({ error: "Page not found" });
-    }
+    // Existence check, identity read, delete and sweep are ONE section. Reading the
+    // identity before the lock meant the page could be renamed in between — a rename
+    // keeps the uuid and moves the file, so the delete then removed nothing while the
+    // sweep cleared every link to a page that is still there, under its new slug.
+    // Only the identity this request actually deleted may be swept.
+    const found = await withContentWriteLock(scope.projectId, async () => {
+      const pageBuf = await storage.read(scope, pageKey(pageId, lang));
+      if (pageBuf == null) return null;
 
-    let deletedPageUuid = null;
-    try {
-      deletedPageUuid = JSON.parse(pageBuf.toString("utf8")).uuid || null;
-    } catch (readError) {
-      console.warn(`Could not read page UUID before deletion for ${pageId}:`, readError.message);
-    }
+      let deletedPage = null;
+      try {
+        deletedPage = JSON.parse(pageBuf.toString("utf8"));
+      } catch (readError) {
+        console.warn(`Could not read page UUID before deletion for ${pageId}:`, readError.message);
+      }
 
-    await deletePageWithMediaTracking({
-      scope,
-      storage,
-      pageId,
+      await deletePageInSection({ scope, storage, pageId, lang });
+      return { incomplete: await clearRefsToDeletedPages(storage, scope, [deletedPage], lang) };
     });
 
-    // Clean up orphaned references in menus and widget links. Resolve the project
-    // working dir via the injected storage adapter so this runs against the correct
-    // per-tenant tree in hosted (Cloud) and DATA_DIR in OSS (Local).
-    if (deletedPageUuid) {
-      try {
-        const projectDir = storage.getProjectBase(scope);
-        await cleanupDeletedPageReferencesFromDir({ projectDir, deletedPageUuid, projectId: scope.projectId });
-      } catch (cleanupError) {
-        console.warn(`Failed to clean up references for deleted page ${pageId}:`, cleanupError.message);
-      }
-    }
+    if (!found) return res.status(404).json({ error: "Page not found" });
 
-    res.json({ success: true });
+    const warnings = referenceCleanupWarnings(found.incomplete);
+    res.json({ success: true, ...(warnings ? { warnings } : {}) });
   } catch (error) {
     console.error("Error deleting page:", error);
     res.status(500).json({ error: "Failed to delete page" });
@@ -285,6 +609,8 @@ export async function bulkDeletePages(req, res) {
   const { pageIds } = req.body;
   const { scope } = req;
   const { storage } = req.adapters;
+  const lang = requestLanguage(req, res);
+  if (!lang) return;
 
   const results = {
     deleted: [],
@@ -292,51 +618,51 @@ export async function bulkDeletePages(req, res) {
     errors: [],
   };
 
-  const deletedUuids = [];
+  const deletedPages = [];
+  let incompleteCleanup = [];
 
-  // Process each page deletion
-  for (const pageId of pageIds) {
-    try {
-      // Read the page (existence + UUID for reference cleanup) before deleting
-      const pageBuf = await storage.read(scope, `pages/${pageId}.json`);
-      if (pageBuf == null) {
-        results.notFound.push(pageId);
-        continue;
-      }
-
+  // One section for the whole batch, so a save cannot slip a new reference to any
+  // of these pages in between the deletes and the sweep that clears them.
+  await withContentWriteLock(scope.projectId, async () => {
+    for (const pageId of pageIds) {
       try {
-        const pageData = JSON.parse(pageBuf.toString("utf8"));
-        if (pageData.uuid) deletedUuids.push(pageData.uuid);
-      } catch (readError) {
-        console.warn(`Could not read page UUID before deletion for ${pageId}:`, readError.message);
+        // Read the page (existence + UUID for reference cleanup) before deleting
+        const pageBuf = await storage.read(scope, pageKey(pageId, lang));
+        if (pageBuf == null) {
+          results.notFound.push(pageId);
+          continue;
+        }
+
+        // Read the uuid before deleting (the file is about to go) but record it
+        // as deleted only after the delete returns — a page whose delete threw may
+        // still be there, and clearing references to it would break live links.
+        let page = null;
+        try {
+          page = JSON.parse(pageBuf.toString("utf8"));
+        } catch (readError) {
+          console.warn(`Could not read page UUID before deletion for ${pageId}:`, readError.message);
+        }
+
+        await deletePageInSection({ scope, storage, pageId, lang });
+
+        if (page?.uuid) deletedPages.push(page);
+        results.deleted.push(pageId);
+      } catch (error) {
+        console.error(`Error deleting page ${pageId}:`, error);
+        results.errors.push({ pageId, error: error.message });
       }
-
-      await deletePageWithMediaTracking({
-        scope,
-        storage,
-        pageId,
-      });
-
-      results.deleted.push(pageId);
-    } catch (error) {
-      console.error(`Error deleting page ${pageId}:`, error);
-      results.errors.push({ pageId, error: error.message });
     }
-  }
 
-  // Clean up orphaned references for all deleted pages (per-tenant dir via the adapter).
-  const projectDir = storage.getProjectBase(scope);
-  for (const uuid of deletedUuids) {
-    try {
-      await cleanupDeletedPageReferencesFromDir({ projectDir, deletedPageUuid: uuid, projectId: scope.projectId });
-    } catch (cleanupError) {
-      console.warn(`Failed to clean up references for deleted page UUID ${uuid}:`, cleanupError.message);
-    }
-  }
+    // Confirmed deletions only, in one walk.
+    incompleteCleanup = await clearRefsToDeletedPages(storage, scope, deletedPages, lang);
+  });
 
   // Determine response status based on results
   const hasErrors = results.errors.length > 0 || results.notFound.length > 0;
   const hasSuccesses = results.deleted.length > 0;
+  // The pages went; some content may still point at them. A warning either way —
+  // never a reason to call a completed deletion a failure.
+  const cleanupWarnings = referenceCleanupWarnings(incompleteCleanup);
 
   if (hasSuccesses && !hasErrors) {
     // All deletions successful
@@ -344,6 +670,7 @@ export async function bulkDeletePages(req, res) {
       success: true,
       message: `Successfully deleted ${results.deleted.length} page(s)`,
       results,
+      ...(cleanupWarnings ? { warnings: cleanupWarnings } : {}),
     });
   } else if (hasSuccesses && hasErrors) {
     // Partial success
@@ -351,6 +678,7 @@ export async function bulkDeletePages(req, res) {
       success: false,
       message: `Deleted ${results.deleted.length} page(s), but encountered ${results.errors.length + results.notFound.length} error(s)`,
       results,
+      ...(cleanupWarnings ? { warnings: cleanupWarnings } : {}),
     });
   } else {
     // No successes
@@ -373,12 +701,14 @@ export async function createPage(req, res) {
     const pageData = req.body; // Get all data including SEO
     const { scope } = req;
     const { storage } = req.adapters;
+    const lang = requestLanguage(req, res);
+    if (!lang) return;
 
     // Defensive sanitization for SEO fields
     if (pageData.seo) {
-      if (pageData.seo.description != null) pageData.seo.description = stripHtmlTags(pageData.seo.description);
-      if (pageData.seo.og_title != null) pageData.seo.og_title = stripHtmlTags(pageData.seo.og_title);
-      if (pageData.seo.canonical_url != null) pageData.seo.canonical_url = stripHtmlTags(pageData.seo.canonical_url);
+      if (pageData.seo.description != null) pageData.seo.description = stripHtmlToText(pageData.seo.description);
+      if (pageData.seo.og_title != null) pageData.seo.og_title = stripHtmlToText(pageData.seo.og_title);
+      if (pageData.seo.canonical_url != null) pageData.seo.canonical_url = stripHtmlToText(pageData.seo.canonical_url);
     }
 
     // Defensive check: ensure name is not empty after sanitization
@@ -390,15 +720,18 @@ export async function createPage(req, res) {
     let slug;
     if (pageData.slug && pageData.slug.trim()) {
       // User provided a slug, ensure it's unique
-      slug = await generateUniqueSlug(pageData.slug, (slug) => storage.exists(scope, `pages/${slug}.json`), { fallback: "page" });
+      slug = await generateUniqueSlug(pageData.slug, pageSlugTaken(storage, scope, lang), { fallback: "page" });
     } else {
       // No slug provided, generate from name
-      slug = await generateUniqueSlug(pageData.name, (slug) => storage.exists(scope, `pages/${slug}.json`));
+      slug = await generateUniqueSlug(pageData.name, pageSlugTaken(storage, scope, lang));
     }
 
+    const uuid = randomUUID();
     const newPage = {
       ...pageData, // Include all submitted data (name, seo, etc.)
-      uuid: randomUUID(), // Stable identifier that persists across renames
+      uuid, // Stable identifier that persists across renames
+      translationGroupId: uuid,
+      language: lang.language,
       id: slug,
       slug,
       widgets: {},
@@ -412,10 +745,13 @@ export async function createPage(req, res) {
       storage,
       pageId: slug,
       pageData: newPage,
+      lang,
+      assetStorage: req.adapters.assetStorage,
     });
 
     res.status(201).json(newPage);
   } catch (error) {
+    if (respondMissingMedia(res, error)) return;
     console.error("Error creating page:", error);
     res.status(500).json({ error: "Failed to create page" });
   }
@@ -433,20 +769,31 @@ export async function savePageContent(req, res) {
   try {
     const pageData = req.body; // Get all data including SEO
 
-
     // Defensive sanitization for SEO fields
     if (pageData.seo) {
-      if (pageData.seo.description != null) pageData.seo.description = stripHtmlTags(pageData.seo.description);
-      if (pageData.seo.og_title != null) pageData.seo.og_title = stripHtmlTags(pageData.seo.og_title);
-      if (pageData.seo.canonical_url != null) pageData.seo.canonical_url = stripHtmlTags(pageData.seo.canonical_url);
+      if (pageData.seo.description != null) pageData.seo.description = stripHtmlToText(pageData.seo.description);
+      if (pageData.seo.og_title != null) pageData.seo.og_title = stripHtmlToText(pageData.seo.og_title);
+      if (pageData.seo.canonical_url != null) pageData.seo.canonical_url = stripHtmlToText(pageData.seo.canonical_url);
     }
 
     const { scope } = req;
     const { storage } = req.adapters;
+    const lang = requestLanguage(req, res);
+    if (!lang) return;
 
     // Validate essential data
     if (!pageData.slug || !pageData.name || !pageData.widgets) {
       return res.status(400).json({ error: "Missing required page data (slug, name, widgets)." });
+    }
+    if (pageData.slug !== id && isReservedPageSlug(pageData.slug, lang)) return reservedPageSlug(res, pageData.slug);
+    if (pageData.slug !== id && (await storage.exists(scope, pageKey(pageData.slug, lang)))) {
+      return res.status(409).json({
+        error: "Slug already exists",
+        message: `A page with the slug "${pageData.slug}" already exists. Please choose a different slug.`,
+      });
+    }
+    if (pageData.slug !== id && (await homeSlugClash(storage, scope, pageData.slug, lang, id))) {
+      return secondHomepage(res, pageData.slug);
     }
 
     // Cap the per-page widget count before persisting. Without this an
@@ -467,11 +814,14 @@ export async function savePageContent(req, res) {
         .json({ error: `Too many widgets on this page (${widgetCount}); the maximum is ${maxWidgets}.` });
     }
 
+    const paginationError = await enforcePaginationRules({ scope, storage, widgets: pageData.widgets });
+    if (paginationError) return res.status(422).json({ error: paginationError });
+
     // Read existing data to preserve timestamps etc.
     let existingData = {};
     let loadedExisting = false;
     try {
-      const buf = await storage.read(scope, `pages/${id}.json`);
+      const buf = await storage.read(scope, pageKey(id, lang));
       if (buf != null) {
         existingData = JSON.parse(buf.toString("utf8"));
         loadedExisting = true;
@@ -494,20 +844,112 @@ export async function savePageContent(req, res) {
       created: existingData.created, // Always preserve original creation date
       updated: new Date().toISOString(), // Set new update timestamp
     };
+    updatedPageData.translationGroupId = existingData.translationGroupId || updatedPageData.uuid;
 
-    await persistPageWithMediaTracking({
-      scope,
-      storage,
-      pageId: pageData.slug,
-      pageData: updatedPageData,
-      previousPageId: id,
+    // ONE section for both writes. The anchor sweep writes other pages in this
+    // language, so leaving it outside let a language removal land between the two
+    // and the sweep then recreated a page in the language that had just gone.
+    const { usageStale, movedFrom } = await withContentWriteLock(scope.projectId, async () => {
+      const persisted = await persistPageInSection({
+        scope,
+        storage,
+        pageId: pageData.slug,
+        pageData: updatedPageData,
+        previousPageId: id,
+        lang,
+        assetStorage: req.adapters.assetStorage,
+      });
+
+      // One listing anchor per collection. Swept on save rather than when the
+      // checkbox is ticked: the editor holds the change until save, so clearing
+      // other pages earlier would strip an anchor for an edit the user then
+      // discarded. Runs after the write so the page that claimed the anchor is
+      // the one that keeps it.
+      const moved = await clearListingAnchorsElsewhere({
+        scope,
+        storage,
+        keepPageId: pageData.slug,
+        widgets: updatedPageData.widgets,
+        lang,
+      });
+      return { ...persisted, movedFrom: moved };
     });
 
-    res.json({ success: true, message: "Page saved successfully" });
+    res.json({
+      success: true,
+      message: "Page saved successfully",
+      ...(movedFrom.length ? { listingAnchorMovedFrom: movedFrom } : {}),
+      // The page is saved either way; this says only that the derived image-usage
+      // rows are behind, so the media library may label a file wrongly until a refresh.
+      ...(usageStale
+        ? { warnings: [{ code: "MEDIA_USAGE_STALE", path: pageData.slug }] }
+        : {}),
+    });
   } catch (error) {
+    if (respondMissingMedia(res, error)) return;
     console.error(`Error saving page content for ${id}:`, error);
     res.status(500).json({ error: "Failed to save page content" });
   }
+}
+
+/**
+ * Clear `listing_anchor` (and `paginate`, which needs it) on every OTHER page for the collections the just-saved
+ * page claims, so a collection has exactly one anchor. Returns the names of the
+ * pages it cleared, for the editor to report.
+ *
+ * Which collection a widget lists comes from its schema's `collection.type`, so
+ * a widget whose schema does not declare one can never hold an anchor. Each
+ * language has its own listing pages, so the sweep stays inside the language.
+ */
+async function clearListingAnchorsElsewhere({ scope, storage, keepPageId, widgets, lang }) {
+  const claimed = new Set();
+  for (const widget of Object.values(widgets || {})) {
+    if (widget?.settings?.listing_anchor && widget.type) claimed.add(widget.type);
+  }
+  if (claimed.size === 0) return [];
+
+  // Map the claimed widget types to the collections they list.
+  const claimedCollections = new Set();
+  for (const type of claimed) {
+    const collectionType = (await readWidgetSchema(storage, scope, type))?.collection?.type;
+    if (collectionType) claimedCollections.add(collectionType);
+  }
+  if (claimedCollections.size === 0) return [];
+
+  const schemaCache = new Map();
+  const collectionOf = async (type) => {
+    if (!schemaCache.has(type)) {
+      schemaCache.set(type, (await readWidgetSchema(storage, scope, type))?.collection?.type || null);
+    }
+    return schemaCache.get(type);
+  };
+
+  const cleared = [];
+  const pageFiles = await listPageFiles(storage, scope, lang);
+  for (const pageFile of pageFiles) {
+    const pageId = pageFile.replace(/\.json$/, "");
+    if (pageId === keepPageId) continue;
+
+    const buf = await storage.read(scope, pageKey(pageId, lang));
+    if (buf == null) continue;
+    const page = JSON.parse(buf.toString("utf8"));
+
+    let modified = false;
+    for (const widget of Object.values(page.widgets || {})) {
+      if (!(widget?.settings?.listing_anchor || widget?.settings?.paginate) || !widget.type) continue;
+      const collectionType = await collectionOf(widget.type);
+      if (!collectionType || !claimedCollections.has(collectionType)) continue;
+      widget.settings.listing_anchor = false;
+      widget.settings.paginate = false;
+      modified = true;
+    }
+
+    if (modified) {
+      await storage.write(scope, pageKey(pageId, lang), JSON.stringify(page, null, 2));
+      cleared.push(page.name || pageId);
+    }
+  }
+  return cleared;
 }
 
 /**
@@ -522,23 +964,25 @@ export async function duplicatePage(req, res) {
     const originalPageId = req.params.id;
     const { scope } = req;
     const { storage } = req.adapters;
+    const lang = requestLanguage(req, res);
+    if (!lang) return;
 
     // Read the original page data (missing original propagates to the 500 handler,
     // matching the pre-storage behavior of a failed filesystem read).
-    const originalBuf = await storage.read(scope, `pages/${originalPageId}.json`);
+    const originalBuf = await storage.read(scope, pageKey(originalPageId, lang));
     if (originalBuf == null) {
       throw new Error(`Original page not found: ${originalPageId}`);
     }
     const originalPageData = JSON.parse(originalBuf.toString("utf8"));
 
     // Read all existing page files to find existing copy names
-    const pageJsonFiles = (await storage.list(scope, "pages")).filter((name) => name.endsWith(".json"));
+    const pageJsonFiles = await listPageFiles(storage, scope, lang);
 
     const existingPageNames = (
       await Promise.all(
         pageJsonFiles.map(async (name) => {
           try {
-            const buf = await storage.read(scope, `pages/${name}`);
+            const buf = await storage.read(scope, pageKey(name.replace(/\.json$/, ""), lang));
             return buf == null ? null : JSON.parse(buf.toString("utf8")).name;
           } catch {
             // Skip unreadable entries rather than failing the whole duplicate:
@@ -551,12 +995,28 @@ export async function duplicatePage(req, res) {
     ).filter(Boolean);
 
     const newName = generateCopyName(originalPageData.name, existingPageNames);
-    const newSlug = await generateUniqueSlug(newName, (slug) => storage.exists(scope, `pages/${slug}.json`));
+    const newSlug = await generateUniqueSlug(newName, pageSlugTaken(storage, scope, lang));
 
-    // Create the new page data
+    // A listing anchor belongs to one page per collection. Copying it would
+    // leave two pages claiming the same collection, which the save-time sweep
+    // never sees (a duplicate is written directly), so the tie-break would pick
+    // by slug rather than by what the user meant. The copy starts unclaimed.
+    const duplicatedWidgets = {};
+    for (const [widgetId, widget] of Object.entries(originalPageData.widgets || {})) {
+      duplicatedWidgets[widgetId] =
+        widget?.settings?.listing_anchor === true || widget?.settings?.paginate === true
+          ? { ...widget, settings: { ...widget.settings, listing_anchor: false, paginate: false } }
+          : widget;
+    }
+
+    // A copy is a new page in its own translation group, not a translation of the original.
+    const uuid = randomUUID();
     const newPage = {
       ...originalPageData,
-      uuid: randomUUID(), // Generate new uuid for the copy (don't inherit from original)
+      widgets: duplicatedWidgets,
+      uuid,
+      translationGroupId: uuid,
+      language: lang.language,
       id: newSlug,
       name: newName,
       slug: newSlug,
@@ -569,11 +1029,90 @@ export async function duplicatePage(req, res) {
       storage,
       pageId: newSlug,
       pageData: newPage,
+      lang,
+      assetStorage: req.adapters.assetStorage,
     });
 
     res.status(201).json(newPage);
   } catch (error) {
+    if (respondMissingMedia(res, error)) return;
     console.error("Error duplicating page:", error);
     res.status(500).json({ error: "Failed to duplicate page" });
+  }
+}
+
+/**
+ * Create this page's version in another language: the same content in the
+ * target language's folder, joined to the source's translation group. The slug
+ * is the source's unless one is given — slugs are unique per language folder,
+ * so `contact` can be the address in every language.
+ *
+ * Unlike a duplicate, a listing anchor is kept: a duplicate is a second page in
+ * the SAME language and would fight the original for the anchor, while this is
+ * that language's own listing page.
+ */
+export async function createPageLanguageVersion(req, res) {
+  try {
+    const { scope } = req;
+    const { storage } = req.adapters;
+    const sourceLang = requestLanguage(req, res);
+    if (!sourceLang) return;
+    const target = resolveTargetLanguage(req.activeProject, req.body?.targetLanguage);
+    if (target.language === sourceLang.language) {
+      return res.status(400).json({
+        error: "Same language",
+        message: "A page cannot be its own translation. Choose a different language.",
+      });
+    }
+
+    const version = await serializeTranslationOps(scope.projectId, async () => {
+      // Read inside the section: the check, the slug and the copied content must
+      // all see the same state, and a version created while this one waited has
+      // already taken the language.
+      const buf = await storage.read(scope, pageKey(req.params.id, sourceLang));
+      if (buf == null) return null;
+      const source = JSON.parse(buf.toString("utf8"));
+
+      assertHasIdentity(source, "page");
+      const groupId = groupIdOf(source);
+      assertLanguageFree(await findPageInGroup({ storage, scope, lang: target, groupId }), target.language, "page");
+
+      const desiredSlug = sanitizeSlug(req.body?.slug || "") || source.slug || req.params.id;
+      const slug = await generateUniqueSlug(desiredSlug, pageSlugTaken(storage, scope, target), { fallback: "page" });
+
+      const created = {
+        ...source,
+        // A custom canonical names the source's address; copied, it would point
+        // the new version at the other language. The new version starts with its
+        // own automatic address instead.
+        ...(source.seo ? { seo: { ...source.seo, canonical_url: "" } } : {}),
+        uuid: randomUUID(),
+        translationGroupId: groupId,
+        language: target.language,
+        id: slug,
+        slug,
+        created: new Date().toISOString(),
+        updated: new Date().toISOString(),
+      };
+      await persistPageWithMediaTracking({
+        scope,
+        storage,
+        pageId: slug,
+        pageData: created,
+        lang: target,
+        assetStorage: req.adapters.assetStorage,
+      });
+      return created;
+    });
+
+    if (!version) return res.status(404).json({ error: "Page not found" });
+    res.status(201).json(version);
+  } catch (error) {
+    if (error?.name === "TranslationError") {
+      return res.status(error.status).json({ error: "Version not created", message: error.message });
+    }
+    if (respondMissingMedia(res, error)) return;
+    console.error("Error creating a page language version:", error);
+    res.status(500).json({ error: "Failed to create the page version" });
   }
 }

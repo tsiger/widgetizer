@@ -20,15 +20,25 @@ A standalone visual style guide for the **admin/editor app chrome** — the pink
 
 The primary brand color used for interactive elements, focus states, and highlights.
 
+Class names stay `pink-*`, but Tailwind's default pink **ramp is remapped to the
+Widgetizer brand magenta (#E0006D)** via an `@theme` override in the shared
+editor-ui preset (`packages/editor-ui/src/styles/preset.css`). So `bg-pink-600`
+etc. render magenta — the hexes below are the remapped values, not Tailwind's
+defaults. A handful of components carry the same magenta as literal hex where
+they can't use utilities (CodeInput/RangeInput/RichTextInput, previewRuntime).
+
 | Token      | Hex     | Usage                                               |
 | ---------- | ------- | --------------------------------------------------- |
-| `pink-50`  | #fdf2f8 | Selected row backgrounds, error message backgrounds |
-| `pink-100` | #fce7f3 | Primary badge backgrounds                           |
-| `pink-200` | #fbcfe8 | Primary badge borders                               |
-| `pink-500` | #ec4899 | Icons, links, focus rings, checkmarks               |
-| `pink-600` | #db2777 | Primary buttons, active sidebar items               |
-| `pink-700` | #be185d | Button hover states, link hovers                    |
-| `pink-800` | #9d174d | Button active/pressed states                        |
+| `pink-50`  | #fff0f8 | Selected row backgrounds, error message backgrounds |
+| `pink-100` | #ffd6eb | Primary badge backgrounds                           |
+| `pink-200` | #ffa3d3 | Primary badge borders                               |
+| `pink-500` | #e0006d | Icons, links, focus rings, checkmarks               |
+| `pink-600` | #e0006d | Primary buttons, active sidebar items               |
+| `pink-700` | #c0005a | Button hover states, link hovers                    |
+| `pink-800` | #99004f | Button active/pressed states                        |
+
+`pink-500` and `pink-600` are deliberately the same brand magenta, so a primary
+rendered with either stop is #E0006D and its hover one stop darker.
 
 ### Neutral — Slate
 
@@ -292,6 +302,20 @@ Used on buttons to create a subtle "lift" effect on hover.
 ```
 
 > In the React editor, prefer the `<Button>` component (`packages/editor-ui/src/components/ui/Button.jsx`) over hand-rolled classes — it owns these `variant` / `size` maps. See [Implementation in this repo](#implementation-in-this-repo).
+
+#### Split Button
+
+`<SplitButton primary={…} items={[…]} menuLabel="…" />`
+(`components/ui/SplitButton.jsx`, exported from the package) is a primary action
+plus a caret menu of secondary actions. It is presentational: the caller supplies
+labels, icons, handlers and `disabled`/`destructive` flags. With no `items` it
+renders the primary alone. The primary uses the primary-button tone
+(`bg-pink-600`, grey when disabled, `h-9 min-w-24`); the caret greys out only when
+every item is disabled, and stays clickable. The menu follows the WAI-ARIA
+menu-button pattern (arrow keys, Home/End, Escape returns focus to the caret).
+Keep the enabled items a superset of the primary's availability, and keep `items`
+stable while the menu is open. Nothing in the OSS app uses it yet; it is there for
+embedding shells.
 
 #### Button Sizes
 
@@ -792,6 +816,11 @@ Same structure but with:
 - Icon: `text-yellow-500`
 - Confirm button: `bg-pink-600 hover:bg-pink-700`
 
+Never hand-roll these: use `ConfirmationModal` through `useConfirmationAction` or
+`useConfirm()` (see [Custom Hooks](core-hooks.md)). The component supplies the
+overlay at `z-[1100]`, `role="dialog"` + `aria-modal` labelling, focus in and back out, and
+keyboard ownership while open. Never call `window.confirm()`.
+
 ---
 
 ### Tooltips
@@ -823,12 +852,14 @@ Same structure but with:
 
 ### Loading Spinner
 
+Use `<LoadingSpinner message="…" />` (`components/ui/LoadingSpinner.jsx`). It is
+invisible for its first 200 ms (`.wz-loader-appear` in `preset.css`), so fast
+loads never flash a spinner.
+
 ```html
-<div class="p-6 text-center">
-  <div
-    class="animate-spin rounded-full h-8 w-8 border-b-2 border-pink-500 mx-auto"
-  ></div>
-  <p class="mt-2 text-slate-500">Loading...</p>
+<div class="p-6 text-center wz-loader-appear">
+  <svg class="mx-auto h-10 w-10 text-slate-400 animate-spin"><!-- circle + arc --></svg>
+  <p class="mt-2 text-sm text-slate-500">Loading...</p>
 </div>
 ```
 
@@ -1074,7 +1105,7 @@ Applied to all focusable elements via the editor's base layer (`*:focus-visible`
 *:focus-visible {
   outline: none;
   ring-width: 2px;
-  ring-color: #ec4899; /* pink-500 */
+  ring-color: #e0006d; /* pink-500 */
   ring-offset: 0;
 }
 ```

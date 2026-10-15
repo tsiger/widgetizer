@@ -11,22 +11,40 @@ import {
   renderCollectionItemPage,
   renderEnqueuedAssetTags,
   widgetSupportsTransparentHeader,
+  planPagination,
 } from "../services/renderingService.js";
 import {
   getCollectionSchema,
+  listCollectionSchemas,
   loadCollectionTemplate,
   loadCollectionItemsByUuid,
+  readCollectionItem,
 } from "../services/collectionService.js";
 import { listPagesFromDir, readGlobalWidgetFromDir, readThemeDataFromDir } from "../utils/projectContentFs.js";
+import { globalKey, pageOutputPath, itemOutputPath } from "@widgetizer/core/contentAddress";
+import { requestLanguage, withoutLanguage, projectLanguageContexts, projectLanguages } from "../utils/contentLanguage.js";
 import { getProjectFolderName } from "../utils/projectHelpers.js";
-import { updateGlobalWidgetMediaUsage } from "../services/mediaUsageService.js";
+import { updateGlobalWidgetMediaUsage, extractMediaPathsFromGlobalWidget } from "../services/mediaUsageService.js";
+import {
+  withContentWriteLock,
+  assertIntroducedMediaExists,
+  assertLanguageStillEnabled,
+} from "../services/contentCoordination.js";
 import { isProjectResolutionError } from "../utils/projectErrors.js";
 import { generateToken, getToken } from "../services/previewTokenStore.js";
+import { LANGUAGE_CODE_RE, DEFAULT_LANGUAGE } from "@widgetizer/core/languages";
 
-// Inject the runtime script and base tag into rendered HTML
-function injectRuntimeScript(html, previewMode = "editor") {
+// Inject the runtime script and base tag into rendered HTML. The site's
+// languages travel with it: a preview renders at the root, so a link reads as
+// `el/contact.html`, and only the enabled codes tell that apart from a
+// collection whose prefix happens to look like one.
+export function injectRuntimeScript(html, previewMode = "editor", collectionPrefixes = [], site = {}) {
   const safeMode = previewMode === "standalone" ? "standalone" : "editor";
-  const script = `<script src="/runtime/previewRuntime.js" type="module" data-preview-mode="${safeMode}"></script>`;
+  const prefixes = collectionPrefixes.filter((prefix) => /^[a-z0-9-]+$/.test(prefix)).join(",");
+  const codes = (code) => LANGUAGE_CODE_RE.test(code || "");
+  const languages = (site.languages || []).filter(codes).join(",");
+  const defaultLanguage = codes(site.defaultLanguage) ? site.defaultLanguage : DEFAULT_LANGUAGE;
+  const script = `<script src="/runtime/previewRuntime.js" type="module" data-preview-mode="${safeMode}" data-collection-prefixes="${prefixes}" data-languages="${languages}" data-default-language="${defaultLanguage}"></script>`;
   html = html.replace(/<\/body>/i, `${script}\n</body>`);
 
   // Editor mode: inject designMode flag in <head> so it's available before
@@ -56,6 +74,12 @@ function collectionDepsFromReq(req) {
   return storage && scope ? { storage, scope } : null;
 }
 
+async function itemPagePrefixes(collectionDeps) {
+  if (!collectionDeps) return [];
+  const schemas = await listCollectionSchemas(collectionDeps.storage, collectionDeps.scope);
+  return schemas.filter((schema) => schema.hasItemPages).map((schema) => schema.slugPrefix);
+}
+
 
 /**
  * Core rendering logic for preview HTML generation.
@@ -65,7 +89,8 @@ function collectionDepsFromReq(req) {
  * @param {string} previewMode - "editor" or "standalone"
  * @returns {Promise<string>} Rendered HTML string
  */
-async function generatePreviewHtml(pageData, rawThemeSettings, previewMode, collectionDeps = null) {
+async function generatePreviewHtml(pageData, rawThemeSettings, previewMode, collectionDeps = null, pageNumber = 1) {
+  if (collectionDeps) collectionDeps = { ...collectionDeps, snapshot: new Map() };
   const activeProjectId = projectRepo.getActiveProjectId();
 
   if (!activeProjectId) {
@@ -76,6 +101,8 @@ async function generatePreviewHtml(pageData, rawThemeSettings, previewMode, coll
   // Origin-relative asset/media URLs (see injectBaseTag). The serving origin is
   // the render document's own; no SERVER_URL/port dependency.
   const apiUrl = "";
+  const project = projectRepo.getProjectById(activeProjectId);
+  const { defaultLanguage } = projectLanguages(project);
   const sharedGlobals = {
     projectId: activeProjectId,
     apiUrl,
@@ -83,8 +110,26 @@ async function generatePreviewHtml(pageData, rawThemeSettings, previewMode, coll
     themeSettingsRaw: rawThemeSettings,
     enqueuedStyles: new Map(),
     enqueuedScripts: new Map(),
-    currentCanonicalPath: `${pageData.slug || ""}.html`,
+    // The file path of the page being previewed, language folder included:
+    // breadcrumbs find a page by rebuilding it, and a slug alone is no longer
+    // unique across languages. Always page ONE, as export does — a page is
+    // listed under its first copy's path, and the numbered crumb comes from
+    // `paginationPlan.current`.
+    currentCanonicalPath: pageOutputPath(pageData.slug || "", 1, {
+      language: pageData.language,
+      defaultLanguage,
+    }),
+    currentPageData: pageData,
   };
+
+  const pagination = await planPagination(
+    activeProjectId,
+    pageData.widgets,
+    pageData.widgetsOrder,
+    { pageSlug: pageData.slug, currentPage: pageNumber, language: pageData.language },
+    collectionDeps,
+  );
+  if (pagination) sharedGlobals.paginationPlan = pagination;
 
   let headerContent = "";
   let mainContent = "";
@@ -221,7 +266,7 @@ async function generatePreviewHtml(pageData, rawThemeSettings, previewMode, coll
   );
 
   renderedHtml = injectBaseTag(renderedHtml);
-  renderedHtml = injectRuntimeScript(renderedHtml, previewMode);
+  renderedHtml = injectRuntimeScript(renderedHtml, previewMode, await itemPagePrefixes(collectionDeps), projectLanguages(project));
 
   return renderedHtml;
 }
@@ -234,8 +279,14 @@ async function generatePreviewHtml(pageData, rawThemeSettings, previewMode, coll
  */
 export async function generatePreview(req, res) {
   try {
-    const { pageData, themeSettings: rawThemeSettings, previewMode } = req.body;
-    const html = await generatePreviewHtml(pageData, rawThemeSettings, previewMode, collectionDepsFromReq(req));
+    const { pageData, themeSettings: rawThemeSettings, previewMode, pageNumber } = req.body;
+    const html = await generatePreviewHtml(
+      pageData,
+      rawThemeSettings,
+      previewMode,
+      collectionDepsFromReq(req),
+      Number(pageNumber) || 1,
+    );
     res.send(html);
   } catch (error) {
     console.error("Error generating preview:", error);
@@ -255,8 +306,14 @@ export async function generatePreview(req, res) {
  */
 export async function createPreviewToken(req, res) {
   try {
-    const { pageData, themeSettings: rawThemeSettings, previewMode } = req.body;
-    const html = await generatePreviewHtml(pageData, rawThemeSettings, previewMode, collectionDepsFromReq(req));
+    const { pageData, themeSettings: rawThemeSettings, previewMode, pageNumber } = req.body;
+    const html = await generatePreviewHtml(
+      pageData,
+      rawThemeSettings,
+      previewMode,
+      collectionDepsFromReq(req),
+      Number(pageNumber) || 1,
+    );
     const token = generateToken(html);
     res.json({ token });
   } catch (error) {
@@ -316,6 +373,11 @@ export async function createCollectionPreviewToken(req, res) {
       return res.status(400).json({ error: "collectionType is required" });
     }
 
+    // Which language's item page this is — it names the folder the rendered
+    // page would live in, which is what its links are resolved against.
+    const lang = requestLanguage(req, res);
+    if (!lang) return;
+
     // Schema must exist; template is required to render an item page.
     const schema = await getCollectionSchema(storage, scope, collectionType);
     if (!schema) {
@@ -338,29 +400,43 @@ export async function createCollectionPreviewToken(req, res) {
 
     const projectDir = getProjectDir(folder);
     const rawThemeSettings = await readThemeDataFromDir(projectDir);
-    const headerData = await readGlobalWidgetFromDir(projectDir, "header");
-    const footerData = await readGlobalWidgetFromDir(projectDir, "footer");
+    const headerData = await readGlobalWidgetFromDir(projectDir, "header", lang);
+    const footerData = await readGlobalWidgetFromDir(projectDir, "footer", lang);
 
     // uuid -> page map so pageUuid links inside the item resolve to slugs.
     // listPagesFromDir reads <projectDir>/pages — projectDir is the working dir
     // resolved from the FOLDER name (not the UUID), matching the export path.
-    const pages = await listPagesFromDir(projectDir);
+    const pages = await listPagesFromDir(projectDir, { defaultLanguage: projectData.defaultLanguage });
     const pagesByUuid = new Map();
     for (const page of pages || []) {
       if (page.uuid) pagesByUuid.set(page.uuid, page);
     }
     // Stable collection-item refs for resolving `menu`/`link`-type item settings
     // that target another item. Menu maps are loaded lazily inside the render.
-    const collectionItemsByUuid = await loadCollectionItemsByUuid(storage, scope);
+    const collectionItemsByUuid = await loadCollectionItemsByUuid(
+      storage,
+      scope,
+      null,
+      projectLanguageContexts(projectData),
+    );
 
     // Assemble the item to render from the posted settings (the navigable preview
     // passes the saved item's settings).
     const safeSlug = (slug && String(slug)) || "preview";
     const now = new Date().toISOString();
+    // The posted settings are what gets rendered, but the identity comes from
+    // the saved item: without it the item is in no translation group, and the
+    // switcher falls every language back to a homepage. An item that has never
+    // been saved simply has none.
+    const saved = await readCollectionItem(storage, scope, collectionType, safeSlug, lang).catch(() => null);
     const previewItem = {
       id: safeSlug,
-      uuid: "preview",
+      uuid: saved?.uuid || "preview",
+      ...(saved?.translationGroupId ? { translationGroupId: saved.translationGroupId } : {}),
       slug: safeSlug,
+      // What the item page is rendered AS: its own links, its media metadata and
+      // its breadcrumbs are all resolved from it.
+      language: lang.language,
       schemaVersion: schema.schemaVersion,
       created: now,
       updated: now,
@@ -381,7 +457,10 @@ export async function createCollectionPreviewToken(req, res) {
       pagesByUuid,
       collectionItemsByUuid,
       outputPathPrefix: "",
-      currentCanonicalPath: `${schema.slugPrefix}/${safeSlug}.html`,
+      currentCanonicalPath: itemOutputPath(schema.slugPrefix, safeSlug, {
+        language: lang.language,
+        defaultLanguage: lang.defaultLanguage,
+      }),
     };
 
     // One shared pipeline renders the item page — header/footer + resolved item +
@@ -404,7 +483,7 @@ export async function createCollectionPreviewToken(req, res) {
     );
 
     html = injectBaseTag(html);
-    html = injectRuntimeScript(html, "standalone");
+    html = injectRuntimeScript(html, "standalone", await itemPagePrefixes(collectionDeps), projectLanguages(req.activeProject));
 
     const token = generateToken(html);
     res.json({ token });
@@ -425,20 +504,53 @@ export async function createCollectionPreviewToken(req, res) {
  */
 export async function renderSingleWidget(req, res) {
   try {
-    const { widgetId, widget, themeSettings: rawThemeSettings, currentCanonicalPath } = req.body; // Expect themeSettings too
+    const { widgetId, widget, themeSettings: rawThemeSettings, currentCanonicalPath, page } = req.body; // Expect themeSettings too
     const activeProjectId = req.activeProject.id;
+    const isPlainObject = (value) => !!value && typeof value === "object" && !Array.isArray(value);
+    const currentPage = isPlainObject(page) ? page : null;
+
+    const morphLanguage = currentPage?.language || "";
+    const { defaultLanguage } = projectLanguages(req.activeProject);
 
     // Provide sharedGlobals so we can read back enqueued assets after render.
     // currentCanonicalPath flows from the morph request so a menu-bearing widget
-    // (header/footer) keeps its active-state on live edits (D3).
+    // (header/footer) keeps its active-state on live edits (D3) — rebuilt here
+    // when the page is known, because the client sends a bare slug and a menu
+    // matches a page by the path it is PUBLISHED at, language folder included.
     const sharedGlobals = {
       renderMode: "preview",
       enqueuedStyles: new Map(),
       enqueuedScripts: new Map(),
-      currentCanonicalPath: typeof currentCanonicalPath === "string" ? currentCanonicalPath : "",
+      currentCanonicalPath: currentPage?.slug
+        ? pageOutputPath(currentPage.slug, 1, { language: morphLanguage, defaultLanguage })
+        : typeof currentCanonicalPath === "string"
+          ? currentCanonicalPath
+          : "",
+      ...(currentPage ? { currentPageData: currentPage } : {}),
     };
 
-    const renderedWidget = await renderWidget(activeProjectId, widgetId, widget, rawThemeSettings || {}, "preview", sharedGlobals, null, collectionDepsFromReq(req));
+    const collectionDeps = collectionDepsFromReq(req);
+    const renderDeps = collectionDeps && { ...collectionDeps, snapshot: new Map() };
+    // The slug, not the published path: the path now carries a language folder,
+    // and the "no slash" test below is here to exclude ITEM pages.
+    const pageSlug = currentPage?.slug || sharedGlobals.currentCanonicalPath.replace(/\.html$/, "");
+    if (pageSlug && !pageSlug.includes("/")) {
+      // Plan from the whole page, not just this widget: a morphed header or
+      // footer would otherwise lose the `page.pagination` the full render gave it.
+      const pageWidgets = isPlainObject(currentPage?.widgets) ? currentPage.widgets : {};
+      const widgets = { ...pageWidgets, [widgetId]: widget };
+      const widgetsOrder = currentPage ? currentPage.widgetsOrder : [widgetId];
+      const pagination = await planPagination(
+        activeProjectId,
+        widgets,
+        widgetsOrder,
+        { pageSlug, language: morphLanguage },
+        renderDeps,
+      );
+      if (pagination) sharedGlobals.paginationPlan = pagination;
+    }
+
+    const renderedWidget = await renderWidget(activeProjectId, widgetId, widget, rawThemeSettings || {}, "preview", sharedGlobals, null, renderDeps);
 
     // Append enqueued asset tags so the preview runtime can load them on morph
     const assetTags = renderEnqueuedAssetTags(sharedGlobals);
@@ -468,12 +580,14 @@ export async function getGlobalWidgets(req, res) {
   try {
     const { scope } = req;
     const { storage } = req.adapters;
+    const lang = requestLanguage(req, res);
+    if (!lang) return;
     // Global widgets *data* is stored in pages/global, not widgets/global
 
     // Read header.json and footer.json
     const globalWidgets = {};
 
-    const headerBuf = await storage.read(scope, "pages/global/header.json");
+    const headerBuf = await storage.read(scope, globalKey("header", lang));
     if (headerBuf != null) {
       try {
         globalWidgets.header = JSON.parse(headerBuf.toString("utf8"));
@@ -486,7 +600,7 @@ export async function getGlobalWidgets(req, res) {
       globalWidgets.header = null;
     }
 
-    const footerBuf = await storage.read(scope, "pages/global/footer.json");
+    const footerBuf = await storage.read(scope, globalKey("footer", lang));
     if (footerBuf != null) {
       try {
         globalWidgets.footer = JSON.parse(footerBuf.toString("utf8"));
@@ -531,20 +645,60 @@ export async function saveGlobalWidget(req, res) {
 
     const { scope } = req;
     const { storage } = req.adapters;
+    const lang = requestLanguage(req, res);
+    if (!lang) return;
 
-    // Save the widget — storage.write creates parent directories as needed.
-    await storage.write(scope, `pages/global/${type}.json`, JSON.stringify(widgetData, null, 2));
+    // The write and its usage sync are one media section, so media deletion — which
+    // verifies and deletes in the same section — cannot run between them and read
+    // this header as not yet using an image it is about to. See contentCoordination.
+    const { usageStale } = await withContentWriteLock(scope.projectId, async () => {
+      // A header or footer belongs to one language's folder, so a removed language
+      // must not get its globals back from a save that was already queued.
+      assertLanguageStillEnabled(scope.projectId, lang);
 
-    // Update media usage
-    try {
-      await updateGlobalWidgetMediaUsage(scope.projectId, `global:${type}`, widgetData);
-    } catch (usageError) {
-      console.error("Error updating media usage for global widget:", usageError);
-      // Don't fail the save if usage update fails, but log it
-    }
+      // Don't let a save queued behind a delete introduce a reference to the file
+      // that delete just removed. Only newly added paths are checked.
+      let previousPaths = [];
+      try {
+        const buf = await storage.read(scope, globalKey(type, lang));
+        if (buf != null) previousPaths = extractMediaPathsFromGlobalWidget(JSON.parse(buf.toString("utf8")));
+      } catch {
+        // First save of this global, or unreadable: nothing known to be pre-existing.
+      }
+      await assertIntroducedMediaExists({
+        assetStorage: req.adapters.assetStorage,
+        scope,
+        previousPaths,
+        nextPaths: extractMediaPathsFromGlobalWidget(widgetData),
+      });
 
-    res.json({ success: true, data: widgetData });
+      // Save the widget — storage.write creates parent directories as needed.
+      await storage.write(scope, globalKey(type, lang), JSON.stringify(withoutLanguage(widgetData), null, 2));
+
+      // Update media usage
+      try {
+        await updateGlobalWidgetMediaUsage(scope.projectId, type, widgetData, lang);
+        return { usageStale: false };
+      } catch (usageError) {
+        console.error("Error updating media usage for global widget:", usageError);
+        // Don't fail the save if usage update fails — the widget IS saved. Report it
+        // as a warning instead, so "saved" and "image tracking is behind" stay distinct.
+        return { usageStale: true };
+      }
+    });
+
+    res.json({
+      success: true,
+      data: widgetData,
+      ...(usageStale ? { warnings: [{ code: "MEDIA_USAGE_STALE", path: `global:${type}` }] } : {}),
+    });
   } catch (error) {
+    if (error?.code === "LANGUAGE_REMOVED") {
+      return res.status(error.statusCode).json({ error: "Language removed", message: error.message, code: error.code, language: error.language });
+    }
+    if (error?.code === "MEDIA_REFERENCE_MISSING") {
+      return res.status(error.statusCode).json({ error: "Missing media", message: error.message, code: error.code });
+    }
     console.error("Error saving global widget:", error);
     if (isProjectResolutionError(error)) {
       return res.status(404).json({ error: "Project not found", message: error.message });

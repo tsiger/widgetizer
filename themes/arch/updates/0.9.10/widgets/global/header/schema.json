@@ -1,0 +1,224 @@
+{
+  "type": "header",
+  "displayName": "tTheme:header.name",
+  "settings": [
+    {
+      "type": "header",
+      "id": "logo_header",
+      "label": "tTheme:header.settings.logo_header.label"
+    },
+    {
+      "type": "image",
+      "id": "logoImage",
+      "label": "tTheme:header.settings.logoImage.label",
+      "description": "tTheme:header.settings.logoImage.description"
+    },
+    {
+      "type": "range",
+      "id": "logoMaxWidth",
+      "label": "tTheme:header.settings.logoMaxWidth.label",
+      "description": "tTheme:header.settings.logoMaxWidth.description",
+      "default": 150,
+      "min": 50,
+      "max": 300,
+      "step": 10,
+      "unit": "px"
+    },
+    {
+      "type": "text",
+      "id": "logoText",
+      "label": "tTheme:header.settings.logoText.label",
+      "description": "tTheme:header.settings.logoText.description",
+      "default": "Arch"
+    },
+    {
+      "type": "header",
+      "id": "contact_header",
+      "label": "tTheme:header.settings.contact_header.label"
+    },
+    {
+      "type": "text",
+      "id": "contactDetailsLine1",
+      "label": "tTheme:header.settings.contactDetailsLine1.label",
+      "description": "tTheme:header.settings.contactDetailsLine1.description",
+      "default": "Call us: (555) 203-9844"
+    },
+    {
+      "type": "text",
+      "id": "contactDetailsLine2",
+      "label": "tTheme:header.settings.contactDetailsLine2.label",
+      "description": "tTheme:header.settings.contactDetailsLine2.description",
+      "default": "1450 Market St, Suite 200"
+    },
+    {
+      "type": "select",
+      "id": "contact_position",
+      "label": "tTheme:header.settings.contact_position.label",
+      "default": "logo",
+      "options": [
+        {
+          "value": "logo",
+          "label": "tTheme:header.settings.contact_position.options.logo"
+        },
+        {
+          "value": "menu",
+          "label": "tTheme:header.settings.contact_position.options.menu"
+        }
+      ]
+    },
+    {
+      "type": "header",
+      "id": "navigation_header",
+      "label": "tTheme:header.settings.navigation_header.label"
+    },
+    {
+      "type": "menu",
+      "id": "headerNavigation",
+      "label": "tTheme:header.settings.headerNavigation.label",
+      "description": "tTheme:header.settings.headerNavigation.description",
+      "default": "main-menu"
+    },
+    {
+      "type": "checkbox",
+      "id": "center_nav",
+      "label": "tTheme:header.settings.center_nav.label",
+      "description": "tTheme:header.settings.center_nav.description",
+      "default": false
+    },
+    {
+      "type": "link",
+      "id": "ctaButtonLink",
+      "label": "tTheme:header.settings.ctaButtonLink.label",
+      "description": "tTheme:header.settings.ctaButtonLink.description",
+      "default": {
+        "href": "contact.html",
+        "text": "Get in touch",
+        "target": "_self"
+      }
+    },
+    {
+      "type": "select",
+      "id": "ctaButtonStyle",
+      "label": "tTheme:header.settings.ctaButtonStyle.label",
+      "default": "secondary",
+      "options": [
+        {
+          "value": "primary",
+          "label": "tTheme:header.settings.ctaButtonStyle.options.primary"
+        },
+        {
+          "value": "secondary",
+          "label": "tTheme:header.settings.ctaButtonStyle.options.secondary"
+        }
+      ]
+    },
+    {
+      "type": "header",
+      "id": "languages_header",
+      "label": "tTheme:header.settings.languages_header.label"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_language_switcher",
+      "label": "tTheme:header.settings.show_language_switcher.label",
+      "description": "tTheme:header.settings.show_language_switcher.description",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "language_switcher_label",
+      "label": "tTheme:header.settings.language_switcher_label.label",
+      "description": "tTheme:header.settings.language_switcher_label.description",
+      "default": "Languages"
+    },
+    {
+      "type": "header",
+      "id": "labels_header",
+      "label": "tTheme:header.settings.labels_header.label"
+    },
+    {
+      "type": "text",
+      "id": "skip_link_text",
+      "label": "tTheme:header.settings.skip_link_text.label",
+      "description": "tTheme:header.settings.skip_link_text.description",
+      "default": "Skip to main content"
+    },
+    {
+      "type": "text",
+      "id": "nav_label",
+      "label": "tTheme:header.settings.nav_label.label",
+      "description": "tTheme:header.settings.nav_label.description",
+      "default": "Primary"
+    },
+    {
+      "type": "text",
+      "id": "menu_title",
+      "label": "tTheme:header.settings.menu_title.label",
+      "description": "tTheme:header.settings.menu_title.description",
+      "default": "Menu"
+    },
+    {
+      "type": "text",
+      "id": "menu_close_label",
+      "label": "tTheme:header.settings.menu_close_label.label",
+      "description": "tTheme:header.settings.menu_close_label.description",
+      "default": "Close menu"
+    },
+    {
+      "type": "header",
+      "id": "display_header",
+      "label": "tTheme:global.widgets.settings.display_header.label"
+    },
+    {
+      "type": "checkbox",
+      "id": "full_width",
+      "label": "tTheme:header.settings.full_width.label",
+      "description": "tTheme:header.settings.full_width.description",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "sticky",
+      "label": "tTheme:header.settings.sticky.label",
+      "description": "tTheme:header.settings.sticky.description",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "transparent_on_hero",
+      "label": "tTheme:header.settings.transparent_on_hero.label",
+      "description": "tTheme:header.settings.transparent_on_hero.description",
+      "default": false
+    },
+    {
+      "type": "image",
+      "id": "transparent_logo",
+      "label": "tTheme:header.settings.transparent_logo.label",
+      "description": "tTheme:header.settings.transparent_logo.description"
+    },
+    {
+      "type": "select",
+      "id": "color_scheme",
+      "label": "tTheme:global.widgets.settings.color_scheme.label",
+      "default": "standard-primary",
+      "options": [
+        {
+          "value": "standard-primary",
+          "label": "tTheme:global.widgets.settings.color_scheme.options.standard_primary"
+        },
+        {
+          "value": "standard-secondary",
+          "label": "tTheme:global.widgets.settings.color_scheme.options.standard_secondary"
+        },
+        {
+          "value": "highlight-primary",
+          "label": "tTheme:global.widgets.settings.color_scheme.options.highlight_primary"
+        },
+        {
+          "value": "highlight-secondary",
+          "label": "tTheme:global.widgets.settings.color_scheme.options.highlight_secondary"
+        }
+      ]
+    }
+  ]
+}

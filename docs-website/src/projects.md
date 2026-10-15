@@ -65,7 +65,38 @@ For the built-in library, many starter cards are presets of the default **Arch**
 - **Folder Name**: The folder where your project files are stored (can be changed independently of the title)
 - **Notes**: Personal notes about your project
 - **Website Address**: The base URL for your site
+- **Site identity** and **Business details**: Who is behind the site and where to find you (see below)
 - **Theme**: Cannot be changed after creation
+
+# Site Identity and Business Details
+
+When you edit a project, two more sections describe who is behind the site. Search engines like Google read these details, and your theme can show them on the site, for example in the footer. They only appear when editing a project, not when creating one.
+
+### What Google Can Read
+
+At the top of **Site identity**, a line shows which details Google can already read, such as *"Google can read your details: website address ✓, name ✓, logo missing"*. Click a missing item to jump to the field that fixes it. Search engines need your **Website Address** before they can read any of it.
+
+### Site Identity
+
+- **What best describes you?**: Choose Organization, Person, or the closest kind of local business (restaurant, hotel, dental practice, and so on). A local business also gets the **Business details** section.
+- **Public name**: The name people know you by. Leave it empty to use the Site Title.
+- **Logo**: A logo for search engines and your theme, separate from the Site Icon. If a Site Icon is set, **Use the Site Icon** fills it in for you. You can only choose or upload a logo while this project is the active project. For other projects the field shows the current logo and a **Remove logo** button.
+- **Email** and **Short description**: One or two sentences about what you do.
+- **Social profiles**: The full address of each profile, such as `https://instagram.com/yourname`.
+
+### Business Details
+
+- **Phone** and **Price range** (optional, e.g. `€€` or `$10–30`)
+- **Location name**: Only if this location goes by a different name than the public name
+- **Street address**, **City**, **Region or state**, **Postal code**
+- **Country code**: Two letters, e.g. `GR`, `US` or `DE`
+- **Opening hours**: Set each day to **Open**, **Closed**, or **Not stated**. Use **Add hours** for a split shift, such as 09:00–13:00 and 17:00–21:00.
+
+If a value can't be used (an email without `@`, a profile address without `https://`), Widgetizer marks the field and doesn't save until you fix it.
+
+> **Tip:** Social profiles you add here replace the social links in your theme settings wherever the Arch theme shows social icons. If you add none, the theme settings are used as before.
+
+Duplicating, backing up and importing a project keeps these details, logo included.
 
 # Setting the Active Project
 

@@ -18,6 +18,8 @@ export default {
     // @widgetizer/core and ride along via that dependency.
     "themes",
     "!themes/widgetizer/**",
+    // Local scratch themes (gitignored) must never ride along into an installer.
+    "!themes/__*/**",
     "electron",
     "package.json",
   ],
@@ -25,6 +27,7 @@ export default {
   asarUnpack: [
     "themes/**",
     "!themes/widgetizer/**",
+    "!themes/__*/**",
     "dist/**",
     // Core placeholder SVGs are served via res.sendFile, which needs real files
     // on disk (not inside the asar).
@@ -57,6 +60,15 @@ export default {
     entitlementsInherit: "electron/entitlements.mac.plist",
   },
   afterSign: "electron/notarize.cjs",
+  linux: {
+    maintainer: "Widgetizer <hello@widgetizer.org>",
+    // The build script selects one architecture after preparing its native libs.
+    target: ["deb"],
+    artifactName: "Widgetizer-${version}-${arch}.${ext}",
+    category: "Development",
+    icon: "electron/resources/icon.icns",
+    desktop: { entry: { Name: "Widgetizer Desktop" } },
+  },
   publish: {
     provider: "github",
     owner: "tsiger",

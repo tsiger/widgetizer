@@ -104,6 +104,61 @@ describe("themeManager saveThemeSettings", () => {
   });
 });
 
+describe("themeManager saveThemeSettingChanges", () => {
+  let apiFetchJson;
+  const changes = [{ group: "colors", id: "accent", baseValue: "#f00", value: "#00f" }];
+  const draft = { version: "1.0.0", settings: { global: {} } };
+
+  beforeEach(async () => {
+    vi.resetModules();
+    ({ apiFetchJson } = await import("../../lib/apiFetch"));
+    apiFetchJson.mockReset();
+  });
+
+  it("PATCHes only the changes and returns the saved file with normalized warnings", async () => {
+    const saved = { version: "1.0.0", settings: { global: {} } };
+    apiFetchJson.mockResolvedValueOnce({ theme: saved, warnings: [{ code: "MEDIA_USAGE_STALE" }] });
+
+    const { saveThemeSettingChanges } = await import("../themeManager");
+    const result = await saveThemeSettingChanges("project-1", changes, draft);
+
+    expect(apiFetchJson).toHaveBeenCalledWith(
+      "/api/themes/project/project-1",
+      expect.objectContaining({ method: "PATCH", body: JSON.stringify({ changes }) }),
+      expect.any(Object),
+    );
+    expect(result).toEqual({ theme: saved, warnings: [{ code: "MEDIA_USAGE_STALE" }] });
+  });
+
+  it("falls back to the whole-file POST on a 404 without a code", async () => {
+    apiFetchJson
+      .mockRejectedValueOnce({ name: "ApiError", status: 404, data: "Cannot PATCH" })
+      .mockResolvedValueOnce({ message: "saved", warnings: ["\"Accent\" contained an invalid value and was reset."] });
+
+    const { saveThemeSettingChanges } = await import("../themeManager");
+    const result = await saveThemeSettingChanges("project-1", changes, draft);
+
+    expect(apiFetchJson.mock.calls[1][1]).toMatchObject({ method: "POST", body: JSON.stringify(draft) });
+    expect(result).toEqual({
+      theme: null,
+      warnings: [{ code: "VALUE_CORRECTED", message: "\"Accent\" contained an invalid value and was reset." }],
+    });
+  });
+
+  it("does not fall back on a coded 404 or on any other error", async () => {
+    const { saveThemeSettingChanges } = await import("../themeManager");
+    for (const error of [
+      { name: "ApiError", status: 404, code: "THEME_SETTINGS_NOT_FOUND" },
+      { name: "ApiError", status: 409, code: "THEME_SETTINGS_CHANGED" },
+      { name: "ApiError", status: 500 },
+    ]) {
+      apiFetchJson.mockReset().mockRejectedValueOnce(error);
+      await expect(saveThemeSettingChanges("project-1", changes, draft)).rejects.toMatchObject(error);
+      expect(apiFetchJson).toHaveBeenCalledTimes(1);
+    }
+  });
+});
+
 // ---------------------------------------------------------------------------
 // getAllThemes caching
 // ---------------------------------------------------------------------------

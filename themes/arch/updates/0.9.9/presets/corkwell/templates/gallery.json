@@ -1,0 +1,176 @@
+{
+  "name": "Gallery",
+  "slug": "gallery",
+  "widgets": {
+    "hero": {
+      "type": "banner",
+      "settings": {
+        "height": "small",
+        "alignment": "center",
+        "overlay_color": "#151e22cc",
+        "color_scheme": "highlight-primary",
+        "fullwidth": true,
+        "top_spacing": "auto",
+        "image": "/uploads/images/gallery-hero.webp"
+      },
+      "blocks": {
+        "hero-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Gallery",
+            "size": "5xl"
+          }
+        },
+        "hero-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>The space, the drinks, the people.</p>",
+            "size": "lg"
+          }
+        }
+      },
+      "blocksOrder": [
+        "hero-heading",
+        "hero-text"
+      ]
+    },
+    "drinks_gallery": {
+      "type": "gallery",
+      "settings": {
+        "eyebrow": "The Drinks",
+        "title": "What We Pour",
+        "heading_alignment": "center",
+        "layout": "carousel",
+        "columns_desktop": 3,
+        "aspect_ratio": "1 / 1",
+        "staggered": false,
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "drink-1": {
+          "type": "image",
+          "settings": {
+            "caption": "Corkwell Negroni",
+            "image": "/uploads/images/drinks-negroni.webp"
+          }
+        },
+        "drink-2": {
+          "type": "image",
+          "settings": {
+            "caption": "Orange wine, skin-contact",
+            "image": "/uploads/images/drinks-wine-glass.webp"
+          }
+        },
+        "drink-3": {
+          "type": "image",
+          "settings": {
+            "caption": "Dirty martini",
+            "image": "/uploads/images/drinks-martini.webp"
+          }
+        },
+        "drink-4": {
+          "type": "image",
+          "settings": {
+            "caption": "Smoked old fashioned",
+            "image": "/uploads/images/drinks-old-fashioned.webp"
+          }
+        },
+        "drink-5": {
+          "type": "image",
+          "settings": {
+            "caption": "Aperol spritz",
+            "image": "/uploads/images/drinks-spritz.webp"
+          }
+        },
+        "drink-6": {
+          "type": "image",
+          "settings": {
+            "caption": "Garden highball",
+            "image": "/uploads/images/drinks-highball.webp"
+          }
+        }
+      },
+      "blocksOrder": [
+        "drink-1",
+        "drink-2",
+        "drink-3",
+        "drink-4",
+        "drink-5",
+        "drink-6"
+      ]
+    },
+    "space_gallery": {
+      "type": "gallery",
+      "settings": {
+        "eyebrow": "The Space",
+        "title": "Inside Corkwell",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 3,
+        "aspect_ratio": "4 / 3",
+        "staggered": true,
+        "color_scheme": "standard-secondary"
+      },
+      "blocks": {
+        "space-1": {
+          "type": "image",
+          "settings": {
+            "caption": "The bar",
+            "image": "/uploads/images/space-bar-counter.webp"
+          }
+        },
+        "space-2": {
+          "type": "image",
+          "settings": {
+            "caption": "Wine wall",
+            "image": "/uploads/images/space-wine-wall.webp"
+          }
+        },
+        "space-3": {
+          "type": "image",
+          "settings": {
+            "caption": "Table seating",
+            "image": "/uploads/images/space-seating.webp"
+          }
+        },
+        "space-4": {
+          "type": "image",
+          "settings": {
+            "caption": "Candlelight details",
+            "image": "/uploads/images/space-detail-candle.webp"
+          }
+        },
+        "space-5": {
+          "type": "image",
+          "settings": {
+            "caption": "The chalkboard",
+            "image": "/uploads/images/space-chalkboard.webp"
+          }
+        },
+        "space-6": {
+          "type": "image",
+          "settings": {
+            "caption": "The entrance",
+            "image": "/uploads/images/space-entrance.webp"
+          }
+        }
+      },
+      "blocksOrder": [
+        "space-1",
+        "space-2",
+        "space-3",
+        "space-4",
+        "space-5",
+        "space-6"
+      ]
+    }
+  },
+  "widgetsOrder": [
+    "hero",
+    "drinks_gallery",
+    "space_gallery"
+  ],
+  "id": "gallery",
+  "created": "2026-04-16T13:48:06.373Z",
+  "updated": "2026-04-16T13:56:30.521Z"
+}

@@ -126,6 +126,12 @@
           "label": "tTheme:global.widgets.settings.bottom_spacing.options.none"
         }
       ]
+    },
+    {
+      "type": "text",
+      "id": "all_positions_text",
+      "label": "tTheme:job_listing.settings.all_positions_text.label",
+      "defaultKey": "site.job_listing.all_positions"
     }
   ],
   "blocks": [

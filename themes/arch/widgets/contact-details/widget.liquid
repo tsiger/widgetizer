@@ -115,8 +115,19 @@
               <h3 class="w-title t-lg" data-setting="title">{{ block.settings.title }}</h3>
             {% endif %}
             <div class="social-links contact-details-social">
-              {% render 'social-icons', social: theme.social %}
+              {% render 'social-icons', social: theme.social, identity: project.identity %}
             </div>
+
+          {% when 'business_details' %}
+            {% if block.settings.title != blank %}
+              <h3 class="w-title t-lg" data-setting="title">{{ block.settings.title }}</h3>
+            {% endif %}
+            {% render 'business-details',
+              identity: project.identity,
+              show_address: block.settings.show_address,
+              show_contact: block.settings.show_contact,
+              show_hours: block.settings.show_hours
+            %}
           {% endcase %}
         </div>
       {% endfor %}

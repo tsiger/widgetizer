@@ -1,0 +1,23 @@
+{
+  "type": "header",
+  "settings": {
+    "logoText": "Bedrock",
+    "contactDetailsLine1": "Call us: (555) 555-0130",
+    "contactDetailsLine2": "Licensed · Bonded · Insured — Lic. #000000",
+    "contact_position": "logo",
+    "headerNavigation": "main-menu",
+    "center_nav": false,
+    "ctaButtonLink": {
+      "href": "contact.html",
+      "text": "Request a quote",
+      "target": "_self"
+    },
+    "ctaButtonStyle": "primary",
+    "full_width": true,
+    "sticky": true,
+    "transparent_on_hero": true,
+    "color_scheme": "standard-primary",
+    "transparent_logo": "/uploads/images/bedrocklogolight.png",
+    "logoImage": "/uploads/images/bedrocklogodark.png"
+  }
+}

@@ -24,6 +24,18 @@ export const THEMES_SEED_DIR = process.env.THEMES_ROOT
   ? path.resolve(process.env.THEMES_ROOT)
   : path.join(APP_ROOT, "themes");
 
+// Additional seed roots (path.delimiter-separated via THEMES_EXTRA_ROOTS).
+// Searched BEFORE THEMES_SEED_DIR: the first root containing <id>/theme.json
+// owns that theme wholesale (base + updates + presets + preset-media), letting
+// an embedding host ship extra themes or intentionally shadow a bundled one.
+export const THEMES_EXTRA_SEED_DIRS = process.env.THEMES_EXTRA_ROOTS
+  ? process.env.THEMES_EXTRA_ROOTS.split(path.delimiter)
+      .filter(Boolean)
+      .map((p) => path.resolve(p))
+  : [];
+
+export const THEMES_SEED_DIRS = [...THEMES_EXTRA_SEED_DIRS, THEMES_SEED_DIR];
+
 // Core widget definitions + Liquid snippets are read via fs during rendering,
 // so resolve the core package root to real files in both workspace dev and
 // packaged Electron.

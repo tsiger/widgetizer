@@ -11,6 +11,8 @@ Themes are structured directories that define the layout, styles, and functional
 - `theme.json`: Theme metadata and configuration.
 - `screenshot.png`: A 1280x720 preview image of the theme, displayed on the card in the Themes UI.
 
+The seed directory defaults to `themes/` (or `THEMES_ROOT` if set) but an embedding host can layer in extra seed roots via `THEMES_EXTRA_ROOTS` — multiple roots separated by the OS path-list delimiter (`path.delimiter` — `:` on macOS/Linux, `;` on Windows), e.g. `THEMES_EXTRA_ROOTS=/srv/partner-themes:/srv/client-themes`. Extra roots are searched **before** the default seed directory; the first root containing `<id>/theme.json` owns that theme wholesale (base + updates + presets + preset media). `theme.json` is required to claim ownership — a root without it for a given `<id>` is skipped. This lets an embedding host ship additional themes alongside the bundled set, or intentionally shadow a bundled theme with its own version.
+
 ### Theme Directory Structure
 
 A theme directory carries its authored content plus two system-managed areas — `updates/` (per-version partial update folders) and `latest/` (a materialized snapshot composed from the base version plus all updates in semver order). An optional `presets/` directory holds named theme variants used only at project creation:
@@ -125,12 +127,13 @@ The backend handles listing themes, processing uploads, deletion, and triggering
 | `GET` | `/api/themes/:id/presets` |  | `getThemePresets` | Gets all presets for a theme (names, descriptions, screenshots). |
 | `POST` | `/api/themes/:id/update` |  | `updateTheme` | Builds `latest/` snapshot for a single theme. |
 | `GET` | `/api/themes/project/:projectId` | `resolveActiveProject` | `getProjectThemeSettings` | Gets a project's `theme.json` settings. |
-| `POST` | `/api/themes/project/:projectId` | `resolveActiveProject` | `saveProjectThemeSettings` | Saves a project's `theme.json` settings. |
+| `POST` | `/api/themes/project/:projectId` | `resolveActiveProject` | `saveProjectThemeSettings` | Saves a whole `theme.json`. Refuses (409 `THEME_VERSION_CHANGED`, nothing written) a file whose `version` differs from the stored one. Responds `{ message, warnings? }`. |
+| `PATCH` | `/api/themes/project/:projectId` | `resolveActiveProject` | `saveProjectThemeSettingChanges` | Saves only changed settings: body `{ changes: [{ group, id, baseValue?, value? }] }`. Merges them into the stored file under the content-write section, responds `{ theme, warnings }`, and refuses the whole save (409 `THEME_SETTINGS_CHANGED` with a `conflicts` list, nothing written) when a changed setting no longer holds its `baseValue` and does not already hold the requested `value` (an identical change made elsewhere is accepted). A malformed body is a 400 `INVALID_CHANGES`; a missing file a 404 `THEME_SETTINGS_NOT_FOUND`. |
 | `GET` | `/api/themes/project/:projectId/locales/:lang` | `resolveActiveProject` | `getProjectThemeLocale` | Gets a project's theme locale strings for a language. |
 | `POST` | `/api/themes/upload` | `handleThemeUpload` | `uploadTheme` | Handles upload and extraction of a theme ZIP (new theme or updates). |
 | `DELETE` | `/api/themes/:id` |  | `deleteTheme` | Deletes a theme. Returns 409 if theme is used by any project. |
 
-The router also applies `standardJsonParser` to all theme routes.
+The router also applies `standardJsonParser` to all theme routes, and every `/:id` route validates the id as a single path segment (`segmentParam("id")`) before it reaches the controller.
 
 ### Controller Logic (`packages/builder-server/src/controllers/themeController.js`)
 
@@ -143,7 +146,7 @@ The router also applies `standardJsonParser` to all theme routes.
   - `author`, `description`, `widgets`: Standard metadata
   - `presets`: Number of presets available (from `presets/presets.json`, 0 if none)
   - `hasPendingUpdate`: Boolean indicating if newer versions exist in `updates/`
-  - `latestAvailableVersion`: Newest version available in `updates/`
+  - `versions` / `latestVersion`: Every available version (base + `updates/`) and the newest of them
   - `projectsUsingTheme` / `projectsUsingThemeCount`: Which projects reference the theme, so the UI can disable Delete before the user clicks.
 
 #### Theme Upload
@@ -153,7 +156,8 @@ The router also applies `standardJsonParser` to all theme routes.
   - Ensures `theme.json`, `layout.liquid`, `screenshot.png` exist
   - Verifies `assets/`, `templates/`, `widgets/` directories
   - Validates collection-type schemas before committing, on **both** paths: a new-theme install validates the self-contained extracted ZIP; an update-import validates the *merged effective theme* (base + installed updates + the incoming deltas, assembled off to the side via `layerThemeSnapshot`) so a `slugPrefix` collision that only appears across versions is caught too. An invalid schema (bad structure, duplicate `slugPrefix`, or a preset shipping `collection-types/`) is rejected with **400 + a per-collection `errors` array**, leaving the installed theme untouched.
-  - Supports importing new update versions for existing themes when base versions match
+  - Supports importing new update versions for an existing theme only when the ZIP's base version equals the **installed root base version**; a mismatch is a 409 naming both versions, and a ZIP that brings no new version folder is a 409 "already up to date" (rules in [Theme Updates](theme-updates.md#distributing-theme-updates))
+  - Refuses a ZIP that unpacks to more than 100 times its own size (a ZIP bomb) with a 400, counting the bytes actually produced, through the same helper as project import (`utils/zipSafety.js`)
 
 #### Theme Deletion
 
@@ -204,7 +208,7 @@ This service applies theme updates **to projects**. It is summarized here; see [
 **Protected** — user content that is never touched by an update, e.g. `pages/`, `uploads/`, and `collections/` (user item data). Note `collection-types/` (theme-owned schemas) is updatable, while `collections/` (user data) is protected.
 
 - `mergeThemeSettings(userThemeJson, newThemeJson)`: merges `theme.json` settings using the new schema as the structural source of truth while preserving user-edited values, adding new settings, and dropping settings the theme author removed.
-- `applyThemeUpdate(projectId)`: copies updatable paths, adds new menus/templates, merges `theme.json`, updates project metadata (`themeVersion`, `lastThemeUpdateAt`, `lastThemeUpdateVersion`), and refreshes media-usage tracking for the project after the structural change.
+- `applyThemeUpdate(projectId)`: copies updatable paths, adds new menus/templates, merges `theme.json`, updates project metadata (`themeVersion`, `lastThemeUpdateAt`, `lastThemeUpdateVersion`), and refreshes media-usage tracking for the project after the structural change. The file work (`applyThemeUpdateToDir`) is staged, swapped, rolled back on failure (a failed rollback keeps its recovery copy for the next run), and recovered at the next run if interrupted, and runs one at a time per project; the metadata write after it is outside that rollback. See [Theme Updates](theme-updates.md#applying-is-staged-and-rolled-back).
 
 ## 4. Sidebar Badge
 
@@ -224,8 +228,8 @@ The sidebar displays a badge next to "Themes" showing the count of themes with p
 
 ## 5. Theme Locales and Site Icon Markup
 
-- Theme locale infrastructure remains supported (`locales/`, `tTheme:` keys, snippet/widget resolution), but the current shipped app + Arch theme are trimmed to English-only locale files for now.
-- Existing projects read theme locale strings from their copied `data/projects/<folder>/locales/` files (served via `GET /api/themes/project/:projectId/locales/:lang`). The installed theme copy in `data/themes/` is the source for new project creation and Apply Theme Update, not the live locale source for already-created projects.
+- Theme locale files carry two halves: editor labels (`tTheme:` keys), which ship in English only, and the visitor `site` block. Arch and the built-in widgets also ship `locales/el.json`, which holds the `site` block alone — see [Visitor-facing text](theming.md#visitor-facing-text).
+- Existing projects read theme locale strings from their copied `data/projects/<folder>/locales/` files: editor labels via `GET /api/themes/project/:projectId/locales/:lang`, and the visitor `site` strings a render uses via `loadSiteStrings` (`packages/builder-server/src/services/siteStringsService.js`). New or translated theme visitor words reach an existing project only through a theme update; the built-in widgets' words come from the app and change with an app update. The installed theme copy in `data/themes/` is the source for new project creation and Apply Theme Update, not the live locale source for already-created projects.
 - Arch's site-icon head markup lives in `themes/arch/snippets/site-icons.liquid`, rendered from `layout.liquid`.
 - The visible setting label is **Site Icon**, but the underlying theme setting key remains `favicon` for compatibility with stored theme settings and existing Liquid access patterns.
 

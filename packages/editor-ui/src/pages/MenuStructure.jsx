@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 import PageLayout from "../components/layout/PageLayout";
 import MenuEditor from "../components/menus/MenuEditor";
+import { EditingLanguageProvider } from "../lib/editingLanguage.jsx";
 import LoadingSpinner from "../components/ui/LoadingSpinner";
 import Button from "../components/ui/Button";
 
@@ -12,10 +13,15 @@ import { getMenu, updateMenu } from "../queries/menuManager";
 import useToastStore from "../stores/toastStore";
 import useGuardedFormPage from "../hooks/useGuardedFormPage";
 import { useEditorPath } from "../lib/routeBase.jsx";
+import { menusListHref } from "../lib/contentRoutes";
 
 export default function MenuStructure() {
   const { t } = useTranslation();
   const { id } = useParams();
+  const [searchParams] = useSearchParams();
+  // An id is unique per language; saving needs nothing, the loaded menu carries
+  // its own `language` and the whole object goes back.
+  const language = searchParams.get("language") || undefined;
   const navigate = useNavigate();
   const editorPath = useEditorPath();
   const [menu, setMenu] = useState(null);
@@ -86,7 +92,7 @@ export default function MenuStructure() {
     async function loadMenu() {
       try {
         setLoading(true);
-        const data = await getMenu(id);
+        const data = await getMenu(id, language);
         setMenu(data);
         initialMenuRef.current = JSON.parse(JSON.stringify(data));
         isInitializedRef.current = false;
@@ -99,7 +105,7 @@ export default function MenuStructure() {
     }
 
     loadMenu();
-  }, [id, showToast, t]);
+  }, [id, language, showToast, t]);
 
   // Save menu
   const handleSave = async () => {
@@ -157,7 +163,7 @@ export default function MenuStructure() {
       title={getDirtyTitle(menu.name)}
       description={t("menuStructure.description")}
       additionalButtons={
-        <Button variant="secondary" onClick={() => navigate(editorPath("/menus"))}>
+        <Button variant="secondary" onClick={() => navigate(editorPath(menusListHref(language)))}>
           {t("forms.common.cancel")}
         </Button>
       }
@@ -173,7 +179,9 @@ export default function MenuStructure() {
         variant: isDirty ? "dark" : "primary",
       }}
     >
-      <MenuEditor initialItems={menu.items || []} onChange={handleMenuItemsChange} onDeleteItem={handleDeleteItem} />
+      <EditingLanguageProvider language={menu.language}>
+        <MenuEditor initialItems={menu.items || []} onChange={handleMenuItemsChange} onDeleteItem={handleDeleteItem} />
+      </EditingLanguageProvider>
     </PageLayout>
   );
 }

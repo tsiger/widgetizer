@@ -16,6 +16,7 @@ import { MemoryRouter, Routes, Route, Outlet } from "react-router-dom";
 
 const loadPage = vi.fn();
 const fetchPreviewToken = vi.fn();
+const getPage = vi.fn();
 
 let projectState;
 let pageState;
@@ -41,6 +42,9 @@ vi.mock("@widgetizer/editor-ui/stores/themeStore", () => ({
 vi.mock("@widgetizer/editor-ui/queries/previewManager", () => ({
   fetchPreviewToken: (...args) => fetchPreviewToken(...args),
 }));
+vi.mock("@widgetizer/editor-ui/queries/pageManager", () => ({
+  getPage: (...args) => getPage(...args),
+}));
 
 import PagePreview from "../PagePreview.jsx";
 
@@ -50,9 +54,9 @@ function CaptureLayout() {
   return <Outlet context={{ setPreview: (s) => reports.push(s) }} />;
 }
 
-function renderPreview() {
+function renderPreview(entry = "/preview/contact") {
   return render(
-    <MemoryRouter initialEntries={["/preview/contact"]}>
+    <MemoryRouter initialEntries={[entry]}>
       <Routes>
         <Route path="/preview" element={<CaptureLayout />}>
           <Route path=":pageId" element={<PagePreview />} />
@@ -65,6 +69,7 @@ function renderPreview() {
 beforeEach(() => {
   loadPage.mockClear();
   fetchPreviewToken.mockReset();
+  getPage.mockReset();
   reports = [];
   projectState = { activeProject: null };
   pageState = { page: null, loading: true, error: null, loadPage, globalWidgets: {} };
@@ -81,7 +86,7 @@ describe("PagePreview — boot-race gate", () => {
   it("loads the page once the active project is seeded", () => {
     projectState = { activeProject: { id: "p1" } };
     renderPreview();
-    expect(loadPage).toHaveBeenCalledWith("contact");
+    expect(loadPage).toHaveBeenCalledWith("contact", undefined);
   });
 
   it("reports a loading state (no notFound) while the project is unseeded", () => {
@@ -105,6 +110,7 @@ describe("PagePreview — one-shot token resolve", () => {
       { id: "contact", widgets: {}, globalWidgets: { header: {} } },
       {},
       "standalone",
+      1,
     );
     await waitFor(() => {
       const last = reports.at(-1);
@@ -112,6 +118,27 @@ describe("PagePreview — one-shot token resolve", () => {
       expect(last.loading).toBe(false);
       expect(last.src).toContain("/render/tok123");
     });
+  });
+
+  it("asks for the page number in the route", async () => {
+    projectState = { activeProject: { id: "p1" } };
+    pageState = { page: { id: "blog", widgets: {} }, loading: false, error: null, loadPage, globalWidgets: {} };
+    fetchPreviewToken.mockResolvedValue({ token: "tok2" });
+
+    render(
+      <MemoryRouter initialEntries={["/preview/paged/blog/2"]}>
+        <Routes>
+          <Route path="/preview" element={<CaptureLayout />}>
+            <Route path=":pageId" element={<PagePreview />} />
+            <Route path="paged/:pageId/:pageNumber" element={<PagePreview />} />
+          </Route>
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => expect(fetchPreviewToken).toHaveBeenCalled());
+    expect(loadPage).toHaveBeenCalledWith("blog", undefined);
+    expect(fetchPreviewToken.mock.calls.at(-1)[3]).toBe(2);
   });
 
   it("reports notFound when the page is missing", () => {
@@ -129,5 +156,32 @@ describe("PagePreview — one-shot token resolve", () => {
     renderPreview();
 
     await waitFor(() => expect(reports.at(-1)).toEqual({ src: null, loading: false, notFound: true }));
+  });
+});
+
+// The published site serves a homepage stored as `home` at index.html, like
+// `index`, so homepage links reach the preview as "index".
+describe("PagePreview — homepage stored as home", () => {
+  it("loads home when the project has no index page", async () => {
+    projectState = { activeProject: { id: "p1" } };
+    getPage.mockRejectedValue(Object.assign(new Error("Page not found"), { status: 404 }));
+    renderPreview("/preview/index");
+    await waitFor(() => expect(loadPage).toHaveBeenCalledWith("home", undefined));
+  });
+
+  it("keeps index when the check fails for another reason, so the real error shows", async () => {
+    projectState = { activeProject: { id: "p1" } };
+    getPage.mockRejectedValue(Object.assign(new Error("Server error"), { status: 500 }));
+    renderPreview("/preview/index");
+    await waitFor(() => expect(loadPage).toHaveBeenCalledWith("index", undefined));
+    expect(loadPage).not.toHaveBeenCalledWith("home", undefined);
+  });
+
+  it("loads index when it exists", async () => {
+    projectState = { activeProject: { id: "p1" } };
+    getPage.mockResolvedValue({ slug: "index" });
+    renderPreview("/preview/index");
+    await waitFor(() => expect(loadPage).toHaveBeenCalledWith("index", undefined));
+    expect(loadPage).not.toHaveBeenCalledWith("home", undefined);
   });
 });

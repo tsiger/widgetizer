@@ -13,42 +13,58 @@
 // in themeController — minus the config.getProjectDir(folderName) reach-through.
 import fs from "fs-extra";
 import path from "path";
+import { LANGUAGE_CODE_RE } from "@widgetizer/core/languages";
+import { globalKey, resolveLanguage } from "@widgetizer/core/contentAddress";
 
 /**
- * Lists and parses every publishable page in `<projectDir>/pages`.
+ * Lists and parses every publishable page in `<projectDir>/pages`: the root
+ * folder and every language folder beside `global/`. The language is derived
+ * from the folder, never read from the file, and stamped resolved.
  * @param {string} projectDir - Absolute path to the project working directory.
+ * @param {{ defaultLanguage?: string }} [project]
  * @returns {Promise<Array<object>>} Parsed page objects, each with `id` set from
- *   its filename. Returns [] when the pages directory does not exist; skips files
- *   that fail to read/parse.
+ *   its filename and `language`. Returns [] when the pages directory does not
+ *   exist; skips files that fail to read/parse.
  * @throws {Error} If the pages directory exists but cannot be read.
  */
-export async function listPagesFromDir(projectDir) {
+export async function listPagesFromDir(projectDir, { defaultLanguage } = {}) {
   const pagesDir = path.join(projectDir, "pages");
   try {
     if (!(await fs.pathExists(pagesDir))) {
       return []; // No pages directory yet — same empty-list contract as before.
     }
-    // withFileTypes so the `global/` subdir (and any other dirs) drop out via isFile().
-    const allEntries = await fs.readdir(pagesDir, { withFileTypes: true });
-    const pageFiles = allEntries.filter((entry) => entry.isFile() && entry.name.endsWith(".json"));
+    const rootEntries = await fs.readdir(pagesDir, { withFileTypes: true });
+    const folders = [
+      { language: resolveLanguage("", defaultLanguage), dir: pagesDir },
+      ...rootEntries
+        .filter((entry) => entry.isDirectory() && LANGUAGE_CODE_RE.test(entry.name))
+        .map((entry) => ({ language: entry.name, dir: path.join(pagesDir, entry.name) })),
+    ];
 
-    const pagesData = await Promise.all(
-      pageFiles.map(async (fileEntry) => {
-        const pageId = fileEntry.name.replace(".json", "");
-        const pagePath = path.join(pagesDir, fileEntry.name);
-        try {
-          const pageContent = await fs.readFile(pagePath, "utf8");
-          const parsedData = JSON.parse(pageContent);
-          // id is authoritative from the filename, overriding any stale id in the file.
-          return { ...parsedData, id: pageId };
-        } catch (readError) {
-          console.error(`Error reading or parsing page file ${pagePath}:`, readError);
-          return null; // Skip a single unreadable/unparseable page, keep the rest.
-        }
-      }),
-    );
+    const pagesData = [];
+    for (const { language, dir } of folders) {
+      // withFileTypes so the `global/` subdir (and any other dirs) drop out via isFile().
+      const allEntries = dir === pagesDir ? rootEntries : await fs.readdir(dir, { withFileTypes: true });
+      const pageFiles = allEntries.filter((entry) => entry.isFile() && entry.name.endsWith(".json"));
+      const loaded = await Promise.all(
+        pageFiles.map(async (fileEntry) => {
+          const pageId = fileEntry.name.replace(".json", "");
+          const pagePath = path.join(dir, fileEntry.name);
+          try {
+            const pageContent = await fs.readFile(pagePath, "utf8");
+            const parsedData = JSON.parse(pageContent);
+            // id is authoritative from the filename, overriding any stale id in the file.
+            return { ...parsedData, id: pageId, language };
+          } catch (readError) {
+            console.error(`Error reading or parsing page file ${pagePath}:`, readError);
+            return null; // Skip a single unreadable/unparseable page, keep the rest.
+          }
+        }),
+      );
+      pagesData.push(...loaded.filter((page) => page !== null));
+    }
 
-    return pagesData.filter((page) => page !== null);
+    return pagesData;
   } catch (error) {
     console.error(`Error listing pages data in ${pagesDir}:`, error);
     throw new Error(`Failed to list pages data in ${pagesDir}: ${error.message}`);
@@ -56,18 +72,20 @@ export async function listPagesFromDir(projectDir) {
 }
 
 /**
- * Reads a global widget (header/footer) JSON from `<projectDir>/pages/global`.
+ * Reads a global widget (header/footer) JSON from `<projectDir>/pages/global`,
+ * or the language's own `pages/<lang>/global`.
  * @param {string} projectDir - Absolute path to the project working directory.
  * @param {'header'|'footer'} widgetType
+ * @param {{ language?: string, defaultLanguage?: string }} [lang]
  * @returns {Promise<object|null>} Parsed widget data with `type` injected, or null
  *   for an invalid type, a missing file, or a read/parse error.
  */
-export async function readGlobalWidgetFromDir(projectDir, widgetType) {
+export async function readGlobalWidgetFromDir(projectDir, widgetType, lang) {
   if (widgetType !== "header" && widgetType !== "footer") {
     console.error(`Invalid global widget type requested: ${widgetType}`);
     return null;
   }
-  const globalWidgetPath = path.join(projectDir, "pages", "global", `${widgetType}.json`);
+  const globalWidgetPath = path.join(projectDir, ...globalKey(widgetType, lang).split("/"));
   try {
     if (!(await fs.pathExists(globalWidgetPath))) {
       return null;

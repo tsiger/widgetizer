@@ -55,14 +55,19 @@ export function getPreviewTargetOrigin() {
 // host's route. The standalone preview page itself hosts PreviewPanel in an
 // iframe and handles NAVIGATE_PREVIEW (the OSS architecture). Registry (not
 // context) so EditorTopBar's click handler can read it without prop-drilling.
-let _standalonePreviewPath = (pageId) => `/preview/${pageId}`;
+// A language is always spelled out under its own namespace when there is one:
+// `/preview/el/contact` cannot say whether `el` is a language or a collection
+// prefix. Without a language the flat route stands, and means the default one.
+const DEFAULT_PREVIEW_PATH = (pageId, language) =>
+  language ? `/preview/page/${language}/${pageId}` : `/preview/${pageId}`;
+let _standalonePreviewPath = DEFAULT_PREVIEW_PATH;
 
 export function setStandalonePreviewPath(builder) {
-  _standalonePreviewPath = typeof builder === "function" ? builder : (pageId) => `/preview/${pageId}`;
+  _standalonePreviewPath = typeof builder === "function" ? builder : DEFAULT_PREVIEW_PATH;
 }
 
-export function getStandalonePreviewPath(pageId) {
-  return _standalonePreviewPath(pageId);
+export function getStandalonePreviewPath(pageId, language) {
+  return _standalonePreviewPath(pageId, language);
 }
 
 // Same mechanism for a collection ITEM page's standalone preview. The OSS shell
@@ -71,13 +76,14 @@ export function getStandalonePreviewPath(pageId) {
 // separate from the page builder because the path is keyed by (slugPrefix, slug),
 // not a pageId. Registry (not context) so the collection pages' click handlers
 // can read it without prop-drilling.
-const DEFAULT_COLLECTION_PREVIEW_PATH = (slugPrefix, slug) => `/preview/collection/${slugPrefix}/${slug}`;
+const DEFAULT_COLLECTION_PREVIEW_PATH = (slugPrefix, slug, language) =>
+  language ? `/preview/collection/${language}/${slugPrefix}/${slug}` : `/preview/collection/${slugPrefix}/${slug}`;
 let _standaloneCollectionPreviewPath = DEFAULT_COLLECTION_PREVIEW_PATH;
 
 export function setStandaloneCollectionPreviewPath(builder) {
   _standaloneCollectionPreviewPath = typeof builder === "function" ? builder : DEFAULT_COLLECTION_PREVIEW_PATH;
 }
 
-export function getStandaloneCollectionPreviewPath(slugPrefix, slug) {
-  return _standaloneCollectionPreviewPath(slugPrefix, slug);
+export function getStandaloneCollectionPreviewPath(slugPrefix, slug, language) {
+  return _standaloneCollectionPreviewPath(slugPrefix, slug, language);
 }

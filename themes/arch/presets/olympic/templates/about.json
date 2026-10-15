@@ -122,7 +122,7 @@
         "description": "Every Olympic trainer holds nationally recognized certifications and brings years of hands-on coaching experience.",
         "heading_alignment": "center",
         "image_style": "full",
-        "aspect_ratio": "1:1",
+        "aspect_ratio": "1 / 1",
         "columns_desktop": 4,
         "layout": "grid",
         "color_scheme": "standard-primary"
@@ -190,7 +190,7 @@
         "review-1": {
           "type": "quote",
           "settings": {
-            "text": "The trainers here genuinely care. Jason rebuilt my entire squat program after I came back from a knee injury, and now I'm stronger than before. You cannot get that at a chain gym.",
+            "quote": "The trainers here genuinely care. Jason rebuilt my entire squat program after I came back from a knee injury, and now I'm stronger than before. You cannot get that at a chain gym.",
             "name": "Alex Petrov",
             "title": "Member for 4 years",
             "rating": "5"
@@ -199,7 +199,7 @@
         "review-2": {
           "type": "quote",
           "settings": {
-            "text": "I joined for the boxing classes and stayed for the community. Priya's yoga sessions have done more for my recovery than years of foam rolling. Every coach here is the real deal.",
+            "quote": "I joined for the boxing classes and stayed for the community. Priya's yoga sessions have done more for my recovery than years of foam rolling. Every coach here is the real deal.",
             "name": "Nina Westbrook",
             "title": "Member for 1 year",
             "rating": "5"

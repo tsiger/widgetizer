@@ -114,8 +114,10 @@ async function seedProjectScaffold() {
   await storage.write(scope, "collections/news/alpha.json", JSON.stringify(ALPHA));
 }
 
-/** Render the alpha item at a given mode/depth via the scope-first wrapper. */
-function renderAlpha(renderMode, outputPathPrefix) {
+/** Render the alpha item at a given mode/depth via the scope-first wrapper.
+ *  `cleanUrls` pre-seeds sharedGlobals (as the export does); `projectData` and
+ *  `siteUrl` override the caller-supplied row. */
+function renderAlpha(renderMode, outputPathPrefix, { cleanUrls, projectData, siteUrl = "", headerData = null } = {}) {
   const sharedGlobals = {
     projectId: PROJECT_ID,
     apiUrl: "",
@@ -128,6 +130,7 @@ function renderAlpha(renderMode, outputPathPrefix) {
     collectionItemsByUuid: new Map(),
     outputPathPrefix,
     currentCanonicalPath: `news/alpha.html`,
+    ...(cleanUrls === undefined ? {} : { cleanUrls }),
   };
   return renderCollectionItemPage(
     PROJECT_ID,
@@ -138,10 +141,10 @@ function renderAlpha(renderMode, outputPathPrefix) {
       rawThemeSettings: RAW_THEME_SETTINGS,
       renderMode,
       sharedGlobals,
-      headerData: null,
+      headerData,
       footerData: null,
-      projectData: { name: "RCIP Project", siteTitle: "RCIP Site" },
-      siteUrl: "",
+      projectData: projectData || { name: "RCIP Project", siteTitle: "RCIP Site" },
+      siteUrl,
     },
     { storage, scope },
   );
@@ -192,3 +195,50 @@ for (const { mode, prefix, label } of [
     });
   });
 }
+
+describe("renderCollectionItemPage — the item canonical follows the render's stamped Clean URLs flag", () => {
+  // An export seeds sharedGlobals.cleanUrls from its one snapshot; the row it
+  // passes as projectData may disagree with it (e.g. a toggle landing between
+  // the two reads). The canonical must follow the stamped flag — the one every
+  // link on the page was emitted with — never the row.
+  const SITE = "https://rcip.example.com";
+
+  it("stamped OFF + row ON → .html canonical", async () => {
+    const { itemPageData } = await renderAlpha("publish", "../", {
+      cleanUrls: false,
+      projectData: { name: "P", siteTitle: "S", cleanUrls: true },
+      siteUrl: SITE,
+    });
+    assert.equal(itemPageData.seo.canonical_url, `${SITE}/news/alpha.html`);
+  });
+
+  it("stamped ON + row OFF → extensionless canonical", async () => {
+    const { itemPageData } = await renderAlpha("publish", "../", {
+      cleanUrls: true,
+      projectData: { name: "P", siteTitle: "S", cleanUrls: false },
+      siteUrl: SITE,
+    });
+    assert.equal(itemPageData.seo.canonical_url, `${SITE}/news/alpha`);
+  });
+
+  it("no stamp → the row decides (first-use stamp), .html when the row has no flag", async () => {
+    const { itemPageData } = await renderAlpha("publish", "../", { siteUrl: SITE });
+    assert.equal(itemPageData.seo.canonical_url, `${SITE}/news/alpha.html`);
+  });
+});
+
+describe("renderCollectionItemPage — the header sees the item page", () => {
+  before(async () => {
+    const headerDir = path.join(getProjectDir(PROJECT_FOLDER), "widgets", "global", "header");
+    await fs.outputFile(path.join(headerDir, "schema.json"), JSON.stringify({ type: "header", settings: [] }));
+    await fs.outputFile(
+      path.join(headerDir, "widget.liquid"),
+      `<header data-slug="{{ page.slug }}" data-site="{{ project.siteTitle }}"></header>`,
+    );
+  });
+
+  it("reads the item's page data and the project", async () => {
+    const { html } = await renderAlpha("publish", "../", { headerData: { type: "header", settings: {} } });
+    assert.match(html, /<header data-slug="news\/alpha" data-site="RCIP Site">/);
+  });
+});

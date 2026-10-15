@@ -9,6 +9,14 @@
   "hasItemPages": true,
   "sortable": false,
   "defaultSort": "date_desc",
+  "structuredData": {
+    "type": "BlogPosting",
+    "headline": "title",
+    "datePublished": "date",
+    "description": "excerpt",
+    "image": "featured_image",
+    "articleBody": "body"
+  },
   "settings": [
     { "type": "header", "id": "content_header", "label": "Content" },
     { "type": "text", "id": "title", "label": "Title", "required": true, "usedAsTitle": true },

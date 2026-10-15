@@ -34,6 +34,7 @@ The filename is automatically generated from your page name, but you can edit it
 **Special filenames:**
 
 - **`index`**: This is your homepage. It exports to `index.html`, the file web servers load by default for your domain.
+- **`page`**: Reserved. Widgetizer uses a `page` folder for page 2, 3 and so on of long lists, so the editor asks you to choose a different filename.
 
 > **Important:** Every project needs a page with the filename `index`. It becomes your homepage, and the site can't be exported without one. If you don't have an `index` page yet, create one or rename an existing page to `index`.
 
@@ -104,6 +105,64 @@ If you change a page's filename, the file will be renamed automatically when you
 - New filename: `about-us` → `about-us.html`
 
 > **Warning:** Renaming a page only affects links from _outside_ your project. Internal links (menu items, rich-text links, and widget link settings) are stored as stable references, so they follow the rename automatically and won't break. What can break are external links to the old URL: search-engine results, links from other websites, and visitors' bookmarks. Once a page is public, rename it with care.
+
+### Page Hierarchy (Parent page)
+
+Under **More settings** you can give a page a **Parent page**. This says where the
+page sits in your site's structure — for example, "Our Team" belongs under "About Us".
+
+It is used for **breadcrumbs**: the small trail of links near the top of a page that
+shows the way back, like `Home › About Us › Our Team`. If your theme shows
+breadcrumbs and a page has no parent, its trail is simply `Home › Page`, which is
+right for most pages. Set a parent only where a page genuinely belongs under
+another one.
+
+A few things the picker takes care of: it won't offer the page itself, any page
+already beneath it, or the homepage (every trail starts there anyway). If you later
+delete a parent page, its children quietly go back to `Home › Page` — nothing breaks.
+
+Whether breadcrumbs appear at all is up to your theme. In Arch, turn them on in
+**Site settings › General › Show breadcrumbs**.
+
+### Blog and collection pages
+
+If your site has a collection — News, Projects, Services — its items get breadcrumbs
+too, showing the page that lists them: `Home › News › My Article`. Widgetizer works
+this out on its own when a single page lists that collection.
+
+If more than one page lists the same collection, it cannot guess which is the main
+one. Open the page you consider the collection's home, select the listing widget in
+the editor, and tick **"Main News page"** (the name matches your collection). Only
+one page per collection can be the main one — ticking it somewhere else moves it, and
+Widgetizer tells you which page it moved from.
+
+### Splitting a long list into pages
+
+A list like News can grow long. Select the listing widget in the editor and tick
+**"Split into pages"**. The widget's number of items to show becomes **items per page**,
+and page links appear under the list.
+
+When you export, the page is published once for every page of items. For a News page,
+`news.html` shows the first items, `news/page/2.html` the next ones, and so on. Everything
+else on the page — header, text, other widgets, footer — repeats on each. If all items fit
+on one page, nothing extra is created.
+
+A few rules keep it simple:
+
+- Only one list per page can be split. If you tick a second one, Widgetizer tells you which
+  list already is.
+- Splitting a list makes its page the collection's main page (see above). If another page
+  was the main page, its list stops being split.
+- While a list is split, it shows at least 1 item per page.
+- Duplicating or pasting a split list, or duplicating its page, gives you a copy that isn't
+  split.
+- Pages 2 and later get their own title (`News - 2 - Your Site`), appear in `sitemap.xml`,
+  and follow the page's search engine indexing setting. With breadcrumbs on, they show
+  `Home › News › Page 2`.
+- In Site preview, the page links work, so you can click through every page.
+
+How the page links look is up to your theme. Arch shows numbered buttons with Previous and
+Next.
 
 # Deleting Pages
 

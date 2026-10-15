@@ -1,0 +1,104 @@
+---
+name: widgetizer-theme-design
+description: "Develop a Widgetizer theme's brief, visual previews for approval, responsive preview page and simple editing experience from its audience, content and the author's preferences. Use when planning a new theme or discussing its design and ease of use. Technical implementation and validation belong to the widgetizer-theme skill."
+---
+
+# Widgetizer Theme Design
+
+Turn the author's business knowledge and visual preferences into a usable theme brief and visual direction. Keep the editing experience simple as the design develops.
+
+## Establish the brief
+
+Read the request, existing theme and any supplied brief or references before asking questions. Distinguish the person editing the website from the visitor using it; their needs shape different decisions.
+
+Collect the information that affects the requested work:
+
+| Input | Decisions it informs |
+| --- | --- |
+| Business or niche, and intended website owner | Relevant capabilities and the owner's editing needs |
+| Visitors and their main purpose | Information priority, navigation and primary actions |
+| Essential content | Pages, sections and recurring content such as projects or articles |
+| Visual preferences and references | The desired character, specific qualities to draw from, and things to avoid |
+| Available content and imagery | Whether the design can rely on photography, illustration or substantial writing |
+| Editing freedom | Which choices customers control and which the theme handles automatically |
+
+These are areas to understand, not a questionnaire to deliver verbatim. For a narrow change, gather only the inputs that matter to it. An author need not supply references or know design terminology.
+
+Keep a compact working brief that distinguishes supplied requirements, delegated choices and unresolved decisions. Before building a new exploration, make the consequential design choices visible: visitor priority, composition, exact typography and available weights, color roles, imagery and useful iconography. A broad adjective such as industrial or friendly does not settle all of these. Ask about material gaps; where choices are delegated, state the recommendation and assumptions concisely rather than silently choosing defaults. Carry collection-wide preferences into its themes when available; keep those preferences specific to that collection rather than imposing them on every author.
+
+Read any collection rules identified by the repository instructions or supplied brief. Record confirmed design bans in that collection's maintained brief or rules file, with precise scope and examples. Apply them to markup, styles, schema controls and demo content, then check the rendered preview; structural validation does not enforce an author's visual preferences. Carry these rules into the implementation handoff.
+
+## Ask useful questions
+
+- Use answers already supplied in the conversation or brief. Do not restart discovery when handing off between design and implementation.
+- Ask only when the missing answer would materially change the result. Keep each round small and use plain language.
+- Resolve material gaps before producing visual previews, not after implementation. Wait for required answers while continuing independent work. Carry forward confirmed choices when restarting a rejected exploration; ask again only if the rejection puts a particular choice in doubt.
+- If a new exploration's intended character cannot be inferred from the brief or references and the author has not delegated the choice, ask a short question before committing to a direction. Offer two or three possibilities tailored to the audience and content, with a recommendation; this can also serve as the direction proposal below. Wait for the answer before building the preview, and continue any work that does not depend on that choice.
+- Invite the author's knowledge of the business and their taste. Propose concrete design choices with their effects instead of asking the author to specify technical design values.
+- When the author is unsure, give them a useful recommendation to react to. When they delegate a choice, make it and identify the assumption briefly.
+
+## Establish a visual direction
+
+Accept website links, screenshots of themes or individual sections, mood boards, photographs and other visual references. References can come from a different industry. Use the available image-viewing or browser tools to inspect them; if a reference cannot be viewed, say so and work from the author's description without claiming to have inspected it.
+
+Identify the visible qualities that could inform this theme: page composition, typography character, spacing, image treatment, colors and atmosphere. A screenshot establishes only the state it shows; other viewport layouts and interaction behavior need additional evidence or an explicit design proposal.
+
+The author may like only part of a reference. Use their annotations and comments to distinguish desired qualities from incidental details. If their preference is unclear, explain what stands out and invite a reaction to the relevant choices. Do not require them to name fonts or describe design techniques.
+
+For an open-ended brief, propose a small selection of distinct directions, usually two or three. Derive them from this skill, the established brief and applicable collection rules. Research external references only when compatible with the author's requested sources; a request to work from this skill and collection alone excludes external style catalogs and unrelated design workflows. Describe meaningful differences in character and intensity as well as composition, typography and imagery. For example, a restaurant theme could emphasize large dining photographs or give menus and editorial storytelling the leading role.
+
+When the author supplies a clear character, develop visual proposals within it rather than reopening that choice. When they delegate the choice, select a suitable character and identify the assumption. Record the proposed character in a few words and explain what it means for typography, contrast, composition, imagery and motion. Carry these decisions into the working brief.
+
+## Choose the review format
+
+Follow the author's or collection's chosen review format. For static-first review, build a standalone responsive HTML/CSS homepage and a separate styleguide before creating Widgetizer theme files. Start with one considered direction unless alternatives are requested. Generated website mockups are not required for this format. Individual photographs or illustrations may still be generated as page assets when appropriate.
+
+If the author requests generated concept options, show coherent page compositions with comparable content, label them as concepts and retain the selected image and brief. Do not substitute this format for an explicitly requested working-page review.
+
+For a collection, compare the proposed opening with existing explorations and record the closest relative and intended difference. A verbal character choice establishes the brief; it does not approve an unseen composition.
+
+## Preview the direction in working pages
+
+For static-first review, keep the prototype separate from installable themes. Use semantic HTML, reusable CSS tokens and limited JavaScript that can carry into later Widgetizer conversion. Consult the technical skill for feasibility without introducing Liquid, schemas or app integration before the requested design approval.
+
+Build a representative homepage with its header, hero, supporting sections, relevant actions and footer, plus a separate compact styleguide for color roles, typography, grid, spacing and common controls. When the author requests a quick static preview, cap the first pass at the header, hero, two representative supporting sections and a compact styleguide. Avoid full forms, integrations, extra pages and production-level checks; one desktop and phone visual pass is the initial review scope. Use the app’s supported font catalog and actual available weights for Widgetizer-targeted typography. Use real text and interactive elements so wrapping, navigation and responsive behavior can be assessed. Label provisional assets and demonstration-only behavior honestly.
+
+Inspect the rendered pages at desktop, intermediate and phone widths. Assess the whole page against the brief and collection rules: character, hierarchy, shared alignment, legibility, image crops and interaction. Refine drift before presenting both browser links. State any views not inspected.
+
+When the author requests approval before conversion, wait for explicit approval of the working pages. Revise these pages in response to feedback; neither a verbal character choice nor internal verification substitutes for visual approval. Preserve the approved prototype and record requested changes as the conversion reference.
+
+After approval, use the technical skill to convert the design into editable widgets, global settings and any needed collections. Reuse markup, styles and assets where possible, adapting them to Widgetizer's lifecycle. Compare the rendered theme with the approved static pages to detect visual drift. Acceptance of an exploration does not imply complete production development, presets or editor/export validation.
+
+For existing themes or other review formats, keep the preview proportionate to the requested work and carry accepted changes into the visual rules and widgets.
+
+## Choose imagery for the preview
+
+Use supplied imagery where it fits the brief. When useful and image-generation tools are available, generate assets such as hero images, illustrations or textures to support the proposed direction. If generation is unavailable, use appropriate available assets or clearly identified placeholders and explain what remains provisional.
+
+For the initial preview, generate only a few key images needed to demonstrate the direction. The author can then choose to have the agent generate the remaining imagery or supply it themselves. Honor an existing explicit choice; if it is unresolved, ask before generating a full set for the theme or its presets. When the author will supply images, provide a concise list of the needed subjects, intended placements and useful proportions.
+
+Plan imagery as part of the composition: subject, atmosphere, lighting, colors, proportions, responsive crops and space for accompanying text. Keep related images visually coherent. Use generated images as assets within the working page. Website screenshots supplied as references inform the design; the theme's actual imagery is a separate asset choice.
+
+## Make editing simple
+
+A theme should look polished with its defaults. Customers should be able to replace content and personalize it without understanding layout or responsive design.
+
+Use this editing model by default, adapting it to explicit requirements:
+
+- Let customers edit text, media, links and other business content directly.
+- Provide global controls for branding, including colors and fonts.
+- Offer a small set of useful layout or style choices where they address a real need.
+- Handle responsive behavior and most detailed spacing automatically.
+- Use clear labels and consistent controls for similar tasks across widgets.
+
+Choose controls by the customer task they support. For example, a welcome section may need a heading, introduction, image, button and a useful image-position choice. Exposing every padding, margin and breakpoint would pass the design work to the customer.
+
+Design defaults to tolerate ordinary editing: longer headings, different images, cleared optional content, and added or reordered sections. Assess the editing experience as well as the visitor-facing result. A visually expressive theme can still have a simple editing model.
+
+Arch can inform familiar editing interactions. Each theme's visual direction should follow its own brief.
+
+## Connect to implementation
+
+Use the companion `widgetizer-theme` skill, when available, for file structure, settings, Liquid, editor behavior and app validation. It owns those technical rules; avoid duplicating them here. Without it, consult the matching Widgetizer documentation before implementation.
+
+Pass the established brief and editing choices into implementation without repeating discovery. In this repository, theme work belongs in `themes/<theme-id>/`, following the technical skill's workspace guidance. Structural validation and assessment of visual quality remain separate results.

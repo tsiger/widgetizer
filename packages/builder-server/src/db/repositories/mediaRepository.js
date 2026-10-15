@@ -8,7 +8,12 @@ import { getDb } from "../index.js";
  */
 export function getMediaFiles(projectId) {
   const db = getDb();
+  // Read-only transaction so the three table reads see one consistent
+  // snapshot if a second connection ever shares the DB file.
+  return db.transaction(() => getMediaFilesStatements(db, projectId))();
+}
 
+function getMediaFilesStatements(db, projectId) {
   const files = db.prepare("SELECT * FROM media_files WHERE project_id = ? ORDER BY uploaded DESC").all(projectId);
 
   if (files.length === 0) return { files: [] };
@@ -19,6 +24,9 @@ export function getMediaFiles(projectId) {
 
   const allSizes = db.prepare(`SELECT * FROM media_sizes WHERE media_file_id IN (${placeholders})`).all(...fileIds);
   const allUsage = db.prepare(`SELECT * FROM media_usage WHERE media_file_id IN (${placeholders})`).all(...fileIds);
+  const allTranslations = db
+    .prepare(`SELECT * FROM media_file_translations WHERE media_file_id IN (${placeholders})`)
+    .all(...fileIds);
 
   // Group by file ID
   const sizesByFile = new Map();
@@ -33,8 +41,21 @@ export function getMediaFiles(projectId) {
     usageByFile.get(usage.media_file_id).push(usage.used_in);
   }
 
+  const translationsByFile = new Map();
+  for (const row of allTranslations) {
+    if (!translationsByFile.has(row.media_file_id)) translationsByFile.set(row.media_file_id, []);
+    translationsByFile.get(row.media_file_id).push(row);
+  }
+
   return {
-    files: files.map((row) => rowToMediaFile(row, sizesByFile.get(row.id) || [], usageByFile.get(row.id) || [])),
+    files: files.map((row) =>
+      rowToMediaFile(
+        row,
+        sizesByFile.get(row.id) || [],
+        usageByFile.get(row.id) || [],
+        translationsByFile.get(row.id) || [],
+      ),
+    ),
   };
 }
 
@@ -46,13 +67,18 @@ export function getMediaFiles(projectId) {
  */
 export function getMediaFileById(projectId, fileId) {
   const db = getDb();
-  const row = db.prepare("SELECT * FROM media_files WHERE id = ? AND project_id = ?").get(fileId, projectId);
-  if (!row) return null;
+  // Read-only transaction so the three table reads see one consistent
+  // snapshot if a second connection ever shares the DB file.
+  return db.transaction(() => {
+    const row = db.prepare("SELECT * FROM media_files WHERE id = ? AND project_id = ?").get(fileId, projectId);
+    if (!row) return null;
 
-  const sizeRows = db.prepare("SELECT * FROM media_sizes WHERE media_file_id = ?").all(fileId);
-  const usageRows = db.prepare("SELECT used_in FROM media_usage WHERE media_file_id = ?").all(fileId);
+    const translationRows = db.prepare("SELECT * FROM media_file_translations WHERE media_file_id = ?").all(fileId);
+    const sizeRows = db.prepare("SELECT * FROM media_sizes WHERE media_file_id = ?").all(fileId);
+    const usageRows = db.prepare("SELECT used_in FROM media_usage WHERE media_file_id = ?").all(fileId);
 
-  return rowToMediaFile(row, sizeRows, usageRows.map((r) => r.used_in));
+    return rowToMediaFile(row, sizeRows, usageRows.map((r) => r.used_in), translationRows);
+  })();
 }
 
 /**
@@ -145,6 +171,66 @@ export function updateFileMetadata(projectId, fileId, metadata) {
 }
 
 /**
+ * Write one language's alt/title/caption for a media file. A field given as
+ * `null` (or left out) is stored as NULL, which means "inherit the default
+ * language"; `""` is stored as-is and means "deliberately blank". Storing all
+ * three as NULL removes the row, so an untranslated file carries no row at all.
+ *
+ * @param {string} projectId - Project UUID (ownership check)
+ * @param {string} fileId
+ * @param {string} language - a NON-default language; the default lives in media_files
+ * @param {{ alt?: string|null, title?: string|null, caption?: string|null }} metadata
+ * @returns {boolean} True if the file belongs to the project
+ */
+export function updateFileTranslation(projectId, fileId, language, metadata) {
+  const db = getDb();
+  return db.transaction(() => {
+    const owned = db
+      .prepare("SELECT 1 FROM media_files WHERE id = ? AND project_id = ?")
+      .get(fileId, projectId);
+    if (!owned) return false;
+
+    const values = {
+      alt: metadata.alt ?? null,
+      title: metadata.title ?? null,
+      caption: metadata.caption ?? null,
+    };
+
+    if (values.alt === null && values.title === null && values.caption === null) {
+      db.prepare("DELETE FROM media_file_translations WHERE media_file_id = ? AND language = ?").run(fileId, language);
+      return true;
+    }
+
+    db.prepare(
+      `INSERT INTO media_file_translations (media_file_id, language, alt, title, caption)
+       VALUES (@fileId, @language, @alt, @title, @caption)
+       ON CONFLICT(media_file_id, language)
+       DO UPDATE SET alt = @alt, title = @title, caption = @caption`,
+    ).run({ fileId, language, ...values });
+    return true;
+  })();
+}
+
+/**
+ * Drop every media translation a language holds in a project. Called when the
+ * language itself is removed; the binaries and the default language are untouched.
+ * @param {string} projectId - Project UUID
+ * @param {string} language
+ * @returns {number} Rows deleted
+ */
+export function deleteMediaTranslationsForLanguage(projectId, language) {
+  const db = getDb();
+  const result = db
+    .prepare(
+      `DELETE FROM media_file_translations
+       WHERE language = ?
+         AND media_file_id IN (SELECT id FROM media_files WHERE project_id = ?)`,
+    )
+    .run(language, projectId);
+  return result.changes;
+}
+
+/**
  * Replace all media_usage entries for a project in one transaction.
  * Only touches the media_usage table — does NOT delete/reinsert media_files or media_sizes.
  * Used by refreshAllMediaUsage which rebuilds all usage from scratch.
@@ -153,20 +239,23 @@ export function updateFileMetadata(projectId, fileId, metadata) {
  */
 export function replaceMediaUsage(projectId, usageMap) {
   const db = getDb();
+  // Write-first transaction: the DELETE subquery replaces a preliminary
+  // SELECT-then-DELETE, so a deferred transaction never has to upgrade a read
+  // snapshot to a write lock (un-waitable SQLITE_BUSY_SNAPSHOT if a second
+  // connection ever shares the DB file). The INSERT … SELECT keeps the insert
+  // path scoped to this project's files, which the id-list previously enforced.
   const txn = db.transaction(() => {
-    // Get all file IDs for this project
-    const fileIds = db.prepare("SELECT id FROM media_files WHERE project_id = ?").all(projectId).map((r) => r.id);
-    if (fileIds.length === 0) return;
+    db.prepare(
+      "DELETE FROM media_usage WHERE media_file_id IN (SELECT id FROM media_files WHERE project_id = ?)"
+    ).run(projectId);
 
-    // Delete all usage for this project's files
-    const placeholders = fileIds.map(() => "?").join(",");
-    db.prepare(`DELETE FROM media_usage WHERE media_file_id IN (${placeholders})`).run(...fileIds);
-
-    // Re-insert from the usage map
-    const insertUsage = db.prepare("INSERT OR IGNORE INTO media_usage (media_file_id, used_in) VALUES (?, ?)");
+    const insertUsage = db.prepare(`
+      INSERT OR IGNORE INTO media_usage (media_file_id, used_in)
+      SELECT id, ? FROM media_files WHERE id = ? AND project_id = ?
+    `);
     for (const [fileId, usedInList] of usageMap) {
       for (const usedIn of usedInList) {
-        insertUsage.run(fileId, usedIn);
+        insertUsage.run(usedIn, fileId, projectId);
       }
     }
   });
@@ -175,29 +264,28 @@ export function replaceMediaUsage(projectId, usageMap) {
 
 /**
  * Update media_usage for a single source (page, global widget, theme settings) in one transaction.
- * Removes all usage rows with this sourceId for the project's files, then re-inserts for the given fileIds.
- * Safe for parallel calls with different sourceIds since each only touches its own rows.
+ * Removes all usage rows with this sourceId for the project's files, then re-inserts for the given
+ * fileIds. Note SQLite serializes ALL writes on one db-level lock (no row-level locking), so calls
+ * for different sourceIds commute logically but still execute strictly one at a time.
  * @param {string} projectId
  * @param {string} sourceId - The usage source (page slug, "global:header", "global:theme-settings", etc.)
  * @param {string[]} fileIds - File IDs that should have this sourceId in their usedIn
  */
 export function updateMediaUsageForSource(projectId, sourceId, fileIds) {
   const db = getDb();
+  // Write-first transaction with a project-scoped insert — same rationale as
+  // replaceMediaUsage above.
   const txn = db.transaction(() => {
-    // Get all file IDs for this project
-    const allFileIds = db.prepare("SELECT id FROM media_files WHERE project_id = ?").all(projectId).map((r) => r.id);
-    if (allFileIds.length === 0) return;
-
-    // Delete only usage rows matching this sourceId for this project's files
-    const placeholders = allFileIds.map(() => "?").join(",");
     db.prepare(
-      `DELETE FROM media_usage WHERE used_in = ? AND media_file_id IN (${placeholders})`
-    ).run(sourceId, ...allFileIds);
+      "DELETE FROM media_usage WHERE used_in = ? AND media_file_id IN (SELECT id FROM media_files WHERE project_id = ?)"
+    ).run(sourceId, projectId);
 
-    // Re-insert for the specific files that reference this source
-    const insertUsage = db.prepare("INSERT OR IGNORE INTO media_usage (media_file_id, used_in) VALUES (?, ?)");
+    const insertUsage = db.prepare(`
+      INSERT OR IGNORE INTO media_usage (media_file_id, used_in)
+      SELECT id, ? FROM media_files WHERE id = ? AND project_id = ?
+    `);
     for (const fileId of fileIds) {
-      insertUsage.run(fileId, sourceId);
+      insertUsage.run(sourceId, fileId, projectId);
     }
   });
   txn();
@@ -208,12 +296,20 @@ export function updateMediaUsageForSource(projectId, sourceId, fileIds) {
 // ==========================================
 
 /**
- * Insert a media file row and its sizes. Used by both addMediaFile and writeMediaData.
+ * Insert a media file row and its sizes, atomically. Used by both addMediaFile
+ * and writeMediaData. Self-wrapped in a transaction so a failure among the
+ * media_sizes inserts can't commit a media_files row with missing variants
+ * (broken thumbnails nothing ever repairs); the wrap nests as a savepoint
+ * under writeMediaData's own transaction.
  * @param {import('better-sqlite3').Database} db
  * @param {string} projectId
  * @param {object} fileData
  */
 function insertMediaFile(db, projectId, fileData) {
+  db.transaction(() => insertMediaFileStatements(db, projectId, fileData))();
+}
+
+function insertMediaFileStatements(db, projectId, fileData) {
   db.prepare(`
     INSERT INTO media_files (id, project_id, filename, original_name, type, size, uploaded, path, alt, title, caption, width, height)
     VALUES (@id, @projectId, @filename, @originalName, @type, @size, @uploaded, @path, @alt, @title, @caption, @width, @height)
@@ -232,6 +328,25 @@ function insertMediaFile(db, projectId, fileData) {
     width: fileData.width || null,
     height: fileData.height || null,
   });
+
+  // Insert translations. A null field means "inherit", `""` means deliberately
+  // blank, and both have to survive a duplication or an import intact.
+  if (fileData.translations) {
+    const insertTranslation = db.prepare(`
+      INSERT INTO media_file_translations (media_file_id, language, alt, title, caption)
+      VALUES (@mediaFileId, @language, @alt, @title, @caption)
+    `);
+    for (const [language, values] of Object.entries(fileData.translations)) {
+      if (!values) continue;
+      insertTranslation.run({
+        mediaFileId: fileData.id,
+        language,
+        alt: values.alt ?? null,
+        title: values.title ?? null,
+        caption: values.caption ?? null,
+      });
+    }
+  }
 
   // Insert sizes
   if (fileData.sizes) {
@@ -256,7 +371,16 @@ function insertMediaFile(db, projectId, fileData) {
 /**
  * Convert a database row + related data to the media file shape controllers expect.
  */
-function rowToMediaFile(row, sizeRows, usageList) {
+function rowToMediaFile(row, sizeRows, usageList, translationRows = []) {
+  const translations = {};
+  for (const translation of translationRows) {
+    translations[translation.language] = {
+      alt: translation.alt,
+      title: translation.title,
+      caption: translation.caption,
+    };
+  }
+
   // Build sizes object
   const sizes = {};
   for (const size of sizeRows) {
@@ -276,6 +400,9 @@ function rowToMediaFile(row, sizeRows, usageList) {
     uploaded: row.uploaded,
     path: row.path,
     metadata: { alt: row.alt || "", title: row.title || "", caption: row.caption || "" },
+    // Only languages someone has actually translated appear here, and a null
+    // field inside one means "inherit" — see @widgetizer/core/mediaMetadata.
+    translations,
     sizes,
     usedIn: usageList,
     width: row.width,

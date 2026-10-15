@@ -32,7 +32,9 @@ You can upload multiple files at once. Widgetizer will process them in batches.
 
 - MP3: for use with the Audio Player widget
 
-> **Note:** Video files can't be uploaded. Embed video with a widget instead (e.g. YouTube).
+**Video:**
+
+- MP4: for use with the Video widget, which plays it with the browser's own player. Use H.264 video with AAC audio for playback everywhere; Widgetizer doesn't convert videos, and a file the visitor's browser can't decode shows a "can't be played" message. Videos count toward the same upload size limit as other files.
 
 ### Upload Limits
 

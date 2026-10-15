@@ -1,0 +1,273 @@
+{
+  "name": "About",
+  "slug": "about",
+  "widgets": {
+    "page_opener": {
+      "type": "rich-text",
+      "settings": {
+        "text_alignment": "start",
+        "content_width": "wide",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "op-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>About us</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "op-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Twenty-two years of showing up.",
+            "size": "6xl"
+          }
+        },
+        "op-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Same owner, same standards, same phone number since 2004. Here's who you'd actually be hiring.</p>",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        }
+      },
+      "blocksOrder": ["op-eyebrow", "op-heading", "op-text"]
+    },
+    "founder_story": {
+      "type": "image-text",
+      "settings": {
+        "image": "/uploads/images/bedrock-founder.webp",
+        "image_position": "start",
+        "text_position": "center",
+        "color_scheme": "standard-primary",
+        "content_color_scheme": "none",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "fs-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>The founder</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "fs-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "It started with one bathroom.",
+            "size": "3xl"
+          }
+        },
+        "fs-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Dan Kovac spent twelve years as a finish carpenter before a neighbor asked him to redo a bathroom in 2004. He ran that job the way he'd always wished the companies he worked for ran theirs: a real price up front, a swept floor every night, and a call the moment anything changed.</p><p>Three hundred and forty projects later, that's still the whole business model. Bedrock stays small on purpose — few enough jobs at once that Dan still walks every site, every week.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": false
+          }
+        }
+      },
+      "blocksOrder": ["fs-eyebrow", "fs-heading", "fs-text"]
+    },
+    "credentials": {
+      "type": "trust-bar",
+      "settings": {
+        "icon_style": "outline",
+        "icon_size": "lg",
+        "icon_shape": "sharp",
+        "alignment": "start",
+        "show_dividers": true,
+        "color_scheme": "standard-secondary",
+        "top_spacing": "small",
+        "bottom_spacing": "small"
+      },
+      "blocks": {
+        "cred-license": {
+          "type": "item",
+          "settings": {
+            "icon": "certificate",
+            "title": "Lic. #000000",
+            "text": "General contractor, in good standing"
+          }
+        },
+        "cred-insured": {
+          "type": "item",
+          "settings": {
+            "icon": "shield",
+            "title": "Bonded & insured",
+            "text": "Liability and workers' comp"
+          }
+        },
+        "cred-epa": {
+          "type": "item",
+          "settings": {
+            "icon": "checklist",
+            "title": "EPA Lead-Safe",
+            "text": "Certified for pre-1978 homes"
+          }
+        },
+        "cred-osha": {
+          "type": "item",
+          "settings": {
+            "icon": "helmet",
+            "title": "OSHA-trained",
+            "text": "Every crew member, every year"
+          }
+        }
+      },
+      "blocksOrder": ["cred-license", "cred-insured", "cred-epa", "cred-osha"]
+    },
+    "client_voices": {
+      "type": "testimonial-slider",
+      "settings": {
+        "autoplay": true,
+        "autoplay_speed": 6000,
+        "color_scheme": "highlight-secondary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "cv-1": {
+          "type": "quote",
+          "settings": {
+            "quote": "Dan looked at our plans and talked us out of the more expensive option. Who does that? People you end up trusting with your whole house, apparently.",
+            "avatar": "/uploads/images/bedrock-avatar-4.webp",
+            "name": "Priya S.",
+            "title": "Whole-home renovation",
+            "rating": "5"
+          }
+        },
+        "cv-2": {
+          "type": "quote",
+          "settings": {
+            "quote": "The Friday updates were worth the price on their own. We always knew exactly where the project stood — even the week the news was bad.",
+            "avatar": "/uploads/images/bedrock-avatar-5.webp",
+            "name": "Tom W.",
+            "title": "Two-story addition",
+            "rating": "5"
+          }
+        },
+        "cv-3": {
+          "type": "quote",
+          "settings": {
+            "quote": "A year after handover a cabinet door sagged. One call, fixed that same week, no invoice. That's what the warranty actually means to them.",
+            "avatar": "/uploads/images/bedrock-avatar-6.webp",
+            "name": "Eleanor B.",
+            "title": "Kitchen remodel",
+            "rating": "5"
+          }
+        }
+      },
+      "blocksOrder": ["cv-1", "cv-2", "cv-3"]
+    },
+    "the_crew": {
+      "type": "team-highlight",
+      "settings": {
+        "eyebrow": "The crew",
+        "eyebrow_uppercase": true,
+        "title": "The people on your job.",
+        "description": "Small by choice. The same four people run every project, and one of them always answers the phone.",
+        "heading_alignment": "start",
+        "columns_desktop": 2,
+        "image_ratio": "portrait",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "crew-dan": {
+          "type": "member",
+          "settings": {
+            "photo": "/uploads/images/bedrock-crew-owner.webp",
+            "name": "Dan Kovac",
+            "role": "Owner & general contractor",
+            "specialty": "Estimates, site walks, and keeping his own standard"
+          }
+        },
+        "crew-maria": {
+          "type": "member",
+          "settings": {
+            "photo": "/uploads/images/bedrock-crew-pm.webp",
+            "name": "Maria Reyes",
+            "role": "Project manager",
+            "specialty": "Schedules, budgets, and your Friday update"
+          }
+        },
+        "crew-luis": {
+          "type": "member",
+          "settings": {
+            "photo": "/uploads/images/bedrock-crew-super.webp",
+            "name": "Luis Ortega",
+            "role": "Site superintendent",
+            "specialty": "Crews, inspections, and the daily sweep"
+          }
+        },
+        "crew-emma": {
+          "type": "member",
+          "settings": {
+            "photo": "/uploads/images/bedrock-crew-office.webp",
+            "name": "Emma Doyle",
+            "role": "Office manager",
+            "specialty": "Permits, paperwork, and the first phone call"
+          }
+        }
+      },
+      "blocksOrder": ["crew-dan", "crew-maria", "crew-luis", "crew-emma"]
+    },
+    "closing_cta": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Come meet us before you decide.",
+            "size": "2xl"
+          }
+        },
+        "cta-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>A site visit costs nothing and commits you to nothing.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": true
+          }
+        },
+        "cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "href": "contact.html",
+              "text": "Book a site visit",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["cta-heading", "cta-text", "cta-button"]
+    }
+  },
+  "widgetsOrder": ["page_opener", "founder_story", "credentials", "client_voices", "the_crew", "closing_cta"],
+  "id": "about",
+  "created": "2026-07-04T09:00:00.000Z",
+  "updated": "2026-07-04T09:00:00.000Z"
+}

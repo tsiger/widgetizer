@@ -45,10 +45,9 @@ themes/arch/
 │   ├── carousel.js     # Carousel initialization and navigation
 │   ├── lightbox.js     # Lightbox for gallery image viewing
 │   ├── masonry.js      # Masonry layout for gallery widgets
-│   ├── video-modal.js  # Video popup modal (YouTube/Vimeo)
 │   ├── countdown.js    # Countdown widget timer
 │   └── icons.json      # SVG icon registry (consumed by icon.liquid)
-├── widgets/            # 56 page widget components + 2 global
+├── widgets/            # 57 page widget components + 2 global (widget-own CSS/JS, e.g. video-popup/video-modal.js, sits in the widget folder)
 │   ├── accordion/
 │   ├── banner/
 │   ├── card-grid/
@@ -60,12 +59,17 @@ themes/arch/
 │   ├── icon.liquid          # SVG icon rendering from icons.json
 │   ├── social-icons.liquid  # Social media link icons (16 platforms)
 │   ├── site-icons.liquid    # Favicon / apple-touch-icon / manifest <link> tags
+│   ├── business-details.liquid   # Address / contact / hours from project.identity
+│   ├── language-switcher.liquid  # Language links from page.translations
+│   ├── pagination.liquid    # Pager for a split collection listing
 │   └── cs-class-row.liquid   # Single class row partial for the class-schedule widget
-├── locales/            # Theme locale files (nested JSON per language)
-│   ├── en.json
-│   └── ...
+├── locales/            # en.json (editor labels + visitor `site` strings), el.json (`site` only)
 ├── templates/          # Page template definitions
-└── menus/              # Navigation menu JSON files
+├── menus/              # Navigation menu JSON files
+├── collection-types/   # news, projects, services: schema + item template
+├── presets/            # Preset registry + per-preset overrides
+├── preset-media/       # Starter images per preset (seed only)
+└── updates/            # Per-version update folders
 ```
 
 ### Asset Loading Order
@@ -81,7 +85,7 @@ Defined in `layout.liquid`, head/body assets load in this sequence:
 7. `{% custom_css %}` — User's custom CSS
 8. `{% custom_head_scripts %}` — User's head scripts
 9. `{% header_assets %}` — Widget-enqueued CSS/JS (head)
-10. Body: skip link, `{{ header | raw }}`, `<main id="main-content">{{ main_content | raw }}</main>`, `{{ footer | raw }}`
+10. Body: `<body>` carries `data-t-*` attributes with the site strings `lightbox.js` and `scripts.js` need; then `{{ header | raw }}` (the header widget opens with the skip link), the core `breadcrumbs` snippet when the `show_breadcrumbs` setting is on (default off), `<main id="main-content">{{ main_content | raw }}</main>`, `{{ footer | raw }}`
 11. `{% asset src: "scripts.js", defer: true %}` — Core JS (header, navigation, sticky header scroll behavior, `--header-sticky-offset` CSS variable)
 12. `{% asset src: "reveal.js", defer: true %}` — Reveal animations (only rendered when `enable_reveal_animations` is on)
 13. `{% footer_assets %}` — Widget-enqueued footer assets (e.g., `carousel.js` when carousel widgets are present)
@@ -1109,7 +1113,7 @@ Widgets with custom token usage (selected):
 | testimonial-hero | `.testimonial-image-wrapper` | `--radius-lg` |
 | timeline | `.timeline-content` / `.timeline-marker` | `--radius-sm` / `--radius-marker` |
 | steps | `.steps-badge` | `--radius-marker` |
-| video-embed | iframe | `--radius-md` |
+| video-embed | iframe / video | `--radius-md` |
 | map | `.map-container` | `--radius-md` |
 
 Widgets intentionally **not** affected by shapes include fullwidth banner/slideshow/split-hero (edge-to-edge backgrounds), profile-grid/testimonials avatars and hotspot dots (`border-radius: 50%`), and gallery/masonry/project-showcase card images (`border-radius: 0` — the image fills the card while the card carries the radius).
@@ -1345,9 +1349,9 @@ Widgets with blocks iterate `widget.blocksOrder` and `{% case block.type %}` to 
 
 ## Available Widgets (Arch Theme)
 
-The Arch theme ships **58 widgets — 56 page widgets + 2 global** (header, footer). Page widgets:
+The Arch theme ships **59 widgets — 57 page widgets + 2 global** (header, footer). Page widgets:
 
-accordion, action-bar, audio-player, banner, bento-grid, card-grid, checkerboard, class-schedule, comparison-slider, comparison-table, contact-details, content-switcher, countdown, embed, event-list, features-split, gallery, icon-card-grid, icon-list, image, image-callout, image-hotspots, image-tabs, image-text, job-listing, key-figures, logo-cloud, map, masonry-gallery, news-grid, numbered-cards, numbered-service-list, priced-list, pricing, profile-grid, project-showcase, projects-grid, resource-list, rich-text, schedule-table, scrolling-text, services-grid, slideshow, sliding-panels, social-icons, split-content, split-hero, steps, team-highlight, testimonial-hero, testimonial-slider, testimonials, timeline, trust-bar, video-embed, video-popup.
+accordion, action-bar, audio-player, banner, bento-grid, card-grid, checkerboard, class-schedule, comparison-slider, comparison-table, contact-details, content-switcher, countdown, data-table, embed, event-list, features-split, gallery, icon-card-grid, icon-list, image, image-callout, image-hotspots, image-tabs, image-text, job-listing, key-figures, logo-cloud, map, masonry-gallery, news-grid, numbered-cards, numbered-service-list, priced-list, pricing, profile-grid, project-showcase, projects-grid, resource-list, rich-text, schedule-table, scrolling-text, services-grid, slideshow, sliding-panels, social-icons, split-content, split-hero, steps, team-highlight, testimonial-hero, testimonial-slider, testimonials, timeline, trust-bar, video-embed, video-popup.
 
 Global widgets: **header**, **footer** (rendered on every page via `{{ header | raw }}` / `{{ footer | raw }}`).
 

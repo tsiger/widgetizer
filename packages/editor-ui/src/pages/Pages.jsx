@@ -2,14 +2,26 @@ import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Palette, Pencil, Trash2, Copy, Search, Check, FileText, CirclePlus, MoreVertical } from "lucide-react";
-import { getAllPages, deletePage, duplicatePage, bulkDeletePages } from "../queries/pageManager";
+import {
+  getAllPages,
+  deletePage,
+  duplicatePage,
+  bulkDeletePages,
+  createPageLanguageVersion,
+} from "../queries/pageManager";
 import { invalidateMediaCache } from "../queries/mediaManager";
+import { hasIncompleteReferenceCleanup } from "../lib/referenceCleanupWarning";
 import { invalidateLinkTargetsCache } from "../hooks/useLinkTargets";
 import { usePageSelection } from "../hooks/usePageSelection";
 import useConfirmationAction from "../hooks/useConfirmationAction";
 import useFormatDate from "../hooks/useFormatDate";
 import useToastStore from "../stores/toastStore";
-import useProjectStore from "../stores/projectStore";
+import useProjectStore, { useDefaultLanguage, useIsMultilang } from "../stores/projectStore";
+import useTranslationVersions from "../hooks/useTranslationVersions";
+import LanguageTabs from "../components/content/LanguageTabs";
+import useListLanguage from "../hooks/useListLanguage";
+import TranslationChips from "../components/content/TranslationChips";
+import { pageEditorHref, pageSettingsHref, pageAddHref } from "../lib/contentRoutes";
 import usePageListStore from "../stores/pageListStore";
 import PageLayout from "../components/layout/PageLayout";
 import Button, { IconButton } from "../components/ui/Button";
@@ -27,21 +39,47 @@ export default function Pages() {
   const [searchTerm, setSearchTerm] = useState("");
   const [openMenuId, setOpenMenuId] = useState(null);
   const menuRef = useRef(null);
-  const { selectedPages, togglePageSelection, selectAllPages, clearSelection, isAllSelected } = usePageSelection();
+  const {
+    selectedPages,
+    togglePageSelection,
+    selectAllPages,
+    deselectPage,
+    deselectPages,
+    clearSelection,
+    isAllSelected,
+  } = usePageSelection();
   const { formatDate } = useFormatDate();
   const showToast = useToastStore((state) => state.showToast);
   const activeProject = useProjectStore((state) => state.activeProject);
+  const isMultilang = useIsMultilang();
+  const defaultLanguage = useDefaultLanguage();
+  const [activeLanguage, setActiveLanguage] = useListLanguage();
 
   // Handle page deletion with confirmation
   const handleDelete = async (data) => {
     try {
       if (data.isBulkDelete) {
-        await bulkDeletePages(data.pageIds);
-        showToast(t("pages.toasts.deleteBulkSuccess", { count: data.pageIds.length }), "success");
-        clearSelection();
+        const result = await bulkDeletePages(data.pageIds, data.language);
+        deselectPages(data.pageIds);
+        // Deleted either way; the warning is about links elsewhere that still
+        // point at them, not about the deletion having failed.
+        showToast(
+          hasIncompleteReferenceCleanup(result)
+            ? t("pages.toasts.deleteBulkLinksIncomplete", { count: data.pageIds.length })
+            : t("pages.toasts.deleteBulkSuccess", { count: data.pageIds.length }),
+          hasIncompleteReferenceCleanup(result) ? "warning" : "success",
+        );
       } else {
-        await deletePage(data.pageId);
-        showToast(t("pages.toasts.deleteSuccess"), "success");
+        const result = await deletePage(data.pageId, data.language);
+        // The deleted page may also be checkbox-selected; drop it so the
+        // selection count and bulk actions don't keep referencing a gone id.
+        deselectPage(data.pageId);
+        showToast(
+          hasIncompleteReferenceCleanup(result)
+            ? t("pages.toasts.deleteLinksIncomplete")
+            : t("pages.toasts.deleteSuccess"),
+          hasIncompleteReferenceCleanup(result) ? "warning" : "success",
+        );
       }
       if (activeProject) {
         invalidateMediaCache(activeProject.id);
@@ -55,8 +93,21 @@ export default function Pages() {
   };
 
   const handleNewPage = () => {
-    navigate(editorPath("/pages/add"));
+    // A new page belongs to the language being looked at.
+    navigate(editorPath(pageAddHref(isMultilang ? activeLanguage : undefined)));
   };
+
+  const pageEditorPath = (page) => editorPath(pageEditorHref(page, isMultilang));
+
+  // Every language comes back in one request, so a row's siblings are already
+  // in hand: no lookup per row, and the chips stay right after any change.
+  const { siblingsOf, createIn, pendingKey } = useTranslationVersions({
+    entries: pages,
+    defaultLanguage,
+    createVersion: (page, targetLanguage) =>
+      createPageLanguageVersion(page.id, { targetLanguage, sourceLanguage: page.language }),
+    onCreated: (created) => navigate(pageEditorPath(created)),
+  });
 
   const { confirm, confirmationModal } = useConfirmationAction(handleDelete);
 
@@ -111,14 +162,17 @@ export default function Pages() {
     }
   };
 
-  const handleDeletePage = (pageId, pageName) => {
+  const handleDeletePage = (pageId, pageName, language) => {
     confirm({
       title: t("pages.deleteModal.title"),
       message: t("pages.deleteModal.message", { name: pageName }),
       confirmText: t("pages.deleteModal.confirm"),
       cancelText: t("pages.deleteModal.cancel"),
       variant: "danger",
-      data: { pageId, pageName, isBulkDelete: false },
+      data: { pageId, pageName, language, isBulkDelete: false },
+      // Opened from the row menu, which closes on the same click — hand focus
+      // back to its trigger, not to the menu item that is about to unmount.
+      returnFocusTo: menuRef.current?.querySelector('[aria-haspopup="menu"]'),
     });
   };
 
@@ -130,13 +184,13 @@ export default function Pages() {
       confirmText: t("pages.deleteModal.confirmBulk", { count: selectedCount }),
       cancelText: t("pages.deleteModal.cancel"),
       variant: "danger",
-      data: { pageIds: selectedPages, isBulkDelete: true },
+      data: { pageIds: selectedPages, language: activeLanguage, isBulkDelete: true },
     });
   };
 
-  const handleDuplicatePage = async (pageId) => {
+  const handleDuplicatePage = async (pageId, language) => {
     try {
-      await duplicatePage(pageId);
+      await duplicatePage(pageId, language);
       showToast(t("pages.toasts.duplicateSuccess"), "success");
       loadPages();
       // Invalidate media cache since the duplicate may reference the same images
@@ -158,13 +212,28 @@ export default function Pages() {
     }
   };
 
+  const pagesInLanguage = isMultilang
+    ? pages.filter((page) => (page.language || defaultLanguage) === activeLanguage)
+    : pages;
+
   // Filter pages based on search term
   const filteredPages = sortItemsByCopyName(
-    pages.filter(
+    pagesInLanguage.filter(
       (page) =>
         page.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         page.slug.toLowerCase().includes(searchTerm.toLowerCase()),
     ),
+  );
+
+  const languageTabs = (
+    <LanguageTabs
+      value={activeLanguage}
+      label={t("pages.languages.tabsLabel")}
+      onChange={(code) => {
+        setActiveLanguage(code);
+        clearSelection();
+      }}
+    />
   );
 
   if (loading) {
@@ -190,13 +259,14 @@ export default function Pages() {
           : undefined
       }
     >
+      {languageTabs}
       {hasPages && (
         <>
           {/* Toolbar */}
           <div className="flex flex-wrap justify-between mb-4 items-center">
             <div className="flex items-center mb-2 sm:mb-0">
               <div className="flex items-center space-x-2">
-                <span className="text-sm text-slate-600">{t("pages.count", { count: pages.length })}</span>
+                <span className="text-sm text-slate-600">{t("pages.count", { count: pagesInLanguage.length })}</span>
                 {selectedPages.length > 0 && (
                   <>
                     <span className="text-sm text-slate-600">
@@ -248,6 +318,7 @@ export default function Pages() {
               </IconButton>,
               t("pages.headers.title"),
               t("pages.headers.updated"),
+              ...(isMultilang ? [t("pages.languages.header")] : []),
               t("pages.headers.actions"),
             ]}
             data={filteredPages}
@@ -286,7 +357,7 @@ export default function Pages() {
                   </td>
                   <td className={`py-3 px-4 ${isSelected ? "bg-pink-50" : ""}`}>
                     <Link
-                      to={editorPath(`/page-editor?pageId=${page.id}`)}
+                      to={pageEditorPath(page)}
                       className="block w-full min-w-0 rounded-sm font-medium text-slate-900 transition-colors hover:text-pink-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pink-500 focus-visible:ring-offset-2"
                     >
                       <span className="block truncate">{page.name}</span>
@@ -295,6 +366,17 @@ export default function Pages() {
                   <td className={`py-3 px-4 whitespace-nowrap ${isSelected ? "bg-pink-50" : ""}`}>
                     <div className="text-slate-600 text-sm">{formatDate(page.updated)}</div>
                   </td>
+                  {isMultilang && (
+                    <td className={`py-3 px-4 whitespace-nowrap ${isSelected ? "bg-pink-50" : ""}`}>
+                      <TranslationChips
+                        entry={page}
+                        siblings={siblingsOf(page)}
+                        hrefOf={pageEditorPath}
+                        onCreate={createIn}
+                        pendingKey={pendingKey}
+                      />
+                    </td>
+                  )}
                   <td className={`py-3 px-4 text-right ${isSelected ? "bg-pink-50" : ""}`}>
                     <div className="relative inline-flex items-center justify-end" ref={openMenuId === page.id ? menuRef : null}>
                       <IconButton
@@ -316,7 +398,7 @@ export default function Pages() {
                       {openMenuId === page.id && (
                         <div className="absolute right-0 top-full z-10 mt-1 w-56 rounded-md border border-slate-200 bg-white py-1 shadow-lg">
                           <Link
-                            to={editorPath(`/page-editor?pageId=${page.id}`)}
+                            to={pageEditorPath(page)}
                             onClick={() => setOpenMenuId(null)}
                             className={`${menuButtonClass} text-slate-700 hover:bg-slate-50`}
                           >
@@ -324,7 +406,7 @@ export default function Pages() {
                             {t("pages.actions.design")}
                           </Link>
                           <Link
-                            to={editorPath(`/pages/${page.id}/edit`)}
+                            to={editorPath(pageSettingsHref(page, isMultilang))}
                             onClick={() => setOpenMenuId(null)}
                             className={`${menuButtonClass} text-slate-700 hover:bg-slate-50`}
                           >
@@ -335,7 +417,7 @@ export default function Pages() {
                             type="button"
                             onClick={() => {
                               setOpenMenuId(null);
-                              handleDuplicatePage(page.id);
+                              handleDuplicatePage(page.id, page.language);
                             }}
                             className={`${menuButtonClass} text-slate-700 hover:bg-slate-50`}
                           >
@@ -347,7 +429,7 @@ export default function Pages() {
                             type="button"
                             onClick={() => {
                               setOpenMenuId(null);
-                              handleDeletePage(page.id, page.name);
+                              handleDeletePage(page.id, page.name, page.language);
                             }}
                             className={`${menuButtonClass} text-red-600 hover:bg-red-50`}
                           >
@@ -370,11 +452,9 @@ export default function Pages() {
           <FileText className="mx-auto mb-4 text-slate-400" size={48} />
           <h2 className="text-xl font-semibold mb-2">{t("pages.noPagesYet")}</h2>
           <p className="text-slate-600 mb-4">{t("pages.createFirstPage")}</p>
-          <Link to={editorPath("/pages/add")}>
-            <Button variant="primary" icon={<CirclePlus size={18} />}>
-              {t("pages.newPage")}
-            </Button>
-          </Link>
+          <Button variant="primary" icon={<CirclePlus size={18} />} onClick={handleNewPage}>
+            {t("pages.newPage")}
+          </Button>
         </div>
       )}
 

@@ -3,7 +3,7 @@ import path from "path";
 import multer from "multer";
 import {
   DATA_DIR,
-  THEMES_SEED_DIR,
+  THEMES_SEED_DIRS,
   CORE_WIDGETS_DIR,
   getThemesDir,
   getThemeDir,
@@ -13,13 +13,18 @@ import {
   getThemeVersionDir,
   getProjectDir,
 } from "../config.js";
+import { resolveSeedThemeDir, listSeedThemeIds } from "../utils/themeSeedRoots.js";
 import { getAllProjects, getProjectById } from "../db/repositories/projectRepository.js";
 import { handleProjectResolutionError } from "../utils/projectErrors.js";
-import { sortVersions, getLatestVersion, isValidVersion } from "../utils/semver.js";
+import { sortVersions, getLatestVersion, isValidVersion, isNewerVersion } from "../utils/semver.js";
 import { hasAvailableUpdate } from "../utils/updateStatus.js";
+import { isSafePathSegment } from "../utils/pathSecurity.js";
+import { extractZipSafely, openZip, readZipEntry, UnsafeZipError } from "../utils/zipSafety.js";
 import { ZIP_MIME_TYPES } from "../utils/mimeTypes.js";
-import { updateThemeSettingsMediaUsage } from "../services/mediaUsageService.js";
+import { updateThemeSettingsMediaUsage, extractMediaPathsFromThemeSettings } from "../services/mediaUsageService.js";
+import { withContentWriteLock, assertIntroducedMediaExists } from "../services/contentCoordination.js";
 import { sanitizeThemeSettings } from "../services/sanitizationService.js";
+import { mergeThemeSettingChanges, readThemeSettingChanges } from "../services/themeSettingChanges.js";
 import { validateThemeCollectionSchemas } from "../services/collectionService.js";
 import { readAppSettingsFile } from "./appSettingsController.js";
 
@@ -70,7 +75,7 @@ function getCachedThemeEntry(cache, key) {
   return null;
 }
 
-async function getCachedThemeValue(cache, key, loader) {
+export async function getCachedThemeValue(cache, key, loader) {
   const cached = getCachedThemeEntry(cache, key);
 
   if (cached?.promise) {
@@ -81,26 +86,29 @@ async function getCachedThemeValue(cache, key, loader) {
     return cached.value;
   }
 
+  // Both settlement paths write back only while this load's own record is
+  // still the current entry — an invalidation (or a newer load) during the
+  // flight must stick, not be overwritten by a late-resolving stale value.
+  const record = { promise: null, expiresAt: 0 };
   const pending = loader()
     .then((value) => {
-      cache.set(key, {
-        value,
-        expiresAt: Date.now() + THEME_SOURCE_CACHE_TTL_MS,
-      });
+      if (cache.get(key) === record) {
+        cache.set(key, {
+          value,
+          expiresAt: Date.now() + THEME_SOURCE_CACHE_TTL_MS,
+        });
+      }
       return value;
     })
     .catch((error) => {
-      const current = cache.get(key);
-      if (current?.promise === pending) {
+      if (cache.get(key) === record) {
         cache.delete(key);
       }
       throw error;
     });
 
-  cache.set(key, {
-    promise: pending,
-    expiresAt: 0,
-  });
+  record.promise = pending;
+  cache.set(key, record);
 
   return pending;
 }
@@ -172,23 +180,45 @@ async function _ensureThemesDirectoryOnce() {
 
   // Provision any seed theme that isn't installed yet. Per-theme (not
   // skip-if-dir-exists) so this self-heals an empty/partial themes dir left by an
-  // earlier failed seed (e.g. THEMES_SEED_DIR was missing) and picks up
-  // newly-added seed themes.
+  // earlier failed seed (e.g. a seed root was missing) and picks up
+  // newly-added seed themes. Each theme is owned wholesale by the first seed root
+  // that contains <id>/theme.json.
   try {
-    const seedExists = await fs.pathExists(THEMES_SEED_DIR);
-    if (seedExists) {
-      const seedThemes = await fs.readdir(THEMES_SEED_DIR, { withFileTypes: true });
-      let provisioned = 0;
-      for (const entry of seedThemes) {
-        if (!entry.isDirectory()) continue;
-        const dest = path.join(userThemesDir, entry.name);
-        if (await fs.pathExists(dest)) continue; // already installed
-        await fs.copy(path.join(THEMES_SEED_DIR, entry.name), dest);
-        provisioned += 1;
+    const seedIds = await listSeedThemeIds();
+
+    // Shadowing is intentional but easy to trip over, so surface it once at startup.
+    if (THEMES_SEED_DIRS.length > 1) {
+      for (const themeId of seedIds) {
+        const owners = [];
+        for (const root of THEMES_SEED_DIRS) {
+          if (await fs.pathExists(path.join(root, themeId, "theme.json"))) owners.push(root);
+        }
+        if (owners.length > 1) {
+          console.log(
+            `[ensureThemesDirectory] Theme "${themeId}" in ${owners[0]} shadows ${owners.slice(1).join(", ")}`,
+          );
+        }
       }
-      if (provisioned > 0) {
-        console.log(`[ensureThemesDirectory] Provisioned ${provisioned} default theme(s)`);
-      }
+    }
+
+    let provisioned = 0;
+    for (const themeId of seedIds) {
+      const dest = path.join(userThemesDir, themeId);
+      if (await fs.pathExists(dest)) continue; // already installed
+      const seedThemeDir = await resolveSeedThemeDir(themeId);
+      if (!seedThemeDir) continue; // dir without theme.json — not a theme
+      // Skip preset-media/: project creation resolves it from the seed directly
+      // (see resolvePresetPaths), so copying it would waste ~180MB per install.
+      await fs.copy(seedThemeDir, dest, {
+        filter: (src) => {
+          const rel = path.relative(seedThemeDir, src);
+          return rel === "" || rel.split(path.sep)[0] !== "preset-media";
+        },
+      });
+      provisioned += 1;
+    }
+    if (provisioned > 0) {
+      console.log(`[ensureThemesDirectory] Provisioned ${provisioned} default theme(s)`);
     }
   } catch (error) {
     console.warn(`[ensureThemesDirectory] Failed to provision default themes: ${error.message}`);
@@ -291,10 +321,9 @@ export async function getThemeVersions(themeId) {
   }
 
   // Get versions from updates/ directories (both user data and seed/source)
-  const updatesDirs = [
-    getThemeUpdatesDir(themeId),
-    path.join(THEMES_SEED_DIR, themeId, "updates"),
-  ];
+  const seedThemeDir = await resolveSeedThemeDir(themeId);
+  const updatesDirs = [getThemeUpdatesDir(themeId)];
+  if (seedThemeDir) updatesDirs.push(path.join(seedThemeDir, "updates"));
 
   for (const updatesDir of updatesDirs) {
     try {
@@ -371,9 +400,12 @@ async function layerThemeSnapshot({ baseDir, updates, targetDir }) {
   await fs.ensureDir(targetDir);
 
   // 1. Base (root) files, excluding the updates/ and latest/ staging trees
+  // (latest.tmp / latest.old are buildLatestSnapshot's in-progress and
+  // renamed-aside siblings — never part of the theme's own content, and
+  // possibly present as stale crash leftovers).
   const baseEntries = await fs.readdir(baseDir, { withFileTypes: true });
   for (const entry of baseEntries) {
-    if (entry.name === "updates" || entry.name === "latest") continue;
+    if (["updates", "latest", "latest.tmp", "latest.old"].includes(entry.name)) continue;
     await fs.copy(path.join(baseDir, entry.name), path.join(targetDir, entry.name));
   }
 
@@ -404,7 +436,13 @@ async function layerThemeSnapshot({ baseDir, updates, targetDir }) {
 
       console.log(`[layerThemeSnapshot] Applied version ${version}`);
     } catch (error) {
-      console.warn(`[layerThemeSnapshot] Could not apply version ${version}:`, error.message);
+      // Fatal, not warn-and-continue: a skipped update would produce a
+      // silently under-layered snapshot that can still claim the newest
+      // version. Failing the whole build is safe — buildLatestSnapshot's
+      // rename-aside swap keeps the previous complete snapshot in place,
+      // and the update-import validation caller likewise wants a corrupt
+      // effective theme rejected rather than approximated.
+      throw new Error(`Failed to apply theme update ${version}: ${error.message}`);
     }
   }
 }
@@ -414,17 +452,36 @@ async function layerThemeSnapshot({ baseDir, updates, targetDir }) {
  * Only called when updates exist.
  * @param {string} themeId - Theme identifier
  */
+// Rebuilds of one theme share the latest.tmp staging dir and the promotion
+// swap, so overlapping calls (e.g. an update import racing a boot-time sync)
+// could delete each other's staging tree or even the just-promoted latest/.
+// Serialize per theme: each call chains behind the in-flight build and then
+// performs its own full rebuild.
+const latestBuildChains = new Map();
+
 export async function buildLatestSnapshot(themeId) {
+  const prev = latestBuildChains.get(themeId) ?? Promise.resolve();
+  const run = prev.catch(() => {}).then(() => buildLatestSnapshotSerial(themeId));
+  latestBuildChains.set(themeId, run);
+  try {
+    return await run;
+  } finally {
+    if (latestBuildChains.get(themeId) === run) latestBuildChains.delete(themeId);
+  }
+}
+
+async function buildLatestSnapshotSerial(themeId) {
   const themeDir = getThemeDir(themeId);
   const latestDir = getThemeLatestDir(themeId);
 
   // Sync update folders from the seed (source) directory into the user data directory.
   // This allows theme authors to create updates in themes/{name}/updates/ and have
   // them picked up automatically without requiring a ZIP upload.
-  const seedUpdatesDir = path.join(THEMES_SEED_DIR, themeId, "updates");
+  const seedThemeDir = await resolveSeedThemeDir(themeId);
+  const seedUpdatesDir = seedThemeDir ? path.join(seedThemeDir, "updates") : null;
   const dataUpdatesDir = getThemeUpdatesDir(themeId);
   try {
-    if (await fs.pathExists(seedUpdatesDir)) {
+    if (seedUpdatesDir && (await fs.pathExists(seedUpdatesDir))) {
       const seedEntries = await fs.readdir(seedUpdatesDir, { withFileTypes: true });
       for (const entry of seedEntries) {
         if (entry.isDirectory() && isValidVersion(entry.name)) {
@@ -459,8 +516,21 @@ export async function buildLatestSnapshot(themeId) {
   const baseTheme = JSON.parse(baseThemeData);
   const baseVersion = baseTheme.version;
 
-  // Validate that all update version folders have a theme.json with matching version
-  const updateVersions = versions.filter((v) => v !== baseVersion);
+  // Only versions NEWER than the base are layered on. A theme keeps every
+  // version folder it has ever shipped, so once the base is bumped to 0.9.20 the
+  // 0.9.9–0.9.19 folders are history, not pending work: the base already
+  // contains their result. Layering them would copy their older files back over
+  // the base (and their theme.json, making latest/ claim an old version), and
+  // re-run their deleted/ removals against content the base has since restored.
+  // Filtering on `!== baseVersion` alone did exactly that.
+  const updateVersions = versions.filter((v) => isNewerVersion(baseVersion, v));
+  if (updateVersions.length === 0) {
+    // Every folder is at or below the base: the base IS the latest state, and a
+    // latest/ built from it would be a pointless copy that readers then prefer.
+    console.log(`[buildLatestSnapshot] No updates newer than base v${baseVersion} for ${themeId}, skipping latest/ build`);
+    invalidateThemeSourceCache(themeId);
+    return;
+  }
   const missingThemeJson = [];
   const versionMismatches = [];
 
@@ -506,22 +576,73 @@ export async function buildLatestSnapshot(themeId) {
 
   console.log(`[buildLatestSnapshot] Building latest/ for ${themeId} with versions: ${versions.join(", ")}`);
 
-  // Remove existing latest/ directory
-  try {
-    await fs.remove(latestDir);
-  } catch (error) {
-    if (error.code !== "ENOENT") {
-      console.warn(`Could not remove existing latest/ for ${themeId}:`, error.message);
-    }
-  }
-
-  // Layer base + updates (ascending order) into a fresh latest/.
+  // Layer the new snapshot into a temp sibling, then swap it in with two
+  // renames. Rebuilding latest/ in place (remove, then re-copy file by file)
+  // exposed concurrent readers — project scaffolds, renders — to a missing or
+  // half-built tree for the whole multi-file copy, and a failed rebuild lost
+  // the previous snapshot entirely. The old tree is renamed aside rather than
+  // removed first: a recursive remove of a large snapshot takes real time,
+  // and for its whole duration new readers would fall back to the theme root
+  // and silently scaffold the stale base version. With rename-aside, latest/
+  // is absent only between the two renames (two syscalls plus one event-loop
+  // turn), the expensive delete happens after the new tree is live, and a
+  // midway build failure leaves the old latest/ restorable. Residual: a
+  // reader already mid-walk inside latest/ at swap time still races the path
+  // flip (it fails loudly rather than reading a mixed tree) — fully fixing
+  // that needs versioned snapshot dirs, deliberately out of scope.
+  const tmpDir = path.join(themeDir, "latest.tmp");
+  const oldDir = path.join(themeDir, "latest.old");
   const sortedUpdateVersions = sortVersions(updateVersions);
-  await layerThemeSnapshot({
-    baseDir: themeDir,
-    updates: sortedUpdateVersions.map((version) => ({ version, dir: getThemeVersionDir(themeId, version) })),
-    targetDir: latestDir,
-  });
+  try {
+    await fs.remove(tmpDir); // stale leftover from a crashed build
+    // A crash between the two promotion renames parks the previous snapshot
+    // at latest.old with latest/ missing — restore it before anything else,
+    // so even a layering failure below still leaves a serving snapshot. An
+    // undeletable stale latest.old is warned, not fatal: it's excluded from
+    // copies and harmless to leave parked.
+    if (!(await fs.pathExists(latestDir)) && (await fs.pathExists(oldDir))) {
+      await fs.rename(oldDir, latestDir);
+    } else {
+      await fs.remove(oldDir).catch((error) => {
+        console.warn(`[buildLatestSnapshot] Could not clear stale latest.old for ${themeId}:`, error.message);
+      });
+    }
+    await layerThemeSnapshot({
+      baseDir: themeDir,
+      updates: sortedUpdateVersions.map((version) => ({ version, dir: getThemeVersionDir(themeId, version) })),
+      targetDir: tmpDir,
+    });
+    const hadLatest = await fs.pathExists(latestDir);
+    if (hadLatest) {
+      await fs.rename(latestDir, oldDir);
+    }
+    try {
+      await fs.rename(tmpDir, latestDir);
+    } catch (renameError) {
+      // Promotion failed with the old tree already set aside — restore it
+      // (best-effort) rather than losing the snapshot, then fail loudly.
+      if (hadLatest) {
+        await fs.rename(oldDir, latestDir).catch((rollbackError) => {
+          console.warn(
+            `[buildLatestSnapshot] Rollback of latest.old failed for ${themeId} (snapshot parked at latest.old):`,
+            rollbackError.message,
+          );
+        });
+      }
+      throw renameError;
+    }
+    // Only after the new tree is live: delete the old one (the expensive
+    // recursive remove readers must never wait behind). Best-effort — the
+    // promotion already succeeded, so a failed delete must not fail the
+    // build (or skip the cache invalidation below); the parked tree is
+    // retried at the next build's stale cleanup.
+    await fs.remove(oldDir).catch((error) => {
+      console.warn(`[buildLatestSnapshot] Could not delete set-aside latest.old for ${themeId}:`, error.message);
+    });
+  } finally {
+    // No-op on success (renamed away); clears the partial tree on failure.
+    await fs.remove(tmpDir);
+  }
 
   console.log(`[buildLatestSnapshot] Successfully built latest/ for ${themeId}`);
   invalidateThemeSourceCache(themeId);
@@ -534,11 +655,21 @@ export async function buildLatestSnapshot(themeId) {
 /**
  * Resolve template, menu, and settings override paths for a preset.
  * If no presetId or preset directory doesn't exist, falls back to root.
+ * Throws when either name is not a single folder name.
  * @param {string} themeId - Theme identifier
  * @param {string|null} presetId - Preset identifier (null = use root defaults)
  * @returns {Promise<{templatesDir: string, menusDir: string|null, settingsOverrides: object|null, collectionsDir: string|null, mediaDir: string|null}>}
  */
 export async function resolvePresetPaths(themeId, presetId) {
+  // Checked here as well as on the create route, because embedding apps call
+  // this directly: a name with a separator or `..` would read another folder.
+  if (!isSafePathSegment(themeId)) {
+    throw new Error(`Invalid theme name: ${JSON.stringify(themeId)}`);
+  }
+  if (presetId && !isSafePathSegment(presetId)) {
+    throw new Error(`Invalid preset name: ${JSON.stringify(presetId)}`);
+  }
+
   // Use the theme source directory (latest/ if it exists, root otherwise)
   const sourceDir = await getThemeSourceDir(themeId);
   const rootTemplatesDir = path.join(sourceDir, "templates");
@@ -584,17 +715,23 @@ export async function resolvePresetPaths(themeId, presetId) {
     // No preset menus, use root
   }
 
-  // Read settings overrides
+  // Read settings overrides. A preset without a preset.json simply has no
+  // overrides; one that HAS it and cannot be read is a different thing, and
+  // reading both as "no settings" gives the project the preset's name and the
+  // theme's appearance.
   let settingsOverrides = null;
   const presetJsonPath = path.join(presetDir, "preset.json");
-  try {
-    const content = await fs.readFile(presetJsonPath, "utf8");
-    const presetData = JSON.parse(content);
+  if (await fs.pathExists(presetJsonPath)) {
+    let presetData;
+    try {
+      presetData = JSON.parse(await fs.readFile(presetJsonPath, "utf8"));
+    } catch (error) {
+      console.error(`[themeController] Could not read ${presetJsonPath}: ${error.message}`);
+      throw new Error(`The "${presetId}" preset's settings file could not be read.`);
+    }
     if (presetData.settings && Object.keys(presetData.settings).length > 0) {
       settingsOverrides = presetData.settings;
     }
-  } catch {
-    // No preset.json or invalid JSON, no overrides
   }
 
   // Resolve preset collections/ (item DATA only). Collection-type SCHEMAS are
@@ -609,15 +746,33 @@ export async function resolvePresetPaths(themeId, presetId) {
     // No preset collections to seed
   }
 
-  // Resolve preset media/ (starter image binaries + manifest). Seeded into the
+  // Resolve preset media (starter image binaries + manifest). Seeded into the
   // project's uploads/images and registered in the media DB at creation time.
+  // Lookup order:
+  //   1. presets/<id>/media in the runtime theme — the per-preset layout any
+  //      theme author can use, unchanged.
+  //   2. preset-media/<id> in the app seed — bundled themes (Arch) keep heavy
+  //      starter images out of deltas and runtime copies; the seed is always
+  //      current, so updated installs seed current images.
+  //   3. preset-media/<id> in the runtime theme — a ZIP-installed theme using
+  //      the theme-root layout (its installed copy IS its distribution copy).
+  // The preset-name match is the opt-in. No media anywhere → seed nothing
+  // (valid: the default "blank" preset has no media and no image refs).
   let mediaDir = null;
-  const presetMediaDir = path.join(presetDir, "media");
-  try {
-    await fs.access(presetMediaDir);
-    mediaDir = presetMediaDir;
-  } catch {
-    // No preset media to seed
+  const seedThemeDir = await resolveSeedThemeDir(themeId);
+  const mediaCandidates = [
+    path.join(presetDir, "media"),
+    ...(seedThemeDir ? [path.join(seedThemeDir, "preset-media", presetId)] : []),
+    path.join(sourceDir, "preset-media", presetId),
+  ];
+  for (const candidate of mediaCandidates) {
+    try {
+      await fs.access(candidate);
+      mediaDir = candidate;
+      break;
+    } catch {
+      // Not here; try the next location.
+    }
   }
 
   return { templatesDir, menusDir, settingsOverrides, collectionsDir, mediaDir };
@@ -1021,7 +1176,7 @@ export async function copyThemeToProject(themeName, projectDir, excludeDirs = []
     // Copy theme directory to project, skipping excluded top-level dirs during the
     // copy (filter) rather than copying everything and deleting after. This avoids
     // copying then throwing away large dirs like presets/ (200MB+ for Arch).
-    const allExcludes = new Set([...excludeDirs, "updates", "latest", "presets"]);
+    const allExcludes = new Set([...excludeDirs, "updates", "latest", "presets", "preset-media"]);
     await fs.cp(sourceDir, projectDir, {
       recursive: true,
       filter: (src) => {
@@ -1146,8 +1301,14 @@ export async function uploadTheme(req, res) {
       return res.status(400).json({ message: "No theme zip file uploaded." });
     }
 
-    const AdmZip = await import("adm-zip");
-    const zip = new AdmZip.default(uploadedFilePath);
+    let zip;
+    try {
+      zip = await openZip(uploadedFilePath);
+    } catch (error) {
+      return res.status(400).json({ message: error.message });
+    }
+    // The unpacking budget is measured against the file as it is on disk.
+    const zipSize = (await fs.stat(uploadedFilePath)).size;
 
     // Safety: validate ZIP paths (prevent path traversal)
     for (const entry of zip.getEntries()) {
@@ -1250,7 +1411,7 @@ export async function uploadTheme(req, res) {
   // Validate theme.json metadata and extract version info
   let uploadedThemeJson;
   try {
-    const themeJsonContent = themeJsonEntry.getData().toString("utf8");
+    const themeJsonContent = (await readZipEntry(themeJsonEntry, zipSize)).toString("utf8");
     uploadedThemeJson = JSON.parse(themeJsonContent);
 
     // Enforce required metadata fields for theme identification and display
@@ -1270,6 +1431,7 @@ export async function uploadTheme(req, res) {
       });
     }
   } catch (error) {
+    if (error instanceof UnsafeZipError) return res.status(400).json({ message: error.message });
     if (error instanceof SyntaxError) {
       return res.status(400).json({ message: "Invalid theme.json: Failed to parse JSON." });
     }
@@ -1321,9 +1483,10 @@ export async function uploadTheme(req, res) {
     // Parse and validate theme.json
     let updateThemeJson;
     try {
-      const content = updateThemeJsonEntry.getData().toString("utf8");
+      const content = (await readZipEntry(updateThemeJsonEntry, zipSize)).toString("utf8");
       updateThemeJson = JSON.parse(content);
-    } catch {
+    } catch (error) {
+      if (error instanceof UnsafeZipError) return res.status(400).json({ message: error.message });
       return res.status(400).json({
         message: `Update folder '${versionFolder}' has invalid theme.json: Failed to parse JSON`,
       });
@@ -1360,8 +1523,22 @@ export async function uploadTheme(req, res) {
 
   // Get existing versions if theme exists
   let existingVersions = [];
+  // The installed ROOT base version, distinct from `existingVersions` (which also
+  // lists installed update folders). The fixed-base import workflow pins the
+  // zip's base to this exact version, and the validation layering below filters
+  // against it so it composes the same tree buildLatestSnapshot will.
+  let installedBaseVersion = null;
   if (themeExists) {
     existingVersions = await getThemeVersions(themeFolderName);
+    try {
+      const installedBaseJson = await fs.readJson(getThemeJsonPath(themeFolderName));
+      installedBaseVersion = installedBaseJson.version;
+    } catch (error) {
+      console.error(`[uploadTheme] Could not read installed base theme.json for ${themeFolderName}:`, error.message);
+      return res.status(500).json({
+        message: `Cannot import updates: the installed theme '${themeFolderName}' has an unreadable theme.json.`,
+      });
+    }
   }
 
   // Determine what to install
@@ -1373,17 +1550,21 @@ export async function uploadTheme(req, res) {
     // Filter out update versions that are already installed
     newUpdateVersions = updateVersionsInZip.filter((v) => !existingVersions.includes(v));
 
-    // If base version already exists and no new updates, reject
-    if (existingVersions.includes(uploadedVersion) && newUpdateVersions.length === 0) {
+    // The zip's base must be the installed ROOT base, not merely one of the
+    // installed versions: an update folder's version passing for the base would
+    // make the validation layering below start from a different floor than the
+    // final build, so the tree that was approved is not the tree that ships.
+    // Checked before the up-to-date case so a mismatch reports the real reason.
+    if (uploadedVersion !== installedBaseVersion) {
       return res.status(409).json({
-        message: `Theme '${themeFolderName}' is already up to date. Base version ${uploadedVersion} and all update versions are already installed.`,
+        message: `Cannot import updates: zip has base version ${uploadedVersion} but installed theme '${themeFolderName}' has base version ${installedBaseVersion || "unknown"}. An update zip must keep the installed base version and carry the new release in updates/.`,
       });
     }
 
-    // If base version doesn't match, we can't safely merge
-    if (!existingVersions.includes(uploadedVersion)) {
+    // Base matches and nothing new to add.
+    if (newUpdateVersions.length === 0) {
       return res.status(409).json({
-        message: `Cannot import updates: zip has base version ${uploadedVersion} but installed theme has base version ${existingVersions[0] || "unknown"}. Base versions must match.`,
+        message: `Theme '${themeFolderName}' is already up to date. Base version ${uploadedVersion} and all update versions are already installed.`,
       });
     }
 
@@ -1405,7 +1586,7 @@ export async function uploadTheme(req, res) {
       await fs.ensureDir(tempDir);
 
       try {
-        zip.extractAllTo(tempDir, /*overwrite*/ false);
+        await extractZipSafely(zip, zipSize, tempDir);
 
         const extractedThemeDir = path.join(tempDir, themeFolderName);
 
@@ -1463,7 +1644,7 @@ export async function uploadTheme(req, res) {
       await fs.ensureDir(tempDir);
 
       try {
-        zip.extractAllTo(tempDir, /*overwrite*/ false);
+        await extractZipSafely(zip, zipSize, tempDir);
 
         const extractedThemeDir = path.join(tempDir, themeFolderName);
         const extractedUpdatesDir = path.join(extractedThemeDir, "updates");
@@ -1474,8 +1655,15 @@ export async function uploadTheme(req, res) {
         // and leave the installed theme untouched. The merge mirrors
         // buildLatestSnapshot.
         const newVersionSet = new Set(newUpdateVersions);
+        // Newer-than-the-installed-base only, exactly as buildLatestSnapshot
+        // layers: anything at or below the base is history the base already
+        // contains. Validating against a composition that re-applied those
+        // folders would judge the incoming delta against files the theme no
+        // longer ships. Filtered on the installed base rather than the zip's
+        // version so this stays aligned with the final build even if the
+        // base-equality guard above is ever relaxed.
         const orderedUpdateVersions = sortVersions([...new Set([...existingVersions, ...newUpdateVersions])]).filter(
-          (version) => version !== uploadedVersion,
+          (version) => isNewerVersion(installedBaseVersion, version),
         );
         const validateDir = path.join(userThemesDir, `_validate_${Date.now()}`);
         try {
@@ -1578,7 +1766,6 @@ export async function uploadTheme(req, res) {
       theme: newThemeData,
     });
   } catch (error) {
-    console.error("Error extracting theme zip:", error);
     // Attempt cleanup if extraction failed partially for new themes
     if (isNewTheme) {
       try {
@@ -1587,6 +1774,8 @@ export async function uploadTheme(req, res) {
         console.error("Error cleaning up failed theme extraction:", cleanupError);
       }
     }
+    if (error instanceof UnsafeZipError) return res.status(400).json({ message: error.message });
+    console.error("Error extracting theme zip:", error);
     res.status(500).json({ message: "Failed to extract theme zip file." });
   }
   } finally {
@@ -1635,27 +1824,144 @@ export async function saveProjectThemeSettings(req, res) {
     // Validate and sanitize theme settings before writing.
     const { data: sanitizedThemeData, warnings } = sanitizeThemeSettings(req.body);
 
-    // Write theme.json through the injected storage adapter over the resolved scope.
-    // The active project's existence is already guaranteed by the
-    // resolveActiveProject middleware (and the write-guard asserts route :projectId
-    // matches scope), so the former manual fs.access project-existence check is gone.
-    await storage.write(scope, "theme.json", JSON.stringify(sanitizedThemeData, null, 2));
+    // The write and its usage sync are one media section, so media deletion cannot
+    // verify between them. See services/contentCoordination.
+    const outcome = await withContentWriteLock(scope.projectId, async () => {
+      // A favicon picked from the library just before it was deleted must not be
+      // written in; references the settings already carried are left alone.
+      // No theme.json yet: nothing to compare against or known to be pre-existing.
+      // An unreadable or unparsable one is not "no file" — reading past it would
+      // skip the version check below — so it fails the save instead.
+      const buf = await storage.read(scope, "theme.json");
+      const current = buf == null ? null : JSON.parse(buf.toString("utf8"));
+      const previousPaths = current ? extractMediaPathsFromThemeSettings(current) : [];
+      // A whole file from a screen that loaded the theme before an update would
+      // put the old version and structure back while the project row keeps the
+      // new version, so the update is never offered again. Refuse it.
+      if (current?.version && sanitizedThemeData?.version && current.version !== sanitizedThemeData.version) {
+        return { versionChanged: true };
+      }
+      await assertIntroducedMediaExists({
+        assetStorage: req.adapters.assetStorage,
+        scope,
+        previousPaths,
+        nextPaths: extractMediaPathsFromThemeSettings(sanitizedThemeData),
+      });
 
-    // Track media used in theme settings (e.g. favicon) for usage and export
-    try {
-      await updateThemeSettingsMediaUsage(scope.projectId, sanitizedThemeData);
-    } catch (usageError) {
-      console.warn("Failed to update theme settings media usage:", usageError.message);
+      // Write theme.json through the injected storage adapter over the resolved scope.
+      // The active project's existence is already guaranteed by the
+      // resolveActiveProject middleware (and the write-guard asserts route :projectId
+      // matches scope), so the former manual fs.access project-existence check is gone.
+      await storage.write(scope, "theme.json", JSON.stringify(sanitizedThemeData, null, 2));
+
+      // Track media used in theme settings (e.g. favicon) for usage and export
+      try {
+        await updateThemeSettingsMediaUsage(scope.projectId, sanitizedThemeData);
+        return { usageStale: false };
+      } catch (usageError) {
+        console.warn("Failed to update theme settings media usage:", usageError.message);
+        return { usageStale: true };
+      }
+    });
+
+    if (outcome.versionChanged) {
+      return res.status(409).json({
+        message: "The theme was updated since these settings were loaded. Reload to continue.",
+        code: "THEME_VERSION_CHANGED",
+      });
     }
-
+    const { usageStale } = outcome;
     const response = { message: "Theme settings saved successfully" };
-    if (warnings.length > 0) {
-      response.warnings = warnings;
+    // Joins the sanitization warnings already carried here: the settings ARE saved,
+    // and this says only that the derived image-usage rows are behind.
+    const allWarnings = usageStale
+      ? [...warnings, { code: "MEDIA_USAGE_STALE", path: "theme.json" }]
+      : warnings;
+    if (allWarnings.length > 0) {
+      response.warnings = allWarnings;
     }
     res.json(response);
   } catch (error) {
+    if (error?.code === "MEDIA_REFERENCE_MISSING") {
+      return res.status(error.statusCode).json({ message: error.message, code: error.code });
+    }
     if (handleProjectResolutionError(res, error)) return;
     console.error("Error saving project theme:", error);
+    res.status(500).json({ message: "Error saving project theme" });
+  }
+}
+
+/**
+ * Save theme setting CHANGES (PATCH): only the settings the editor changed, each
+ * with the value it started from, merged into the theme.json held now. A screen
+ * holding an older copy of the theme can then never put back a version,
+ * structure or values it did not change; a setting changed elsewhere since the
+ * screen loaded it is a conflict (409), and nothing is written.
+ * Responds `{ theme, warnings }` with the file as saved.
+ * @param {import('express').Request} req - Express request with `{ changes }` body
+ * @param {import('express').Response} res - Express response object
+ * @returns {Promise<void>}
+ */
+export async function saveProjectThemeSettingChanges(req, res) {
+  try {
+    const { scope } = req;
+    const { storage } = req.adapters;
+
+    const changes = readThemeSettingChanges(req.body);
+    if (!changes) {
+      return res.status(400).json({ message: "Expected { changes: [{ group, id, baseValue?, value? }] }.", code: "INVALID_CHANGES" });
+    }
+
+    const outcome = await withContentWriteLock(scope.projectId, async () => {
+      const buf = await storage.read(scope, "theme.json");
+      // Coded, so the editor can tell it from a server that has no PATCH route.
+      if (buf == null) return { missing: true };
+      const current = JSON.parse(buf.toString("utf8"));
+      if (changes.length === 0) return { theme: current, warnings: [] };
+
+      const { theme, warnings, conflicts } = mergeThemeSettingChanges(current, changes);
+      if (conflicts.length > 0) return { conflicts };
+
+      // A favicon picked from the library just before it was deleted must not be
+      // written in; references the settings already carried are left alone.
+      await assertIntroducedMediaExists({
+        assetStorage: req.adapters.assetStorage,
+        scope,
+        previousPaths: extractMediaPathsFromThemeSettings(current),
+        nextPaths: extractMediaPathsFromThemeSettings(theme),
+      });
+      await storage.write(scope, "theme.json", JSON.stringify(theme, null, 2));
+
+      // The settings ARE saved; this says only that the derived image-usage rows are behind.
+      try {
+        await updateThemeSettingsMediaUsage(scope.projectId, theme);
+      } catch (usageError) {
+        console.warn("Failed to update theme settings media usage:", usageError.message);
+        warnings.push({ code: "MEDIA_USAGE_STALE", path: "theme.json" });
+      }
+      return { theme, warnings };
+    });
+
+    if (outcome.missing) {
+      return res.status(404).json({
+        message: `Theme settings file not found for project ${scope.projectId}.`,
+        code: "THEME_SETTINGS_NOT_FOUND",
+      });
+    }
+    if (outcome.conflicts) {
+      return res.status(409).json({
+        message: "Some of these settings were changed elsewhere since they were loaded.",
+        code: "THEME_SETTINGS_CHANGED",
+        conflicts: outcome.conflicts,
+      });
+    }
+    res.json({ theme: outcome.theme, warnings: outcome.warnings });
+  } catch (error) {
+    if (error?.code === "MEDIA_REFERENCE_MISSING") {
+      return res.status(error.statusCode).json({ message: error.message, code: error.code });
+    }
+    if (handleProjectResolutionError(res, error)) return;
+    console.error("Error saving project theme setting changes:", error);
     res.status(500).json({ message: "Error saving project theme" });
   }
 }

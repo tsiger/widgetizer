@@ -1,4 +1,4 @@
-import { Check, Search, Trash2, Edit2, FileText, Music, Copy } from "lucide-react";
+import { Check, Search, Trash2, Edit2, FileText, Music, Film, Copy } from "lucide-react";
 import { API_URL } from "../../lib/config";
 import Tooltip from "../ui/Tooltip";
 import { resolveUsageTitle } from "../../utils/mediaUsageDisplay";
@@ -40,6 +40,8 @@ export default function MediaGridItem({
           <div className="flex flex-col items-center gap-1">
             {file.type?.startsWith("audio/") ? (
               <Music className="text-slate-400" size={48} />
+            ) : file.type?.startsWith("video/") ? (
+              <Film className="text-slate-400" size={48} />
             ) : (
               <FileText className="text-slate-400" size={48} />
             )}

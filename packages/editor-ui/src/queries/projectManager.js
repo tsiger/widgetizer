@@ -1,6 +1,7 @@
 import { apiFetch, apiFetchJson, rethrowQueryError, throwApiError } from "../lib/apiFetch";
 import { uploadFormData } from "../lib/uploadRequest";
 import { announceActiveProjectChange } from "../lib/activeProjectChannel.js";
+import { invalidateThemeLocale } from "../hooks/useThemeLocale";
 
 // ---------------------------------------------------------------------------
 // Lightweight cache for getAllProjects() — single entry, not project-keyed.
@@ -180,7 +181,8 @@ export async function updateProject(projectId, updates) {
 /**
  * Permanently delete a project and all its associated data.
  * @param {string} projectId - The ID of the project to delete
- * @returns {Promise<{success: boolean, message: string}>} Deletion confirmation
+ * @returns {Promise<{success: boolean, message: string, activeProjectId: string|null, folderLeftBehind: string|null}>}
+ *   Deletion confirmation; `folderLeftBehind` is the project folder's path when it could not be fully removed
  * @throws {Error} If the project cannot be deleted
  */
 export async function deleteProject(projectId) {
@@ -231,13 +233,15 @@ export async function exportProject(projectId) {
       await throwApiError(response, "Failed to export project");
     }
 
-    // Get filename from Content-Disposition header or use default
+    // Get filename from Content-Disposition header or use default. The quoted form is matched
+    // explicitly: a greedy `"?(.+)"?` keeps the closing quote, and Chromium then rewrites that
+    // illegal character to `_` when saving on Windows, producing `<name>.zip_`.
     const contentDisposition = response.headers.get("Content-Disposition");
     let filename = "project-export.zip";
     if (contentDisposition) {
-      const filenameMatch = contentDisposition.match(/filename="?(.+)"?/);
+      const filenameMatch = contentDisposition.match(/filename="([^"]+)"|filename=([^;]+)/i);
       if (filenameMatch) {
-        filename = filenameMatch[1];
+        filename = (filenameMatch[1] ?? filenameMatch[2]).trim();
       }
     }
 
@@ -352,6 +356,7 @@ export async function applyThemeUpdate(projectId) {
     }, { fallbackMessage: "Failed to apply theme update" });
     // Theme updates change project metadata (themeVersion), so invalidate the list
     invalidateProjectsListCache();
+    if (result?.success) invalidateThemeLocale(projectId);
     return result;
   } catch (error) {
     rethrowQueryError(error, "Failed to apply theme update");

@@ -13,6 +13,12 @@
     "heading_font": {
       "stack": "\"Fraunces\", serif",
       "weight": 600
-    }
+    },
+    "facebook_url": "#",
+    "instagram_url": "#",
+    "twitter_url": "#",
+    "linkedin_url": "#",
+    "youtube_url": "#",
+    "tiktok_url": "#"
   }
 }

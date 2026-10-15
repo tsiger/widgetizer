@@ -1,4 +1,5 @@
 import { Hash } from "liquidjs";
+import { buildAssetUrl, splitAssetRef } from "../utils/assetUrl.js";
 
 export const AssetTag = {
   parse(tagToken) {
@@ -21,6 +22,7 @@ export const AssetTag = {
      * - integrity: string (default: null)
      * - media: string (default: null) for CSS
      * - id: string (default: null)
+     * - alt: string for images (default: the media alt text, else "")
      */
     const options = yield this.hash.render(context);
     const {
@@ -31,6 +33,7 @@ export const AssetTag = {
       integrity = null,
       media = null,
       id = null,
+      alt = null,
     } = options;
 
     if (!filepath) {
@@ -40,39 +43,22 @@ export const AssetTag = {
 
     // Get context globals
     const globals = context.globals || {};
-    const apiUrl = globals.apiUrl || "";
-    const activeProjectId = globals.projectId || "";
-    const renderMode = globals.renderMode || "preview"; // Default to preview
-    // Depth-aware prefix for nested item pages ("" at the export root).
-    const outputPathPrefix = globals.outputPathPrefix || "";
 
-    // Determine file type from extension
-    const isCSS = filepath.endsWith(".css");
-    const isJS = filepath.endsWith(".js");
-    const isImage = /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(filepath);
+    // Determine file type from extension (any case, ignoring ?query / #fragment),
+    // the same way buildAssetUrl decides which files get the cache-busting token.
+    const { path: assetPath } = splitAssetRef(filepath);
+    const isCSS = /\.css$/i.test(assetPath);
+    const isJS = /\.js$/i.test(assetPath);
+    const isImage = /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(assetPath);
 
-    let assetUrl;
-    if (renderMode === "publish") {
-      // For publish mode, use a relative path assuming all assets are in a top-level 'assets' folder
-      // Add cache busting version for CSS and JS files
-      const version = globals.exportVersion;
-      if ((isCSS || isJS) && version) {
-        assetUrl = `${outputPathPrefix}assets/${filepath}?v=${version}`;
-      } else {
-        assetUrl = `${outputPathPrefix}assets/${filepath}`;
-      }
-    } else {
-      // For preview mode, use the existing API route
-      // Determine the source folder based on the current template context
-      if (context.environments.widget && context.environments.widget.type) {
-        // Inside a widget template: load from widgets/{widgetType}/
-        const widgetType = context.environments.widget.type;
-        assetUrl = `${apiUrl}/api/preview/assets/${activeProjectId}/widgets/${widgetType}/${filepath}`;
-      } else {
-        // In layout/snippets: load from assets/
-        assetUrl = `${apiUrl}/api/preview/assets/${activeProjectId}/assets/${filepath}`;
-      }
-    }
+    // In preview mode an asset referenced from inside a widget template is served
+    // from that widget's own directory rather than the shared assets/ folder.
+    const widgetType = context.environments?.widget?.type || null;
+    const assetUrl = buildAssetUrl(filepath, {
+      globals,
+      source: widgetType ? "widget" : null,
+      widgetType,
+    });
 
     // Build attributes string
     let attributes = "";
@@ -81,10 +67,11 @@ export const AssetTag = {
     if (integrity) attributes += ` integrity="${integrity}"`;
 
     // For images, check if we have metadata in the context
-    if (isImage && context.mediaDimensions && context.mediaDimensions[filepath]) {
-      const imageData = context.mediaDimensions[filepath];
-      if (imageData.alt) attributes += ` alt="${imageData.alt}"`;
-      if (imageData.title) attributes += ` title="${imageData.title}"`;
+    if (isImage) {
+      const imageData = context.mediaDimensions?.[assetPath];
+      const finalAlt = alt ?? imageData?.alt ?? "";
+      attributes += ` alt="${String(finalAlt).replace(/&/g, "&amp;").replace(/"/g, "&quot;")}"`;
+      if (imageData?.title) attributes += ` title="${imageData.title}"`;
     }
 
     // Return the appropriate HTML tag based on file type

@@ -53,6 +53,8 @@ For types with item pages:
 
 Your theme places collection content using its own widgets, for example a "News Grid" widget that lists recent articles, or a "Projects" gallery. Add that widget to a page in the editor and it pulls in your items automatically. The exact widgets available depend on your theme.
 
+When a list grows long, you can split it across several pages — see [Splitting a long list into pages](pages.html).
+
 # Exporting
 
 When you [export](export.html) your site, every item that has its own page becomes an HTML file (e.g. `news/summer-sale.html`) and is included in your `sitemap.xml`. List-only items are rendered wherever the theme's widgets display them. Your item content lives in your project files and is never touched by [theme updates](themes.html#theme-updates).

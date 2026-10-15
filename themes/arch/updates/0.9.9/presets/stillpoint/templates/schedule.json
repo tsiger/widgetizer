@@ -1,0 +1,233 @@
+{
+  "name": "Schedule",
+  "slug": "schedule",
+  "widgets": {
+    "hero": {
+      "type": "banner",
+      "settings": {
+        "image": "/uploads/images/schedule-hero.webp",
+        "height": "small",
+        "fullwidth": true,
+        "alignment": "center",
+        "vertical_alignment": "center",
+        "overlay_color": "#2c242080",
+        "color_scheme": "highlight-primary",
+        "top_spacing": "none",
+        "bottom_spacing": "none"
+      },
+      "blocks": {
+        "hero-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Class Schedule",
+            "size": "4xl"
+          }
+        }
+      },
+      "blocksOrder": [
+        "hero-heading"
+      ]
+    },
+    "schedule": {
+      "type": "card-grid",
+      "settings": {
+        "eyebrow": "",
+        "title": "Weekly Schedule",
+        "description": "",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 3,
+        "card_layout": "box",
+        "alignment": "start",
+        "aspect_ratio": "1 / 1",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "card-weekday-am": {
+          "type": "card",
+          "settings": {
+            "image": "/uploads/images/schedule-morning.webp",
+            "subtitle": "Mon — Fri",
+            "title": "Morning Classes",
+            "description": "<p>6:30 AM Vinyasa Flow<br>9:00 AM Hatha<br>Start your day grounded and energized.</p>",
+            "button_link": {
+              "text": "Book a Morning Class",
+              "href": "contact.html",
+              "target": "_self"
+            }
+          }
+        },
+        "card-weekday-mid": {
+          "type": "card",
+          "settings": {
+            "image": "/uploads/images/schedule-midday.webp",
+            "subtitle": "Mon — Fri",
+            "title": "Midday Reset",
+            "description": "<p>12:00 PM Yin or Meditation<br>A quiet pause in the middle of your day.</p>",
+            "button_link": {
+              "text": "Book a Midday Class",
+              "href": "contact.html",
+              "target": "_self"
+            }
+          }
+        },
+        "card-weekday-pm": {
+          "type": "card",
+          "settings": {
+            "image": "/uploads/images/schedule-evening.webp",
+            "subtitle": "Mon — Fri",
+            "title": "Evening Flow",
+            "description": "<p>5:30 PM Vinyasa Flow<br>7:00 PM Pilates Mat<br>Unwind and move after work.</p>",
+            "button_link": {
+              "text": "Book an Evening Class",
+              "href": "contact.html",
+              "target": "_self"
+            }
+          }
+        },
+        "card-saturday": {
+          "type": "card",
+          "settings": {
+            "image": "/uploads/images/schedule-saturday.webp",
+            "subtitle": "Saturday",
+            "title": "Weekend Practice",
+            "description": "<p>8:00 AM Vinyasa Flow<br>9:30 AM Hatha<br>11:00 AM Prenatal<br>4:00 PM Yin</p>",
+            "button_link": {
+              "text": "Book Saturday",
+              "href": "contact.html",
+              "target": "_self"
+            }
+          }
+        },
+        "card-sunday": {
+          "type": "card",
+          "settings": {
+            "image": "/uploads/images/schedule-sunday.webp",
+            "subtitle": "Sunday",
+            "title": "Slow Sunday",
+            "description": "<p>9:00 AM Hatha<br>10:30 AM Meditation<br>4:00 PM Yin<br>A gentle close to the week.</p>",
+            "button_link": {
+              "text": "Book Sunday",
+              "href": "contact.html",
+              "target": "_self"
+            }
+          }
+        },
+        "card-private": {
+          "type": "card",
+          "settings": {
+            "image": "/uploads/images/schedule-private.webp",
+            "subtitle": "By Appointment",
+            "title": "Private Sessions",
+            "description": "<p>One-on-one instruction tailored to your goals. Available with any of our instructors, any day of the week.</p>",
+            "button_link": {
+              "text": "Request a Session",
+              "href": "contact.html",
+              "target": "_self"
+            }
+          }
+        }
+      },
+      "blocksOrder": [
+        "card-weekday-am",
+        "card-weekday-mid",
+        "card-weekday-pm",
+        "card-saturday",
+        "card-sunday",
+        "card-private"
+      ]
+    },
+    "intro_class": {
+      "type": "image-text",
+      "settings": {
+        "image": "/uploads/images/schedule-beginner.webp",
+        "image_position": "start",
+        "text_position": "center",
+        "content_color_scheme": "none",
+        "color_scheme": "standard-secondary"
+      },
+      "blocks": {
+        "intro-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "New to Yoga?",
+            "size": "2xl"
+          }
+        },
+        "intro-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Everyone starts somewhere. Our Hatha and Yin classes are designed to be beginner-friendly, with clear cues and modifications for every pose. You don't need to be flexible, strong, or experienced — you just need to show up. We'll take care of the rest.</p>",
+            "size": "base"
+          }
+        },
+        "intro-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Book an Intro Class",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": [
+        "intro-heading",
+        "intro-text",
+        "intro-button"
+      ]
+    },
+    "cta": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight-primary",
+        "top_spacing": "small",
+        "bottom_spacing": "small"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Can't Find a Time That Works?",
+            "size": "2xl"
+          }
+        },
+        "cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Request a Private Session",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "link_2": {
+              "text": "Contact Us",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "style_2": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": [
+        "cta-heading",
+        "cta-button"
+      ]
+    }
+  },
+  "widgetsOrder": [
+    "hero",
+    "schedule",
+    "intro_class",
+    "cta"
+  ],
+  "id": "schedule",
+  "created": "2026-04-17T11:59:16.455Z",
+  "updated": "2026-04-17T12:09:29.349Z"
+}

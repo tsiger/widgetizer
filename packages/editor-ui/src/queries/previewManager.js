@@ -3,38 +3,10 @@ import useProjectStore from "../stores/projectStore";
 import useWidgetStore from "../stores/widgetStore";
 import fontDefinitions from "@widgetizer/core/config/fonts.json" with { type: "json" };
 import { getPreviewTargetOrigin } from "../lib/previewBase";
+import { readThemeSetting, themeSettingsOfType } from "@widgetizer/core/themeSettingChanges";
+import { collectThemeFonts, themeFontsStylesheetUrl } from "@widgetizer/core/themeFonts";
 
 const ALL_FONTS_LIST = [...fontDefinitions.system, ...fontDefinitions.google];
-
-/**
- * Extract Google fonts used in theme typography settings.
- * @param {Object} settings - Theme settings object
- * @returns {Object<string, Set<string>>} Map of font names to Sets of weight values
- */
-function extractFonts(settings) {
-  const fontsToLoad = {}; // { FontName: Set(weights) }
-  if (!settings?.settings?.global?.typography) return {};
-
-  const allFonts = [...fontDefinitions.system, ...fontDefinitions.google];
-
-  settings.settings.global.typography.forEach((setting) => {
-    if (setting.type === "font_picker" && setting.value) {
-      const value = setting.value; // { stack, weight }
-      if (value && typeof value === "object" && value.stack && value.weight) {
-        const fontDef = allFonts.find((f) => f.stack === value.stack);
-        if (fontDef && fontDef.isGoogleFont) {
-          const fontName = fontDef.name;
-          if (!fontsToLoad[fontName]) {
-            fontsToLoad[fontName] = new Set();
-          }
-          fontsToLoad[fontName].add(value.weight);
-        }
-      }
-    }
-  });
-
-  return fontsToLoad;
-}
 
 /**
  * Fetch a preview token for src-based rendering.
@@ -44,7 +16,7 @@ function extractFonts(settings) {
  * @returns {Promise<{token: string}>} Object with token property
  * @throws {Error} If the request fails
  */
-export async function fetchPreviewToken(pageData, themeSettings, previewMode = "editor") {
+export async function fetchPreviewToken(pageData, themeSettings, previewMode = "editor", pageNumber = 1) {
   try {
     return await editorFetchJson("/preview/token", {
       method: "POST",
@@ -55,6 +27,7 @@ export async function fetchPreviewToken(pageData, themeSettings, previewMode = "
         pageData,
         themeSettings,
         previewMode,
+        ...(pageNumber > 1 ? { pageNumber } : {}),
       }),
     }, { fallbackMessage: "Failed to create preview token" });
   } catch (error) {
@@ -105,10 +78,12 @@ export async function fetchPreview(pageData, themeSettings, previewMode = "edito
  * @param {string} [currentCanonicalPath] - Un-prefixed path of the page being
  *   previewed (e.g. "about.html"), so a morphed menu-bearing widget keeps its
  *   active-state (D3). Empty string when unknown.
+ * @param {Object|null} [page] - The page being previewed, exposed to the widget
+ *   as `page` the same way a full render does.
  * @returns {Promise<string>} Rendered widget HTML string
  * @throws {Error} If widget rendering fails
  */
-export async function fetchRenderedWidget(widgetId, widget, themeSettings, currentCanonicalPath = "") {
+export async function fetchRenderedWidget(widgetId, widget, themeSettings, currentCanonicalPath = "", page = null) {
   try {
     const response = await editorFetch("/preview/widget", {
       method: "POST",
@@ -120,6 +95,7 @@ export async function fetchRenderedWidget(widgetId, widget, themeSettings, curre
         widget,
         themeSettings,
         currentCanonicalPath,
+        page,
       }),
     });
 
@@ -210,7 +186,7 @@ export async function updatePreview(iframe, newState, oldState) {
     const widgetData = newWidgets[widgetId];
     if (widgetData) {
       try {
-        const renderedHtml = await fetchRenderedWidget(widgetId, widgetData, newThemeSettings, currentCanonicalPath);
+        const renderedHtml = await fetchRenderedWidget(widgetId, widgetData, newThemeSettings, currentCanonicalPath, newState.page);
         iframe.contentWindow.postMessage({ type: "MORPH_WIDGET", payload: { widgetId, html: renderedHtml } }, getPreviewTargetOrigin());
       } catch (error) {
         console.error(`Error updating widget ${widgetId}:`, error);
@@ -221,7 +197,7 @@ export async function updatePreview(iframe, newState, oldState) {
   // Update global widgets if changed
   if ((headerChanged || themeSettingsChanged) && newGlobalWidgets.header) {
     try {
-      const renderedHtml = await fetchRenderedWidget("header", newGlobalWidgets.header, newThemeSettings, currentCanonicalPath);
+      const renderedHtml = await fetchRenderedWidget("header", newGlobalWidgets.header, newThemeSettings, currentCanonicalPath, newState.page);
       iframe.contentWindow.postMessage(
         { type: "MORPH_WIDGET", payload: { widgetId: "header", html: renderedHtml } },
         getPreviewTargetOrigin(),
@@ -253,7 +229,7 @@ export async function updatePreview(iframe, newState, oldState) {
   }
   if ((footerChanged || themeSettingsChanged) && newGlobalWidgets.footer) {
     try {
-      const renderedHtml = await fetchRenderedWidget("footer", newGlobalWidgets.footer, newThemeSettings, currentCanonicalPath);
+      const renderedHtml = await fetchRenderedWidget("footer", newGlobalWidgets.footer, newThemeSettings, currentCanonicalPath, newState.page);
       iframe.contentWindow.postMessage(
         { type: "MORPH_WIDGET", payload: { widgetId: "footer", html: renderedHtml } },
         getPreviewTargetOrigin(),
@@ -339,15 +315,12 @@ function updateThemeSettings(iframe, settings) {
   }
 
   const variables = settingsToCssVariables(settings);
-  const fontsMetadata = extractFonts(settings);
+  const fontsUrl = themeFontsStylesheetUrl(collectThemeFonts(settings));
 
   iframe.contentWindow.postMessage({ type: "UPDATE_CSS_VARIABLES", payload: variables }, getPreviewTargetOrigin());
 
-  if (Object.keys(fontsMetadata).length > 0) {
-    const fontsPayload = Object.fromEntries(
-      Object.entries(fontsMetadata).map(([name, weightsSet]) => [name, Array.from(weightsSet)]),
-    );
-    iframe.contentWindow.postMessage({ type: "LOAD_FONTS", payload: fontsPayload }, getPreviewTargetOrigin());
+  if (fontsUrl) {
+    iframe.contentWindow.postMessage({ type: "LOAD_FONTS", payload: { url: fontsUrl } }, getPreviewTargetOrigin());
   }
 
   const styleClasses = extractStyleClasses(settings);
@@ -378,17 +351,10 @@ function extractStyleClasses(settings) {
   };
 
   const classes = {};
-  if (!settings?.settings?.global?.style) return classes;
-
-  settings.settings.global.style.forEach((item) => {
-    if (item.id && classMap[item.id]) {
-      const value = item.value !== undefined ? item.value : item.default;
-      if (value !== undefined) {
-        classes[classMap[item.id]] = value;
-      }
-    }
-  });
-
+  for (const [id, prefix] of Object.entries(classMap)) {
+    const value = readThemeSetting(settings, { group: "style", id });
+    if (value !== undefined) classes[prefix] = value;
+  }
   return classes;
 }
 
@@ -402,38 +368,47 @@ function extractCustomCode(settings) {
   const css = {};
   const scripts = {};
 
-  if (!settings?.settings?.global) return { css, scripts };
+  const codeSettings = themeSettingsOfType(settings, "code");
+  const asString = (value) => (typeof value === "string" ? value : "");
 
-  Object.values(settings.settings.global).forEach((items) => {
-    if (!Array.isArray(items)) return;
-    items.forEach((item) => {
-      if (item.type !== "code" || !item.id) return;
-      const value = item.value !== undefined ? item.value : item.default;
-      const str = typeof value === "string" ? value : "";
+  // Reserved ids go where their layout tag prints them, resolved as the tag resolves them.
+  for (const [id, target] of Object.entries(RESERVED_CODE_TARGETS)) {
+    if (!codeSettings.some((item) => item.id === id)) continue;
+    const str = asString(readThemeSetting(settings, { group: "advanced", id }));
+    if (target === "css") css[id] = str;
+    else scripts[id] = { html: str, placement: target };
+  }
 
-      if (item.language === "css") {
-        css[item.id] = str;
-      } else {
-        // HTML / script settings — derive placement from id
-        const placement = item.id.includes("head") ? "head" : "footer";
-        scripts[item.id] = { html: str, placement };
-      }
-    });
-  });
+  for (const item of codeSettings) {
+    if (Object.hasOwn(RESERVED_CODE_TARGETS, item.id)) continue;
+    const str = asString(item.value !== undefined ? item.value : item.default);
+
+    if (item.language === "css") {
+      css[item.id] = str;
+    } else {
+      // HTML / script settings — derive placement from id
+      const placement = item.id.includes("head") ? "head" : "footer";
+      scripts[item.id] = { html: str, placement };
+    }
+  }
 
   return { css, scripts };
 }
+
+const RESERVED_CODE_TARGETS = { custom_css: "css", custom_head_scripts: "head", custom_footer_scripts: "footer" };
 
 let customCodeTimer = null;
 
 /**
  * Fetch global widgets (header and footer) for the active project.
+ * @param {string} [language] - which language's header/footer; each language has its own
  * @returns {Promise<{header: Object|null, footer: Object|null}>} Global widget data
  * @throws {Error} If the request fails
  */
-export async function getGlobalWidgets() {
+export async function getGlobalWidgets(language) {
+  const query = language ? `?language=${encodeURIComponent(language)}` : "";
   try {
-    return await editorFetchJson("/preview/global-widgets", {}, {
+    return await editorFetchJson(`/preview/global-widgets${query}`, {}, {
       fallbackMessage: "Failed to fetch global widgets",
     });
   } catch (error) {
@@ -446,12 +421,14 @@ export async function getGlobalWidgets() {
  * Save a global widget (header or footer) for the active project.
  * @param {string} type - Widget type: "header" or "footer"
  * @param {Object} widget - Widget data to save
+ * @param {string} [language] - which language's header/footer; each language has its own
  * @returns {Promise<{success: boolean}>} Save confirmation
  * @throws {Error} If save fails
  */
-export async function saveGlobalWidget(type, widget) {
+export async function saveGlobalWidget(type, widget, language) {
+  const query = language ? `?language=${encodeURIComponent(language)}` : "";
   try {
-    return await editorFetchJson(`/preview/global-widgets/${type}`, {
+    return await editorFetchJson(`/preview/global-widgets/${type}${query}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -471,7 +448,7 @@ export async function saveGlobalWidget(type, widget) {
  * @returns {Promise<Array<Object>>} Array of widget schema definitions
  * @throws {Error} If no active project or request fails
  */
-export async function getProjectWidgets() {
+export async function getProjectWidgets(language) {
   const activeProject = useProjectStore.getState().activeProject;
 
   if (!activeProject) {
@@ -479,7 +456,10 @@ export async function getProjectWidgets() {
   }
 
   try {
-    return await editorFetchJson("/widgets", {}, {
+    // A setting's default can be one of the theme's own words, which differs per
+    // language, so the schemas are fetched for the language being edited.
+    const query = language ? `?language=${encodeURIComponent(language)}` : "";
+    return await editorFetchJson(`/widgets${query}`, {}, {
       fallbackMessage: "Failed to get project widgets",
     });
   } catch (error) {

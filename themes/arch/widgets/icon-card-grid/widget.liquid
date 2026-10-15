@@ -86,12 +86,12 @@
 
       {% if widget.settings.layout == 'carousel' %}
         <div class="carousel-container reveal reveal-up">
-          <button type="button" class="carousel-btn carousel-btn-prev" aria-label="Previous">
+          <button type="button" class="carousel-btn carousel-btn-prev" aria-label="{{ 'site.common.previous' | t }}">
             <svg class="carousel-btn-icon" viewBox="0 0 24 24" aria-hidden="true">
               <path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round" />
             </svg>
           </button>
-          <button type="button" class="carousel-btn carousel-btn-next" aria-label="Next">
+          <button type="button" class="carousel-btn carousel-btn-next" aria-label="{{ 'site.common.next' | t }}">
             <svg class="carousel-btn-icon" viewBox="0 0 24 24" aria-hidden="true">
               <path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round" />
             </svg>
@@ -146,7 +146,7 @@
 
       {% elsif has_featured_image %}
         <div class="icon-card-grid-split{% if widget.settings.featured_image_position == 'end' %} icon-card-grid-split-reversed{% endif %}">
-          <div class="icon-card-grid-featured reveal reveal-scale" role="img" aria-label="Featured image" style="background-image: url('{% image src: widget.settings.featured_image, size: 'large', output: 'path' %}');"></div>
+          <div class="icon-card-grid-featured reveal reveal-scale" role="img" aria-label="{{ 'site.icon_card_grid.featured_image' | t }}" style="background-image: url('{% image src: widget.settings.featured_image, size: 'large', output: 'path' %}');"></div>
           <ul class="widget-card-grid widget-grid" style="--grid-cols-desktop: 2;">
             {% for blockId in widget.blocksOrder %}
               {% assign block = widget.blocks[blockId] %}

@@ -1,0 +1,39 @@
+{
+  "settings": {
+    "standard_bg_primary": "#fafaf8",
+    "standard_bg_secondary": "#f0ede6",
+    "standard_text_heading": "#1a1c2b",
+    "standard_text_content": "#3a3c4a",
+    "standard_text_muted": "#7a7c88",
+    "standard_border_color": "#dddbe0",
+    "standard_accent": "#b8860b",
+    "standard_accent_text": "#ffffff",
+    "standard_rating_star": "#d4a017",
+    "highlight_bg_primary": "#1a1c2b",
+    "highlight_bg_secondary": "#111220",
+    "highlight_text_heading": "#ffffff",
+    "highlight_text_content": "#c8c6d0",
+    "highlight_text_muted": "#8a889a",
+    "highlight_border_color": "#3a3c4a",
+    "highlight_accent": "#d4a843",
+    "highlight_accent_text": "#1a1c2b",
+    "highlight_rating_star": "#d4a017",
+    "heading_font": {
+      "stack": "\"Playfair Display\", serif",
+      "weight": 700
+    },
+    "body_font": {
+      "stack": "\"Source Sans 3\", sans-serif",
+      "weight": 400
+    },
+    "corner_style": "slightly-rounded",
+    "spacing_density": "default",
+    "button_shape": "auto",
+    "facebook_url": "#",
+    "instagram_url": "#",
+    "twitter_url": "#",
+    "linkedin_url": "#",
+    "youtube_url": "#",
+    "tiktok_url": "#"
+  }
+}

@@ -8,7 +8,8 @@
     "logo_text_1": {
       "type": "logo_text",
       "settings": {
-        "text": "<p>A leading company dedicated to delivering high-quality solutions.</p>"
+        "text": "<p>A leading company dedicated to delivering high-quality solutions.</p>",
+        "logo": "/uploads/images/arch-logo-light.svg"
       }
     },
     "text_block_1": {

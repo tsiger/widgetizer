@@ -13,10 +13,10 @@ export default defineConfig({
     alias: [
       // Resolve the editor-ui package to its SOURCE (not a built artifact) so
       // Vite/Vitest bundle + HMR work across the workspace boundary, mirroring
-      // how hosted will alias the submodule. Exact-match only, so future
-      // subpath exports (e.g. the Tailwind preset in 1.6) still resolve via the
-      // package's own exports map. @widgetizer/core keeps its symlink+exports
-      // resolution (it has subpath exports we must not shadow).
+      // how hosted aliases the vendored package. Exact-match only, so subpath
+      // exports (e.g. the Tailwind preset) still resolve via the package's own
+      // exports map. @widgetizer/core keeps its symlink+exports resolution (it
+      // has subpath exports we must not shadow).
       {
         find: /^@widgetizer\/editor-ui$/,
         replacement: resolve(import.meta.dirname, "packages/editor-ui/src/index.js"),
@@ -25,6 +25,7 @@ export default defineConfig({
   },
   define: {
     __APP_VERSION__: JSON.stringify(packageJson.version),
+    __APP_NAME__: JSON.stringify("Widgetizer Desktop"),
   },
   server: {
     port: 3000,

@@ -220,6 +220,61 @@ export async function saveThemeSettings(projectId, data) {
 }
 
 /**
+ * Save-result warnings in one shape. The whole-file save reports sanitizer
+ * corrections as plain strings beside `{ code }` objects; everything past this
+ * boundary sees only objects.
+ * @param {Array<string|object>} [warnings]
+ * @returns {Array<{ code: string, message?: string }>}
+ */
+export function normalizeThemeWarnings(warnings) {
+  if (!Array.isArray(warnings)) return [];
+  return warnings
+    .filter(Boolean)
+    .map((warning) => (typeof warning === "string" ? { code: "VALUE_CORRECTED", message: warning } : warning));
+}
+
+/**
+ * Save only the theme settings that changed, each with the value it started
+ * from (see `@widgetizer/core/themeSettingChanges`). The server merges them into
+ * the file it holds now and answers with that file, so a screen holding an older
+ * copy cannot put back what it did not change.
+ * @param {string} projectId - The project ID to save settings for
+ * @param {Array<object>} changes - `{ group, id, baseValue, value }` entries
+ * @param {ThemeSettings} draft - The whole draft, sent only by the fallback below
+ * @returns {Promise<{ theme: ThemeSettings|null, warnings: Array<object> }>} The saved
+ *   file (null when the fallback saved, which returns none) and the warnings
+ * @throws {Error} If the save fails; a 409 carries `code` THEME_SETTINGS_CHANGED or
+ *   THEME_VERSION_CHANGED when the settings were changed elsewhere
+ */
+export async function saveThemeSettingChanges(projectId, changes, draft) {
+  try {
+    const result = await apiFetchJson(`/api/themes/project/${projectId}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ changes }),
+    }, { fallbackMessage: "Failed to save theme settings" });
+    return { theme: result?.theme ?? null, warnings: normalizeThemeWarnings(result?.warnings) };
+  } catch (error) {
+    if (error?.status === 404 && !error?.code) return saveViaLegacyPost(projectId, draft);
+    console.error("Error saving theme settings:", error);
+    rethrowQueryError(error, "Failed to save theme settings");
+  }
+}
+
+// A server that predates the PATCH route answers 404 with no error code and
+// writes nothing; fall back to the whole-file POST so theme saves keep working
+// there. That path keeps the old exposure to a stale screen, except that the
+// server refuses a file from an older theme version. A proxy that blocks PATCH
+// the same way lands here too. Remove once every server this editor runs
+// against implements PATCH.
+async function saveViaLegacyPost(projectId, draft) {
+  const result = await saveThemeSettings(projectId, draft);
+  return { theme: null, warnings: normalizeThemeWarnings(result?.warnings) };
+}
+
+/**
  * Upload and install a theme from a ZIP file.
  * The ZIP should contain a valid theme structure with config and templates.
  * @param {File} zipFile - The theme ZIP file to upload

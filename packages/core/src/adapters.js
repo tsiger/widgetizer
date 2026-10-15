@@ -106,6 +106,9 @@ export const LIMIT_KEYS = Object.freeze({
   // Collection-type count ceiling per project (defense against amplification of
   // the export-time per-collection enumeration). OSS stays unbounded.
   MAX_COLLECTIONS: "MAX_COLLECTIONS",
+  // Distinct-form count ceiling per site, enforced at export when the forms
+  // manifest is built. OSS stays unbounded.
+  MAX_FORMS_PER_SITE: "MAX_FORMS_PER_SITE",
 });
 
 /**
@@ -123,6 +126,14 @@ export const MAX_WIDGETS_PER_PAGE = 5000;
  * (Infinity). Far above any realistic menu (real menus have tens of items).
  */
 export const MAX_MENU_ITEMS = 1000;
+
+/**
+ * Default distinct-forms-per-site ceiling (the hosted forms-service contract).
+ * Hosted returns this for LIMIT_KEYS.MAX_FORMS_PER_SITE; OSS stays unbounded
+ * (Infinity). Also the fallback when no limits adapter is wired (e.g. direct
+ * calls to buildFormsManifest in tests), preserving the historical behavior.
+ */
+export const MAX_FORMS_PER_SITE = 5;
 
 /**
  * Hard cap on menu-tree nesting depth. Applied at both

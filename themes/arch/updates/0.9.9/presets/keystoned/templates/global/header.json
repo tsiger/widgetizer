@@ -1,0 +1,24 @@
+{
+  "type": "header",
+  "settings": {
+    "logoText": "Keystoned",
+    "contactDetailsLine1": "(617) 555-0189",
+    "contactDetailsLine2": "",
+    "contact_position": "logo",
+    "ctaButtonLink": {
+      "href": "properties.html",
+      "text": "View Properties",
+      "target": "_self"
+    },
+    "ctaButtonStyle": "primary",
+    "center_nav": false,
+    "full_width": true,
+    "sticky": true,
+    "transparent_on_hero": true,
+    "color_scheme": "standard-primary",
+    "logoImage": "/uploads/images/keystoneddark.png",
+    "transparent_logo": "/uploads/images/keystonedlight.png"
+  },
+  "blocks": {},
+  "blocksOrder": []
+}

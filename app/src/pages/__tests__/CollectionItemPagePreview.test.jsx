@@ -71,7 +71,7 @@ describe("CollectionItemPagePreview", () => {
     renderAt("rooms", "deluxe");
 
     await waitFor(() => expect(previewCollectionItem).toHaveBeenCalled());
-    expect(getCollectionItem).toHaveBeenCalledWith("accommodation", "deluxe");
+    expect(getCollectionItem).toHaveBeenCalledWith("accommodation", "deluxe", undefined);
     expect(previewCollectionItem).toHaveBeenCalledWith({
       collectionType: "accommodation",
       slug: "deluxe",

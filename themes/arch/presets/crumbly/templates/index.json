@@ -7,7 +7,6 @@
       "settings": {
         "height": "large",
         "fullwidth": true,
-        "alignment": "center",
         "autoplay": true,
         "autoplay_speed": 5000
       },
@@ -65,7 +64,7 @@
     "trust_bar": {
       "type": "trust-bar",
       "settings": {
-        "alignment": "centered",
+        "alignment": "center",
         "show_dividers": true,
         "icon_style": "plain",
         "icon_size": "lg",

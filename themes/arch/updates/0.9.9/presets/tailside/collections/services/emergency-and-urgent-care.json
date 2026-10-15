@@ -1,0 +1,13 @@
+{
+  "slug": "emergency-and-urgent-care",
+  "schemaVersion": 1,
+  "settings": {
+    "title": "Emergency and Urgent Care",
+    "icon": "emergency-bed",
+    "summary": "Prompt help when your pet is injured, in pain, or suddenly unwell.",
+    "description": "<p>Accidents and sudden illness are frightening, and timing matters. When your pet is injured, in pain, or suddenly unwell, getting them seen promptly gives us the best chance to help.</p><h2>What happens when you arrive</h2><p>Call ahead if you can so the team is ready when you arrive. We stabilise your pet first, focusing on pain, breathing, and anything that needs immediate attention, before moving on to work out the full picture. We explain what we are seeing as we go, and keep you informed at every step rather than leaving you guessing.</p><ul><li>Difficulty breathing, collapse, or severe pain</li><li>Injuries from a fall, fight, or road accident</li><li>Repeated vomiting, a swollen abdomen, or suspected poisoning</li></ul><p>Once your pet is settled, we talk through what we have found and what we would suggest next. You will always be part of the decisions, and we make sure you understand the options before anything goes ahead.</p><h3>Getting there safely</h3><p>Keep your pet warm, quiet, and as still as possible on the way in. For a cat or small dog, a carrier or a towel-lined box helps; for a larger dog, a blanket can serve as a makeshift stretcher.</p><p>If you are ever unsure whether something counts as an emergency, call us and describe what is happening. We would far rather take that call and reassure you than have you wait at home wondering.</p>",
+    "price": "Contact for quote",
+    "duration": "45 min",
+    "featured_image": "/uploads/images/tailside-services-emergency-and-urgent-care.webp"
+  }
+}

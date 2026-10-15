@@ -119,6 +119,37 @@ Render the original richtext value with `| raw`; render the `rte_text` result as
 
 Structured `link` settings and internal page/collection links are already sanitized by the platform. Use `safe_url` when you place a raw user-entered text value into `href`, `src`, `action`, or a similar URL-bearing attribute.
 
+## `page_url` and `item_url`
+
+These build an internal link when your template knows the slug but nobody picked a target in
+the editor — a logo linking home, a "view all" button, a hand-written footer link. They read
+the project's Clean URLs setting and the current render depth for you, so the template never
+branches on either.
+
+```liquid
+<a href="{{ 'index' | page_url }}">Home</a>
+<a href="{{ 'contact' | page_url }}">Contact</a>
+<a href="{{ item.slug | item_url: 'news' }}">{{ item.settings.title }}</a>
+```
+
+The value is the page slug; for `item_url`, the collection's `slugPrefix` is the argument.
+
+| Clean URLs | page being rendered | `'index' \| page_url` | `'contact' \| page_url` |
+| :-- | :-- | :-- | :-- |
+| off | root page | `index.html` | `contact.html` |
+| off | item page | `../index.html` | `../contact.html` |
+| on | root page | `./` | `contact` |
+| on | item page | `../` | `../contact` |
+
+The home link is the case worth the filter: with Clean URLs on it is `./` at the root and
+`../` one level deep, which no amount of prefixing produces. Both filters return an empty
+string for a missing slug (or a missing prefix), and behave identically inside a
+`{% render %}`'d snippet.
+
+Use them only for links your theme invents. Menu items, `link` settings, and richtext links
+arrive already resolved to the right shape — emit those as-is — and a raw URL typed by the
+user goes through [`safe_url`](#safe-url) instead.
+
 ## `format_date`
 
 `format_date` formats a `YYYY-MM-DD` date value with the project's configured date format. You can pass a format string to override the project setting for one output.
@@ -152,15 +183,15 @@ Handles are not guaranteed to be unique. If several blocks can share the same ti
 `media_meta` looks up uploaded media metadata by filename or media path. Without a property name it returns the whole media record; with a property name it returns that field.
 
 ```liquid
-{% assign image_title = block.settings.image | media_meta: 'title' %}
+{% assign image_caption = block.settings.image | media_meta: 'caption' %}
 {% assign image_alt = block.settings.image | media_meta: 'alt' %}
 
-{% if image_title != blank %}
-  <figcaption>{{ image_title }}</figcaption>
+{% if image_caption != blank %}
+  <figcaption>{{ image_caption }}</figcaption>
 {% endif %}
 ```
 
-Typical properties are `alt` and `title`, but the available keys depend on the media record stored by the project.
+Typical properties are `alt`, `title` and `caption`, but the available keys depend on the media record stored by the project.
 
 ## `collection`
 
@@ -186,6 +217,10 @@ Supported options:
 | `limit` | Maximum number of items to return |
 | `offset` | Number of items to skip before returning results |
 | `sort` | Sort mode, such as date-based modes used by collection templates |
+
+On a page split into pages, Widgetizer sets `offset` and `limit` itself for the splitting
+widget's collection, so keep passing your normal `limit` and never compute offsets. See
+[Splitting a List into Pages](theme-dev-widgets-blocks.html).
 
 See [Collections](theme-dev-collections.html) for collection type schemas, item templates, and item-page behavior.
 
@@ -441,6 +476,7 @@ Title behavior:
 - `seo.title` is used when present.
 - Otherwise `page.name` is used.
 - When `project.siteTitle` exists, the final `<title>` becomes `Page title - Site title`.
+- On page 2 and later of a page split into pages, the number joins the title: `Page title - 2 - Site title`.
 
 Canonical behavior:
 
@@ -448,6 +484,7 @@ Canonical behavior:
 - Otherwise the tag uses `project.siteUrl` plus the page slug.
 - `index` and `home` slugs canonicalize to the site root.
 - If `project.siteUrl` is missing or invalid, no canonical tag is emitted.
+- On page 2 and later of a page split into pages, the canonical is that page's own address (`seo.canonical_url` applies to page 1 only), and `rel="prev"` / `rel="next"` links point at the neighbouring pages. Those need a site URL too.
 
 Open Graph image behavior:
 
@@ -458,6 +495,14 @@ Open Graph image behavior:
 - If no absolute URL can be built, `og:image` and `twitter:image` are omitted.
 
 All SEO text is escaped before output. Collection item pages use the same `page.seo` contract after Widgetizer shapes the collection item into a page-like render context.
+
+Structured data behavior:
+
+- The tag also writes one `<script type="application/ld+json">` describing the page to search engines, so a theme that already has `{% seo %}` needs nothing else.
+- The homepage describes the website and, when a name is set (public name or Site Title), the organization, person or local business from Project details. Every page gets a web page entry, plus its breadcrumb trail when the trail has two or more entries.
+- Item pages of a collection type with a [`structuredData` block](theme-dev-collections.html#structured-data) also describe the item.
+- Addresses are the page's own published address, even when `seo.canonical_url` is set.
+- If `project.siteUrl` is missing or invalid, no structured data is written.
 
 ## `{% fonts %}`
 
@@ -707,6 +752,55 @@ The Arch snippet checks:
 On export, Widgetizer generates the needed favicon files and rewrites nested-page paths automatically.
 
 # Snippets and Menus
+
+## Breadcrumbs
+
+Widgetizer builds one breadcrumb trail per page and hands it to your layout as
+`page.breadcrumbs`, and to every widget as `globals.breadcrumbs` — so you can put
+it in the layout or inside your header widget, whichever suits the design.
+
+```liquid
+{% render 'breadcrumbs', class_nav: 'site-breadcrumbs', class_link: 'crumb' %}
+```
+
+| Param | Purpose |
+| :-- | :-- |
+| `class_nav`, `class_list`, `class_item`, `class_link`, `class_current` | Classes for each element |
+| `separator` | Text between crumbs. Most themes draw one in CSS instead |
+| `home_label` | Replaces the first crumb's label |
+| `page_label` | Word before the number on page 2 and later of a page split into pages (default "Page") |
+| `aria_label` | Accessible name for the nav (default "Breadcrumb") |
+| `show_home` | Set `false` to drop the first crumb |
+
+It emits `<nav aria-label><ol><li>`, marks the last crumb with `aria-current="page"`,
+and renders **nothing at all** when the trail is empty — which is the case on the
+homepage (its page 2 and later show `Home › Page 2`), so you do not need to guard the call.
+
+Prefer your own markup? Loop the array:
+
+```liquid
+{% for crumb in page.breadcrumbs %}
+  {% if crumb.current %}
+    <span aria-current="page">{{ crumb.label }}</span>
+  {% else %}
+    <a href="{{ crumb.href }}">{{ crumb.label }}</a>
+  {% endif %}
+{% endfor %}
+```
+
+Each entry has `label`, `href`, `canonicalPath` (the un-prefixed `.html` path, handy
+for matching), `current` and `home`. On page 2 and later of a page split into pages, the
+trail ends with one more crumb for the page number (it carries `pageNumber`), and the page's
+own crumb links back to page 1.
+
+**Where the trail comes from.** For a page, the parent page its owner picked in Page
+settings — with no parent it is simply `Home › page`. For a collection item, the page
+whose listing widget is marked as that collection's main page, or the single page that
+lists it. Nothing is guessed from menus or URLs, so a site owner reordering navigation
+never changes a breadcrumb.
+
+For an item's trail to find its listing page, the listing widget's schema has to declare
+what it lists — see [the `collection` declaration](theme-dev-widgets-blocks.html).
 
 ## `{% render 'snippet_name' %}`
 

@@ -1,0 +1,13 @@
+{
+  "slug": "full-groom",
+  "schemaVersion": 1,
+  "settings": {
+    "title": "Full Groom",
+    "icon": "paw",
+    "summary": "A bath, dry, trim, and tidy from nose to tail for dogs of any coat type.",
+    "description": "<p>This is the complete service: a warm bath, a thorough dry, a haircut to your chosen length, plus a nail trim and ear clean. It covers everything in one visit, so your dog leaves clean, tidy, and comfortable from nose to tail.</p><h2>What the appointment includes</h2><p>We start with the bath and dry, then move on to the cut, shaping the coat to the length and style you have asked for. The nails and ears are tended at the end, and we finish with a brush-through so the coat sits well.</p><ul><li>A warm bath and a full dry</li><li>A haircut to your chosen length</li><li>A nail trim and ear clean</li></ul><p>We work at a pace that keeps your dog calm and take breaks if they need one. Nervous or older dogs are welcome, and we would rather go slowly and keep them settled than push through and leave them stressed.</p><h3>After the groom</h3><p>You leave with a clean, comfortable dog, and we will flag anything we noticed on their skin or coat, such as dryness, lumps, or signs of irritation worth a vet's eye. We are not diagnosing anything, just passing on what we saw while we worked.</p><p>For breeds whose coats mat easily, brushing at home between visits makes a real difference and keeps future grooms quicker and gentler. Bring a photo if you have a particular style in mind, and let us know how your dog usually copes with handling so we can plan the visit around them.</p>",
+    "price": "From $80",
+    "duration": "120 min",
+    "featured_image": "/uploads/images/pawlish-services-full-groom.webp"
+  }
+}

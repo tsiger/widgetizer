@@ -31,6 +31,12 @@
     "corner_style": "sharp",
     "spacing_density": "default",
     "button_shape": "pill",
-    "enable_reveal_animations": true
+    "enable_reveal_animations": true,
+    "facebook_url": "#",
+    "instagram_url": "#",
+    "twitter_url": "#",
+    "linkedin_url": "#",
+    "youtube_url": "#",
+    "tiktok_url": "#"
   }
 }

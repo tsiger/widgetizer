@@ -23,6 +23,27 @@ export const ALLOWED_MIME_TYPES = [
   // Audio. `audio/mpeg` is the standard for .mp3; some browsers/OSes report `audio/mp3`.
   "audio/mpeg",
   "audio/mp3",
+  "video/mp4",
+];
+
+/**
+ * File extensions accepted for media uploads — mirrors ALLOWED_MIME_TYPES.
+ * Acceptance must gate on the extension and require it to match the declared MIME: the
+ * multipart Content-Type is client-controlled, storage keeps the original
+ * extension, and serving derives the response Content-Type from that stored
+ * extension — so a MIME-only check lets a crafted `x.html` upload in and back
+ * out as executable text/html.
+ */
+export const ALLOWED_UPLOAD_EXTENSIONS = [
+  ".jpg",
+  ".jpeg",
+  ".png",
+  ".gif",
+  ".webp",
+  ".svg",
+  ".pdf",
+  ".mp3",
+  ".mp4",
 ];
 
 /** MIME types that indicate a ZIP archive (used for theme / project imports). */

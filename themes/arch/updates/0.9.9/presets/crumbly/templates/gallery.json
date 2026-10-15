@@ -1,0 +1,253 @@
+{
+  "name": "Gallery",
+  "slug": "gallery",
+  "widgets": {
+    "gallery_hero": {
+      "type": "banner",
+      "settings": {
+        "height": "small",
+        "alignment": "center",
+        "color_scheme": "highlight-primary",
+        "fullwidth": true,
+        "top_spacing": "auto",
+        "content_width": "narrow",
+        "image": "/uploads/images/gallery-hero.webp",
+        "vertical_alignment": "end"
+      },
+      "blocks": {
+        "hero-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Gallery",
+            "size": "5xl"
+          }
+        },
+        "hero-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Golden crusts, flour-dusted counters, and the faces behind the oven. This is what mornings at Crumbly look like.</p>",
+            "size": "lg"
+          }
+        }
+      },
+      "blocksOrder": [
+        "hero-heading",
+        "hero-text"
+      ]
+    },
+    "bakes": {
+      "type": "bento-grid",
+      "settings": {
+        "eyebrow": "From the Oven",
+        "title": "Our Bakes",
+        "heading_alignment": "center",
+        "gap": "var(--space-md)",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "bento-hero": {
+          "type": "item",
+          "settings": {
+            "title": "Sourdough",
+            "text": "Our signature 24-hour loaf",
+            "col_span": 2,
+            "row_span": 2,
+            "text_color": "light",
+            "overlay_color": "#2e1f2e99",
+            "image": "/uploads/images/bento-croissants.webp"
+          }
+        },
+        "bento-2": {
+          "type": "item",
+          "settings": {
+            "title": "Croissants",
+            "text": "Hand-laminated daily",
+            "col_span": 1,
+            "row_span": 1,
+            "text_color": "light",
+            "overlay_color": "#2e1f2e99",
+            "image": "/uploads/images/bake-croissants-1.webp"
+          }
+        },
+        "bento-3": {
+          "type": "item",
+          "settings": {
+            "title": "Cinnamon Rolls",
+            "text": "Cream cheese icing",
+            "col_span": 1,
+            "row_span": 1,
+            "text_color": "light",
+            "overlay_color": "#2e1f2e99",
+            "image": "/uploads/images/bento-cinnamon.webp"
+          }
+        },
+        "bento-4": {
+          "type": "item",
+          "settings": {
+            "title": "Layer Cakes",
+            "text": "Made to order",
+            "col_span": 1,
+            "row_span": 1,
+            "text_color": "light",
+            "overlay_color": "#2e1f2e99",
+            "image": "/uploads/images/bento-cakes.webp"
+          }
+        },
+        "bento-5": {
+          "type": "item",
+          "settings": {
+            "title": "Cookies & Bars",
+            "text": "Brown butter everything",
+            "col_span": 1,
+            "row_span": 1,
+            "text_color": "light",
+            "overlay_color": "#2e1f2e99",
+            "image": "/uploads/images/bento-cookies-1.webp"
+          }
+        }
+      },
+      "blocksOrder": [
+        "bento-hero",
+        "bento-2",
+        "bento-3",
+        "bento-4",
+        "bento-5"
+      ]
+    },
+    "bakery_gallery": {
+      "type": "gallery",
+      "settings": {
+        "eyebrow": "The Bakery",
+        "title": "Behind the Counter",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 3,
+        "staggered": true,
+        "aspect_ratio": "4 / 3",
+        "color_scheme": "standard-secondary"
+      },
+      "blocks": {
+        "space-1": {
+          "type": "image",
+          "settings": {
+            "caption": "The display case",
+            "image": "/uploads/images/space-display.webp"
+          }
+        },
+        "space-2": {
+          "type": "image",
+          "settings": {
+            "caption": "Dough shaping",
+            "image": "/uploads/images/space-shaping.webp"
+          }
+        },
+        "space-3": {
+          "type": "image",
+          "settings": {
+            "caption": "Our deck oven",
+            "image": "/uploads/images/space-oven.webp"
+          }
+        },
+        "space-4": {
+          "type": "image",
+          "settings": {
+            "caption": "Café seating",
+            "image": "/uploads/images/space-cafe.webp"
+          }
+        },
+        "space-5": {
+          "type": "image",
+          "settings": {
+            "caption": "Flour-dusted hands",
+            "image": "/uploads/images/space-hands.webp"
+          }
+        },
+        "space-6": {
+          "type": "image",
+          "settings": {
+            "caption": "The bread wall",
+            "image": "/uploads/images/space-bread-wall.webp"
+          }
+        }
+      },
+      "blocksOrder": [
+        "space-1",
+        "space-2",
+        "space-3",
+        "space-4",
+        "space-5",
+        "space-6"
+      ]
+    },
+    "events": {
+      "type": "event-list",
+      "settings": {
+        "eyebrow": "Coming Up",
+        "title": "Classes & Events",
+        "heading_alignment": "center",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "event-1": {
+          "type": "event",
+          "settings": {
+            "day": "18",
+            "month": "May",
+            "title": "Sourdough Workshop",
+            "location": "Crumbly Bakery · 10:00 AM – 1:00 PM",
+            "description": "<p>Learn to make your own sourdough starter and bake your first loaf. All materials included. Bring an apron and an appetite.</p>",
+            "button_link": {
+              "text": "Reserve a Spot",
+              "href": "contact.html",
+              "target": "_self"
+            }
+          }
+        },
+        "event-2": {
+          "type": "event",
+          "settings": {
+            "day": "1",
+            "month": "Jun",
+            "title": "Kids Decorating Class",
+            "location": "Crumbly Bakery · 2:00 PM – 4:00 PM",
+            "description": "<p>Ages 6–12. Each kid decorates their own cupcakes with buttercream, sprinkles, and edible flowers. Parents welcome to watch (and eat).</p>",
+            "button_link": {
+              "text": "Sign Up",
+              "href": "contact.html",
+              "target": "_self"
+            }
+          }
+        },
+        "event-3": {
+          "type": "event",
+          "settings": {
+            "day": "14",
+            "month": "Jun",
+            "title": "Seasonal Pie Night",
+            "location": "Crumbly Bakery · 6:00 PM – 8:00 PM",
+            "description": "<p>A summer evening of pie. We bake, you eat. Seasonal fruit pies, savory galettes, and homemade ice cream. Bring your own wine.</p>",
+            "button_link": {
+              "text": "Get Tickets",
+              "href": "contact.html",
+              "target": "_self"
+            }
+          }
+        }
+      },
+      "blocksOrder": [
+        "event-1",
+        "event-2",
+        "event-3"
+      ]
+    }
+  },
+  "widgetsOrder": [
+    "gallery_hero",
+    "bakes",
+    "bakery_gallery",
+    "events"
+  ],
+  "id": "gallery",
+  "created": "2026-04-16T14:40:08.891Z",
+  "updated": "2026-04-16T14:56:14.073Z"
+}

@@ -1,0 +1,12 @@
+{
+  "slug": "meridian-press-editorial",
+  "schemaVersion": 1,
+  "settings": {
+    "title": "Editorial System for Meridian Press",
+    "summary": "We designed a grid and type system that lets a small publisher lay out a quarterly journal in half the time.",
+    "description": "<p>Meridian put out a quarterly arts journal, but every issue was laid out from scratch and looked a little different each time. With a small team and a hard print deadline four times a year, that meant long nights nudging columns into place and a title that never quite settled into a recognizable look.</p><h2>The brief</h2><p>Meridian did not want a rigid template that flattened every article into the same shape. An arts journal needs room to breathe and the odd surprise. The ask was a system with structure underneath and freedom on top, that a small team could work fast.</p><h2>What we built</h2><p>We built a reusable editorial system around a flexible grid, a pairing of two typefaces, and a set of templates for the recurring sections. The grid gives every page a shared backbone while still allowing a feature to open large and a review to run tight.</p><ul><li>A flexible baseline grid that holds the whole journal together</li><li>A two-typeface pairing for headings and body</li><li>Templates for features, reviews, and front matter</li><li>Spacing and style rules the team can apply without us</li></ul><p>The two-typeface pairing did a lot of quiet work. By limiting choices to one display face and one text face, we removed most of the per-issue decisions that used to eat time and drift the look. Designers now reach for a defined option instead of inventing one.</p><h2>The result</h2><p><strong>Layout time for each issue dropped by about half, and the journal finally looks like one consistent title across the run.</strong> The team spends less of its deadline week fighting the layout and more of it on the writing and images, which is where it wanted to be.</p>",
+    "client": "Meridian Press",
+    "year": "2023",
+    "featured_image": "/uploads/images/pixelcraft-projects-meridian-press-editorial.webp"
+  }
+}

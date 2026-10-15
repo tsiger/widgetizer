@@ -25,6 +25,9 @@ function checkDevMode() {
 // Module-level in-flight tracking — shared across ALL hook instances
 let inflightPromise = null;
 let inflightCacheKey = null;
+// Per project, bumped by invalidateThemeLocale so mounted hooks refetch and a
+// fetch begun before the invalidation cannot store its older answer as fresh.
+const generations = {};
 
 // Subscribers for useSyncExternalStore
 const listeners = new Set();
@@ -34,6 +37,24 @@ function subscribe(cb) {
 }
 function notify() {
   for (const cb of listeners) cb();
+}
+
+/**
+ * Mark a project's theme labels stale and refetch them where they are shown,
+ * keeping the old labels on screen until the new ones arrive. A theme update
+ * adds settings whose labels the cached copy does not have.
+ */
+export function invalidateThemeLocale(projectId) {
+  const prefix = `${projectId}:`;
+  for (const key of Object.keys(localeCache)) {
+    if (key.startsWith(prefix)) localeCache[key].timestamp = 0;
+  }
+  if (inflightCacheKey?.startsWith(prefix)) {
+    inflightPromise = null;
+    inflightCacheKey = null;
+  }
+  generations[projectId] = (generations[projectId] || 0) + 1;
+  notify();
 }
 
 export function getLocaleCacheKey(projectId, lang) {
@@ -85,6 +106,7 @@ export function useThemeLocale() {
 
   // Subscribe to locale cache changes — re-renders when notify() is called
   const locale = useSyncExternalStore(subscribe, () => getSnapshot(cacheKey));
+  const generation = useSyncExternalStore(subscribe, () => generations[projectId] || 0);
 
   // Fetch when cache is empty/stale (keeps serving stale data until refresh completes)
   useEffect(() => {
@@ -94,10 +116,14 @@ export function useThemeLocale() {
     // Another instance is already fetching this project+lang
     if (inflightCacheKey === cacheKey && inflightPromise) return;
 
-    inflightCacheKey = cacheKey;
-    inflightPromise = apiFetch(`/api/themes/project/${projectId}/locales/${lang}`)
-      .then((res) => (res.ok ? res.json() : {}))
+    const startedAt = generations[projectId] || 0;
+    const request = apiFetch(`/api/themes/project/${projectId}/locales/${lang}`)
+      .then((res) => {
+        if (!res.ok) throw new Error(`Theme locale request failed (${res.status})`);
+        return res.json();
+      })
       .then((data) => {
+        if ((generations[projectId] || 0) !== startedAt) return;
         localeCache[cacheKey] = { data, timestamp: Date.now() };
         notify();
       })
@@ -105,10 +131,14 @@ export function useThemeLocale() {
         // don't cache errors
       })
       .finally(() => {
-        inflightPromise = null;
-        inflightCacheKey = null;
+        if (inflightPromise === request) {
+          inflightPromise = null;
+          inflightCacheKey = null;
+        }
       });
-  }, [cacheKey, lang, projectId]);
+    inflightCacheKey = cacheKey;
+    inflightPromise = request;
+  }, [cacheKey, lang, projectId, generation]);
 
   const tTheme = useCallback(
     (str) => resolveThemeKey(str, locale),

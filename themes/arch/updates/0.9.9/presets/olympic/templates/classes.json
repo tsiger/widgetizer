@@ -1,0 +1,521 @@
+{
+  "name": "Classes",
+  "slug": "classes",
+  "widgets": {
+    "classes_hero": {
+      "type": "banner",
+      "settings": {
+        "overlay_color": "#0a0a0abf",
+        "height": "small",
+        "fullwidth": true,
+        "content_width": "medium",
+        "alignment": "center",
+        "color_scheme": "highlight-primary",
+        "image": "/uploads/images/classes-hero-1.webp"
+      },
+      "blocks": {
+        "classes-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Our Classes",
+            "size": "6xl"
+          }
+        },
+        "classes-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>From strength and conditioning to yoga and boxing, find the class that fits your goals.</p>",
+            "size": "lg"
+          }
+        }
+      },
+      "blocksOrder": [
+        "classes-heading",
+        "classes-text"
+      ]
+    },
+    "class_types": {
+      "type": "icon-card-grid",
+      "settings": {
+        "eyebrow": "Programs",
+        "eyebrow_uppercase": true,
+        "title": "What We Offer",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 3,
+        "card_layout": "box",
+        "alignment": "start",
+        "icon_style": "plain",
+        "icon_size": "lg",
+        "icon_shape": "sharp",
+        "color_scheme": "standard-primary",
+        "featured_image_position": "start"
+      },
+      "blocks": {
+        "class-1": {
+          "type": "card",
+          "settings": {
+            "icon": "barbell",
+            "title": "Strength Training",
+            "description": "<p>Progressive barbell programs focused on the big lifts. Squat, bench, deadlift, and overhead press with structured periodization and coaching cues.</p>"
+          }
+        },
+        "class-2": {
+          "type": "card",
+          "settings": {
+            "icon": "flame",
+            "title": "HIIT",
+            "description": "<p>45-minute high-intensity interval sessions combining kettlebells, rowing, battle ropes, and bodyweight movements. Maximum effort, maximum results.</p>"
+          }
+        },
+        "class-3": {
+          "type": "card",
+          "settings": {
+            "icon": "target-arrow",
+            "title": "Boxing",
+            "description": "<p>Technical striking fundamentals, heavy bag rounds, mitt work, and conditioning circuits. All skill levels from first-timers to experienced fighters.</p>"
+          }
+        },
+        "class-4": {
+          "type": "card",
+          "settings": {
+            "icon": "stretching",
+            "title": "Yoga & Mobility",
+            "description": "<p>Vinyasa flow and targeted mobility work. Essential recovery for hard-training athletes. Improves range of motion, reduces injury risk, and builds body awareness.</p>"
+          }
+        },
+        "class-5": {
+          "type": "card",
+          "settings": {
+            "icon": "trophy",
+            "title": "CrossFit",
+            "description": "<p>Constantly varied functional movements at high intensity. Olympic lifting, gymnastics, and metabolic conditioning in a competitive team environment.</p>"
+          }
+        },
+        "class-6": {
+          "type": "card",
+          "settings": {
+            "icon": "user",
+            "title": "Personal Training",
+            "description": "<p>One-on-one coaching tailored to your goals. Custom programming, nutrition guidance, and accountability from a certified trainer.</p>"
+          }
+        }
+      },
+      "blocksOrder": [
+        "class-1",
+        "class-2",
+        "class-3",
+        "class-4",
+        "class-5",
+        "class-6"
+      ]
+    },
+    "weekly_schedule": {
+      "type": "class-schedule",
+      "settings": {
+        "eyebrow": "Schedule",
+        "eyebrow_uppercase": true,
+        "title": "Weekly Class Timetable",
+        "heading_alignment": "start",
+        "note": "Schedule may vary on public holidays. Drop-ins welcome for all classes. All classes are 45–60 minutes. Arrive 10 minutes early for your first class. Equipment provided — just bring water and a towel.",
+        "layout": "tabs",
+        "week_start_day": "monday",
+        "default_day": "today",
+        "hide_empty_days": false,
+        "show_time": true,
+        "show_duration": true,
+        "show_instructor": true,
+        "show_level": true,
+        "show_description": true,
+        "show_book_button": true,
+        "color_scheme": "standard-secondary"
+      },
+      "blocks": {
+        "mon-1": {
+          "type": "class",
+          "settings": {
+            "day": "monday",
+            "time": "6:00 AM",
+            "duration": "60 min",
+            "title": "Strength Training",
+            "level": "all-levels",
+            "instructor": "",
+            "description": ""
+          }
+        },
+        "mon-2": {
+          "type": "class",
+          "settings": {
+            "day": "monday",
+            "time": "12:00 PM",
+            "duration": "45 min",
+            "title": "HIIT",
+            "level": "all-levels",
+            "instructor": "",
+            "description": ""
+          }
+        },
+        "mon-3": {
+          "type": "class",
+          "settings": {
+            "day": "monday",
+            "time": "5:30 PM",
+            "duration": "60 min",
+            "title": "Boxing",
+            "level": "all-levels"
+          }
+        },
+        "mon-4": {
+          "type": "class",
+          "settings": {
+            "day": "monday",
+            "time": "7:00 PM",
+            "duration": "60 min",
+            "title": "Yoga & Mobility",
+            "level": "all-levels"
+          }
+        },
+        "tue-1": {
+          "type": "class",
+          "settings": {
+            "day": "tuesday",
+            "time": "6:00 AM",
+            "duration": "45 min",
+            "title": "HIIT",
+            "level": "intermediate"
+          }
+        },
+        "tue-2": {
+          "type": "class",
+          "settings": {
+            "day": "tuesday",
+            "time": "12:00 PM",
+            "duration": "60 min",
+            "title": "Strength Training",
+            "level": "all-levels"
+          }
+        },
+        "tue-3": {
+          "type": "class",
+          "settings": {
+            "day": "tuesday",
+            "time": "5:30 PM",
+            "duration": "60 min",
+            "title": "CrossFit",
+            "level": "intermediate"
+          }
+        },
+        "tue-4": {
+          "type": "class",
+          "settings": {
+            "day": "tuesday",
+            "time": "7:00 PM",
+            "duration": "60 min",
+            "title": "Strength Training",
+            "level": "all-levels"
+          }
+        },
+        "wed-1": {
+          "type": "class",
+          "settings": {
+            "day": "wednesday",
+            "time": "6:00 AM",
+            "duration": "60 min",
+            "title": "Strength Training",
+            "level": "all-levels"
+          }
+        },
+        "wed-2": {
+          "type": "class",
+          "settings": {
+            "day": "wednesday",
+            "time": "12:00 PM",
+            "duration": "60 min",
+            "title": "Boxing",
+            "level": "beginner"
+          }
+        },
+        "wed-3": {
+          "type": "class",
+          "settings": {
+            "day": "wednesday",
+            "time": "5:30 PM",
+            "duration": "45 min",
+            "title": "HIIT",
+            "level": "intermediate"
+          }
+        },
+        "wed-4": {
+          "type": "class",
+          "settings": {
+            "day": "wednesday",
+            "time": "7:00 PM",
+            "duration": "60 min",
+            "title": "Yoga & Mobility",
+            "level": "all-levels"
+          }
+        },
+        "thu-1": {
+          "type": "class",
+          "settings": {
+            "day": "thursday",
+            "time": "6:00 AM",
+            "duration": "45 min",
+            "title": "HIIT",
+            "level": "intermediate"
+          }
+        },
+        "thu-2": {
+          "type": "class",
+          "settings": {
+            "day": "thursday",
+            "time": "12:00 PM",
+            "duration": "60 min",
+            "title": "Strength Training",
+            "level": "all-levels"
+          }
+        },
+        "thu-3": {
+          "type": "class",
+          "settings": {
+            "day": "thursday",
+            "time": "5:30 PM",
+            "duration": "60 min",
+            "title": "Boxing",
+            "level": "beginner"
+          }
+        },
+        "thu-4": {
+          "type": "class",
+          "settings": {
+            "day": "thursday",
+            "time": "7:00 PM",
+            "duration": "60 min",
+            "title": "CrossFit",
+            "level": "intermediate"
+          }
+        },
+        "fri-1": {
+          "type": "class",
+          "settings": {
+            "day": "friday",
+            "time": "6:00 AM",
+            "duration": "60 min",
+            "title": "Strength Training",
+            "level": "all-levels"
+          }
+        },
+        "fri-2": {
+          "type": "class",
+          "settings": {
+            "day": "friday",
+            "time": "12:00 PM",
+            "duration": "45 min",
+            "title": "HIIT",
+            "level": "intermediate"
+          }
+        },
+        "fri-3": {
+          "type": "class",
+          "settings": {
+            "day": "friday",
+            "time": "5:30 PM",
+            "duration": "60 min",
+            "title": "CrossFit",
+            "level": "intermediate"
+          }
+        },
+        "fri-4": {
+          "type": "class",
+          "settings": {
+            "day": "friday",
+            "time": "7:00 PM",
+            "duration": "90 min",
+            "title": "Open Gym",
+            "level": "all-levels"
+          }
+        },
+        "sat-1": {
+          "type": "class",
+          "settings": {
+            "day": "saturday",
+            "time": "8:00 AM",
+            "duration": "60 min",
+            "title": "CrossFit",
+            "level": "intermediate"
+          }
+        },
+        "sat-2": {
+          "type": "class",
+          "settings": {
+            "day": "saturday",
+            "time": "10:00 AM",
+            "duration": "60 min",
+            "title": "Yoga & Mobility",
+            "level": "all-levels"
+          }
+        },
+        "sat-3": {
+          "type": "class",
+          "settings": {
+            "day": "saturday",
+            "time": "12:00 PM",
+            "duration": "90 min",
+            "title": "Open Gym",
+            "level": "all-levels"
+          }
+        },
+        "sun-1": {
+          "type": "class",
+          "settings": {
+            "day": "sunday",
+            "time": "9:00 AM",
+            "duration": "60 min",
+            "title": "Yoga & Mobility",
+            "level": "all-levels",
+            "instructor": "",
+            "description": ""
+          }
+        },
+        "sun-2": {
+          "type": "class",
+          "settings": {
+            "day": "sunday",
+            "time": "11:00 AM",
+            "duration": "90 min",
+            "title": "Open Gym",
+            "level": "all-levels"
+          }
+        }
+      },
+      "blocksOrder": [
+        "mon-1",
+        "mon-2",
+        "mon-3",
+        "mon-4",
+        "tue-1",
+        "tue-2",
+        "tue-3",
+        "tue-4",
+        "wed-1",
+        "wed-2",
+        "wed-3",
+        "wed-4",
+        "thu-1",
+        "thu-2",
+        "thu-3",
+        "thu-4",
+        "fri-1",
+        "fri-2",
+        "fri-3",
+        "fri-4",
+        "sat-1",
+        "sat-2",
+        "sat-3",
+        "sun-1",
+        "sun-2"
+      ]
+    },
+    "coaching_split": {
+      "type": "image-text",
+      "settings": {
+        "image_position": "end",
+        "text_position": "center",
+        "color_scheme": "standard-primary",
+        "image": "/uploads/images/trainer-coaching.webp"
+      },
+      "blocks": {
+        "coaching-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Our Approach</p>",
+            "size": "sm",
+            "uppercase": true
+          }
+        },
+        "coaching-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Coaching That Makes the Difference",
+            "size": "5xl"
+          }
+        },
+        "coaching-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Every class is led by a certified trainer who watches your form, adjusts your load, and pushes you to improve. We do not just run timers and count reps. We coach.</p>",
+            "size": "base"
+          }
+        },
+        "coaching-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "href": "about.html",
+              "text": "Meet Our Trainers",
+              "target": "_self"
+            },
+            "style": "secondary",
+            "size": "large"
+          }
+        }
+      },
+      "blocksOrder": [
+        "coaching-eyebrow",
+        "coaching-heading",
+        "coaching-text",
+        "coaching-button"
+      ]
+    },
+    "classes_cta": {
+      "type": "action-bar",
+      "settings": {
+        "color_scheme": "highlight-primary"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Try a Class Free",
+            "size": "3xl"
+          }
+        },
+        "cta-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Drop in for any class. No membership required for your first session.</p>",
+            "size": "base",
+            "muted": true
+          }
+        },
+        "cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "href": "pricing.html",
+              "text": "Get Started",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "large"
+          }
+        }
+      },
+      "blocksOrder": [
+        "cta-heading",
+        "cta-text",
+        "cta-button"
+      ]
+    }
+  },
+  "widgetsOrder": [
+    "classes_hero",
+    "class_types",
+    "weekly_schedule",
+    "coaching_split",
+    "classes_cta"
+  ],
+  "id": "classes",
+  "created": "2026-04-19T11:06:05.091Z",
+  "updated": "2026-04-19T14:42:40.966Z"
+}

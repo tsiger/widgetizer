@@ -308,7 +308,7 @@
                 {% if block.settings.title != blank %}
                   <h3 class="image-hotspot-tooltip-title w-title t-sm" data-setting="title">{{ block.settings.title }}</h3>
                 {% endif %}
-                <button type="button" class="image-hotspot-tooltip-close" aria-label="Close tooltip">
+                <button type="button" class="image-hotspot-tooltip-close" aria-label="{{ 'site.image_hotspots.close_tooltip' | t }}">
                   <svg class="image-hotspot-tooltip-close-icon" viewBox="0 0 24 24" aria-hidden="true">
                     <path d="M18 6L6 18M6 6l12 12" stroke-linecap="round" stroke-linejoin="round" />
                   </svg>

@@ -1,0 +1,239 @@
+{
+  "name": "Gallery",
+  "slug": "gallery",
+  "widgets": {
+    "gallery_hero": {
+      "type": "banner",
+      "settings": {
+        "height": "small",
+        "fullwidth": true,
+        "content_width": "medium",
+        "alignment": "start",
+        "vertical_alignment": "center",
+        "color_scheme": "highlight-secondary",
+        "top_spacing": "none",
+        "bottom_spacing": "none",
+        "image": "/uploads/images/gallery-hero.webp",
+        "overlay_color": "#0a1e388a"
+      },
+      "blocks": {
+        "hero-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Gallery</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": false
+          }
+        },
+        "hero-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Cuts from our table.",
+            "size": "7xl"
+          }
+        },
+        "hero-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Real dogs. Real grooms. Updated weekly.</p>",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        }
+      },
+      "blocksOrder": [
+        "hero-eyebrow",
+        "hero-heading",
+        "hero-text"
+      ]
+    },
+    "gallery_grid": {
+      "type": "masonry-gallery",
+      "settings": {
+        "eyebrow": "",
+        "eyebrow_uppercase": false,
+        "title": "",
+        "heading_alignment": "start",
+        "alignment": "start",
+        "columns_desktop": 3,
+        "gap": "medium",
+        "color_scheme": "standard-primary",
+        "description": ""
+      },
+      "blocks": {
+        "item-maple": {
+          "type": "item",
+          "settings": {
+            "title": "Maple",
+            "category": "Goldendoodle · teddy",
+            "image": "/uploads/images/gallery-cut-1.webp"
+          }
+        },
+        "item-otis": {
+          "type": "item",
+          "settings": {
+            "title": "Otis",
+            "category": "Schnauzer · hand-strip",
+            "image": "/uploads/images/gallery-cut-2.webp"
+          }
+        },
+        "item-koda": {
+          "type": "item",
+          "settings": {
+            "title": "Koda",
+            "category": "Husky · de-shed",
+            "image": "/uploads/images/gallery-cut-3.webp"
+          }
+        },
+        "item-luna": {
+          "type": "item",
+          "settings": {
+            "title": "Luna",
+            "category": "Cavalier · tidy",
+            "image": "/uploads/images/gallery-cut-5.webp"
+          }
+        },
+        "item-biscuit": {
+          "type": "item",
+          "settings": {
+            "title": "Biscuit",
+            "category": "Cockapoo · puppy cut",
+            "image": "/uploads/images/gallery-cut-4.webp"
+          }
+        },
+        "item-marlow": {
+          "type": "item",
+          "settings": {
+            "title": "Marlow",
+            "category": "Senior lab · bath",
+            "image": "/uploads/images/gallery-cut-6.webp"
+          }
+        },
+        "item-finn": {
+          "type": "item",
+          "settings": {
+            "title": "Finn",
+            "category": "Wire fox terrier · hand-strip",
+            "image": "/uploads/images/gallery-cut-7.webp"
+          }
+        },
+        "item-ziggy": {
+          "type": "item",
+          "settings": {
+            "title": "Ziggy",
+            "category": "Sheltie · brush-out",
+            "image": "/uploads/images/gallery-cut-8.webp"
+          }
+        },
+        "item-arlo": {
+          "type": "item",
+          "settings": {
+            "title": "Arlo",
+            "category": "Bichon · round head",
+            "image": "/uploads/images/gallery-cut-9.webp"
+          }
+        },
+        "item-pepper": {
+          "type": "item",
+          "settings": {
+            "title": "Pepper",
+            "category": "Yorkie · short cut",
+            "image": "/uploads/images/gallery-cut-11.webp"
+          }
+        },
+        "item-hank": {
+          "type": "item",
+          "settings": {
+            "title": "Hank",
+            "category": "Bernedoodle · long teddy",
+            "image": "/uploads/images/gallery-cut-10.webp"
+          }
+        },
+        "item-rosie": {
+          "type": "item",
+          "settings": {
+            "title": "Rosie",
+            "category": "Border collie · groom",
+            "image": "/uploads/images/gallery-cut-12.webp"
+          }
+        },
+        "item-gus": {
+          "type": "item",
+          "settings": {
+            "title": "Gus",
+            "category": "Bedlington · trim",
+            "image": "/uploads/images/gallery-cut-13.webp"
+          }
+        },
+        "item-ivy": {
+          "type": "item",
+          "settings": {
+            "title": "Ivy",
+            "category": "Cavachon · puppy cut",
+            "image": "/uploads/images/gallery-cut-14.webp"
+          }
+        }
+      },
+      "blocksOrder": [
+        "item-maple",
+        "item-otis",
+        "item-koda",
+        "item-luna",
+        "item-biscuit",
+        "item-marlow",
+        "item-finn",
+        "item-ziggy",
+        "item-arlo",
+        "item-pepper",
+        "item-hank",
+        "item-rosie",
+        "item-gus",
+        "item-ivy"
+      ]
+    },
+    "gallery_close": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight-primary",
+        "top_spacing": "small",
+        "bottom_spacing": "small"
+      },
+      "blocks": {
+        "close-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Want this for your dog?",
+            "size": "3xl"
+          }
+        },
+        "close-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Book a groom",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "large"
+          }
+        }
+      },
+      "blocksOrder": [
+        "close-heading",
+        "close-button"
+      ]
+    }
+  },
+  "widgetsOrder": [
+    "gallery_hero",
+    "gallery_grid",
+    "gallery_close"
+  ],
+  "id": "gallery",
+  "created": "2026-04-23T13:59:56.910Z",
+  "updated": "2026-04-23T15:19:27.882Z"
+}

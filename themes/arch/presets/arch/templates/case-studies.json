@@ -8,7 +8,8 @@
         "height": "medium",
         "alignment": "center",
         "color_scheme": "highlight-primary",
-        "fullwidth": true
+        "fullwidth": true,
+        "image": "/uploads/images/archhero04.webp"
       },
       "blocks": {
         "case-eyebrow": {
@@ -78,7 +79,8 @@
               "text": "Read case study",
               "href": "case-study-atlas-growth.html",
               "target": "_self"
-            }
+            },
+            "image": "/uploads/images/archhero01.webp"
           }
         },
         "project-2": {
@@ -90,7 +92,8 @@
               "text": "Read case study",
               "href": "case-study-atlas-growth.html",
               "target": "_self"
-            }
+            },
+            "image": "/uploads/images/archcta01.webp"
           }
         },
         "project-3": {
@@ -102,7 +105,8 @@
               "text": "Read case study",
               "href": "case-study-atlas-growth.html",
               "target": "_self"
-            }
+            },
+            "image": "/uploads/images/archhero02.webp"
           }
         }
       },
@@ -124,7 +128,8 @@
             "quote": "Arch delivered a clear plan and stayed hands-on through execution.",
             "name": "Sofia Grant",
             "title": "CEO, Atlas Group",
-            "rating": "5"
+            "rating": "5",
+            "avatar": "/uploads/images/about1.webp"
           }
         },
         "case-quote-2": {
@@ -133,7 +138,8 @@
             "quote": "We shipped faster, aligned better, and finally had the metrics we needed.",
             "name": "Noah Kim",
             "title": "VP Product, Momentum",
-            "rating": "5"
+            "rating": "5",
+            "avatar": "/uploads/images/about3.webp"
           }
         }
       },
@@ -145,7 +151,8 @@
         "height": "small",
         "alignment": "center",
         "color_scheme": "highlight-primary",
-        "fullwidth": true
+        "fullwidth": true,
+        "image": "/uploads/images/archcta01.webp"
       },
       "blocks": {
         "case-cta-heading": {

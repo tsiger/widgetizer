@@ -1,13 +1,28 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { X, FileText } from "lucide-react";
+import { nativeLanguageName, hreflangCase } from "@widgetizer/core/languages";
 import Button from "../ui/Button";
+import { useDefaultLanguage, useExtraLanguages, useIsMultilang } from "../../stores/projectStore";
 import { API_URL } from "../../lib/config";
 
 export default function MediaDrawer({ visible, onClose, selectedFile, onSave, loading, activeProject }) {
   const { t } = useTranslation();
+  const isMultilang = useIsMultilang();
+  const defaultLanguage = useDefaultLanguage();
+  const extraLanguages = useExtraLanguages();
+  // The binaries and the grid are shared; only these three fields are per
+  // language, and only where someone has written them. The drawer stays mounted
+  // between openings, so the chosen language is tied to the file it was chosen
+  // for — a different file opens on the default language again.
+  const [chosen, setChosen] = useState({ fileId: null, language: defaultLanguage });
+  const language = chosen.fileId === (selectedFile?.id ?? null) ? chosen.language : defaultLanguage;
+  const setLanguage = (code) => setChosen({ fileId: selectedFile?.id ?? null, language: code });
+  const isTranslation = isMultilang && language !== defaultLanguage;
+  const inherited = selectedFile?.metadata || {};
+  const defaultName = nativeLanguageName(defaultLanguage);
 
   const {
     register,
@@ -29,17 +44,18 @@ export default function MediaDrawer({ visible, onClose, selectedFile, onSave, lo
   // below see "no change" and skip the reset, showing blank alt/title/caption.
   const prevSelectedFileRef = useRef(JSON.stringify(null));
 
-  // Update form data when selectedFile or visibility changes
+  // Update form data when selectedFile, language or visibility changes
   useEffect(() => {
-    const currentSelectedFileStr = JSON.stringify(selectedFile);
+    const currentSelectedFileStr = JSON.stringify([selectedFile, language]);
 
     if (visible && selectedFile) {
-      // Only reset if the file actually changed
+      // Only reset if the file (or the language being written) actually changed
       if (prevSelectedFileRef.current !== currentSelectedFileStr) {
+        const source = language === defaultLanguage ? selectedFile.metadata || {} : selectedFile.translations?.[language];
         reset({
-          alt: selectedFile.metadata?.alt || "",
-          title: selectedFile.metadata?.title || "",
-          caption: selectedFile.metadata?.caption || "",
+          alt: source?.alt || "",
+          title: source?.title || "",
+          caption: source?.caption || "",
         });
         prevSelectedFileRef.current = currentSelectedFileStr;
       }
@@ -48,7 +64,7 @@ export default function MediaDrawer({ visible, onClose, selectedFile, onSave, lo
       reset({ alt: "", title: "", caption: "" });
       prevSelectedFileRef.current = JSON.stringify(null);
     }
-  }, [visible, selectedFile, reset]);
+  }, [visible, selectedFile, language, defaultLanguage, reset]);
 
   // Prevent background scroll when drawer is open
   useEffect(() => {
@@ -64,11 +80,20 @@ export default function MediaDrawer({ visible, onClose, selectedFile, onSave, lo
   }, [visible]);
 
   const onSubmitHandler = (data) => {
-    if (selectedFile) {
+    if (!selectedFile) return;
+    if (!isTranslation) {
       // caption is image-only (the field renders for images only; the backend also
       // gates on type), so a non-image save sends an empty caption harmlessly.
       onSave(selectedFile.id, { alt: data.alt, title: data.title, caption: data.caption });
+      return;
     }
+
+    // Omitted translated fields inherit the default-language metadata.
+    const written = {};
+    if (data.alt.trim()) written.alt = data.alt;
+    if (data.title.trim()) written.title = data.title;
+    if (data.caption.trim()) written.caption = data.caption;
+    onSave(selectedFile.id, written, language);
   };
 
   // Handle Escape key press to close the drawer
@@ -127,7 +152,15 @@ export default function MediaDrawer({ visible, onClose, selectedFile, onSave, lo
           </button>
         </div>
 
-        <form onSubmit={rhfHandleSubmit(onSubmitHandler)} className="p-6 space-y-6">
+        {/* React bubbles events through portals along the component tree, so without
+            this a drawer opened from inside another form would submit that form too. */}
+        <form
+          onSubmit={(event) => {
+            event.stopPropagation();
+            return rhfHandleSubmit(onSubmitHandler)(event);
+          }}
+          className="p-6 space-y-6"
+        >
           {/* Preview section */}
           {fileUrl && (
             <div className="mb-4 p-2 border border-slate-200 rounded-sm bg-slate-50 flex flex-col items-center justify-center gap-2">
@@ -146,24 +179,48 @@ export default function MediaDrawer({ visible, onClose, selectedFile, onSave, lo
             </div>
           )}
 
+          {isMultilang && (
+            <div className="flex items-center gap-3">
+              <label htmlFor="media-metadata-language" className="shrink-0 text-sm font-medium text-slate-600">
+                {t("forms.media.languagesLabel")}
+              </label>
+              <select
+                id="media-metadata-language"
+                value={language}
+                onChange={(event) => setLanguage(event.target.value)}
+                className="form-select min-w-0 flex-1"
+              >
+                {[defaultLanguage, ...extraLanguages].map((code) => (
+                  <option key={code} value={code}>
+                    {nativeLanguageName(code)} ({hreflangCase(code)})
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+
           {/* Alt Text (required) + Title */}
           <div className="form-field">
-            <label htmlFor="alt" className="form-label">
-              {t("forms.media.altLabel")}
+            <label htmlFor="alt" className={isTranslation ? "form-label-optional" : "form-label"}>
+              {t(isTranslation ? "forms.media.altTranslationLabel" : "forms.media.altLabel")}
             </label>
             <input
               type="text"
               id="alt"
               {...register("alt", {
-                required: t("forms.media.altRequired"),
-                validate: (value) => value.trim() !== "" || t("forms.media.altNotEmpty"),
+                required: isTranslation ? false : t("forms.media.altRequired"),
+                validate: (value) =>
+                  isTranslation || value.trim() !== "" || t("forms.media.altNotEmpty"),
               })}
               className="form-input"
-              aria-required="true"
+              placeholder={isTranslation ? inherited.alt || "" : undefined}
+              aria-required={isTranslation ? undefined : "true"}
             />
             {errors.alt && <p className="form-error">{errors.alt.message}</p>}
             <p className="form-description">
-              {t("forms.media.altHelp", { type: t("forms.media.types.image").toLowerCase() })}
+              {isTranslation
+                ? t("forms.media.inheritsHelp", { name: defaultName })
+                : t("forms.media.altHelp", { type: t("forms.media.types.image").toLowerCase() })}
             </p>
           </div>
 
@@ -171,8 +228,16 @@ export default function MediaDrawer({ visible, onClose, selectedFile, onSave, lo
             <label htmlFor="title" className="form-label-optional">
               {t("forms.media.titleLabel")}
             </label>
-            <input type="text" id="title" {...register("title")} className="form-input" />
-            <p className="form-description">{t("forms.media.titleHelp")}</p>
+            <input
+              type="text"
+              id="title"
+              {...register("title")}
+              className="form-input"
+              placeholder={isTranslation ? inherited.title || "" : undefined}
+            />
+            <p className="form-description">
+              {isTranslation ? t("forms.media.inheritsHelp", { name: defaultName }) : t("forms.media.titleHelp")}
+            </p>
           </div>
 
           {/* Caption — images only (a caption is an image concept; the backend also gates on type) */}
@@ -181,8 +246,16 @@ export default function MediaDrawer({ visible, onClose, selectedFile, onSave, lo
               <label htmlFor="caption" className="form-label-optional">
                 {t("forms.media.captionLabel")}
               </label>
-              <input type="text" id="caption" {...register("caption")} className="form-input" />
-              <p className="form-description">{t("forms.media.captionHelp")}</p>
+              <input
+                type="text"
+                id="caption"
+                {...register("caption")}
+                className="form-input"
+                placeholder={isTranslation ? inherited.caption || "" : undefined}
+              />
+              <p className="form-description">
+                {isTranslation ? t("forms.media.inheritsHelp", { name: defaultName }) : t("forms.media.captionHelp")}
+              </p>
             </div>
           )}
 

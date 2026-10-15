@@ -41,6 +41,15 @@ describe("MediaGridItem — non-image icon", () => {
   });
 });
 
+describe("MediaGridItem — video icon", () => {
+  it("shows the Film icon for an MP4, without loading a player", () => {
+    const { container } = renderItem({ id: "v", type: "video/mp4", filename: "clip.mp4" });
+    expect(container.querySelector(".lucide-film")).not.toBeNull();
+    expect(container.querySelector(".lucide-file-text")).toBeNull();
+    expect(container.querySelector("video")).toBeNull();
+  });
+});
+
 describe("MediaGridItem — name label", () => {
   it("shows the filename, not the title, for an image with a title set", () => {
     const { getByText, queryByText } = renderItem({

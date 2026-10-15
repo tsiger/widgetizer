@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 
 // Mock the async query modules BEFORE importing the store
 vi.mock("../../queries/pageManager", () => ({
@@ -367,8 +367,56 @@ describe("pageStore", () => {
       expect(state.loadedProjectId).toBe("project-a");
       expect(Object.keys(state.page.widgets)).toEqual(["w-1"]);
       expect(state.globalWidgets.header.type).toBe("header");
+      // originalGlobalWidgets is set alongside globalWidgets on a successful
+      // load — an independent deep-copy clone, not the same reference (so a
+      // later live-state mutation can't retroactively move the save baseline).
+      expect(state.originalGlobalWidgets).toEqual(state.globalWidgets);
+      expect(state.originalGlobalWidgets).not.toBe(state.globalWidgets);
       // The snapshot should reflect what themeStore loaded
       expect(state.themeSettingsSnapshot).toEqual(themeData);
+    });
+
+    // Each language has its own header/footer, so the canvas would otherwise show
+    // the default language's chrome around a translated page.
+    it("fetches the globals of the language the page came back in", async () => {
+      getPage.mockResolvedValue({ id: "sxetika", language: "el", widgets: {}, widgetsOrder: [] });
+      getGlobalWidgets.mockResolvedValue({ header: null, footer: null });
+
+      await usePageStore.getState().loadPage("sxetika", "el");
+      expect(getGlobalWidgets).toHaveBeenCalledWith("el");
+    });
+
+    it("asks for the default language's globals by the language the page reports, not the argument", async () => {
+      getPage.mockResolvedValue({ id: "about", language: "en", widgets: {}, widgetsOrder: [] });
+      getGlobalWidgets.mockResolvedValue({ header: null, footer: null });
+
+      await usePageStore.getState().loadPage("about");
+      expect(getGlobalWidgets).toHaveBeenCalledWith("en");
+    });
+
+    // The globals used to be written the moment they arrived, so a load that had
+    // already been superseded could leave one language's header on another
+    // language's page — and the next save would write it into that page's file.
+    it("does not let a superseded load's globals land on the page that replaced it", async () => {
+      let releaseEnglish;
+      getPage
+        .mockImplementationOnce(async () => ({ id: "about", language: "en", widgets: {}, widgetsOrder: [] }))
+        .mockImplementationOnce(async () => ({ id: "sxetika", language: "el", widgets: {}, widgetsOrder: [] }));
+      getGlobalWidgets
+        .mockImplementationOnce(
+          () => new Promise((resolve) => { releaseEnglish = () => resolve({ header: { settings: { text: "EN" } }, footer: null }); }),
+        )
+        .mockImplementationOnce(async () => ({ header: { settings: { text: "EL" } }, footer: null }));
+
+      const english = usePageStore.getState().loadPage("about", "en");
+      await usePageStore.getState().loadPage("sxetika", "el");
+      releaseEnglish();
+      await english;
+
+      const state = usePageStore.getState();
+      expect(state.page.id).toBe("sxetika");
+      expect(state.globalWidgets.header.settings.text).toBe("EL");
+      expect(state.originalGlobalWidgets.header.settings.text).toBe("EL");
     });
 
     it("clears stale state when the load fails", async () => {
@@ -383,6 +431,7 @@ describe("pageStore", () => {
       const state = usePageStore.getState();
       expect(state.page).toBeNull();
       expect(state.globalWidgets).toEqual({ header: null, footer: null });
+      expect(state.originalGlobalWidgets).toEqual({ header: null, footer: null });
       expect(state.themeSettingsSnapshot).toBeNull();
       expect(state.loadedProjectId).toBe("project-b");
       expect(state.error).toBe("boom");
@@ -557,6 +606,149 @@ describe("pageStore", () => {
 
       page.title = "Mutated";
       expect(usePageStore.getState().originalPage.title).toBe("Original");
+    });
+  });
+
+  // --------------------------------------------------------------------------
+  // setOriginalGlobalWidgets
+  // --------------------------------------------------------------------------
+
+  describe("setOriginalGlobalWidgets", () => {
+    it("stores a deep copy of the provided globalWidgets", () => {
+      const globalWidgets = {
+        header: { type: "header", settings: { logo: "logo.png" }, blocks: {}, blocksOrder: [] },
+        footer: null,
+      };
+      usePageStore.getState().setOriginalGlobalWidgets(globalWidgets);
+
+      const stored = usePageStore.getState().originalGlobalWidgets;
+      expect(stored).toEqual(globalWidgets);
+      expect(stored).not.toBe(globalWidgets); // deep copy
+    });
+
+    it("stored copy is independent of the source object", () => {
+      const globalWidgets = {
+        header: { type: "header", settings: { logo: "logo.png" }, blocks: {}, blocksOrder: [] },
+        footer: null,
+      };
+      usePageStore.getState().setOriginalGlobalWidgets(globalWidgets);
+
+      globalWidgets.header.settings.logo = "mutated.png";
+      expect(usePageStore.getState().originalGlobalWidgets.header.settings.logo).toBe("logo.png");
+    });
+  });
+
+  // --------------------------------------------------------------------------
+  // undo history
+  // --------------------------------------------------------------------------
+
+  describe("undo history", () => {
+    let now;
+    let nowSpy;
+
+    const temporal = () => usePageStore.temporal.getState();
+    const textOf = () => usePageStore.getState().page.widgets["w-1"].settings.text;
+    const editSettings = (changes) => {
+      const page = usePageStore.getState().page;
+      const widget = page.widgets["w-1"];
+      usePageStore.getState().setPage({
+        ...page,
+        widgets: { ...page.widgets, "w-1": { ...widget, settings: { ...widget.settings, ...changes } } },
+      });
+    };
+    const typeText = (text) => editSettings({ text });
+
+    beforeEach(() => {
+      now = 1_000_000;
+      nowSpy = vi.spyOn(Date, "now").mockImplementation(() => now);
+      seedPage();
+      temporal().clear();
+    });
+
+    afterEach(() => {
+      nowSpy.mockRestore();
+    });
+
+    it("turns quick edits to one setting into one undo step", () => {
+      for (const text of ["H", "Hi", "Hi t", "Hi there"]) {
+        typeText(text);
+        now += 200;
+      }
+
+      expect(temporal().pastStates).toHaveLength(1);
+      temporal().undo();
+      expect(textOf()).toBe("Hello");
+    });
+
+    it("starts a new step after a pause", () => {
+      typeText("A");
+      now += 600;
+      typeText("AB");
+
+      expect(temporal().pastStates).toHaveLength(2);
+      temporal().undo();
+      expect(textOf()).toBe("A");
+    });
+
+    it("keeps quick edits to different settings as separate steps", () => {
+      typeText("A");
+      now += 100;
+      editSettings({ color: "red" });
+
+      expect(temporal().pastStates).toHaveLength(2);
+    });
+
+    it("does not group a change that touches several values at once", () => {
+      editSettings({ text: "A", color: "red" });
+      now += 100;
+      editSettings({ text: "B", color: "blue" });
+
+      expect(temporal().pastStates).toHaveLength(2);
+    });
+
+    it("starts a new step for an edit made right after an undo or redo", () => {
+      typeText("A");
+      now += 600;
+      typeText("AB");
+      temporal().undo();
+      now += 100;
+      typeText("AC");
+
+      expect(temporal().pastStates).toHaveLength(2);
+      expect(temporal().futureStates).toHaveLength(0);
+
+      temporal().undo();
+      now += 100;
+      temporal().redo();
+      now += 100;
+      typeText("ACD");
+      expect(temporal().pastStates).toHaveLength(3);
+    });
+
+    it("groups quick edits to one theme setting", () => {
+      seedThemeSettings();
+      temporal().clear();
+
+      for (const value of ["#111111", "#222222", "#333333"]) {
+        const next = JSON.parse(JSON.stringify(mockThemeStoreState.settings));
+        next.settings.global.colors[0].value = value;
+        mockThemeStoreState.settings = next;
+        usePageStore.getState().updateThemeSetting("colors", "primary_color", value);
+        now += 100;
+      }
+
+      expect(temporal().pastStates).toHaveLength(1);
+      temporal().undo();
+      expect(usePageStore.getState().themeSettingsSnapshot.settings.global.colors[0].value).toBe("#ff0000");
+    });
+
+    it("keeps up to 150 steps", () => {
+      for (let step = 0; step < 160; step++) {
+        typeText(`step ${step}`);
+        now += 1000;
+      }
+
+      expect(temporal().pastStates).toHaveLength(150);
     });
   });
 });

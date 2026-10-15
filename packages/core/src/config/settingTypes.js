@@ -30,6 +30,7 @@ export const SUPPORTED_SETTING_TYPES = [
   "gallery",
   "table",
   "file",
+  "video",
   "link",
   "youtube",
   "icon",

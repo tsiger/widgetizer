@@ -194,7 +194,7 @@
       {% endfor %}
       {% assign dept_array = departments | split: ',' %}
 
-      <ul class="job-filter-list" role="group" aria-label="Job filters">
+      <ul class="job-filter-list" role="group" aria-label="{{ 'site.job_listing.filters' | t }}">
         <li>
           <button
             type="button"
@@ -202,7 +202,7 @@
             data-filter="all"
             aria-pressed="true"
           >
-            All Positions
+            {{ widget.settings.all_positions_text }}
           </button>
         </li>
         {% for dept in dept_array %}

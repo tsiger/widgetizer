@@ -13,16 +13,18 @@
 
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 
 import {
   sanitizeRichText,
   sanitizeWidgetData,
   sanitizeCollectionItemData,
-  stripHtmlTags,
+  stripHtmlToText,
   sanitizeCssValue,
   sanitizeThemeSettings,
   sanitizeImagePath,
   sanitizeImageSettingValue,
+  sanitizeVideoPath,
 } from "../services/sanitizationService.js";
 
 // ============================================================================
@@ -1002,6 +1004,82 @@ describe("image setting sanitization (entry points)", () => {
   });
 });
 
+describe("video setting sanitization", () => {
+  it("keeps only an MP4 in the project's file uploads", () => {
+    assert.equal(sanitizeVideoPath("/uploads/files/tour.mp4"), "/uploads/files/tour.mp4");
+    assert.equal(sanitizeVideoPath("  /uploads/files/Legacy.MP4 "), "/uploads/files/Legacy.MP4");
+    for (const bad of [
+      "",
+      null,
+      undefined,
+      42,
+      { path: "/uploads/files/tour.mp4" },
+      "/uploads/files/song.mp3",
+      "/uploads/files/brochure.pdf",
+      "/uploads/images/tour.mp4",
+      "/uploads/videos/tour.mp4",
+      "uploads/files/tour.mp4",
+      "https://cdn.example/tour.mp4",
+      "//cdn.example/uploads/files/tour.mp4",
+      "/api/media/projects/p1/uploads/files/tour.mp4",
+      "/uploads/files/../secret.mp4",
+      "/uploads/files/sub/tour.mp4",
+      '/uploads/files/x" onerror="alert(1).mp4',
+      "/uploads/files/a b.mp4",
+      "javascript:alert(1)//.mp4",
+    ]) {
+      assert.equal(sanitizeVideoPath(bad), "", JSON.stringify(bad));
+    }
+  });
+
+  it("applies the same rule to widget, block and collection values, null included", () => {
+    const schema = {
+      settings: [{ id: "video", type: "video" }, { id: "other", type: "video" }, { id: "gone", type: "video" }],
+      blocks: [{ type: "clip", settings: [{ id: "video", type: "video" }] }],
+    };
+    const data = {
+      settings: { video: "/uploads/files/tour.mp4", other: "https://youtube.com/watch?v=x", gone: null },
+      blocks: { b1: { type: "clip", settings: { video: "/uploads/files/song.mp3" } } },
+    };
+    sanitizeWidgetData(data, schema);
+    assert.equal(data.settings.video, "/uploads/files/tour.mp4");
+    assert.equal(data.settings.other, "");
+    assert.equal(data.settings.gone, "");
+    assert.equal(data.blocks.b1.settings.video, "");
+
+    const item = { settings: { clip: { src: "/uploads/files/tour.mp4" }, ok: "/uploads/files/ok.mp4" } };
+    sanitizeCollectionItemData(item, { settings: [{ id: "clip", type: "video" }, { id: "ok", type: "video" }] });
+    assert.equal(item.settings.clip, "");
+    assert.equal(item.settings.ok, "/uploads/files/ok.mp4");
+  });
+
+  it("keeps a valid theme video or an explicit clear, and reverts anything else to a valid default", () => {
+    const themeData = {
+      settings: {
+        global: {
+          media: [
+            { type: "video", id: "ok", value: "/uploads/files/intro.mp4", default: "" },
+            { type: "video", id: "cleared", value: "", default: "/uploads/files/default.mp4" },
+            { type: "video", id: "bad", value: "/uploads/files/intro.mov", default: "/uploads/files/default.mp4" },
+            { type: "video", id: "nulled", value: null, default: "/uploads/files/default.mp4" },
+            { type: "video", id: "object", value: { url: "x" }, default: "" },
+            { type: "video", id: "badDefault", value: 7, default: "https://cdn.example/x.mp4" },
+          ],
+        },
+      },
+    };
+    const { data, warnings } = sanitizeThemeSettings(themeData);
+    const byId = Object.fromEntries(data.settings.global.media.map((s) => [s.id, s.value]));
+    assert.equal(byId.ok, "/uploads/files/intro.mp4");
+    assert.equal(byId.cleared, "");
+    assert.equal(byId.bad, "/uploads/files/default.mp4");
+    assert.equal(byId.nulled, "/uploads/files/default.mp4");
+    assert.equal(byId.object, "");
+    assert.equal(byId.badDefault, "");
+    assert.equal(warnings.length, 4);
+  });
+});
+
 // ============================================================================
 // gallery sanitization — via the exported entry points (the switch helpers are
 // private). The value is a string[] of upload paths. Same rule everywhere: drop
@@ -1142,59 +1220,162 @@ describe("table sanitization", () => {
 });
 
 // ============================================================================
-// stripHtmlTags
+// stripHtmlToText
 // ============================================================================
 
-describe("stripHtmlTags", () => {
+describe("stripHtmlToText", () => {
   it("strips <script> tags completely", () => {
-    assert.equal(stripHtmlTags('<script>alert("xss")</script>'), "");
+    assert.equal(stripHtmlToText('<script>alert("xss")</script>'), "");
   });
 
   it("strips <script> tags but keeps surrounding text", () => {
-    assert.equal(stripHtmlTags('Hello <script>alert("xss")</script> World'), "Hello  World");
+    assert.equal(stripHtmlToText('Hello <script>alert("xss")</script> World'), "Hello  World");
   });
 
   it("preserves ampersands without encoding", () => {
-    assert.equal(stripHtmlTags("Tom & Jerry"), "Tom & Jerry");
+    assert.equal(stripHtmlToText("Tom & Jerry"), "Tom & Jerry");
   });
 
   it("preserves double quotes without encoding", () => {
-    assert.equal(stripHtmlTags('Say "Hello"'), 'Say "Hello"');
+    assert.equal(stripHtmlToText('Say "Hello"'), 'Say "Hello"');
   });
 
   it("preserves single quotes without encoding", () => {
-    assert.equal(stripHtmlTags("O'Brien"), "O'Brien");
+    assert.equal(stripHtmlToText("O'Brien"), "O'Brien");
   });
 
   it("preserves special unicode characters", () => {
     const input = "Test & Site #1 — \"Quotes\"";
-    assert.equal(stripHtmlTags(input), input);
+    assert.equal(stripHtmlToText(input), input);
   });
 
   it("strips all HTML tags but keeps text content", () => {
-    assert.equal(stripHtmlTags("Tom <b>Bold</b> Name"), "Tom Bold Name");
+    assert.equal(stripHtmlToText("Tom <b>Bold</b> Name"), "Tom Bold Name");
   });
 
   it("strips <img> tags including event handlers", () => {
-    assert.equal(stripHtmlTags('<img src=x onerror=alert("xss")>'), "");
+    assert.equal(stripHtmlToText('<img src=x onerror=alert("xss")>'), "");
   });
 
   it("strips nested HTML", () => {
-    assert.equal(stripHtmlTags("<div><p>Hello</p></div>"), "Hello");
+    assert.equal(stripHtmlToText("<div><p>Hello</p></div>"), "Hello");
   });
 
   it("returns non-string values as-is", () => {
-    assert.equal(stripHtmlTags(42), 42);
-    assert.equal(stripHtmlTags(null), null);
-    assert.equal(stripHtmlTags(undefined), undefined);
+    assert.equal(stripHtmlToText(42), 42);
+    assert.equal(stripHtmlToText(null), null);
+    assert.equal(stripHtmlToText(undefined), undefined);
   });
 
   it("handles empty string", () => {
-    assert.equal(stripHtmlTags(""), "");
+    assert.equal(stripHtmlToText(""), "");
   });
 
   it("handles plain text without HTML", () => {
-    assert.equal(stripHtmlTags("Just plain text"), "Just plain text");
+    assert.equal(stripHtmlToText("Just plain text"), "Just plain text");
+  });
+
+  // A query string is not markup: `&copy=2` must not become `©=2`. These fields hold
+  // canonical URLs and menu links, and validation downstream cannot recover the original.
+  it("leaves URLs byte-for-byte, including query keys that look like entities", () => {
+    const urls = [
+      "https://example.com/?a=1&copy=2",
+      "https://example.com/?a=1&notin=2",
+      "https://example.com/path?utm_source=x&utm_medium=y#frag",
+      "/about.html?ref=a&b=c",
+    ];
+    for (const url of urls) assert.equal(stripHtmlToText(url), url);
+  });
+
+  // Route sanitizer AND controller both run on the same field, and a value is re-saved
+  // every time the user edits the row — so the conversion has to be stable.
+  it("is idempotent: a second pass changes nothing", () => {
+    const inputs = [
+      "Use &lt;b&gt; for bold",
+      "https://example.com/?a=1&copy=2",
+      "Bed & Breakfast <b>now</b>",
+      "Tom & Jerry <script>x</script>",
+      "5 > 3 & 2 < 4",
+      "AT&T &amp; Co",
+      "plain text",
+    ];
+    for (const input of inputs) {
+      const once = stripHtmlToText(input);
+      assert.equal(stripHtmlToText(once), once, `not stable for ${input}`);
+      assert.equal(stripHtmlToText(stripHtmlToText(once)), once, `not stable for ${input}`);
+    }
+  });
+
+  // Removing a tag can splice its neighbours into new markup, so a single pass is not
+  // stable: `Use <<b>name</b>> here` -> `Use <name> here` -> `Use  here`. The helper
+  // settles to a fixed point instead, so both layers and every later save agree.
+  it("settles markup assembled by tag removal", () => {
+    const assembled = [
+      "Use <<b>name</b>> here",
+      "Use <span><</span>name<span>></span> here",
+      "<<<<<<b>x</b>>>>>>",
+      `${"<".repeat(30)}b>x</b>${">".repeat(30)}`,
+    ];
+    for (const input of assembled) {
+      const once = stripHtmlToText(input);
+      assert.equal(stripHtmlToText(once), once, `not settled for ${input}`);
+      assert.ok(!/<[a-zA-Z/]/.test(once), `tag-like text survived for ${input}: ${once}`);
+    }
+    assert.equal(stripHtmlToText("Use <<b>name</b>> here"), "Use  here");
+  });
+
+  it("keeps literal entity text the user typed", () => {
+    assert.equal(stripHtmlToText("Use &lt;b&gt; for bold"), "Use &lt;b&gt; for bold");
+    assert.equal(stripHtmlToText("AT&T &amp; Co"), "AT&T &amp; Co");
+  });
+
+  // The reason this helper exists: DOMPurify's string return re-serialises, so a value
+  // holding BOTH an ampersand and a tag used to be stored as `Bed &amp; Breakfast`.
+  it("keeps & < > as typed even when the value also contains a tag", () => {
+    assert.equal(stripHtmlToText("Bed & Breakfast <b>now</b>"), "Bed & Breakfast now");
+    assert.equal(stripHtmlToText("Tom & Jerry <script>x</script>"), "Tom & Jerry ");
+    assert.equal(stripHtmlToText("5 > 3 & 2 < 4"), "5 > 3 & 2 < 4");
+    assert.equal(stripHtmlToText('Sales & Support <em>"today"</em>'), 'Sales & Support "today"');
+  });
+});
+
+// ============================================================================
+// plain-text sanitizing is applied twice (route validator + controller)
+// ============================================================================
+
+describe("plain-text sanitizing — one helper on both layers", () => {
+  const read = (file) => readFileSync(new URL(file, import.meta.url), "utf8");
+
+  // Every plain-text field is sanitized by the express-validator chain on the route AND
+  // again in the controller. That is only safe while both use the same idempotent helper,
+  // so a re-serialising one must not come back.
+  const sources = [
+    "../routes/media.js",
+    "../routes/menus.js",
+    "../routes/pages.js",
+    "../routes/projects.js",
+    "../controllers/mediaController.js",
+    "../controllers/menuController.js",
+    "../controllers/pageController.js",
+    "../controllers/projectController.js",
+    "../services/collectionService.js",
+    "../services/sanitizationService.js",
+  ];
+
+  it("uses stripHtmlToText everywhere and never a re-serialising sanitizer", () => {
+    for (const source of sources) {
+      const code = read(source);
+      assert.ok(!code.includes("stripHtmlTags"), `${source} still references stripHtmlTags`);
+    }
+  });
+
+  it("route and controller passes together leave a value untouched", () => {
+    // What the media metadata path does: customSanitizer on the route, then the controller.
+    const throughBothLayers = (value) => stripHtmlToText(stripHtmlToText(value));
+    for (const value of ["Use &lt;b&gt; for bold", "https://example.com/?a=1&copy=2", "Salt & pepper"]) {
+      assert.equal(throughBothLayers(value), stripHtmlToText(value));
+    }
+    assert.equal(throughBothLayers("Use &lt;b&gt; for bold"), "Use &lt;b&gt; for bold");
   });
 });
 

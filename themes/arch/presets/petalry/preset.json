@@ -28,6 +28,12 @@
     },
     "corner_style": "rounded",
     "spacing_density": "airy",
-    "button_shape": "pill"
+    "button_shape": "pill",
+    "facebook_url": "#",
+    "instagram_url": "#",
+    "twitter_url": "#",
+    "linkedin_url": "#",
+    "youtube_url": "#",
+    "tiktok_url": "#"
   }
 }

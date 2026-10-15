@@ -3,7 +3,7 @@
  * Uses inline Tailwind classes for consistency
  */
 
-export default function Badge({ variant = "neutral", className = "", children, ...props }) {
+export default function Badge({ variant = "neutral", size = "md", className = "", children, ...props }) {
   const variants = {
     success: "bg-green-100 text-green-700 border-green-200",
     warning: "bg-yellow-100 text-yellow-700 border-yellow-200",
@@ -13,7 +13,12 @@ export default function Badge({ variant = "neutral", className = "", children, .
     pink: "bg-pink-100 text-pink-700 border-pink-200",
   };
 
-  const baseClasses = "text-xs font-medium px-2 py-1 rounded-full border";
+  const sizes = {
+    md: "px-2 py-1 text-xs font-medium",
+    sm: "px-2.5 py-0.5 text-xs font-semibold",
+  };
+
+  const baseClasses = `rounded-full border ${sizes[size] || sizes.md}`;
   const variantClasses = variants[variant] || variants.neutral;
 
   return (

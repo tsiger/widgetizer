@@ -280,17 +280,28 @@ describe("buildFormsManifest", () => {
     );
   });
 
-  it("throws when a field label cannot be converted to an identifier", () => {
+  it("falls back to a positional key when a field label has no transliterable characters", () => {
+    // "!!!" (like CJK or emoji-only labels) slugs to "" — rather than failing the export we
+    // assign a positional key so the field still submits. The human label is preserved.
     const widget = makeFormWidget({
-      blocks: [{ type: "field", settings: { label: "!!!", type: "text" } }],
+      blocks: [
+        { type: "field", settings: { label: "Your name", type: "text" } },
+        { type: "field", settings: { label: "!!!", type: "text" } },
+      ],
     });
-    assert.throws(
-      () => buildFormsManifest([makePage({ widgets: { w: widget } })], APP_VERSION),
-      (err) => err.formsErrors.some((m) => m.includes("cannot be converted to an identifier")),
+    const { manifest } = buildFormsManifest(
+      [makePage({ widgets: { w: widget } })],
+      APP_VERSION,
     );
+    const fields = manifest.forms[0].fields;
+    assert.deepEqual(
+      fields.map((f) => f.key),
+      ["your-name", "field-2"],
+    );
+    assert.equal(fields[1].label, "!!!");
   });
 
-  it("throws when site exceeds 5 unique forms", () => {
+  it("throws when site exceeds 5 unique forms (default cap, no adapter wired)", () => {
     const pages = [];
     for (let i = 0; i < 6; i++) {
       const widget = makeFormWidget({ formName: `Form ${i}`, blocks: SIMPLE_FIELDS });
@@ -299,6 +310,22 @@ describe("buildFormsManifest", () => {
     assert.throws(
       () => buildFormsManifest(pages, APP_VERSION),
       (err) => err.formsErrors.some((m) => m.includes("more than the 5 limit")),
+    );
+  });
+
+  it("respects the caller-supplied cap (OSS resolves Infinity from the limits adapter)", () => {
+    const pages = [];
+    for (let i = 0; i < 6; i++) {
+      const widget = makeFormWidget({ formName: `Form ${i}`, blocks: SIMPLE_FIELDS });
+      pages.push(makePage({ id: `page-${i}`, widgets: { w: widget } }));
+    }
+    // Unbounded (OSS): 6 forms build fine.
+    const { manifest } = buildFormsManifest(pages, APP_VERSION, Infinity);
+    assert.equal(manifest.forms.length, 6);
+    // A tighter hosted cap still throws, with the cap echoed in the message.
+    assert.throws(
+      () => buildFormsManifest(pages, APP_VERSION, 2),
+      (err) => err.formsErrors.some((m) => m.includes("more than the 2 limit")),
     );
   });
 
@@ -634,5 +661,100 @@ describe("widget.liquid rendering vs manifest consistency", () => {
     assert.match(html, /data-widgetizer-honeypot/);
     assert.match(html, /data-widgetizer-turnstile/);
     assert.match(html, /data-widgetizer-form-status/);
+  });
+
+  it("renders the required-fields note, autocomplete hints and a hidden error slot per field", async () => {
+    const widget = {
+      id: "w1",
+      type: "core-form",
+      settings: { form_name: "Contact", style: "outlined", color_scheme: "standard-primary" },
+      blocks: {
+        b1: { type: "field", settings: { label: "Your name", type: "text", required: true } },
+        b2: { type: "field", settings: { label: "Email address", type: "email" } },
+        b3: { type: "field", settings: { label: "Phone", type: "tel" } },
+        b4: { type: "field", settings: { label: "Company", type: "text" } },
+        b5: { type: "choice", settings: { label: "Topic", type: "radio", options: "Sales\nSupport" } },
+        b6: { type: "consent", settings: { label: "I agree" } },
+      },
+      blocksOrder: ["b1", "b2", "b3", "b4", "b5", "b6"],
+      index: 1,
+    };
+    const engine = makeLiquidEngine();
+    const html = await engine.parseAndRender(WIDGET_TEMPLATE, { widget });
+
+    assert.match(html, /class="form-required-note"/);
+    assert.match(html, /<input[^>]*name="your-name"[^>]*autocomplete="name"/);
+    assert.match(html, /<input[^>]*name="email-address"[^>]*autocomplete="email"/);
+    assert.match(html, /<input[^>]*name="phone"[^>]*autocomplete="tel"/);
+    assert.doesNotMatch(html, /<input[^>]*name="company"[^>]*autocomplete=/);
+    for (const blockId of widget.blocksOrder) {
+      assert.match(html, new RegExp(`<p class="form-error" id="form-w1-${blockId}-error" hidden></p>`));
+    }
+    assert.deepEqual(extractInputNames(html), ["company", "email-address", "i-agree", "phone", "topic", "your-name"]);
+  });
+
+  it("omits the required-fields note when no field is required", async () => {
+    const widget = {
+      id: "w1",
+      type: "core-form",
+      settings: { form_name: "Contact", style: "outlined", color_scheme: "standard-primary" },
+      blocks: { b1: { type: "field", settings: { label: "Name", type: "text" } } },
+      blocksOrder: ["b1"],
+      index: 1,
+    };
+    const engine = makeLiquidEngine();
+    const html = await engine.parseAndRender(WIDGET_TEMPLATE, { widget });
+
+    assert.doesNotMatch(html, /form-required-note"/);
+  });
+
+  it("transliterates non-Latin labels and keeps rendered names in sync with the manifest (Greek + CJK fallback)", async () => {
+    const widget = {
+      id: "w1",
+      type: "core-form",
+      settings: { form_name: "Επικοινωνία", style: "outlined", color_scheme: "standard-primary" },
+      blocks: {
+        b1: { type: "field", settings: { label: "Το όνομα σας", type: "text", required: true } },
+        // No Latin transliteration exists for CJK → the field key falls back to its position.
+        b2: { type: "field", settings: { label: "こんにちは", type: "text" } },
+        b3: {
+          type: "choice",
+          settings: { label: "Θέμα", type: "select", options: "Γενική ερώτηση\nΥποστήριξη\n日本語" },
+        },
+      },
+      blocksOrder: ["b1", "b2", "b3"],
+      index: 1,
+    };
+    const engine = makeLiquidEngine();
+    const html = await engine.parseAndRender(WIDGET_TEMPLATE, { widget });
+
+    const { manifest } = buildFormsManifest(
+      [{ id: "index", widgets: { w1: widget }, widgetsOrder: ["w1"] }],
+      APP_VERSION,
+    );
+    const form = manifest.forms[0];
+
+    // Greek form name transliterates instead of collapsing to the "contact" fallback.
+    assert.equal(form.key, "epikoinwnia");
+    // Greek field/choice keys transliterate; the CJK field falls back to its position (2nd block).
+    assert.deepEqual(
+      form.fields.map((f) => f.key),
+      ["to-onoma-sas", "field-2", "8ema"],
+    );
+    // The human label is always preserved, even when the derived key is positional.
+    assert.equal(form.fields[1].label, "こんにちは");
+
+    // Choice options: Greek transliterated, the CJK option falls back to its position (3rd line).
+    const topic = form.fields.find((f) => f.key === "8ema");
+    assert.deepEqual(
+      topic.options.map((o) => o.value),
+      ["genikh-erwthsh", "yposthri3h", "option-3"],
+    );
+
+    // The rendered HTML must carry the exact same field names and option values as the manifest,
+    // or the hosted service would reject submissions from this page. (extractInputNames sorts;
+    // digits sort before letters, so "8ema" leads.)
+    assert.deepEqual(extractInputNames(html), ["8ema", "field-2", "to-onoma-sas"]);
+    assert.deepEqual(extractOptionValues(html), ["genikh-erwthsh", "yposthri3h", "option-3"]);
   });
 });

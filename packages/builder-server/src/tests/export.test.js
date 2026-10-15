@@ -21,6 +21,7 @@ import assert from "node:assert/strict";
 import fs from "fs-extra";
 import path from "path";
 import os from "os";
+import { fileURLToPath } from "node:url";
 
 // ============================================================================
 // Isolated test environment
@@ -32,6 +33,7 @@ const TEST_THEMES_DIR = path.join(TEST_ROOT, "themes");
 
 process.env.DATA_ROOT = TEST_DATA_DIR;
 process.env.THEMES_ROOT = TEST_THEMES_DIR;
+process.env.CORE_WIDGETS_DIR = path.join(TEST_ROOT, "core-widgets");
 process.env.NODE_ENV = "test";
 
 // Silence noisy console output from production code during tests.
@@ -93,11 +95,6 @@ after(async () => {
   await fs.remove(TEST_ROOT);
   // Also clean up any publish dirs we created
   // (PUBLISH_DIR is under TEST_DATA_DIR which is under TEST_ROOT, so already handled)
-
-  // Remove the test-only core-link widget that gets written into the real
-  // CORE_WIDGETS_DIR. export.test.js doesn't override CORE_WIDGETS_DIR, so
-  // without this cleanup the widget pollutes @widgetizer/core's widgets dir.
-  await fs.remove(path.join(CORE_WIDGETS_DIR, "core-link"));
 });
 
 // ============================================================================
@@ -185,6 +182,8 @@ function getLatestExportDir() {
 // ============================================================================
 
 before(async () => {
+  // Keep test-only widgets out of the catalog read by concurrent theme checks.
+  await fs.copy(fileURLToPath(new URL("../../../core/src/widgets/", import.meta.url)), CORE_WIDGETS_DIR);
   // -----------------------------------------------------------
   // 1. Seed test project in the DB
   // -----------------------------------------------------------
@@ -233,7 +232,7 @@ before(async () => {
       {
         settings: {
           global: {
-            general: [
+            branding: [
               { id: "favicon", value: "/uploads/images/site-icon.svg", default: "" },
             ],
             colors: [
@@ -261,14 +260,17 @@ before(async () => {
   <title>{{ page.seo.title }}</title>
   {% if site_icons.primaryIconHref != blank %}<link rel="icon" href="{{ site_icons.primaryIconHref }}" {% if site_icons.primaryIconType != blank %}type="{{ site_icons.primaryIconType }}"{% endif %}{% if site_icons.primaryIconSizes != blank %} sizes="{{ site_icons.primaryIconSizes }}"{% endif %}>{% endif %}
   {% if site_icons.legacyIconHref != blank and site_icons.legacyIconHref != site_icons.primaryIconHref %}<link rel="icon" href="{{ site_icons.legacyIconHref }}" type="image/png" sizes="32x32">{% endif %}
+  {% if site_icons.serpIconHref != blank %}<link rel="icon" href="{{ site_icons.serpIconHref }}" type="image/png" sizes="192x192">{% endif %}
   {% if site_icons.appleTouchIconHref != blank %}<link rel="apple-touch-icon" href="{{ site_icons.appleTouchIconHref }}" sizes="180x180">{% endif %}
   {% if site_icons.manifestHref != blank %}<link rel="manifest" href="{{ site_icons.manifestHref }}">{% endif %}
   {% seo %}
+  {% header_assets %}
 </head>
 <body class="{{ body_class }}">
   {{ header | raw }}
   <main>{{ main_content | raw }}</main>
   {{ footer | raw }}
+  {% footer_assets %}
 </body>
 </html>`,
   );
@@ -467,7 +469,7 @@ before(async () => {
         type: "image/jpeg",
         width: 1920,
         height: 1080,
-        usedIn: ["index"],
+        usedIn: ["page:index"],
         sizes: {
           thumb: {
             path: "/uploads/images/hero-thumb.jpg",
@@ -493,7 +495,7 @@ before(async () => {
         type: "image/jpeg",
         width: 1200,
         height: 800,
-        usedIn: ["index"],
+        usedIn: ["page:index"],
         sizes: {
           medium: {
             path: "/uploads/images/inline-medium.jpg",
@@ -525,7 +527,7 @@ before(async () => {
         filename: "brochure.pdf",
         path: "/uploads/files/brochure.pdf",
         type: "application/pdf",
-        usedIn: ["index"], // used on the homepage
+        usedIn: ["page:index"], // used on the homepage
       },
       {
         id: "file-2",
@@ -546,6 +548,8 @@ before(async () => {
   await fs.writeFile(path.join(projectDir, "assets", ".DS_Store"), "junk");
   await fs.ensureDir(path.join(projectDir, "assets", "__MACOSX"));
   await fs.writeFile(path.join(projectDir, "assets", "__MACOSX", "foo"), "junk");
+  // Render-time icon source — inlined into HTML at render, never fetched by pages.
+  await fs.writeFile(path.join(projectDir, "assets", "icons.json"), JSON.stringify({ star: { body: "<svg/>" } }));
 
   // -----------------------------------------------------------
   // 10. Widget assets (CSS/JS in widgets dir)
@@ -563,10 +567,14 @@ before(async () => {
     path.join(widgetAssetsDir, "widget.liquid"),
     `{% enqueue_style src: "hero-slider.css" %}
 {% enqueue_script src: "hero-slider.js", defer: true %}
+{% enqueue_style src: "Hero.CSS?variant=a" %}
 <div class="hero-slider">slides</div>`,
   );
   await fs.writeFile(path.join(widgetAssetsDir, "hero-slider.css"), ".hero { display: flex; }");
   await fs.writeFile(path.join(widgetAssetsDir, "hero-slider.js"), "// slider init");
+  // Uppercase extension + author query: the copier must match on the real
+  // filename (any case), ignoring the query the tag emits in the URL.
+  await fs.writeFile(path.join(widgetAssetsDir, "Hero.CSS"), ".hero-variant { color: red; }");
 
   const unusedWidgetDir = path.join(projectDir, "widgets", "audio-player");
   await fs.ensureDir(unusedWidgetDir);
@@ -675,6 +683,7 @@ describe("exportProject", () => {
     const html = await fs.readFile(path.join(exportDir, "index.html"), "utf8");
     assert.ok(html.includes('rel="icon" href="favicon.svg" type="image/svg+xml" sizes="any"'));
     assert.ok(html.includes('rel="icon" href="favicon-32.png" type="image/png" sizes="32x32"'));
+    assert.ok(html.includes('rel="icon" href="icon-192.png" type="image/png" sizes="192x192"'));
     assert.ok(html.includes('rel="apple-touch-icon" href="apple-touch-icon.png" sizes="180x180"'));
     assert.ok(html.includes('rel="manifest" href="site.webmanifest"'));
   });
@@ -700,6 +709,22 @@ describe("exportProject", () => {
     assert.ok(await fs.pathExists(path.join(exportDir, "icon-192.png")));
     assert.ok(await fs.pathExists(path.join(exportDir, "icon-512.png")));
     assert.ok(await fs.pathExists(path.join(exportDir, "site.webmanifest")));
+  });
+
+  it("generates a valid single-entry favicon.ico with embedded PNG", async () => {
+    const exportDir = await getLatestExportDir();
+    const ico = await fs.readFile(path.join(exportDir, "favicon.ico"));
+    // ICONDIR: reserved=0, type=1 (icon), count=1
+    assert.equal(ico.readUInt16LE(0), 0);
+    assert.equal(ico.readUInt16LE(2), 1);
+    assert.equal(ico.readUInt16LE(4), 1);
+    // ICONDIRENTRY: 32×32, data offset 22, length matches the rest of the file
+    assert.equal(ico.readUInt8(6), 32);
+    assert.equal(ico.readUInt8(7), 32);
+    assert.equal(ico.readUInt32LE(18), 22);
+    assert.equal(ico.readUInt32LE(14), ico.length - 22);
+    // Embedded image is a PNG (signature at the declared offset)
+    assert.equal(ico.subarray(22, 30).toString("hex"), "89504e470d0a1a0a");
   });
 
   it("generates sitemap.xml with site URL", async () => {
@@ -757,6 +782,10 @@ describe("exportProject", () => {
     // ...but system junk is filtered out.
     assert.ok(!(await fs.pathExists(path.join(exportDir, "assets", ".DS_Store"))), ".DS_Store must not be exported");
     assert.ok(!(await fs.pathExists(path.join(exportDir, "assets", "__MACOSX"))), "__MACOSX must not be exported");
+    assert.ok(
+      !(await fs.pathExists(path.join(exportDir, "assets", "icons.json"))),
+      "icons.json is render-time only and must not be exported",
+    );
   });
 
   it("copies image size variants", async () => {
@@ -827,9 +856,37 @@ describe("exportProject", () => {
     assert.equal(manifest.themeId, "__export_test_theme__");
     assert.equal(manifest.themeVersion, "1.0.0");
     assert.equal(manifest.exportVersion, 1);
+    // Cache-busting token stamped on this export's CSS/JS: <export>-<appVersion>-<UTC stamp>
+    assert.match(manifest.assetVersion, /^1-[\w.-]+-\d{8}T\d{6}$/);
     assert.equal(manifest.projectName, "Export Test Project");
     assert.ok(manifest.exportedAt, "Should have exportedAt timestamp");
     assert.ok(manifest.widgetizerVersion, "Should have widgetizerVersion");
+  });
+
+  it("stamps manifest.assetVersion on the enqueued CSS/JS URLs in the exported HTML", async () => {
+    // The manifest field exists so a live page traces back to its export, which
+    // only holds if the token in the page is the very same string.
+    const exportDir = await getLatestExportDir();
+    const { assetVersion } = await fs.readJson(path.join(exportDir, "manifest.json"));
+    const html = await fs.readFile(path.join(exportDir, "index.html"), "utf8");
+    assert.ok(html.includes(`assets/hero-slider.css?v=${assetVersion}`), "enqueued style should carry the manifest token");
+    assert.ok(html.includes(`assets/hero-slider.js?v=${assetVersion}`), "enqueued script should carry the manifest token");
+  });
+
+  it("copies an uppercase widget file enqueued with a query, and joins the token to that query", async () => {
+    const exportDir = await getLatestExportDir();
+    assert.ok(await fs.pathExists(path.join(exportDir, "assets", "Hero.CSS")), "Hero.CSS should be copied");
+    const { assetVersion } = await fs.readJson(path.join(exportDir, "manifest.json"));
+    const html = await fs.readFile(path.join(exportDir, "index.html"), "utf8");
+    assert.ok(html.includes(`assets/Hero.CSS?variant=a&v=${assetVersion}`), "query kept, token appended with &");
+  });
+
+  it("manifest.exportedAt is the same instant as the token's timestamp", async () => {
+    const exportDir = await getLatestExportDir();
+    const { assetVersion, exportedAt } = await fs.readJson(path.join(exportDir, "manifest.json"));
+    const tokenStamp = assetVersion.split("-").pop();
+    const exportedAtStamp = exportedAt.replace(/[-:]/g, "").replace(/\.\d+Z$/, "");
+    assert.equal(tokenStamp, exportedAtStamp);
   });
 
   it("records export in history", async () => {
@@ -885,6 +942,113 @@ describe("export versioning", () => {
 
   it("nextVersion is always one more than the last exported version", async () => {
     assert.equal(exportRepo.getNextVersion(PROJECT_ID), 4);
+  });
+});
+
+// ========================================================================
+// Concurrent export serialization
+// ========================================================================
+
+describe("concurrent exports are serialized per project", () => {
+  before(async () => {
+    await cleanExportHistory();
+  });
+
+  it("two overlapping exports get distinct versions and dirs, both recorded success", async () => {
+    const [res1, res2] = await Promise.all([
+      callController(exportProject, { params: { projectId: PROJECT_ID } }),
+      callController(exportProject, { params: { projectId: PROJECT_ID } }),
+    ]);
+
+    assert.equal(res1._status, 200, `first export should succeed: ${JSON.stringify(res1._json)}`);
+    assert.equal(res2._status, 200, `second export should succeed: ${JSON.stringify(res2._json)}`);
+    assert.notEqual(res1._json.version, res2._json.version, "overlapping exports must not share a version");
+    assert.notEqual(res1._json.outputDir, res2._json.outputDir, "overlapping exports must not share an output dir");
+
+    const history = readExportHistory(PROJECT_ID);
+    assert.equal(history.length, 2, "exactly two history rows — no bogus extra failure row");
+    assert.ok(history.every((h) => h.status === "success"), "both exports recorded as success");
+  });
+
+  it("a failed export does not block the next export on the SAME project", async () => {
+    // No index page → the export rejects during validation (an empty pages dir
+    // is enough); the chain for THIS key must release past the rejection, so
+    // the second call — queued concurrently behind the failing one — must
+    // still settle rather than hang.
+    const EMPTY_ID = "export-serial-fail-uuid";
+    const EMPTY_FOLDER = "export-serial-fail-project";
+    projectRepo.createProject({
+      id: EMPTY_ID,
+      folderName: EMPTY_FOLDER,
+      name: "Serial Fail",
+      created: new Date().toISOString(),
+      updated: new Date().toISOString(),
+    });
+    await fs.ensureDir(path.join(getProjectDir(EMPTY_FOLDER), "pages"));
+    try {
+      const scope = { projectId: EMPTY_ID, folderName: EMPTY_FOLDER };
+      const [first, second] = await Promise.all([
+        callController(exportProject, { params: { projectId: EMPTY_ID }, scope }),
+        callController(exportProject, { params: { projectId: EMPTY_ID }, scope }),
+      ]);
+      assert.notEqual(first._status, 200, "export without an index page should fail");
+      assert.notEqual(second._status, 200, "the queued export should fail the same way, not hang");
+    } finally {
+      projectRepo.deleteProject(EMPTY_ID);
+    }
+  });
+
+  it("a reused version dir cannot leak stale files into a new export", async () => {
+    // Crash leftovers (or a freed version number) can leave junk at the next
+    // version's output path; the export must start from an empty dir.
+    const next = exportRepo.getNextVersion(PROJECT_ID);
+    const staleFile = path.join(PUBLISH_DIR, `${PROJECT_FOLDER}-v${next}`, "stale.html");
+    await fs.outputFile(staleFile, "junk from a previous life");
+
+    const res = await callController(exportProject, { params: { projectId: PROJECT_ID } });
+
+    assert.equal(res._status, 200);
+    assert.equal(res._json.version, next);
+    assert.ok(!(await fs.pathExists(staleFile)), "stale file must not survive into the new export");
+  });
+
+  it("an export overlapping project deletion cannot leave an orphan export bundle", async () => {
+    // The dangerous interleave: project deletion cleans up exports, releases,
+    // and only then removes the project row — an export slipping into that gap
+    // completes against a project that is about to vanish, leaving a bundle
+    // dir no history row tracks. The deletion must hold the export lock across
+    // cleanup AND the row removal. (The pre-fix window is a microtask-ordering
+    // accident, so this test pins the invariant end-state rather than a
+    // deterministic failure.)
+    const DEL_ID = "export-del-race-uuid";
+    const DEL_FOLDER = "export-del-race-project";
+    await fs.copy(getProjectDir(PROJECT_FOLDER), getProjectDir(DEL_FOLDER));
+    projectRepo.createProject({
+      id: DEL_ID,
+      folderName: DEL_FOLDER,
+      name: "Delete Race",
+      theme: "__export_test_theme__",
+      themeVersion: "1.0.0",
+      created: new Date().toISOString(),
+      updated: new Date().toISOString(),
+    });
+    const scope = { projectId: DEL_ID, folderName: DEL_FOLDER };
+    try {
+      const seeded = await callController(exportProject, { params: { projectId: DEL_ID }, scope });
+      assert.equal(seeded._status, 200, "seed export should succeed");
+
+      const { deleteProjectById } = await import("../services/projectService.js");
+      const deletion = deleteProjectById(DEL_ID);
+      const racing = callController(exportProject, { params: { projectId: DEL_ID }, scope });
+      await Promise.all([deletion, racing]);
+
+      const leftovers = (await fs.readdir(PUBLISH_DIR)).filter((n) => n.startsWith(`${DEL_FOLDER}-v`));
+      assert.deepEqual(leftovers, [], "no export bundle may survive the project deletion");
+      assert.equal(exportRepo.getExports(DEL_ID).length, 0, "no history rows may survive either");
+    } finally {
+      projectRepo.deleteProject(DEL_ID);
+      await fs.remove(getProjectDir(DEL_FOLDER));
+    }
   });
 });
 
@@ -1312,6 +1476,32 @@ describe("deleteExport", () => {
     });
     assert.equal(res._status, 400);
   });
+
+  // chmod-000 blocks removal only on POSIX and only for unprivileged users.
+  it("a failed directory removal does not free the version number", { skip: process.platform === "win32" || process.getuid?.() === 0 }, async () => {
+    // If the bundle dir can't be removed, the history row must survive —
+    // deleting the row first would hand the version to the next export while
+    // the old directory still exists.
+    const res = await callController(exportProject, { params: { projectId: PROJECT_ID } });
+    assert.equal(res._status, 200);
+    const version = res._json.version;
+    const dir = path.join(PUBLISH_DIR, `${PROJECT_FOLDER}-v${version}`);
+    await fs.chmod(dir, 0o000); // non-empty dir with no permissions → removal fails
+
+    try {
+      const del = await callController(deleteExport, {
+        params: { projectId: PROJECT_ID, version: String(version) },
+      });
+      assert.equal(del._status, 500, "the delete should report the fs failure");
+      const versions = readExportHistory(PROJECT_ID).map((e) => e.version);
+      assert.ok(versions.includes(version), "history row must survive so the version stays reserved");
+    } finally {
+      await fs.chmod(dir, 0o755);
+      await callController(deleteExport, {
+        params: { projectId: PROJECT_ID, version: String(version) },
+      });
+    }
+  });
 });
 
 // ========================================================================
@@ -1445,10 +1635,10 @@ describe("exportProject with markdown", () => {
     const html = await fs.readFile(path.join(exportDir, "index.html"), "utf8");
     assert.ok(html.includes('rel="alternate"'), "Should have alternate link tag");
     assert.ok(html.includes('type="text/markdown"'), "Should specify text/markdown type");
-    assert.ok(
-      html.includes(`href="${SITE_URL}/index.md"`) || html.includes(`href="${SITE_URL}index.md"`),
-      "Should use absolute URL when siteUrl is set",
-    );
+    // Pinned exactly: the markdown alternate is one of the generated absolute
+    // addresses and shares the Site URL base helper with the canonicals and the
+    // sitemap, so the trailing slash in the stored value cannot change it.
+    assert.ok(html.includes(`href="${SITE_URL}/index.md"`), "Should use the absolute URL built from siteUrl");
   });
 
   it("about.html alternate link points to about.md", async () => {
@@ -1539,17 +1729,15 @@ describe("home page slug mapping", () => {
     await projectRepo.writeProjectsData(data);
   });
 
-  it("'home' slug produces index.html (same as 'index')", async () => {
+  // Both slugs publish as index.html, so the pair is refused rather than one
+  // page silently replacing the other.
+  it("refuses a project holding both an 'index' and a 'home' page", async () => {
     const res = await callController(exportProject, {
       params: { projectId: HOME_SLUG_ID },
     });
-    assert.equal(res._status, 200);
-
-    const exportDir = res._json.outputDir;
-    // "home" page should produce index.html too (the controller maps both to index.html)
-    // This means there could be a conflict — let's document what happens
-    const indexExists = await fs.pathExists(path.join(exportDir, "index.html"));
-    assert.ok(indexExists, "index.html should exist from either index or home page");
+    assert.equal(res._status, 400);
+    assert.equal(res._json.error, "Export failed: two homepages");
+    assert.match(res._json.message, /The pages include both "index" and "home"/);
   });
 });
 

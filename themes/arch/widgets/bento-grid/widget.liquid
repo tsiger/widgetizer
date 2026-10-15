@@ -96,7 +96,7 @@
         {% for blockId in widget.blocksOrder %}
           {% assign block = widget.blocks[blockId] %}
           & [data-block-id="{{ blockId }}"] {
-            grid-column: span {{ block.settings.col_span | default: 1 | min: 4 }};
+            grid-column: span {{ block.settings.col_span | default: 1 | at_most: 4 }};
             grid-row: span {{ block.settings.row_span | default: 1 }};
           }
         {% endfor %}

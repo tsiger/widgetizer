@@ -169,6 +169,12 @@
           "label": "tTheme:global.widgets.settings.bottom_spacing.options.none"
         }
       ]
+    },
+    {
+      "type": "text",
+      "id": "closed_text",
+      "label": "tTheme:schedule_table.settings.closed_text.label",
+      "defaultKey": "site.schedule_table.closed"
     }
   ],
   "blocks": [

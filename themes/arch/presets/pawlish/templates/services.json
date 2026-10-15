@@ -131,9 +131,9 @@
           "settings": {
             "title": "Full groom",
             "text": "Bath, dry, breed-aware cut, nails, ears.",
-            "col_span": "2",
-            "row_span": "2",
-            "alignment": "end",
+            "col_span": 2,
+            "row_span": 2,
+            "alignment": "start",
             "link": {
               "text": "Book a full groom",
               "href": "contact.html",
@@ -149,9 +149,9 @@
           "settings": {
             "title": "Bath & tidy",
             "text": "Between full grooms.",
-            "col_span": "1",
-            "row_span": "1",
-            "alignment": "end",
+            "col_span": 1,
+            "row_span": 1,
+            "alignment": "start",
             "image": "/uploads/images/services-bento-bath.webp",
             "overlay_color": "#0a1e386e",
             "text_color": "light"
@@ -162,9 +162,9 @@
           "settings": {
             "title": "De-shed",
             "text": "Double-coat undercoat work.",
-            "col_span": "1",
-            "row_span": "1",
-            "alignment": "end",
+            "col_span": 1,
+            "row_span": 1,
+            "alignment": "start",
             "image": "/uploads/images/services-bento-deshed.webp",
             "overlay_color": "#0a1e386e",
             "text_color": "light"
@@ -175,9 +175,9 @@
           "settings": {
             "title": "Hand-strip",
             "text": "Traditional terrier coats.",
-            "col_span": "1",
-            "row_span": "1",
-            "alignment": "end",
+            "col_span": 1,
+            "row_span": 1,
+            "alignment": "start",
             "image": "/uploads/images/services-bento-handstrip.webp",
             "overlay_color": "#0a1e386e",
             "text_color": "light"
@@ -188,9 +188,9 @@
           "settings": {
             "title": "Nails & ears",
             "text": "Walk-in, no appointment.",
-            "col_span": "1",
-            "row_span": "1",
-            "alignment": "end",
+            "col_span": 1,
+            "row_span": 1,
+            "alignment": "start",
             "image": "/uploads/images/services-bento-nails.webp",
             "text_color": "light",
             "overlay_color": "#0a1e386e"

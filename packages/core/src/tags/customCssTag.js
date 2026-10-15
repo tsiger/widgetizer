@@ -1,3 +1,5 @@
+import { readThemeSetting } from "../utils/themeSettingChanges.js";
+
 /**
  * {% custom_css %} Liquid Tag
  *
@@ -20,19 +22,7 @@ export const CustomCssTag = {
         return ""; // Return empty string if no settings found
       }
 
-      const advancedGroup = rawSettings.settings.global.advanced;
-
-      if (!Array.isArray(advancedGroup)) {
-        return "";
-      }
-
-      const customCssSetting = advancedGroup.find((s) => s.id === "custom_css");
-
-      if (!customCssSetting) {
-        return "";
-      }
-
-      const cssValue = customCssSetting.value !== undefined ? customCssSetting.value : customCssSetting.default;
+      const cssValue = readThemeSetting(rawSettings, { group: "advanced", id: "custom_css" });
 
       if (!cssValue || typeof cssValue !== "string" || cssValue.trim() === "") {
         return "";

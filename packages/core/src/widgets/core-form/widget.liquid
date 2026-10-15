@@ -1,8 +1,11 @@
 {% assign has_sidebar_blocks = false %}
+{% assign has_required_fields = false %}
 {% for blockId in widget.blocksOrder %}
   {% assign block = widget.blocks[blockId] %}
   {% if block.type == 'info' or block.type == 'social' %}
     {% assign has_sidebar_blocks = true %}
+  {% elsif block.settings.required %}
+    {% assign has_required_fields = true %}
   {% endif %}
 {% endfor %}
 
@@ -11,9 +14,18 @@
 {% assign form_key = form_name | handleize %}
 {% if form_key == blank %}{% assign form_key = 'contact' %}{% endif %}
 {% assign form_key = form_key | truncate: 64, '' %}
+{%- comment -%} Must match the key widgetizer.forms.json declares, or the submission lands under a key nothing describes. {%- endcomment -%}
+{% if page.language and project.defaultLanguage and page.language != project.defaultLanguage %}
+  {%- assign form_key = page.language | append: ':' | append: form_key -%}
+{% endif %}
 
+{%- comment -%} A button with no label is not a form, so this one keeps a floor under any empty value. {%- endcomment -%}
 {% assign submit_label = widget.settings.submit_label %}
-{% if submit_label == blank %}{% assign submit_label = 'Send message' %}{% endif %}
+{% if submit_label == blank %}{% assign submit_label = 'site.core_form.submit' | t %}{% endif %}
+
+{%- comment -%} nil, not blank: the setting resolves its own wording per language, so nil means nothing reached it at all, while "" is a note the owner cleared on purpose and must stay gone. {%- endcomment -%}
+{% assign required_note = widget.settings.required_note %}
+{% if required_note == nil %}{% assign required_note = 'site.core_form.required_note' | t %}{% endif %}
 
 <section
   id="{{ widget.id }}"
@@ -57,6 +69,18 @@
       & .form-required {
         color: var(--accent);
         font-weight: 500;
+      }
+
+      & .form-required-note,
+      & .form-error {
+        margin: 0;
+        font-size: calc(var(--font-size-sm) * var(--body-scale));
+        color: var(--text-content);
+      }
+
+      & .form-error {
+        font-weight: 500;
+        color: var(--text-heading);
       }
 
       & .form-input,
@@ -255,10 +279,19 @@
             action="/__widgetizer/forms/{{ form_key }}"
             method="post"
           >
+            {% if has_required_fields and required_note != blank %}
+              <p class="form-required-note"><span class="form-required" aria-hidden="true">*</span> {{ required_note }}</p>
+            {% endif %}
+            {% assign field_i = 0 %}
             {% for blockId in widget.blocksOrder %}
               {% assign block = widget.blocks[blockId] %}
               {% assign field_id = 'form-' | append: widget.id | append: '-' | append: blockId %}
-              {% assign field_key = block.settings.label | handleize | truncate: 64, '' %}
+              {% if block.type == 'field' or block.type == 'choice' or block.type == 'consent' %}
+                {% assign field_i = field_i | plus: 1 %}
+                {% assign field_key = block.settings.label | handleize | truncate: 64, '' %}
+                {% comment %}Non-Latin labels (e.g. CJK) slug to "" — fall back to a positional key so the field still submits. Mirrors formsManifestService.buildField.{% endcomment %}
+                {% if field_key == blank %}{% assign field_key = 'field-' | append: field_i %}{% endif %}
+              {% endif %}
 
               {% case block.type %}
               {% when 'field' %}
@@ -283,10 +316,12 @@
                       id="{{ field_id }}"
                       name="{{ field_key }}"
                       class="form-input"
+                      {% if input_type == 'email' %}autocomplete="email"{% elsif input_type == 'tel' %}autocomplete="tel"{% elsif input_type == 'url' %}autocomplete="url"{% elsif field_key == 'name' or field_key == 'your-name' or field_key == 'full-name' %}autocomplete="name"{% endif %}
                       {% if block.settings.placeholder != blank %}placeholder="{{ block.settings.placeholder }}"{% endif %}
                       {% if block.settings.required %}required aria-required="true"{% endif %}
                     />
                   {% endif %}
+                  <p class="form-error" id="{{ field_id }}-error" hidden></p>
                 </div>
 
               {% when 'choice' %}
@@ -298,10 +333,13 @@
                         <span data-setting="label">{{ block.settings.label }}</span>
                         {% if block.settings.required %}<span class="form-required" aria-hidden="true">*</span>{% endif %}
                       </legend>
+                      {% assign option_i = 0 %}
                       {% for option_line in options_lines %}
                         {% assign option_label = option_line | strip %}
                         {% if option_label != blank %}
+                          {% assign option_i = option_i | plus: 1 %}
                           {% assign option_value = option_label | handleize | truncate: 200, '' %}
+                          {% if option_value == blank %}{% assign option_value = 'option-' | append: option_i %}{% endif %}
                           <label class="form-radio">
                             <input
                               type="radio"
@@ -325,16 +363,20 @@
                       class="form-input form-select"
                       {% if block.settings.required %}required aria-required="true"{% endif %}
                     >
-                      <option value="">{{ block.settings.placeholder | default: 'Select an option' }}</option>
+                      <option value="">{{ block.settings.placeholder }}</option>
+                      {% assign option_i = 0 %}
                       {% for option_line in options_lines %}
                         {% assign option_label = option_line | strip %}
                         {% if option_label != blank %}
+                          {% assign option_i = option_i | plus: 1 %}
                           {% assign option_value = option_label | handleize | truncate: 200, '' %}
+                          {% if option_value == blank %}{% assign option_value = 'option-' | append: option_i %}{% endif %}
                           <option value="{{ option_value }}">{{ option_label }}</option>
                         {% endif %}
                       {% endfor %}
                     </select>
                   {% endif %}
+                  <p class="form-error" id="{{ field_id }}-error" hidden></p>
                 </div>
 
               {% when 'consent' %}
@@ -348,6 +390,7 @@
                   <span data-setting="label">{{ block.settings.label }}</span>
                   {% if block.settings.required %}<span class="form-required" aria-hidden="true">*</span>{% endif %}
                 </label>
+                <p class="form-error" id="{{ field_id }}-error" hidden></p>
               {% endcase %}
             {% endfor %}
 
@@ -395,4 +438,61 @@
       </div>
     </div>
   </div>
+
+  <script>
+    (function () {
+      var section = document.getElementById('{{ widget.id }}');
+      var form = section && section.querySelector('form[data-widgetizer-form]');
+      if (!form || form.dataset.fieldErrors) return;
+      form.dataset.fieldErrors = 'true';
+      var focusQueued = false;
+
+      function errorFor(field) {
+        var block = field.closest('[data-block-id]');
+        return block ? document.getElementById('form-{{ widget.id }}-' + block.getAttribute('data-block-id') + '-error') : null;
+      }
+
+      function describe(field, id, on) {
+        var ids = (field.getAttribute('aria-describedby') || '').split(' ').filter(function (token) {
+          return token && token !== id;
+        });
+        if (on) ids.push(id);
+        if (ids.length) field.setAttribute('aria-describedby', ids.join(' '));
+        else field.removeAttribute('aria-describedby');
+      }
+
+      form.addEventListener('invalid', function (event) {
+        var field = event.target;
+        var error = errorFor(field);
+        if (!error) return;
+        event.preventDefault();
+        error.textContent = field.validationMessage;
+        error.hidden = false;
+        field.setAttribute('aria-invalid', 'true');
+        describe(field, error.id, true);
+        if (!focusQueued) {
+          focusQueued = true;
+          field.focus();
+          setTimeout(function () { focusQueued = false; });
+        }
+      }, true);
+
+      function clearValid() {
+        Array.prototype.forEach.call(form.querySelectorAll('[aria-invalid="true"]'), function (field) {
+          if (!field.validity.valid) return;
+          field.removeAttribute('aria-invalid');
+          var error = errorFor(field);
+          if (!error) return;
+          describe(field, error.id, false);
+          if (!form.querySelector('[aria-describedby~="' + error.id + '"]')) {
+            error.textContent = '';
+            error.hidden = true;
+          }
+        });
+      }
+
+      form.addEventListener('input', clearValid);
+      form.addEventListener('change', clearValid);
+    })();
+  </script>
 </section>

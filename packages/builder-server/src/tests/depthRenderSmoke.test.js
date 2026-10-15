@@ -98,6 +98,7 @@ const LAYOUT =
   `{% if site_icons.primaryIconSizes != blank %} sizes="{{ site_icons.primaryIconSizes }}"{% endif %}>{% endif %}\n` +
   `{% if site_icons.legacyIconHref != blank and site_icons.legacyIconHref != site_icons.primaryIconHref %}` +
   `<link rel="icon" href="{{ site_icons.legacyIconHref }}" type="image/png" sizes="32x32">{% endif %}\n` +
+  `{% if site_icons.serpIconHref != blank %}<link rel="icon" href="{{ site_icons.serpIconHref }}" type="image/png" sizes="192x192">{% endif %}\n` +
   `{% if site_icons.appleTouchIconHref != blank %}<link rel="apple-touch-icon" href="{{ site_icons.appleTouchIconHref }}" sizes="180x180">{% endif %}\n` +
   `{% if site_icons.manifestHref != blank %}<link rel="manifest" href="{{ site_icons.manifestHref }}">{% endif %}\n` +
   `{% header_assets %}\n` +
@@ -215,8 +216,8 @@ async function seedProjectScaffold() {
   // Media metadata: hero (no `sizes` → image tag falls back to path basename) + favicon.
   await writeMediaFile(PROJECT_ID, {
     files: [
-      { id: "hero", filename: "hero.jpg", type: "image/jpeg", path: "/uploads/images/hero.jpg", width: 200, height: 150, usedIn: ["news/alpha"] },
-      { id: "fav", filename: "favicon.svg", type: "image/svg+xml", path: "/uploads/images/favicon.svg", usedIn: ["theme"] },
+      { id: "hero", filename: "hero.jpg", type: "image/jpeg", path: "/uploads/images/hero.jpg", width: 200, height: 150, usedIn: ["page:news/alpha"] },
+      { id: "fav", filename: "favicon.svg", type: "image/svg+xml", path: "/uploads/images/favicon.svg", usedIn: ["page:theme"] },
     ],
   });
 }
@@ -259,7 +260,8 @@ describe("depth-1 item render — full path chain is prefixed", () => {
   });
 
   it("asset-tag URL is prefixed", () => {
-    assert.match(html, /href="\.\.\/assets\/base\.css(\?v=\d+)?"/);
+    // The cache-busting token is required, not optional: <export>-<appVersion>-<UTC stamp>.
+    assert.match(html, /href="\.\.\/assets\/base\.css\?v=\d+-[\w.-]+-\d{8}T\d{6}"/);
   });
 
   it("image src is prefixed (and lazy)", () => {
@@ -280,6 +282,7 @@ describe("depth-1 item render — full path chain is prefixed", () => {
   it("favicon / apple-touch / manifest refs are prefixed", () => {
     assert.match(html, /<link rel="icon" href="\.\.\/favicon\.svg"/);
     assert.match(html, /href="\.\.\/favicon-32\.png"/);
+    assert.match(html, /href="\.\.\/icon-192\.png" type="image\/png" sizes="192x192"/);
     assert.match(html, /<link rel="apple-touch-icon" href="\.\.\/apple-touch-icon\.png"/);
     assert.match(html, /<link rel="manifest" href="\.\.\/site\.webmanifest"/);
   });
@@ -315,7 +318,7 @@ describe("depth-0 root render — no ../ leakage", () => {
   });
 
   it("emits the canonical un-prefixed asset / image / placeholder forms (non-vacuity)", () => {
-    assert.match(html, /href="assets\/base\.css(\?v=\d+)?"/);
+    assert.match(html, /href="assets\/base\.css\?v=\d+-[\w.-]+-\d{8}T\d{6}"/);
     assert.match(html, /<img[^>]+src="assets\/images\/hero\.jpg"/);
     assert.match(html, /src="assets\/placeholder\.svg"/);
   });
@@ -325,6 +328,7 @@ describe("depth-0 root render — no ../ leakage", () => {
     assert.match(html, /imagesrcset="a\.jpg 320w, b\.jpg 640w"/);
     assert.match(html, /<link rel="icon" href="favicon\.svg"/);
     assert.match(html, /href="favicon-32\.png"/);
+    assert.match(html, /href="icon-192\.png" type="image\/png" sizes="192x192"/);
     assert.match(html, /<link rel="apple-touch-icon" href="apple-touch-icon\.png"/);
     assert.match(html, /<link rel="manifest" href="site\.webmanifest"/);
   });
@@ -332,5 +336,94 @@ describe("depth-0 root render — no ../ leakage", () => {
   it("emits the relative markdown-alternate href and leaks no raw /uploads/", () => {
     assert.match(html, /<link rel="alternate" type="text\/markdown" href="index\.md">/);
     assert.doesNotMatch(html, /\/uploads\//);
+  });
+});
+
+describe("depth-2 paginated copy — full path chain is prefixed", () => {
+  let html;
+  let dir;
+
+  before(async () => {
+    await resetExports();
+    const projectDir = getProjectDir(PROJECT_FOLDER);
+    await fs.remove(path.join(projectDir, "collections"));
+    await fs.remove(path.join(projectDir, "collection-types"));
+    await storage.write(scope, "collection-types/news/schema.json", JSON.stringify(NEWS_SCHEMA, null, 2));
+    await storage.write(scope, "collection-types/news/template.liquid", NEWS_TEMPLATE);
+    await storage.write(scope, "collections/news/alpha.json", JSON.stringify(newsItem("alpha", "Alpha", "2026-01-02T00:00:00.000Z")));
+    await storage.write(scope, "collections/news/beta.json", JSON.stringify(newsItem("beta", "Beta", "2026-01-01T00:00:00.000Z")));
+
+    await fs.outputFile(
+      path.join(projectDir, "widgets", "news-grid", "schema.json"),
+      JSON.stringify({
+        type: "news-grid",
+        collection: { type: "news", perPageSetting: "limit" },
+        settings: [
+          { type: "number", id: "limit", default: 1 },
+          { type: "link", id: "cta" },
+        ],
+      }),
+    );
+    await fs.outputFile(
+      path.join(projectDir, "widgets", "news-grid", "widget.liquid"),
+      `{% assign items = 'news' | collection: limit: widget.settings.limit %}` +
+        `{% for item in items %}<a class="item" href="{{ item.url }}">{{ item.settings.title }}</a>{% endfor %}` +
+        `<a class="cta" href="{{ widget.settings.cta.href }}">{{ widget.settings.cta.text }}</a>` +
+        `<img src="/uploads/images/banner.jpg" alt="">`,
+    );
+    await fs.writeFile(
+      path.join(getProjectPagesDir(PROJECT_FOLDER), "blog.json"),
+      JSON.stringify({
+        name: "Blog",
+        slug: "blog",
+        uuid: "p-blog",
+        seo: { title: "Blog" },
+        widgets: {
+          w1: {
+            type: "news-grid",
+            settings: { limit: 1, paginate: true, cta: { pageUuid: "p-index", href: "index.html", text: "Home", target: "_self" } },
+          },
+        },
+        widgetsOrder: ["w1"],
+      }),
+    );
+
+    const res = await runExport({ exportMarkdown: true });
+    assert.equal(res._status, 200, `export failed: ${JSON.stringify(res._json)}`);
+    dir = latestExportDir();
+    html = await fs.readFile(path.join(dir, "blog", "page", "2.html"), "utf8");
+  });
+
+  after(async () => {
+    await fs.remove(path.join(getProjectPagesDir(PROJECT_FOLDER), "blog.json"));
+  });
+
+  it("prefixes the asset, image, placeholder and preload forms with ../../", () => {
+    assert.match(html, /href="\.\.\/\.\.\/assets\/base\.css\?v=\d+-[\w.-]+-\d{8}T\d{6}"/);
+    assert.match(html, /<img[^>]+src="\.\.\/\.\.\/assets\/images\/hero\.jpg"/);
+    assert.match(html, /src="\.\.\/\.\.\/assets\/placeholder\.svg"/);
+    assert.match(html, /<link rel="preload" href="\.\.\/\.\.\/hero\.jpg"/);
+    assert.match(html, /imagesrcset="\.\.\/\.\.\/a\.jpg 320w, \.\.\/\.\.\/b\.jpg 640w"/);
+  });
+
+  it("prefixes the favicon / apple-touch / manifest refs", () => {
+    assert.match(html, /<link rel="icon" href="\.\.\/\.\.\/favicon\.svg"/);
+    assert.match(html, /<link rel="apple-touch-icon" href="\.\.\/\.\.\/apple-touch-icon\.png"/);
+    assert.match(html, /<link rel="manifest" href="\.\.\/\.\.\/site\.webmanifest"/);
+  });
+
+  it("rewrites /uploads storage paths and resolves item and page links at depth 2", () => {
+    assert.ok(html.includes('src="../../assets/images/banner.jpg"'), html);
+    assert.doesNotMatch(html, /\/uploads\//);
+    assert.ok(html.includes('class="item" href="../../news/beta.html"'), html);
+    assert.ok(html.includes('class="cta" href="../../index.html"'), html);
+  });
+
+  it("writes markdown for page 1 only", async () => {
+    assert.ok(await fs.pathExists(path.join(dir, "blog.md")));
+    assert.ok(!(await fs.pathExists(path.join(dir, "blog", "page", "2.md"))));
+    assert.doesNotMatch(html, /type="text\/markdown"/);
+    const first = await fs.readFile(path.join(dir, "blog.html"), "utf8");
+    assert.match(first, /<link rel="alternate" type="text\/markdown" href="blog\.md">/);
   });
 });

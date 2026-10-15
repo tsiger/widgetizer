@@ -34,9 +34,11 @@ const PROJECT_ID = "widgets-test-project-uuid";
 const PROJECT_FOLDER = "widgets-test-project";
 const projectDir = path.join(TEST_DATA_DIR, "projects", PROJECT_FOLDER);
 
-function mockReq() {
+function mockReq(query = {}) {
   return {
+    query,
     scope: { actor: { id: "default", kind: "local" }, projectId: PROJECT_ID, folderName: PROJECT_FOLDER },
+    activeProject: { id: PROJECT_ID, defaultLanguage: "en", languages: ["el"] },
     adapters: { storage },
   };
 }
@@ -168,5 +170,120 @@ describe("getProjectWidgets", () => {
       (w) => w.includes("Failed to parse schema") && w.includes("broken-widget"),
     );
     assert.ok(brokenWarning, "a real broken schema.json must still warn");
+  });
+});
+
+// A setting whose default is one of the theme's own words has to arrive filled
+// in, or the editor shows an empty field while the page shows the text.
+describe("getProjectWidgets — defaults that come from the theme's words", () => {
+  before(async () => {
+    await fs.ensureDir(path.join(projectDir, "widgets", "talky"));
+    await fs.writeJson(path.join(projectDir, "widgets", "talky", "schema.json"), {
+      type: "talky",
+      settings: [{ type: "text", id: "empty_text", defaultKey: "site.talky.empty" }],
+      blocks: [{ type: "row", settings: [{ type: "text", id: "label", defaultKey: "site.common.next" }] }],
+    });
+    await fs.ensureDir(path.join(projectDir, "locales"));
+    await fs.writeJson(path.join(projectDir, "locales", "en.json"), {
+      site: { talky: { empty: "Nothing here" }, common: { next: "Next" } },
+    });
+    await fs.writeJson(path.join(projectDir, "locales", "el.json"), {
+      site: { talky: { empty: "Τίποτα εδώ" }, common: { next: "Επόμενο" } },
+    });
+  });
+
+  after(async () => {
+    await fs.remove(path.join(projectDir, "widgets", "talky"));
+    await fs.remove(path.join(projectDir, "locales"));
+  });
+
+  const talky = async (query) => {
+    const res = mockRes();
+    await getProjectWidgets(mockReq(query), res);
+    assert.equal(res._status, 200);
+    return res._json.find((schema) => schema.type === "talky");
+  };
+
+  it("fills the default in the language being edited, blocks included", async () => {
+    const greek = await talky({ language: "el" });
+    assert.equal(greek.settings[0].resolvedDefault, "Τίποτα εδώ");
+    assert.equal(greek.blocks[0].settings[0].resolvedDefault, "Επόμενο");
+  });
+
+  it("falls back to the default language when none is asked for", async () => {
+    const plain = await talky({});
+    assert.equal(plain.settings[0].resolvedDefault, "Nothing here");
+  });
+
+  // A `default` is copied into a new widget's settings and saved; this must not
+  // be, or one language's wording becomes content and follows a page into its
+  // translations.
+  it("never sends it as a `default`, which the editor would store as content", async () => {
+    const greek = await talky({ language: "el" });
+    assert.equal(greek.settings[0].default, undefined);
+    assert.equal(greek.blocks[0].settings[0].default, undefined);
+  });
+
+  it("leaves a schema that names none of them exactly as it is", async () => {
+    const res = mockRes();
+    await getProjectWidgets(mockReq({ language: "el" }), res);
+    const hero = res._json.find((schema) => schema.type === "hero");
+    assert.deepEqual(hero.settings, []);
+  });
+});
+
+// The built-in widgets belong to no theme, so their words ship with the app and
+// have to reach the editor through the same route a theme's do.
+describe("getProjectWidgets — the built-in widgets' own words", () => {
+  const coreForm = async (query) => {
+    const res = mockRes();
+    await getProjectWidgets(mockReq(query), res);
+    assert.equal(res._status, 200);
+    return res._json.find((schema) => schema.type === "core-form");
+  };
+
+  const setting = (schema, id) => schema.settings.find((s) => s.id === id);
+  const blockSetting = (schema, type, id) => schema.blocks.find((b) => b.type === type).settings.find((s) => s.id === id);
+
+  it("reach the editor in the language being edited, with no theme locales in sight", async () => {
+    const greek = await coreForm({ language: "el" });
+    assert.equal(setting(greek, "submit_label").resolvedDefault, "Αποστολή μηνύματος");
+    assert.equal(setting(greek, "required_note").resolvedDefault, "Υποχρεωτικά πεδία");
+    assert.equal(blockSetting(greek, "consent", "label").resolvedDefault, "Συμφωνώ να επικοινωνήσετε μαζί μου σχετικά με το αίτημά μου.");
+  });
+
+  // A field's label is its submitted name, so a form cannot be saved without
+  // one — which is why these keep a literal `default` for the editor to store,
+  // while the wording a page can resolve for itself does not.
+  it("says which of them content must carry and which stay suggestions", async () => {
+    const greek = await coreForm({ language: "el" });
+
+    assert.equal(blockSetting(greek, "field", "label").default, "Your name");
+    assert.equal(blockSetting(greek, "field", "label").resolvedDefault, "Το όνομά σας");
+
+    assert.equal(setting(greek, "submit_label").default, undefined);
+    assert.equal(setting(greek, "required_note").default, undefined);
+  });
+
+  // One block schema cannot hold three different labels, so each starting block
+  // names its own word.
+  it("give each starting field its own word", async () => {
+    const greek = await coreForm({ language: "el" });
+    assert.deepEqual(
+      greek.defaultBlocks.map((block) => block.resolvedDefaults?.label),
+      ["Το όνομά σας", "Διεύθυνση email", "Μήνυμα"],
+    );
+
+    const english = await coreForm({ language: "en" });
+    assert.deepEqual(
+      english.defaultBlocks.map((block) => block.resolvedDefaults?.label),
+      ["Your name", "Email address", "Message"],
+    );
+  });
+
+  it("keep the form's own name out of it, because that is its exported identity", async () => {
+    const greek = await coreForm({ language: "el" });
+    assert.equal(setting(greek, "form_name").default, "Contact");
+    assert.equal(setting(greek, "form_name").resolvedDefault, undefined);
   });
 });

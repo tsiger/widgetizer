@@ -1,0 +1,13 @@
+{
+  "slug": "aromatherapy-bath",
+  "schemaVersion": 1,
+  "settings": {
+    "title": "Aromatherapy Soak",
+    "icon": "bath",
+    "summary": "A private warm bath with blended essential oils to start or end your visit.",
+    "description": "<p>Settle into a deep tub drawn with oils chosen for how you want to feel, calm and sleepy or clear and awake. We blend the oils when you arrive rather than from a fixed bottle, so the scent matches your mood that day.</p><h2>What the soak includes</h2><p>You have the room to yourself with soft light and a cup of herbal tea within reach. The water is run to a warm, steady temperature, and we leave you a buzzer so you can call for more tea or a top-up of warm water without getting out.</p><ul><li>A private, pre-run bath blended with essential oils</li><li>Soft lighting and a cup of herbal tea</li><li>Time to settle without anyone hurrying you</li></ul><p>The session runs around twenty to thirty minutes, which is long enough to let the warmth reach your shoulders and lower back. We knock first and wait before we come in, so the quiet is genuinely yours.</p><h3>Who it suits</h3><p>It works well for anyone who carries tension in their neck and shoulders, or who finds it hard to slow down at the end of a long week. Many guests add it before a massage so the muscles are already warm and the deeper work goes more easily.</p><p>A small tip from us: come in a few minutes early so you are not rushing, and drink the tea slowly rather than all at once. Afterwards we suggest a glass of water and a quiet half hour before you head back out.</p>",
+    "price": "From $70",
+    "duration": "45 min",
+    "featured_image": "/uploads/images/velvet-touch-services-aromatherapy-bath.webp"
+  }
+}

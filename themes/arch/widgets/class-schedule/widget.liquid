@@ -338,7 +338,7 @@
                 {% endfor %}
               </div>
             {% else %}
-              <p class="cs-empty t-sm">No classes scheduled.</p>
+              <p class="cs-empty t-sm">{{ widget.settings.empty_text }}</p>
             {% endif %}
           </div>
         {% endfor %}
@@ -377,7 +377,7 @@
                   {% endfor %}
                 </div>
               {% else %}
-                <p class="cs-empty t-sm">No classes scheduled.</p>
+                <p class="cs-empty t-sm">{{ widget.settings.empty_text }}</p>
               {% endif %}
             </div>
           </details>
@@ -411,7 +411,7 @@
                 {% endfor %}
               </div>
             {% else %}
-              <p class="cs-empty t-sm">No classes scheduled.</p>
+              <p class="cs-empty t-sm">{{ widget.settings.empty_text }}</p>
             {% endif %}
           </div>
         {% endfor %}

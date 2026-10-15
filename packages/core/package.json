@@ -14,20 +14,35 @@
     "./test-helpers/publish": "./test-helpers/publishConformance.js",
     "./test-helpers/limits": "./test-helpers/limitsConformance.js",
     "./test-helpers/scope-resolver": "./test-helpers/scopeResolverConformance.js",
+    "./assetUrl": "./src/utils/assetUrl.js",
     "./youtube": "./src/utils/youtubeHelpers.js",
     "./blockLimits": "./src/utils/blockLimits.js",
     "./mimeTypes": "./src/utils/mimeTypes.js",
+    "./escapeHtml": "./src/utils/escapeHtml.js",
     "./pathSecurity": "./src/utils/pathSecurity.js",
     "./urlSafety": "./src/utils/urlSafety.js",
     "./richtextMedia": "./src/utils/richtextMedia.js",
     "./richtextLinks": "./src/utils/richtextLinks.js",
     "./linkPrefixer": "./src/utils/linkPrefixer.js",
+    "./internalHref": "./src/utils/internalHref.js",
+    "./publishedUrls": "./src/utils/publishedUrls.js",
+    "./breadcrumbs": "./src/utils/breadcrumbs.js",
+    "./contentAddress": "./src/utils/contentAddress.js",
+    "./siteIdentity": "./src/utils/siteIdentity.js",
+    "./languages": "./src/utils/languages.js",
+    "./mediaMetadata": "./src/utils/mediaMetadata.js",
+    "./translations": "./src/utils/translations.js",
+    "./structuredData": "./src/structuredData/index.js",
     "./dateFormat": "./src/utils/dateFormat.js",
+    "./themeSettingChanges": "./src/utils/themeSettingChanges.js",
+    "./themeFonts": "./src/utils/themeFonts.js",
     "./config/settingTypes": "./src/config/settingTypes.js",
     "./config/fonts.json": "./src/config/fonts.json",
-    "./locales/*": "./src/locales/*"
+    "./locales/*": "./src/locales/*",
+    "./widgets/locales/*": "./src/widgets/locales/*"
   },
   "dependencies": {
-    "liquidjs": "^10.26.0"
+    "liquidjs": "^10.26.0",
+    "slugify": "^1.6.6"
   }
 }

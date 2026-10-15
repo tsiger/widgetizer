@@ -42,4 +42,21 @@ describe("createEditorRoutes", () => {
     expect(route.element.props.plugins).toEqual([]);
     expect(route.element.props.slots).toEqual({});
   });
+
+  it("excludePaths omits the named child routes, leaving everything else intact", () => {
+    const all = createEditorRoutes({});
+    const trimmed = createEditorRoutes({ excludePaths: ["export-site"] });
+
+    const paths = (route) => route.children[0].children.map((c) => c.path);
+
+    expect(paths(all)).toContain("export-site");
+    expect(paths(trimmed)).not.toContain("export-site");
+    expect(paths(trimmed)).toEqual(paths(all).filter((p) => p !== "export-site"));
+  });
+
+  it("keeps every built-in route when excludePaths is omitted (standalone default)", () => {
+    const route = createEditorRoutes({});
+    const paths = route.children[0].children.map((c) => c.path);
+    expect(paths).toContain("export-site");
+  });
 });

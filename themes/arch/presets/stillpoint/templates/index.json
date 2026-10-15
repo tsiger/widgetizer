@@ -323,7 +323,7 @@
         "icon_style": "outline",
         "icon_size": "lg",
         "icon_shape": "circle",
-        "alignment": "centered",
+        "alignment": "center",
         "show_dividers": true,
         "color_scheme": "standard-secondary",
         "top_spacing": "small",

@@ -581,6 +581,12 @@ describe("buildLatestSnapshot", () => {
 
     const seedUpdateDir = path.join(THEMES_SEED_DIR, repairedTheme, "updates", "1.1.0");
     await fs.ensureDir(seedUpdateDir);
+    // A seed theme is identified by its root theme.json — without it the seed dir
+    // is not a theme and its updates/ are not consulted.
+    await fs.writeFile(
+      path.join(THEMES_SEED_DIR, repairedTheme, "theme.json"),
+      JSON.stringify({ name: repairedTheme, version: "1.0.0" }),
+    );
     await fs.writeFile(path.join(seedUpdateDir, "theme.json"), JSON.stringify({ name: repairedTheme, version: "1.1.0" }));
     await fs.writeFile(path.join(seedUpdateDir, "seed-file.txt"), "from seed");
 
@@ -1290,6 +1296,42 @@ describe("uploadTheme — theme update", () => {
     assert.equal(res._status, 409);
     assert.ok(res._json.message.includes("base version"));
   });
+
+  // The guard must compare against the installed ROOT base, not "any installed
+  // version". By this point 1.1.0 is installed as an update folder, so a zip
+  // claiming 1.1.0 as its base used to pass: validation would then layer from a
+  // 1.1.0 floor while the final build layers from the real 1.0.0 base, approving
+  // a different tree than the one that ships.
+  it("rejects a zip whose base matches an installed UPDATE version rather than the base", async () => {
+    const installedBase = (await fs.readJson(path.join(getThemeDir(EXISTING_THEME), "theme.json"))).version;
+    assert.equal(installedBase, "1.0.0");
+    assert.ok((await getThemeVersions(EXISTING_THEME)).includes("1.1.0"), "1.1.0 must be installed as an update");
+
+    const buffer = buildThemeZip(EXISTING_THEME, {
+      version: "1.1.0", // an installed update version, not the installed base
+      updates: [{ version: "1.2.0", files: { "assets/later.css": "later" } }],
+    });
+
+    const res = await callController(uploadTheme, { file: buffer });
+    assert.equal(res._status, 409);
+    assert.match(res._json.message, /base version 1\.1\.0 but installed theme .* base version 1\.0\.0/);
+    // Nothing was imported.
+    assert.equal(await fs.pathExists(path.join(getThemeDir(EXISTING_THEME), "updates", "1.2.0")), false);
+  });
+
+  it("still accepts the matching-base zip that carries a further release", async () => {
+    const buffer = buildThemeZip(EXISTING_THEME, {
+      version: "1.0.0",
+      updates: [
+        { version: "1.1.0", files: { "assets/patch.css": "patched" } },
+        { version: "1.2.0", files: { "assets/later.css": "later" } },
+      ],
+    });
+
+    const res = await callController(uploadTheme, { file: buffer });
+    assert.equal(res._status, 201);
+    assert.deepEqual(res._json.theme.addedVersions, ["1.2.0"]);
+  });
 });
 
 // ============================================================================
@@ -1643,18 +1685,21 @@ describe("copyThemeToProject excludes presets", () => {
     const presetsDir = path.join(getThemeDir(COPY_PRESET_THEME), "presets");
     await fs.ensureDir(presetsDir);
     await fs.outputFile(path.join(presetsDir, "presets.json"), JSON.stringify({ presets: [] }));
+    // theme-root starter-media pool — must never reach projects either
+    await fs.outputFile(path.join(getThemeDir(COPY_PRESET_THEME), "preset-media", "p1", "images", "a.jpg"), "x");
   });
 
   after(async () => {
     await fs.remove(getThemeDir(COPY_PRESET_THEME));
   });
 
-  it("does not copy presets/ to project directory", async () => {
+  it("does not copy presets/ or preset-media/ to project directory", async () => {
     const targetDir = path.join(TEST_ROOT, "copy-no-presets-target");
     await fs.ensureDir(targetDir);
 
     await copyThemeToProject(COPY_PRESET_THEME, targetDir);
     assert.ok(!(await fs.pathExists(path.join(targetDir, "presets"))));
+    assert.ok(!(await fs.pathExists(path.join(targetDir, "preset-media"))));
 
     await fs.remove(targetDir);
   });

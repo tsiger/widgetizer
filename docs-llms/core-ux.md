@@ -32,13 +32,15 @@ Destructive actions use the in-app modal, never a browser `confirm()` dialog. Li
 
 The page owns its mutation logic and localized copy; the hook owns the modal wiring.
 
+Code that asks but renders nothing (the navigation guards) uses `useConfirm()` instead: an awaitable `confirm(options) => Promise<boolean>` backed by one `ConfirmProvider` that the **shell** mounts per window (`app/src/App.jsx` in OSS). While open, the dialog owns the keyboard — only Escape, Tab (trapped inside), Enter and Space get through, so editor shortcuts and Escape-listening drawers behind it never fire — and on close it returns focus to the opener, or to an explicit `returnFocusTo` when the opener unmounted in the same click (row menus). See [Custom Hooks](core-hooks.md) (`useConfirm`).
+
 ### Navigation Guards
 
-Forms (project, page, menu, settings) install a navigation guard that blocks accidental navigation away from unsaved changes. When a save legitimately changes the URL (e.g. a page slug change rewrites the route), the guard is bypassed for that programmatic navigation.
+Forms (project, page, menu, collection item, settings) install a navigation guard that blocks accidental navigation away from unsaved changes, and the page editor installs its own over the save store. In-app navigation asks through the in-app `useConfirm()` dialog, never `window.confirm()`; tab close/refresh gets the browser's own leave prompt in web builds only (the desktop app closes without asking). When a save legitimately changes the URL (e.g. a page slug change rewrites the route), the guard is bypassed for that programmatic navigation.
 
 ### Bulk Delete
 
-List pages that support multi-select (pages, media) share one pattern: selection checkboxes feed a single confirmation modal, then a batch delete runs and a count-aware success toast is shown (`File "[name]" deleted successfully.` vs. `Successfully deleted [count] files`). Single and bulk delete go through the same confirm → mutate → toast → refresh path.
+List pages that support multi-select (pages, collection items, media) share one pattern: selection checkboxes feed a single confirmation modal, then a batch delete runs and a count-aware success toast is shown (`File "[name]" deleted successfully.` vs. `Successfully deleted [count] files`). Single and bulk delete go through the same confirm → mutate → toast → refresh path. Deleting a row from its own menu also drops it from the selection, and a bulk delete removes only the ids it submitted (the set the dialog confirmed), so rows selected while it ran stay selected and a stale id never reaches the next bulk action.
 
 ### Redirect / "Go with the Flow" Conventions
 
@@ -52,7 +54,7 @@ List pages that support multi-select (pages, media) share one pattern: selection
 
 The backend is **adapter-injected and scope-first**: every storage/asset/limits call carries a `scope` (`{ actor, projectId, folderName }`), and capability is supplied by injected adapters rather than hard-wired filesystem access (see [core-packages.md](core-packages.md)). For the OSS shell this is the local-FS + SQLite adapter set; a hosted shell swaps in cloud adapters.
 
-One consequence is visible at the UX layer: a **limits/quota adapter** can shape create/upload outcomes. The contract exposes `LIMIT_KEYS` (`packages/core/src/adapters.js`) — `MAX_UPLOAD_SIZE_BYTES`, `MAX_PAGES_PER_PROJECT`, `MAX_PROJECTS_PER_USER`, `MAX_MEDIA_BYTES`, `CUSTOM_DOMAIN_ALLOWED`, `ANALYTICS_TIER`, `FORM_SUBMISSIONS_PER_MONTH`, `MAX_WIDGETS_PER_PAGE`, `MAX_MENU_ITEMS`, `MAX_COLLECTION_ITEMS`, `MAX_COLLECTIONS`. In OSS, the count/quota keys are effectively unbounded while `MAX_UPLOAD_SIZE_BYTES` mirrors the App Settings upload cap; under a hosted limits adapter, a create or upload can be rejected on quota grounds and the UI surfaces that as an error toast like any other failed mutation. Treat "create/upload can fail for limit reasons" as a baseline assumption.
+One consequence is visible at the UX layer: a **limits/quota adapter** can shape create/upload outcomes. The contract exposes `LIMIT_KEYS` (`packages/core/src/adapters.js`) — `MAX_UPLOAD_SIZE_BYTES`, `MAX_PAGES_PER_PROJECT`, `MAX_PROJECTS_PER_USER`, `MAX_MEDIA_BYTES`, `CUSTOM_DOMAIN_ALLOWED`, `ANALYTICS_TIER`, `FORM_SUBMISSIONS_PER_MONTH`, `MAX_WIDGETS_PER_PAGE`, `MAX_MENU_ITEMS`, `MAX_COLLECTION_ITEMS`, `MAX_COLLECTIONS`, `MAX_FORMS_PER_SITE` (checked at export). In OSS, the count/quota keys are effectively unbounded while `MAX_UPLOAD_SIZE_BYTES` mirrors the App Settings upload cap; under an injected limits adapter, a create or upload can be rejected on quota grounds and the UI surfaces that as an error toast like any other failed mutation. Treat "create/upload can fail for limit reasons" as a baseline assumption.
 
 ---
 
@@ -88,7 +90,7 @@ Theme management lives in the admin shell (`/themes`, `app/src/pages/Themes.jsx`
 
 - All mutating workflows give toast feedback; destructive ones go through the shared in-app confirmation modal.
 - Navigation guards prevent unsaved-change data loss on forms.
-- Bulk delete is supported for pages and media via the shared select → confirm → batch → toast pattern.
+- Bulk delete is supported for pages, collection items and media via the shared select → confirm → batch → toast pattern.
 - Redirects follow "go with the flow": create lands on the next useful surface, edit stays put with an exit.
 - The backend is scope-first and adapter-injected; a hosted limits adapter (`LIMIT_KEYS`) can turn create/upload actions into quota-driven failures that surface as error toasts.
 - Two surfaces sit outside the "every action redirects" model: the Page Editor (its own auto-save/undo model, see [core-page-editor.md](core-page-editor.md)) and theme activation (driven from project creation, not the Themes page).

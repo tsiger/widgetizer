@@ -9,6 +9,8 @@ describe("isStandalonePreviewNavigationUrl", () => {
     expect(isStandalonePreviewNavigationUrl("/preview/about")).toBe(true);
     expect(isStandalonePreviewNavigationUrl("/preview/case-study")).toBe(true);
     expect(isStandalonePreviewNavigationUrl("/preview/collection/rooms/suite-caldera")).toBe(true);
+    expect(isStandalonePreviewNavigationUrl("/preview/paged/blog/2")).toBe(true);
+    expect(isStandalonePreviewNavigationUrl("/preview/paged/collection/2")).toBe(true);
   });
 
   it("rejects non-preview targets", () => {
@@ -20,5 +22,8 @@ describe("isStandalonePreviewNavigationUrl", () => {
     expect(isStandalonePreviewNavigationUrl("/preview/collection/rooms/suite-caldera?x=1")).toBe(false);
     expect(isStandalonePreviewNavigationUrl("/preview/collection/rooms")).toBe(false);
     expect(isStandalonePreviewNavigationUrl("/preview/collection/a/b/c")).toBe(false);
+    expect(isStandalonePreviewNavigationUrl("/preview/blog/page/2")).toBe(false);
+    expect(isStandalonePreviewNavigationUrl("/preview/paged/blog/0")).toBe(false);
+    expect(isStandalonePreviewNavigationUrl("/preview/paged/blog/two")).toBe(false);
   });
 });

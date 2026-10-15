@@ -11,10 +11,14 @@
 import { MAX_MENU_DEPTH } from "@widgetizer/core/adapters";
 import { prefixInternalHref, normalize } from "@widgetizer/core/linkPrefixer";
 import { sanitizeHref } from "@widgetizer/core/urlSafety";
+import { pageHref, itemHref } from "@widgetizer/core/internalHref";
+import { pageOutputPath, itemOutputPath } from "@widgetizer/core/contentAddress";
+import { languageFolder } from "@widgetizer/core/contentAddress";
 
 /**
  * Recursively resolve links in menu items. Each item resolves to an emitted
- * (depth-aware, prefixed) `link` plus an un-prefixed `canonicalPath` for
+ * `link` — `.html` file name, or the extensionless address when the project's
+ * Clean URLs setting is on — plus an un-prefixed `.html` `canonicalPath` for
  * active-state matching. Stable refs (collectionItemUuid/pageUuid) resolve to
  * the current slug; missing targets clear the link; custom links are sanitized.
  * @param {Array} menuItems - Array of menu items
@@ -27,6 +31,8 @@ export function resolveMenuItemLinks(
   outputPathPrefix = "",
   collectionItemsByUuid = new Map(),
   depth = 1,
+  cleanUrls = false,
+  defaultLanguage = "",
 ) {
   if (!menuItems || !Array.isArray(menuItems)) {
     return menuItems;
@@ -51,9 +57,9 @@ export function resolveMenuItemLinks(
       // slug, mirroring pageUuid so renames follow and deletes clear the link.
       const entry = collectionItemsByUuid && collectionItemsByUuid.get(item.collectionItemUuid);
       if (entry) {
-        const href = `${entry.slugPrefix}/${entry.slug}.html`;
-        resolved.link = prefixInternalHref(href, outputPathPrefix);
-        resolved.canonicalPath = normalize(href);
+        const lang = { language: entry.language, defaultLanguage };
+        resolved.link = itemHref(entry.slugPrefix, entry.slug, { cleanUrls, outputPathPrefix, ...lang });
+        resolved.canonicalPath = normalize(itemOutputPath(entry.slugPrefix, entry.slug, lang));
       } else {
         // Collection item was deleted - clear the link
         resolved.link = "";
@@ -64,9 +70,9 @@ export function resolveMenuItemLinks(
     } else if (item.pageUuid) {
       const page = pagesByUuid && pagesByUuid.get(item.pageUuid);
       if (page) {
-        const href = `${page.slug}.html`;
-        resolved.link = prefixInternalHref(href, outputPathPrefix);
-        resolved.canonicalPath = normalize(href);
+        const lang = { language: page.language, defaultLanguage };
+        resolved.link = pageHref(page.slug, { cleanUrls, outputPathPrefix, ...lang });
+        resolved.canonicalPath = normalize(pageOutputPath(page.slug, 1, lang));
       } else {
         // Page was deleted - clear the link
         resolved.link = "";
@@ -95,6 +101,8 @@ export function resolveMenuItemLinks(
         outputPathPrefix,
         collectionItemsByUuid,
         depth + 1,
+        cleanUrls,
+        defaultLanguage,
       );
     }
 
@@ -108,14 +116,29 @@ export function resolveMenuItemLinks(
  * @param {Map} pagesByUuid - Map of uuid -> page data
  * @returns {object} Menu data with resolved links
  */
-export function resolveMenuPageLinks(menuData, pagesByUuid, outputPathPrefix = "", collectionItemsByUuid = new Map()) {
+export function resolveMenuPageLinks(
+  menuData,
+  pagesByUuid,
+  outputPathPrefix = "",
+  collectionItemsByUuid = new Map(),
+  cleanUrls = false,
+  defaultLanguage = "",
+) {
   if (!menuData || !menuData.items) {
     return menuData;
   }
 
   return {
     ...menuData,
-    items: resolveMenuItemLinks(menuData.items, pagesByUuid, outputPathPrefix, collectionItemsByUuid),
+    items: resolveMenuItemLinks(
+      menuData.items,
+      pagesByUuid,
+      outputPathPrefix,
+      collectionItemsByUuid,
+      1,
+      cleanUrls,
+      defaultLanguage,
+    ),
   };
 }
 
@@ -134,13 +157,21 @@ export function schemaHasMenuSetting(schema) {
  *
  * @param {object} settings - settings object (mutated in place)
  * @param {Array} schemaSettings - schema setting definitions for `settings`
- * @param {object} deps - { menuMaps, pagesByUuid, collectionItemsByUuid, outputPathPrefix }
+ * @param {object} deps - { menuMaps, pagesByUuid, collectionItemsByUuid, outputPathPrefix, cleanUrls }
  * @returns {object} the same `settings` object
  */
 export function resolveMenuSettings(
   settings,
   schemaSettings,
-  { menuMaps, pagesByUuid, collectionItemsByUuid = new Map(), outputPathPrefix = "" } = {},
+  {
+    menuMaps,
+    pagesByUuid,
+    collectionItemsByUuid = new Map(),
+    outputPathPrefix = "",
+    cleanUrls = false,
+    defaultLanguage = "",
+    language = "",
+  } = {},
 ) {
   if (!settings || !Array.isArray(schemaSettings) || !menuMaps) return settings;
 
@@ -150,10 +181,22 @@ export function resolveMenuSettings(
     try {
       const value = settings[key];
       if (value) {
-        const menuData = menuMaps.byUuid.get(value) || menuMaps.bySlug.get(value);
-        settings[key] = resolveMenuPageLinks(menuData, pagesByUuid, outputPathPrefix, collectionItemsByUuid) || {
-          items: [],
-        };
+        // A uuid names one menu anywhere; a bare SLUG names this language's
+        // menu of that name, and only falls back to the root when the language
+        // has none of its own.
+        const folder = languageFolder({ language, defaultLanguage });
+        const menuData =
+          menuMaps.byUuid.get(value) ||
+          menuMaps.bySlug.get(folder)?.get(value) ||
+          menuMaps.bySlug.get("")?.get(value);
+        settings[key] = resolveMenuPageLinks(
+          menuData,
+          pagesByUuid,
+          outputPathPrefix,
+          collectionItemsByUuid,
+          cleanUrls,
+          defaultLanguage,
+        ) || { items: [] };
       } else {
         settings[key] = { items: [] };
       }

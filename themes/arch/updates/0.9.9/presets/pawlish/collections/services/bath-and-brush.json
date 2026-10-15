@@ -1,0 +1,13 @@
+{
+  "slug": "bath-and-brush",
+  "schemaVersion": 1,
+  "settings": {
+    "title": "Bath and Brush",
+    "icon": "bath",
+    "summary": "A wash, blow-dry, and brush-out for dogs who do not need a full haircut.",
+    "description": "<p>Good for short coats or between full grooms, this keeps your dog clean and the shedding down. It is a tidy-up rather than a haircut, so it is an easy way to keep your dog fresh without a full appointment.</p><h2>What the visit includes</h2><p>We bathe with a shampoo suited to their coat, dry them off, and brush through to clear loose hair and small tangles. We work at a gentle pace and let your dog get used to the warm water and the dryer rather than rushing them.</p><ul><li>A warm bath with a shampoo matched to the coat</li><li>A thorough dry</li><li>A brush-out to clear loose hair and light knots</li></ul><p>Most dogs find it a calm, pleasant experience, and the brush-out at the end is where a lot of the loose fur comes away. You will usually notice less hair around the house for a good while afterwards.</p><h3>Add-ons and what to bring</h3><p>Nails and ears can be added on request, so just let us know when you book if you would like those done at the same time. If your dog has any sore spots or a coat that mats easily, mention it so we can take extra care.</p><p>A short walk and a chance to go to the toilet before the appointment helps everything go smoothly. For dogs that shed heavily, a regular bath and brush keeps the coat in much better order between full grooms.</p>",
+    "price": "$50",
+    "duration": "60 min",
+    "featured_image": "/uploads/images/pawlish-services-bath-and-brush.webp"
+  }
+}

@@ -1,0 +1,340 @@
+{
+  "name": "Programs",
+  "slug": "programs",
+  "widgets": {
+    "programs_hero": {
+      "type": "banner",
+      "settings": {
+        "height": "auto",
+        "fullwidth": true,
+        "content_width": "medium",
+        "alignment": "center",
+        "color_scheme": "highlight-primary"
+      },
+      "blocks": {
+        "programs-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Our Programs",
+            "size": "6xl"
+          }
+        },
+        "programs-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Age-appropriate learning designed around how children actually grow. Every program balances structure with play, curiosity with care.</p>",
+            "size": "lg"
+          }
+        }
+      },
+      "blocksOrder": [
+        "programs-heading",
+        "programs-text"
+      ]
+    },
+    "programs_grid": {
+      "type": "checkerboard",
+      "settings": {
+        "eyebrow": "By Age Group",
+        "eyebrow_uppercase": true,
+        "title": "What Each Program Looks Like",
+        "heading_alignment": "center",
+        "columns_desktop": 4,
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "tile-1": {
+          "type": "card",
+          "settings": {
+            "title": "Infants (6 weeks – 12 months)",
+            "description": "<p>Gentle sensory exploration, tummy time, and one-on-one bonding. Dedicated caregivers follow each baby's natural schedule for feeding, napping, and play. A calm, secure space that helps infants build trust and attachment.</p>",
+            "button_link": {
+              "href": "",
+              "text": "",
+              "target": "_self"
+            }
+          }
+        },
+        "tile-2": {
+          "type": "card",
+          "settings": {
+            "title": "",
+            "image": "/uploads/images/checkerboard-art-1.webp",
+            "button_link": {
+              "href": "",
+              "text": "",
+              "target": "_self"
+            },
+            "description": "<p></p>"
+          }
+        },
+        "tile-3": {
+          "type": "card",
+          "settings": {
+            "title": "",
+            "image": "/uploads/images/checkerboard-reading.webp",
+            "button_link": {
+              "href": "",
+              "text": "",
+              "target": "_self"
+            },
+            "description": "<p></p>"
+          }
+        },
+        "tile-4": {
+          "type": "card",
+          "settings": {
+            "title": "Toddlers (1 – 2 years)",
+            "description": "<p>Active discovery through music, movement, art, and early language. Structured routines build confidence and independence while giving toddlers the freedom to explore at their own pace. Small group sizes ensure every child is seen.</p>",
+            "button_link": {
+              "href": "",
+              "text": "",
+              "target": "_self"
+            }
+          }
+        },
+        "tile-5": {
+          "type": "card",
+          "settings": {
+            "title": "Preschool (3 – 4 years)",
+            "description": "<p>Play-based learning in literacy, math, science, and social skills. Daily circle time, creative projects, and outdoor exploration. Children learn to share, collaborate, and express themselves in a supportive environment.</p>",
+            "button_link": {
+              "href": "",
+              "text": "",
+              "target": "_self"
+            }
+          }
+        },
+        "tile-6": {
+          "type": "card",
+          "settings": {
+            "title": "",
+            "image": "/uploads/images/checkerboard-blocks.webp",
+            "button_link": {
+              "href": "",
+              "text": "",
+              "target": "_self"
+            },
+            "description": "<p></p>"
+          }
+        },
+        "tile-7": {
+          "type": "card",
+          "settings": {
+            "title": "",
+            "description": "<p></p>",
+            "button_link": {
+              "href": "",
+              "text": "",
+              "target": "_self"
+            },
+            "image": "/uploads/images/checkerboard-garden.webp"
+          }
+        },
+        "tile-8": {
+          "type": "card",
+          "settings": {
+            "title": "Pre-K (4 – 5 years)",
+            "description": "<p>Kindergarten readiness through structured academics, problem-solving, and collaborative projects. Children practice letters, numbers, and early reading while developing the social and emotional skills they need to thrive in school.</p>",
+            "button_link": {
+              "href": "",
+              "text": "",
+              "target": "_self"
+            }
+          }
+        }
+      },
+      "blocksOrder": [
+        "tile-1",
+        "tile-2",
+        "tile-4",
+        "tile-3",
+        "tile-6",
+        "tile-5",
+        "tile-7",
+        "tile-8"
+      ]
+    },
+    "daily_schedule": {
+      "type": "schedule-table",
+      "settings": {
+        "eyebrow": "A Typical Day",
+        "eyebrow_uppercase": true,
+        "title": "Sample Daily Schedule",
+        "description": "Each day follows a consistent rhythm of learning, play, meals, and rest. Here is what a typical preschool day looks like.",
+        "heading_alignment": "start",
+        "note": "Infant and toddler schedules follow each child's individual routine.",
+        "sidebar_position": "end",
+        "week_start_day": 1,
+        "color_scheme": "standard-secondary"
+      },
+      "blocks": {
+        "time-1": {
+          "type": "day",
+          "settings": {
+            "day": "7:00 – 8:30 AM",
+            "hours": "Arrival and free play"
+          }
+        },
+        "time-2": {
+          "type": "day",
+          "settings": {
+            "day": "8:30 – 9:00 AM",
+            "hours": "Breakfast"
+          }
+        },
+        "time-3": {
+          "type": "day",
+          "settings": {
+            "day": "9:00 – 10:30 AM",
+            "hours": "Circle time and guided learning"
+          }
+        },
+        "time-4": {
+          "type": "day",
+          "settings": {
+            "day": "10:30 – 11:30 AM",
+            "hours": "Outdoor play and nature exploration"
+          }
+        },
+        "time-5": {
+          "type": "day",
+          "settings": {
+            "day": "11:30 AM – 12:00 PM",
+            "hours": "Lunch",
+            "closed": false
+          }
+        },
+        "time-6": {
+          "type": "day",
+          "settings": {
+            "day": "12:00 – 2:00 PM",
+            "hours": "Rest and quiet time"
+          }
+        },
+        "time-7": {
+          "type": "day",
+          "settings": {
+            "day": "2:00 – 3:30 PM",
+            "hours": "Art, music, and creative projects"
+          }
+        },
+        "time-8": {
+          "type": "day",
+          "settings": {
+            "day": "3:30 – 6:00 PM",
+            "hours": "Snack, outdoor play, and pickup"
+          }
+        },
+        "schedule-sidebar": {
+          "type": "info",
+          "settings": {
+            "title": "Meals Included",
+            "text": "<p>Breakfast, lunch, and afternoon snack are provided daily. All meals are nut-free and we accommodate common dietary needs.</p>"
+          }
+        }
+      },
+      "blocksOrder": [
+        "time-1",
+        "time-2",
+        "time-3",
+        "time-4",
+        "time-5",
+        "time-6",
+        "time-7",
+        "time-8",
+        "schedule-sidebar"
+      ]
+    },
+    "outdoor_section": {
+      "type": "image-text",
+      "settings": {
+        "image_position": "end",
+        "text_position": "center",
+        "color_scheme": "standard-primary",
+        "image": "/uploads/images/outdoor-play.webp"
+      },
+      "blocks": {
+        "outdoor-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Beyond the Classroom</p>",
+            "size": "sm",
+            "uppercase": true
+          }
+        },
+        "outdoor-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Learning Grows Outside Too",
+            "size": "4xl"
+          }
+        },
+        "outdoor-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Our outdoor space includes a fenced play area, a small garden where children plant and tend vegetables, and natural materials for open-ended exploration. Every age group spends time outside daily, building physical skills and connecting with nature.</p>",
+            "size": "base"
+          }
+        }
+      },
+      "blocksOrder": [
+        "outdoor-eyebrow",
+        "outdoor-heading",
+        "outdoor-text"
+      ]
+    },
+    "programs_cta": {
+      "type": "action-bar",
+      "settings": {
+        "color_scheme": "highlight-primary",
+        "top_spacing": "small",
+        "bottom_spacing": "small"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "See our programs in person",
+            "size": "3xl"
+          }
+        },
+        "cta-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Book a tour and visit the classrooms your child would be in.</p>",
+            "size": "base",
+            "muted": true
+          }
+        },
+        "cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "href": "contact.html",
+              "text": "Schedule a Tour",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": [
+        "cta-heading",
+        "cta-text",
+        "cta-button"
+      ]
+    }
+  },
+  "widgetsOrder": [
+    "programs_hero",
+    "programs_grid",
+    "daily_schedule",
+    "outdoor_section",
+    "programs_cta"
+  ],
+  "id": "programs",
+  "created": "2026-04-17T16:20:56.788Z",
+  "updated": "2026-04-17T16:46:48.489Z"
+}

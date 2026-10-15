@@ -1,0 +1,306 @@
+{% if widget.settings.layout == 'carousel' %}
+  {% enqueue_script src: "carousel.js", defer: true, location: "footer", priority: 40, theme: true %}
+{% endif %}
+<section
+  id="{{ widget.id }}"
+  class="widget widget-type-key-figures widget-{{ widget.id }} color-scheme-{{ widget.settings.color_scheme }}{% if widget.settings.layout == 'carousel' %} layout-carousel{% endif %}{% if widget.settings.card_layout == 'flat' %} card-layout-flat{% endif %}{% if widget.settings.top_spacing != 'auto' %} spacing-top-{{ widget.settings.top_spacing }}{% endif %}{% if widget.settings.bottom_spacing != 'auto' %} spacing-bottom-{{ widget.settings.bottom_spacing }}{% endif %}"
+  {% unless widget.settings.color_scheme == 'standard-primary' %}
+    style="--widget-bg-color: var(--bg-primary);"
+  {% endunless %}
+  data-widget-id="{{ widget.id }}"
+  data-widget-type="key-figures"
+  {% if widget.index != null %}data-widget-index="{{ widget.index }}"{% endif %}
+  {% if widget.settings.animate %}
+    data-animate="true"
+  {% endif %}
+>
+  <style>
+    .widget-{{ widget.id }} {
+      & .widget-card {
+        text-align: center;
+        padding: var(--space-xl) var(--space-lg);
+      }
+
+      & .stats-number {
+        font-size: calc(var(--font-size-5xl) * var(--heading-scale));
+        line-height: 1;
+        color: var(--text-heading);
+        margin: 0;
+        margin-block-end: var(--space-sm);
+        font-variant-numeric: tabular-nums;
+      }
+
+      & .odometer {
+        display: inline-flex;
+        align-items: flex-end;
+      }
+
+      & .odometer-digit {
+        display: inline-block;
+        height: 1em;
+        overflow: hidden;
+      }
+
+      & .odometer-strip {
+        display: flex;
+        flex-direction: column;
+        transform: translateY(0);
+        transition: transform var(--odometer-duration, 1200ms) cubic-bezier(0.16, 1, 0.3, 1);
+        transition-delay: var(--odometer-delay, 0ms);
+      }
+
+      & .odometer-strip > span {
+        height: 1em;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      & .odometer-digit.odometer-active .odometer-strip {
+        transform: translateY(calc(var(--digit-target) * -1em));
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        & .odometer-strip {
+          transition: none;
+        }
+      }
+
+      & .w-title {
+        margin-block-end: var(--space-xs);
+      }
+
+      @media (min-width: 990px) {
+        & .widget-card {
+          padding: var(--space-3xl) var(--space-xl);
+        }
+      }
+
+      &:not(.card-layout-flat).color-scheme-standard-secondary,
+      &:not(.card-layout-flat).color-scheme-highlight-secondary {
+        & .widget-card {
+          background-color: var(--bg-secondary);
+        }
+      }
+
+      &:not(.card-layout-flat).color-scheme-standard-secondary,
+      &:not(.card-layout-flat).color-scheme-highlight-primary,
+      &:not(.card-layout-flat).color-scheme-highlight-secondary {
+        & .widget-card {
+          border: var(--border-width-thin) solid var(--border-color);
+        }
+      }
+
+      &.card-layout-flat {
+        & .widget-card {
+          padding: 0;
+        }
+
+        @media (min-width: 990px) {
+          & .widget-card {
+            padding: 0;
+          }
+        }
+      }
+    }
+  </style>
+
+  <div class="widget-container {% unless widget.settings.color_scheme == 'standard-primary' %}widget-container-padded{% endunless %}">
+    {% if widget.settings.title != blank or widget.settings.description != blank or widget.settings.eyebrow != blank %}
+      <div class="widget-header{% if widget.settings.heading_alignment == 'start' %} widget-header--align-start{% endif %}">
+        {% assign header_delay = 0 %}
+        {% if widget.settings.eyebrow != blank %}
+          <span class="w-eyebrow{% if widget.settings.eyebrow_uppercase %} t-uppercase{% endif %} reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
+          {% assign header_delay = header_delay | plus: 1 %}
+        {% endif %}
+        {% if widget.settings.title != blank %}
+          {% if widget.index == 1 %}
+            <h1 class="w-headline reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="title">{{ widget.settings.title }}</h1>
+          {% else %}
+            <h2 class="w-headline reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="title">{{ widget.settings.title }}</h2>
+          {% endif %}
+          {% assign header_delay = header_delay | plus: 1 %}
+        {% endif %}
+        {% if widget.settings.description != blank %}
+          <p class="w-description reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="description">{{ widget.settings.description }}</p>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <div class="widget-content">
+      {% assign item_heading_level = 'h3' %}
+      {% if widget.settings.title == blank %}
+        {% assign item_heading_level = 'h2' %}
+      {% endif %}
+
+      {% if widget.settings.layout == 'carousel' %}
+        <div class="carousel-container reveal reveal-up">
+          <button type="button" class="carousel-btn carousel-btn-prev" aria-label="{{ 'site.common.previous' | t }}">
+            <svg class="carousel-btn-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </button>
+          <button type="button" class="carousel-btn carousel-btn-next" aria-label="{{ 'site.common.next' | t }}">
+            <svg class="carousel-btn-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </button>
+          <ul class="widget-card-grid carousel-track" style="--carousel-cols: {{ widget.settings.columns_desktop }}">
+            {% for blockId in widget.blocksOrder %}
+              {% assign block = widget.blocks[blockId] %}
+              <li class="widget-card carousel-item" data-block-id="{{ blockId }}">
+                <div
+                  class="stats-number"
+                  {% if widget.settings.animate %}
+                    data-count="{{ block.settings.number }}" data-suffix="{{ block.settings.suffix }}"
+                  {% endif %}
+                >
+                  {% if widget.settings.animate -%}
+                    0
+                  {%- else -%}
+                    {{- block.settings.number -}}
+                    {{- block.settings.suffix -}}
+                  {%- endif %}
+                </div>
+                <div class="widget-card-content">
+                  {% if block.settings.label != blank %}
+                    <{{ item_heading_level }} class="w-title t-xl" data-setting="label">{{ block.settings.label }}</{{ item_heading_level }}>
+                  {% endif %}
+                  {% if block.settings.description != blank %}
+                    <p class="w-body t-sm" data-setting="description">{{ block.settings.description }}</p>
+                  {% endif %}
+                </div>
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+
+      {% else %}
+        <ul
+          class="widget-card-grid widget-grid"
+          style="--grid-cols-desktop: {{ widget.settings.columns_desktop }};"
+        >
+          {% for blockId in widget.blocksOrder %}
+            {% assign block = widget.blocks[blockId] %}
+            <li class="widget-card reveal reveal-up" style="--reveal-delay: {{ forloop.index0 }}" data-block-id="{{ blockId }}">
+              <div
+                class="stats-number"
+                {% if widget.settings.animate %}
+                  data-count="{{ block.settings.number }}" data-suffix="{{ block.settings.suffix }}"
+                {% endif %}
+              >
+                {% if widget.settings.animate -%}
+                  0
+                {%- else -%}
+                  {{- block.settings.number -}}
+                  {{- block.settings.suffix -}}
+                {%- endif %}
+              </div>
+              <div class="widget-card-content">
+                {% if block.settings.label != blank %}
+                  <{{ item_heading_level }} class="w-title t-xl" data-setting="label">{{ block.settings.label }}</{{ item_heading_level }}>
+                {% endif %}
+                {% if block.settings.description != blank %}
+                  <p class="w-body t-sm" data-setting="description">{{ block.settings.description }}</p>
+                {% endif %}
+              </div>
+            </li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    </div>
+  </div>
+
+  {% if widget.settings.animate %}
+    <script>
+      (function () {
+        const widget = document.getElementById('{{ widget.id }}');
+        if (!widget || widget.dataset.initialized) return;
+        widget.dataset.initialized = 'true';
+
+        const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        widget.querySelectorAll('.stats-number[data-count]').forEach((el) => {
+          const raw = el.getAttribute('data-count') || '';
+          const suffix = el.getAttribute('data-suffix') || '';
+          const fullText = raw + suffix;
+
+          const odometer = document.createElement('span');
+          odometer.className = 'odometer';
+          odometer.setAttribute('aria-label', fullText);
+
+          const allChars = (raw + suffix).split('');
+          const digitChars = raw.split('').filter((ch) => /\d/.test(ch));
+          const totalDigits = digitChars.length;
+          let digitIndex = 0;
+
+          allChars.forEach((ch, i) => {
+            const isNumberPart = i < raw.length;
+            const isDigit = isNumberPart && /\d/.test(ch);
+
+            if (isDigit) {
+              const digit = document.createElement('span');
+              digit.className = 'odometer-digit';
+              digit.setAttribute('aria-hidden', 'true');
+
+              const posFromRight = totalDigits - 1 - digitIndex;
+              const duration = 1200 + posFromRight * 400;
+              const delay = digitIndex * 80;
+              digit.style.setProperty('--digit-target', ch);
+              digit.style.setProperty('--odometer-duration', duration + 'ms');
+              digit.style.setProperty('--odometer-delay', delay + 'ms');
+
+              const strip = document.createElement('span');
+              strip.className = 'odometer-strip';
+              for (let n = 0; n <= 9; n++) {
+                const s = document.createElement('span');
+                s.textContent = n;
+                strip.appendChild(s);
+              }
+              digit.appendChild(strip);
+              odometer.appendChild(digit);
+              digitIndex++;
+            } else {
+              const staticEl = document.createElement('span');
+              staticEl.className = 'odometer-static';
+              staticEl.setAttribute('aria-hidden', 'true');
+              staticEl.textContent = ch;
+              odometer.appendChild(staticEl);
+            }
+          });
+
+          el.textContent = '';
+          el.appendChild(odometer);
+
+          if (reducedMotion) {
+            el.querySelectorAll('.odometer-digit').forEach((d) => d.classList.add('odometer-active'));
+          }
+        });
+
+        if (reducedMotion) return;
+
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              const digits = entry.target.querySelectorAll('.odometer-digit');
+              if (entry.isIntersecting) {
+                digits.forEach((d) => d.classList.add('odometer-active'));
+              } else {
+                digits.forEach((d) => {
+                  const strip = d.querySelector('.odometer-strip');
+                  strip.style.transition = 'none';
+                  d.classList.remove('odometer-active');
+                  strip.offsetHeight;
+                  strip.style.transition = '';
+                });
+              }
+            });
+          },
+          { threshold: 0.2 },
+        );
+
+        widget.querySelectorAll('.stats-number[data-count]').forEach((el) => observer.observe(el));
+      })();
+    </script>
+  {% endif %}
+</section>

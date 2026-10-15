@@ -8,6 +8,19 @@ This document serves as a comprehensive index to all documentation in the Widget
 
 ## 🗺️ Authoritative Maps
 
+### **[Domain and behavior handbook](domain/README.md)** - Entities, Operations, and Coverage
+
+**Purpose**: A navigable map of what the app owns, how entities relate, what each user operation changes, and which expectations have test evidence. This complements the code/package maps below.
+
+- Start with the entity directory and ownership diagram.
+- Every entity and workflow page begins with a plain-language guide covering everyday examples, available actions, shared effects, languages and saving; implementation references follow under Technical details.
+- Follow operation walkthroughs for project creation/import, content editing, language lifecycle, media, themes, preview, and export.
+- Use the multilingual shared-versus-local matrix and coverage evidence to understand current behaviour and its verification limits. The handbook contains no task queue.
+- Includes theme language controls, date formatting, integration contracts and current limitations. [Built-in widgets](domain/entities/core-widget.md) and [forms](domain/operations/forms.md) have their own guides, including core form localization.
+- Key pages: [multilingual rules](domain/multilingual.md) (shared-versus-local matrix), [language lifecycle](domain/operations/languages.md), [API index](domain/operations/api-index.md), and [coverage](domain/coverage.md) (which expectations have test evidence).
+
+---
+
 ### **[core-architecture.md](core-architecture.md)** - Application Architecture
 
 **Purpose**: Authoritative orientation map (#1 of 2) — a thin index of how the package codebase fits together and where each subsystem lives, deferring all per-subsystem detail to the dedicated docs **When to use**:
@@ -17,7 +30,7 @@ This document serves as a comprehensive index to all documentation in the Widget
 - Tracing the DI assembly and scoped routers at a high level
 - Locating which dedicated doc owns a given subsystem
 
-**Key topics**: Workspace package layout & shells, `createEditorApp`/`setupBuilderServer`/`initDb` DI assembly, scoped routers, `req.scope`/`req.adapters`/write-guard, admin vs site shell routing, one-line index rows per subsystem (Projects, Pages, Menus, Media, Themes, Export, App Settings, Preview, Page Editor, Core Widgets, Collections), pointer to core-packages.md for adapter contracts and `LIMIT_KEYS`
+**Key topics**: Workspace package layout & shells, `createEditorApp`/`setupBuilderServer`/`initDb` DI assembly, scoped routers (incl. `/languages`, `/translations`), `req.scope`/`req.adapters`/write-guard, admin vs site shell routing (incl. standalone `/preview` routes with a language segment), one-line index rows per subsystem (Projects, Pages, Menus, Media, Collections, Themes, Export, App Settings, Preview, Page Editor, Core Widgets, Languages & translations), content language and theme visitor text, backend shared-utility table (`contentLanguage`, `contentCoordination`, `zipSafety`, `pathSecurity`, `uploadFileName`, `themeSettingChanges`, `siteStringsService`, ...), pointer to core-packages.md for adapter contracts and `LIMIT_KEYS`
 
 ---
 
@@ -25,17 +38,19 @@ This document serves as a comprehensive index to all documentation in the Widget
 
 **Purpose**: Authoritative adapter/package map (#2 of 2) — the five packages, the OSS/hosted adapter boundary, adapter contracts + `Scope` shape, `LIMIT_KEYS`/errors/conformance, DI assembly, editor-ui seams, render-engine scope-free boundary, and the `require-scope-arg` lint rule **When to use**:
 
-- Understanding the five packages and the OSS/hosted boundary
+- Understanding the five packages and the shell/package boundary
 - Working with the adapter contracts, `Scope` shape, `LIMIT_KEYS`, or error types
 - Wiring or mounting the backend (`setupBuilderServer`, `createEditorApp`, `initDb`) or embedding the editor (`EditorProvider`, `createEditorRoutes`)
 - Building a new adapter implementation against the conformance suites
 - Tracing the render-engine scope-free boundary or the `require-scope-arg` lint rule
 
-**Key topics**: Five packages, OSS/hosted boundary, adapter contracts (Storage/AssetStorage incl. `stat()` + download byte-range/Publish/Limits/ScopeResolver), `Scope`, `LIMIT_KEYS` (incl. `MAX_COLLECTION_ITEMS`/`MAX_COLLECTIONS`) + constants, error types + status codes, conformance suites, `projectScopedRouter` mounts (incl. `/collections`), editor-ui seams (apiBase/editorFetch, routeBase, EditorProvider/EditorShell, extension registry/hooks/slots, tailwind preset), render-engine deps bag, preview-iframe runtime in `@widgetizer/core`, `require-scope-arg`
+**Key topics**: Five packages and their exports (`@widgetizer/core` subpath table: `contentAddress`, `languages`, `translations`, `internalHref`, `linkPrefixer`, `publishedUrls`, `breadcrumbs`, `structuredData`, `siteIdentity`, `themeSettingChanges`, ...; render-engine `planPagination`/`createLiquidEngine`), shell/package boundary, adapter contracts (Storage/AssetStorage incl. `stat()` + download byte-range/Publish/Limits/ScopeResolver), `Scope`, `LIMIT_KEYS` (incl. `MAX_COLLECTION_ITEMS`/`MAX_COLLECTIONS`) + constants, error types + status codes, conformance suites, `projectScopedRouter` mounts (incl. `/collections`, `/languages`, `/translations`), editor-ui seams (apiBase/editorFetch, `subscribeMutationSuccess`, routeBase, EditorProvider/EditorShell, `createEditorRoutes` `excludePaths`, extension registry/hooks/slots incl. `pageEditorActions`, tailwind preset), render-engine deps bag (optional `loadSiteStrings` + collection loaders, `safePath` containment), language as a partition within `Scope`, preview-iframe runtime in `@widgetizer/core`, `require-scope-arg`
 
 ---
 
 ## 📚 Theme Development & Authoring
+
+The [Widgetizer Theme skill](../skills/widgetizer-theme/SKILL.md) provides a task-oriented technical authoring workflow, focused references, a starter theme and a generated capability catalog (`references/contract.json`); the companion [design skill](../skills/widgetizer-theme-design/SKILL.md) covers briefs and visual review. Static validation is app-owned: `npm run validate:theme -- <theme-folder>` (`scripts/validate-theme.js`). Maintainer notes are in [skills/README.md](../skills/README.md); the skills are maintained in the repository and not yet published.
 
 ### **[theming.md](theming.md)** - Theme Development & Structure
 
@@ -44,10 +59,11 @@ This document serves as a comprehensive index to all documentation in the Widget
 - Building new themes from scratch
 - Understanding theme structure and file organization
 - Working with Liquid templates, tags, and global components (header/footer)
+- Writing snippets: what a `{% render %}`'d snippet can see, and the engine's reserved variable names
 - Managing theme assets, CSS variables, and locales (i18n)
 - Implementing scroll reveal animations
 
-**Key topics**: Theme manifest, layout template, Liquid tags & filters (`rte_text`/`rte_blank`, richtext + `| raw`, incl. stable internal-link refs in richtext anchors), widgets, blocks, global settings, menu rendering & collection-item link targets (`collectionItemUuid`/`collectionType`), asset management, scroll reveal animations, theme locales, pointers to theming-setting-types.md, theme-presets.md, and core-export.md
+**Key topics**: Theme manifest, layout template, Liquid tags & filters (`rte_text`/`rte_blank`, richtext + `| raw`, incl. stable internal-link refs in richtext anchors; `page_url`/`item_url` link filters; `format_date` in the page's language), snippets and reserved names, breadcrumbs, image tag, visitor-facing text (`site` dictionaries + the `t` filter), the language switcher (`page.translations`), widgets, blocks, global settings, menu rendering & collection-item link targets (`collectionItemUuid`/`collectionType`), asset management, scroll reveal animations, theme locales, pointers to theming-setting-types.md, theme-presets.md, and core-export.md
 
 ---
 
@@ -66,14 +82,14 @@ This document serves as a comprehensive index to all documentation in the Widget
 
 ### **[theming-setting-types.md](theming-setting-types.md)** - Setting Types Reference
 
-**Purpose**: Authoritative author-facing catalog of all theme/widget setting types with schema properties, JSON examples, and Liquid usage — now also the home for the shipped `file` setting type **When to use**:
+**Purpose**: Authoritative author-facing catalog of all theme/widget setting types with schema properties, JSON examples, and Liquid usage — now also the home for the shipped `file` and `video` setting types **When to use**:
 
 - Defining settings in `theme.json` global configuration
 - Creating widget schemas with proper setting types
 - Understanding setting properties, CSS variable output, and i18n labels
-- Looking up the `file` setting type or richtext/link options
+- Looking up the `file`/`video` setting types or richtext/link options
 
-**Key topics**: Setting types (color, text, range, select, date, gallery, table, icon, youtube, richtext, code, `file`, etc.), common properties, CSS variable generation, i18n label resolution (tTheme: keys), collection field flags (`usedAsTitle`/`usedAsDate`), richtext `allow_headings`/`allow_images`/`min_height` + stable internal-link refs in richtext anchors (`data-page-uuid`/`data-collection-item-uuid`), structured link targets (`pageUuid`/`collectionType`/`collectionItemUuid`), icon `allow_patterns`, `rte_text`/`rte_blank`
+**Key topics**: Setting types (color, text, range, select, date, gallery, table, icon, youtube, richtext, code, menu, link, `file`, `video` incl. MP4 uploads, etc.), common properties, CSS variable generation, i18n label resolution (tTheme: keys), collection field flags (`usedAsTitle`/`usedAsDate`), richtext `allow_headings`/`allow_images`/`min_height` + stable internal-link refs in richtext anchors (`data-page-uuid`/`data-collection-item-uuid`), structured link targets (`pageUuid`/`collectionType`/`collectionItemUuid`), icon `allow_patterns`, `rte_text`/`rte_blank`
 
 ---
 
@@ -179,7 +195,7 @@ This document serves as a comprehensive index to all documentation in the Widget
 - Working with the project store/queries and active-project handling
 - Troubleshooting project state or the scope-first resolver
 
-**Key topics**: Project CRUD, admin-shell pages (`app/src/` ProjectsList/ProjectForm/ProjectImportModal), stores/queries in `packages/editor-ui/src/`, `apiFetch` + `X-Project-Id` from `getActiveProjectId()`, theme-copy + preset application + link enrichment on creation, scope-first resolver (`req.scope` via `req.adapters.scopeResolver`), ZIP import/export, `siteTitle`, `/api/projects` route table
+**Key topics**: Project CRUD, admin-shell pages (`app/src/` ProjectsList/ProjectForm/ProjectImportModal), stores/queries in `packages/editor-ui/src/`, `apiFetch` + `X-Project-Id` from `getActiveProjectId()`, theme-copy + preset application + link enrichment on creation, scope-first resolver (`req.scope` via `req.adapters.scopeResolver`), ZIP import/export, `siteTitle`, site identity & business details (`site_identity`, `normalizeSiteIdentity`, `400 { error, fields }`, active-project logo picker, readiness line, `global:site-identity` media usage), validation before folder rename (folder name field hidden behind `SHOW_FOLDER_NAME`), site languages (default language + additional languages added/removed one at a time), `/api/projects` route table
 
 ---
 
@@ -205,7 +221,7 @@ This document serves as a comprehensive index to all documentation in the Widget
 - Working with slugs, UUID preservation, and media-usage sync
 - Troubleshooting page limits or slug conflicts
 
-**Key topics**: Page JSON structure, scope-first storage (`req.scope` + `req.adapters.storage`; `fs-extra` only in non-adapter render/export helpers), Pages list/forms/bulk UI, `generateUniqueSlug` (`(Copy)` name), `MAX_WIDGETS_PER_PAGE` 422 cap, 409 explicit-slug-conflict, bulkDelete 207/400 semantics, pointer to core-hooks.md for `usePageSelection`
+**Key topics**: Page JSON structure (`translationGroupId`, `parentPageUuid` for breadcrumbs), per-language page folders + `POST /api/pages/:id/translations`, one homepage (`index` or `home`) per language, scope-first storage (`req.scope` + `req.adapters.storage`; `fs-extra` only in non-adapter render/export helpers), Pages list/forms/bulk UI, `generateUniqueSlug` (`(Copy)` name), `MAX_WIDGETS_PER_PAGE` 422 cap, 409 explicit-slug-conflict, bulkDelete 207/400 semantics, pointer to core-hooks.md for `usePageSelection`
 
 ---
 
@@ -218,7 +234,7 @@ This document serves as a comprehensive index to all documentation in the Widget
 - Implementing menu editing interfaces
 - Working with menu depth/item caps and render-time link resolution
 
-**Key topics**: Menu JSON (top-level `uuid`, `item_<uuid>` ids, `pageUuid` + `collectionItemUuid`/`collectionType` link targets), editor pages/components in `packages/editor-ui/src/`, scope-first StorageAdapter path (`getMenuById` is the non-adapter render read), `MAX_MENU_DEPTH=32`/`MAX_MENU_ITEMS` caps + 422 over-cap, render-time resolution (`render-engine/menuResolver.js`), `linkEnrichment.js` clone/delete cleanup (also covers richtext stable-link anchors)
+**Key topics**: Menu JSON per language (`menus/<lang>/`; top-level `uuid`, `item_<uuid>` ids, `pageUuid` + `collectionItemUuid`/`collectionType` link targets), editor pages/components in `packages/editor-ui/src/`, scope-first StorageAdapter path (`getMenuById` is the non-adapter render read), `MAX_MENU_DEPTH=32`/`MAX_MENU_ITEMS` caps + 422 over-cap, render-time resolution (`render-engine/menuResolver.js`), `linkEnrichment.js` clone/delete cleanup (also covers richtext stable-link anchors)
 
 ---
 
@@ -231,7 +247,7 @@ This document serves as a comprehensive index to all documentation in the Widget
 - Using the `| collection` Liquid filter in templates
 - Understanding item-page depth prefixing, SEO, and export output
 
-**Key topics**: Collection-type schemas, item record shape & lifecycle, storage keys (`collection-types/`, `collections/`), scope-first service API, routes (`:collectionType`/`:itemSlug`) & isolation, `| collection` filter, item-page depth prefixing (`outputPathPrefix`/`prefixInternalHref`), per-item SEO (`robots: index,follow` default), `MAX_COLLECTION_ITEMS`/`MAX_COLLECTIONS`, duplicate-uuid recovery, `_archived`/invalid normalization, `mediaBasePaths` richtext-media + richtext-link resolution (stable `data-*-uuid` anchors), item preview
+**Key topics**: Collection-type schemas, item record shape & lifecycle, per-language item folders + item translations, listing pages and the anchor, pagination (numbered listing pages), storage keys (`collection-types/`, `collections/`), scope-first service API, routes (`:collectionType`/`:itemSlug`) & isolation, `| collection` filter, item-page depth prefixing (`outputPathPrefix`/`prefixInternalHref`), Clean URLs link shapes (`internalHref.js` `pageHref`/`itemHref`, `menuDeps.cleanUrls`, `globals.cleanUrls`), reserved `index` item slug, per-item SEO (`robots: index,follow` default), `structuredData` block (`BlogPosting` field rules, validation, visible values, `collectionItem` on item page data), `MAX_COLLECTION_ITEMS`/`MAX_COLLECTIONS`, duplicate-uuid recovery, `_archived`/invalid normalization, `mediaBasePaths` richtext-media + richtext-link resolution (stable `data-*-uuid` anchors), item preview
 
 ---
 
@@ -257,7 +273,7 @@ This document serves as a comprehensive index to all documentation in the Widget
 - Working with usage tracking and deletion protection
 - Troubleshooting upload size limits or streaming
 
-**Key topics**: Per-project storage/resizing, SQLite metadata, projectScopedRouter media routes (`'/'`, `'/:fileId'`, `'/bulk-delete'`, `'/refresh-usage'`, `'/:fileId/usage'` via `X-Project-Id`; `uploadWithLimit` middleware), `MEDIA_ACCEPT`/`NON_IMAGE_ACCEPT`, `getMediaCategory` (PDF → `uploads/files/`), audio byte-range (HTTP 206) streaming, usage tracking (pages/global/site settings/og_image/embedded-richtext/collection items, recursive scan), decompression-bomb guards, two-gate size enforcement, deletion protection, Copy URL
+**Key topics**: Per-project storage/resizing, upload file names that keep their words (`normalizeUploadName`), SQLite metadata incl. per-language alt/title/caption (`media_file_translations`), projectScopedRouter media routes (`'/'`, `'/:fileId'`, `'/bulk-delete'`, `'/refresh-usage'`, `'/:fileId/usage'` via `X-Project-Id`; `uploadWithLimit` middleware), `MEDIA_ACCEPT`/`NON_IMAGE_ACCEPT`, `getMediaCategory` (PDF → `uploads/files/`), audio and MP4 video byte-range (HTTP 206) streaming, usage tracking (pages/global/site settings/og_image/embedded-richtext/collection items, recursive scan), decompression-bomb guards, two-gate size enforcement, deletion protection (usage re-derived from content before a delete), Copy URL
 
 ---
 
@@ -270,7 +286,7 @@ This document serves as a comprehensive index to all documentation in the Widget
 - Implementing export functionality and history tracking
 - Troubleshooting export issues
 
-**Key topics**: `exportProjectToDir()` core with fail-fast validation-before-write, scope-resolved endpoints (`X-Project-Id`, no `:projectId` in path), versioning/history (`sizeBytes`/`hasIssuesReport`/`developerMode`, `cleanupProjectExports`, failed-export recording), `renderingService` split (render-engine + builder-server), collection item-page export + two-pass validation, forms manifest + `manifest.collections`, markdown alternate link, file-asset export (`assets/files/`, `/uploads/files/` rewrite, `filePath` var), `collectionDeps` adapter threading, ZIP downloads, site icons
+**Key topics**: `exportProjectToDir()` core with fail-fast validation-before-write, scope-resolved endpoints (`X-Project-Id`, no `:projectId` in path), versioning/history (`sizeBytes`/`hasIssuesReport`/`developerMode`, `cleanupProjectExports`, failed-export recording), `renderingService` split (render-engine + builder-server), collection item-page export + two-pass validation, Clean URLs (one flag snapshot per export → links, canonicals, sitemap/robots; file names unchanged; viewer `<path>.html` fallback), forms manifest + `manifest.collections`, markdown alternate link, file-asset export (`assets/files/`, `/uploads/files/` rewrite, `filePath` var), `collectionDeps` adapter threading, ZIP downloads, site icons, multilingual output (language-first folders, per-language headers/footers, hreflang alternates, languages without a homepage skipped with a warning), paginated listing copies, structured data (JSON-LD graph per page type, Site URL requirement, ids on the page's own address, identity logo shipped via `global:site-identity`, `structuredData.readiness` in the export result)
 
 ---
 
@@ -282,7 +298,7 @@ This document serves as a comprehensive index to all documentation in the Widget
 - Learning how themes opt out via `useCoreWidgets`
 - Adding new core widgets to the platform
 
-**Key topics**: Spacer, Divider (core-form deferred to core-form-widget.md), `packages/core/src/widgets/` + `CORE_WIDGETS_DIR` resolution, `isCore`/`category` schema metadata, `useCoreWidgets` opt-out, `GET /api/widgets` load flow (`getProjectWidgets`/`getCoreWidgets`), render path `deps.coreWidgetsDir/<type>/widget.liquid`, `hasPreview`, asar read-only behavior
+**Key topics**: Spacer, Divider (core-form deferred to core-form-widget.md), core `site` dictionaries a theme's `locales/<code>.json` overrides, `packages/core/src/widgets/` + `CORE_WIDGETS_DIR` resolution, `isCore`/`category` schema metadata, `useCoreWidgets` opt-out, `GET /api/widgets` load flow (`getProjectWidgets`/`getCoreWidgets`), render path `deps.coreWidgetsDir/<type>/widget.liquid`, `hasPreview`, asar read-only behavior
 
 ---
 
@@ -310,7 +326,7 @@ This document serves as a comprehensive index to all documentation in the Widget
 - Planning changes to repositories or persisted metadata
 - Wiring the DB connection via DI
 
-**Key topics**: Tables and relationships, 4-migration history (`owner_id`, `caption`, backfill, `_migrations` tracking), Connection & DI (`initDb({ getConnection })` vs `getDb()` fallback, pragmas), repository pattern, scope-first/adapter-agnostic framing, DB vs filesystem boundaries (incl. `collections/<type>/<slug>.json`), pointers to core-packages.md and core-export.md
+**Key topics**: Tables and relationships, 8-migration history (`owner_id`, `caption`, backfill, `clean_urls`, `site_identity`, site languages, `media_file_translations`; `_migrations` tracking), Connection & DI (`initDb({ getConnection })` vs `getDb()` fallback, pragmas), repository pattern, scope-first/adapter-agnostic framing, DB vs filesystem boundaries (incl. `collections/<type>/<slug>.json`), pointers to core-packages.md and core-export.md
 
 ---
 
@@ -337,7 +353,7 @@ This document serves as a comprehensive index to all documentation in the Widget
 - Working with link-target and theme-locale hooks
 - Finding which hook a subsystem uses
 
-**Key topics**: `useConfirmationModal`/`useConfirmationAction`, `useNavigationGuard`/`useFormNavigationGuard(hasUnsavedChanges, skipRef)`/`useGuardedFormPage`, `usePageSelection`, `useLinkTargets` (collection-item uuid targets), `useDeleteKeyShortcut`, `useStickyActionBar`, media/export/app-settings hooks (pointers), `useThemeLocale` (developer-mode cache invalidation), `useFormatDate`; all under `packages/editor-ui/src/hooks/*`
+**Key topics**: `useConfirmationModal`/`useConfirmationAction`, `useConfirm` (app-level async confirm; replaces `window.confirm`, which breaks focus on Electron/Windows), `useNavigationGuard`/`useFormNavigationGuard(hasUnsavedChanges, skipRef)`/`useGuardedFormPage`, `usePageSelection`, `useLinkTargets` (collection-item uuid targets), `useListLanguage`/`useTranslationVersions` (language tabs and versions), `useStaleActiveProjectDetection`, `useDeleteKeyShortcut`, `useStickyActionBar`, media/export/app-settings hooks (pointers), `useThemeLocale` (developer-mode cache invalidation), `useFormatDate`; all under `packages/editor-ui/src/hooks/*`
 
 ---
 
@@ -350,7 +366,7 @@ This document serves as a comprehensive index to all documentation in the Widget
 - Configuring the application for a production environment
 - Tracing the cross-tenant isolation floor
 
-**Key topics**: Input validation, two-tier (2mb/10mb) JSON body parser, HTTP security headers/helmet, CORS, SVG sanitization (incl. tenant), global error handling, gallery/table setting-type sanitizers, richtext `allow_headings`/`allow_images` opt-in tag sets + path-validated `<img>` + stable-link `data-*-uuid` anchor allowlist, `rte_text`/`rte_blank` filters, `collectionItemUuid` link enrichment (structured + richtext), Project-Switch Isolation + write-guard, cross-tenant contract (cites core-packages.md for Scope/`LIMIT_KEYS`), Link & URL safety (`sanitizeHref`/`safe_url`, image-path allowlist), `createEditorApp({ adapters })` entry point
+**Key topics**: Input validation, request slugs/theme ids as single path segments (`isSafePathSegment`), ZIP-bomb guard (`zipSafety.js`), two-tier (2mb/10mb) JSON body parser, HTTP security headers/helmet, CORS, SVG sanitization (incl. tenant), global error handling, gallery/table setting-type sanitizers, richtext `allow_headings`/`allow_images` opt-in tag sets + path-validated `<img>` + stable-link `data-*-uuid` anchor allowlist, `rte_text`/`rte_blank` filters, `collectionItemUuid` link enrichment (structured + richtext), Project-Switch Isolation + write-guard, cross-tenant contract (cites core-packages.md for Scope/`LIMIT_KEYS`), Link & URL safety (`sanitizeHref`/`safe_url`, image-path allowlist), `createEditorApp({ adapters })` entry point
 
 ---
 
@@ -390,7 +406,11 @@ This document serves as a comprehensive index to all documentation in the Widget
 - Understanding runtime paths, the dynamic-port server model, and packaging
 - Code signing and distribution
 
-**Key topics**: Preview window, error handling, runtime data paths, `utilityProcess` dynamic-port server (`{ type: "server-ready", port }`), `electron/builder.config.mjs` (mac block; package.json has no build key), Windows NSIS `Widgetizer-Setup-x.x.x.exe`, dev port 3000, `scripts/build-electron.mjs` build entry + `server-bootstrap.js`, FE citations (`UpdateBanner` in `app/src/`, Layout/ErrorBoundary in `packages/editor-ui`), cross-links to CLAUDE.md (release/auto-update) and core-packages.md (asar bundling)
+**Key topics**: Visible app name "Widgetizer Desktop" (`appName.js`), Linux `.deb` packaging (x64 + ARM64), preview window, error handling, runtime data paths, `utilityProcess` dynamic-port server (`{ type: "server-ready", port }`), `electron/builder.config.mjs` (mac block; package.json has no build key), Windows NSIS `Widgetizer-Setup-x.x.x.exe`, dev port 3000, `scripts/build-electron.mjs` build entry + `server-bootstrap.js`, FE citations (`UpdateBanner` in `app/src/`, Layout/ErrorBoundary in `packages/editor-ui`), cross-links to CLAUDE.md (release/auto-update) and core-packages.md (asar bundling)
+
+### **[core-electron-update-tests.md](core-electron-update-tests.md)** - Electron Update Test Playbook
+
+**Purpose**: Human-run playbook for testing a real Windows Electron auto-update plus the bundled theme-update delta between two releases (base app built from the previous release tag, installed via NSIS). Not for agents to execute unasked.
 
 ---
 
@@ -420,9 +440,88 @@ This document serves as a comprehensive index to all documentation in the Widget
 
 ---
 
+### **[future-image-optimization.md](future-image-optimization.md)** - Future: Image Optimization
+
+**Purpose**: Early concept for lighter website images without extra work for the owner: use the right image size first, optimize new uploads automatically, then safely improve existing projects. Implementation choices remain open. **When to use**:
+
+- Deciding how to reduce image weight for non-technical users
+- Discussing automatic upload improvements and preserving original images
+- Planning a safe way to optimize images already used in a project
+
+**Key topics**: Appropriate image sizes, appearance and transparency, worthwhile savings, retained originals, storage versus download size, progress and recovery, existing image uses, re-exporting, quality controls deferred until needed
+
+---
+
+### **[future-drafts-and-trash.md](future-drafts-and-trash.md)** - Drafts and trash
+
+**Purpose**: Early concept for Draft and Published pages and collection items, with a separate trash area for recoverable deletion. **When to use**:
+
+- Discussing unfinished content and temporary removal from the website
+- Planning restoration, permanent deletion and affected links
+- Considering language versions, homepages and project storage
+
+**Key topics**: Export inclusion, ordinary editing versus separate draft revisions, collection lists, saved relationships, restoration choices, media preservation, backups and open decisions
+
+---
+
+### **[future-custom-widgets.md](future-custom-widgets.md)** - Future: Protected Custom Widgets
+
+**Purpose**: Early proposal for a per-project `custom-widgets/` folder whose widget files and content survive theme updates, with rules for identity, languages, forms, export and project operations. Not implemented.
+
+---
+
+### **[future-shared-widget-areas.md](future-shared-widget-areas.md)** - Future: Shared Widget Areas
+
+**Purpose**: Brainstorming notes for theme-defined shared areas (e.g. After header, Before footer) that hold ordinary widgets per language, and what saving, links, media, languages and export must account for. Not implemented.
+
+---
+
+### **[future-themes.md](future-themes.md)** - Future: Themes and Arch Presets
+
+**Purpose**: Candidate sector directions (workshops/manufacturers first; architecture, education, therapy, tours) and whether each should be a new theme or an Arch preset. A recommendation, not a roadmap.
+
+---
+
+### **[future_draft_collection_item_editor.md](future_draft_collection_item_editor.md)** - Future: Editable Collection Type Templates
+
+**Purpose**: Placeholder for discussing how collection-type templates could become editable in the editor. No content yet.
+
+---
+
+### **[future-skills-theme.md](future-skills-theme.md)** - Future: Widgetizer Theme Skill
+
+**Purpose**: Build notes for the tool-neutral theme Agent Skill: the repository skill and app-owned validator exist; the desktop-user flow, distribution and packaging remain proposals **When to use**:
+
+- Building or scoping the theme-creation skill
+- Deciding how the skill is distributed to Claude and OpenAI users
+- Checking the desktop data-folder paths, theme copy model and dev-loop gotchas an agent must handle
+
+**Key topics**: SKILL.md format and progressive disclosure, master copy in repo + small public repo, Claude plugin marketplace / app upload / directory, OpenAI ChatGPT + Codex, desktop `<userData>/data/` paths, seed/runtime/project theme copies, `latest/` precedence, theme ZIP upload requirements, update folders, knowledge sources, open questions
+
+---
+
+### **[future-skills-site.md](future-skills-site.md)** - Future: Widgetizer Site Skill
+
+**Purpose**: Early notes for a skill that lets a desktop-app user's AI agent build a website with a theme/preset (pages, header/footer, menus, collections, images); shared skill/distribution facts live in future-skills-theme.md **When to use**:
+
+- Scoping the site-building skill
+- Checking what an agent can do through project files versus what needs the app's database or local API
+
+**Key topics**: Files vs SQLite (projects, media), open-editor overwrite risk, no schema validator, three routes (files only / local API / MCP server), creating a project from a prompt via `POST /api/projects`, proposed `server.json` port file, active-project switch behaviour, page and menu JSON shape, knowledge sources, open questions
+
+---
+
+## 🧭 Plans & Reference Lists
+
+- **[plan-preset-media.md](plan-preset-media.md)** — Plan for the theme-root `preset-media/<id>/` folder that keeps Arch's preset images out of update deltas and runtime copies. Shipped in 0.9.9; the durable rules live in theme-preset-file-format.md.
+- **[release-microsoft-store.md](release-microsoft-store.md)** — Step-by-step guide for a future Microsoft Store (MSIX/AppX) submission at 1.0.0, including the repo changes to reapply (appx config block, a Store-build flag that disables the auto-updater).
+- **[preset-plans/bedrock.md](preset-plans/bedrock.md)** — Working plan for the Bedrock preset (strategy brief and page plan), with its [image prompts](preset-plans/bedrock-images.json) and [image usage map](preset-plans/bedrock-images-usage.md).
+- **[arch-fonts-list.csv](arch-fonts-list.csv)** / **[arch-icons-list.txt](arch-icons-list.txt)** — Reference lists of available font stacks/weights and Arch's Tabler icon names, for preset and widget authoring.
+
+---
+
 ## ✅ Project Tracking
 
-- **[TODO.md](TODO.md)** — Living task/issue tracker for in-flight work; not a reference doc.
 - **[user-test-checklist.md](user-test-checklist.md)** — Standalone manual user-test checklist (no codebase knowledge assumed): IDs/actions/expected results, test pack/setup, and run waves for confirming create/edit/preview/export/backup/import/update/delete flows.
 
 ---

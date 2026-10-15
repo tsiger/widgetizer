@@ -1,0 +1,303 @@
+{
+  "type": "data-table",
+  "displayName": "tTheme:data_table.name",
+  "aliases": [
+    "table",
+    "price list",
+    "rate sheet",
+    "tuition",
+    "specs",
+    "rows and columns"
+  ],
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "tTheme:global.widgets.settings.eyebrow.label"
+    },
+    {
+      "type": "checkbox",
+      "id": "eyebrow_uppercase",
+      "label": "tTheme:global.widgets.settings.eyebrow_uppercase.label",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "tTheme:global.widgets.settings.title.label",
+      "default": "Rates"
+    },
+    {
+      "type": "text",
+      "id": "description",
+      "label": "tTheme:global.widgets.settings.description.label"
+    },
+    {
+      "type": "select",
+      "id": "heading_alignment",
+      "label": "tTheme:global.widgets.settings.alignment.label",
+      "default": "center",
+      "options": [
+        {
+          "value": "start",
+          "label": "tTheme:global.widgets.settings.alignment.options.start"
+        },
+        {
+          "value": "center",
+          "label": "tTheme:global.widgets.settings.alignment.options.center"
+        }
+      ]
+    },
+    {
+      "type": "header",
+      "id": "content_header",
+      "label": "tTheme:global.widgets.settings.content_header.label"
+    },
+    {
+      "type": "select",
+      "id": "columns",
+      "label": "tTheme:data_table.settings.columns.label",
+      "default": "2",
+      "options": [
+        {
+          "value": "2",
+          "label": "tTheme:data_table.settings.columns.options.2"
+        },
+        {
+          "value": "3",
+          "label": "tTheme:data_table.settings.columns.options.3"
+        },
+        {
+          "value": "4",
+          "label": "tTheme:data_table.settings.columns.options.4"
+        }
+      ]
+    },
+    {
+      "type": "checkbox",
+      "id": "show_header",
+      "label": "tTheme:data_table.settings.show_header.label",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "column_1_header",
+      "label": "tTheme:data_table.settings.column_1_header.label",
+      "default": "Service"
+    },
+    {
+      "type": "text",
+      "id": "column_2_header",
+      "label": "tTheme:data_table.settings.column_2_header.label",
+      "default": "Price"
+    },
+    {
+      "type": "text",
+      "id": "column_3_header",
+      "label": "tTheme:data_table.settings.column_3_header.label"
+    },
+    {
+      "type": "text",
+      "id": "column_4_header",
+      "label": "tTheme:data_table.settings.column_4_header.label"
+    },
+    {
+      "type": "text",
+      "id": "note",
+      "label": "tTheme:data_table.settings.note.label"
+    },
+    {
+      "type": "header",
+      "id": "display_header",
+      "label": "tTheme:global.widgets.settings.display_header.label"
+    },
+    {
+      "type": "select",
+      "id": "style",
+      "label": "tTheme:data_table.settings.style.label",
+      "default": "lines",
+      "options": [
+        {
+          "value": "lines",
+          "label": "tTheme:data_table.settings.style.options.lines"
+        },
+        {
+          "value": "striped",
+          "label": "tTheme:data_table.settings.style.options.striped"
+        },
+        {
+          "value": "plain",
+          "label": "tTheme:data_table.settings.style.options.plain"
+        }
+      ]
+    },
+    {
+      "type": "checkbox",
+      "id": "first_column_emphasis",
+      "label": "tTheme:data_table.settings.first_column_emphasis.label",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "align_last_column",
+      "label": "tTheme:data_table.settings.align_last_column.label",
+      "default": "start",
+      "options": [
+        {
+          "value": "start",
+          "label": "tTheme:global.widgets.settings.options.start"
+        },
+        {
+          "value": "end",
+          "label": "tTheme:global.widgets.settings.options.end"
+        }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "content_width",
+      "label": "tTheme:global.widgets.settings.content_width.label",
+      "default": "medium",
+      "options": [
+        {
+          "value": "narrow",
+          "label": "tTheme:global.widgets.settings.content_width.options.narrow"
+        },
+        {
+          "value": "medium",
+          "label": "tTheme:global.widgets.settings.content_width.options.medium"
+        },
+        {
+          "value": "wide",
+          "label": "tTheme:global.widgets.settings.content_width.options.wide"
+        },
+        {
+          "value": "fullwidth",
+          "label": "tTheme:global.widgets.settings.content_width.options.fullwidth"
+        }
+      ]
+    },
+    {
+      "type": "header",
+      "id": "appearance_header",
+      "label": "tTheme:global.widgets.settings.appearance_header.label"
+    },
+    {
+      "type": "select",
+      "id": "color_scheme",
+      "label": "tTheme:global.widgets.settings.color_scheme.label",
+      "default": "standard-primary",
+      "options": [
+        {
+          "value": "standard-primary",
+          "label": "tTheme:global.widgets.settings.color_scheme.options.standard_primary"
+        },
+        {
+          "value": "standard-secondary",
+          "label": "tTheme:global.widgets.settings.color_scheme.options.standard_secondary"
+        },
+        {
+          "value": "highlight-primary",
+          "label": "tTheme:global.widgets.settings.color_scheme.options.highlight_primary"
+        },
+        {
+          "value": "highlight-secondary",
+          "label": "tTheme:global.widgets.settings.color_scheme.options.highlight_secondary"
+        }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "top_spacing",
+      "label": "tTheme:global.widgets.settings.top_spacing.label",
+      "default": "auto",
+      "options": [
+        {
+          "value": "auto",
+          "label": "tTheme:global.widgets.settings.top_spacing.options.auto"
+        },
+        {
+          "value": "small",
+          "label": "tTheme:global.widgets.settings.top_spacing.options.small"
+        },
+        {
+          "value": "none",
+          "label": "tTheme:global.widgets.settings.top_spacing.options.none"
+        }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "bottom_spacing",
+      "label": "tTheme:global.widgets.settings.bottom_spacing.label",
+      "default": "auto",
+      "options": [
+        {
+          "value": "auto",
+          "label": "tTheme:global.widgets.settings.bottom_spacing.options.auto"
+        },
+        {
+          "value": "small",
+          "label": "tTheme:global.widgets.settings.bottom_spacing.options.small"
+        },
+        {
+          "value": "none",
+          "label": "tTheme:global.widgets.settings.bottom_spacing.options.none"
+        }
+      ]
+    }
+  ],
+  "blocks": [
+    {
+      "type": "row",
+      "displayName": "tTheme:data_table.blocks.row.name",
+      "settings": [
+        {
+          "type": "text",
+          "id": "cell_1",
+          "label": "tTheme:data_table.blocks.row.settings.cell_1.label"
+        },
+        {
+          "type": "text",
+          "id": "cell_2",
+          "label": "tTheme:data_table.blocks.row.settings.cell_2.label"
+        },
+        {
+          "type": "text",
+          "id": "cell_3",
+          "label": "tTheme:data_table.blocks.row.settings.cell_3.label",
+          "description": "tTheme:data_table.blocks.row.settings.cell_3.description"
+        },
+        {
+          "type": "text",
+          "id": "cell_4",
+          "label": "tTheme:data_table.blocks.row.settings.cell_4.label",
+          "description": "tTheme:data_table.blocks.row.settings.cell_4.description"
+        }
+      ]
+    }
+  ],
+  "defaultBlocks": [
+    {
+      "type": "row",
+      "settings": {
+        "cell_1": "Initial consultation",
+        "cell_2": "Free"
+      }
+    },
+    {
+      "type": "row",
+      "settings": {
+        "cell_1": "Standard session",
+        "cell_2": "$80"
+      }
+    },
+    {
+      "type": "row",
+      "settings": {
+        "cell_1": "Extended session",
+        "cell_2": "$120"
+      }
+    }
+  ]
+}

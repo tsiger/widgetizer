@@ -1,0 +1,177 @@
+{
+  "name": "Projects",
+  "slug": "projects",
+  "widgets": {
+    "page_opener": {
+      "type": "rich-text",
+      "settings": {
+        "text_alignment": "start",
+        "content_width": "wide",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "op-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Our work</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "op-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Proof, not promises.",
+            "size": "6xl"
+          }
+        },
+        "op-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Every project below was finished by the same crews we'd send to your house. Click through for the full story on each one.</p>",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        }
+      },
+      "blocksOrder": ["op-eyebrow", "op-heading", "op-text"]
+    },
+    "all_projects": {
+      "type": "projects-grid",
+      "settings": {
+        "eyebrow": "",
+        "title": "",
+        "description": "",
+        "heading_alignment": "start",
+        "view_all_link": { "href": "", "text": "", "target": "_self" },
+        "layout": "card",
+        "text_display": "always",
+        "limit": 12,
+        "columns_desktop": 3,
+        "aspect_ratio": "4 / 3",
+        "show_summary": true,
+        "show_client": true,
+        "show_year": true,
+        "show_read_more": true,
+        "color_scheme": "standard-primary",
+        "top_spacing": "none",
+        "bottom_spacing": "auto"
+      }
+    },
+    "project_reviews": {
+      "type": "testimonials",
+      "settings": {
+        "eyebrow": "From the homeowners",
+        "eyebrow_uppercase": true,
+        "title": "What it's like to work with us.",
+        "description": "",
+        "heading_alignment": "start",
+        "layout": "grid",
+        "columns_desktop": 3,
+        "card_layout": "box",
+        "color_scheme": "highlight-secondary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "rev-1": {
+          "type": "quote",
+          "settings": {
+            "quote": "The quote was the quote. Eleven weeks of work and the final invoice matched the paper we signed in March.",
+            "avatar": "/uploads/images/bedrock-avatar-1.webp",
+            "name": "James R.",
+            "title": "Two-story addition",
+            "rating": "5"
+          }
+        },
+        "rev-2": {
+          "type": "quote",
+          "settings": {
+            "quote": "They treated our 1920s house like it was theirs. When they found rot behind the tub, they showed us photos, priced the fix, and kept moving.",
+            "avatar": "/uploads/images/bedrock-avatar-2.webp",
+            "name": "Ruth & Alan P.",
+            "title": "Primary bath remodel",
+            "rating": "5"
+          }
+        },
+        "rev-3": {
+          "type": "quote",
+          "settings": {
+            "quote": "One week over on the schedule because of a countertop delay, and they told us the day they knew, not the day it landed. That honesty is rarer than it should be.",
+            "avatar": "/uploads/images/bedrock-avatar-3.webp",
+            "name": "Marcus D.",
+            "title": "Whole-home renovation",
+            "rating": "4"
+          }
+        }
+      },
+      "blocksOrder": ["rev-1", "rev-2", "rev-3"]
+    },
+    "before_after": {
+      "type": "comparison-slider",
+      "settings": {
+        "eyebrow": "Before & after",
+        "eyebrow_uppercase": true,
+        "title": "As we found it — and as we left it.",
+        "description": "",
+        "heading_alignment": "start",
+        "before_image": "/uploads/images/bedrock-before-livingroom.webp",
+        "after_image": "/uploads/images/bedrock-after-livingroom.webp",
+        "before_label": "As found",
+        "after_label": "Handover",
+        "content_width": "wide",
+        "orientation": "horizontal",
+        "initial_position": 30,
+        "show_labels": true,
+        "color_scheme": "standard-secondary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      }
+    },
+    "closing_cta": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Your house could be next.",
+            "size": "3xl"
+          }
+        },
+        "cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "href": "contact.html",
+              "text": "Request a quote",
+              "target": "_self"
+            },
+            "style": "primary",
+            "link_2": {
+              "href": "process.html",
+              "text": "See how we work",
+              "target": "_self"
+            },
+            "style_2": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["cta-heading", "cta-button"]
+    }
+  },
+  "widgetsOrder": ["page_opener", "all_projects", "project_reviews", "before_after", "closing_cta"],
+  "id": "projects",
+  "created": "2026-07-04T09:00:00.000Z",
+  "updated": "2026-07-04T09:00:00.000Z"
+}

@@ -5,7 +5,7 @@ import Sidebar from "./Sidebar";
 import { SlotOutlet } from "../../extension/PluginProvider.jsx";
 
 // Editor chrome shared by both shells. Shell-specific chrome (the admin menu,
-// the desktop update banner, the dev state overlay) is injected by the host
+// the removed-language banner, the dev state overlay) is injected by the host
 // through named slots rather than imported here — keeping Layout free of any
 // OSS- or hosted-only dependency. EditorShell renders this inside a
 // <PluginProvider>, so the slot outlets resolve to whatever the shell provided.

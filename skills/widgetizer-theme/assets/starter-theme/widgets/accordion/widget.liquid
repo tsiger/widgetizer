@@ -1,0 +1,52 @@
+{% enqueue_style src: 'accordion.css' %}
+{% enqueue_script src: 'accordion.js', defer: true %}
+
+<section
+  id="{{ widget.id }}"
+  class="widget widget-accordion"
+  data-widget-id="{{ widget.id }}"
+  data-widget-type="accordion"
+  {% if widget.settings.allow_multiple %}data-allow-multiple="true"{% endif %}
+>
+  <div class="container container--narrow">
+    {% if widget.settings.heading != blank %}
+      {% if widget.index == 1 %}
+        <h1 class="accordion__heading" data-setting="heading">{{ widget.settings.heading }}</h1>
+      {% else %}
+        <h2 class="accordion__heading" data-setting="heading">{{ widget.settings.heading }}</h2>
+      {% endif %}
+    {% endif %}
+
+    <div class="accordion">
+      {% comment %} Always loop blocksOrder: it holds the order the author chose. {% endcomment %}
+      {% for block_id in widget.blocksOrder %}
+        {% assign block = widget.blocks[block_id] %}
+        {% if block.type == 'item' %}
+          <div class="accordion__item" data-block-id="{{ block_id }}">
+            <h3 class="accordion__title">
+              <button
+                type="button"
+                class="accordion__trigger"
+                id="accordion-trigger-{{ widget.id }}-{{ block_id }}"
+                aria-expanded="false"
+                aria-controls="accordion-panel-{{ widget.id }}-{{ block_id }}"
+              >
+                <span data-setting="question">{{ block.settings.question }}</span>
+                {% render 'icon', icon: 'chevron-down', class: 'accordion__icon' %}
+              </button>
+            </h3>
+            <div
+              class="accordion__panel"
+              id="accordion-panel-{{ widget.id }}-{{ block_id }}"
+              role="region"
+              aria-labelledby="accordion-trigger-{{ widget.id }}-{{ block_id }}"
+              hidden
+            >
+              <div class="rte" data-setting="answer">{{ block.settings.answer | raw }}</div>
+            </div>
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+</section>

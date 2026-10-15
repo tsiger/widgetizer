@@ -1,21 +1,24 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import useProjectStore from "../../stores/projectStore";
+import useProjectStore, { useDefaultLanguage } from "../../stores/projectStore";
 import usePageListStore from "../../stores/pageListStore";
 import { getAllPages } from "../../queries/pageManager";
 import SidebarMeta from "./SidebarMeta";
+import { APP_NAME } from "../../lib/appName";
 import { useNavItems } from "../../extension/PluginProvider.jsx";
 import { groupNavItems } from "../../extension/builtinNav.js";
 import useCollections from "../../hooks/useCollections";
 import { resolveLucideIcon } from "../../utils/lucideIcon";
 import { openPagePreview } from "../../lib/openSitePreview";
+import { isHomeSlug } from "@widgetizer/core/contentAddress";
 
 export default function Sidebar() {
   const { t } = useTranslation();
   const location = useLocation();
   const activeProject = useProjectStore((state) => state.activeProject);
   const hasActiveProject = !!activeProject;
+  const defaultLanguage = useDefaultLanguage();
   const [hasPages, setHasPages] = useState(false);
   const pagesVersion = usePageListStore((state) => state.version);
   const { schemas: collectionSchemas } = useCollections();
@@ -103,7 +106,10 @@ export default function Sidebar() {
   const openSitePreview = async () => {
     try {
       const pages = await getAllPages();
-      const homepage = pages.find((p) => p.slug === "index") || pages[0];
+      // The standalone preview is the default language's site, so pick that
+      // language's homepage, slugged "index" or "home".
+      const inDefault = pages.filter((p) => (p.language || defaultLanguage) === defaultLanguage);
+      const homepage = inDefault.find((p) => isHomeSlug(p.slug)) || inDefault[0];
       if (!homepage) return;
       // Resolve the homepage's standalone preview route and dispatch it (Electron
       // preview window in the desktop app, shared browser tab on the web). The route
@@ -192,9 +198,9 @@ export default function Sidebar() {
       <div className="grow px-2 pb-2 md:px-[var(--shell-inset)]">
         <div className="mb-4 py-0 pb-2 md:pb-4 md:pt-[var(--shell-inset)]">
           <div className="hidden pt-1 md:block">
-            <img src="/widgetizer_logo.svg" alt={t("common.appTitle")} className="h-auto w-[var(--sidebar-logo-width)]" />
+            <img src="/widgetizer_logo.svg" alt={APP_NAME} className="h-auto w-[var(--sidebar-logo-width)]" />
           </div>
-          <img src="/widgetizer_symbol.svg" alt={t("common.appTitle")} className="mx-auto h-12 w-12 md:hidden" />
+          <img src="/widgetizer_symbol.svg" alt={APP_NAME} className="mx-auto h-12 w-12 md:hidden" />
         </div>
 
         {sections.map(renderSection)}

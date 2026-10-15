@@ -1,0 +1,277 @@
+{% comment %}
+  News Grid — lists items from the `news` collection as a card grid.
+  Content comes from the collection (not blocks). `limit: 0` shows all items.
+{% endcomment %}
+{% if widget.settings.limit and widget.settings.limit > 0 %}
+  {% assign news_items = 'news' | collection: limit: widget.settings.limit, sort: widget.settings.sort %}
+{% else %}
+  {% assign news_items = 'news' | collection: sort: widget.settings.sort %}
+{% endif %}
+
+{% comment %} View-all placement: header top-right when alignment is "start", else centered below the grid. {% endcomment %}
+{% assign has_items = false %}
+{% if news_items.size > 0 %}{% assign has_items = true %}{% endif %}
+{% assign show_view_all = false %}
+{% if widget.settings.view_all_link.href != blank and has_items %}{% assign show_view_all = true %}{% endif %}
+{% assign view_all_in_header = false %}
+{% if show_view_all and widget.settings.heading_alignment == 'start' %}{% assign view_all_in_header = true %}{% endif %}
+{% assign has_heading_text = false %}
+{% if widget.settings.title != blank or widget.settings.description != blank or widget.settings.eyebrow != blank %}{% assign has_heading_text = true %}{% endif %}
+
+{% capture view_all_button %}<a href="{{ widget.settings.view_all_link.href }}" class="widget-button widget-button-secondary widget-button-medium" data-setting="view_all_link"{% if widget.settings.view_all_link.target == '_blank' %} target="_blank" rel="noopener"{% endif %}>{{ widget.settings.view_all_link.text | default: 'View all' }}</a>{% endcapture %}
+
+{% capture header_inner %}
+  {%- assign header_delay = 0 -%}
+  {%- if widget.settings.eyebrow != blank -%}<span class="w-eyebrow{% if widget.settings.eyebrow_uppercase %} t-uppercase{% endif %} reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>{%- assign header_delay = header_delay | plus: 1 -%}{%- endif -%}
+  {%- if widget.settings.title != blank -%}{%- if widget.index == 1 -%}<h1 class="w-headline reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="title">{{ widget.settings.title }}</h1>{%- else -%}<h2 class="w-headline reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="title">{{ widget.settings.title }}</h2>{%- endif -%}{%- assign header_delay = header_delay | plus: 1 -%}{%- endif -%}
+  {%- if widget.settings.description != blank -%}<p class="w-description reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="description">{{ widget.settings.description }}</p>{%- endif -%}
+{% endcapture %}
+
+<section
+  id="{{ widget.id }}"
+  class="widget widget-type-news-grid widget-{{ widget.id }} color-scheme-{{ widget.settings.color_scheme }}{% if widget.settings.top_spacing != 'auto' %} spacing-top-{{ widget.settings.top_spacing }}{% endif %}{% if widget.settings.bottom_spacing != 'auto' %} spacing-bottom-{{ widget.settings.bottom_spacing }}{% endif %}"
+  style="--card-image-ratio: {{ widget.settings.aspect_ratio | default: '16 / 9' }};{% unless widget.settings.color_scheme == 'standard-primary' %}--widget-bg-color: var(--bg-primary);{% endunless %}"
+  data-widget-id="{{ widget.id }}"
+  data-widget-type="news-grid"
+  {% if widget.index != null %}data-widget-index="{{ widget.index }}"{% endif %}
+>
+  <style>
+    .widget-{{ widget.id }} {
+      & .w-title a {
+        color: inherit;
+        text-decoration: none;
+        transition: text-decoration var(--transition-speed-fast);
+
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+
+      {% comment %} Single-column "blog feed" mode: force one card per row at every width
+         (the base grid otherwise drops to 2 columns in the 750–990px band). The
+         widget-content-md wrapper keeps it at a centered, readable measure. {% endcomment %}
+      & .news-grid-single {
+        grid-template-columns: 1fr;
+      }
+
+      & .grid-header-text {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-sm);
+      }
+
+      & .grid-header-action {
+        flex-shrink: 0;
+      }
+
+      & .grid-view-all {
+        margin-block-start: calc(var(--space-xl) * var(--spacing-scale));
+      }
+
+      @media (min-width: 750px) {
+        & .grid-header--with-action {
+          flex-direction: row;
+          justify-content: space-between;
+          align-items: flex-start;
+          gap: var(--space-lg);
+        }
+      }
+
+      &.color-scheme-standard-secondary,
+      &.color-scheme-highlight-secondary {
+        & .widget-card {
+          background-color: var(--bg-secondary);
+        }
+      }
+
+      &.color-scheme-standard-secondary,
+      &.color-scheme-highlight-primary,
+      &.color-scheme-highlight-secondary {
+        & .widget-card {
+          border: var(--border-width-thin) solid var(--border-color);
+        }
+      }
+
+      {% comment %} Overlay layout: the image fills the card, text sits on top of a
+         bottom-up gradient. Placed last so it overrides the card color-scheme rules
+         above at equal specificity. {% endcomment %}
+      & .news-grid-overlay {
+        & .widget-card {
+          position: relative;
+          padding: 0;
+          overflow: hidden;
+          border: none;
+          background: none;
+
+          &:hover .widget-card-image {
+            transform: scale(1.05);
+          }
+
+          &:hover .news-overlay {
+            opacity: 1;
+          }
+        }
+
+        & .widget-card-image {
+          width: 100%;
+          height: 100%;
+          aspect-ratio: {% if widget.settings.aspect_ratio == 'auto' %}4 / 3{% else %}var(--card-image-ratio){% endif %};
+          object-fit: cover;
+          display: block;
+          margin: 0;
+          border-radius: 0;
+          transition: transform var(--transition-speed-normal) ease;
+        }
+
+        & .news-overlay {
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(to top, rgba(0, 0, 0, 0.8) 0%, transparent 60%);
+          display: flex;
+          align-items: flex-end;
+          padding: var(--space-lg);
+          opacity: {% if widget.settings.text_display == 'hover' %}0{% else %}1{% endif %};
+          transition: opacity var(--transition-speed-normal) ease;
+        }
+
+        & .news-overlay-content {
+          display: flex;
+          flex-direction: column;
+          gap: var(--space-sm);
+          color: #ffffff;
+        }
+
+        & .news-overlay .w-title {
+          color: #ffffff;
+        }
+
+        & .news-overlay .w-meta,
+        & .news-overlay .w-body {
+          color: rgba(255, 255, 255, 0.85);
+        }
+
+        & .widget-card-link {
+          position: absolute;
+          inset: 0;
+          z-index: 1;
+        }
+      }
+    }
+  </style>
+
+  <div class="widget-container {% unless widget.settings.color_scheme == 'standard-primary' %}widget-container-padded{% endunless %}">
+    {% if has_heading_text or view_all_in_header %}
+      <div class="widget-header{% if widget.settings.heading_alignment == 'start' %} widget-header--align-start{% endif %}{% if view_all_in_header %} grid-header--with-action{% endif %}">
+        {% if view_all_in_header %}
+          <div class="grid-header-text">{{ header_inner | raw }}</div>
+          <div class="grid-header-action">{{ view_all_button | raw }}</div>
+        {% else %}
+          {{ header_inner | raw }}
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <div class="widget-content{% if widget.settings.columns_desktop == 1 %} widget-content-md{% endif %}">
+      {% comment %} Heading level: respects the page-wide hierarchy (one h1). {% endcomment %}
+      {% assign has_widget_title = false %}
+      {% if widget.settings.title != blank %}
+        {% assign has_widget_title = true %}
+      {% endif %}
+
+      {% assign card_heading_level = 'h2' %}
+      {% if has_widget_title %}
+        {% if widget.index == 1 %}
+          {% assign card_heading_level = 'h2' %}
+        {% else %}
+          {% assign card_heading_level = 'h3' %}
+        {% endif %}
+      {% else %}
+        {% if widget.index == 1 %}
+          {% assign card_heading_level = 'h1' %}
+        {% else %}
+          {% assign card_heading_level = 'h2' %}
+        {% endif %}
+      {% endif %}
+
+      {% if news_items.size > 0 %}
+        {% assign is_overlay = false %}
+        {% if widget.settings.layout == 'overlay' %}{% assign is_overlay = true %}{% endif %}
+        {% comment %} Column-aware image sizing. At 1 column the content is capped at
+           widget-content-md (800px); above that the card width scales with the column
+           count at ≥990px (the grid is 2-up in the 750–989 band and 1-up below). {% endcomment %}
+        {% if widget.settings.columns_desktop == 1 %}
+          {% assign card_sizes = '(max-width: 749px) 100vw, 800px' %}
+        {% else %}
+          {% assign desktop_vw = 100 | divided_by: widget.settings.columns_desktop %}
+          {% assign card_sizes = '(max-width: 749px) 100vw, (max-width: 989px) 50vw, ' | append: desktop_vw | append: 'vw' %}
+        {% endif %}
+        <ul class="widget-card-grid widget-grid{% if is_overlay %} news-grid-overlay{% endif %}{% if widget.settings.columns_desktop == 1 and is_overlay == false %} news-grid-single{% endif %}" style="--grid-cols-desktop: {{ widget.settings.columns_desktop }};">
+          {% for item in news_items %}
+            {% comment %} Promote the first card to h1 only when the widget has no title and is first on the page. {% endcomment %}
+            {% assign current_card_level = card_heading_level %}
+            {% if has_widget_title == false and widget.index == 1 %}
+              {% if forloop.first %}
+                {% assign current_card_level = 'h1' %}
+              {% else %}
+                {% assign current_card_level = 'h2' %}
+              {% endif %}
+            {% endif %}
+
+            {% if is_overlay %}
+              {% comment %} Overlay layout: image fills the card, the whole card is the link. {% endcomment %}
+              <li class="widget-card reveal reveal-up" style="--reveal-delay: {{ forloop.index0 }}" data-collection-item="{{ item.slug }}">
+                {% if item.settings.featured_image != blank %}
+                  {% image src: item.settings.featured_image, size: 'large', srcset: true, sizes: card_sizes, class: 'widget-card-image' %}
+                {% else %}
+                  {% placeholder_image aspect: 'landscape', class: 'widget-card-image' %}
+                {% endif %}
+                <div class="news-overlay">
+                  <div class="news-overlay-content">
+                    {% if widget.settings.show_date and item.settings.date != blank %}
+                      <time class="w-meta t-sm" datetime="{{ item.settings.date }}">{{ item.settings.date | format_date }}</time>
+                    {% endif %}
+                    <{{ current_card_level }} class="w-title t-xl">{{ item.settings.title }}</{{ current_card_level }}>
+                    {% if widget.settings.show_excerpt and item.settings.excerpt != blank %}
+                      <p class="w-body t-sm">{{ item.settings.excerpt }}</p>
+                    {% endif %}
+                  </div>
+                </div>
+                {% if item.url %}
+                  <a href="{{ item.url }}" class="widget-card-link" aria-label="{{ item.settings.title }}"></a>
+                {% endif %}
+              </li>
+            {% else %}
+              <li class="widget-card reveal reveal-up" style="--reveal-delay: {{ forloop.index0 }}" data-collection-item="{{ item.slug }}">
+                {% if widget.settings.show_image and item.settings.featured_image != blank %}
+                  {% image src: item.settings.featured_image, size: 'large', srcset: true, sizes: card_sizes, class: 'widget-card-image' %}
+                {% endif %}
+                <div class="widget-card-content">
+                  {% if widget.settings.show_date and item.settings.date != blank %}
+                    <time class="w-meta t-sm" datetime="{{ item.settings.date }}">{{ item.settings.date | format_date }}</time>
+                  {% endif %}
+                  <{{ current_card_level }} class="w-title t-xl">
+                    {% if item.url %}<a href="{{ item.url }}">{{ item.settings.title }}</a>{% else %}{{ item.settings.title }}{% endif %}
+                  </{{ current_card_level }}>
+                  {% if widget.settings.show_excerpt and item.settings.excerpt != blank %}
+                    <p class="w-body t-sm">{{ item.settings.excerpt }}</p>
+                  {% endif %}
+                  {% if widget.settings.show_read_more and item.url %}
+                    <div class="widget-card-footer">
+                      <a href="{{ item.url }}" class="widget-button widget-button-secondary" aria-label="Read more: {{ item.settings.title }}">Read more</a>
+                    </div>
+                  {% endif %}
+                </div>
+              </li>
+            {% endif %}
+          {% endfor %}
+        </ul>
+
+        {% if show_view_all and view_all_in_header == false %}
+          <div class="widget-actions grid-view-all reveal reveal-up">{{ view_all_button | raw }}</div>
+        {% endif %}
+      {% else %}
+        <p class="w-body t-muted">No news items yet. Add some under News.</p>
+      {% endif %}
+    </div>
+  </div>
+</section>

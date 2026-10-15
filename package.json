@@ -1,7 +1,8 @@
 {
   "name": "widgetizer",
-  "version": "0.9.9",
+  "version": "0.9.10",
   "description": "A visual website builder with theme support",
+  "homepage": "https://widgetizer.org",
   "author": "Widgetizer",
   "private": true,
   "type": "module",
@@ -38,6 +39,8 @@
     "preset:sync": "node scripts/preset-sync.js",
     "preset:media": "node scripts/pack-preset-media.js",
     "preset:templates": "node scripts/sync-preset-templates.js",
+    "demos:release": "node scripts/release-demos.js",
+    "validate:theme": "node scripts/validate-theme.js",
     "validate:locales": "node scripts/validate-locales.js",
     "validate:theme-locales": "node scripts/validate-theme-locales.js",
     "validate:all-locales": "node scripts/validate-locales.js && node scripts/validate-theme-locales.js",
@@ -45,6 +48,8 @@
     "electron:build:mac:unsigned": "node scripts/build-electron.mjs --platform mac --unsigned",
     "electron:build:win": "node scripts/build-electron.mjs --platform win",
     "electron:build:win:unsigned": "node scripts/build-electron.mjs --platform win --unsigned",
+    "electron:build:linux": "node scripts/build-electron.mjs --platform linux",
+    "electron:build:linux:arm64": "node scripts/build-electron.mjs --platform linux --arch arm64",
     "electron:preflight": "npm run validate:all-locales && npm run lint:all"
   },
   "dependencies": {

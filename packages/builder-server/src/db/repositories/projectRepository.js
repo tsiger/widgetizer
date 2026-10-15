@@ -1,3 +1,4 @@
+import { DEFAULT_LANGUAGE } from "@widgetizer/core/languages";
 import { getDb } from "../index.js";
 
 /**
@@ -39,8 +40,8 @@ export function getProjectFolderName(projectId) {
 export function createProject(project) {
   const db = getDb();
   db.prepare(`
-    INSERT INTO projects (id, folder_name, name, description, site_title, theme, theme_version, preset, receive_theme_updates, site_url, last_theme_update_at, last_theme_update_version, created, updated)
-    VALUES (@id, @folderName, @name, @description, @siteTitle, @theme, @themeVersion, @preset, @receiveThemeUpdates, @siteUrl, @lastThemeUpdateAt, @lastThemeUpdateVersion, @created, @updated)
+    INSERT INTO projects (id, folder_name, name, description, site_title, theme, theme_version, preset, receive_theme_updates, site_url, clean_urls, site_identity, default_language, languages, last_theme_update_at, last_theme_update_version, created, updated)
+    VALUES (@id, @folderName, @name, @description, @siteTitle, @theme, @themeVersion, @preset, @receiveThemeUpdates, @siteUrl, @cleanUrls, @siteIdentity, @defaultLanguage, @languages, @lastThemeUpdateAt, @lastThemeUpdateVersion, @created, @updated)
   `).run({
     id: project.id,
     folderName: project.folderName,
@@ -52,6 +53,10 @@ export function createProject(project) {
     preset: project.preset || null,
     receiveThemeUpdates: project.receiveThemeUpdates ? 1 : 0,
     siteUrl: project.siteUrl || "",
+    cleanUrls: project.cleanUrls ? 1 : 0,
+    siteIdentity: JSON.stringify(project.siteIdentity || {}),
+    defaultLanguage: project.defaultLanguage || DEFAULT_LANGUAGE,
+    languages: JSON.stringify(project.languages || []),
     lastThemeUpdateAt: project.lastThemeUpdateAt || null,
     lastThemeUpdateVersion: project.lastThemeUpdateVersion || null,
     created: project.created,
@@ -67,6 +72,15 @@ export function createProject(project) {
  */
 export function updateProject(id, updates) {
   const db = getDb();
+  // Immediate transaction: the read-merge-write must hold the write lock from
+  // the start — a deferred wrap would take a read snapshot first and could die
+  // with un-waitable SQLITE_BUSY_SNAPSHOT on the upgrade if a second connection
+  // ever shares the DB file, and no wrap at all makes the merge a lost-update
+  // window for such a connection.
+  return db.transaction(() => updateProjectStatements(db, id, updates)).immediate();
+}
+
+function updateProjectStatements(db, id, updates) {
   const current = db.prepare("SELECT * FROM projects WHERE id = ?").get(id);
   if (!current) return null;
 
@@ -83,6 +97,16 @@ export function updateProject(id, updates) {
       ? (updates.receiveThemeUpdates ? 1 : 0)
       : current.receive_theme_updates,
     siteUrl: updates.siteUrl !== undefined ? (updates.siteUrl || "") : current.site_url,
+    cleanUrls: updates.cleanUrls !== undefined ? (updates.cleanUrls ? 1 : 0) : current.clean_urls,
+    siteIdentity: updates.siteIdentity !== undefined
+      ? JSON.stringify(updates.siteIdentity || {})
+      : (current.site_identity ?? "{}"),
+    defaultLanguage: updates.defaultLanguage !== undefined
+      ? (updates.defaultLanguage || DEFAULT_LANGUAGE)
+      : (current.default_language ?? DEFAULT_LANGUAGE),
+    languages: updates.languages !== undefined
+      ? JSON.stringify(updates.languages || [])
+      : (current.languages ?? "[]"),
     lastThemeUpdateAt: updates.lastThemeUpdateAt !== undefined ? updates.lastThemeUpdateAt : current.last_theme_update_at,
     lastThemeUpdateVersion: updates.lastThemeUpdateVersion !== undefined ? updates.lastThemeUpdateVersion : current.last_theme_update_version,
     updated: updates.updated || new Date().toISOString(),
@@ -100,6 +124,10 @@ export function updateProject(id, updates) {
       preset = @preset,
       receive_theme_updates = @receiveThemeUpdates,
       site_url = @siteUrl,
+      clean_urls = @cleanUrls,
+      site_identity = @siteIdentity,
+      default_language = @defaultLanguage,
+      languages = @languages,
       last_theme_update_at = @lastThemeUpdateAt,
       last_theme_update_version = @lastThemeUpdateVersion,
       updated = @updated
@@ -189,10 +217,13 @@ export function setActiveProjectId(id) {
  * @returns {{projects: Array<object>, activeProjectId: string|null}}
  */
 export function readProjectsData() {
-  return {
+  const db = getDb();
+  // Read-only transaction so both reads see one consistent snapshot if a
+  // second connection ever shares the DB file.
+  return db.transaction(() => ({
     projects: getAllProjects(),
     activeProjectId: getActiveProjectId(),
-  };
+  }))();
 }
 
 /**
@@ -201,6 +232,8 @@ export function readProjectsData() {
  */
 export function writeProjectsData(data) {
   const db = getDb();
+  // Immediate transaction: the id-list read precedes the writes, so the write
+  // lock must be taken up front (see updateProject for the rationale).
   const txn = db.transaction(() => {
     // Get current project IDs in DB
     const currentIds = new Set(
@@ -217,8 +250,8 @@ export function writeProjectsData(data) {
 
     // Upsert each project
     const upsert = db.prepare(`
-      INSERT INTO projects (id, folder_name, name, description, site_title, theme, theme_version, preset, receive_theme_updates, site_url, last_theme_update_at, last_theme_update_version, created, updated)
-      VALUES (@id, @folderName, @name, @description, @siteTitle, @theme, @themeVersion, @preset, @receiveThemeUpdates, @siteUrl, @lastThemeUpdateAt, @lastThemeUpdateVersion, @created, @updated)
+      INSERT INTO projects (id, folder_name, name, description, site_title, theme, theme_version, preset, receive_theme_updates, site_url, clean_urls, site_identity, default_language, languages, last_theme_update_at, last_theme_update_version, created, updated)
+      VALUES (@id, @folderName, @name, @description, @siteTitle, @theme, @themeVersion, @preset, @receiveThemeUpdates, @siteUrl, @cleanUrls, @siteIdentity, @defaultLanguage, @languages, @lastThemeUpdateAt, @lastThemeUpdateVersion, @created, @updated)
       ON CONFLICT(id) DO UPDATE SET
         folder_name = @folderName,
         name = @name,
@@ -229,6 +262,10 @@ export function writeProjectsData(data) {
         preset = @preset,
         receive_theme_updates = @receiveThemeUpdates,
         site_url = @siteUrl,
+        clean_urls = @cleanUrls,
+        site_identity = @siteIdentity,
+        default_language = @defaultLanguage,
+        languages = @languages,
         last_theme_update_at = @lastThemeUpdateAt,
         last_theme_update_version = @lastThemeUpdateVersion,
         updated = @updated
@@ -246,6 +283,10 @@ export function writeProjectsData(data) {
         preset: p.preset || null,
         receiveThemeUpdates: p.receiveThemeUpdates ? 1 : 0,
         siteUrl: p.siteUrl || "",
+        cleanUrls: p.cleanUrls ? 1 : 0,
+        siteIdentity: JSON.stringify(p.siteIdentity || {}),
+        defaultLanguage: p.defaultLanguage || DEFAULT_LANGUAGE,
+        languages: JSON.stringify(p.languages || []),
         lastThemeUpdateAt: p.lastThemeUpdateAt || null,
         lastThemeUpdateVersion: p.lastThemeUpdateVersion || null,
         created: p.created,
@@ -257,12 +298,56 @@ export function writeProjectsData(data) {
     setActiveProjectId(data.activeProjectId || null);
   });
 
-  txn();
+  txn.immediate();
+}
+
+/**
+ * Delete a project and, when it was the active one (or none was active),
+ * reassign the active id to the first remaining project — in one transaction,
+ * so no observer of a second connection can see the deleted project still
+ * active. The transaction's first statement is the DELETE, so a default
+ * deferred transaction already takes the write lock up front.
+ * @param {string} id - Project UUID
+ * @returns {string|null} The active project id after the deletion
+ */
+export function deleteProjectAndReassignActive(id) {
+  const db = getDb();
+  return db.transaction(() => {
+    db.prepare("DELETE FROM projects WHERE id = ?").run(id);
+
+    let activeId = getActiveProjectId();
+    if (activeId === id || !activeId) {
+      const remaining = getAllProjects();
+      activeId = remaining[0]?.id || null;
+      setActiveProjectId(activeId);
+    }
+    return activeId;
+  })();
+}
+
+function parseSiteIdentity(raw) {
+  try {
+    const parsed = JSON.parse(raw || "{}");
+    return parsed && typeof parsed === "object" && !Array.isArray(parsed) ? parsed : {};
+  } catch {
+    return {};
+  }
 }
 
 /**
  * Convert a database row to the project shape controllers expect.
  */
+/** Stored as a JSON array of the ADDITIONAL codes; anything unreadable means none. */
+function parseLanguages(raw) {
+  if (!raw) return [];
+  try {
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed.filter((code) => typeof code === "string") : [];
+  } catch {
+    return [];
+  }
+}
+
 function rowToProject(row) {
   const project = {
     id: row.id,
@@ -275,6 +360,10 @@ function rowToProject(row) {
     preset: row.preset,
     receiveThemeUpdates: !!row.receive_theme_updates,
     siteUrl: row.site_url,
+    cleanUrls: !!row.clean_urls,
+    siteIdentity: parseSiteIdentity(row.site_identity),
+    defaultLanguage: row.default_language || DEFAULT_LANGUAGE,
+    languages: parseLanguages(row.languages),
     created: row.created,
     updated: row.updated,
   };

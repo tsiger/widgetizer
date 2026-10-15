@@ -17,7 +17,7 @@ import { invalidateMediaCache } from "../queries/mediaManager";
  *   isSavingMetadata: boolean,
  *   handleEditMetadata: (file: Object) => void,
  *   handleCloseDrawer: () => void,
- *   handleSaveMetadata: (fileId: string, metadata: Object) => Promise<void>,
+ *   handleSaveMetadata: (fileId: string, metadata: Object, language?: string) => Promise<void>,
  *   handleFileView: (file: Object) => void
  * }} Metadata editing state and handlers
  * @property {boolean} drawerVisible - Whether the metadata editing drawer is open
@@ -46,12 +46,15 @@ export default function useMediaMetadata({ activeProject, showToast, setFiles })
   };
 
   // Handler to save metadata changes
-  const handleSaveMetadata = async (fileId, metadata) => {
+  const handleSaveMetadata = async (fileId, metadata, language) => {
     if (!activeProject || !fileId) return;
 
     setIsSavingMetadata(true);
     try {
-      const response = await apiFetch(`/api/media/projects/${activeProject.id}/media/${fileId}/metadata`, {
+      // Only alt/title/caption are per language; the binary and everything else
+      // about the file are shared, so the language is all that is added here.
+      const query = language ? `?language=${encodeURIComponent(language)}` : "";
+      const response = await apiFetch(`/api/media/projects/${activeProject.id}/media/${fileId}/metadata${query}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -68,7 +71,11 @@ export default function useMediaMetadata({ activeProject, showToast, setFiles })
 
       // Update the file in the local state
       setFiles((prevFiles) =>
-        prevFiles.map((file) => (file.id === fileId ? { ...file, metadata: updatedFileData.file.metadata } : file)),
+        prevFiles.map((file) =>
+          file.id === fileId
+            ? { ...file, metadata: updatedFileData.file.metadata, translations: updatedFileData.file.translations }
+            : file,
+        ),
       );
 
       // Drop the shared 30s media cache so the page editor's image inputs re-fetch

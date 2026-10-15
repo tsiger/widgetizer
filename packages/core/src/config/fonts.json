@@ -1504,6 +1504,22 @@
       ]
     },
     {
+      "name": "Instrument Sans",
+      "stack": "\"Instrument Sans\", sans-serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        400,
+        500,
+        600,
+        700
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin",
+        "latin-ext"
+      ]
+    },
+    {
       "name": "Inter",
       "stack": "\"Inter\", sans-serif",
       "isGoogleFont": true,
@@ -3512,6 +3528,26 @@
       "subsets": [
         "latin",
         "latin-ext"
+      ]
+    },
+    {
+      "name": "STIX Two Text",
+      "stack": "\"STIX Two Text\", serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        400,
+        500,
+        600,
+        700
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "greek",
+        "latin",
+        "latin-ext",
+        "vietnamese"
       ]
     },
     {

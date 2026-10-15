@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo, useRef } from "react";
 import DOMPurify from "dompurify";
 import useProjectStore from "../../../stores/projectStore";
 import useIconsStore from "../../../stores/iconsStore";
+import { searchIconGroups } from "../../../utils/iconSearch";
 import { Search } from "lucide-react";
 
 // An icon's `body` is raw SVG markup read verbatim from the project's
@@ -115,9 +116,7 @@ export default function IconInput({ value, onChange, options, allow_patterns, de
 
   // Filter icons based on schema settings and search term
   const filteredGroups = useMemo(() => {
-    const lowerSearch = searchTerm.toLowerCase();
-
-    return normalizedIcons
+    const scoped = normalizedIcons
       .map((group) => {
         let filteredIcons = group.icons;
 
@@ -138,14 +137,12 @@ export default function IconInput({ value, onChange, options, allow_patterns, de
           });
         }
 
-        // 3. Filter by Search Term
-        if (searchTerm) {
-          filteredIcons = filteredIcons.filter((icon) => icon.name.toLowerCase().includes(lowerSearch));
-        }
-
         return { ...group, icons: filteredIcons };
       })
       .filter((group) => group.icons.length > 0);
+
+    // 3. Search: name/keyword/synonym/group matching, ranked by relevance.
+    return searchIconGroups(scoped, searchTerm);
   }, [normalizedIcons, options, allow_patterns, searchTerm]);
 
   // Handle icon selection (clicking selected icon clears it)

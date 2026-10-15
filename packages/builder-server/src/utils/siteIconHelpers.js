@@ -28,6 +28,7 @@ function emptySiteIcons() {
     primaryIconType: "",
     primaryIconSizes: "",
     legacyIconHref: "",
+    serpIconHref: "",
     appleTouchIconHref: "",
     manifestHref: "",
   };
@@ -61,21 +62,45 @@ export function buildRuntimeSiteIcons(siteIconSrc, mediaFiles, imageBasePath) {
     primaryIconType: siteIcon.mimeType,
     primaryIconSizes: siteIcon.isSvg ? "any" : "",
     legacyIconHref: siteIcon.isSvg ? "" : sourceHref,
+    serpIconHref: "", // derived sizes exist only in exports; runtime serves the source file
     appleTouchIconHref: sourceHref,
     manifestHref: "",
   };
 }
 
-async function writePngVariant(sourcePath, outputPath, size) {
-  await sharp(sourcePath, { limitInputPixels: 100_000_000 })
+function pngVariantPipeline(sourcePath, size) {
+  return sharp(sourcePath, { limitInputPixels: 100_000_000 })
     .resize({
       width: size,
       height: size,
       fit: "cover",
       position: "centre",
     })
-    .png()
-    .toFile(outputPath);
+    .png();
+}
+
+async function writePngVariant(sourcePath, outputPath, size) {
+  await pngVariantPipeline(sourcePath, size).toFile(outputPath);
+}
+
+// Wrap a PNG in a single-entry .ico container: 6-byte ICONDIR + 16-byte
+// ICONDIRENTRY + the PNG bytes verbatim at offset 22. PNG-compressed entries
+// are valid ICO and understood by every current browser and crawler, which
+// spares us a dedicated ico-encoder dependency (sharp cannot write .ico).
+function icoFromPng(pngBuffer, size) {
+  const header = Buffer.alloc(22);
+  header.writeUInt16LE(0, 0); // reserved
+  header.writeUInt16LE(1, 2); // resource type: icon
+  header.writeUInt16LE(1, 4); // image count
+  header.writeUInt8(size >= 256 ? 0 : size, 6); // width (0 encodes 256)
+  header.writeUInt8(size >= 256 ? 0 : size, 7); // height
+  header.writeUInt8(0, 8); // palette size (none)
+  header.writeUInt8(0, 9); // reserved
+  header.writeUInt16LE(1, 10); // color planes
+  header.writeUInt16LE(32, 12); // bits per pixel
+  header.writeUInt32LE(pngBuffer.length, 14); // image data length
+  header.writeUInt32LE(22, 18); // image data offset
+  return Buffer.concat([header, pngBuffer]);
 }
 
 export async function generateExportSiteIcons({ outputDir, projectDir, projectName, siteTitle, siteIconSrc }) {
@@ -104,11 +129,18 @@ export async function generateExportSiteIcons({ outputDir, projectDir, projectNa
       icons.legacyIconHref = "favicon-32.png";
     }
 
-    await writePngVariant(sourcePath, path.join(outputDir, "favicon-32.png"), 32);
+    const png32 = await pngVariantPipeline(sourcePath, 32).toBuffer();
+    await fs.writeFile(path.join(outputDir, "favicon-32.png"), png32);
+    // favicon.ico is written for agents that request /favicon.ico directly
+    // (Google, legacy browsers) but deliberately never linked in the HTML —
+    // a <link> to it would make browsers prefer the 32px ico over the
+    // higher-resolution PNG/SVG icons.
+    await fs.writeFile(path.join(outputDir, "favicon.ico"), icoFromPng(png32, 32));
     await writePngVariant(sourcePath, path.join(outputDir, "apple-touch-icon.png"), 180);
     await writePngVariant(sourcePath, path.join(outputDir, "icon-192.png"), 192);
     await writePngVariant(sourcePath, path.join(outputDir, "icon-512.png"), 512);
 
+    icons.serpIconHref = "icon-192.png";
     icons.appleTouchIconHref = "apple-touch-icon.png";
     icons.manifestHref = "site.webmanifest";
 

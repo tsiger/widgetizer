@@ -44,6 +44,72 @@ The schema tells Widgetizer what settings to show in the editor and what block t
 - `defaultBlocks`: Array of block instances to pre-populate when the widget is added
 - `maxBlocks`: Maximum number of blocks allowed (integer). When omitted or `0`, blocks are unlimited
 - `aliases`: Array of alternative names for AI/search ("quote", "review", "feedback")
+- `collection`: For a widget that lists collection items, which collection it lists and, optionally, which setting holds items per page — `{ "type": "news", "perPageSetting": "limit" }`. See below
+
+## Declaring a Listed Collection
+
+If your widget shows items from a collection, say so at the top of the schema:
+
+```json
+{
+  "type": "news-grid",
+  "collection": { "type": "news" },
+  "displayName": "News Grid"
+}
+```
+
+Your template already names the collection (`{% assign items = 'news' | collection %}`),
+but only while it renders — nothing outside can read it. The declaration is what lets
+Widgetizer know which of the site's pages list what.
+
+It does two things. Breadcrumbs on a collection item find the item's parent page by
+looking for the page that carries a widget listing that collection. And the editor adds a
+**"Main {collection} page"** checkbox to your widget's settings, so a site owner with more
+than one listing page can say which is the collection's home; only one page per collection
+can hold it.
+
+Nothing to add for a widget that does not list a collection.
+
+## Splitting a List into Pages
+
+Name the setting that controls how many items your widget shows, and site owners get a
+**"Split into pages"** checkbox:
+
+```json
+{
+  "type": "news-grid",
+  "collection": { "type": "news", "perPageSetting": "limit" }
+}
+```
+
+When it is on, that setting becomes items per page, and export publishes the whole page
+once per page of items: `news.html`, `news/page/2.html`, `news/page/3.html` (or
+`page/2.html` for the homepage). If everything fits on one page, nothing extra is written.
+
+Your template keeps asking for items the same way — Widgetizer applies the right offset
+and limit to the splitting widget's `collection` call. All you add is the page links,
+drawn from the `pagination` object, which only the splitting widget receives:
+
+```liquid
+{% if pagination %}
+  <nav aria-label="Pagination">
+    {% if pagination.prevHref %}<a href="{{ pagination.prevHref }}" rel="prev">Previous</a>{% endif %}
+    {% for entry in pagination.pages %}
+      {% if entry.current %}
+        <span aria-current="page">{{ entry.number }}</span>
+      {% else %}
+        <a href="{{ entry.href }}">{{ entry.number }}</a>
+      {% endif %}
+    {% endfor %}
+    {% if pagination.nextHref %}<a href="{{ pagination.nextHref }}" rel="next">Next</a>{% endif %}
+  </nav>
+{% endif %}
+```
+
+Every link is already correct for the page's depth and the Clean URLs setting. See
+[Pagination Object](theme-dev-objects-context.html) for all fields. Widgetizer takes care
+of the rest: numbered titles, canonical and prev/next links, sitemap entries, and a
+`Home › News › Page 2` breadcrumb.
 
 ## Adding Widget Settings
 

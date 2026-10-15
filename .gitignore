@@ -26,10 +26,10 @@ logs/
 .claude/
 .electron-home/
 themes/widgetizer/
+themes/widgetizer-saas-theme/
 temp/
 tmp/
 temp-webp/
 .obsidian/
 docs-entities/.trash/
-themes/widgetizer-saas-theme/
 /themes/__*/

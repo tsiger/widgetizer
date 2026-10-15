@@ -32,7 +32,7 @@ export default class ErrorBoundary extends Component {
             <div className="min-w-0">
               <h1 className="text-2xl font-bold text-slate-900 mt-1">Something went wrong</h1>
               <p className="text-slate-600 mt-3">
-                An unexpected error occurred. You can try reloading the page or going back to the dashboard.
+                An unexpected error occurred. You can try reloading the page or going back to the start.
               </p>
             </div>
           </div>
@@ -45,7 +45,7 @@ export default class ErrorBoundary extends Component {
               className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
             >
               <Home size={16} />
-              Dashboard
+              Home
             </button>
             <button
               onClick={() => window.location.reload()}

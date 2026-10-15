@@ -148,6 +148,37 @@
       ]
     },
     {
+      "type": "business_details",
+      "displayName": "tTheme:global.widgets.blocks.business_details.name",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "tTheme:global.widgets.blocks.business_details.settings.title.label",
+          "description": "tTheme:global.widgets.blocks.business_details.settings.title.description",
+          "default": "Visit Us"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_address",
+          "label": "tTheme:global.widgets.blocks.business_details.settings.show_address.label",
+          "default": true
+        },
+        {
+          "type": "checkbox",
+          "id": "show_contact",
+          "label": "tTheme:global.widgets.blocks.business_details.settings.show_contact.label",
+          "default": true
+        },
+        {
+          "type": "checkbox",
+          "id": "show_hours",
+          "label": "tTheme:global.widgets.blocks.business_details.settings.show_hours.label",
+          "default": true
+        }
+      ]
+    },
+    {
       "type": "badges_block",
       "displayName": "tTheme:footer.blocks.badges_block.name",
       "settings": [

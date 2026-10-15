@@ -112,21 +112,21 @@
         >
           <div class="countdown-unit">
             <span class="countdown-number" data-unit="days">00</span>
-            <span class="countdown-label w-meta t-sm">Days</span>
+            <span class="countdown-label w-meta t-sm">{{ 'site.countdown.days' | t }}</span>
           </div>
           {% if widget.settings.style == 'minimal' -%}
             <span class="countdown-separator t-4xl t-muted">:</span>
           {%- endif %}
           <div class="countdown-unit">
             <span class="countdown-number" data-unit="hours">00</span>
-            <span class="countdown-label w-meta t-sm">Hours</span>
+            <span class="countdown-label w-meta t-sm">{{ 'site.countdown.hours' | t }}</span>
           </div>
           {% if widget.settings.style == 'minimal' -%}
             <span class="countdown-separator t-4xl t-muted">:</span>
           {%- endif %}
           <div class="countdown-unit">
             <span class="countdown-number" data-unit="minutes">00</span>
-            <span class="countdown-label w-meta t-sm">Minutes</span>
+            <span class="countdown-label w-meta t-sm">{{ 'site.countdown.minutes' | t }}</span>
           </div>
           {% if widget.settings.show_seconds %}
             {% if widget.settings.style == 'minimal' -%}
@@ -134,7 +134,7 @@
             {%- endif %}
             <div class="countdown-unit">
               <span class="countdown-number" data-unit="seconds">00</span>
-              <span class="countdown-label w-meta t-sm">Seconds</span>
+              <span class="countdown-label w-meta t-sm">{{ 'site.countdown.seconds' | t }}</span>
             </div>
           {% endif %}
         </div>

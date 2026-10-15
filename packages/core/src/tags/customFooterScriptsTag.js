@@ -1,3 +1,5 @@
+import { readThemeSetting } from "../utils/themeSettingChanges.js";
+
 /**
  * {% custom_footer_scripts %} Liquid Tag
  *
@@ -23,22 +25,7 @@ export const CustomFooterScriptsTag = {
         return ""; // Return empty string if no settings found
       }
 
-      const advancedGroup = rawSettings.settings.global.advanced;
-
-      if (!Array.isArray(advancedGroup)) {
-        return "";
-      }
-
-      const customFooterScriptsSetting = advancedGroup.find((s) => s.id === "custom_footer_scripts");
-
-      if (!customFooterScriptsSetting) {
-        return "";
-      }
-
-      const scriptsValue =
-        customFooterScriptsSetting.value !== undefined
-          ? customFooterScriptsSetting.value
-          : customFooterScriptsSetting.default;
+      const scriptsValue = readThemeSetting(rawSettings, { group: "advanced", id: "custom_footer_scripts" });
 
       if (!scriptsValue || typeof scriptsValue !== "string" || scriptsValue.trim() === "") {
         return "";

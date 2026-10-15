@@ -1,0 +1,414 @@
+{
+  "files": [
+    {
+      "filename": "archhero03.webp",
+      "originalName": "archhero03.webp",
+      "type": "image/webp",
+      "size": 77424,
+      "path": "/uploads/images/archhero03.webp",
+      "width": 1500,
+      "height": 750,
+      "alt": "Executive meeting in a glass-walled office with screen presentation",
+      "title": "Strategy meeting",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/archhero03-medium.webp",
+          "width": 1024,
+          "height": 512
+        },
+        "small": {
+          "path": "/uploads/images/archhero03-small.webp",
+          "width": 480,
+          "height": 240
+        },
+        "thumb": {
+          "path": "/uploads/images/archhero03-thumb.webp",
+          "width": 150,
+          "height": 75
+        }
+      }
+    },
+    {
+      "filename": "cs01.webp",
+      "originalName": "cs01.webp",
+      "type": "image/webp",
+      "size": 93458,
+      "path": "/uploads/images/cs01.webp",
+      "width": 1000,
+      "height": 668,
+      "alt": "Couple reviewing a document together in a sunlit office, warm collaborative moment",
+      "title": "Client success story",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/cs01-small.webp",
+          "width": 480,
+          "height": 321
+        },
+        "thumb": {
+          "path": "/uploads/images/cs01-thumb.webp",
+          "width": 150,
+          "height": 100
+        }
+      }
+    },
+    {
+      "filename": "archhero04.webp",
+      "originalName": "archhero04.webp",
+      "type": "image/webp",
+      "size": 79390,
+      "path": "/uploads/images/archhero04.webp",
+      "width": 1500,
+      "height": 750,
+      "alt": "Two consultants reviewing documents together in a modern co-working office",
+      "title": "Client consultation",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/archhero04-medium.webp",
+          "width": 1024,
+          "height": 512
+        },
+        "small": {
+          "path": "/uploads/images/archhero04-small.webp",
+          "width": 480,
+          "height": 240
+        },
+        "thumb": {
+          "path": "/uploads/images/archhero04-thumb.webp",
+          "width": 150,
+          "height": 75
+        }
+      }
+    },
+    {
+      "filename": "about3.webp",
+      "originalName": "about3.webp",
+      "type": "image/webp",
+      "size": 29228,
+      "path": "/uploads/images/about3.webp",
+      "width": 586,
+      "height": 586,
+      "alt": "Professional man in a dark suit with arms crossed, smiling in front of a modern building",
+      "title": "Team member portrait",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/about3-small.webp",
+          "width": 480,
+          "height": 480
+        },
+        "thumb": {
+          "path": "/uploads/images/about3-thumb.webp",
+          "width": 150,
+          "height": 150
+        }
+      }
+    },
+    {
+      "filename": "about2.webp",
+      "originalName": "about2.webp",
+      "type": "image/webp",
+      "size": 22094,
+      "path": "/uploads/images/about2.webp",
+      "width": 586,
+      "height": 586,
+      "alt": "Young professional man in a navy blazer smiling, studio portrait",
+      "title": "Team member portrait",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/about2-small.webp",
+          "width": 480,
+          "height": 480
+        },
+        "thumb": {
+          "path": "/uploads/images/about2-thumb.webp",
+          "width": 150,
+          "height": 150
+        }
+      }
+    },
+    {
+      "filename": "about1.webp",
+      "originalName": "about1.webp",
+      "type": "image/webp",
+      "size": 27018,
+      "path": "/uploads/images/about1.webp",
+      "width": 586,
+      "height": 586,
+      "alt": "Woman with long dark hair in a striped linen top smiling against a pink stucco wall",
+      "title": "Team member portrait",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/about1-small.webp",
+          "width": 480,
+          "height": 480
+        },
+        "thumb": {
+          "path": "/uploads/images/about1-thumb.webp",
+          "width": 150,
+          "height": 150
+        }
+      }
+    },
+    {
+      "filename": "logo06.webp",
+      "originalName": "logo06.webp",
+      "type": "image/webp",
+      "size": 5022,
+      "path": "/uploads/images/logo06.webp",
+      "width": 480,
+      "height": 269,
+      "alt": "Grimpany Stratege logo — upward arrow bars with Grimpany Stratege in navy",
+      "title": "Grimpany Stratege",
+      "caption": "",
+      "sizes": {
+        "thumb": {
+          "path": "/uploads/images/logo06-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "logo05.webp",
+      "originalName": "logo05.webp",
+      "type": "image/webp",
+      "size": 3756,
+      "path": "/uploads/images/logo05.webp",
+      "width": 480,
+      "height": 269,
+      "alt": "STHANF logo — hexagonal mark with STHANF wordmark in charcoal",
+      "title": "STHANF",
+      "caption": "",
+      "sizes": {
+        "thumb": {
+          "path": "/uploads/images/logo05-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "logo04.webp",
+      "originalName": "logo04.webp",
+      "type": "image/webp",
+      "size": 4722,
+      "path": "/uploads/images/logo04.webp",
+      "width": 480,
+      "height": 269,
+      "alt": "Strategic Solutions logo — interlocking hexagons with Strategic Solutions in navy",
+      "title": "Strategic Solutions",
+      "caption": "",
+      "sizes": {
+        "thumb": {
+          "path": "/uploads/images/logo04-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "logo03.webp",
+      "originalName": "logo03.webp",
+      "type": "image/webp",
+      "size": 5016,
+      "path": "/uploads/images/logo03.webp",
+      "width": 480,
+      "height": 269,
+      "alt": "Apex Solutions logo — circular geometric mark with APEX SOLUTIONS in navy",
+      "title": "Apex Solutions",
+      "caption": "",
+      "sizes": {
+        "thumb": {
+          "path": "/uploads/images/logo03-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "logo02.webp",
+      "originalName": "logo02.webp",
+      "type": "image/webp",
+      "size": 4136,
+      "path": "/uploads/images/logo02.webp",
+      "width": 480,
+      "height": 269,
+      "alt": "Meridian Solutions logo — geometric shield mark with MERIDIAN SOLUTIONS in navy",
+      "title": "Meridian Solutions",
+      "caption": "",
+      "sizes": {
+        "thumb": {
+          "path": "/uploads/images/logo02-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "logo01.webp",
+      "originalName": "logo01.webp",
+      "type": "image/webp",
+      "size": 4114,
+      "path": "/uploads/images/logo01.webp",
+      "width": 480,
+      "height": 269,
+      "alt": "Nexus Corp logo — stylized sphere mark with NEXUS CORP in navy",
+      "title": "Nexus Corp",
+      "caption": "",
+      "sizes": {
+        "thumb": {
+          "path": "/uploads/images/logo01-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "arch-logo-light.svg",
+      "originalName": "arch-logo-light.svg",
+      "type": "image/svg+xml",
+      "size": 3093,
+      "path": "/uploads/images/arch-logo-light.svg",
+      "width": null,
+      "height": null,
+      "alt": "Arch theme wordmark in white with pink accent for dark backgrounds",
+      "title": "Arch logo light",
+      "caption": "",
+      "sizes": {}
+    },
+    {
+      "filename": "archcta01.webp",
+      "originalName": "archcta01.webp",
+      "type": "image/webp",
+      "size": 63600,
+      "path": "/uploads/images/archcta01.webp",
+      "width": 1500,
+      "height": 750,
+      "alt": "Curved modern architectural facade at dusk with blue-tinted glass panels",
+      "title": "Modern architecture",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/archcta01-medium.webp",
+          "width": 1024,
+          "height": 512
+        },
+        "small": {
+          "path": "/uploads/images/archcta01-small.webp",
+          "width": 480,
+          "height": 240
+        },
+        "thumb": {
+          "path": "/uploads/images/archcta01-thumb.webp",
+          "width": 150,
+          "height": 75
+        }
+      }
+    },
+    {
+      "filename": "callout.webp",
+      "originalName": "callout.webp",
+      "type": "image/webp",
+      "size": 142624,
+      "path": "/uploads/images/callout.webp",
+      "width": 1500,
+      "height": 841,
+      "alt": "Bright industrial-style office interior with wooden desks, monitors, and plants",
+      "title": "Our workspace",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/callout-medium.webp",
+          "width": 1024,
+          "height": 574
+        },
+        "small": {
+          "path": "/uploads/images/callout-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/callout-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "archhero02.webp",
+      "originalName": "archhero02.webp",
+      "type": "image/webp",
+      "size": 61072,
+      "path": "/uploads/images/archhero02.webp",
+      "width": 1500,
+      "height": 750,
+      "alt": "Upward view of tall glass skyscrapers at sunrise with light beams",
+      "title": "Corporate skyline",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/archhero02-medium.webp",
+          "width": 1024,
+          "height": 512
+        },
+        "small": {
+          "path": "/uploads/images/archhero02-small.webp",
+          "width": 480,
+          "height": 240
+        },
+        "thumb": {
+          "path": "/uploads/images/archhero02-thumb.webp",
+          "width": 150,
+          "height": 75
+        }
+      }
+    },
+    {
+      "filename": "archhero01.webp",
+      "originalName": "archhero01.webp",
+      "type": "image/webp",
+      "size": 65858,
+      "path": "/uploads/images/archhero01.webp",
+      "width": 1500,
+      "height": 750,
+      "alt": "Silhouettes of professionals in a boardroom meeting with city skyline backdrop",
+      "title": "Boardroom meeting",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/archhero01-medium.webp",
+          "width": 1024,
+          "height": 512
+        },
+        "small": {
+          "path": "/uploads/images/archhero01-small.webp",
+          "width": 480,
+          "height": 240
+        },
+        "thumb": {
+          "path": "/uploads/images/archhero01-thumb.webp",
+          "width": 150,
+          "height": 75
+        }
+      }
+    },
+    {
+      "filename": "arch-logo.svg",
+      "originalName": "arch-logo.svg",
+      "type": "image/svg+xml",
+      "size": 3288,
+      "path": "/uploads/images/arch-logo.svg",
+      "width": null,
+      "height": null,
+      "alt": "Arch theme wordmark in dark navy with pink accent",
+      "title": "Arch logo",
+      "caption": "",
+      "sizes": {}
+    }
+  ]
+}

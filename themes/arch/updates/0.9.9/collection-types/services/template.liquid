@@ -1,0 +1,98 @@
+{%- comment -%}
+  Service page. Exported at services/{slug}.html (one directory deep, so internal
+  links use ../). Renders inside the Arch layout (header / main / footer). Mirrors
+  the project page. SEO is wired automatically for hasItemPages items.
+{%- endcomment -%}
+<article class="widget widget-service">
+  <style>
+    .widget-service {
+      & .service-meta {
+        margin-block-start: var(--space-xs);
+        color: var(--text-muted);
+      }
+
+      & .service-figure {
+        margin: var(--space-xl) 0 0;
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+      }
+
+      & .service-image {
+        display: block;
+        width: 100%;
+        height: auto;
+        aspect-ratio: 16 / 10;
+        object-fit: cover;
+      }
+
+      & .service-gallery {
+        margin-block-start: var(--space-xl);
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: var(--space-md);
+
+        @media (min-width: 750px) {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+
+      & .service-gallery-img {
+        display: block;
+        width: 100%;
+        height: auto;
+        border-radius: var(--radius-md);
+      }
+    }
+  </style>
+
+  <div class="widget-container">
+    <div class="widget-content content-flow widget-content-md">
+      <h1 class="w-headline reveal reveal-up">{{ item.settings.title }}</h1>
+
+      {% if item.settings.price != blank or item.settings.duration != blank %}
+        <p class="service-meta w-meta t-sm reveal reveal-up">
+          {%- if item.settings.price != blank -%}{{ item.settings.price }}{%- endif -%}
+          {%- if item.settings.price != blank and item.settings.duration != blank %} &middot; {% endif -%}
+          {%- if item.settings.duration != blank -%}{{ item.settings.duration }}{%- endif -%}
+        </p>
+      {% endif %}
+
+      {% if item.settings.summary != blank %}
+        <p class="w-body t-lg t-muted reveal reveal-up">{{ item.settings.summary }}</p>
+      {% endif %}
+
+      {% if item.settings.featured_image != blank %}
+        <figure class="service-figure reveal reveal-up">
+          {% image src: item.settings.featured_image, size: 'large', class: 'service-image', srcset: true, sizes: '(max-width: 800px) 100vw, 800px', alt: item.settings.title %}
+        </figure>
+      {% endif %}
+
+      {% if item.settings.description != blank %}
+        <div class="w-body w-rte reveal reveal-up">{{ item.settings.description | raw }}</div>
+      {% endif %}
+
+      {% assign gallery = item.settings.gallery %}
+      {% if gallery.size > 0 %}
+        <div class="service-gallery reveal reveal-up">
+          {% for img in gallery %}
+            {% if img != blank %}
+              {% image src: img, size: 'medium', class: 'service-gallery-img', srcset: true, sizes: '(max-width: 750px) 100vw, 50vw' %}
+            {% endif %}
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      {% if item.settings.cta_link.href != blank %}
+        <div class="widget-actions reveal reveal-up">
+          <a
+            class="widget-button widget-button-primary"
+            href="{{ item.settings.cta_link.href }}"
+            {% if item.settings.cta_link.target == '_blank' %}target="_blank" rel="noopener"{% endif %}
+          >
+            {{ item.settings.cta_link.text | default: 'Book now' }}
+          </a>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</article>

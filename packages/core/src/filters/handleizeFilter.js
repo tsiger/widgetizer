@@ -1,21 +1,29 @@
+import slugify from "slugify";
+
 /**
- * handleize filter
+ * handleize
  *
- * Converts a string to a URL/form-safe handle (kebab-case).
- * Equivalent to Shopify's handleize filter.
+ * Converts a string to a URL/form-safe handle (kebab-case). Non-Latin scripts
+ * (Greek, Cyrillic, …) are *transliterated* to their Latin equivalents rather
+ * than stripped, so "Το όνομα σας" -> "to-onoma-sas" instead of "".
  *
- * Usage: {{ "My Option" | handleize }} -> "my-option"
+ * Uses the same `slugify` settings as page/project slugs (see
+ * editor-ui/src/utils/slugUtils.js and builder-server/src/utils/slugHelpers.js)
+ * so form field keys behave exactly like the rest of the app's slugs.
+ *
+ * Returns "" when the input has no transliterable letters or digits (e.g. CJK,
+ * emoji, punctuation-only). Callers that need a guaranteed non-empty identifier
+ * layer their own positional fallback on top — see formsManifestService.js and
+ * the core-form widget.liquid, which both key off this exact function.
+ *
+ * Usage: {{ "My Option" | handleize }}   -> "my-option"
+ *        {{ "Το όνομα σας" | handleize }} -> "to-onoma-sas"
  */
+export function handleize(str) {
+  if (!str || typeof str !== "string") return "";
+  return slugify(str, { lower: true, strict: true, trim: true });
+}
 
 export function registerHandleizeFilter(engine) {
-  engine.registerFilter("handleize", (str) => {
-    if (!str || typeof str !== "string") return "";
-    return str
-      .toLowerCase()
-      .trim()
-      .replace(/[^\w\s-]/g, "") // remove non-word chars (except spaces and hyphens)
-      .replace(/[\s_]+/g, "-") // spaces/underscores to hyphens
-      .replace(/-+/g, "-") // collapse multiple hyphens
-      .replace(/^-|-$/g, ""); // trim leading/trailing hyphens
-  });
+  engine.registerFilter("handleize", handleize);
 }

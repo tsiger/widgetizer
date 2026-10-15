@@ -65,12 +65,8 @@ const openDeleteConfirmation = (itemId, itemName) => {
 
 #### Used In
 
-- Media file deletion (`useMediaSelection`)
-- Page deletion and bulk operations (`Pages.jsx`)
-- Project deletion (`Projects.jsx`)
-- Menu deletion (`Menus.jsx`)
-- Export deletion (`ExportHistoryTable.jsx`)
-- Widget deletion (`PageEditor.jsx`)
+- Media file deletion (`useMediaSelection`, which snapshots the file ids into the modal `data` so the set deleted is exactly the set confirmed)
+- `useConfirmationAction` (below), which every other destructive list surface goes through
 
 ### `useConfirmationAction` (`packages/editor-ui/src/hooks/useConfirmationAction.js`)
 
@@ -84,10 +80,22 @@ Thin wrapper around `useConfirmationModal` that removes the repeated modal-wirin
 
 **Returns:**
 
-- `confirm(options)` (function): Opens the confirmation dialog — same options object as `openModal`.
+- `confirm(options)` (function): Opens the confirmation dialog — same options object as `openModal`. Pass `returnFocusTo` (an element or a ref) when the opener unmounts on the same click: the list pages' row menus close as their "Delete" item opens the dialog, so the item that was focused is gone before the modal can note it, and without a target focus would be dropped on close. Those callers pass the row's menu trigger (`menuRef.current?.querySelector('[aria-haspopup="menu"]')`, read while the menu is still mounted). Openers that stay mounted (bulk-action buttons) don't need it — the modal returns focus to whatever was focused when it opened. The value is per-open, never inherited from a previous `confirm()`.
 - `confirmationModal` (React element): A ready-to-render `<ConfirmationModal />` already wired to the hook's state.
 
 Pages still own their mutation logic and localized copy; this hook only eliminates the `modalState`/`openModal`/`closeModal`/`handleConfirm` plumbing and the manual `<ConfirmationModal />` props.
+
+Used in `Pages.jsx`, `CollectionItems.jsx`, `CollectionItemForm.jsx`, `Menus.jsx`, `ExportHistoryTable.jsx`, and the OSS shell's `Projects.jsx` and `Themes.jsx`.
+
+`ConfirmationModal` itself (shared by all three confirmation APIs) owns the keyboard while open: a capture-phase `document` listener swallows every key except Escape (cancel), Tab (trapped inside the dialog), Enter and Space, so page-editor shortcuts, Escape-listening drawers and a browser Ctrl/Cmd+S cannot act behind it. With two dialogs open only the newest answers keys. Focus moves to Cancel on open and returns on close to `returnFocusTo` or the previously focused element, skipping a target that has left the DOM. A window-capture keydown listener would fire before this guard, so none may be registered (a repo test, `noCaptureKeydown`, enforces it).
+
+### `useConfirm` (`packages/editor-ui/src/components/ui/ConfirmProvider.jsx`)
+
+App-level confirmation dialog. It is one surface per window, so the **shell** mounts `ConfirmProvider` once — the OSS app root wraps the whole router with it (editor routes and picker routes alike), and every embedding shell mounts its own — exactly the way `ToastContainer` is handled. `EditorProvider` deliberately does not mount one; a shell that forgets gets a render-time throw from `useConfirm()` ("must be used within a <ConfirmProvider>"), and `app/src/__tests__/confirmProviderMount.test.jsx` proves the OSS mount tree-level, and `confirmProviderCoverage.test.js` pins the absence of one in `EditorProvider`. `useConfirm()` returns `confirm(options) => Promise<boolean>` — `true` on confirm, `false` on cancel/Escape/backdrop. The returned promise also carries `.cancel()`, which closes the dialog and resolves `false`, but only while that request is still the open one — so a caller unmounting mid-prompt cleans up without closing someone else's dialog. Opening a second dialog supersedes the first, resolving it `false` rather than leaving its caller awaiting forever.
+
+Use this when the asking code is not a component that renders (side-effect-only hooks like the navigation guards). Pages with a visible destructive action should keep using `useConfirmationAction`, which returns an element they render themselves.
+
+**Why it exists**: `window.confirm()` is unusable in the Electron build. On Windows the native dialog leaves the window believing it lost focus, so every input goes dead until the user alt-tabs away and back — an upstream bug reported since 2019 and still open. The canonical issue is [electron#31917](https://github.com/electron/electron/issues/31917) (the maintainers consolidated the duplicates into it in 2026-08 — [#41603](https://github.com/electron/electron/issues/41603) and [#19977](https://github.com/electron/electron/issues/19977) are closed as dupes); [#40212](https://github.com/electron/electron/issues/40212) is the formally confirmed variant. A candidate fix, [electron#50770](https://github.com/electron/electron/pull/50770), is open but unmerged and untested on Windows. Reproducible on the pinned Electron 40 / Windows 11, not on macOS. Whether or not that PR lands, never calling the native dialog is the only fix that does not depend on the user's Electron version. The guards' `beforeunload` layer is unchanged: in **web builds** it triggers the browser's own leave-page prompt on tab close/refresh (a browser dialog, not `window.confirm()`, and not affected by the Electron bug). In the **Electron build** it does nothing — Electron never shows a `beforeunload` prompt, and `electron/main.js` answers `will-prevent-unload` with `event.preventDefault()`, so the window closes without asking and unsaved changes are discarded. Whether desktop should warn on close is an open product question; today it deliberately does not.
 
 ## Navigation & Protection Hooks
 
@@ -128,14 +136,14 @@ function PageEditor() {
 
 - Integrates with `saveStore` to check for unsaved changes
 - Uses React Router's `useBlocker` to intercept navigation
-- Automatically shows confirmation dialogs when blocking navigation
+- Awaits the app-level `useConfirm()` dialog when blocking navigation; on confirm it calls `saveStore.reset()` (which also discards the theme draft) and proceeds
+- Blocks a change of pathname **or** search, so switching pages in the editor (`?pageId=`) or changing `?language=` is guarded too
+- Unmounting mid-prompt (a project switch tearing down the editor) cancels the open dialog
 - Uses the `beforeunload` event for browser navigation protection
 
 #### Integration Points
 
-- **Page Editor**: Primary use case for protecting page editing workflows
-- **Layout Component**: Integrates with sidebar navigation when on editor routes
-- **Editor Top Bar**: Used for page switching within the editor
+Called only from `PageEditor.jsx`; because `useBlocker` intercepts every router navigation, that one call also covers the sidebar and the top bar's page switcher and language menu.
 
 This hook is purpose-built for the page editor's `saveStore`. Form pages (Projects, Pages, Menus, Settings) use the form-state variant below instead.
 
@@ -178,8 +186,8 @@ function ProjectForm() {
 
 #### Key Features
 
-- **Layer 1 — Browser protection**: `beforeunload` handler blocks tab close / refresh / external URL changes while dirty (and `skipRef` is not set).
-- **Layer 2 — Internal protection**: `useBlocker` blocks React Router navigation while dirty and the location is actually changing; shows a `window.confirm` dialog and proceeds or resets accordingly.
+- **Layer 1 — Browser protection**: `beforeunload` handler blocks tab close / refresh / external URL changes while dirty (and `skipRef` is not set). **Web builds only** — Electron overrides it (see `useConfirm` above), so desktop closes without a prompt.
+- **Layer 2 — Internal protection**: `useBlocker` blocks React Router navigation while dirty and the location is actually changing; awaits the app-level `useConfirm()` dialog and proceeds or resets accordingly. Because the prompt is async, the blocker simply stays `"blocked"` until the user answers.
 - **Bypass**: `skipRef.current === true` short-circuits both layers.
 
 Most pages consume this indirectly through `useGuardedFormPage` rather than calling it directly.
@@ -208,6 +216,22 @@ Stay-in-place pages (`Settings.jsx`, App Settings) that don't navigate after sav
 - `CollectionItemAdd.jsx`, `CollectionItemEdit.jsx`
 - `Settings.jsx`
 
+### `useListLanguage` (`packages/editor-ui/src/hooks/useListLanguage.js`)
+
+The language tab of a content list (pages, collection items, menus), kept in the URL as `?language=` so that coming back to the list lands on the tab the user left: the browser's back button returns to a URL that names it, and every back, Cancel and after-create link from a page, item or menu names that content's language (`pagesListHref`, `itemsListHref`, `menusListHref` in `lib/contentRoutes.js`). Returns `[language, setLanguage]`.
+
+- A URL with no language shows the optional `fallback`, else the default language. Choosing a tab always writes it, the default included, so "no language" means "not said".
+- A code the site does not have (a removed language, a hand-typed URL) is dropped from the URL. A fallback tab is written into it. Both replace the history entry, as does choosing a tab, so back leaves the list rather than stepping through its tabs.
+- A single-language site ignores the parameter.
+
+### `useTranslationVersions` (`packages/editor-ui/src/hooks/useTranslationVersions.js`)
+
+Groups a list holding every language's pages or items into translation groups (by `translationGroupIdOf`) and creates a missing version. Takes `{ entries, defaultLanguage, createVersion, onCreated, keys? }` and returns `{ siblingsOf(entry), createIn(entry, targetLanguage), pendingKey }`: `siblingsOf` maps language → entry for the entry's group, `createIn` calls `createVersion`, toasts success or the error, then calls `onCreated` (usually a navigation), and `pendingKey` (`<id>:<language>`) marks the creation in progress. A created version is patched into the groups until `entries` itself carries it, so a navigation cancelled by a guard cannot offer the same version again. Feeds `LanguageMenu` in the page editor's top bar and the collection item form.
+
+### `useStaleActiveProjectDetection` (`packages/editor-ui/src/hooks/useStaleActiveProjectDetection.js`)
+
+OSS single-tenant only, mounted by the shell in the editor scope. On every focus/visibility regain it asks the server for the active project and sets or clears the "project" warning in `staleProjectStore` (rendered by `StaleProjectCurtain`), so re-activating this project elsewhere and returning dismisses the curtain. No polling. A removed-language warning (raised by `saveStore`, shown by `StaleLanguageBanner`) is left alone by the probe, and comes back when a project warning covering it clears. `isActiveProjectStale` is exported for tests.
+
 ## Selection & Shortcut Hooks
 
 ### `usePageSelection` (`packages/editor-ui/src/hooks/usePageSelection.js`)
@@ -225,6 +249,8 @@ Provides selection state management for list interfaces that support bulk operat
 - `selectedPages` (array): Currently selected page IDs
 - `togglePageSelection(pageId)` (function): Toggles selection state for a specific page
 - `selectAllPages(pageIds)` (function): Selects all pages from the provided ID array
+- `deselectPage(pageId)` (function): Removes one id if present, never adds. Called after a row-menu delete so a deleted page cannot linger in the selection
+- `deselectPages(pageIds)` (function): Removes the given ids. A bulk delete prunes only the ids it submitted, so rows selected while the request ran stay selected
 - `clearSelection()` (function): Clears all selected pages
 - `isAllSelected(pages)` (function): Returns true if all provided pages are selected
 
@@ -232,6 +258,8 @@ Provides selection state management for list interfaces that support bulk operat
 
 - **Pages Interface**: Used in `Pages.jsx` for bulk page operations
 - **Bulk Operations**: Powers bulk deletion and other multi-page actions
+
+`CollectionItems.jsx` keeps its own slug selection with the same pruning rules (functional filters over the deleted slugs).
 
 ### `useDeleteKeyShortcut` (`packages/editor-ui/src/hooks/useDeleteKeyShortcut.js`)
 
@@ -280,9 +308,9 @@ Used in `PageForm.jsx` and `CollectionItemForm.jsx`.
 The media library is built from four cooperating hooks. They are documented in full in [Media Library](core-media.md); the one-line roles:
 
 - `useMediaState` (`packages/editor-ui/src/hooks/useMediaState.js`) — core state, data loading, view-mode persistence, and search filtering for the media library.
-- `useMediaUpload` (`packages/editor-ui/src/hooks/useMediaUpload.js`) — file upload operations with per-file XHR progress and toast feedback.
+- `useMediaUpload` (`packages/editor-ui/src/hooks/useMediaUpload.js`) — file upload operations with per-file XHR progress and toast feedback; uploaded files go to the top of the list (and the shared media cache), matching the library's newest-first order.
 - `useMediaSelection` (`packages/editor-ui/src/hooks/useMediaSelection.js`) — file selection and deletion workflows, with usage-protection validation via `useConfirmationModal`.
-- `useMediaMetadata` (`packages/editor-ui/src/hooks/useMediaMetadata.js`) — metadata-edit drawer state and saving (alt text, title) plus image viewing.
+- `useMediaMetadata` (`packages/editor-ui/src/hooks/useMediaMetadata.js`) — metadata-edit drawer state and saving (alt text, title, caption; these three are per language, sent with `?language=`) plus image viewing.
 
 See [Media Library](core-media.md) for the full architecture, API, and usage-protection rules.
 
@@ -335,6 +363,8 @@ Loads the active project's collection schemas. Per-project module-level cache (1
 
 Loads the items of a single collection type. Unlike schemas, item lists are **not** cached across navigations — list pages mutate them frequently, so each mount fetches fresh.
 
+Only the newest load updates `items`, `loading` and `error`: a load still running when the type, project or language set changes (or the screen unmounts, or `refetch` starts another) is discarded. `refetch` keeps one identity and always loads for the current type, project and languages, so a caller holding it from an earlier render (an edit that finishes after the user moved on) cannot load what that render saw. After the hook unmounts, `refetch` does nothing. `CollectionItems` also renders one screen per collection (keyed by type), so a pending refresh or an open delete confirmation from one collection cannot act on the next; an edit already sent still finishes on the collection it was made in. The language tab being viewed lives in the URL (`useListLanguage`), and the last one shown is held above that key, so it carries over between collections even though the sidebar's collection links name no language.
+
 **Parameters:** `type` (collection type slug), `params` (optional query params: sort, invalid, limit, offset).
 
 **Returns:** `{ items, loading, error, refetch }`.
@@ -343,17 +373,17 @@ Loads the items of a single collection type. Unlike schemas, item lists are **no
 
 ### `useLinkTargets` (`packages/editor-ui/src/hooks/useLinkTargets.js`)
 
-Loads the link-target options for the active project — all pages plus the items of every `hasItemPages` collection — as a flat, grouped option list the shared `<Combobox>` renders (a "Pages" group plus one group per collection).
+Loads the link-target options for the active project — all pages plus the items of every `hasItemPages` collection, in **every** language of the site — as a flat, grouped option list the shared `<Combobox>` renders (per language, a "Pages" group then one group per collection, each A–Z). Every option carries its `language`, which the picker uses for its language filter and badges.
 
 #### Purpose
 
-Powers the link picker in `LinkInput.jsx` and the menu editor (`MenuEditor`). Each option carries a stable `value` that is a **uuid**, so a stored link reference survives renames; the rendered `href` is re-derived at render time from the uuid, so a briefly-stale picker label can never produce a wrong link. Collection-item options additionally carry `collectionType`, `slugPrefix`, and `slug`.
+Powers the link picker in `LinkInput.jsx`, the richtext internal-link picker (`RichTextInput.jsx`) and the menu editor (`MenuEditor`). Each option carries a stable `value` that is a **uuid**, so a stored link reference survives renames; the rendered `href` is re-derived at render time from the uuid, so a briefly-stale picker label can never produce a wrong link. Collection-item options additionally carry `collectionType`, `slugPrefix`, and `slug`.
 
 #### API Reference
 
 **Returns:**
 
-- `options` (array): Grouped option objects. Page options have `{ value: uuid, label, slug, isPage, group: "Pages" }`; collection-item options have `{ value: uuid, label, isCollectionItem, collectionType, slugPrefix, slug, group }`.
+- `options` (array): Grouped option objects. Page options have `{ value: uuid, label, slug, isPage, group: "Pages", language }`; collection-item options have `{ value: uuid, label, isCollectionItem, collectionType, slugPrefix, slug, group, language }`.
 - `loading` (boolean): True while the first load is in flight.
 
 **Named export:**
@@ -362,14 +392,15 @@ Powers the link picker in `LinkInput.jsx` and the menu editor (`MenuEditor`). Ea
 
 #### Caching
 
-- Per-project module-level cache (1-minute TTL) shared across all `LinkInput` instances, so the many link inputs a page can host don't each refetch.
+- Module-level cache (1-minute TTL) keyed by project **and** its language list (adding, removing or reordering languages changes the answer under the same project id), shared across all pickers, so the many link inputs a page can host don't each refetch.
 - Single in-flight promise per project deduplicates concurrent loads.
+- A load that was in flight when the cache was invalidated still answers the picker that started it, but doesn't refill the cache, so the next picker loads afresh.
 
 #### Used In
 
 - `LinkInput.jsx` (settings link picker)
 - `MenuEditor/index.jsx` (menu link picker)
-- Cache invalidated from `CollectionItemAdd.jsx`, `CollectionItemEdit.jsx`, and `CollectionItems.jsx` after item writes.
+- Cache invalidated from `PagesAdd.jsx`, `PagesEdit.jsx`, `Pages.jsx`, `CollectionItemAdd.jsx`, `CollectionItemEdit.jsx`, and `CollectionItems.jsx` after writes.
 
 ## Theme Locale Hook
 
@@ -395,13 +426,14 @@ The pure resolver `resolveThemeKey(str, locale)` is exported separately so it ca
 - 5-minute staleness window before re-fetching.
 - **Stale-while-revalidate**: when the cache expires, stale data keeps being served while the re-fetch runs in the background, preventing a flash of raw keys between expiry and fetch completion.
 - Single in-flight promise (tracked at module level) deduplicates concurrent fetches across instances.
+- **Refresh after a theme update**: `invalidateThemeLocale(projectId)` marks every language of that project stale and refetches wherever the hook is mounted, keeping the old labels until the new ones arrive; a per-project generation stops a fetch begun earlier from storing its older answer, and a failed reply never replaces cached labels. `projectManager.applyThemeUpdate` calls it after a successful update; an embedding app that applies updates through its own request should call it too.
 - **Developer-mode invalidation**: on first use the hook reads `/api/settings` once; if `developer.enabled` is true the cache is always treated as stale (`isStale()` returns true), so theme/locale edits show up without waiting out the TTL.
 - Backend endpoint: `GET /api/themes/project/:projectId/locales/:lang` (served by `themeController.js`).
 - Locale source: the project's copied `data/projects/<folder>/locales/`, merged server-side over the core widget locales in `packages/core/src/widgets/locales/` (the `themeController.js` `loadMergedLocale` / `CORE_WIDGET_LOCALES_DIR` path); requests for a missing language fall back to English.
 
 #### Used In
 
-~10 editor components including `SettingsPanel`, `ThemeSelector`, `PreviewPanel`, `BlockList`, `WidgetList`, `WidgetSelector`, `BlockSelector`, `WidgetItem`, `BlockItem`, and `EditorTopBar`.
+About a dozen components, including the page editor's `SettingsPanel`, `ThemeSelector`, `ThemeSettingsSection`, `PreviewPanel`, `WidgetSelector`, `BlockSelector`, `WidgetItem`, `FixedWidgetItem` and `BlockItem`, plus `SettingsRenderer`, the Theme Settings `SettingsPanel` and `CollectionItemForm`.
 
 ---
 

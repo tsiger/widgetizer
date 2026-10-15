@@ -201,7 +201,7 @@
             {% assign intro_delay = 0 %}
           {% endif %}
           {% if widget.settings.signature_image != blank and widget.settings.signature_image != 'placeholder' %}
-            {% image src: widget.settings.signature_image, size: 'small', class: 'team-highlight-signature reveal reveal-up', style: '--reveal-delay: ' | append: intro_delay %}
+            {% image src: widget.settings.signature_image, size: 'small', class: 'team-highlight-signature reveal reveal-up' %}
           {% endif %}
         </div>
       {% endif %}

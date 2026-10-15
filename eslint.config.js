@@ -9,13 +9,18 @@ import requireScopeArg from "./eslint-rules/require-scope-arg.js";
 const local = { rules: { "require-scope-arg": requireScopeArg } };
 
 export default [
-  { ignores: ["dist", "dist-electron"] },
+  // data/ is runtime state (installed theme copies, projects), not source. A theme
+  // update's deleted/ folder holds plain-text markers named after the removed
+  // files, so a removed .js leaves a marker ESLint cannot parse.
+  { ignores: ["dist", "dist-electron", "data/**", "themes/*/updates/*/deleted/**"] },
   // Node packages: the Express backend (@widgetizer/builder-server) and the
   // OSS local adapters (@widgetizer/adapters-local).
   {
     files: [
       "packages/builder-server/src/**/*.js",
       "packages/adapters-local/src/**/*.js",
+      "scripts/validate-theme.js",
+      "scripts/build-theme-skill-contract.js",
     ],
     languageOptions: {
       globals: globals.node,
@@ -61,6 +66,7 @@ export default [
         ...globals.browser,
         ...globals.node,
         __APP_VERSION__: "readonly",
+        __APP_NAME__: "readonly",
       },
       parserOptions: {
         ecmaVersion: "latest",
@@ -110,6 +116,7 @@ export default [
       globals: {
         ...globals.browser,
         __APP_VERSION__: "readonly",
+        __APP_NAME__: "readonly",
       },
       parserOptions: {
         ecmaVersion: "latest",

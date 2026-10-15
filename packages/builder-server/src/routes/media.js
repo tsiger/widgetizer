@@ -1,6 +1,6 @@
 import express from "express";
 import { param, body } from "express-validator";
-import { stripHtmlTags } from "../services/sanitizationService.js";
+import { stripHtmlToText } from "../services/sanitizationService.js";
 import { validateRequest } from "../middleware/validateRequest.js";
 import {
   getProjectMedia,
@@ -49,19 +49,20 @@ router.delete("/:fileId", [param("fileId").notEmpty()], validateRequest, deleteP
 // the project id in the URL and read req.params.projectId directly. The hosted
 // shell serves media via the cloud asset adapter's getUrl instead. ---
 
+// `null` is not a value to clean — it is the request saying "inherit the default
+// language". Trimming it would turn it into a deliberate blank, which is a
+// different thing on disk and to a screen reader. Exported so that rule can be
+// tested on its own; the controller never sees what this strips.
+export const metadataValidators = [
+  param("projectId").notEmpty(),
+  param("fileId").notEmpty(),
+  body("alt").optional({ nullable: true }).trim().customSanitizer(stripHtmlToText),
+  body("title").optional({ nullable: true }).trim().customSanitizer(stripHtmlToText),
+  body("caption").optional({ nullable: true }).trim().customSanitizer(stripHtmlToText),
+];
+
 // Update media metadata
-router.put(
-  "/projects/:projectId/media/:fileId/metadata",
-  [
-    param("projectId").notEmpty(),
-    param("fileId").notEmpty(),
-    body("alt").optional().trim().customSanitizer(stripHtmlTags),
-    body("title").optional().trim().customSanitizer(stripHtmlTags),
-    body("caption").optional().trim().customSanitizer(stripHtmlTags),
-  ],
-  validateRequest,
-  updateMediaMetadata,
-);
+router.put("/projects/:projectId/media/:fileId/metadata", metadataValidators, validateRequest, updateMediaMetadata);
 
 // Serve a media file by ID
 router.get(

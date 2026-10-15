@@ -1,0 +1,303 @@
+{
+  "type": "contact-details",
+  "displayName": "tTheme:contact_details.name",
+  "aliases": [
+    "contact",
+    "footer",
+    "info",
+    "details",
+    "address"
+  ],
+  "maxBlocks": 4,
+  "settings": [
+    {
+      "type": "header",
+      "id": "content_header",
+      "label": "tTheme:global.widgets.settings.content_header.label"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "tTheme:global.widgets.settings.eyebrow.label"
+    },
+    {
+      "type": "checkbox",
+      "id": "eyebrow_uppercase",
+      "label": "tTheme:global.widgets.settings.eyebrow_uppercase.label",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "tTheme:global.widgets.settings.title.label"
+    },
+    {
+      "type": "text",
+      "id": "description",
+      "label": "tTheme:global.widgets.settings.description.label"
+    },
+    {
+      "type": "select",
+      "id": "heading_alignment",
+      "label": "tTheme:global.widgets.settings.alignment.label",
+      "default": "center",
+      "options": [
+        {
+          "value": "start",
+          "label": "tTheme:global.widgets.settings.alignment.options.start"
+        },
+        {
+          "value": "center",
+          "label": "tTheme:global.widgets.settings.alignment.options.center"
+        }
+      ]
+    },
+    {
+      "type": "header",
+      "id": "display_header",
+      "label": "tTheme:global.widgets.settings.display_header.label"
+    },
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "tTheme:global.widgets.settings.layout.label",
+      "default": "first-featured",
+      "options": [
+        {
+          "value": "first-featured",
+          "label": "tTheme:contact_details.settings.layout.options.first_featured"
+        },
+        {
+          "value": "last-featured",
+          "label": "tTheme:contact_details.settings.layout.options.last_featured"
+        },
+        {
+          "value": "equal",
+          "label": "tTheme:contact_details.settings.layout.options.equal"
+        }
+      ]
+    },
+    {
+      "type": "header",
+      "id": "appearance_header",
+      "label": "tTheme:global.widgets.settings.appearance_header.label"
+    },
+    {
+      "type": "select",
+      "id": "color_scheme",
+      "label": "tTheme:global.widgets.settings.color_scheme.label",
+      "default": "standard-primary",
+      "options": [
+        {
+          "value": "standard-primary",
+          "label": "tTheme:global.widgets.settings.color_scheme.options.standard_primary"
+        },
+        {
+          "value": "standard-secondary",
+          "label": "tTheme:global.widgets.settings.color_scheme.options.standard_secondary"
+        },
+        {
+          "value": "highlight-primary",
+          "label": "tTheme:global.widgets.settings.color_scheme.options.highlight_primary"
+        },
+        {
+          "value": "highlight-secondary",
+          "label": "tTheme:global.widgets.settings.color_scheme.options.highlight_secondary"
+        }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "top_spacing",
+      "label": "tTheme:global.widgets.settings.top_spacing.label",
+      "default": "auto",
+      "options": [
+        {
+          "value": "auto",
+          "label": "tTheme:global.widgets.settings.top_spacing.options.auto"
+        },
+        {
+          "value": "small",
+          "label": "tTheme:global.widgets.settings.top_spacing.options.small"
+        },
+        {
+          "value": "none",
+          "label": "tTheme:global.widgets.settings.top_spacing.options.none"
+        }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "bottom_spacing",
+      "label": "tTheme:global.widgets.settings.bottom_spacing.label",
+      "default": "auto",
+      "options": [
+        {
+          "value": "auto",
+          "label": "tTheme:global.widgets.settings.bottom_spacing.options.auto"
+        },
+        {
+          "value": "small",
+          "label": "tTheme:global.widgets.settings.bottom_spacing.options.small"
+        },
+        {
+          "value": "none",
+          "label": "tTheme:global.widgets.settings.bottom_spacing.options.none"
+        }
+      ]
+    }
+  ],
+  "blocks": [
+    {
+      "type": "info",
+      "displayName": "tTheme:global.widgets.blocks.info.name",
+      "settings": [
+        {
+          "type": "header",
+          "id": "content_header",
+          "label": "tTheme:global.widgets.settings.content_header.label"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "tTheme:global.widgets.blocks.info.settings.title.label",
+          "default": "Saffron"
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "tTheme:global.widgets.blocks.info.settings.text.label",
+          "default": "<p>A neighborhood restaurant serving seasonal dishes made with locally sourced ingredients.</p>"
+        }
+      ]
+    },
+    {
+      "type": "text_block",
+      "displayName": "tTheme:global.widgets.blocks.text_block.name",
+      "settings": [
+        {
+          "type": "header",
+          "id": "content_header",
+          "label": "tTheme:global.widgets.settings.content_header.label"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "tTheme:global.widgets.blocks.text_block.settings.title.label",
+          "default": "Hours"
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "tTheme:global.widgets.blocks.text_block.settings.text.label",
+          "default": "<p>Mon – Fri: 11am – 10pm</p><p>Sat – Sun: 10am – 11pm</p>"
+        }
+      ]
+    },
+    {
+      "type": "menu_block",
+      "displayName": "tTheme:global.widgets.blocks.menu_block.name",
+      "settings": [
+        {
+          "type": "header",
+          "id": "content_header",
+          "label": "tTheme:global.widgets.settings.content_header.label"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "tTheme:global.widgets.blocks.menu_block.settings.title.label",
+          "default": "Links"
+        },
+        {
+          "type": "menu",
+          "id": "menu",
+          "label": "tTheme:global.widgets.blocks.menu_block.settings.menu.label",
+          "description": "tTheme:global.widgets.blocks.menu_block.settings.menu.description",
+          "default": "footer-menu"
+        }
+      ]
+    },
+    {
+      "type": "social_block",
+      "displayName": "tTheme:global.widgets.blocks.social_block.name",
+      "settings": [
+        {
+          "type": "header",
+          "id": "content_header",
+          "label": "tTheme:global.widgets.settings.content_header.label"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "tTheme:global.widgets.blocks.social_block.settings.title.label",
+          "default": "Follow Us"
+        }
+      ]
+    },
+    {
+      "type": "business_details",
+      "displayName": "tTheme:global.widgets.blocks.business_details.name",
+      "settings": [
+        {
+          "type": "header",
+          "id": "content_header",
+          "label": "tTheme:global.widgets.settings.content_header.label"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "tTheme:global.widgets.blocks.business_details.settings.title.label",
+          "description": "tTheme:global.widgets.blocks.business_details.settings.title.description",
+          "default": "Visit Us"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_address",
+          "label": "tTheme:global.widgets.blocks.business_details.settings.show_address.label",
+          "default": true
+        },
+        {
+          "type": "checkbox",
+          "id": "show_contact",
+          "label": "tTheme:global.widgets.blocks.business_details.settings.show_contact.label",
+          "default": true
+        },
+        {
+          "type": "checkbox",
+          "id": "show_hours",
+          "label": "tTheme:global.widgets.blocks.business_details.settings.show_hours.label",
+          "default": true
+        }
+      ]
+    }
+  ],
+  "defaultBlocks": [
+    {
+      "type": "info",
+      "settings": {
+        "title": "Saffron",
+        "text": "<p>A neighborhood restaurant serving seasonal dishes made with locally sourced ingredients.</p>"
+      }
+    },
+    {
+      "type": "text_block",
+      "settings": {
+        "title": "Hours",
+        "text": "<p>Mon – Fri: 11am – 10pm</p><p>Sat – Sun: 10am – 11pm</p>"
+      }
+    },
+    {
+      "type": "menu_block",
+      "settings": {
+        "title": "Links"
+      }
+    },
+    {
+      "type": "social_block",
+      "settings": {
+        "title": "Follow Us"
+      }
+    }
+  ]
+}

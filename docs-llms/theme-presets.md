@@ -26,8 +26,8 @@ For any preset, resolution falls back to the theme root when the preset omits a 
 - **Menus**: `presets/<id>/menus/` → root `menus/`
 - **Settings**: `presets/<id>/preset.json` overrides → `theme.json` defaults
 - **Collections**: `presets/<id>/collections/` (item data only — schemas stay theme-only) → none
-- **Media**: `presets/<id>/media/` (starter image binaries + `manifest.json`) → none
-- **Screenshot**: `presets/<id>/screenshot.png` → root `screenshot.png`
+- **Media**: `presets/<id>/media/` → `preset-media/<id>/` in the app's seed theme → `preset-media/<id>/` in the runtime theme (starter image binaries + `manifest.json`; bundled Arch uses the seed `preset-media/` pool) → none
+- **Screenshot**: `presets/<id>/screenshot.png` → root `screenshot.png` (a preset's is 1024x1024 and shown square; the theme's root one is 1280x720)
 
 Themes with no `presets/` directory behave exactly as before — presets are fully opt-in, and the `preset` param defaults to none.
 
@@ -40,6 +40,6 @@ Themes with no `presets/` directory behave exactly as before — presets are ful
 
 ## Lifecycle notes
 
-- **Creation-time only**: presets are consumed once, at project creation. Afterward the project is independent — preset edits don't propagate. The `copyThemeToProject` flow excludes `presets/` (alongside `updates/` and `latest/`) so preset data never lands in a project.
+- **Creation-time only**: presets are consumed once, at project creation. Afterward the project is independent — preset edits don't propagate. The `copyThemeToProject` flow excludes `presets/` and `preset-media/` (alongside `updates/` and `latest/`) so preset data never lands in a project.
 - **Screenshots**: served from the themes directory via `/themes/*`, so `presets/<id>/screenshot.png` resolves automatically.
 - **Theme updates**: handled by the version system, which refreshes shared infrastructure and merges `theme.json` without clobbering project content — see [theme-updates.md](theme-updates.md).

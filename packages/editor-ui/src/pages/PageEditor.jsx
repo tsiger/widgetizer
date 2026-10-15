@@ -13,7 +13,10 @@ import usePageStore from "../stores/pageStore";
 import useThemeStore from "../stores/themeStore";
 import useProjectStore from "../stores/projectStore";
 import useWidgetStore from "../stores/widgetStore";
+import useAutoSave from "../stores/saveStore";
+import useToastStore from "../stores/toastStore";
 import useNavigationGuard from "../hooks/useNavigationGuard";
+import { EditingLanguageProvider } from "../lib/editingLanguage.jsx";
 import useDeleteKeyShortcut from "../hooks/useDeleteKeyShortcut";
 
 export default function PageEditor() {
@@ -48,11 +51,56 @@ export default function PageEditor() {
   // remounts this component on project switch, so no manual reset is needed.
   useEffect(() => {
     const pageId = searchParams.get("pageId");
-    usePageStore.getState().loadPage(pageId);
+    // A slug is unique per language, so which language is being edited travels
+    // in the URL. Saving already targets it: the loaded page carries its own
+    // language and every save sends the page back.
+    // A page load is a new editing session. If the previous one ended with its
+    // language removed, saving was suspended on purpose and has to be re-enabled
+    // here — a suspension that outlived its session would silently stop saving a
+    // page that is perfectly fine.
+    useAutoSave.getState().resumeSaving();
+    usePageStore.getState().loadPage(pageId, searchParams.get("language") || undefined);
     if (activeProject?.id) {
-      useWidgetStore.getState().loadSchemas();
+      useWidgetStore.getState().loadSchemas(searchParams.get("language") || "");
     }
   }, [searchParams, activeProject?.id]);
+
+  // A save can move a collection's listing anchor onto this page, clearing it on
+  // another. The store records that as data; announcing it belongs here, where
+  // the i18n provider is — and where a failure cannot turn a completed save into
+  // a reported failure.
+  const listingAnchorMoved = useAutoSave((state) => state.listingAnchorMoved);
+  useEffect(() => {
+    if (!listingAnchorMoved?.pages?.length) return;
+    useToastStore
+      .getState()
+      .showToast(t("pageEditor.listingAnchor.moved", { pages: listingAnchorMoved.pages.join(", ") }), "info");
+    useAutoSave.getState().clearListingAnchorMoved();
+  }, [listingAnchorMoved, t]);
+
+  // The page saved, but the server could not update which images it records as
+  // used. Deliberately a warning and not an error: the work IS saved, and the
+  // only consequence is that the media library may call a file unused until a
+  // refresh — deletion checks the content itself, so nothing is at risk.
+  const mediaUsageStale = useAutoSave((state) => state.mediaUsageStale);
+  useEffect(() => {
+    if (!mediaUsageStale) return;
+    useToastStore.getState().showToast(t("pageEditor.mediaUsage.stale"), "warning");
+    useAutoSave.getState().clearMediaUsageStale();
+  }, [mediaUsageStale, t]);
+
+  // Theme settings were changed elsewhere (another tab, or Site settings) since
+  // this editor loaded them. The edits were kept on top of the current settings
+  // and autosave sends them; this only says so.
+  const themeConflict = useAutoSave((state) => state.themeConflict);
+  useEffect(() => {
+    if (!themeConflict) return;
+    useToastStore.getState().showToast(t("pageEditor.themeConflict"), "info");
+    // A setting a theme update removed cannot take the edit that was made to it.
+    if (themeConflict.editsDropped) useToastStore.getState().showToast(t("themeSettings.toasts.settingRemoved"), "warning");
+    useAutoSave.getState().clearThemeConflict();
+    useThemeStore.getState().clearConflict?.();
+  }, [themeConflict, t]);
 
   // Handle block selection (cross-component coordination)
   const handleBlockSelect = (blockId) => {
@@ -98,8 +146,9 @@ export default function PageEditor() {
   }
 
   return (
+    <EditingLanguageProvider language={page.language}>
     <div className="flex flex-col h-full overflow-hidden bg-slate-900">
-      <EditorTopBar pageName={page.name} pageId={page.id} onPreviewModeChange={setPreviewMode}>
+      <EditorTopBar pageName={page.name} pageId={page.id} pageLanguage={page.language} onPreviewModeChange={setPreviewMode}>
         <ThemeSelector />
       </EditorTopBar>
 
@@ -146,5 +195,6 @@ export default function PageEditor() {
         />
       </div>
     </div>
+    </EditingLanguageProvider>
   );
 }
