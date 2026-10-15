@@ -1,5 +1,14 @@
 const isWinUnsigned = process.env.WIN_UNSIGNED === "1";
 
+// Built by scripts/build-relay.mjs. ${os}/${arch} are electron-builder macros: the mac
+// build packs arm64 and x64 in one run, so each needs its own runtime. Not shipped on
+// Linux (no MCP support yet).
+const relayResources = (nodeBinary) => [
+  { from: "build/relay/widgetizer-mcp.mjs", to: "relay/widgetizer-mcp.mjs" },
+  { from: "build/relay-runtime/${os}-${arch}/" + nodeBinary, to: "relay/" + nodeBinary },
+  { from: "build/mcpb/widgetizer.mcpb", to: "relay/widgetizer.mcpb" },
+];
+
 export default {
   appId: "com.widgetizer.app",
   productName: "Widgetizer",
@@ -10,10 +19,13 @@ export default {
   },
   files: [
     "dist",
-    // OSS shell server assembly — the only backend file under app/ (the rest of
-    // app/ is frontend source already bundled into dist/ by Vite). It composes
-    // the @widgetizer/* backend packages, which are bundled via dependencies.
+    // OSS shell server assembly and its helpers in app/server/ — the only backend
+    // files under app/ (the rest of app/ is frontend source already bundled into
+    // dist/ by Vite). They compose the @widgetizer/* backend packages, which are
+    // bundled via dependencies.
     "app/server-common.js",
+    "app/server/**",
+    "!app/server/__tests__/**",
     // Core assets + preview-iframe runtime modules are supplied by
     // @widgetizer/core and ride along via that dependency.
     "themes",
@@ -58,6 +70,7 @@ export default {
     gatekeeperAssess: false,
     entitlements: "electron/entitlements.mac.plist",
     entitlementsInherit: "electron/entitlements.mac.plist",
+    extraResources: relayResources("node"),
   },
   afterSign: "electron/notarize.cjs",
   linux: {
@@ -82,6 +95,7 @@ export default {
         arch: ["x64"],
       },
     ],
+    extraResources: relayResources("node.exe"),
     ...(isWinUnsigned
       ? {}
       : {

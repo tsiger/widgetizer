@@ -1,0 +1,41 @@
+{
+  "manifest_version": "0.3",
+  "name": "widgetizer",
+  "display_name": "Widgetizer",
+  "version": "0.0.0",
+  "description": "Build and edit your Widgetizer websites. Needs the Widgetizer app running with AI Assistant access turned on.",
+  "author": {
+    "name": "Widgetizer",
+    "url": "https://widgetizer.org"
+  },
+  "homepage": "https://widgetizer.org",
+  "server": {
+    "type": "node",
+    "entry_point": "server/widgetizer-mcp.mjs",
+    "mcp_config": {
+      "command": "node",
+      "args": ["${__dirname}/server/widgetizer-mcp.mjs", "--data-root", "${user_config.data_root}"]
+    }
+  },
+  "tools": [
+    {
+      "name": "widgetizer_connect",
+      "description": "Checks the connection to the Widgetizer app."
+    }
+  ],
+  "tools_generated": true,
+  "compatibility": {
+    "platforms": ["darwin", "win32"],
+    "runtimes": {
+      "node": ">=20.19.5"
+    }
+  },
+  "user_config": {
+    "data_root": {
+      "type": "directory",
+      "title": "Data Folder",
+      "description": "Only needed when Widgetizer keeps its data somewhere other than the usual place.",
+      "required": false
+    }
+  }
+}

@@ -6,7 +6,7 @@
  *   node scripts/build-electron.mjs --platform <mac|win|linux> [--unsigned] [--arch <x64|arm64>]
  *
  * Pipeline (runs sequentially; aborts on any failure):
- *   1. Vite build (`npm run build`)
+ *   1. Vite build (`npm run build`), then the MCP relay (mac/win only; scripts/build-relay.mjs)
  *   2. Platform prep
  *        mac: swap in per-arch Sharp binaries via electron/prepare-mac-sharp.cjs
  *        win: install win32 x64 optional deps without saving
@@ -99,8 +99,13 @@ function run(cmd, cmdArgs, extraEnv = {}) {
   }
 }
 
-// 1. Vite build
+// 1. Vite build, then the MCP relay that electron-builder copies into resources/relay/
 run("npm", ["run", "build"]);
+if (platform === "mac") {
+  run("node", ["scripts/build-relay.mjs", "--platform", "mac", "--arch", "arm64,x64"]);
+} else if (platform === "win") {
+  run("node", ["scripts/build-relay.mjs", "--platform", "win", "--arch", "x64"]);
+}
 
 // 2. Platform prep
 if (platform === "mac") {

@@ -12,7 +12,7 @@ export default [
   // data/ is runtime state (installed theme copies, projects), not source. A theme
   // update's deleted/ folder holds plain-text markers named after the removed
   // files, so a removed .js leaves a marker ESLint cannot parse.
-  { ignores: ["dist", "dist-electron", "data/**", "themes/*/updates/*/deleted/**"] },
+  { ignores: ["dist", "dist-electron", "build", "data/**", "themes/*/updates/*/deleted/**"] },
   // Node packages: the Express backend (@widgetizer/builder-server) and the
   // OSS local adapters (@widgetizer/adapters-local).
   {

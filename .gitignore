@@ -33,3 +33,5 @@ temp-webp/
 .obsidian/
 docs-entities/.trash/
 /themes/__*/
+/build/relay*/
+/build/mcpb/
