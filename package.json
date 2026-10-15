@@ -50,6 +50,7 @@
     "electron:build:win:unsigned": "node scripts/build-electron.mjs --platform win --unsigned",
     "electron:build:linux": "node scripts/build-electron.mjs --platform linux",
     "electron:build:linux:arm64": "node scripts/build-electron.mjs --platform linux --arch arm64",
+    "relay:build": "node scripts/build-relay.mjs",
     "electron:preflight": "npm run validate:all-locales && npm run lint:all"
   },
   "dependencies": {
@@ -64,6 +65,7 @@
     "@tiptap/react": "^3.18.0",
     "@tiptap/starter-kit": "^3.18.0",
     "@widgetizer/adapters-local": "*",
+    "@widgetizer/assistant": "*",
     "@widgetizer/builder-server": "*",
     "@widgetizer/core": "*",
     "@widgetizer/render-engine": "*",
