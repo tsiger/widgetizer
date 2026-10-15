@@ -12,6 +12,7 @@ export default mergeConfig(
       setupFiles: ["./vitest.setup.js"],
       include: [
         "app/src/**/*.test.{js,jsx}",
+        "app/server/**/*.test.js",
         // Electron shell carries a few pure, import-safe helpers (e.g. the preview
         // path guard) that are unit-tested here; main.js itself stays out (it imports
         // electron and isn't import-safe under Vitest).
@@ -23,6 +24,8 @@ export default mergeConfig(
         "packages/adapters-local/src/**/*.test.js",
         "packages/render-engine/src/**/*.test.js",
         "packages/editor-ui/src/**/*.test.{js,jsx}",
+        "packages/assistant/src/**/*.test.js",
+        "packages/mcp/src/**/*.test.js",
       ],
     },
   }),

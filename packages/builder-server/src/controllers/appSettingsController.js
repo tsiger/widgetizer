@@ -116,6 +116,16 @@ export async function updateAppSettings(req, res) {
       }
     }
 
+    if (newSettings.assistant !== undefined) {
+      const { assistant } = newSettings;
+      if (!assistant || typeof assistant !== "object" || Array.isArray(assistant)) {
+        return res.status(400).json({ error: "Invalid assistant settings: Expected an object." });
+      }
+      if (typeof assistant.enabled !== "boolean") {
+        return res.status(400).json({ error: "Invalid assistant access flag. Must be boolean." });
+      }
+    }
+
     saveSettings(newSettings);
     res.json({ message: "Settings updated successfully", settings: newSettings });
   } catch (error) {

@@ -659,7 +659,7 @@
     "toasts": {
       "loadError": "Failed to load menus",
       "deleteSuccess": "Menu \"{{name}}\" was deleted successfully",
-    "deleteLinksIncomplete": "Menu \"{{name}}\" was deleted, but some sections that used it couldn't be updated. Check the pages that showed it.",
+      "deleteLinksIncomplete": "Menu \"{{name}}\" was deleted, but some sections that used it couldn't be updated. Check the pages that showed it.",
       "deleteError": "Failed to delete menu",
       "duplicateSuccess": "Menu duplicated successfully",
       "duplicateError": "Failed to duplicate menu"
@@ -1015,6 +1015,11 @@
         "description": "Manage export settings and version control",
         "sectionTitle": "Export & Versioning Settings"
       },
+      "assistant": {
+        "label": "AI Assistant",
+        "description": "Let an AI assistant build and edit your sites",
+        "sectionTitle": "AI Assistant"
+      },
       "developer": {
         "label": "Developer Tools",
         "description": "Tools for theme and widget development",
@@ -1096,6 +1101,20 @@
       "maxImportSizeMB": {
         "label": "Max Project Import Size (MB)",
         "description": "Maximum file size for project import ZIP files. Increase this if you need to import large projects with many media files."
+      }
+    },
+    "assistant": {
+      "enabled": {
+        "label": "Allow AI Assistants",
+        "description": "Lets AI assistants such as Claude and Codex read and edit the site open in Widgetizer."
+      },
+      "status": {
+        "off": "Assistant access is off.",
+        "starting": "Turning on assistant access…",
+        "ready": "Ready. No assistant connected yet.",
+        "connected": "Connected: {{names}}",
+        "error": "Assistant access couldn't start: {{error}}",
+        "browserOnly": "In the web version, other programs on this computer can act as the editor. Turn this on only on a computer you trust."
       }
     },
     "developer": {

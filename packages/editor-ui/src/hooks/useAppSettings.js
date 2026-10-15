@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { getAppSettings, saveAppSettings } from "../queries/appSettingsManager.js";
 import useToastStore from "../stores/toastStore.js";
@@ -16,7 +16,8 @@ import settingsSchema from "../config/appSettings.schema.json";
  *   schema: Object,
  *   handleInputChange: (settingKey: string, value: any) => void,
  *   handleSave: () => Promise<void>,
- *   handleCancel: () => void
+ *   handleCancel: () => void,
+ *   syncSetting: (settingKey: string, value: any) => void
  * }} Application settings state and handlers
  * @property {Object|null} settings - Current settings object (merged with schema defaults)
  * @property {boolean} loading - Whether settings are being fetched
@@ -33,6 +34,23 @@ let settingsCache = null;
 let settingsCachePromise = null;
 let settingsCacheTime = 0;
 const CACHE_DURATION = 60000; // 1 minute cache
+
+// Only the leaves the user changed, so a form opened earlier can't overwrite a
+// setting changed elsewhere since (the server merges the patch into its copy).
+export function changedSettings(current, original) {
+  const patch = {};
+  for (const key of Object.keys(current ?? {})) {
+    const next = current[key];
+    const prev = original?.[key];
+    if (next && typeof next === "object" && !Array.isArray(next) && prev && typeof prev === "object" && !Array.isArray(prev)) {
+      const nested = changedSettings(next, prev);
+      if (Object.keys(nested).length > 0) patch[key] = nested;
+    } else if (JSON.stringify(next) !== JSON.stringify(prev)) {
+      patch[key] = next;
+    }
+  }
+  return patch;
+}
 
 export default function useAppSettings() {
   const [settings, setSettings] = useState(null);
@@ -160,9 +178,10 @@ export default function useAppSettings() {
     try {
       // Process settings according to schema types
       const processedSettings = processSettingsForSave(settings, settingsSchema.settings);
+      const baseline = processSettingsForSave(originalSettings, settingsSchema.settings);
 
-      const result = await saveAppSettings(processedSettings);
-      const savedSettings = result.settings || processedSettings;
+      const result = await saveAppSettings(changedSettings(processedSettings, baseline));
+      const savedSettings = mergeWithDefaults(result.settings || processedSettings, settingsSchema.settings);
 
       setSettings(savedSettings);
       setOriginalSettings(JSON.parse(JSON.stringify(savedSettings)));
@@ -184,6 +203,24 @@ export default function useAppSettings() {
       setIsSaving(false);
     }
   };
+
+  // Adopt a value committed elsewhere (another window, the server) into a field
+  // the user hasn't touched here, so the form keeps showing the real setting.
+  const syncSetting = useCallback((settingKey, value) => {
+    setOriginalSettings((prevOriginal) => {
+      if (!prevOriginal || getNestedValue(prevOriginal, settingKey) === value) return prevOriginal;
+      setSettings((prev) => {
+        if (!prev || getNestedValue(prev, settingKey) !== getNestedValue(prevOriginal, settingKey)) return prev;
+        const next = JSON.parse(JSON.stringify(prev));
+        setNestedValue(next, settingKey, value);
+        return next;
+      });
+      const nextOriginal = JSON.parse(JSON.stringify(prevOriginal));
+      setNestedValue(nextOriginal, settingKey, value);
+      if (settingsCache) setNestedValue(settingsCache, settingKey, value);
+      return nextOriginal;
+    });
+  }, []);
 
   const handleCancel = () => {
     setSettings(JSON.parse(JSON.stringify(originalSettings)));
@@ -219,5 +256,6 @@ export default function useAppSettings() {
     handleInputChange,
     handleSave,
     handleCancel,
+    syncSetting,
   };
 }

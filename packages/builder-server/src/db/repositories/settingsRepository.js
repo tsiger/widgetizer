@@ -49,6 +49,9 @@ const defaultSettings = {
   developer: {
     enabled: false,
   },
+  assistant: {
+    enabled: false,
+  },
 };
 
 const SETTINGS_KEY = "config:local";
@@ -77,10 +80,36 @@ export function getSettings() {
 export function saveSettings(settings) {
   const db = getDb();
   const key = SETTINGS_KEY;
+  const previous = getSettings();
   db.prepare(`
     INSERT INTO app_settings (key, value) VALUES (@key, @value)
     ON CONFLICT(key) DO UPDATE SET value = @value
   `).run({ key, value: JSON.stringify(settings) });
+  notifySettingsChanged(getSettings(), previous);
+}
+
+const settingsListeners = new Set();
+
+/**
+ * Subscribe to committed settings changes. Listeners run synchronously after the
+ * write with `(next, previous)`; a listener that throws is logged and never turns
+ * the already-committed save into a failure.
+ * @param {(next: object, previous: object) => void} listener
+ * @returns {() => void} Unsubscribe
+ */
+export function onSettingsChanged(listener) {
+  settingsListeners.add(listener);
+  return () => settingsListeners.delete(listener);
+}
+
+function notifySettingsChanged(next, previous) {
+  for (const listener of settingsListeners) {
+    try {
+      listener(next, previous);
+    } catch (error) {
+      console.error("Settings change listener failed:", error);
+    }
+  }
 }
 
 /**

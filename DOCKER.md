@@ -74,4 +74,8 @@ docker run -p 3001:3001 -v widgetizer-data:/data widgetizer
   it calls the API on whatever origin served it, with no hardcoded `localhost`.
 - **`HOST=0.0.0.0`**: the server normally binds to loopback; the container sets
   this env var so the published port is reachable from the host.
+- **`WIDGETIZER_ALLOWED_HOSTS`**: the server only answers requests addressed to
+  `localhost` (or `127.0.0.1`). To open it under another name, such as
+  `widgetizer.lan:3001`, list that host here (comma-separated). This keeps a
+  malicious website from reaching the app through DNS rebinding.
 - **`DATA_ROOT=/data`**: points the app's storage at the mounted volume.

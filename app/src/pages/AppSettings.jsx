@@ -2,9 +2,10 @@ import PageLayout from "@widgetizer/editor-ui/components/layout/PageLayout.jsx";
 import LoadingSpinner from "@widgetizer/editor-ui/components/ui/LoadingSpinner.jsx";
 import Button from "@widgetizer/editor-ui/components/ui/Button.jsx";
 import AppSettingsPanel from "../components/settings/AppSettingsPanel.jsx";
+import { AssistantStatus } from "@widgetizer/assistant/editor";
 import useAppSettings from "@widgetizer/editor-ui/hooks/useAppSettings";
 import useGuardedFormPage from "@widgetizer/editor-ui/hooks/useGuardedFormPage";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { getTheme } from "@widgetizer/editor-ui/queries/themeManager";
@@ -15,8 +16,9 @@ export default function AppSettings() {
   const navigate = useNavigate();
   const activeProject = useProjectStore((state) => state.activeProject);
   const [themeConfig, setThemeConfig] = useState(null);
-  const { settings, loading, isSaving, hasChanges, schema, handleInputChange, handleSave, handleCancel } =
+  const { settings, loading, isSaving, hasChanges, schema, handleInputChange, handleSave, handleCancel, syncSetting } =
     useAppSettings();
+  const syncAssistantAccess = useCallback((status) => syncSetting("assistant.enabled", status.enabled), [syncSetting]);
 
   const { getDirtyTitle } = useGuardedFormPage(hasChanges);
 
@@ -94,6 +96,7 @@ export default function AppSettings() {
             schema={schema}
             settings={settings}
             onChange={handleInputChange}
+            tabExtras={{ assistant: <AssistantStatus onStatus={syncAssistantAccess} /> }}
             hiddenGroups={hasThemeImageSizes ? ["appSettings.groups.imageSizes"] : []}
             groupMessages={
               hasThemeImageSizes

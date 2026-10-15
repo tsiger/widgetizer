@@ -1,4 +1,5 @@
-import { app, BrowserWindow, dialog, ipcMain, Menu, shell, utilityProcess } from "electron";
+import { app, BrowserWindow, dialog, ipcMain, Menu, session, shell, utilityProcess } from "electron";
+import crypto from "crypto";
 import pkg from "electron-updater";
 const { autoUpdater } = pkg;
 import fs from "fs";
@@ -10,6 +11,9 @@ import { isSafePreviewPath } from "./previewPath.js";
 const DEFAULT_PORT = "3001";
 const SERVER_STARTUP_TIMEOUT_MS = 30000;
 const DOCS_URL = "https://docs.widgetizer.org";
+const SERVER_SHUTDOWN_TIMEOUT_MS = 6000;
+const EDITOR_CREDENTIAL_HEADER = "X-Widgetizer-Editor";
+const EDITOR_SECRET = crypto.randomBytes(32).toString("base64url");
 
 // State
 let mainWindow = null;
@@ -199,6 +203,7 @@ function startServer() {
     THEMES_ROOT: themesRoot,
     APP_ROOT: appRoot,
     UNPACKED_ROOT: unpackedRoot,
+    WIDGETIZER_EDITOR_SECRET: EDITOR_SECRET,
   };
 
   // Set up the readiness deferred BEFORE forking so a fast server can't race us.
@@ -268,13 +273,60 @@ function createDeferred() {
   };
 }
 
-// Stop the server
+let serverStopping = null;
+
+// Ask the server to shut down cleanly (it withdraws assistant access), and kill it
+// if it hasn't exited in time.
 function stopServer() {
-  if (serverProcess) {
+  if (!serverProcess) return Promise.resolve();
+  serverStopping ??= new Promise((resolve) => {
+    const child = serverProcess;
     log("Stopping server process...");
-    serverProcess.kill();
-    serverProcess = null;
+    const timer = setTimeout(() => {
+      log("Server did not exit in time; killing it");
+      child.kill();
+    }, SERVER_SHUTDOWN_TIMEOUT_MS);
+    child.once("exit", () => {
+      clearTimeout(timer);
+      serverProcess = null;
+      resolve();
+    });
+    child.postMessage({ type: "shutdown" });
+  });
+  return serverStopping;
+}
+
+// The editor credential is added by the main process, never handed to page
+// scripts: only to API requests from the top frame of our own windows, while that
+// frame shows the editor. Preview content in iframes never gets it.
+function isTrustedEditorRequest(details) {
+  if (!serverPort || !details.frame || details.frame.parent) return false;
+  const owner = details.webContents && BrowserWindow.fromWebContents(details.webContents);
+  if (!owner || (owner !== mainWindow && owner !== previewWindow)) return false;
+  try {
+    const target = new URL(details.url);
+    const frameOrigin = new URL(details.frame.url).origin;
+    const apiHosts = new Set(["127.0.0.1", "localhost"]);
+    return (
+      target.protocol === "http:" &&
+      apiHosts.has(target.hostname) &&
+      target.port === String(serverPort) &&
+      frameOrigin === new URL(getRendererBaseUrl()).origin
+    );
+  } catch {
+    return false;
   }
+}
+
+function setupEditorCredential() {
+  session.defaultSession.webRequest.onBeforeSendHeaders((details, callback) => {
+    const requestHeaders = { ...details.requestHeaders };
+    for (const name of Object.keys(requestHeaders)) {
+      if (name.toLowerCase() === EDITOR_CREDENTIAL_HEADER.toLowerCase()) delete requestHeaders[name];
+    }
+    if (isTrustedEditorRequest(details)) requestHeaders[EDITOR_CREDENTIAL_HEADER] = EDITOR_SECRET;
+    callback({ requestHeaders });
+  });
 }
 
 // Wait for the bundled server to report its bound port via IPC.
@@ -837,7 +889,9 @@ function setupAutoUpdater() {
     autoUpdater.downloadUpdate();
   });
 
-  ipcMain.on("install-update", () => {
+  ipcMain.on("install-update", async () => {
+    isQuitting = true;
+    await stopServer();
     autoUpdater.quitAndInstall();
   });
 
@@ -858,6 +912,7 @@ app.whenReady().then(async () => {
     initPaths();
     ensureDataDirectories();
     createAppMenu();
+    setupEditorCredential();
     setupIpcHandlers();
     setupAutoUpdater();
 
@@ -902,10 +957,13 @@ app.on("activate", () => {
   }
 });
 
-app.on("before-quit", () => {
+app.on("before-quit", (event) => {
   log("App before-quit event");
   isQuitting = true;
-  stopServer();
+  if (serverProcess) {
+    event.preventDefault();
+    stopServer().finally(() => app.quit());
+  }
 });
 
 app.on("window-all-closed", () => {

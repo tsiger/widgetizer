@@ -27,7 +27,7 @@ process.env.NODE_ENV = "test";
 
 const { getAppSettings, updateAppSettings, readAppSettingsFile, getSetting } =
   await import("../controllers/appSettingsController.js");
-const { saveSettings, defaultSettings } = await import("../db/repositories/settingsRepository.js");
+const { saveSettings, defaultSettings, onSettingsChanged } = await import("../db/repositories/settingsRepository.js");
 const { getDb, closeDb } = await import("../db/index.js");
 
 // ============================================================================
@@ -390,5 +390,55 @@ describe("getSetting", () => {
   it("retrieves boolean false correctly", async () => {
     const result = await getSetting("developer.enabled");
     assert.equal(result, false);
+  });
+});
+
+describe("assistant access setting", () => {
+  it("is off by default", async () => {
+    const settings = await readAppSettingsFile();
+    assert.deepEqual(settings.assistant, { enabled: false });
+  });
+
+  it("accepts a boolean and rejects anything else", async () => {
+    assert.equal((await callController(updateAppSettings, { body: { assistant: { enabled: true } } }))._status, 200);
+    assert.equal((await readAppSettingsFile()).assistant.enabled, true);
+    assert.equal((await callController(updateAppSettings, { body: { assistant: { enabled: "yes" } } }))._status, 400);
+    assert.equal((await callController(updateAppSettings, { body: { assistant: true } }))._status, 400);
+    assert.equal((await readAppSettingsFile()).assistant.enabled, true);
+  });
+
+  it("a partial save of another section leaves it alone", async () => {
+    await callController(updateAppSettings, { body: { assistant: { enabled: true } } });
+    await callController(updateAppSettings, { body: { general: { language: "el" } } });
+    assert.equal((await readAppSettingsFile()).assistant.enabled, true);
+  });
+});
+
+describe("onSettingsChanged", () => {
+  it("tells listeners the committed settings and what they replaced", async () => {
+    const seen = [];
+    const unsubscribe = onSettingsChanged((next, previous) => seen.push([previous.assistant.enabled, next.assistant.enabled]));
+    try {
+      await callController(updateAppSettings, { body: { assistant: { enabled: true } } });
+    } finally {
+      unsubscribe();
+    }
+    assert.deepEqual(seen, [[false, true]]);
+  });
+
+  it("a failing listener doesn't fail a save that was already committed", async () => {
+    const unsubscribe = onSettingsChanged(() => {
+      throw new Error("listener broke");
+    });
+    const originalError = console.error;
+    console.error = () => {};
+    try {
+      const res = await callController(updateAppSettings, { body: { general: { language: "el" } } });
+      assert.equal(res._status, 200);
+    } finally {
+      console.error = originalError;
+      unsubscribe();
+    }
+    assert.equal((await readAppSettingsFile()).general.language, "el");
   });
 });

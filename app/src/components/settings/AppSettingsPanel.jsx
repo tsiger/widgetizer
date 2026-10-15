@@ -6,7 +6,14 @@ import SettingsRenderer from "@widgetizer/editor-ui/components/settings/Settings
  * AppSettingsPanel component
  * Renders app settings using JSON schema format with vertical tabs
  */
-export default function AppSettingsPanel({ schema, settings, onChange, hiddenGroups = [], groupMessages = {} }) {
+export default function AppSettingsPanel({
+  schema,
+  settings,
+  onChange,
+  hiddenGroups = [],
+  groupMessages = {},
+  tabExtras = {},
+}) {
   const { t } = useTranslation();
   const hiddenGroupsSet = new Set(hiddenGroups);
 
@@ -126,7 +133,10 @@ export default function AppSettingsPanel({ schema, settings, onChange, hiddenGro
       {/* Content area */}
       <div className="flex-1 p-6 min-h-[400px]">
         <h2 className="text-lg font-semibold mb-4 text-slate-800">{t(`appSettings.tabs.${activeTab}.sectionTitle`)}</h2>
-        <div className="space-y-6">{renderTabSettings()}</div>
+        <div className="space-y-6">
+          {renderTabSettings()}
+          {tabExtras[activeTab]}
+        </div>
       </div>
     </div>
   );

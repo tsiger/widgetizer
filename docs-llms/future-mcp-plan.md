@@ -16,8 +16,10 @@
 
 ## M0 — Switch, connection and packaging spike
 
-- The `assistantAccess` setting: backend default and validation, plus the **AI Assistant** tab. Settings saves send only changed fields, so a stale form can't revert the switch.
+- The `assistant.enabled` setting: backend default and validation, plus the **AI Assistant** tab. Settings saves send only changed fields, so a stale form can't revert the switch.
 - Editor request authentication and real Host/Origin checks, so the token can't be bypassed through existing routes. Only the editor can change the setting or answer approvals; the relay never can.
+  - Desktop: the main process adds an editor credential to API requests from the top frame of its own windows; page scripts never see it, and the packaged server refuses to start without it.
+  - Self-run web: Host/Origin checks only. That protects against other websites, not against programs on the same computer, and the AI Assistant tab says so.
 - Connection file: published by the shared OSS server start-up (desktop and self-run web) in the data folder, written atomically after bind, holding the real bound address, a fresh token and an instance ID. Owner-only permissions (including on Windows). Removed on shutdown and when access is turned off; a leftover file from a crash reads as "not running". The relay accepts a data-folder override for custom web installs.
 - Client sessions: the relay exchanges the installation token for a session identity. Jobs and approvals are bound to the session. Health comes from heartbeat/disconnect, not from the last handshake.
 - Handshake: bridge protocol version, MCP version, capabilities, action catalogue. Plain messages on a mismatch, naming which side to update.
@@ -33,6 +35,8 @@
 - Works on the site open in Widgetizer; listing all sites is allowed.
 
 ## M2 — One complete edit, with recovery
+
+- **First, isolate the preview.** Scripts in the same-origin preview iframe can act as the editor today (including turning access on). Serve the preview from a separate origin, or otherwise cut it off from the editor's privileges, before any assistant write exists.
 
 The hard milestone. A single edit family (**edit sections** on a page, header or footer) with everything around it:
 

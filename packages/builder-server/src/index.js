@@ -91,3 +91,7 @@ export { checkForUpdates, toggleThemeUpdates, applyThemeUpdateToDir } from "./se
 // Global app settings (image sizes, dev mode, export limits) — the editor's
 // client reads these via GET /api/settings; hosted exposes a read-only route.
 export { readAppSettingsFile } from "./controllers/appSettingsController.js";
+// Read-only project listing and change notifications for shell-composed features
+// (the OSS AI assistant) that must never select or persist an active project.
+export { getSettings, onSettingsChanged } from "./db/repositories/settingsRepository.js";
+export { getAllProjects, getProjectById, getActiveProjectId } from "./db/repositories/projectRepository.js";

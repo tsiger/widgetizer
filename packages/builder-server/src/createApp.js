@@ -121,14 +121,16 @@ function mountEditorUiRoutes(app) {
 /**
  * Create and configure an Express app for the Widgetizer editor.
  *
- * @param {{ adapters: object, plugins?: Array<object> }} options - `adapters` is
+ * @param {{ adapters: object, plugins?: Array<object>, mount?: (app: import('express').Express) => void | Promise<void> }} options - `adapters` is
  *   the REQUIRED adapter set (scopeResolver, previewScopeResolver, storage,
  *   assetStorage, publish, limits) constructed by the shell. Handlers
  *   unconditionally read `req.adapters`; setupBuilderServer validates the set and
  *   attaches it per-router. Passing none (or an incomplete set) throws.
+ *   `mount` runs after the shared middleware and before every editor route, so a
+ *   shell can add request guards and its own routers ahead of them.
  * @returns {Promise<import('express').Express>} Configured Express app (call .listen() yourself)
  */
-export async function createEditorApp({ adapters, plugins = [] } = {}) {
+export async function createEditorApp({ adapters, plugins = [], mount } = {}) {
   if (!adapters) {
     throw new Error("createEditorApp requires an adapters set; pass the shell's adapters (see setupBuilderServer)");
   }
@@ -140,6 +142,7 @@ export async function createEditorApp({ adapters, plugins = [] } = {}) {
   }
 
   applySharedMiddleware(app);
+  await mount?.(app);
 
   // req.adapters is attached per-router inside setupBuilderServer (so the routers
   // are self-sufficient wherever mounted), not app-wide here.
