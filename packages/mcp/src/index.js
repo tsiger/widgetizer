@@ -26,10 +26,14 @@ function textResult(text, isError = false) {
 
 function toToolResult(outcome) {
   if (outcome?.isError) return textResult(outcome.error?.message ?? "Widgetizer couldn't complete this request.", true);
-  const structured = outcome?.structuredContent;
+  const structured = outcome.structuredContent;
+  const images = (outcome.images ?? []).flatMap((image) => [
+    ...(image.label ? [{ type: "text", text: image.label }] : []),
+    { type: "image", data: image.data, mimeType: image.mimeType },
+  ]);
   return {
-    content: [{ type: "text", text: JSON.stringify(structured ?? null, null, 2) }],
-    ...(structured && typeof structured === "object" ? { structuredContent: structured } : {}),
+    content: [{ type: "text", text: JSON.stringify(structured, null, 2) }, ...images],
+    structuredContent: structured,
     isError: false,
   };
 }

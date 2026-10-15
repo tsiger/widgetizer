@@ -54,7 +54,14 @@ async function requestJson(url, { method = "GET", headers = {}, body, timeout = 
 
 function isCompleteOutcome(data) {
   if (data.isError === false) {
-    return Boolean(data.structuredContent) && typeof data.structuredContent === "object" && !Array.isArray(data.structuredContent);
+    const images = data.images ?? [];
+    return (
+      Boolean(data.structuredContent) &&
+      typeof data.structuredContent === "object" &&
+      !Array.isArray(data.structuredContent) &&
+      Array.isArray(images) &&
+      images.every((image) => typeof image?.data === "string" && typeof image.mimeType === "string")
+    );
   }
   return data.isError === true && typeof data.error?.message === "string";
 }

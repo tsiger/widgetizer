@@ -5,6 +5,9 @@ import { createSessionStore } from "./sessions.js";
 import { builtinTools } from "./tools/index.js";
 import { PLATFORM_INSTRUCTIONS } from "./instructions.js";
 import { BRIDGE_PROTOCOL, ERROR_CODES, selectBridgeVersion } from "./protocol.js";
+import { validateArguments } from "./validate.js";
+import { asToolError, toolError } from "./errors.js";
+import { createToolContext } from "./tools/context.js";
 
 export { BRIDGE_PROTOCOL, BRIDGE_BASE, EDITOR_CREDENTIAL_HEADER } from "./protocol.js";
 export { secretsMatch } from "./access.js";
@@ -20,29 +23,90 @@ function bearer(req) {
   return header.startsWith("Bearer ") ? header.slice(7) : null;
 }
 
-function validateArguments(tool, args) {
-  if (args === undefined) return {};
-  if (!args || typeof args !== "object" || Array.isArray(args)) {
-    throw Object.assign(new Error("Arguments must be an object."), { code: ERROR_CODES.INVALID_ARGUMENTS });
+// Images travel base64-encoded beside the result, never inside it, so the relay
+// can hand them to the client as images rather than print them as text.
+const MAX_IMAGE_BASE64 = Math.ceil((1024 * 1024 * 4) / 3) + 4;
+const MAX_IMAGES_BASE64_TOTAL = 3 * 1024 * 1024;
+
+function boundedImages(images) {
+  const kept = [];
+  let total = 0;
+  for (const image of Array.isArray(images) ? images : []) {
+    if (typeof image?.data !== "string" || image.data.length > MAX_IMAGE_BASE64) continue;
+    if (total + image.data.length > MAX_IMAGES_BASE64_TOTAL) break;
+    total += image.data.length;
+    kept.push({ data: image.data, mimeType: image.mimeType, mediaId: image.mediaId ?? null, label: image.label ?? null });
   }
-  const allowed = Object.keys(tool.inputSchema.properties ?? {});
-  if (tool.inputSchema.additionalProperties === false) {
-    const unknown = Object.keys(args).filter((key) => !allowed.includes(key));
-    if (unknown.length) {
-      throw Object.assign(new Error(`Unknown argument(s): ${unknown.join(", ")}. Allowed: ${allowed.join(", ") || "none"}.`), {
-        code: ERROR_CODES.INVALID_ARGUMENTS,
-      });
-    }
-  }
-  return args;
+  return kept;
 }
 
 function clientInfo(client) {
   return { name: String(client?.name ?? "unknown").slice(0, 100), version: String(client?.version ?? "").slice(0, 50) };
 }
 
+// Tools shorten their own results; this is the guarantee behind them. Whatever is
+// still too large is kept once and handed out in numbered parts of its JSON, so
+// nothing is cut and every part comes from the same result.
+const MAX_RESULT_CHARS = 48000;
+const SPLIT_TTL_MS = 10 * 60 * 1000;
+const MAX_SPLIT_RESULTS = 20;
+const RESULT_PART = {
+  type: "integer",
+  minimum: 2,
+  maximum: 1000,
+  description: "Only when a result was split: which further part to return.",
+};
+const RESULT_ID = {
+  type: "string",
+  pattern: "^[a-f0-9-]{36}$",
+  description: "Only when a result was split: its resultId.",
+};
+
+function withResultPart(inputSchema) {
+  return {
+    ...inputSchema,
+    properties: { ...(inputSchema.properties ?? {}), resultId: RESULT_ID, resultPart: RESULT_PART },
+  };
+}
+
+function createSplitStore(now = () => Date.now()) {
+  const results = new Map();
+  const sweep = () => {
+    for (const [id, entry] of results) if (entry.expires < now()) results.delete(id);
+  };
+  const partOf = (id, entry, part) => ({
+    split: true,
+    resultId: id,
+    resultPart: part,
+    resultParts: Math.ceil(entry.text.length / MAX_RESULT_CHARS),
+    json: entry.text.slice((part - 1) * MAX_RESULT_CHARS, part * MAX_RESULT_CHARS),
+    note: "This result was too large for one reply. Call the same tool with resultId and resultPart 2, 3, … and join the json pieces in order.",
+  });
+  return {
+    first(tool, data) {
+      const text = JSON.stringify(data);
+      if (text.length <= MAX_RESULT_CHARS) return data;
+      sweep();
+      const id = crypto.randomUUID();
+      results.set(id, { tool, text, expires: now() + SPLIT_TTL_MS });
+      if (results.size > MAX_SPLIT_RESULTS) results.delete(results.keys().next().value);
+      return partOf(id, results.get(id), 1);
+    },
+    later(tool, id, part) {
+      sweep();
+      const entry = results.get(id);
+      if (!entry || entry.tool !== tool) {
+        throw toolError(ERROR_CODES.INVALID_ARGUMENTS, "That split result is no longer available. Call the tool again without resultId.");
+      }
+      const parts = Math.ceil(entry.text.length / MAX_RESULT_CHARS);
+      if (part > parts) throw toolError(ERROR_CODES.INVALID_ARGUMENTS, `resultPart must be at most ${parts}.`);
+      return partOf(id, entry, part);
+    },
+  };
+}
+
 function describeTool({ name, title, description, inputSchema, outputSchema, annotations }) {
-  return { name, title, description, inputSchema, outputSchema, annotations };
+  return { name, title, description, inputSchema: withResultPart(inputSchema), outputSchema, annotations };
 }
 
 /**
@@ -52,7 +116,11 @@ function describeTool({ name, title, description, inputSchema, outputSchema, ann
  *
  * @param {{
  *   access: { isEnabled: () => boolean, subscribe: (fn: () => void) => () => void },
- *   sites: { list: (actor) => Promise<object[]>, get: (actor, id) => Promise<object|null>, openSiteId: (actor) => Promise<string|null> },
+ *   site: {
+ *     listSites: (actor) => Promise<{ sites: object[], openSiteId: string|null }>,
+ *     openSite: (actor) => Promise<{ scope: object, project: object } | null>,
+ *     reader: object,
+ *   },
  *   resolveActor: (req) => Promise<object>,
  *   appInfo: { version: string },
  *   publisher?: { publish: (record: object) => Promise<void>, unpublish: (instanceId: string) => Promise<void> },
@@ -64,7 +132,7 @@ function describeTool({ name, title, description, inputSchema, outputSchema, ann
  */
 export function setupAssistantServer({
   access: source,
-  sites,
+  site,
   resolveActor,
   appInfo,
   publisher,
@@ -82,6 +150,7 @@ export function setupAssistantServer({
     onRevoke: () => sessions.clear(),
   });
   const toolsByName = new Map(tools.map((tool) => [tool.name, tool]));
+  const splitResults = createSplitStore(now);
 
   const bridgeRouter = express.Router();
   bridgeRouter.use(express.json({ limit: "1mb" }));
@@ -160,11 +229,33 @@ export function setupAssistantServer({
     let outcome;
     try {
       const actor = await resolveActor(req);
-      const result = await tool.run({ args: validateArguments(tool, args), sites, appInfo, actor });
-      outcome = { isError: false, structuredContent: result };
+      const plain = args === undefined || (args !== null && typeof args === "object" && !Array.isArray(args));
+      const { resultId, resultPart, ...toolArgs } = plain ? (args ?? {}) : {};
+      const split = validateArguments(
+        { type: "object", properties: { resultId: RESULT_ID, resultPart: RESULT_PART } },
+        { resultId, resultPart },
+      );
+      if (Boolean(split.resultId) !== Boolean(split.resultPart)) {
+        throw toolError(ERROR_CODES.INVALID_ARGUMENTS, "resultId and resultPart go together.");
+      }
+      if (split.resultId) {
+        outcome = { isError: false, structuredContent: splitResults.later(tool.name, split.resultId, split.resultPart) };
+      } else {
+        const checked = validateArguments(tool.inputSchema, plain ? toolArgs : args);
+        const ctx = createToolContext({ args: checked, actor, appInfo, site });
+        const result = await tool.run(ctx);
+        await ctx.finish();
+        const images = boundedImages(result.images);
+        outcome = {
+          isError: false,
+          structuredContent: splitResults.first(tool.name, result.data),
+          ...(images.length ? { images } : {}),
+        };
+      }
     } catch (error) {
-      if (error.code === ERROR_CODES.INVALID_ARGUMENTS) {
-        outcome = { isError: true, error: { code: error.code, message: error.message } };
+      const expected = asToolError(error);
+      if (expected) {
+        outcome = { isError: true, error: { code: expected.code, message: expected.message } };
       } else {
         console.error(`Assistant tool ${tool.name} failed:`, error);
         outcome = { isError: true, error: { code: ERROR_CODES.TOOL_FAILED, message: "Widgetizer couldn't complete this request." } };

@@ -94,11 +94,9 @@ describe("relay", () => {
     const root = await tempRoot();
     await startApp(root);
     const { client } = await connectClient(root);
-    expect((await client.listTools()).tools.map((tool) => tool.name)).toEqual([
-      "widgetizer_status",
-      "list_sites",
-      "widgetizer_connect",
-    ]);
+    const names = (await client.listTools()).tools.map((tool) => tool.name);
+    expect(names).toContain("list_sites");
+    expect(names.at(-1)).toBe("widgetizer_connect");
     const result = await client.callTool({ name: "list_sites", arguments: {} });
     expect(result.structuredContent.sites).toHaveLength(2);
   });
@@ -144,7 +142,7 @@ describe("relay", () => {
             name: "count",
             description: "",
             inputSchema: { type: "object", properties: {} },
-            run: async () => ({ runs: ++runs }),
+            run: async () => ({ data: { runs: ++runs } }),
           },
         ],
       },
@@ -187,7 +185,7 @@ describe("relay", () => {
 
     await first.close();
     bridge.session = null;
-    const extra = { name: "new_tool", description: "", inputSchema: { type: "object", properties: {} }, run: async () => ({}) };
+    const extra = { name: "new_tool", description: "", inputSchema: { type: "object", properties: {} }, run: async () => ({ data: {} }) };
     await startApp(root, { assistant: { tools: [extra] } });
     expect((await client.listTools()).tools.map((tool) => tool.name)).toEqual(["new_tool", "widgetizer_connect"]);
   });
@@ -267,5 +265,28 @@ describe("relay", () => {
     releaseCall();
     expect((await pending).code).toBe("OUTCOME_UNKNOWN");
     expect(bridge.session).toBe(fresh);
+  });
+
+  it("hands images to the client as image content, labelled", async () => {
+    const root = await tempRoot();
+    await startApp(root, {
+      assistant: {
+        tools: [
+          {
+            name: "picture",
+            description: "",
+            inputSchema: { type: "object", properties: {} },
+            run: async () => ({ data: { ok: true }, images: [{ data: "aGk=", mimeType: "image/png", mediaId: "m1", label: "A photo" }] }),
+          },
+        ],
+      },
+    });
+    const { client } = await connectClient(root);
+    const result = await client.callTool({ name: "picture", arguments: {} });
+    expect(result.content.slice(1)).toEqual([
+      { type: "text", text: "A photo" },
+      { type: "image", data: "aGk=", mimeType: "image/png" },
+    ]);
+    expect(result.structuredContent).toEqual({ ok: true });
   });
 });

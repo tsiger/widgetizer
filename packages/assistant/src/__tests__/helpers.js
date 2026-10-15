@@ -23,11 +23,15 @@ export const SITES = [
   { id: "b", name: "Studio", theme: "arch" },
 ];
 
-export function createSites(openId = "a") {
+/** A site context over fixed projects; `open` picks the open one per call. */
+export function createSite({ open = () => "a", reader = {} } = {}) {
   return {
-    list: async () => SITES,
-    get: async (_actor, id) => SITES.find((site) => site.id === id) ?? null,
-    openSiteId: async () => openId,
+    listSites: async () => ({ sites: SITES, openSiteId: open() }),
+    openSite: async () => {
+      const project = SITES.find((site) => site.id === open());
+      return project ? { scope: { actor: { id: "default" }, projectId: project.id, folderName: project.id }, project } : null;
+    },
+    reader: { contentLanguage: () => ({ language: "en", defaultLanguage: "en", languages: [] }), ...reader },
   };
 }
 
@@ -68,7 +72,7 @@ export async function startBridge(options = {}) {
   const assistant = setupAssistantServer({
     access,
     publisher,
-    sites: options.sites ?? createSites(),
+    site: options.site ?? createSite(),
     resolveActor: async () => ({ id: "default", kind: "local" }),
     appInfo: { version: "9.9.9" },
     ...options.assistant,

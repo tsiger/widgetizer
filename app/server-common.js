@@ -12,9 +12,6 @@ import {
   DATA_DIR,
   getSettings,
   onSettingsChanged,
-  getAllProjects,
-  getProjectById,
-  getActiveProjectId,
 } from "@widgetizer/builder-server";
 import {
   LocalScopeResolver,
@@ -28,6 +25,7 @@ import { setupAssistantServer, BRIDGE_BASE } from "@widgetizer/assistant";
 import { createConnectionFile } from "@widgetizer/assistant/local";
 import { createRequestGuard } from "./server/requestGuard.js";
 import { createAssistantOwnerStore } from "./server/assistantOwner.js";
+import { createAssistantSite } from "./server/assistantSite.js";
 
 const LOOPBACK_BIND_HOSTS = new Set(["127.0.0.1", "localhost", "::1"]);
 const DEV_ORIGINS = ["http://localhost:3000", "http://127.0.0.1:3000"];
@@ -54,7 +52,7 @@ function allowedExtraOrigins() {
   return process.env.NODE_ENV === "production" ? configured : [...DEV_ORIGINS, ...configured];
 }
 
-function createAssistant(scopeResolver, { db, editorProtected }) {
+function createAssistant(adapters, { db, editorProtected }) {
   const access = {
     isEnabled: () => getSettings().assistant?.enabled === true,
     subscribe: (listener) =>
@@ -62,18 +60,10 @@ function createAssistant(scopeResolver, { db, editorProtected }) {
         if (next.assistant?.enabled !== previous.assistant?.enabled) listener();
       }),
   };
-  const sites = {
-    list: async () => getAllProjects(),
-    get: async (_actor, id) => getProjectById(id),
-    openSiteId: async () => {
-      const id = getActiveProjectId();
-      return id && getProjectById(id) ? id : null;
-    },
-  };
   return setupAssistantServer({
     access,
-    sites,
-    resolveActor: (req) => scopeResolver.resolveActor(req),
+    site: createAssistantSite({ adapters }),
+    resolveActor: (req) => adapters.scopeResolver.resolveActor(req),
     appInfo: { version: readAppVersion() },
     publisher: createConnectionFile({ dataRoot: DATA_DIR, ownerStore: createAssistantOwnerStore(db) }),
     editorProtected,
@@ -110,7 +100,7 @@ export async function buildOssApp({ getPort = () => null, bindHost = "127.0.0.1"
   };
 
   const editorSecret = process.env.WIDGETIZER_EDITOR_SECRET || null;
-  const assistant = createAssistant(adapters.scopeResolver, { db, editorProtected: Boolean(editorSecret) });
+  const assistant = createAssistant(adapters, { db, editorProtected: Boolean(editorSecret) });
   const guard = createRequestGuard({
     getPort,
     loopbackOnly: LOOPBACK_BIND_HOSTS.has(bindHost),

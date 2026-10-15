@@ -1,5 +1,5 @@
 import { describe, it, expect, afterEach } from "vitest";
-import { startBridge, json, createAccessSource } from "./helpers.js";
+import { startBridge, json, createAccessSource, createSite } from "./helpers.js";
 import { BRIDGE_BASE, BRIDGE_PROTOCOL, ERROR_CODES } from "../protocol.js";
 
 let bridge;
@@ -58,11 +58,11 @@ describe("assistant bridge", () => {
     bridge = await startBridge();
     const { data: session } = await openSession();
     const catalog = await json(`${bridge.url}${BRIDGE_BASE}/catalog`, { headers: sessionHeaders(session) });
-    expect(catalog.data.tools.map((tool) => tool.name)).toEqual(["widgetizer_status", "list_sites"]);
+    expect(catalog.data.tools.map((tool) => tool.name)).toContain("read_page");
     expect(catalog.data.instructions.length).toBeGreaterThan(0);
 
     const status = await call(session, "widgetizer_status", { requestId: "req-status-1" });
-    expect(status.data.structuredContent).toEqual({
+    expect(status.data.structuredContent).toMatchObject({
       appVersion: "9.9.9",
       openSite: { id: "a", name: "Bakery", theme: "arch" },
     });
@@ -172,5 +172,104 @@ describe("assistant bridge", () => {
     release();
     await bridge.assistant.settled();
     expect(publisher.record).toBeNull();
+  });
+
+  it("refuses an answer about a site the user switched away from mid-read", async () => {
+    let calls = 0;
+    const site = createSite({ open: () => (calls++ === 0 ? "a" : "b") });
+    bridge = await startBridge({
+      site,
+      assistant: {
+        tools: [
+          {
+            name: "read",
+            description: "",
+            inputSchema: { type: "object", properties: {} },
+            run: async (ctx) => {
+              await ctx.openSite();
+              return { data: { ok: true } };
+            },
+          },
+        ],
+      },
+    });
+    const { data: session } = await openSession();
+    const res = await call(session, "read", { requestId: "switch-1234" });
+    expect(res.data.isError).toBe(true);
+    expect(res.data.error.code).toBe("SITE_CHANGED");
+  });
+
+  it("says when no site is open", async () => {
+    bridge = await startBridge({ site: createSite({ open: () => null }) });
+    const { data: session } = await openSession();
+    const res = await call(session, "read_page", { requestId: "no-site-1234", arguments: { page: "index" } });
+    expect(res.data.error).toMatchObject({ code: "NO_OPEN_SITE" });
+  });
+
+  it("returns images beside the result, within limits", async () => {
+    const big = "A".repeat(2 * 1024 * 1024);
+    bridge = await startBridge({
+      assistant: {
+        tools: [
+          {
+            name: "pictures",
+            description: "",
+            inputSchema: { type: "object", properties: {} },
+            run: async () => ({
+              data: { ok: true },
+              images: [
+                { data: "aGk=", mimeType: "image/png", mediaId: "m1", label: "small" },
+                { data: big, mimeType: "image/png", mediaId: "m2" },
+              ],
+            }),
+          },
+        ],
+      },
+    });
+    const { data: session } = await openSession();
+    const res = await call(session, "pictures", { requestId: "pictures-1234" });
+    expect(res.data.structuredContent).toEqual({ ok: true });
+    expect(res.data.images).toEqual([{ data: "aGk=", mimeType: "image/png", mediaId: "m1", label: "small" }]);
+  });
+
+  it("splits any result still too large into parts that join back exactly", async () => {
+    let version = 0;
+    const bigResult = () => ({ version, rows: Array.from({ length: 3000 }, (_, i) => ({ i, text: "z".repeat(40) })) });
+    bridge = await startBridge({
+      assistant: {
+        tools: [
+          { name: "big", description: "", inputSchema: { type: "object", properties: {} }, run: async () => ({ data: bigResult() }) },
+        ],
+      },
+    });
+    const { data: session } = await openSession();
+    const first = (await call(session, "big", { requestId: "split-0001" })).data.structuredContent;
+    expect(first).toMatchObject({ split: true, resultPart: 1 });
+    const expected = bigResult();
+    version += 1;
+    let json = first.json;
+    for (let part = 2; part <= first.resultParts; part += 1) {
+      const next = await call(session, "big", {
+        requestId: `split-000${part}`,
+        arguments: { resultId: first.resultId, resultPart: part },
+      });
+      json += next.data.structuredContent.json;
+    }
+    expect(JSON.parse(json)).toEqual(expected);
+
+    const tooFar = await call(session, "big", { requestId: "split-0099", arguments: { resultId: first.resultId, resultPart: 99 } });
+    expect(tooFar.data.error.message).toMatch(/resultPart must be at most/);
+    const unknown = await call(session, "big", {
+      requestId: "split-0098",
+      arguments: { resultId: "00000000-0000-0000-0000-000000000000", resultPart: 2 },
+    });
+    expect(unknown.data.error.message).toMatch(/no longer available/);
+  });
+
+  it("rejects arguments that aren't an object", async () => {
+    bridge = await startBridge();
+    const { data: session } = await openSession();
+    const res = await call(session, "list_sites", { requestId: "array-args-1", arguments: [1] });
+    expect(res.data.error.message).toBe("Arguments must be an object.");
   });
 });
