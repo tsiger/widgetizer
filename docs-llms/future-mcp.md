@@ -1,6 +1,6 @@
 # Future: Widgetizer MCP Integration
 
-> **Status: Design decided — not implemented.** All eight design steps are agreed. The few remaining open items are listed under **Next**. The previous proposal (HTTP calls to a fixed `localhost:3001`, a long low-level tool list) no longer matches the architecture and was replaced; it is readable in git history.
+> **Status: Design decided — implementation planned for 1.0.** All eight design steps are agreed; the build order is in `future-mcp-plan.md`. The few remaining open items are listed under **Next**. The previous proposal (HTTP calls to a fixed `localhost:3001`, a long low-level tool list) no longer matches the architecture and was replaced; it is readable in git history.
 
 ---
 
@@ -10,7 +10,8 @@ Let non-technical Widgetizer users build and edit their sites by chatting with a
 
 ### Direction already agreed
 
-- **A new workspace package** (`packages/mcp`, alongside the existing packages).
+- **New workspace packages, minimal core changes.** The relay lives in `packages/mcp` and the app-side assistant backend in its own package that a shell mounts beside the existing backend (see **Code layout**). Existing code only gains small, generic hooks that do nothing while the assistant is off.
+- **One switch.** Everything sits behind a single app setting, off by default, in its own **AI Assistant** tab of App Settings. There is no separate menu control.
 - **A bridge to the running app, not direct storage access.** The `mcp` branch prototype opened the SQLite database and project files itself. That bypasses the app's validation, sanitisation and services, duplicates backend logic (e.g. widget discovery), and leaves an open editor unaware of the changes. The new design goes through the running app, so every write follows the same rules as the editor and the editor can reflect it.
 - **No manual setup for users.** Users never edit config files, open a terminal or see ports. The packaged app binds an OS-assigned port (`PORT=0`), so how the bridge finds the app is part of the connection design (step 2).
 
@@ -46,7 +47,7 @@ The first version covers all of these:
 - **Promise only what the theme offers.** Available widgets, blocks, settings and collection types depend on the site's theme. "Add testimonials" has to discover whether the theme does that with blocks or with collection items. New sites start from a theme preset.
 - **Business details are real data.** Hours, address, phone and logo update the project's site identity (see `core-projects.md`, Site Identity and Business Details), not text typed into a footer.
 - **Never invent facts.** The assistant must not make up business facts, prices or customer testimonials. Where it needs them it asks, or uses clearly marked placeholders.
-- **Honest review.** Reading content cannot judge visual or mobile quality, or whether a form works. Review either uses a rendered preview or says what it couldn't check.
+- **Honest review.** Reading content cannot judge visual or mobile quality, or whether a form works. Review uses the rendered page text and says plainly what it couldn't check: how the page looks, on desktop or mobile.
 - **Undo needs designing.** The editor's undo history covers only edits made in the editor and clears when a page loads. The assistant's changes (often across several pages) are not covered today. See step 3.
 - **Language-aware throughout.** Every journey acts on a specific site language, not just the default.
 
@@ -58,7 +59,8 @@ The first version covers all of these:
 
 - The bridge (the MCP server in `packages/mcp`) is assistant-neutral: one implementation for every MCP client, with no Claude-specific behaviour. Its tool descriptions and guidance are written for any assistant.
 - Claude Desktop's desktop extension (`.mcpb`) and any later plugins are only packaging around that same bridge (step 8).
-- Widgetizer gets a **"Connect an AI assistant"** screen:
+- **Turning it on and off.** The **AI Assistant** tab holds the one setting. Off (the default): no connection file, and every assistant request is refused. Turning it off while connected revokes the token and sessions; a running job is stopped and undone, and pending approvals are cancelled. Job history and undo points are kept, so revision tracking and image retention keep running while access is off.
+- The same tab is the **"Connect an AI assistant"** screen:
   - **Claude Desktop:** the Connect button opens Widgetizer's `.mcpb` file, which hands it to Claude Desktop's own install screen (review, permissions, Install). If that handoff fails (file associations, installation or organisation policy), Widgetizer shows the file and explains the drag-and-drop and **Settings → Extensions** alternatives. If Claude Desktop isn't installed, say so and link to its download.
   - **Codex:** guided setup. Widgetizer shows the exact values to enter in Codex's own settings screen (the ChatGPT desktop app's **Settings → MCP servers → Add server → STDIO**: command and arguments), or one `codex mcp add` command for CLI users. Widgetizer configuring it automatically is a possible later improvement.
   - **Other MCP assistants:** generic copy-paste connection details plus a help page.
@@ -206,7 +208,7 @@ Today the editor has no live-update channel: it loads data only when the user na
 - **Structured, not raw.** The assistant never sees filesystem paths or whole internal documents, but it does not edit by prose either. Reads expose stable IDs, current values and the permitted options. Edits submit typed operations against those IDs, and errors are field-specific and fixable ("`layout` must be one of: grid, list").
 - **Widgetizer validates every write** against the theme's real schemas (setting keys and types, select options, ranges, block types, `maxBlocks`, link shape, fonts) before saving.
 - **Results report actual effects:** every affected page and language, including side effects such as reference clean-up or collection listings that change.
-- **New orchestration over existing capabilities.** Most underlying operations exist as routes and controllers today. Atomic batches of section operations, full schema validation, readable inspection, the job lifecycle and screenshots are new work.
+- **New orchestration over existing capabilities.** Most underlying operations exist as routes and controllers today. Atomic batches of section operations, full schema validation, readable inspection, and the job lifecycle are new work.
 
 ### Looking (always allowed)
 
@@ -219,9 +221,9 @@ Today the editor has no live-update channel: it loads data only when the user na
 | What the theme offers | Section types with their options, collection types, and presets with their guidance file |
 | Browse media | Library items with IDs, descriptions and usage |
 | Read collections | Items per collection type, in order |
-| Preview a page | Rendered text (headings, links, content, errors) **and** desktop + mobile screenshots |
+| Preview a page | Rendered text (headings, links, content, errors) |
 
-**Preview:** rendered text is close to free (preview routes already render HTML, including collection item pages). **Screenshots are in the first version** and are new app-side work: Widgetizer captures and returns the images itself, because a localhost link won't open in every assistant. Neither output proves an interactive form works, so review says so (step 1).
+**Preview:** rendered text is close to free (preview routes already render HTML, including collection item pages). **No screenshots.** Sites are built deterministically from a theme and a preset, so the assistant doesn't need to see the result to place content correctly. Review says it hasn't seen the visual result, and that the text can't prove an interactive form works (step 1).
 
 ### Working (the job lifecycle, step 3)
 
@@ -253,8 +255,8 @@ Today the editor has no live-update channel: it loads data only when the user na
 ### Confirm-first actions
 
 - **Widgetizer asks the user itself**, in its own window: "The assistant wants to delete the About page. [Allow] [Cancel]." A confirmation code handed to the assistant would prove nothing, because the assistant could pass it straight back.
-- The request returns the exact plan and waits for the user's answer in Widgetizer. The approval is bound to that plan, the site revision, the job and the connected client. It is single-use and expires.
-- The site is **not** held locked while the prompt waits. If the site changed in the meantime, the approval is void and the plan is re-checked.
+- The request returns the exact plan and waits for the user's answer in Widgetizer. The approval is bound to that plan, the site revision, the job and the connected client. It is single-use, and it doesn't expire while the prompt is open.
+- **The whole app halts while the prompt waits.** Nothing in Widgetizer can be edited and the job makes no progress until the user answers. There is no timeout. Otherwise an edit made during the wait could be wiped when a later Stop or Cancel restores the job's snapshot. The prompt itself, Stop and turning access off stay usable. If the assistant disconnects or Widgetizer restarts while the prompt is open, the prompt becomes a choice to keep or undo the job's changes so far, and the job ends either way. In Hosted the halt covers the user's account, never the whole service.
 
 ---
 
@@ -343,7 +345,7 @@ Media IDs are values any edit accepts, and finding media and editing its descrip
 ### Adding new files from the user's computer (should-have)
 
 - **The assistant never reads the user's disk.** Widgetizer shows a **"Choose files"** button with an explanation ("The assistant would like you to add photos"), and the user picks the files. In the web and Hosted versions this is a button the user clicks, not a dialog triggered remotely.
-- The selection is bound to the site and the request. The site is **not** held locked while the user chooses. Cancelling and partial upload failures are handled and reported.
+- The selection is bound to the site and the request. As with Allow/Cancel, the app halts until the user picks or cancels. Cancelling and partial upload failures are handled and reported.
 - Uploads follow the existing rules: the type allowlist (jpg, png, gif, webp, svg, pdf, mp3, mp4), size limits (the platform limit plus the App Settings per-file limit), automatic raster resizing and SVG sanitisation.
 - First scope is picking files. Recursive folder import is a separate later step. Photos dragged into the chat are not supported in the first version, because passing files through assistants is inconsistent.
 
@@ -413,10 +415,28 @@ External facts below were checked against Anthropic's and OpenAI's documentation
 
 ### Not in the first version
 
-- **In-chat interactive previews** (MCP Apps). They are an optional later enhancement that would need UI-capability negotiation. An embedded preview wouldn't give the model visual evidence or reach localhost by itself, so preview data would still go through tools, and approvals stay in Widgetizer (step 5). The first version uses screenshots and text results plus "Open in Widgetizer".
+- **In-chat interactive previews** (MCP Apps). They are an optional later enhancement that would need UI-capability negotiation. An embedded preview wouldn't give the model visual evidence or reach localhost by itself, so preview data would still go through tools, and approvals stay in Widgetizer (step 5). The first version uses text results plus "Open in Widgetizer".
+
+---
+
+## Code layout
+
+- **`packages/mcp`** — the relay. Standalone; imports nothing from the backend, Electron or native modules.
+- **Assistant backend package** — actions, validation orchestration, jobs, snapshots and undo, approvals, guidance. It exports a setup function that a shell mounts beside the existing backend routers, built on the same adapters and scope, so Hosted can mount it too. The existing backend-plugin hook isn't used: it forces project resolution, which listing sites and creating the first site can't have.
+- **Editor side** — the AI Assistant settings tab, the job banner and the Allow/Cancel prompt plug in through editor-ui's extension registry where it allows, and extend it where it doesn't.
+- **Generic hooks in existing code.** The write gate and editor events do nothing while the assistant is off; revision tracking, image retention and editor authentication always run, so undo points stay valid:
+  - a write gate every mutating route passes through, checked again inside the content-write section
+  - a per-site revision number and a live-update event channel to the editor
+  - asset retention in the storage contract (hold, don't delete) and in every media delete/replace path
+  - an unsaved-changes registry and a read-only mode in the editor, plus a clean refresh after a job
+  - save logic moved out of controllers into services, so the assistant calls the same code as the editor
+  - authentication for editor requests, so the token isn't bypassable through existing routes
+  - the shared OSS server start-up (desktop and self-run web alike) publishing the connection file in the data folder; the relay accepts a data-folder override, and the Connect screen includes it in the generated config for custom installs
+  - the Electron build packaging the relay and runtime
+- **Hosted** reuses the assistant backend package. It adds its own remote MCP endpoint with OAuth instead of the relay and connection file, and a cloud implementation of asset retention.
 
 ---
 
 ## Next
 
-All eight design steps are decided. Before implementation: define the preset guidance file format (step 6, layer 4), settle the per-language blank alt decision (step 7), confirm the relay runtime (step 8), and turn this design into an implementation plan.
+All eight design steps are decided. Still open: the preset guidance file format (step 6, layer 4) and the per-language blank alt decision (step 7). The relay runtime (step 8) is confirmed by the packaging spike in the first milestone of `future-mcp-plan.md`.
