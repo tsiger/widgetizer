@@ -50,6 +50,7 @@ export {
 export {
   listCollectionSchemas,
   listCollectionItems,
+  readCollectionItem,
   getCollectionSchema,
   loadCollectionTemplate,
   loadCollectionItemsByUuid,
@@ -95,3 +96,21 @@ export { readAppSettingsFile } from "./controllers/appSettingsController.js";
 // (the OSS AI assistant) that must never select or persist an active project.
 export { getSettings, onSettingsChanged } from "./db/repositories/settingsRepository.js";
 export { getAllProjects, getProjectById, getActiveProjectId } from "./db/repositories/projectRepository.js";
+// Request-free, scope-first reads of a site's saved content, shared with the
+// editor's own controllers, for shell-composed readers such as the AI assistant.
+export {
+  listPageSlugs,
+  readPage,
+  readGlobal,
+  listMenuIds,
+  readMenu,
+  readThemeJson,
+  readWidgetSchemas,
+  resolveSchemaDefaults,
+  readLabelLocale,
+  readWidgetGuidance,
+  readUploadBytes,
+} from "./services/siteReader.js";
+export { contentLanguage, projectLanguages, projectLanguageContexts } from "./utils/contentLanguage.js";
+export { renderSavedPagePreview, renderCollectionItemPreview } from "./controllers/previewController.js";
+export { getMediaFilesPage, getMediaFileById, getMediaIdsByPaths } from "./db/repositories/mediaRepository.js";

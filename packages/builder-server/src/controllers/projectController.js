@@ -16,9 +16,8 @@ import { randomUUID } from "crypto";
 import { ZIP_MIME_TYPES } from "../utils/mimeTypes.js";
 import { hasAvailableUpdate } from "../utils/updateStatus.js";
 import * as projectRepo from "../db/repositories/projectRepository.js";
-import { resolveSiteString } from "@widgetizer/core";
-import { loadSiteStrings, readerFor } from "../services/siteStringsService.js";
 import { requestLanguage } from "../utils/contentLanguage.js";
+import { readWidgetSchemas, schemasNeedResolvedDefaults, resolveSchemaDefaults } from "../services/siteReader.js";
 import * as mediaRepo from "../db/repositories/mediaRepository.js";
 import { stripHtmlToText } from "../services/sanitizationService.js";
 import { isReservedItemSlug } from "@widgetizer/core/contentAddress";
@@ -983,172 +982,24 @@ export async function duplicateProject(req, res) {
 }
 
 /**
- * Retrieves all available widget schemas for a project, including core and theme widgets.
- * @param {import('express').Request} req - Express request object with project ID in params
+ * Retrieves all available widget schemas for a project, including core and theme
+ * widgets, with theme-word defaults resolved in the language being edited.
+ * @param {import('express').Request} req - Express request object
  * @param {import('express').Response} res - Express response object
  * @returns {Promise<void>}
  */
-/**
- * Fill in every `defaultKey` with the theme's word for it, in the language the
- * editor is showing. Nothing is stored: this is a default like any other, and
- * an owner's own value still overrides it.
- */
-async function withResolvedDefaults(schemas, req, res) {
-  const names = (list) => Array.isArray(list) && list.some((setting) => setting?.defaultKey);
-  const startingBlocksName = (list) => Array.isArray(list) && list.some((block) => block?.defaultKeys);
-  const wanted = schemas.some(
-    (s) =>
-      names(s?.settings) ||
-      (Array.isArray(s?.blocks) && s.blocks.some((b) => names(b?.settings))) ||
-      startingBlocksName(s?.defaultBlocks),
-  );
-  if (!wanted) return schemas;
-
-  const lang = requestLanguage(req, res);
-  if (!lang) return null;
-
-  const { defaultLanguage, languages } = lang;
-  // Through the same adapter the schemas above came from, so both describe the
-  // same project whatever root that adapter is rooted at.
-  const strings = await loadSiteStrings(readerFor(req.adapters.storage, req.scope), [defaultLanguage, ...languages]);
-
-  // As `resolvedDefault`, NOT as `default`: a `default` is copied into a new
-  // widget's settings and saved, which would freeze one language's wording into
-  // content and follow a page into its translations. The editor shows this and
-  // stores nothing until the owner types.
-  const fill = (list) =>
-    !Array.isArray(list)
-      ? list
-      : list.map((setting) => {
-          if (!setting?.defaultKey) return setting;
-          const found = resolveSiteString(strings, setting.defaultKey, lang.language, defaultLanguage);
-          return found === undefined ? setting : { ...setting, resolvedDefault: found };
-        });
-
-  // A starting block names its words itself, one key per setting, because the
-  // blocks a widget opens with can differ while sharing one block schema.
-  const fillStartingBlock = (block) => {
-    if (!block?.defaultKeys) return block;
-    const resolvedDefaults = {};
-    for (const [settingId, key] of Object.entries(block.defaultKeys)) {
-      const found = resolveSiteString(strings, key, lang.language, defaultLanguage);
-      if (found !== undefined) resolvedDefaults[settingId] = found;
-    }
-    return Object.keys(resolvedDefaults).length ? { ...block, resolvedDefaults } : block;
-  };
-
-  return schemas.map((schema) => ({
-    ...schema,
-    settings: fill(schema.settings),
-    ...(Array.isArray(schema.blocks)
-      ? { blocks: schema.blocks.map((block) => ({ ...block, settings: fill(block?.settings) })) }
-      : {}),
-    ...(Array.isArray(schema.defaultBlocks) ? { defaultBlocks: schema.defaultBlocks.map(fillStartingBlock) } : {}),
-  }));
-}
-
 export async function getProjectWidgets(req, res) {
   try {
     const { scope } = req;
     const { storage } = req.adapters;
-
-    // Import core widgets controller
-    const { getCoreWidgets } = await import("./coreWidgetsController.js");
-
-    // Check if the theme opts out of core widgets. Read theme.json through the
-    // storage adapter so this resolves the right project dir under any backend
-    // (the OSS global dir, or hosted's per-user dir) — not a global DATA_DIR path.
-    let includeCoreWidgets = true;
-    try {
-      const themeBuf = await storage.read(scope, "theme.json");
-      if (themeBuf != null) {
-        const themeJson = JSON.parse(themeBuf.toString("utf8"));
-        if (themeJson.useCoreWidgets === false) {
-          includeCoreWidgets = false;
-        }
-      }
-    } catch (error) {
-      console.warn(
-        `[ProjectController] Failed to read theme.json, defaulting to core widgets=true. Error: ${error.message}`,
-      );
-      // If there's an error reading theme.json, default to including core widgets
-    }
-
-    // The storage adapter lists plain names (files, dirs, dotfiles alike) with
-    // no type info, so probe each candidate for its schema.json before treating
-    // it as a widget folder — mirroring listCollectionSchemas. This skips stray
-    // entries (e.g. a macOS .DS_Store, which on some platforms throws ENOTDIR on
-    // read) instead of letting processWidgetFolder log a spurious "Failed to
-    // parse schema" warning, keeping that warning honest: it now fires only on a
-    // genuinely malformed schema.json.
-    async function widgetFoldersWithSchema(folderRelPaths) {
-      const present = await Promise.all(
-        folderRelPaths.map((relPath) => storage.exists(scope, `${relPath}/schema.json`)),
-      );
-      return folderRelPaths.filter((_, idx) => present[idx]);
-    }
-
-    // Helper: read one widget folder's schema.json (flagging a sibling
-    // preview.png) via the storage adapter. Only ever called on entries that
-    // passed the schema.json existence probe above, so a thrown error here means
-    // a real malformed schema.json.
-    async function processWidgetFolder(folderRelPath) {
-      try {
-        const buf = await storage.read(scope, `${folderRelPath}/schema.json`);
-        if (buf == null) return null;
-        const schema = JSON.parse(buf.toString("utf8"));
-        if (await storage.exists(scope, `${folderRelPath}/preview.png`)) {
-          schema.hasPreview = true;
-        }
-        return schema;
-      } catch (error) {
-        console.warn(`[ProjectController] Failed to parse schema for widget at ${folderRelPath}: ${error.message}`);
-        // Silently handle widget schema parsing errors
-      }
-      return null;
-    }
-
-    let allSchemas = [];
-
-    // First, get core widgets if not opted out
-    if (includeCoreWidgets) {
-      try {
-        const coreWidgets = await getCoreWidgets();
-        allSchemas = allSchemas.concat(coreWidgets);
-      } catch (error) {
-        console.warn(`[ProjectController] Failed to load core widgets: ${error.message}`);
-        // Silently handle core widgets loading errors
-      }
-    }
-
-    // Theme widget folders (new structure: widgets/<name>/schema.json),
-    // excluding the global/ subdir which is handled separately below.
-    const widgetEntries = await storage.list(scope, "widgets");
-    const widgetFolders = await widgetFoldersWithSchema(
-      widgetEntries.filter((name) => name !== "global").map((name) => `widgets/${name}`),
-    );
-    allSchemas = allSchemas.concat(await Promise.all(widgetFolders.map(processWidgetFolder)));
-
-    // Global widget folders (widgets/global/<name>/schema.json)
-    const globalEntries = await storage.list(scope, "widgets/global");
-    const globalFolders = await widgetFoldersWithSchema(
-      globalEntries.map((name) => `widgets/global/${name}`),
-    );
-    allSchemas = allSchemas.concat(await Promise.all(globalFolders.map(processWidgetFolder)));
-
-    // Filter out nulls (files without schemas or errors)
-    const validSchemas = allSchemas.filter((schema) => schema !== null);
-
-    // A `defaultKey` names one of the theme's own words, which only the render
-    // knows how to read. The editor shows settings, not pages, so the value is
-    // resolved here in the language being edited — otherwise a field whose
-    // default comes from the theme looks empty while the canvas shows its text.
-    const resolved = await withResolvedDefaults(validSchemas, req, res);
-    // `requestLanguage` has already answered a bad language code.
-    if (resolved === null) return;
-    res.json(resolved);
+    const schemas = await readWidgetSchemas(storage, scope);
+    // The language is only checked when a default needs it, as before: a listing
+    // with nothing to resolve never answered a language error.
+    if (!schemasNeedResolvedDefaults(schemas)) return res.json(schemas);
+    const lang = requestLanguage(req, res);
+    if (!lang) return;
+    res.json(await resolveSchemaDefaults(schemas, storage, scope, lang));
   } catch (error) {
-    // Broader catch for unexpected errors
     res.status(500).json({ error: `Failed to get project widgets: ${error.message}` });
   }
 }

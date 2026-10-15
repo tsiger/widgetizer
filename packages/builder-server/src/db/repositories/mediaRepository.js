@@ -15,7 +15,57 @@ export function getMediaFiles(projectId) {
 
 function getMediaFilesStatements(db, projectId) {
   const files = db.prepare("SELECT * FROM media_files WHERE project_id = ? ORDER BY uploaded DESC").all(projectId);
+  return assembleMediaFiles(db, files);
+}
 
+/**
+ * One page of a project's media library, newest first, optionally filtered by a
+ * case-insensitive match on the file name or default-language alt/title/caption.
+ * Loads the related rows for that page only.
+ * @param {string} projectId
+ * @param {{ offset?: number, limit?: number, search?: string }} options
+ * @returns {{ files: Array<object>, total: number }}
+ */
+export function getMediaFilesPage(projectId, { offset = 0, limit = 20, search = "" } = {}) {
+  const db = getDb();
+  return db.transaction(() => {
+    const term = search.trim();
+    const where = term
+      ? "project_id = @projectId AND (original_name LIKE @like ESCAPE '!' OR filename LIKE @like ESCAPE '!' OR alt LIKE @like ESCAPE '!' OR title LIKE @like ESCAPE '!' OR caption LIKE @like ESCAPE '!')"
+      : "project_id = @projectId";
+    const params = { projectId, like: `%${term.replace(/[!%_]/g, (c) => `!${c}`)}%` };
+    const total = db.prepare(`SELECT COUNT(*) AS n FROM media_files WHERE ${where}`).get(params).n;
+    const rows = db
+      .prepare(`SELECT * FROM media_files WHERE ${where} ORDER BY uploaded DESC, id LIMIT @limit OFFSET @offset`)
+      .all({ ...params, limit, offset });
+    return { files: assembleMediaFiles(db, rows).files, total };
+  })();
+}
+
+/**
+ * Media IDs for stored upload paths as content references them, the original or
+ * one of its resized copies (rich text embeds those), for this project only.
+ * @param {string} projectId
+ * @param {string[]} paths
+ * @returns {Map<string, string>} path -> media file ID
+ */
+export function getMediaIdsByPaths(projectId, paths) {
+  const unique = [...new Set(paths)].filter((p) => typeof p === "string" && p);
+  if (unique.length === 0) return new Map();
+  const db = getDb();
+  const ids = new Map();
+  const original = db.prepare("SELECT id FROM media_files WHERE project_id = ? AND path = ?");
+  const resized = db.prepare(
+    "SELECT f.id FROM media_sizes s JOIN media_files f ON f.id = s.media_file_id WHERE f.project_id = ? AND s.path = ?",
+  );
+  for (const path of unique) {
+    const row = original.get(projectId, path) ?? resized.get(projectId, path);
+    if (row) ids.set(path, row.id);
+  }
+  return ids;
+}
+
+function assembleMediaFiles(db, files) {
   if (files.length === 0) return { files: [] };
 
   // Batch-load sizes and usage for all files in this project

@@ -3,7 +3,8 @@ import { stripHtmlToText } from "../services/sanitizationService.js";
 import { LIMIT_KEYS, MAX_MENU_ITEMS, MAX_MENU_DEPTH } from "@widgetizer/core/adapters";
 import { generateUniqueSlug } from "../utils/slugHelpers.js";
 import { generateCopyName } from "../utils/namingHelpers.js";
-import { menuKey, menusDir } from "@widgetizer/core/contentAddress";
+import { menuKey } from "@widgetizer/core/contentAddress";
+import { listMenuIds, readMenu } from "../services/siteReader.js";
 import { requestLanguage, projectLanguageContexts, withoutLanguage } from "../utils/contentLanguage.js";
 import {
   withContentWriteLock,
@@ -12,10 +13,6 @@ import {
 } from "../services/contentCoordination.js";
 import { cleanupDeletedMenuReferences, referenceCleanupWarnings } from "../utils/linkEnrichment.js";
 
-async function listMenuIds(storage, scope, lang) {
-  const files = await storage.list(scope, menusDir(lang));
-  return files.filter((file) => file.endsWith(".json")).map((file) => file.replace(/\.json$/, ""));
-}
 
 /** The bare write. Only the uuid backfill below uses it — see writeMenu. */
 const writeMenuRaw = (storage, scope, menu, lang) =>
@@ -264,12 +261,12 @@ export async function getMenu(req, res) {
     const lang = requestLanguage(req, res);
     if (!lang) return;
 
-    const buf = await storage.read(scope, menuKey(id, lang));
-    if (buf == null) {
+    const menu = await readMenu(storage, scope, id, lang);
+    if (menu == null) {
       return res.status(404).json({ error: "Menu not found" });
     }
 
-    res.json({ ...JSON.parse(buf.toString("utf8")), language: lang.language });
+    res.json({ ...menu, language: lang.language });
   } catch (error) {
     console.error("Error getting menu:", error);
     res.status(500).json({ error: "Failed to get menu" });

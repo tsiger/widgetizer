@@ -21,6 +21,7 @@ import {
   readCollectionItem,
 } from "../services/collectionService.js";
 import { listPagesFromDir, readGlobalWidgetFromDir, readThemeDataFromDir } from "../utils/projectContentFs.js";
+import { readPage, readGlobal, readThemeJson } from "../services/siteReader.js";
 import { globalKey, pageOutputPath, itemOutputPath } from "@widgetizer/core/contentAddress";
 import { requestLanguage, withoutLanguage, projectLanguageContexts, projectLanguages } from "../utils/contentLanguage.js";
 import { getProjectFolderName } from "../utils/projectHelpers.js";
@@ -87,11 +88,21 @@ async function itemPagePrefixes(collectionDeps) {
  * @param {Object} pageData - Page content including widgets and metadata
  * @param {Object} rawThemeSettings - Theme settings for rendering
  * @param {string} previewMode - "editor" or "standalone"
+ * @param {string|null} [projectId] - the site to render as. A caller that read the
+ *   content for a specific site passes it, so a site switch mid-render can't mix
+ *   that content with another site's theme and media. Defaults to the active one.
  * @returns {Promise<string>} Rendered HTML string
  */
-async function generatePreviewHtml(pageData, rawThemeSettings, previewMode, collectionDeps = null, pageNumber = 1) {
+export async function generatePreviewHtml(
+  pageData,
+  rawThemeSettings,
+  previewMode,
+  collectionDeps = null,
+  pageNumber = 1,
+  projectId = null,
+) {
   if (collectionDeps) collectionDeps = { ...collectionDeps, snapshot: new Map() };
-  const activeProjectId = projectRepo.getActiveProjectId();
+  const activeProjectId = projectId ?? projectRepo.getActiveProjectId();
 
   if (!activeProjectId) {
     throw Object.assign(new Error("No active project found"), { status: 404 });
@@ -272,6 +283,133 @@ async function generatePreviewHtml(pageData, rawThemeSettings, previewMode, coll
 }
 
 /**
+ * Render one collection item's page as the preview shows it. The editor posts its
+ * form as `settings` (rendered over the saved item's identity, so translation
+ * links and breadcrumbs resolve); a reader of the saved site passes `savedItem`
+ * and gets that item exactly, SEO and dates included. Throws COLLECTION_NOT_FOUND
+ * or NO_ITEM_TEMPLATE for the two cases a caller can explain.
+ */
+export async function renderCollectionItemPreview({
+  storage,
+  scope,
+  project,
+  collectionType,
+  slug,
+  settings,
+  savedItem = null,
+  lang,
+}) {
+  const collectionDeps = { storage, scope };
+  const schema = await getCollectionSchema(storage, scope, collectionType);
+  if (!schema) {
+    throw Object.assign(new Error(`Collection "${collectionType}" not found.`), { code: "COLLECTION_NOT_FOUND" });
+  }
+  const template = await loadCollectionTemplate(storage, scope, collectionType);
+  if (!template) {
+    throw Object.assign(
+      new Error(
+        `This collection has no template.liquid, so its items have no page to preview. Enable hasItemPages and add a template to ${collectionType}.`,
+      ),
+      { code: "NO_ITEM_TEMPLATE" },
+    );
+  }
+
+  const projectId = project.id;
+  const projectDir = storage.getProjectBase(scope);
+  const rawThemeSettings = await readThemeDataFromDir(projectDir);
+  const headerData = await readGlobalWidgetFromDir(projectDir, "header", lang);
+  const footerData = await readGlobalWidgetFromDir(projectDir, "footer", lang);
+
+  // uuid -> page map so pageUuid links inside the item resolve to slugs.
+  const pages = await listPagesFromDir(projectDir, { defaultLanguage: project.defaultLanguage });
+  const pagesByUuid = new Map();
+  for (const page of pages || []) {
+    if (page.uuid) pagesByUuid.set(page.uuid, page);
+  }
+  // Stable collection-item refs for resolving `menu`/`link`-type item settings
+  // that target another item. Menu maps are loaded lazily inside the render.
+  const collectionItemsByUuid = await loadCollectionItemsByUuid(storage, scope, null, projectLanguageContexts(project));
+
+  const safeSlug = (slug && String(slug)) || "preview";
+  const now = new Date().toISOString();
+  // Without the saved item's identity the item is in no translation group, and
+  // the switcher falls every language back to a homepage. An item that has never
+  // been saved simply has none.
+  const saved = savedItem ?? (await readCollectionItem(storage, scope, collectionType, safeSlug, lang).catch(() => null));
+  const previewItem = savedItem ? { ...savedItem, id: safeSlug, slug: safeSlug, language: lang.language } : {
+    id: safeSlug,
+    uuid: saved?.uuid || "preview",
+    ...(saved?.translationGroupId ? { translationGroupId: saved.translationGroupId } : {}),
+    slug: safeSlug,
+    // What the item page is rendered AS: its own links, its media metadata and
+    // its breadcrumbs are all resolved from it.
+    language: lang.language,
+    schemaVersion: schema.schemaVersion,
+    created: now,
+    updated: now,
+    settings: settings || {},
+  };
+
+  // Preview is served at a single URL (root), so no depth prefixing: assets
+  // resolve via origin-relative URLs (see injectBaseTag).
+  const sharedGlobals = {
+    projectId,
+    apiUrl: "",
+    renderMode: "preview",
+    themeSettingsRaw: rawThemeSettings,
+    enqueuedStyles: new Map(),
+    enqueuedScripts: new Map(),
+    collectionCache: new Map(),
+    pagesByUuid,
+    collectionItemsByUuid,
+    outputPathPrefix: "",
+    currentCanonicalPath: itemOutputPath(schema.slugPrefix, safeSlug, {
+      language: lang.language,
+      defaultLanguage: lang.defaultLanguage,
+    }),
+  };
+
+  // One shared pipeline renders the item page — header/footer + resolved item +
+  // template + layout — identical to the export path.
+  let { html } = await renderCollectionItemPage(
+    projectId,
+    {
+      schema,
+      item: previewItem,
+      template,
+      rawThemeSettings,
+      renderMode: "preview",
+      sharedGlobals,
+      headerData,
+      footerData,
+      projectData: project,
+      siteUrl: "",
+    },
+    collectionDeps,
+  );
+
+  html = injectBaseTag(html);
+  return injectRuntimeScript(html, "standalone", await itemPagePrefixes(collectionDeps), projectLanguages(project));
+}
+
+/**
+ * Render a saved page of `project` as the standalone preview shows it, reading
+ * everything (page, header, footer, theme) from that site's storage.
+ * @returns {Promise<string|null>} HTML, or null when the page doesn't exist
+ */
+export async function renderSavedPagePreview({ storage, scope, project, slug, lang }) {
+  const page = await readPage(storage, scope, slug, lang);
+  if (!page) return null;
+  const theme = await readThemeJson(storage, scope);
+  const [header, footer] = await Promise.all([
+    readGlobal(storage, scope, "header", lang),
+    readGlobal(storage, scope, "footer", lang),
+  ]);
+  const pageData = { ...page, slug: page.slug ?? slug, language: lang.language, globalWidgets: { header, footer } };
+  return generatePreviewHtml(pageData, theme, "standalone", { storage, scope }, 1, project.id);
+}
+
+/**
  * Generates a full HTML preview of a page with header, widgets, and footer.
  * @param {import('express').Request} req - Express request object with pageData, themeSettings, and previewMode in body
  * @param {import('express').Response} res - Express response object (sends HTML)
@@ -378,112 +516,21 @@ export async function createCollectionPreviewToken(req, res) {
     const lang = requestLanguage(req, res);
     if (!lang) return;
 
-    // Schema must exist; template is required to render an item page.
-    const schema = await getCollectionSchema(storage, scope, collectionType);
-    if (!schema) {
-      return res.status(404).json({ error: `Collection "${collectionType}" not found.` });
-    }
-    const template = await loadCollectionTemplate(storage, scope, collectionType);
-    if (!template) {
-      return res.status(400).json({
-        error: "Preview unavailable",
-        message: `This collection has no template.liquid, so its items have no page to preview. Enable hasItemPages and add a template to ${collectionType}.`,
-      });
-    }
-
-    const activeProjectId = scope.projectId;
-    const projectData = projectRepo.getProjectById(activeProjectId);
-    if (!projectData) {
+    const project = projectRepo.getProjectById(scope.projectId);
+    if (!project) {
       return res.status(404).json({ error: "No active project found" });
     }
-    const folder = projectData.folderName;
 
-    const projectDir = getProjectDir(folder);
-    const rawThemeSettings = await readThemeDataFromDir(projectDir);
-    const headerData = await readGlobalWidgetFromDir(projectDir, "header", lang);
-    const footerData = await readGlobalWidgetFromDir(projectDir, "footer", lang);
-
-    // uuid -> page map so pageUuid links inside the item resolve to slugs.
-    // listPagesFromDir reads <projectDir>/pages — projectDir is the working dir
-    // resolved from the FOLDER name (not the UUID), matching the export path.
-    const pages = await listPagesFromDir(projectDir, { defaultLanguage: projectData.defaultLanguage });
-    const pagesByUuid = new Map();
-    for (const page of pages || []) {
-      if (page.uuid) pagesByUuid.set(page.uuid, page);
+    let html;
+    try {
+      html = await renderCollectionItemPreview({ storage, scope, project, collectionType, slug, settings, lang });
+    } catch (error) {
+      if (error.code === "COLLECTION_NOT_FOUND") return res.status(404).json({ error: error.message });
+      if (error.code === "NO_ITEM_TEMPLATE") {
+        return res.status(400).json({ error: "Preview unavailable", message: error.message });
+      }
+      throw error;
     }
-    // Stable collection-item refs for resolving `menu`/`link`-type item settings
-    // that target another item. Menu maps are loaded lazily inside the render.
-    const collectionItemsByUuid = await loadCollectionItemsByUuid(
-      storage,
-      scope,
-      null,
-      projectLanguageContexts(projectData),
-    );
-
-    // Assemble the item to render from the posted settings (the navigable preview
-    // passes the saved item's settings).
-    const safeSlug = (slug && String(slug)) || "preview";
-    const now = new Date().toISOString();
-    // The posted settings are what gets rendered, but the identity comes from
-    // the saved item: without it the item is in no translation group, and the
-    // switcher falls every language back to a homepage. An item that has never
-    // been saved simply has none.
-    const saved = await readCollectionItem(storage, scope, collectionType, safeSlug, lang).catch(() => null);
-    const previewItem = {
-      id: safeSlug,
-      uuid: saved?.uuid || "preview",
-      ...(saved?.translationGroupId ? { translationGroupId: saved.translationGroupId } : {}),
-      slug: safeSlug,
-      // What the item page is rendered AS: its own links, its media metadata and
-      // its breadcrumbs are all resolved from it.
-      language: lang.language,
-      schemaVersion: schema.schemaVersion,
-      created: now,
-      updated: now,
-      settings: settings || {},
-    };
-
-    const apiUrl = "";
-    // Preview is served at a single URL (root), so no depth prefixing: assets
-    // resolve via origin-relative URLs (see injectBaseTag).
-    const sharedGlobals = {
-      projectId: activeProjectId,
-      apiUrl,
-      renderMode: "preview",
-      themeSettingsRaw: rawThemeSettings,
-      enqueuedStyles: new Map(),
-      enqueuedScripts: new Map(),
-      collectionCache: new Map(),
-      pagesByUuid,
-      collectionItemsByUuid,
-      outputPathPrefix: "",
-      currentCanonicalPath: itemOutputPath(schema.slugPrefix, safeSlug, {
-        language: lang.language,
-        defaultLanguage: lang.defaultLanguage,
-      }),
-    };
-
-    // One shared pipeline renders the item page — header/footer + resolved item +
-    // template + layout — identical to the export path.
-    let { html } = await renderCollectionItemPage(
-      activeProjectId,
-      {
-        schema,
-        item: previewItem,
-        template,
-        rawThemeSettings,
-        renderMode: "preview",
-        sharedGlobals,
-        headerData,
-        footerData,
-        projectData,
-        siteUrl: "",
-      },
-      collectionDeps,
-    );
-
-    html = injectBaseTag(html);
-    html = injectRuntimeScript(html, "standalone", await itemPagePrefixes(collectionDeps), projectLanguages(req.activeProject));
 
     const token = generateToken(html);
     res.json({ token });

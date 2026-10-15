@@ -16,7 +16,8 @@ import { stripHtmlToText } from "../services/sanitizationService.js";
 import { LIMIT_KEYS, MAX_WIDGETS_PER_PAGE } from "@widgetizer/core/adapters";
 import { sanitizeSlug, generateUniqueSlug } from "../utils/slugHelpers.js";
 import { generateCopyName } from "../utils/namingHelpers.js";
-import { isHomeSlug, isReservedPageSlug, pageKey, pagesDir } from "@widgetizer/core/contentAddress";
+import { isHomeSlug, isReservedPageSlug, pageKey } from "@widgetizer/core/contentAddress";
+import { listPageSlugs, readPage } from "../services/siteReader.js";
 import { requestLanguage, projectLanguageContexts, withoutLanguage } from "../utils/contentLanguage.js";
 import {
   assertHasIdentity,
@@ -41,9 +42,6 @@ const pageSlugTaken = (storage, scope, lang, ownSlug) => async (slug) =>
   (await storage.exists(scope, pageKey(slug, lang))) ||
   homeSlugClash(storage, scope, slug, lang, ownSlug);
 
-async function listPageFiles(storage, scope, lang) {
-  return (await storage.list(scope, pagesDir(lang))).filter((name) => name.endsWith(".json"));
-}
 
 function reservedPageSlug(res, slug) {
   return res.status(400).json({
@@ -340,11 +338,11 @@ export async function getPage(req, res) {
     const lang = requestLanguage(req, res);
     if (!lang) return;
 
-    const pageData = await storage.read(scope, pageKey(id, lang));
+    const pageData = await readPage(storage, scope, id, lang);
     if (pageData == null) {
       return res.status(404).json({ error: "Page not found" });
     }
-    return res.json({ ...JSON.parse(pageData.toString("utf8")), language: lang.language });
+    return res.json({ ...pageData, language: lang.language });
   } catch (error) {
     console.error("Error getting page:", error);
     res.status(500).json({ error: "Failed to get page" });
@@ -529,15 +527,14 @@ export async function getAllPages(req, res) {
     // without req.adapters against the project working directory.)
     const pages = [];
     for (const lang of projectLanguageContexts(req.activeProject)) {
-      const pageFiles = await listPageFiles(storage, scope, lang);
+      const pageIds = await listPageSlugs(storage, scope, lang);
       const loaded = await Promise.all(
-        pageFiles.map(async (name) => {
-          const pageId = name.replace(/\.json$/, "");
+        pageIds.map(async (pageId) => {
           try {
-            const buf = await storage.read(scope, pageKey(pageId, lang));
-            return buf == null ? null : { ...JSON.parse(buf.toString("utf8")), id: pageId, language: lang.language };
+            const page = await readPage(storage, scope, pageId, lang);
+            return page == null ? null : { ...page, id: pageId, language: lang.language };
           } catch (readError) {
-            console.error(`Error reading or parsing page file ${name}:`, readError);
+            console.error(`Error reading or parsing page file ${pageId}.json:`, readError);
             return null;
           }
         }),
@@ -925,9 +922,7 @@ async function clearListingAnchorsElsewhere({ scope, storage, keepPageId, widget
   };
 
   const cleared = [];
-  const pageFiles = await listPageFiles(storage, scope, lang);
-  for (const pageFile of pageFiles) {
-    const pageId = pageFile.replace(/\.json$/, "");
+  for (const pageId of await listPageSlugs(storage, scope, lang)) {
     if (pageId === keepPageId) continue;
 
     const buf = await storage.read(scope, pageKey(pageId, lang));
@@ -976,13 +971,13 @@ export async function duplicatePage(req, res) {
     const originalPageData = JSON.parse(originalBuf.toString("utf8"));
 
     // Read all existing page files to find existing copy names
-    const pageJsonFiles = await listPageFiles(storage, scope, lang);
+    const pageIds = await listPageSlugs(storage, scope, lang);
 
     const existingPageNames = (
       await Promise.all(
-        pageJsonFiles.map(async (name) => {
+        pageIds.map(async (pageId) => {
           try {
-            const buf = await storage.read(scope, pageKey(name.replace(/\.json$/, ""), lang));
+            const buf = await storage.read(scope, pageKey(pageId, lang));
             return buf == null ? null : JSON.parse(buf.toString("utf8")).name;
           } catch {
             // Skip unreadable entries rather than failing the whole duplicate:

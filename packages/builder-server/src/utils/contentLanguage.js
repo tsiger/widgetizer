@@ -50,6 +50,26 @@ export function requestLanguage(req, res) {
   return lang;
 }
 
+/**
+ * The language a caller outside a request asks for (the default when absent), or a
+ * LANGUAGE_UNKNOWN error naming the site's languages. Same rules as
+ * `requestLanguage`, which keeps its own HTTP answer for the editor.
+ */
+export function contentLanguage(project, code) {
+  const { defaultLanguage, languages } = projectLanguages(project);
+  const requested = normalizeLanguageCode(code ?? "");
+  const language = resolveLanguage(requested, defaultLanguage);
+  const lang = { language, defaultLanguage, languages };
+  const malformed = Boolean(requested) && !LANGUAGE_CODE_RE.test(requested);
+  if (malformed || (Boolean(languageFolder(lang)) && !languages.includes(language))) {
+    const available = [defaultLanguage, ...languages].join(", ");
+    throw Object.assign(new Error(`Language "${requested}" isn't on this site. Its languages are: ${available}.`), {
+      code: "LANGUAGE_UNKNOWN",
+    });
+  }
+  return lang;
+}
+
 /** The language folders present under a content directory, for scans that must touch every file. */
 export async function languageFoldersIn(storage, scope, dir) {
   const entries = await storage.list(scope, dir);
