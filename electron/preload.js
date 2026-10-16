@@ -21,3 +21,7 @@ contextBridge.exposeInMainWorld("electronUpdater", {
   openExternal: (url) => ipcRenderer.send("open-external", url),
   openPreviewWindow: (previewPath) => ipcRenderer.send("open-preview-window", previewPath),
 });
+
+contextBridge.exposeInMainWorld("electronAssistant", {
+  requestEnable: () => ipcRenderer.invoke("assistant:request-enable"),
+});

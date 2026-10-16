@@ -4,6 +4,7 @@ import {
   getSetting as repoGetSetting,
   defaultSettings,
   deepMerge,
+  checkSettingsUpdate,
 } from "../db/repositories/settingsRepository.js";
 
 /**
@@ -126,10 +127,15 @@ export async function updateAppSettings(req, res) {
       }
     }
 
+    checkSettingsUpdate(currentSettings, newSettings);
     saveSettings(newSettings);
     res.json({ message: "Settings updated successfully", settings: newSettings });
   } catch (error) {
-    res.status(500).json({ error: error.message || "Failed to update application settings." });
+    const status = Number.isInteger(error?.statusCode) ? error.statusCode : 500;
+    res.status(status).json({
+      error: error.message || "Failed to update application settings.",
+      ...(error?.code ? { code: error.code } : {}),
+    });
   }
 }
 

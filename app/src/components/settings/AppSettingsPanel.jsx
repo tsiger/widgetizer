@@ -33,9 +33,12 @@ export default function AppSettingsPanel({
     });
   });
 
-  const [activeTab, setActiveTab] = useState(Object.keys(settingsByTab)[0] || "");
+  const tabKeys = [...new Set([...Object.keys(schema.tabs ?? {}), ...Object.keys(settingsByTab)])].filter(
+    (tabKey) => settingsByTab[tabKey] || tabExtras[tabKey],
+  );
+  const [activeTab, setActiveTab] = useState(tabKeys[0] || "");
 
-  if (Object.keys(settingsByTab).length === 0) {
+  if (tabKeys.length === 0) {
     return <div className="p-4 text-slate-500">{t("appSettings.messages.noSettings")}</div>;
   }
 
@@ -114,7 +117,7 @@ export default function AppSettingsPanel({
       {/* Vertical tabs sidebar */}
       <div className="w-60 border-r border-slate-200 shrink-0">
         <div className="sticky top-0">
-          {Object.keys(settingsByTab).map((tabKey) => (
+          {tabKeys.map((tabKey) => (
             <button
               key={tabKey}
               className={`w-full text-left px-4 py-3 text-sm font-medium border-l-2 ${

@@ -94,7 +94,12 @@ export { checkForUpdates, toggleThemeUpdates, applyThemeUpdateToDir } from "./se
 export { readAppSettingsFile } from "./controllers/appSettingsController.js";
 // Read-only project listing and change notifications for shell-composed features
 // (the OSS AI assistant) that must never select or persist an active project.
-export { getSettings, onSettingsChanged } from "./db/repositories/settingsRepository.js";
+export {
+  getSettings,
+  saveSettings,
+  onSettingsChanged,
+  setSettingsUpdatePolicy,
+} from "./db/repositories/settingsRepository.js";
 export { getAllProjects, getProjectById, getActiveProjectId } from "./db/repositories/projectRepository.js";
 // Request-free, scope-first reads of a site's saved content, shared with the
 // editor's own controllers, for shell-composed readers such as the AI assistant.

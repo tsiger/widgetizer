@@ -1,1 +1,1 @@
-export { default as AssistantStatus } from "./AssistantStatus.jsx";
+export { default as AssistantAccess } from "./AssistantAccess.jsx";

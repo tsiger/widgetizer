@@ -1108,6 +1108,10 @@
         "label": "Allow AI Assistants",
         "description": "Lets AI assistants such as Claude and Codex read and edit the site open in Widgetizer."
       },
+      "turnOn": "Turn On",
+      "turnOff": "Turn Off",
+      "desktopOnly": "Turn this on from the Widgetizer desktop app.",
+      "notConfirmed": "Widgetizer couldn't confirm the change. Check the status below.",
       "status": {
         "off": "Assistant access is off.",
         "starting": "Turning on assistant access…",

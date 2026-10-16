@@ -6,6 +6,9 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import { isSafePreviewPath } from "./previewPath.js";
+import { createServerRpc } from "./serverRpc.js";
+import { createEnableGate, isTrustedSender } from "./assistantPrompt.js";
+import { windowOpenTarget } from "./windowOpenPolicy.js";
 
 // Constants
 const DEFAULT_PORT = "3001";
@@ -19,6 +22,7 @@ const EDITOR_SECRET = crypto.randomBytes(32).toString("base64url");
 let mainWindow = null;
 let previewWindow = null;
 let serverProcess = null;
+let serverRpc = null;
 let logFile = null;
 let serverReadyDeferred = null;
 
@@ -215,6 +219,7 @@ function startServer() {
       env,
       stdio: "pipe",
     });
+    serverRpc = createServerRpc(serverProcess);
 
     serverProcess.stdout.on("data", (data) => {
       log(`[server stdout] ${data.toString().trim()}`);
@@ -235,6 +240,7 @@ function startServer() {
     serverProcess.on("exit", (code) => {
       log(`Server process exited with code ${code}`);
       serverProcess = null;
+      serverRpc = null;
       // If the server died before reporting ready, fail the waiter so the user
       // sees the startup error instead of hanging until the timeout.
       serverReadyDeferred?.reject(new Error(`Server process exited with code ${code} before ready`));
@@ -291,6 +297,7 @@ function stopServer() {
       serverProcess = null;
       resolve();
     });
+    serverRpc?.close();
     child.postMessage({ type: "shutdown" });
   });
   return serverStopping;
@@ -397,6 +404,8 @@ function createWindow() {
     },
   });
 
+  applyWindowOpenPolicy(mainWindow);
+
   mainWindow.on("closed", () => {
     log("Main window closed");
     mainWindow = null;
@@ -496,6 +505,7 @@ function createPreviewWindow() {
   }
 
   previewWindow = new BrowserWindow(browserWindowOpts);
+  applyWindowOpenPolicy(previewWindow);
 
   previewWindow.on("closed", () => {
     log("Preview window closed");
@@ -521,6 +531,58 @@ function createPreviewWindow() {
 
   return previewWindow;
 }
+
+function contentOrigins() {
+  return serverPort ? [`http://127.0.0.1:${serverPort}`, `http://localhost:${serverPort}`] : [];
+}
+
+function applyWindowOpenPolicy(window) {
+  window.webContents.setWindowOpenHandler(({ url }) => {
+    const target = windowOpenTarget(url, contentOrigins());
+    if (target === "content") openContentWindow(url);
+    else if (target === "external") shell.openExternal(url);
+    return { action: "deny" };
+  });
+}
+
+// Exports and media files run site code, so they get a window without the preload bridge.
+function openContentWindow(url) {
+  const window = new BrowserWindow({
+    width: 1280,
+    height: 800,
+    backgroundColor: "#ffffff",
+    webPreferences: { contextIsolation: true, nodeIntegration: false, sandbox: true },
+  });
+  applyWindowOpenPolicy(window);
+  window.loadURL(url).catch((err) => log(`Failed to open ${url}: ${err.message}`));
+}
+
+async function askToEnableAssistant() {
+  if (!mainWindow || mainWindow.isDestroyed()) return false;
+  const { response } = await dialog.showMessageBox(mainWindow, {
+    type: "question",
+    title: "Allow AI assistants?",
+    message: "Allow AI assistants to read and change your sites?",
+    detail:
+      "Assistants such as Claude and Codex on this computer will be able to read and edit the site open in Widgetizer. You can turn this off at any time in Settings → AI Assistant.",
+    buttons: ["Cancel", "Allow"],
+    defaultId: 0,
+    cancelId: 0,
+    noLink: true,
+  });
+  return response === 1 && !isQuitting && Boolean(mainWindow) && !mainWindow.isDestroyed();
+}
+
+const requestAssistantEnable = createEnableGate({
+  isTrusted: (event) =>
+    isTrustedSender(event, {
+      webContents: mainWindow && !mainWindow.isDestroyed() ? mainWindow.webContents : null,
+      rendererOrigin: new URL(getRendererBaseUrl()).origin,
+    }),
+  getAccess: () => (serverRpc ? serverRpc.call("assistantAccess") : Promise.reject(new Error("No server"))),
+  enable: () => (serverRpc ? serverRpc.call("enableAssistant") : Promise.reject(new Error("No server"))),
+  ask: askToEnableAssistant,
+});
 
 // previewPath arrives over IPC and is untrusted; isSafePreviewPath (electron/previewPath.js)
 // is the guard that keeps a hostile path from loading remote content into the privileged
@@ -816,6 +878,8 @@ function setupIpcHandlers() {
       shell.openExternal(url);
     }
   });
+
+  ipcMain.handle("assistant:request-enable", (event) => requestAssistantEnable(event));
 
   ipcMain.on("open-preview-window", (_event, previewPath) => {
     openPreviewWindow(previewPath).catch((err) => {

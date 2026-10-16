@@ -11,8 +11,11 @@ import {
   getDb,
   DATA_DIR,
   getSettings,
+  saveSettings,
   onSettingsChanged,
+  setSettingsUpdatePolicy,
 } from "@widgetizer/builder-server";
+import { AuthorizationError } from "@widgetizer/core/errors";
 import {
   LocalScopeResolver,
   LocalPreviewScopeResolver,
@@ -52,9 +55,25 @@ function allowedExtraOrigins() {
   return process.env.NODE_ENV === "production" ? configured : [...DEV_ORIGINS, ...configured];
 }
 
+const assistantEnabled = (settings) => settings.assistant?.enabled === true;
+
+// Code in a page (a preview, an embed) can reach the editor's routes, so only the desktop app's own prompt may turn access on.
+function refuseEnablingFromPages() {
+  setSettingsUpdatePolicy((previous, next) => {
+    if (!assistantEnabled(previous) && assistantEnabled(next)) {
+      throw new AuthorizationError("Turn on assistant access from Widgetizer's own prompt.", { code: "DECISION_REQUIRED" });
+    }
+  });
+}
+
+function enableAssistantAccess() {
+  const current = getSettings();
+  if (!assistantEnabled(current)) saveSettings({ ...current, assistant: { ...current.assistant, enabled: true } });
+}
+
 function createAssistant(adapters, { db, editorProtected }) {
   const access = {
-    isEnabled: () => getSettings().assistant?.enabled === true,
+    isEnabled: () => assistantEnabled(getSettings()),
     subscribe: (listener) =>
       onSettingsChanged((next, previous) => {
         if (next.assistant?.enabled !== previous.assistant?.enabled) listener();
@@ -100,6 +119,8 @@ export async function buildOssApp({ getPort = () => null, bindHost = "127.0.0.1"
   };
 
   const editorSecret = process.env.WIDGETIZER_EDITOR_SECRET || null;
+  setSettingsUpdatePolicy(null);
+  if (editorSecret) refuseEnablingFromPages();
   const assistant = createAssistant(adapters, { db, editorProtected: Boolean(editorSecret) });
   const guard = createRequestGuard({
     getPort,
@@ -135,7 +156,15 @@ export async function buildOssApp({ getPort = () => null, bindHost = "127.0.0.1"
  * withdrawn by `shutdown`, which SIGINT/SIGTERM also run.
  *
  * @param {{ defaultPort: number|string, onReady?: (port: number) => void }} options
- * @returns {Promise<{ server: import('http').Server, shutdown: () => Promise<void> }>}
+ * `assistantAccess` and `enableAssistant` are for the desktop app's main process
+ * only, over its private channel, never for routes.
+ *
+ * @returns {Promise<{
+ *   server: import('http').Server,
+ *   shutdown: () => Promise<void>,
+ *   assistantAccess: () => { enabled: boolean },
+ *   enableAssistant: () => Promise<{ enabled: boolean }>,
+ * }>}
  */
 export async function startOssServer({ defaultPort, onReady } = {}) {
   // PORT=0 → OS assigns an ephemeral port at bind time. Otherwise use the
@@ -205,5 +234,12 @@ export async function startOssServer({ defaultPort, onReady } = {}) {
 
   onReady?.(port);
 
-  return { server, shutdown };
+  const assistantAccess = () => ({ enabled: assistantEnabled(getSettings()) });
+  const enableAssistant = async () => {
+    enableAssistantAccess();
+    await assistant.settled();
+    return assistantAccess();
+  };
+
+  return { server, shutdown, assistantAccess, enableAssistant };
 }

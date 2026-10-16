@@ -4,9 +4,10 @@
 
 ## Progress
 
-- **M0 — done** (`d48762c6`…`ae7598e4`). Tried by the maintainer with Claude Desktop and Codex. Still open from it: verifying the macOS builds (arm64 + x64 relay runtime, signing) and installing the `.mcpb` in Claude Desktop. Decided: keep the bundled Node runtime for the relay.
+- **M0 — done** (`d48762c6`…`ae7598e4`, packaging fix `35691e75`). Tried by the maintainer with Claude Desktop and Codex; the unsigned packaged builds work on macOS and Windows, and the `.mcpb` installs and connects in Claude Desktop. Still open: verifying signed builds before release. Decided: keep the bundled Node runtime for the relay.
 - **M1 — done** (`c9d00efc`, `eb373c82`). Fourteen read-only tools, reviewed by Codex until no findings remained. Tried by the maintainer: works.
-- **Next: M2.** Start with its first bullet, isolating the preview from the editor's privileges, before any assistant write exists. Then plan M2 in detail and have it reviewed before coding, as for M0 and M1.
+- **M2a — built, reviewed by Codex (no findings), not yet tried by the maintainer.** Turning access on in the desktop app goes through the app's own prompt (see M2's first bullet). Isolating the preview itself was dropped: embeds, maps and theme scripts must keep working as they do. To try it, use a packaged build (`npm run electron:build:win:unsigned`, then `dist-electron\win-unpacked\Widgetizer.exe`); `electron:dev` runs without the editor credential and behaves like the browser version. Check: Turn On shows the system prompt, Cancel leaves access off, Allow turns it on; the window still takes keyboard input afterwards; Turn Off needs no prompt; exports and media open in a plain app window, outside links in the browser. Afterwards `npm run dev:all` rebuilds `better-sqlite3` for Node.
+- **Next: the rest of M2.** Revision and receipts, jobs, the start handshake, the write gate, snapshots, asset retention, validation (including where executable content is output), the live editor, Stop/Undo. Plan it in detail, have Codex review the plan, explain it to the maintainer in plain words, then build.
 - Known test baseline on Windows: 11 backend tests (theme update / preset / snapshot atomicity) and 1 adapters-local test (concurrent atomic writes) fail without any of this work too.
 
 ---
@@ -43,7 +44,7 @@
 
 ## M2 — One complete edit, with recovery
 
-- **First, isolate the preview.** Scripts in the same-origin preview iframe can act as the editor today (including turning access on). Serve the preview from a separate origin, or otherwise cut it off from the editor's privileges, before any assistant write exists.
+- **First, decisions the page can't make (M2a).** Code in the preview can act as the editor, so in the desktop app turning access on happens in a prompt the main process draws and reaches the server over the utility-process channel; the settings route refuses it whenever the editor credential is configured. Windows opened by pages follow one rule: the app server's own pages open in a window with no preload, other web addresses in the browser, anything else is refused.
 
 The hard milestone. A single edit family (**edit sections** on a page, header or footer) with everything around it:
 
@@ -53,6 +54,7 @@ The hard milestone. A single edit family (**edit sections** on a page, header or
 - **Write gate:** checked on admission and again inside the write section after any wait. Job ownership is persisted state with short critical sections, never a mutex held across the conversation. No new lock wraps an existing operation (the content-write lock is non-reentrant and innermost); mutation helpers are extracted where needed.
 - **Snapshots:** captured through the storage adapters plus scoped repository reads, under exclusion, so files and rows describe one revision. Packed as one archive and manifest in injected snapshot storage. Restore keeps IDs, removes what the job added, and reconciles media usage.
 - **Asset retention:** immutable versions, pinning, read/restore and garbage collection in the asset contract and conformance suite. Every delete/replace path goes through it, the editor's included. A retention failure stops the delete (today deletion swallows asset errors and removes metadata anyway). Capped by count and disk, never pruning the latest snapshot or a running job.
+- **Executable content is confirm-first** (refused until M3). Classify fields by where their value is output, not by setting type: a `textarea` used as an iframe `src` (Arch's map) can run code through a `javascript:` address. Either restrict such values to safe schemes and targets or treat the field as executable; reject unknown cases. Check effective values, including schema defaults a new section or block brings in.
 - **Validation:** a pure validator in core (setting keys and types, options, ranges, block types, `maxBlocks`, link shape, fonts, project-owned media, ID and order consistency). Orchestration lives in the backend package and reuses sanitisation.
 - **Live editor:** an event channel; banner with Stop; lock across every window; refetch on reconnect; clean-baseline refresh without autosave; "Undo assistant changes" button.
 - Stop and Undo; undo refused after later edits or a theme update.
@@ -63,6 +65,7 @@ The hard milestone. A single edit family (**edit sections** on a page, header or
 - The request carries the exact plan; Widgetizer shows the prompt. **The whole app halts** until the user answers, with no timeout: an app-wide write barrier across every site, window and in-flight write. The prompt, Stop and turning access off stay usable. In Hosted the halt covers the user's account only.
 - If the assistant disconnects or Widgetizer restarts while the prompt is open, the prompt becomes a choice to keep or undo the job's changes so far; the job ends either way.
 - Approval is single-use and bound to the plan, job, session and revision. Impact counts across the whole job.
+- Desktop prompt: a small window main creates (no site content), holding Allow, Cancel and Stop. A parent-modal system box would block Stop. Main keeps the approval ID it showed and sends the answer over the utility-process channel; the server consumes it atomically and refuses it once Stop, turning access off, a disconnect or a restart has invalidated it. Requests for a different approval while one is open are refused, not merged.
 - Covers deleting pages, collection items and media; removing a language; replacing a whole menu or header/footer; multi-page rewrites; export (including which older export it prunes).
 
 ## M4 — Remaining edit families

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { getAppSettings, saveAppSettings } from "../queries/appSettingsManager.js";
 import useToastStore from "../stores/toastStore.js";
@@ -16,8 +16,7 @@ import settingsSchema from "../config/appSettings.schema.json";
  *   schema: Object,
  *   handleInputChange: (settingKey: string, value: any) => void,
  *   handleSave: () => Promise<void>,
- *   handleCancel: () => void,
- *   syncSetting: (settingKey: string, value: any) => void
+ *   handleCancel: () => void
  * }} Application settings state and handlers
  * @property {Object|null} settings - Current settings object (merged with schema defaults)
  * @property {boolean} loading - Whether settings are being fetched
@@ -204,24 +203,6 @@ export default function useAppSettings() {
     }
   };
 
-  // Adopt a value committed elsewhere (another window, the server) into a field
-  // the user hasn't touched here, so the form keeps showing the real setting.
-  const syncSetting = useCallback((settingKey, value) => {
-    setOriginalSettings((prevOriginal) => {
-      if (!prevOriginal || getNestedValue(prevOriginal, settingKey) === value) return prevOriginal;
-      setSettings((prev) => {
-        if (!prev || getNestedValue(prev, settingKey) !== getNestedValue(prevOriginal, settingKey)) return prev;
-        const next = JSON.parse(JSON.stringify(prev));
-        setNestedValue(next, settingKey, value);
-        return next;
-      });
-      const nextOriginal = JSON.parse(JSON.stringify(prevOriginal));
-      setNestedValue(nextOriginal, settingKey, value);
-      if (settingsCache) setNestedValue(settingsCache, settingKey, value);
-      return nextOriginal;
-    });
-  }, []);
-
   const handleCancel = () => {
     setSettings(JSON.parse(JSON.stringify(originalSettings)));
     setHasChanges(false);
@@ -256,6 +237,5 @@ export default function useAppSettings() {
     handleInputChange,
     handleSave,
     handleCancel,
-    syncSetting,
   };
 }

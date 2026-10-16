@@ -88,6 +88,22 @@ export function saveSettings(settings) {
   notifySettingsChanged(getSettings(), previous);
 }
 
+let settingsUpdatePolicy = null;
+
+/**
+ * Let the shell veto an update made through the settings route. The policy runs
+ * synchronously with `(previous, next)` and throws to refuse the whole update.
+ * Writes the shell makes itself with `saveSettings` don't pass through it.
+ * @param {((previous: object, next: object) => void) | null} policy
+ */
+export function setSettingsUpdatePolicy(policy) {
+  settingsUpdatePolicy = policy;
+}
+
+export function checkSettingsUpdate(previous, next) {
+  settingsUpdatePolicy?.(previous, next);
+}
+
 const settingsListeners = new Set();
 
 /**

@@ -24,7 +24,7 @@ export default mergeConfig(
         "packages/adapters-local/src/**/*.test.js",
         "packages/render-engine/src/**/*.test.js",
         "packages/editor-ui/src/**/*.test.{js,jsx}",
-        "packages/assistant/src/**/*.test.js",
+        "packages/assistant/src/**/*.test.{js,jsx}",
         "packages/mcp/src/**/*.test.js",
       ],
     },

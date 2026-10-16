@@ -27,7 +27,10 @@ process.env.NODE_ENV = "test";
 
 const { getAppSettings, updateAppSettings, readAppSettingsFile, getSetting } =
   await import("../controllers/appSettingsController.js");
-const { saveSettings, defaultSettings, onSettingsChanged } = await import("../db/repositories/settingsRepository.js");
+const { saveSettings, defaultSettings, onSettingsChanged, setSettingsUpdatePolicy } = await import(
+  "../db/repositories/settingsRepository.js"
+);
+const { AuthorizationError } = await import("@widgetizer/core/errors");
 const { getDb, closeDb } = await import("../db/index.js");
 
 // ============================================================================
@@ -411,6 +414,29 @@ describe("assistant access setting", () => {
     await callController(updateAppSettings, { body: { assistant: { enabled: true } } });
     await callController(updateAppSettings, { body: { general: { language: "el" } } });
     assert.equal((await readAppSettingsFile()).assistant.enabled, true);
+  });
+});
+
+describe("settings update policy", () => {
+  it("refuses the whole update with the policy's status and code, saving nothing", async () => {
+    setSettingsUpdatePolicy((previous, next) => {
+      if (!previous.assistant.enabled && next.assistant.enabled) {
+        throw new AuthorizationError("Not from here.", { code: "DECISION_REQUIRED" });
+      }
+    });
+    try {
+      const res = await callController(updateAppSettings, {
+        body: { assistant: { enabled: true }, general: { language: "el" } },
+      });
+      assert.equal(res._status, 403);
+      assert.equal(res._json.code, "DECISION_REQUIRED");
+      const settings = await readAppSettingsFile();
+      assert.equal(settings.assistant.enabled, false);
+      assert.equal(settings.general.language, defaultSettings.general.language);
+      assert.equal((await callController(updateAppSettings, { body: { general: { language: "el" } } }))._status, 200);
+    } finally {
+      setSettingsUpdatePolicy(null);
+    }
   });
 });
 
