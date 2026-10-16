@@ -4,8 +4,8 @@
 
 ## Progress
 
-- **M0 — done** (`d48762c6`…`ae7598e4`). Tried by the maintainer with Claude Desktop and Codex. Still open from it: verifying the macOS builds (arm64 + x64 relay runtime, signing) and installing the `.mcpb` in Claude Desktop; deciding bundled Node vs. running the relay through the app's own executable (`ELECTRON_RUN_AS_NODE`).
-- **M1 — done** (`c9d00efc`, `eb373c82`). Fourteen read-only tools, reviewed by Codex until no findings remained. Not yet tried in the app by the maintainer.
+- **M0 — done** (`d48762c6`…`ae7598e4`). Tried by the maintainer with Claude Desktop and Codex. Still open from it: verifying the macOS builds (arm64 + x64 relay runtime, signing) and installing the `.mcpb` in Claude Desktop. Decided: keep the bundled Node runtime for the relay.
+- **M1 — done** (`c9d00efc`, `eb373c82`). Fourteen read-only tools, reviewed by Codex until no findings remained. Tried by the maintainer: works.
 - **Next: M2.** Start with its first bullet, isolating the preview from the editor's privileges, before any assistant write exists. Then plan M2 in detail and have it reviewed before coding, as for M0 and M1.
 - Known test baseline on Windows: 11 backend tests (theme update / preset / snapshot atomicity) and 1 adapters-local test (concurrent atomic writes) fail without any of this work too.
 
