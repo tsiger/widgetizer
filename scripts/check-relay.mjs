@@ -20,7 +20,7 @@ const TIMEOUT_MS = 15000;
 
 export function checkRelay({ relay, node = process.execPath, args = [], env = process.env }) {
   const dataRoot = mkdtempSync(join(tmpdir(), "wz-relay-check-"));
-  const child = spawn(node, [resolve(relay), ...args], {
+  const child = spawn(resolve(node), [resolve(relay), ...args], {
     cwd: tmpdir(),
     env: { ...env, WIDGETIZER_DATA_ROOT: dataRoot },
     stdio: ["pipe", "pipe", "pipe"],

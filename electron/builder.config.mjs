@@ -24,7 +24,7 @@ export default {
     // dist/ by Vite). They compose the @widgetizer/* backend packages, which are
     // bundled via dependencies.
     "app/server-common.js",
-    "app/server/**",
+    "app/server",
     "!app/server/__tests__/**",
     // Core assets + preview-iframe runtime modules are supplied by
     // @widgetizer/core and ride along via that dependency.
