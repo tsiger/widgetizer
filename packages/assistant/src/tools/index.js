@@ -1,10 +1,13 @@
 import { GUIDANCE } from "../guidance.js";
-import { statusTool, listSitesTool } from "./sites.js";
+import { statusTool, listSitesTool, openSiteTool, createSiteTool } from "./sites.js";
 import { siteOverviewTool, readPageTool, readSitePartTool, readMenusTool } from "./content.js";
 import { readLookTool, themeCatalogTool, sectionDetailsTool } from "./theme.js";
 import { listMediaTool, viewImageTool } from "./media.js";
 import { readCollectionsTool } from "./collections.js";
 import { previewPageTool } from "./preview.js";
+import { jobTools } from "./jobs.js";
+import { editSectionsTool } from "./edit.js";
+import { familyTools } from "./families.js";
 
 export const guidanceTool = {
   name: "get_guidance",
@@ -38,4 +41,9 @@ export const builtinTools = [
   readCollectionsTool,
   previewPageTool,
   guidanceTool,
+  ...jobTools,
+  editSectionsTool,
+  ...familyTools,
+  openSiteTool,
+  createSiteTool,
 ];

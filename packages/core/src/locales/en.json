@@ -1132,5 +1132,31 @@
       "imageSizesManagedByThemeGeneric": "Image sizes are managed by the selected theme. App settings are ignored. Thumbnails are still generated for the media library.",
       "noSettings": "No settings available"
     }
+  },
+  "assistantJob": {
+    "preparing": "The assistant is getting ready to change your site: {{summary}}",
+    "working": "The assistant is changing your site: {{summary}}",
+    "stopping": "Stopping the assistant and putting your site back…",
+    "recovery": "Widgetizer couldn't undo the assistant's changes. Try again, or keep the site as it is now.",
+    "connecting": "Connecting to Widgetizer…",
+    "reloading": "Loading the latest version of your site…",
+    "missed": "The assistant changed this site while this window was disconnected, so the unsaved changes in this window can't be saved.",
+    "stop": "Stop",
+    "retry": "Try Again",
+    "keep": "Keep Site As Is",
+    "discard": "Discard and Reload",
+    "failed": "That didn't work: {{error}}",
+    "turnOff": "Turn Off Assistant Access",
+    "finished": "The assistant finished: {{summary}}",
+    "undo": "Undo",
+    "close": "Close",
+    "approvalAsk": "The assistant is asking for your OK to:",
+    "allow": "Allow",
+    "cancel": "Cancel",
+    "answerInWindow": "Answer in the Widgetizer window that opened.",
+    "decision": "The assistant disconnected while it was asking for your OK. Keep the changes it made so far, or undo them?",
+    "keepChanges": "Keep Changes",
+    "undoChanges": "Undo Changes",
+    "nextSteps": "Next steps:"
   }
 }

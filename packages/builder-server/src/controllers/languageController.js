@@ -11,6 +11,7 @@ import * as projectRepo from "../db/repositories/projectRepository.js";
 import { addLanguage, removeLanguage, countLanguageContent } from "../services/languageService.js";
 import { createKeyedSerializer } from "../utils/serializeByKey.js";
 import { withContentWriteLock } from "../services/contentCoordination.js";
+import { rethrowIfLocked } from "../services/writeGate.js";
 
 // Check, change and record are one operation per project: two calls in flight
 // would otherwise both read the same list and the second would drop the first's
@@ -48,6 +49,7 @@ export async function createLanguage(req, res) {
 
     res.status(201).json(project);
   } catch (error) {
+    rethrowIfLocked(error);
     respondError(res, error, "Failed to add language");
   }
 }
@@ -65,6 +67,7 @@ export async function getLanguageSummary(req, res) {
     });
     res.json({ code: req.params.code, ...counts });
   } catch (error) {
+    rethrowIfLocked(error);
     respondError(res, error, "Failed to read the language summary");
   }
 }
@@ -101,6 +104,7 @@ export async function deleteLanguage(req, res) {
       : undefined;
     res.json({ ...result.project, deleted: result.deleted, ...(warnings ? { warnings } : {}) });
   } catch (error) {
+    rethrowIfLocked(error);
     respondError(res, error, "Failed to remove language");
   }
 }

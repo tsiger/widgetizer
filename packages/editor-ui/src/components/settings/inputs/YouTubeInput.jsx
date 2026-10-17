@@ -1,9 +1,12 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { Play, ExternalLink, Settings, Check, X, AlertCircle } from "lucide-react";
 import { validateYouTubeUrl, createYouTubeEmbed } from "@widgetizer/core/youtube";
+import { useRegisterUnsaved } from "../../../stores/unsavedRegistry";
 
 export default function YouTubeInput({ id, label, description, value = null, onChange, setting = {} }) {
   const [url, setUrl] = useState(value?.url || "");
+  const [processedUrl, setProcessedUrl] = useState(value?.url || "");
+  useRegisterUnsaved(url !== processedUrl);
   const [embedData, setEmbedData] = useState(value);
   const [isValid, setIsValid] = useState(!!value?.videoId);
   const [showOptions, setShowOptions] = useState(false);
@@ -30,6 +33,7 @@ export default function YouTubeInput({ id, label, description, value = null, onC
   // Process URL input and create embed data
   const processUrl = useCallback(
     async (inputUrl) => {
+      setProcessedUrl(inputUrl);
       if (!inputUrl.trim()) {
         setEmbedData(null);
         setIsValid(false);
@@ -125,6 +129,7 @@ export default function YouTubeInput({ id, label, description, value = null, onC
   // Clear video
   const clearVideo = useCallback(() => {
     setUrl("");
+    setProcessedUrl("");
     setEmbedData(null);
     setIsValid(false);
     setError("");

@@ -17,6 +17,8 @@
     "./assetUrl": "./src/utils/assetUrl.js",
     "./youtube": "./src/utils/youtubeHelpers.js",
     "./blockLimits": "./src/utils/blockLimits.js",
+    "./settingValues": "./src/utils/settingValues.js",
+    "./widgetDefaults": "./src/utils/widgetDefaults.js",
     "./mimeTypes": "./src/utils/mimeTypes.js",
     "./escapeHtml": "./src/utils/escapeHtml.js",
     "./pathSecurity": "./src/utils/pathSecurity.js",

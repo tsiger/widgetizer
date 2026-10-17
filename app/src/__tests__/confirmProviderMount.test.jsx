@@ -30,7 +30,7 @@ describe("OSS shell provides the confirm surface (tree-level)", () => {
   it("a route rendered through the real <App/> can call useConfirm()", async () => {
     vi.stubGlobal(
       "fetch",
-      vi.fn(() => Promise.resolve({ ok: true, json: () => Promise.resolve({}) })),
+      vi.fn(() => Promise.resolve({ ok: true, json: () => Promise.resolve({}), text: () => Promise.resolve("{}") })),
     );
     const { default: App } = await import("../App.jsx");
     render(<App />);

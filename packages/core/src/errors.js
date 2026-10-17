@@ -54,3 +54,9 @@ export class ConflictError extends WidgetizerError {
     super(message, { statusCode: 409, code, cause });
   }
 }
+
+export class SiteLockedError extends WidgetizerError {
+  constructor(message = "This site is locked", { code = "SITE_LOCKED", cause } = {}) {
+    super(message, { statusCode: 423, code, cause });
+  }
+}

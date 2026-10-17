@@ -34,6 +34,17 @@ export { preprocessThemeSettings } from "./utils/themeHelpers.js";
 // serialize per project; embedding hosts can wrap their own long-running
 // per-site operations (their export/publish orchestration) with the same primitive.
 export { createKeyedSerializer } from "./utils/serializeByKey.js";
+export {
+  runAsWriter,
+  currentWriter,
+  setWriteGate,
+  setChangeObserver,
+  setRequestWriterResolver,
+  SITE_GENERATION_HEADER,
+} from "./services/writeGate.js";
+export { withContentWriteLock } from "./services/contentCoordination.js";
+export { editSiteDocument } from "./services/siteDocumentEdit.js";
+export { sanitizeRichText } from "./services/sanitizationService.js";
 export { buildRuntimeSiteIcons, generateExportSiteIcons } from "./utils/siteIconHelpers.js";
 export { CORE_WIDGETS_DIR, CORE_SNIPPETS_DIR, getThemesDir } from "./config.js";
 
@@ -100,7 +111,12 @@ export {
   onSettingsChanged,
   setSettingsUpdatePolicy,
 } from "./db/repositories/settingsRepository.js";
-export { getAllProjects, getProjectById, getActiveProjectId } from "./db/repositories/projectRepository.js";
+export {
+  getAllProjects,
+  getProjectById,
+  getActiveProjectId,
+  setActiveProjectId,
+} from "./db/repositories/projectRepository.js";
 // Request-free, scope-first reads of a site's saved content, shared with the
 // editor's own controllers, for shell-composed readers such as the AI assistant.
 export {

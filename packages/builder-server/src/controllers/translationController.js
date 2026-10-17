@@ -6,6 +6,7 @@
  * and where. Membership lives in the content, so it is read per language.
  */
 import { findGroupMembers } from "../services/translationService.js";
+import { rethrowIfLocked } from "../services/writeGate.js";
 
 export async function getTranslationGroup(req, res) {
   try {
@@ -19,6 +20,7 @@ export async function getTranslationGroup(req, res) {
     });
     res.json({ groupId: req.params.groupId, members });
   } catch (error) {
+    rethrowIfLocked(error);
     console.error("Error reading a translation group:", error);
     res.status(500).json({ error: "Failed to read the translation group" });
   }

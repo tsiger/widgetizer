@@ -130,6 +130,7 @@
 
 import { ConflictError } from "@widgetizer/core/errors";
 import { createKeyedSerializer } from "../utils/serializeByKey.js";
+import { checkWriteGate } from "./writeGate.js";
 import { refreshAllMediaUsageFromDir } from "./mediaUsageService.js";
 import * as mediaRepo from "../db/repositories/mediaRepository.js";
 import * as projectRepo from "../db/repositories/projectRepository.js";
@@ -154,7 +155,10 @@ const serializeContentWrites = createKeyedSerializer();
  * @template T
  */
 export function withContentWriteLock(projectId, fn) {
-  return serializeContentWrites(projectId, fn);
+  return serializeContentWrites(projectId, async () => {
+    await checkWriteGate(projectId);
+    return fn();
+  });
 }
 
 /**

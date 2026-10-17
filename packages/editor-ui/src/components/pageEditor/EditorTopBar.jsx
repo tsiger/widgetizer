@@ -13,6 +13,7 @@ import { pageEditorHref, pageAddHref, pagesListHref } from "../../lib/contentRou
 import { useEditorPath } from "../../lib/routeBase.jsx";
 import { openPagePreview } from "../../lib/openSitePreview.js";
 import { SlotOutlet } from "../../extension/PluginProvider.jsx";
+import { isEditorLocked } from "../../lib/editorLock";
 
 export default function EditorTopBar({
   pageName,
@@ -119,6 +120,7 @@ export default function EditorTopBar({
 
   useEffect(() => {
     const handleKeyDown = (e) => {
+      if (isEditorLocked()) return;
       if ((e.ctrlKey || e.metaKey) && e.key === "s") {
         e.preventDefault();
         // Prevent multiple simultaneous saves if one is already in progress

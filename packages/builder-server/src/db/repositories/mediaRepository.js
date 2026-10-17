@@ -361,8 +361,8 @@ function insertMediaFile(db, projectId, fileData) {
 
 function insertMediaFileStatements(db, projectId, fileData) {
   db.prepare(`
-    INSERT INTO media_files (id, project_id, filename, original_name, type, size, uploaded, path, alt, title, caption, width, height)
-    VALUES (@id, @projectId, @filename, @originalName, @type, @size, @uploaded, @path, @alt, @title, @caption, @width, @height)
+    INSERT INTO media_files (id, project_id, filename, original_name, type, size, uploaded, path, alt, title, caption, width, height, source)
+    VALUES (@id, @projectId, @filename, @originalName, @type, @size, @uploaded, @path, @alt, @title, @caption, @width, @height, @source)
   `).run({
     id: fileData.id,
     projectId,
@@ -377,6 +377,7 @@ function insertMediaFileStatements(db, projectId, fileData) {
     caption: fileData.metadata?.caption || "",
     width: fileData.width || null,
     height: fileData.height || null,
+    source: fileData.source ?? null,
   });
 
   // Insert translations. A null field means "inherit", `""` means deliberately
@@ -457,6 +458,7 @@ function rowToMediaFile(row, sizeRows, usageList, translationRows = []) {
     usedIn: usageList,
     width: row.width,
     height: row.height,
+    ...(row.source ? { source: row.source } : {}),
   };
 
   return file;

@@ -19,6 +19,7 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import { Hash, TokenKind, toValueSync } from "liquidjs";
 import { createLiquidEngine } from "@widgetizer/render-engine";
 import { splitAssetRef } from "@widgetizer/core/assetUrl";
+import { settingValueProblems } from "@widgetizer/core/settingValues";
 import { validateCollectionSchema } from "../packages/builder-server/src/services/collectionService.js";
 import { sanitizeVideoPath } from "../packages/builder-server/src/services/sanitizationService.js";
 import { buildContract } from "./build-theme-skill-contract.js";
@@ -158,7 +159,6 @@ export function validateTheme(dir) {
   const SLUG_RE = /^[a-z0-9-]+$/;
   const TABLE_COLUMN_ID_RE = /^[a-zA-Z][a-zA-Z0-9_]*$/;
   const RESERVED_COLUMN_IDS = new Set(["__proto__", "constructor", "prototype"]);
-  const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
   const RAW_SAFE_TYPES = new Set(["richtext", "code"]);
 
   // ---------------------------------------------------------------------------
@@ -297,137 +297,12 @@ export function validateTheme(dir) {
 
   /** Problems with `value` as a value for `setting`; an empty list when it fits. */
   function valueProblems(setting, value) {
-    const problems = [];
-    const type = setting.type;
-    const typeName = Array.isArray(value) ? "an array" : value === null ? "null" : `a ${typeof value}`;
-    const expect = (what) => problems.push(`must be ${what}, found ${typeName}`);
-
-    switch (type) {
-      case "text":
-      case "textarea":
-      case "richtext":
-      case "code":
-      case "color":
-      case "menu":
-        if (typeof value !== "string") expect("a string");
-        break;
-      case "number":
-        if (typeof value !== "number" && value !== "") expect("a number");
-        break;
-      case "range":
-        if (typeof value !== "number") expect("a number");
-        else if (
-          typeof setting.min === "number" &&
-          typeof setting.max === "number" &&
-          (value < setting.min || value > setting.max)
-        ) {
-          problems.push(`${value} is outside min ${setting.min} / max ${setting.max}`);
-        }
-        break;
-      case "checkbox":
-        if (typeof value !== "boolean") expect("true or false (not a string)");
-        break;
-      case "select":
-      case "radio": {
-        const values = Array.isArray(setting.options) ? setting.options.map((option) => option?.value) : [];
-        if (values.length > 0 && !values.includes(value)) {
-          problems.push(
-            `${JSON.stringify(value)} is not one of its options (${values.map((v) => JSON.stringify(v)).join(", ")})`,
-          );
-        }
-        break;
-      }
-      case "date":
-        if (typeof value !== "string") expect("a YYYY-MM-DD string");
-        else if (value !== "" && !DATE_RE.test(value)) problems.push(`"${value}" is not a YYYY-MM-DD date`);
-        break;
-      case "icon":
-        if (typeof value !== "string") expect("an icon name string");
-        else if (value !== "" && theme.icons && !theme.icons.has(value)) {
-          problems.push(`icon "${value}" is not in assets/icons.json.${didYouMean(value, theme.icons)}`);
-        }
-        break;
-      case "image":
-        if (typeof value !== "string") expect("an image path string");
-        else if (value !== "" && !value.startsWith("/uploads/images/")) {
-          problems.push(
-            `"${value}" must be empty or start with /uploads/images/ (theme images are not media-library images)`,
-          );
-        }
-        break;
-      case "file":
-        if (typeof value !== "string") expect("a file path string");
-        else if (value !== "" && !value.startsWith("/uploads/files/")) {
-          problems.push(`"${value}" must be empty or start with /uploads/files/`);
-        }
-        break;
-      case "video":
-        if (typeof value !== "string") expect("an MP4 path string");
-        else if (value !== "" && sanitizeVideoPath(value) !== value) {
-          problems.push(`"${value}" must be empty or an /uploads/files/<name>.mp4 path`);
-        }
-        break;
-      case "gallery":
-        if (!Array.isArray(value)) expect("an array of image paths");
-        else if (value.some((entry) => typeof entry !== "string" || !entry.startsWith("/uploads/images/"))) {
-          problems.push("every entry must be a /uploads/images/... path string");
-        }
-        break;
-      case "font_picker":
-        if (!isObject(value) || typeof value.stack !== "string" || typeof value.weight !== "number") {
-          problems.push('must be { "stack": "...", "weight": 400 }');
-        } else if (!Object.hasOwn(FONTS, value.stack)) {
-          const family = value.stack.split(",")[0].replaceAll('"', "").trim().toLowerCase();
-          const close = Object.keys(FONTS)
-            .filter((stack) => stack.toLowerCase().includes(family))
-            .slice(0, 3);
-          problems.push(
-            `font stack ${JSON.stringify(value.stack)} is not in the font catalog` +
-              (close.length ? ` (closest: ${close.map((stack) => JSON.stringify(stack)).join(", ")})` : "") +
-              '; copy the exact stack from contract.json "fonts"',
-          );
-        } else if (!FONTS[value.stack].includes(value.weight)) {
-          problems.push(
-            `weight ${value.weight} is not available for that font (available: ${FONTS[value.stack].join(", ")})`,
-          );
-        }
-        break;
-      case "link":
-        if (!isObject(value)) expect('an object like { "href": "", "text": "", "target": "_self" }');
-        else {
-          if (value.href !== undefined && typeof value.href !== "string") problems.push('"href" must be a string');
-          if (value.text !== undefined && typeof value.text !== "string") problems.push('"text" must be a string');
-          if (value.target !== undefined && !["_self", "_blank"].includes(value.target))
-            problems.push('"target" must be "_self" or "_blank"');
-          if ("label" in value || "url" in value || "link" in value) {
-            problems.push('a link value uses "href" and "text" (menu items are the ones that use "label" and "link")');
-          }
-        }
-        break;
-      case "table": {
-        const columnIds = new Set((Array.isArray(setting.columns) ? setting.columns : []).map((column) => column?.id));
-        if (!Array.isArray(value)) expect("an array of row objects");
-        else {
-          for (const row of value) {
-            if (!isObject(row)) {
-              problems.push("every row must be an object keyed by column id");
-              break;
-            }
-            const unknown = Object.keys(row).find((key) => !columnIds.has(key));
-            if (unknown) {
-              problems.push(`row key "${unknown}" is not a declared column`);
-              break;
-            }
-          }
-        }
-        break;
-      }
-      case "youtube":
-        if (value !== "" && !isObject(value)) expect("an embed object or an empty string");
-        break;
-      default:
-        break;
-    }
+    const problems = settingValueProblems(setting, value, {
+      icons: theme.icons,
+      fonts: FONTS,
+      isVideoPath: (path) => sanitizeVideoPath(path) === path,
+    });
+    if (setting.type === "icon" && typeof value === "string" && problems.length && theme.icons) problems[0] += `.${didYouMean(value, theme.icons)}`;
     return problems;
   }
 

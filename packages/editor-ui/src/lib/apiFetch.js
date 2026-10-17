@@ -2,6 +2,7 @@ import { API_URL } from "./config";
 import { getActiveProjectId } from "./activeProjectId";
 import { getApiBase } from "./apiBase";
 import { notifyMutationSuccess } from "./mutationEvents";
+import { getSiteGeneration, SITE_GENERATION_HEADER } from "./siteGeneration";
 
 const NON_MUTATING_METHODS = new Set(["GET", "HEAD", "OPTIONS"]);
 
@@ -28,6 +29,8 @@ export async function apiFetch(path, options = {}) {
   if (projectId) {
     headers["X-Project-Id"] = projectId;
   }
+  const generation = getSiteGeneration();
+  if (generation != null) headers[SITE_GENERATION_HEADER] = generation;
 
   const response = await fetch(url, { ...options, headers });
 

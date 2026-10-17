@@ -1,5 +1,6 @@
 import express from "express";
 
+import { bindRequestWriter } from "./services/writeGate.js";
 import projectRoutes from "./routes/projects.js";
 import themeRoutes from "./routes/themes.js";
 import pagesRoutes from "./routes/pages.js";
@@ -41,6 +42,7 @@ function attachAdapters(router, adapters) {
     req.adapters = adapters;
     next();
   });
+  router.use(bindRequestWriter);
 }
 
 /**

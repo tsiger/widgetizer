@@ -102,6 +102,15 @@ export default function PageEditor() {
     useThemeStore.getState().clearConflict?.();
   }, [themeConflict, t]);
 
+  // Arriving with ?section= (after an assistant job) selects that section once, so the change is shown.
+  const shownSectionRef = useRef(null);
+  useEffect(() => {
+    const section = searchParams.get("section");
+    if (!section || loading || !page?.widgets?.[section] || shownSectionRef.current === section) return;
+    shownSectionRef.current = section;
+    setSelectedWidgetId(section);
+  }, [searchParams, loading, page, setSelectedWidgetId]);
+
   // Handle block selection (cross-component coordination)
   const handleBlockSelect = (blockId) => {
     setSelectedBlockId(blockId);

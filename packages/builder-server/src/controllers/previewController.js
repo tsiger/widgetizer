@@ -34,6 +34,7 @@ import {
 import { isProjectResolutionError } from "../utils/projectErrors.js";
 import { generateToken, getToken } from "../services/previewTokenStore.js";
 import { LANGUAGE_CODE_RE, DEFAULT_LANGUAGE } from "@widgetizer/core/languages";
+import { rethrowIfLocked } from "../services/writeGate.js";
 
 // Inject the runtime script and base tag into rendered HTML. The site's
 // languages travel with it: a preview renders at the root, so a link reads as
@@ -427,6 +428,7 @@ export async function generatePreview(req, res) {
     );
     res.send(html);
   } catch (error) {
+    rethrowIfLocked(error);
     console.error("Error generating preview:", error);
     if (error.status === 404 || isProjectResolutionError(error)) {
       return res.status(404).send(`<html><body><h1>Preview Error</h1><pre>${error.message}</pre></body></html>`);
@@ -455,6 +457,7 @@ export async function createPreviewToken(req, res) {
     const token = generateToken(html);
     res.json({ token });
   } catch (error) {
+    rethrowIfLocked(error);
     console.error("Error creating preview token:", error);
     if (error.status === 404 || isProjectResolutionError(error)) {
       return res.status(404).json({ error: error.message });
@@ -535,6 +538,7 @@ export async function createCollectionPreviewToken(req, res) {
     const token = generateToken(html);
     res.json({ token });
   } catch (error) {
+    rethrowIfLocked(error);
     console.error("Error creating collection preview:", error);
     if (error.status === 404 || isProjectResolutionError(error)) {
       return res.status(404).json({ error: error.message });
@@ -604,6 +608,7 @@ export async function renderSingleWidget(req, res) {
 
     res.send(renderedWidget + assetTags);
   } catch (error) {
+    rethrowIfLocked(error);
     console.error("Widget rendering error:", error);
     if (isProjectResolutionError(error)) {
       return res.status(404).json({ error: "Project not found", message: error.message });
@@ -662,6 +667,7 @@ export async function getGlobalWidgets(req, res) {
 
     res.json(globalWidgets);
   } catch (error) {
+    rethrowIfLocked(error);
     console.error("Error getting global widgets:", error);
     if (isProjectResolutionError(error)) {
       return res.status(404).json({ error: "Project not found", message: error.message });
@@ -671,6 +677,44 @@ export async function getGlobalWidgets(req, res) {
       message: error.message,
       stack: process.env.NODE_ENV !== "production" ? error.stack : undefined,
     });
+  }
+}
+
+/** A header or footer write, WITHOUT taking the section — the caller holds it. */
+export async function persistGlobalInSection({ scope, storage, assetStorage, type, widgetData, lang, beforeWrite }) {
+  // A header or footer belongs to one language's folder, so a removed language
+  // must not get its globals back from a save that was already queued.
+  assertLanguageStillEnabled(scope.projectId, lang);
+
+  // Don't let a save queued behind a delete introduce a reference to the file
+  // that delete just removed. Only newly added paths are checked.
+  let previousPaths = [];
+  try {
+    const buf = await storage.read(scope, globalKey(type, lang));
+    if (buf != null) previousPaths = extractMediaPathsFromGlobalWidget(JSON.parse(buf.toString("utf8")));
+  } catch {
+    // First save of this global, or unreadable: nothing known to be pre-existing.
+  }
+  await assertIntroducedMediaExists({
+    assetStorage,
+    scope,
+    previousPaths,
+    nextPaths: extractMediaPathsFromGlobalWidget(widgetData),
+  });
+
+  // Save the widget — storage.write creates parent directories as needed.
+  await beforeWrite?.();
+  await storage.write(scope, globalKey(type, lang), JSON.stringify(withoutLanguage(widgetData), null, 2));
+
+  // Update media usage
+  try {
+    await updateGlobalWidgetMediaUsage(scope.projectId, type, widgetData, lang);
+    return { usageStale: false };
+  } catch (usageError) {
+    console.error("Error updating media usage for global widget:", usageError);
+    // Don't fail the save if usage update fails — the widget IS saved. Report it
+    // as a warning instead, so "saved" and "image tracking is behind" stay distinct.
+    return { usageStale: true };
   }
 }
 
@@ -698,41 +742,9 @@ export async function saveGlobalWidget(req, res) {
     // The write and its usage sync are one media section, so media deletion — which
     // verifies and deletes in the same section — cannot run between them and read
     // this header as not yet using an image it is about to. See contentCoordination.
-    const { usageStale } = await withContentWriteLock(scope.projectId, async () => {
-      // A header or footer belongs to one language's folder, so a removed language
-      // must not get its globals back from a save that was already queued.
-      assertLanguageStillEnabled(scope.projectId, lang);
-
-      // Don't let a save queued behind a delete introduce a reference to the file
-      // that delete just removed. Only newly added paths are checked.
-      let previousPaths = [];
-      try {
-        const buf = await storage.read(scope, globalKey(type, lang));
-        if (buf != null) previousPaths = extractMediaPathsFromGlobalWidget(JSON.parse(buf.toString("utf8")));
-      } catch {
-        // First save of this global, or unreadable: nothing known to be pre-existing.
-      }
-      await assertIntroducedMediaExists({
-        assetStorage: req.adapters.assetStorage,
-        scope,
-        previousPaths,
-        nextPaths: extractMediaPathsFromGlobalWidget(widgetData),
-      });
-
-      // Save the widget — storage.write creates parent directories as needed.
-      await storage.write(scope, globalKey(type, lang), JSON.stringify(withoutLanguage(widgetData), null, 2));
-
-      // Update media usage
-      try {
-        await updateGlobalWidgetMediaUsage(scope.projectId, type, widgetData, lang);
-        return { usageStale: false };
-      } catch (usageError) {
-        console.error("Error updating media usage for global widget:", usageError);
-        // Don't fail the save if usage update fails — the widget IS saved. Report it
-        // as a warning instead, so "saved" and "image tracking is behind" stay distinct.
-        return { usageStale: true };
-      }
-    });
+    const { usageStale } = await withContentWriteLock(scope.projectId, () =>
+      persistGlobalInSection({ scope, storage, assetStorage: req.adapters.assetStorage, type, widgetData, lang }),
+    );
 
     res.json({
       success: true,
@@ -740,6 +752,7 @@ export async function saveGlobalWidget(req, res) {
       ...(usageStale ? { warnings: [{ code: "MEDIA_USAGE_STALE", path: `global:${type}` }] } : {}),
     });
   } catch (error) {
+    rethrowIfLocked(error);
     if (error?.code === "LANGUAGE_REMOVED") {
       return res.status(error.statusCode).json({ error: "Language removed", message: error.message, code: error.code, language: error.language });
     }
@@ -821,6 +834,7 @@ export async function serveAsset(req, res) {
     // Send the file
     return res.send(fileContent);
   } catch (error) {
+    rethrowIfLocked(error);
     console.error(`Error serving asset: ${error.message}`);
     console.error(error.stack);
     if (isProjectResolutionError(error)) {

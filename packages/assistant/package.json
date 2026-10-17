@@ -8,6 +8,7 @@
     ".": "./src/index.js",
     "./protocol": "./src/protocol.js",
     "./local": "./src/local/index.js",
+    "./snapshots": "./src/snapshots/index.js",
     "./editor": "./src/editor/index.js"
   },
   "dependencies": {

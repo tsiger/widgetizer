@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { HexColorPicker, HexAlphaColorPicker } from "react-colorful";
+import { useRegisterUnsaved } from "../../../stores/unsavedRegistry";
 
 /**
  * ColorInput component
@@ -9,6 +10,7 @@ export default function ColorInput({ id, value = "#000000", onChange, allow_alph
   const [isOpen, setIsOpen] = useState(false);
   const [localColor, setLocalColor] = useState(value);
   const [isDragging, setIsDragging] = useState(false);
+  useRegisterUnsaved(isDragging);
   const popoverRef = useRef(null);
   const colorPickerRef = useRef(null);
 

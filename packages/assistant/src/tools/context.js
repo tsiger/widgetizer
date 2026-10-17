@@ -6,15 +6,19 @@ import { toolError } from "../errors.js";
  * didn't switch sites while the call ran, since the answer would describe a site
  * that is no longer open.
  *
- * @param {{ args: object, actor: object, appInfo: object, site: object }} options
+ * @param {{ args: object, actor: object, appInfo: object, site: object, session?: object, requestId?: string, jobs?: object|null }} options
  */
-export function createToolContext({ args, actor, appInfo, site }) {
+export function createToolContext({ toolName = null, args, actor, appInfo, site, session = null, requestId = null, jobs = null }) {
   let pinned = null;
 
   return {
+    toolName,
     args,
     actor,
     appInfo,
+    session,
+    requestId,
+    jobs,
     reader: site.reader,
     listSites: () => site.listSites(actor),
 

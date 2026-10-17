@@ -1,5 +1,6 @@
 import { DEFAULT_LANGUAGE } from "@widgetizer/core/languages";
 import { getDb } from "../index.js";
+import { checkActiveSiteChange } from "../../services/writeGate.js";
 
 /**
  * Get all projects.
@@ -204,6 +205,7 @@ export function getActiveProjectId() {
  * @param {string|null} id
  */
 export function setActiveProjectId(id) {
+  checkActiveSiteChange();
   const db = getDb();
   const key = "activeProjectId";
   db.prepare(`

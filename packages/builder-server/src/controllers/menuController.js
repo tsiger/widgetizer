@@ -12,6 +12,7 @@ import {
   isLanguageStillEnabled,
 } from "../services/contentCoordination.js";
 import { cleanupDeletedMenuReferences, referenceCleanupWarnings } from "../utils/linkEnrichment.js";
+import { rethrowIfLocked, runMaintenanceWrite } from "../services/writeGate.js";
 
 
 /** The bare write. Only the uuid backfill below uses it — see writeMenu. */
@@ -123,15 +124,26 @@ export async function getAllMenus(req, res) {
           // legitimately persist it.
           if (!menu.uuid) {
             menu.uuid = randomUUID();
-            // Check and write in ONE section. Checking first and writing after is
-            // not a check: a removal landing between the two put the deleted menu
-            // straight back. The check stays non-throwing because this is a read
-            // path — an obsolete backfill is skipped, the listing still answers.
-    await withContentWriteLock(scope.projectId, async () => {
-              if (isLanguageStillEnabled(scope.projectId, lang)) {
-                await writeMenuRaw(storage, scope, { ...menu, id }, lang);
-              }
-            });
+            // Check, reread and write in ONE section: a removal or a save landing
+            // after this listing read the menu must win over the backfill. The check
+            // stays non-throwing because this is a read path — an obsolete backfill
+            // is skipped, the listing still answers.
+            let current = menu;
+            await runMaintenanceWrite(() =>
+              withContentWriteLock(scope.projectId, async () => {
+                if (!isLanguageStillEnabled(scope.projectId, lang)) return;
+                const latest = await storage.read(scope, menuKey(id, lang));
+                if (latest == null) return;
+                const saved = JSON.parse(latest.toString("utf8"));
+                if (saved.uuid) {
+                  current = saved;
+                  return;
+                }
+                current = { ...saved, uuid: menu.uuid };
+                await writeMenuRaw(storage, scope, { ...current, id }, lang);
+              }),
+            );
+            return { ...current, language: lang.language };
           }
 
           return { ...menu, language: lang.language };
@@ -142,6 +154,7 @@ export async function getAllMenus(req, res) {
 
     res.json(menus);
   } catch (error) {
+    rethrowIfLocked(error);
     console.error("Error reading menus:", error);
     res.status(500).json({ error: "Failed to get menus" });
   }
@@ -188,6 +201,7 @@ export async function createMenu(req, res) {
 
     res.status(201).json(newMenu);
   } catch (error) {
+    rethrowIfLocked(error);
     if (error?.code === "LANGUAGE_REMOVED") {
       return res.status(error.statusCode).json({ error: "Language removed", message: error.message, code: error.code, language: error.language });
     }
@@ -242,6 +256,7 @@ export async function deleteMenu(req, res) {
     const warnings = referenceCleanupWarnings(incomplete);
     res.json({ success: true, ...(warnings ? { warnings } : {}) });
   } catch (error) {
+    rethrowIfLocked(error);
     console.error("Error deleting menu:", error);
     res.status(500).json({ error: "Failed to delete menu" });
   }
@@ -268,6 +283,7 @@ export async function getMenu(req, res) {
 
     res.json({ ...menu, language: lang.language });
   } catch (error) {
+    rethrowIfLocked(error);
     console.error("Error getting menu:", error);
     res.status(500).json({ error: "Failed to get menu" });
   }
@@ -347,6 +363,7 @@ export async function updateMenu(req, res) {
 
     res.json(dataToSave);
   } catch (error) {
+    rethrowIfLocked(error);
     if (error?.code === "LANGUAGE_REMOVED") {
       return res.status(error.statusCode).json({ error: "Language removed", message: error.message, code: error.code, language: error.language });
     }
@@ -437,6 +454,7 @@ export async function duplicateMenu(req, res) {
 
     res.status(201).json(duplicatedMenu);
   } catch (error) {
+    rethrowIfLocked(error);
     if (error?.code === "LANGUAGE_REMOVED") {
       return res.status(error.statusCode).json({ error: "Language removed", message: error.message, code: error.code, language: error.language });
     }

@@ -108,6 +108,7 @@ async function writeTheme() {
 
 let server;
 let shutdown;
+let releaseDataFolder;
 let client;
 let relayBridge;
 let project;
@@ -131,7 +132,7 @@ async function call(name, args = {}) {
 beforeAll(async () => {
   await writeTheme();
   const { startOssServer } = await import("../../server-common.js");
-  ({ server, shutdown } = await startOssServer({ defaultPort: 0 }));
+  ({ server, shutdown, releaseDataFolder } = await startOssServer({ defaultPort: 0 }));
   await api("PUT", "/api/settings", { assistant: { enabled: true } });
   project = await api("POST", "/api/projects", { name: "Assistant Test", theme: THEME });
 
@@ -148,6 +149,7 @@ afterAll(async () => {
   await client?.close();
   await relayBridge?.close();
   await shutdown?.();
+  releaseDataFolder?.();
   const { closeDb } = await import("@widgetizer/builder-server");
   closeDb();
   await fs.rm(root, { recursive: true, force: true });

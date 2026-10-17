@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import { useBlocker } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useConfirm } from "../components/ui/ConfirmProvider";
+import { useRegisterUnsaved } from "../stores/unsavedRegistry";
 
 /**
  * Navigation guard hook to prevent users from leaving pages with unsaved changes
@@ -34,6 +35,7 @@ export default function useFormNavigationGuard(hasUnsavedChanges, skipRef = null
   useEffect(() => {
     onDiscardRef.current = onDiscard;
   });
+  useRegisterUnsaved(hasUnsavedChanges);
 
   // Layer 1: Browser navigation (beforeunload) - handles tab closing, URL changes, etc.
   useEffect(() => {

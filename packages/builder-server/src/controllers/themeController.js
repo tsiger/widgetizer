@@ -27,6 +27,7 @@ import { sanitizeThemeSettings } from "../services/sanitizationService.js";
 import { mergeThemeSettingChanges, readThemeSettingChanges } from "../services/themeSettingChanges.js";
 import { validateThemeCollectionSchemas } from "../services/collectionService.js";
 import { readAppSettingsFile } from "./appSettingsController.js";
+import { rethrowIfLocked } from "../services/writeGate.js";
 
 const CORE_WIDGET_LOCALES_DIR = path.join(CORE_WIDGETS_DIR, "locales");
 const THEME_SOURCE_CACHE_TTL_MS = 5000;
@@ -174,6 +175,7 @@ async function _ensureThemesDirectoryOnce() {
   try {
     await fs.mkdir(userThemesDir, { recursive: true });
   } catch (error) {
+    rethrowIfLocked(error);
     console.error("Error creating themes directory:", error);
     throw new Error("Failed to create themes directory");
   }
@@ -221,6 +223,7 @@ async function _ensureThemesDirectoryOnce() {
       console.log(`[ensureThemesDirectory] Provisioned ${provisioned} default theme(s)`);
     }
   } catch (error) {
+    rethrowIfLocked(error);
     console.warn(`[ensureThemesDirectory] Failed to provision default themes: ${error.message}`);
     // Non-fatal — user can still upload themes manually
   }
@@ -317,6 +320,7 @@ export async function getThemeVersions(themeId) {
       versions.push(baseTheme.version);
     }
   } catch (error) {
+    rethrowIfLocked(error);
     console.warn(`Could not read base theme.json for ${themeId}:`, error.message);
   }
 
@@ -498,6 +502,7 @@ async function buildLatestSnapshotSerial(themeId) {
       }
     }
   } catch (error) {
+    rethrowIfLocked(error);
     console.warn(`[buildLatestSnapshot] Could not sync seed updates for ${themeId}:`, error.message);
   }
 
@@ -823,6 +828,7 @@ export async function listThemePresets(themeId) {
     );
     return { default: presetsData.default, presets: enrichedPresets };
   } catch (error) {
+    rethrowIfLocked(error);
     if (error.code === "ENOENT") {
       return { default: null, presets: [] };
     }
@@ -834,6 +840,7 @@ export async function getThemePresets(req, res) {
   try {
     res.json(await listThemePresets(req.params.id));
   } catch (error) {
+    rethrowIfLocked(error);
     if (error.code === "THEME_NOT_FOUND") {
       return res.status(404).json({ error: error.message });
     }
@@ -977,6 +984,7 @@ export async function getThemeWidgets(req, res) {
 
     res.json(widgetsList.filter((widget) => widget !== null));
   } catch (error) {
+    rethrowIfLocked(error);
     res.status(404).json({ error: `Failed to get widgets: ${error.message}` });
   }
 }
@@ -1018,6 +1026,7 @@ export async function getThemeTemplates(req, res) {
 
     res.json(templatesList.filter(Boolean));
   } catch (error) {
+    rethrowIfLocked(error);
     res.status(404).json({ error: `Failed to get templates: ${error.message}` });
   }
 }
@@ -1040,6 +1049,7 @@ export async function getThemeVersionsHandler(req, res) {
       latestVersion,
     });
   } catch (error) {
+    rethrowIfLocked(error);
     res.status(404).json({ error: `Failed to get theme versions: ${error.message}` });
   }
 }
@@ -1102,6 +1112,7 @@ export async function getThemeUpdateCount(req, res) {
 
     res.json({ count: updateCount });
   } catch (error) {
+    rethrowIfLocked(error);
     res.status(500).json({ error: `Failed to get theme update count: ${error.message}` });
   }
 }
@@ -1145,6 +1156,7 @@ export async function updateTheme(req, res) {
       },
     });
   } catch (error) {
+    rethrowIfLocked(error);
     res.status(500).json({ error: `Failed to update theme: ${error.message}` });
   }
 }
@@ -1188,6 +1200,7 @@ export async function copyThemeToProject(themeName, projectDir, excludeDirs = []
     // Get and return the version that was copied
     return theme.version;
   } catch (error) {
+    rethrowIfLocked(error);
     console.error(`Error during theme copy from ${sourceDir} to ${projectDir}:`, error);
     // Provide a more specific error if possible
     throw new Error(`Failed to copy theme files: ${error.message}`);
@@ -1236,6 +1249,7 @@ export async function deleteTheme(req, res) {
 
     res.json({ success: true, message: `Theme "${id}" deleted successfully` });
   } catch (error) {
+    rethrowIfLocked(error);
     console.error(`Error deleting theme: ${error.message}`);
     res.status(500).json({ error: `Failed to delete theme: ${error.message}` });
   }
@@ -1431,6 +1445,7 @@ export async function uploadTheme(req, res) {
       });
     }
   } catch (error) {
+    rethrowIfLocked(error);
     if (error instanceof UnsafeZipError) return res.status(400).json({ message: error.message });
     if (error instanceof SyntaxError) {
       return res.status(400).json({ message: "Invalid theme.json: Failed to parse JSON." });
@@ -1515,6 +1530,7 @@ export async function uploadTheme(req, res) {
     await fs.access(themeDir);
     themeExists = true;
   } catch (error) {
+    rethrowIfLocked(error);
     if (error.code !== "ENOENT") {
       console.error("Error checking existing theme path:", error);
       return res.status(500).json({ message: "Error checking theme directory." });
@@ -1766,6 +1782,7 @@ export async function uploadTheme(req, res) {
       theme: newThemeData,
     });
   } catch (error) {
+    rethrowIfLocked(error);
     // Attempt cleanup if extraction failed partially for new themes
     if (isNewTheme) {
       try {
@@ -1804,6 +1821,7 @@ export async function getProjectThemeSettings(req, res) {
     }
     res.json(JSON.parse(buf.toString("utf8")));
   } catch (error) {
+    rethrowIfLocked(error);
     if (handleProjectResolutionError(res, error)) return;
     console.error(`API Error in getProjectThemeSettings for ${req.scope?.projectId}:`, error);
     res.status(500).json({ message: "Error reading project theme settings" });
@@ -1882,6 +1900,7 @@ export async function saveProjectThemeSettings(req, res) {
     }
     res.json(response);
   } catch (error) {
+    rethrowIfLocked(error);
     if (error?.code === "MEDIA_REFERENCE_MISSING") {
       return res.status(error.statusCode).json({ message: error.message, code: error.code });
     }
@@ -1957,6 +1976,7 @@ export async function saveProjectThemeSettingChanges(req, res) {
     }
     res.json({ theme: outcome.theme, warnings: outcome.warnings });
   } catch (error) {
+    rethrowIfLocked(error);
     if (error?.code === "MEDIA_REFERENCE_MISSING") {
       return res.status(error.statusCode).json({ message: error.message, code: error.code });
     }
@@ -2003,6 +2023,7 @@ export async function getProjectThemeLocale(req, res) {
 
     return res.json(deepMerge(coreLocale, themeLocale));
   } catch (error) {
+    rethrowIfLocked(error);
     if (handleProjectResolutionError(res, error)) return;
     console.error("Error reading theme locale:", error);
     res.status(500).json({ error: "Failed to read theme locale" });

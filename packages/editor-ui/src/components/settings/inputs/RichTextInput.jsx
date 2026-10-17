@@ -34,6 +34,7 @@ import { groupLinkTargets } from "../../../lib/linkTargetGroups";
 import { resolveRichtextLinkRefs } from "@widgetizer/core/richtextLinks";
 import { StableLink } from "./stableLink";
 import { API_URL } from "../../../lib/config";
+import { useRegisterUnsaved } from "../../../stores/unsavedRegistry";
 import "./RichTextInput.css";
 
 /** A picker (mounted only when internal targets are allowed + the link row is open) so
@@ -106,6 +107,8 @@ function MenuBar({
 }) {
   const [showLinkInput, setShowLinkInput] = useState(false);
   const [linkUrl, setLinkUrl] = useState("");
+  const [linkOpenedWith, setLinkOpenedWith] = useState("");
+  useRegisterUnsaved(showLinkInput && linkUrl !== linkOpenedWith);
 
   const setLink = useCallback(() => {
     const url = normalizeLinkUrl(linkUrl);
@@ -143,6 +146,7 @@ function MenuBar({
   const openLinkInput = useCallback(() => {
     const previousUrl = editor.getAttributes("link").href || "";
     setLinkUrl(previousUrl);
+    setLinkOpenedWith(previousUrl);
     setShowLinkInput(true);
   }, [editor]);
 
@@ -160,6 +164,7 @@ function MenuBar({
       // editor mid-click, after which the browser would otherwise follow the link/new tab.
       event.preventDefault();
       setLinkUrl(anchor.getAttribute("href") || "");
+      setLinkOpenedWith(anchor.getAttribute("href") || "");
       setShowLinkInput(true);
     };
     dom.addEventListener("click", handleLinkClick);
@@ -342,6 +347,7 @@ export default function RichTextInput({
 }) {
   const [isSourceMode, setIsSourceMode] = useState(false);
   const [sourceValue, setSourceValue] = useState(value);
+  useRegisterUnsaved(isSourceMode && sourceValue !== value);
   const [isExpanded, setIsExpanded] = useState(false);
   const [pickerMode, setPickerMode] = useState(null); // null | "image" | "fileLink"
   // True only when a press STARTED on the overlay backdrop itself — so a text-selection

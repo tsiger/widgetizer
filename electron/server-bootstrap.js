@@ -12,16 +12,33 @@ if (process.env.NODE_ENV === "production" && !process.env.WIDGETIZER_EDITOR_SECR
 
 // Electron sets PORT=0 to avoid collisions; report the bound port to the parent
 // so it can build the renderer URL without guessing.
-const { shutdown, assistantAccess, enableAssistant } = await startOssServer({
-  defaultPort: 0,
-  onReady: (port) => {
-    if (process.parentPort) {
-      process.parentPort.postMessage({ type: "server-ready", port });
-    }
-  },
-});
+let started;
+try {
+  started = await startOssServer({
+    defaultPort: 0,
+    onReady: (port) => {
+      if (process.parentPort) {
+        process.parentPort.postMessage({ type: "server-ready", port });
+      }
+    },
+  });
+} catch (error) {
+  console.error(error.message);
+  process.parentPort?.postMessage({ type: "server-error", message: error.message });
+  process.exit(1);
+}
+const { shutdown, assistantAccess, enableAssistant, assistant } = started;
+const jobs = assistant.jobs;
 
-const rpcMethods = { assistantAccess, enableAssistant };
+const rpcMethods = {
+  assistantAccess,
+  enableAssistant,
+  answerApproval: ({ id, allow }) => jobs.answerApproval(String(id), allow === true),
+  decideJob: ({ keep }) => jobs.decide(keep === true),
+  stopJob: () => jobs.stop({ reason: "user" }),
+};
+
+jobs.onPrompt((prompt) => process.parentPort?.postMessage({ type: "assistant-prompt", prompt }));
 
 process.parentPort?.on("message", ({ data }) => {
   if (data?.type === "shutdown") {
@@ -30,7 +47,7 @@ process.parentPort?.on("message", ({ data }) => {
   }
   if (data?.type === "rpc" && typeof data.id === "string" && Object.hasOwn(rpcMethods, data.method)) {
     Promise.resolve()
-      .then(() => rpcMethods[data.method]())
+      .then(() => rpcMethods[data.method](data.params ?? {}))
       .then(
         (value) => process.parentPort.postMessage({ type: "rpc-result", id: data.id, ok: true, value }),
         (error) => process.parentPort.postMessage({ type: "rpc-result", id: data.id, ok: false, error: error.message }),

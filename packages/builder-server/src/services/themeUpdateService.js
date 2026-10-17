@@ -13,6 +13,7 @@ import { getThemeSourceDir, readThemeSourceMetadata } from "../controllers/theme
 import { createKeyedSerializer } from "../utils/serializeByKey.js";
 import { isWithinDirectory } from "../utils/pathSecurity.js";
 import { refreshMediaUsageAfterStructuralChange } from "./mediaUsageService.js";
+import { noteSiteChange } from "./writeGate.js";
 import { withContentWriteLock } from "./contentCoordination.js";
 import { getUpdateStatus } from "../utils/updateStatus.js";
 import { processTemplatesRecursive } from "../utils/templateHelpers.js";
@@ -524,6 +525,7 @@ async function applyThemeUpdateExclusively(projectId) {
   // wholesale from the theme either way. Rolling the files back for it would
   // mean holding the backup across a database write, which is more machinery
   // than the outcome warrants.
+  await noteSiteChange(projectId, "theme");
   await applyThemeUpdateToDir({ themeSourceDir, projectDir });
 
   // 4. Update project metadata
@@ -554,15 +556,14 @@ async function applyThemeUpdateExclusively(projectId) {
  * @throws {Error} If project not found
  */
 export async function toggleThemeUpdates(projectId, enabled) {
-  const project = projectRepo.getProjectById(projectId);
-
-  if (!project) {
-    throw new Error(`Project not found: ${projectId}`);
-  }
-
-  projectRepo.updateProject(projectId, {
-    receiveThemeUpdates: enabled,
-    updated: new Date().toISOString(),
+  await withContentWriteLock(projectId, async () => {
+    if (!projectRepo.getProjectById(projectId)) {
+      throw new Error(`Project not found: ${projectId}`);
+    }
+    projectRepo.updateProject(projectId, {
+      receiveThemeUpdates: enabled,
+      updated: new Date().toISOString(),
+    });
   });
 
   return {

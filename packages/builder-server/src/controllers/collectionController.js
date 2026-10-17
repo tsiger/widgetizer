@@ -37,6 +37,7 @@ import {
   resolveTargetLanguage,
   serializeTranslationOps,
 } from "../services/translationService.js";
+import { rethrowIfLocked } from "../services/writeGate.js";
 
 /** Map a service error to an HTTP response, or 500 for the unexpected. */
 /**
@@ -122,6 +123,7 @@ async function clearRefsToDeletedItems(storage, scope, uuids, lang) {
     });
     return incomplete;
   } catch (cleanupError) {
+    rethrowIfLocked(cleanupError);
     console.warn(`Failed to clear references for deleted items ${itemUuids.join(", ")}:`, cleanupError.message);
     return [{ key: "*", reason: cleanupError.message }];
   }
@@ -171,6 +173,7 @@ export async function getCollectionSchemas(req, res) {
     const schemas = await collectionService.listCollectionSchemas(storage, scope);
     res.json(schemas);
   } catch (err) {
+    rethrowIfLocked(err);
     respondError(res, err);
   }
 }
@@ -183,6 +186,7 @@ export async function getCollectionSchema(req, res) {
     if (!schema) return res.status(404).json({ error: "Collection type not found" });
     res.json(schema);
   } catch (err) {
+    rethrowIfLocked(err);
     respondError(res, err);
   }
 }
@@ -208,6 +212,7 @@ export async function getAllItems(req, res) {
     if (req.query.invalid === "true") items = items.filter((i) => i.invalid);
     res.json(items);
   } catch (err) {
+    rethrowIfLocked(err);
     respondError(res, err);
   }
 }
@@ -223,6 +228,7 @@ export async function getItem(req, res) {
     if (!item) return res.status(404).json({ error: "Item not found" });
     res.json(item);
   } catch (err) {
+    rethrowIfLocked(err);
     respondError(res, err);
   }
 }
@@ -271,6 +277,7 @@ export async function createItem(req, res) {
       .status(201)
       .json(withUsageWarning(collectionService.normalizeCollectionItem(item, schema, lang), usageStale, item.slug));
   } catch (err) {
+    rethrowIfLocked(err);
     respondError(res, err);
   }
 }
@@ -303,6 +310,7 @@ export async function updateItem(req, res) {
       withUsageWarning(collectionService.normalizeCollectionItem(item, schema, lang), usageStale, item.slug),
     );
   } catch (err) {
+    rethrowIfLocked(err);
     respondError(res, err);
   }
 }
@@ -354,6 +362,7 @@ export async function deleteItem(req, res) {
     const warnings = referenceCleanupWarnings(incomplete);
     noStore(res).json({ success: true, slug: itemSlug, ...(warnings ? { warnings } : {}) });
   } catch (err) {
+    rethrowIfLocked(err);
     respondError(res, err);
   }
 }
@@ -426,6 +435,7 @@ export async function bulkDeleteItems(req, res) {
       .status(partial ? 207 : 200)
       .json({ ...result, ...(warnings ? { warnings } : {}) });
   } catch (err) {
+    rethrowIfLocked(err);
     respondError(res, err);
   }
 }
@@ -466,6 +476,7 @@ export async function duplicateItem(req, res) {
     if (!dup) return res.status(404).json({ error: "Item not found" });
     noStore(res).status(201).json(collectionService.normalizeCollectionItem(dup, schema, lang));
   } catch (err) {
+    rethrowIfLocked(err);
     respondError(res, err);
   }
 }
@@ -497,6 +508,7 @@ export async function discardArchivedItem(req, res) {
     if (!item) return res.status(404).json({ error: "Item not found" });
     noStore(res).json(item);
   } catch (err) {
+    rethrowIfLocked(err);
     respondError(res, err);
   }
 }
@@ -516,6 +528,7 @@ export async function reorderItems(req, res) {
     });
     noStore(res).json({ success: true, ...result });
   } catch (err) {
+    rethrowIfLocked(err);
     respondError(res, err);
   }
 }
@@ -586,6 +599,7 @@ export async function createItemLanguageVersion(req, res) {
     }
     noStore(res).status(201).json(collectionService.normalizeCollectionItem(outcome.item, schema, target));
   } catch (err) {
+    rethrowIfLocked(err);
     respondError(res, err);
   }
 }

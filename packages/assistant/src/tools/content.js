@@ -1,4 +1,5 @@
 import { toolError } from "../errors.js";
+import { documentVersion } from "../edits/sections.js";
 import {
   RESULT_BUDGET_CHARS,
   collectUploadPaths,
@@ -239,6 +240,7 @@ export const readPageTool = {
     }
     const header = {
       ...ctx.about(lang),
+      version: documentVersion(doc),
       page: {
         slug,
         name: doc.name ?? slug,
@@ -296,13 +298,14 @@ export const readSitePartTool = {
     const lang = ctx.language(language);
     const doc = await ctx.reader.readGlobal(scope, which, lang);
     if (!doc) return { data: { ...ctx.about(lang), which, missing: true } };
+    const version = documentVersion(doc);
     if (field) return { data: { ...ctx.about(lang), ...readField({ widgets: { [which]: doc } }, field, part) } };
     const section = sectionDto(which, doc, await sectionContext(ctx, scope, lang, doc));
     const budget = RESULT_BUDGET_CHARS - 500;
-    if (size(section) <= budget && blockOffset === undefined) return { data: { ...ctx.about(lang), which, section } };
+    if (size(section) <= budget && blockOffset === undefined) return { data: { ...ctx.about(lang), which, version, section } };
     const fitted = fitSection(section, budget);
-    if (size(fitted) <= budget && blockOffset === undefined) return { data: { ...ctx.about(lang), which, section: fitted } };
-    return { data: { ...ctx.about(lang), which, section: sectionBlocksPage(section, blockOffset ?? 0, budget, { which }) } };
+    if (size(fitted) <= budget && blockOffset === undefined) return { data: { ...ctx.about(lang), which, version, section: fitted } };
+    return { data: { ...ctx.about(lang), which, version, section: sectionBlocksPage(section, blockOffset ?? 0, budget, { which }) } };
   },
 };
 

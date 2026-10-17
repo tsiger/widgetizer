@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import useWidgetStore from "../stores/widgetStore";
 import useAutoSave from "../stores/saveStore";
+import { isEditorLocked } from "../lib/editorLock";
 
 const GLOBAL_WIDGET_IDS = new Set(["header", "footer"]);
 
@@ -48,6 +49,7 @@ export function resolveDeleteTarget({ selectedWidgetId, selectedBlockId, selecte
 export default function useDeleteKeyShortcut() {
   useEffect(() => {
     const handleKeyDown = (e) => {
+      if (isEditorLocked()) return;
       if (e.key !== "Delete" && e.key !== "Backspace") return;
       if (e.metaKey || e.ctrlKey || e.altKey) return;
       if (isEditableTarget(e.target)) return;

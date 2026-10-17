@@ -37,6 +37,7 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await started?.shutdown();
+  started?.releaseDataFolder();
   delete process.env.WIDGETIZER_EDITOR_SECRET;
   closeDb();
   await fs.rm(dataRoot, { recursive: true, force: true });

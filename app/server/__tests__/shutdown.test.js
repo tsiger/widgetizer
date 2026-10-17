@@ -18,7 +18,7 @@ afterAll(async () => {
 
 describe("server shutdown", () => {
   it("lets a save that was already running finish before closing", async () => {
-    const { server, shutdown } = await startOssServer({ defaultPort: 0 });
+    const { server, shutdown, releaseDataFolder } = await startOssServer({ defaultPort: 0 });
     const port = server.address().port;
     const body = JSON.stringify({ general: { language: "en" } });
 
@@ -50,5 +50,6 @@ describe("server shutdown", () => {
     const stopped = shutdown();
     expect(await response).toBe(200);
     await stopped;
+    releaseDataFolder();
   });
 });

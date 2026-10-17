@@ -26,6 +26,12 @@ export const partArg = {
   description: "Which part of a long text to return (1 = the start). Results say how many parts there are.",
 };
 
+export const APPROVAL_ID = {
+  type: "string",
+  pattern: "^[a-f0-9-]{36}$",
+  description: "Only when repeating a call the user has allowed: the approvalId from NEEDS_APPROVAL.",
+};
+
 export const offsetArg = { type: "integer", minimum: 0, maximum: 100000, description: "How many entries to skip." };
 export const limitArg = (max, description = `How many entries to return (at most ${max}).`) => ({
   type: "integer",

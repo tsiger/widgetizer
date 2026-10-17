@@ -1,6 +1,7 @@
 import fs from "fs-extra";
 import { getProjectDir } from "../config.js";
 import * as projectRepo from "../db/repositories/projectRepository.js";
+import { withContentWriteLock } from "./contentCoordination.js";
 
 /**
  * Delete an editor project and its associated local data.
@@ -35,30 +36,32 @@ export async function deleteProjectById(projectId) {
   // bundle after the deletion completes.
   const { withExportOpLock, cleanupProjectExports } = await import("../controllers/exportController.js");
   let newActiveProjectId = null;
-  await withExportOpLock(projectId, async () => {
-    try {
-      await cleanupProjectExports(projectId, { withinLock: true });
-    } catch (exportCleanupError) {
-      console.warn(`[deleteProjectById] Export cleanup failed for ${projectId}:`, exportCleanupError);
-      // Non-fatal: proceed with deletion even if export cleanup fails
-    }
-
-    // Delete from SQLite (cascades to media_files, media_sizes, media_usage,
-    // exports) and reassign the active project in one transaction.
-    newActiveProjectId = projectRepo.deleteProjectAndReassignActive(projectId);
-  });
-
-  // The project is already gone from the database, so a folder that cannot be
-  // removed (a file locked by another program, on Windows) does not undo the
-  // deletion; the caller reports what was left behind instead of a failure.
-  const projectDir = getProjectDir(projectFolderName);
   let folderLeftBehind = null;
-  try {
-    await fs.remove(projectDir);
-  } catch (removeError) {
-    console.warn(`[deleteProjectById] Could not fully remove ${projectDir}:`, removeError);
-    folderLeftBehind = projectDir;
-  }
+  await withExportOpLock(projectId, () =>
+    withContentWriteLock(projectId, async () => {
+      try {
+        await cleanupProjectExports(projectId, { withinLock: true });
+      } catch (exportCleanupError) {
+        console.warn(`[deleteProjectById] Export cleanup failed for ${projectId}:`, exportCleanupError);
+        // Non-fatal: proceed with deletion even if export cleanup fails
+      }
+
+      // Delete from SQLite (cascades to media_files, media_sizes, media_usage,
+      // exports) and reassign the active project in one transaction.
+      newActiveProjectId = projectRepo.deleteProjectAndReassignActive(projectId);
+
+      // The project is already gone from the database, so a folder that cannot be
+      // removed (a file locked by another program, on Windows) does not undo the
+      // deletion; the caller reports what was left behind instead of a failure.
+      const projectDir = getProjectDir(projectFolderName);
+      try {
+        await fs.remove(projectDir);
+      } catch (removeError) {
+        console.warn(`[deleteProjectById] Could not fully remove ${projectDir}:`, removeError);
+        folderLeftBehind = projectDir;
+      }
+    }),
+  );
 
   return { success: true, projectName, newActiveProjectId, folderLeftBehind };
 }

@@ -6,14 +6,19 @@ import { HEARTBEAT_SECONDS, MISSED_HEARTBEATS } from "./protocol.js";
  * Live relay connections. A session proves a relay held the current installation
  * token; it is not the key future jobs are stored under.
  */
-export function createSessionStore({ now = () => Date.now(), heartbeatSeconds = HEARTBEAT_SECONDS } = {}) {
+export function createSessionStore({ now = () => Date.now(), heartbeatSeconds = HEARTBEAT_SECONDS, onEnd } = {}) {
   const sessions = new Map();
   const ttl = heartbeatSeconds * MISSED_HEARTBEATS * 1000;
+  let sweeper = null;
+
+  function remove(id) {
+    if (sessions.delete(id)) onEnd?.(id);
+  }
 
   function sweep() {
     const cutoff = now() - ttl;
     for (const [id, session] of sessions) {
-      if (session.lastSeen < cutoff) sessions.delete(id);
+      if (session.lastSeen < cutoff) remove(id);
     }
   }
 
@@ -42,10 +47,24 @@ export function createSessionStore({ now = () => Date.now(), heartbeatSeconds = 
       return session;
     },
     end(id) {
-      sessions.delete(id);
+      remove(id);
     },
     clear() {
-      sessions.clear();
+      for (const id of [...sessions.keys()]) remove(id);
+    },
+    isAlive(id) {
+      sweep();
+      return sessions.has(id);
+    },
+    /** Ends sessions that stopped sending heartbeats even when nothing else calls in. */
+    startSweeping() {
+      if (sweeper) return;
+      sweeper = setInterval(sweep, heartbeatSeconds * 1000);
+      sweeper.unref?.();
+    },
+    stopSweeping() {
+      clearInterval(sweeper);
+      sweeper = null;
     },
     list() {
       sweep();

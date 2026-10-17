@@ -59,7 +59,7 @@ The first version covers all of these:
 
 - The bridge (the MCP server in `packages/mcp`) is assistant-neutral: one implementation for every MCP client, with no Claude-specific behaviour. Its tool descriptions and guidance are written for any assistant.
 - Claude Desktop's desktop extension (`.mcpb`) and any later plugins are only packaging around that same bridge (step 8).
-- **Turning it on and off.** The **AI Assistant** tab holds the one setting. Off (the default): no connection file, and every assistant request is refused. Turning it off while connected revokes the token and sessions; a running job is stopped and undone, and pending approvals are cancelled. Job history and undo points are kept, so revision tracking and image retention keep running while access is off.
+- **Turning it on and off.** The **AI Assistant** tab holds the one setting. Off (the default): no connection file, and every assistant request is refused. Turning it off while connected revokes the token and sessions; a running job is stopped and undone, and pending approvals are cancelled. Job history and undo points are kept, so change tracking and image retention keep running while access is off.
 - **Only the user turns it on.** Code running in a page (a site preview, an embed, code the assistant wrote) can do whatever the editor can, so in the desktop app turning access on happens in a prompt drawn by the app itself, which no page can answer, and reaches the server over the app's private channel. Turning it off works from the tab. The self-run browser version turns it on from the tab directly; it is meant for developers.
 - The same tab is the **"Connect an AI assistant"** screen:
   - **Claude Desktop:** the Connect button opens Widgetizer's `.mcpb` file, which hands it to Claude Desktop's own install screen (review, permissions, Install). If that handoff fails (file associations, installation or organisation policy), Widgetizer shows the file and explains the drag-and-drop and **Settings → Extensions** alternatives. If Claude Desktop isn't installed, say so and link to its download.
@@ -99,7 +99,7 @@ All rules below are **enforced by Widgetizer**, not just written into the assist
 - **Look** (read sites, pages, settings, media, collections): always allowed. This includes **listing all sites**, which "edit an existing site" needs.
 - **Change** (text, sections, colours/fonts, menus, business details, SEO, collection items, translations): allowed, because the job can be undone.
 - **Remove or replace a lot**: deleting a page, collection item or media file; removing a language; replacing a whole menu or the header/footer; rewriting many pages in one job; exporting. Widgetizer refuses these until the user has approved the exact plan **in Widgetizer's own Allow/Cancel prompt** (see step 5, "Confirm-first actions"). Approval through the assistant alone doesn't count. The confirmation is tied to that specific plan and to the site as it stood when the plan was made. Impact is counted across the whole job, so many small calls can't add up to an unconfirmed large change.
-- **Adding or changing code is confirm-first.** Code the assistant writes runs in the preview with the editor's rights, so it could otherwise do anything without asking. This covers embed code and custom scripts, and any value a browser could run, such as a map's embed address used as an iframe source. Which fields count is decided by where the value is output, not by its setting type, and the check applies to the values actually saved, including defaults a new section brings in.
+- **Any setting can be changed, code included.** Every theme, widget, block and setting type is editable, embed code and scripts too; values must be valid for their field, and every change is undoable like any other.
 - **Deleting a whole site is impossible** through the assistant.
 
 ### Jobs
@@ -169,7 +169,7 @@ Today the editor has no live-update channel: it loads data only when the user na
 ### Notifications
 
 - **One app-owned event contract** shared by desktop, web and Hosted, not something Electron-specific. One-way server-to-editor events (e.g. Server-Sent Events) are a reasonable starting transport; Stop and other actions stay ordinary requests.
-- Events are scoped to the site (and, in Hosted, to the user) and carry the job ID and a site revision. After a reconnect, the editor refetches the authoritative job and site state instead of trusting missed events.
+- Events are scoped to the site (and, in Hosted, to the user) and carry the job ID and the site's change generation. After a reconnect, the editor refetches the authoritative job and site state instead of trusting missed events.
 - The backend notifies after each **coherent saved step** (e.g. "About page done"), not after every field write, plus one **final full refresh** when the job ends.
 - The editor refreshes everything affected, not just the page JSON. A menu or collection change can alter the current preview without touching that page, and the media library has a cache that must be invalidated. The media library, collection lists, menus and settings screens all refresh.
 - Live refreshes may simply reload the affected data. Clearing the editor's own undo history is acceptable: users understand someone else is editing on their behalf, and undoing the assistant's work is handled by job undo (step 3). Fresh server state is applied as a clean baseline and must not trigger an autosave. Where cheap, reuse the preview's existing content-morphing reload to avoid a full flash.
@@ -258,7 +258,7 @@ Today the editor has no live-update channel: it loads data only when the user na
 
 - **Widgetizer asks the user itself**, in its own window: "The assistant wants to delete the About page. [Allow] [Cancel]." A confirmation code handed to the assistant would prove nothing, because the assistant could pass it straight back.
 - **Page code can't answer it.** In the desktop app the prompt is a small window the app draws itself, with no site content in it, holding Allow, Cancel and Stop. The answer reaches the server over the app's private channel, never through a page. A system message box won't do, because it would block Stop. The self-run browser version shows the prompt in the page (developer use, weaker). Hosted can serve previews from a separate address, which makes an in-page prompt safe there.
-- The request returns the exact plan and waits for the user's answer in Widgetizer. The approval is bound to that plan, the site revision, the job and the connected client. It is single-use, and it doesn't expire while the prompt is open.
+- The request returns the exact plan and waits for the user's answer in Widgetizer. The approval is bound to that plan, the site's fingerprint, the job and the connected client. It is single-use, and it doesn't expire while the prompt is open.
 - **The whole app halts while the prompt waits.** Nothing in Widgetizer can be edited and the job makes no progress until the user answers. There is no timeout. Otherwise an edit made during the wait could be wiped when a later Stop or Cancel restores the job's snapshot. The prompt itself, Stop and turning access off stay usable. If the assistant disconnects or Widgetizer restarts while the prompt is open, the prompt becomes a choice to keep or undo the job's changes so far, and the job ends either way. In Hosted the halt covers the user's account, never the whole service.
 
 ---
@@ -427,9 +427,10 @@ External facts below were checked against Anthropic's and OpenAI's documentation
 - **`packages/mcp`** — the relay. Standalone; imports nothing from the backend, Electron or native modules.
 - **Assistant backend package** — actions, validation orchestration, jobs, snapshots and undo, approvals, guidance. It exports a setup function that a shell mounts beside the existing backend routers, built on the same adapters and scope, so Hosted can mount it too. The existing backend-plugin hook isn't used: it forces project resolution, which listing sites and creating the first site can't have.
 - **Editor side** — the AI Assistant settings tab, the job banner and the Allow/Cancel prompt plug in through editor-ui's extension registry where it allows, and extend it where it doesn't.
-- **Generic hooks in existing code.** The write gate and editor events do nothing while the assistant is off; revision tracking, image retention and editor authentication always run, so undo points stay valid:
+- **Generic hooks in existing code.** The write gate and editor events do nothing while the assistant is off; change tracking, image retention and editor authentication always run, so undo points stay valid:
   - a write gate every mutating route passes through, checked again inside the content-write section
-  - a per-site revision number and a live-update event channel to the editor
+  - a change generation, a site fingerprint for Undo, and a live-update event channel to the editor
+  - an exclusive owner lock on the data folder, so only one Widgetizer serves it
   - asset retention in the storage contract (hold, don't delete) and in every media delete/replace path
   - an unsaved-changes registry and a read-only mode in the editor, plus a clean refresh after a job
   - save logic moved out of controllers into services, so the assistant calls the same code as the editor

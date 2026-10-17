@@ -1370,6 +1370,7 @@ describe("updateMediaMetadata across languages", () => {
   const multilang = { id: PROJECT_ID, defaultLanguage: "en", languages: ["el"] };
 
   before(async () => {
+    projectRepo.updateProject(PROJECT_ID, { languages: ["el"] });
     await writeMediaFile(PROJECT_ID, {
       files: [
         {
@@ -1380,6 +1381,10 @@ describe("updateMediaMetadata across languages", () => {
         },
       ],
     });
+  });
+
+  after(() => {
+    projectRepo.updateProject(PROJECT_ID, { languages: [] });
   });
 
   it("writes a translation without touching the default language", async () => {

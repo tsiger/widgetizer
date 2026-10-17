@@ -23,6 +23,7 @@ import {
   renderSavedPagePreview,
   renderCollectionItemPreview,
   listThemePresets,
+  sanitizeRichText,
 } from "@widgetizer/builder-server";
 
 /**
@@ -81,6 +82,7 @@ export function createAssistantSite({ adapters }) {
         return renderCollectionItemPreview({ storage, scope, project, collectionType, slug, savedItem: saved, lang });
       },
       presets: (themeId) => listThemePresets(themeId),
+      sanitizeRichText,
     },
   };
 }

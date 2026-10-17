@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import Slider from "rc-slider";
 import "rc-slider/assets/index.css";
+import { useRegisterUnsaved } from "../../../stores/unsavedRegistry";
 
 /**
  * RangeInput component
@@ -9,6 +10,7 @@ import "rc-slider/assets/index.css";
 export default function RangeInput({ id, value = 0, onChange, min = 0, max = 100, step = 1, unit = "" }) {
   const [localValue, setLocalValue] = useState(value);
   const [isDragging, setIsDragging] = useState(false);
+  useRegisterUnsaved(isDragging);
 
   // Sync local value with prop value
   useEffect(() => {

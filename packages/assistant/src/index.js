@@ -8,6 +8,9 @@ import { BRIDGE_PROTOCOL, ERROR_CODES, selectBridgeVersion } from "./protocol.js
 import { validateArguments } from "./validate.js";
 import { asToolError, toolError } from "./errors.js";
 import { createToolContext } from "./tools/context.js";
+import { createEditorEvents } from "./jobs/events.js";
+import { createJobManager } from "./jobs/manager.js";
+import { createAdmission } from "./jobs/admission.js";
 
 export { BRIDGE_PROTOCOL, BRIDGE_BASE, EDITOR_CREDENTIAL_HEADER } from "./protocol.js";
 export { secretsMatch } from "./access.js";
@@ -128,7 +131,16 @@ function describeTool({ name, title, description, inputSchema, outputSchema, ann
  *   editorProtected?: boolean,
  *   now?: () => number,
  *   heartbeatSeconds?: number,
- * }} options
+ *   jobs?: {
+ *     store: object,
+ *     snapshots: object,
+ *     sections: { run: Function },
+ *     siteScope: (projectId: string) => object|null,
+ *     siteExists: (projectId: string) => boolean,
+ *     normalize: (scope: object) => Promise<boolean>,
+ *     switchSite: (projectId: string) => Promise<void>,
+ *   },
+ * }} options - without `jobs` the assistant can only read.
  */
 export function setupAssistantServer({
   access: source,
@@ -140,15 +152,35 @@ export function setupAssistantServer({
   editorProtected = false,
   now,
   heartbeatSeconds,
+  jobs: jobDeps = null,
 }) {
   const instanceId = crypto.randomUUID();
-  const sessions = createSessionStore({ now, heartbeatSeconds });
+  let jobs = null;
+  const sessions = createSessionStore({ now, heartbeatSeconds, onEnd: (id) => jobs?.sessionEnded(id) });
   const access = createAccessController({
     source,
     publisher,
     instanceId,
-    onRevoke: () => sessions.clear(),
+    onRevoke: (reason) => {
+      if (reason === "disabled") jobs?.accessTurnedOff();
+      sessions.clear();
+    },
   });
+  const events = createEditorEvents({
+    state: async () => ({ instanceId, ...(jobs ? await jobs.state() : { generation: null, job: null, lastFinished: null }) }),
+    now,
+  });
+  if (jobDeps) {
+    jobs = createJobManager({
+      reader: site.reader,
+      ...jobDeps,
+      openSite: () => site.openSite(),
+      isAccessEnabled: () => access.isEnabled(),
+      isSessionAlive: (id) => sessions.isAlive(id),
+      events,
+      now,
+    });
+  }
   const toolsByName = new Map(tools.map((tool) => [tool.name, tool]));
   const splitResults = createSplitStore(now);
 
@@ -227,6 +259,7 @@ export function setupAssistantServer({
     }
 
     let outcome;
+    jobs?.touch(req.assistantSession.id);
     try {
       const actor = await resolveActor(req);
       const plain = args === undefined || (args !== null && typeof args === "object" && !Array.isArray(args));
@@ -242,9 +275,19 @@ export function setupAssistantServer({
         outcome = { isError: false, structuredContent: splitResults.later(tool.name, split.resultId, split.resultPart) };
       } else {
         const checked = validateArguments(tool.inputSchema, plain ? toolArgs : args);
-        const ctx = createToolContext({ args: checked, actor, appInfo, site });
+        const ctx = createToolContext({
+          toolName: tool.name,
+          args: checked,
+          actor,
+          appInfo,
+          site,
+          session: req.assistantSession,
+          requestId,
+          jobs,
+        });
         const result = await tool.run(ctx);
-        await ctx.finish();
+        // A job tool's effect stands whatever site is open by now; the job checks its own site.
+        if (!tool.recordsOutcome) await ctx.finish();
         const images = boundedImages(result.images);
         outcome = {
           isError: false,
@@ -261,6 +304,14 @@ export function setupAssistantServer({
         outcome = { isError: true, error: { code: ERROR_CODES.TOOL_FAILED, message: "Widgetizer couldn't complete this request." } };
       }
     }
+    if (tool.recordsOutcome && jobs) {
+      const jobId = outcome.structuredContent?.job?.id ?? null;
+      try {
+        jobs.recordOutcome(requestId, tool.name, jobId, outcome.isError ? { committed: false, error: outcome.error } : { committed: true, result: outcome.structuredContent });
+      } catch (error) {
+        console.error("Recording an assistant job outcome failed:", error);
+      }
+    }
     res.json({ requestId, ...outcome });
   });
 
@@ -268,13 +319,60 @@ export function setupAssistantServer({
   controlRouter.get("/status", (_req, res) => {
     res.json({ ...access.status(), editorProtected, sessions: access.isEnabled() ? sessions.list() : [] });
   });
+  controlRouter.get("/events", (req, res) => events.connect(req, res));
+  controlRouter.post("/editor/ready", express.json({ limit: "16kb" }), (req, res) => events.ready(req, res));
+
+  const control = (action) => async (req, res) => {
+    if (!jobs) return res.status(404).json({ error: "Not available." });
+    try {
+      res.json({ job: await action(req) });
+    } catch (error) {
+      const expected = asToolError(error);
+      if (!expected) console.error("Assistant control action failed:", error);
+      res.status(expected ? 409 : 500).json({
+        code: expected?.code ?? "FAILED",
+        message: expected?.message ?? "Widgetizer couldn't complete this.",
+      });
+    }
+  };
+  controlRouter.get("/jobs/state", control(() => jobs.state()));
+  controlRouter.post("/jobs/stop", express.json({ limit: "16kb" }), control((req) => jobs.stop({ jobId: req.body?.jobId ?? null, reason: "user" })));
+  controlRouter.post("/jobs/undo", express.json({ limit: "16kb" }), control((req) => jobs.undo({ jobId: String(req.body?.jobId ?? "") })));
+  controlRouter.post("/recovery/retry", control(() => jobs.retry()));
+  // In the desktop app page code can reach these routes, so its own prompt window answers instead.
+  const promptAnswer = (action) => async (req, res, next) => {
+    if (editorProtected) return res.status(403).json({ code: "ANSWER_IN_PROMPT", message: "Answer in Widgetizer's own prompt window." });
+    return control(action)(req, res, next);
+  };
+  controlRouter.post(
+    "/approvals/:id",
+    express.json({ limit: "16kb" }),
+    promptAnswer((req) => jobs.answerApproval(String(req.params.id), req.body?.allow === true)),
+  );
+  controlRouter.post("/decision", express.json({ limit: "16kb" }), promptAnswer((req) => jobs.decide(req.body?.keep === true)));
+  controlRouter.post("/recovery/keep", control(() => jobs.keep()));
 
   return {
     bridgeRouter,
     controlRouter,
     instanceId,
-    start: (url) => access.start(url),
-    stop: () => access.stop(),
+    jobs,
+    writeGate: jobs
+      ? { check: (projectId, writer) => jobs.check(projectId, writer), checkActiveSite: (writer) => jobs.checkActiveSite(writer) }
+      : null,
+    admission: jobs ? createAdmission({ jobs, siteExists: jobDeps.siteExists }) : (_req, _res, next) => next(),
+    recover: () => jobs?.recover(),
+    start(url) {
+      sessions.startSweeping();
+      jobs?.setBaseUrl(url);
+      return access.start(url);
+    },
+    async stop() {
+      sessions.stopSweeping();
+      jobs?.close();
+      events.close();
+      await access.stop();
+    },
     settled: () => access.settled(),
   };
 }

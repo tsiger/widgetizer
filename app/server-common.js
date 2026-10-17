@@ -14,8 +14,16 @@ import {
   saveSettings,
   onSettingsChanged,
   setSettingsUpdatePolicy,
+  setChangeObserver,
+  setWriteGate,
+  runAsWriter,
+  withContentWriteLock,
+  getProjectById,
+  setActiveProjectId,
+  editSiteDocument,
+  setRequestWriterResolver,
 } from "@widgetizer/builder-server";
-import { AuthorizationError } from "@widgetizer/core/errors";
+import { AuthorizationError, SiteLockedError } from "@widgetizer/core/errors";
 import {
   LocalScopeResolver,
   LocalPreviewScopeResolver,
@@ -24,11 +32,18 @@ import {
   LocalPublishAdapter,
   LocalLimitsAdapter,
 } from "@widgetizer/adapters-local";
-import { setupAssistantServer, BRIDGE_BASE } from "@widgetizer/assistant";
+import { setupAssistantServer, BRIDGE_BASE, EDITOR_CREDENTIAL_HEADER } from "@widgetizer/assistant";
 import { createConnectionFile } from "@widgetizer/assistant/local";
 import { createRequestGuard } from "./server/requestGuard.js";
 import { createAssistantOwnerStore } from "./server/assistantOwner.js";
 import { createAssistantSite } from "./server/assistantSite.js";
+import { migrateAssistantTables } from "./server/assistantDb.js";
+import { createSiteGenerations, holdAssetWrites } from "./server/siteGenerations.js";
+import { acquireOwnerFence } from "./server/ownerFence.js";
+import { createJobStore } from "./server/jobStore.js";
+import { createOssSnapshots, createOssAssetLedger, rebuildUsageWithoutWrites } from "./server/snapshots.js";
+import { normalizeLegacyIds } from "./server/normalizeLegacy.js";
+import { canonicalJson } from "@widgetizer/assistant/snapshots";
 
 const LOOPBACK_BIND_HOSTS = new Set(["127.0.0.1", "localhost", "::1"]);
 const DEV_ORIGINS = ["http://localhost:3000", "http://127.0.0.1:3000"];
@@ -57,12 +72,20 @@ function allowedExtraOrigins() {
 
 const assistantEnabled = (settings) => settings.assistant?.enabled === true;
 
-// Code in a page (a preview, an embed) can reach the editor's routes, so only the desktop app's own prompt may turn access on.
-function refuseEnablingFromPages() {
+const withoutAccess = (settings) => canonicalJson({ ...settings, assistant: { ...settings.assistant, enabled: null } });
+
+/**
+ * Code in a page (a preview, an embed) can reach the editor's routes, so on the desktop only the
+ * app's own prompt may turn access on. While a job runs, turning access off is the only change.
+ */
+function setAssistantSettingsPolicy({ editorProtected, isBusy }) {
   setSettingsUpdatePolicy((previous, next) => {
-    if (!assistantEnabled(previous) && assistantEnabled(next)) {
+    if (editorProtected && !assistantEnabled(previous) && assistantEnabled(next)) {
       throw new AuthorizationError("Turn on assistant access from Widgetizer's own prompt.", { code: "DECISION_REQUIRED" });
     }
+    if (!isBusy() || canonicalJson(previous) === canonicalJson(next)) return;
+    if (assistantEnabled(previous) && !assistantEnabled(next) && withoutAccess(previous) === withoutAccess(next)) return;
+    throw new SiteLockedError("Settings can't change while the assistant is working. You can turn assistant access off.");
   });
 }
 
@@ -71,7 +94,36 @@ function enableAssistantAccess() {
   if (!assistantEnabled(current)) saveSettings({ ...current, assistant: { ...current.assistant, enabled: true } });
 }
 
-function createAssistant(adapters, { db, editorProtected }) {
+function createJobDeps(adapters, { db, generations, ledger, editorSecret }) {
+  const siteScope = (projectId) => {
+    const project = getProjectById(projectId);
+    return project ? { actor: null, projectId: project.id, folderName: project.folderName } : null;
+  };
+  const rebuildUsage = rebuildUsageWithoutWrites(adapters.storage);
+  return {
+    store: createJobStore(db),
+    snapshots: createOssSnapshots({ adapters, db, generations, ledger }),
+    sections: { run: (projectId, writer, fn) => runAsWriter(writer, () => withContentWriteLock(projectId, fn)) },
+    siteScope,
+    siteExists: (projectId) => Boolean(getProjectById(projectId)),
+    normalize: (scope) => normalizeLegacyIds({ storage: adapters.storage, scope, rebuildUsage }),
+    internalHeaders: () => (editorSecret ? { [EDITOR_CREDENTIAL_HEADER]: editorSecret } : {}),
+    saves: {
+      editDocument: (writer, args) =>
+        runAsWriter(writer, () =>
+          editSiteDocument({ storage: adapters.storage, assetStorage: adapters.assetStorage, limits: adapters.limits, ...args }),
+        ),
+    },
+    async switchSite(projectId) {
+      if (!getProjectById(projectId)) throw new Error(`No site ${projectId}.`);
+      setActiveProjectId(projectId);
+      global.iconsCache?.delete(projectId);
+    },
+  };
+}
+
+function createAssistant(adapters, { db, generations, ledger, editorSecret }) {
+  const editorProtected = Boolean(editorSecret);
   const access = {
     isEnabled: () => assistantEnabled(getSettings()),
     subscribe: (listener) =>
@@ -86,6 +138,7 @@ function createAssistant(adapters, { db, editorProtected }) {
     appInfo: { version: readAppVersion() },
     publisher: createConnectionFile({ dataRoot: DATA_DIR, ownerStore: createAssistantOwnerStore(db) }),
     editorProtected,
+    jobs: createJobDeps(adapters, { db, generations, ledger, editorSecret }),
   });
 }
 
@@ -102,26 +155,34 @@ function createAssistant(adapters, { db, editorProtected }) {
  *
  * @param {{ getPort?: () => number|null, bindHost?: string }} [options] - the bound
  *   port (known only after listen) and host, for the request guard.
- * @returns {Promise<{ app: import('express').Express, assistant: ReturnType<typeof setupAssistantServer> }>}
+ * @returns {Promise<{ app: import('express').Express, assistant: ReturnType<typeof setupAssistantServer>, adapters: object,
+ *   db: import('better-sqlite3').Database, generations: ReturnType<typeof createSiteGenerations> }>}
  */
 export async function buildOssApp({ getPort = () => null, bindHost = "127.0.0.1" } = {}) {
   // getDb() opens (and migrates) the default on-disk database and returns the
   // singleton the controllers already use. The db-backed adapters share it.
   const db = getDb();
+  migrateAssistantTables(db);
+  const generations = createSiteGenerations(db);
+  setChangeObserver((projectId, kind) => generations.bump(projectId, kind));
+
+  const rawAssets = new LocalAssetStorageAdapter({ dataRoot: DATA_DIR });
+  const ledger = createOssAssetLedger({ assetStorage: rawAssets });
 
   const adapters = {
     scopeResolver: new LocalScopeResolver(db),
     previewScopeResolver: new LocalPreviewScopeResolver(db),
     storage: new LocalStorageAdapter({ dataRoot: DATA_DIR }),
-    assetStorage: new LocalAssetStorageAdapter({ dataRoot: DATA_DIR }),
+    assetStorage: holdAssetWrites(rawAssets, ledger),
     publish: new LocalPublishAdapter({ dataRoot: DATA_DIR, db }),
     limits: new LocalLimitsAdapter(db),
   };
 
   const editorSecret = process.env.WIDGETIZER_EDITOR_SECRET || null;
-  setSettingsUpdatePolicy(null);
-  if (editorSecret) refuseEnablingFromPages();
-  const assistant = createAssistant(adapters, { db, editorProtected: Boolean(editorSecret) });
+  const assistant = createAssistant(adapters, { db, generations, ledger, editorSecret });
+  setRequestWriterResolver((req) => assistant.jobs.writerForRequest(req));
+  setAssistantSettingsPolicy({ editorProtected: Boolean(editorSecret), isBusy: () => assistant.jobs.isBusy() });
+  setWriteGate(assistant.writeGate);
   const guard = createRequestGuard({
     getPort,
     loopbackOnly: LOOPBACK_BIND_HOSTS.has(bindHost),
@@ -137,10 +198,11 @@ export async function buildOssApp({ getPort = () => null, bindHost = "127.0.0.1"
       app.use(guard);
       app.use(BRIDGE_BASE, assistant.bridgeRouter);
       app.use("/api/assistant", assistant.controlRouter);
+      app.use(assistant.admission);
     },
   });
 
-  return { app, assistant };
+  return { app, assistant, adapters, db, generations };
 }
 
 /**
@@ -164,7 +226,10 @@ export async function buildOssApp({ getPort = () => null, bindHost = "127.0.0.1"
  *   shutdown: () => Promise<void>,
  *   assistantAccess: () => { enabled: boolean },
  *   enableAssistant: () => Promise<{ enabled: boolean }>,
- * }>}
+ *   releaseDataFolder: () => void,
+ *   assistant: ReturnType<typeof setupAssistantServer>,
+ * }>} `releaseDataFolder` is for tests that start a server in-process; it gives up
+ * the data folder after `shutdown`, which otherwise holds it until the process exits.
  */
 export async function startOssServer({ defaultPort, onReady } = {}) {
   // PORT=0 → OS assigns an ephemeral port at bind time. Otherwise use the
@@ -176,14 +241,20 @@ export async function startOssServer({ defaultPort, onReady } = {}) {
   // inside a container so the published port is reachable from the host.
   const requestedHost = process.env.HOST || "127.0.0.1";
 
+  // Held until the process exits: a handler can outlive shutdown and its connection.
+  const fence = await acquireOwnerFence(DATA_DIR);
+
   let boundPort = null;
   const { app, assistant } = await buildOssApp({ getPort: () => boundPort, bindHost: requestedHost });
+  // Before any request: an interrupted job is restored or left closed for the user to decide.
+  await assistant.recover().catch((error) => console.error("Recovering the assistant's last job failed:", error));
 
   const server = app.listen(requestedPort, requestedHost);
   await new Promise((resolve) => {
     server.once("listening", resolve);
     server.once("error", (err) => {
       console.error(`Server failed to start on port ${requestedPort}: ${err.message}`);
+      fence.release();
       process.exit(1);
     });
   });
@@ -241,5 +312,5 @@ export async function startOssServer({ defaultPort, onReady } = {}) {
     return assistantAccess();
   };
 
-  return { server, shutdown, assistantAccess, enableAssistant };
+  return { server, shutdown, assistantAccess, enableAssistant, assistant, releaseDataFolder: () => fence.release() };
 }

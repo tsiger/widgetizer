@@ -8,7 +8,10 @@ export const GUIDANCE = {
 - Work in the language the user is working in; every content tool takes a language.
 - Use only what the theme offers (theme_catalog, section_details). If something isn't possible with this theme, say so instead of approximating it.
 - When you're unsure what the user wants, ask one focused question.
-- Write for the site's visitors, not for the site owner.`,
+- Write for the site's visitors, not for the site owner.
+- To change a site: start_job, read what you'll change (read_page or read_site_part give its version), edit_sections with basedOn = that version, then finish_job. Pages, menus, the look, site details, collection items, image descriptions and languages have their own tools. Tell the user what you changed; they can undo it.
+- Deleting, removing more than half of something, or changing more than 3 pages in one job needs the user's OK: the call answers NEEDS_APPROVAL; call wait_for_approval until it says allowed, then repeat the call with its approvalId.
+- Open another site or create a new one (open_site, create_site) only when the user asked.`,
 
   writing: `- Match the site's existing voice unless the user asks for a change. Read a page or two first.
 - Lead with what the visitor gets. Short sentences, concrete words, no filler ("world-class", "solutions").

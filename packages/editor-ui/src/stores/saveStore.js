@@ -7,6 +7,8 @@ import usePageStore from "./pageStore";
 import useThemeStore from "./themeStore";
 import useProjectStore from "./projectStore";
 import useStaleProjectStore from "./staleProjectStore";
+import { registerUnsaved } from "./unsavedRegistry";
+import { isEditorLocked } from "../lib/editorLock";
 
 /**
  * Zustand store for managing auto-save functionality in the page editor.
@@ -231,6 +233,7 @@ const useAutoSave = create((set, get) => ({
     // explained that. Refusing here keeps a retry from re-issuing a doomed request
     // and keeps the failure counter and backoff out of it entirely.
     if (get().savingSuspended) return { status: "suspended" };
+    if (isEditorLocked()) return { status: "locked" };
 
     if (!get().hasUnsavedChanges()) return { status: "clean" };
 
@@ -632,5 +635,10 @@ const useAutoSave = create((set, get) => ({
     });
   },
 }));
+
+registerUnsaved(() => {
+  const state = useAutoSave.getState();
+  return state.isSaving || state.hasUnsavedChanges();
+});
 
 export default useAutoSave;

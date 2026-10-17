@@ -7,6 +7,7 @@ import { nativeLanguageName, hreflangCase } from "@widgetizer/core/languages";
 import Button from "../ui/Button";
 import { useDefaultLanguage, useExtraLanguages, useIsMultilang } from "../../stores/projectStore";
 import { API_URL } from "../../lib/config";
+import { useRegisterUnsaved } from "../../stores/unsavedRegistry";
 
 export default function MediaDrawer({ visible, onClose, selectedFile, onSave, loading, activeProject }) {
   const { t } = useTranslation();
@@ -27,7 +28,7 @@ export default function MediaDrawer({ visible, onClose, selectedFile, onSave, lo
   const {
     register,
     handleSubmit: rhfHandleSubmit,
-    formState: { errors },
+    formState: { errors, isDirty },
     reset,
   } = useForm({
     defaultValues: {
@@ -36,6 +37,8 @@ export default function MediaDrawer({ visible, onClose, selectedFile, onSave, lo
       caption: "",
     },
   });
+
+  useRegisterUnsaved(visible && isDirty);
 
   // Track previous selectedFile so the populate-form effect only resets on a real file
   // change (not every render). Initialize to a sentinel — NOT the initial selectedFile —

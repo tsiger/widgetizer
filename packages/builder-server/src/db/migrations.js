@@ -186,6 +186,14 @@ const migrations = [
       `);
     },
   },
+  {
+    version: 9,
+    description: "Remember which media files came with a theme preset",
+    up(db) {
+      // NULL for anything not known to come from a preset, including every file added before this.
+      if (!columnExists(db, "media_files", "source")) db.exec("ALTER TABLE media_files ADD COLUMN source TEXT");
+    },
+  },
 ];
 
 export const DEFAULT_TRACKING_TABLE = "_migrations";

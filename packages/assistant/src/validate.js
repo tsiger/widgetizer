@@ -49,7 +49,9 @@ function check(schema, value, name) {
 
 function checkObject(schema, value, name) {
   if (!value || typeof value !== "object" || Array.isArray(value)) fail(`${name} must be an object.`);
-  const properties = schema.properties ?? {};
+  // An object schema that names no properties holds free-form values (setting values); it is checked where it is used.
+  if (!schema.properties) return value;
+  const properties = schema.properties;
   if (schema.additionalProperties === false) {
     const unknown = Object.keys(value).filter((key) => !(key in properties));
     if (unknown.length) {

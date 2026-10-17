@@ -8,6 +8,7 @@ import { fileURLToPath } from "url";
 import { isSafePreviewPath } from "./previewPath.js";
 import { createServerRpc } from "./serverRpc.js";
 import { createEnableGate, isTrustedSender } from "./assistantPrompt.js";
+import { promptHtml, actionFromUrl, serverCallFor } from "./assistantPromptWindow.js";
 import { windowOpenTarget } from "./windowOpenPolicy.js";
 
 // Constants
@@ -235,6 +236,10 @@ function startServer() {
         log(`Server reported ready on port ${serverPort}`);
         serverReadyDeferred?.resolve();
       }
+      if (msg && msg.type === "server-error" && typeof msg.message === "string") {
+        serverReadyDeferred?.reject(new Error(msg.message));
+      }
+      if (msg && msg.type === "assistant-prompt") showAssistantPrompt(msg.prompt ?? null);
     });
 
     serverProcess.on("exit", (code) => {
@@ -530,6 +535,66 @@ function createPreviewWindow() {
   });
 
   return previewWindow;
+}
+
+// The Allow/Cancel and keep/undo questions, in a window of the app's own with no site content,
+// so code in a page can't answer them. It doesn't block the editor, where Stop stays usable.
+let promptWindow = null;
+let shownPrompt = null;
+let closingPrompt = false;
+
+function showAssistantPrompt(prompt) {
+  shownPrompt = prompt;
+  if (!prompt) {
+    if (promptWindow && !promptWindow.isDestroyed()) {
+      closingPrompt = true;
+      promptWindow.close();
+    }
+    promptWindow = null;
+    return;
+  }
+  if (!promptWindow || promptWindow.isDestroyed()) {
+    promptWindow = new BrowserWindow({
+      width: 460,
+      height: 340,
+      resizable: false,
+      minimizable: false,
+      maximizable: false,
+      alwaysOnTop: true,
+      parent: mainWindow && !mainWindow.isDestroyed() ? mainWindow : undefined,
+      title: "Widgetizer",
+      backgroundColor: "#ffffff",
+      webPreferences: { contextIsolation: true, nodeIntegration: false, sandbox: true, javascript: false },
+    });
+    promptWindow.setMenuBarVisibility(false);
+    promptWindow.webContents.setWindowOpenHandler(() => ({ action: "deny" }));
+    promptWindow.webContents.on("will-navigate", (event, url) => {
+      event.preventDefault();
+      answerAssistantPrompt(actionFromUrl(url));
+    });
+    // Closing a question is Cancel; the keep-or-undo choice stays until it is answered.
+    promptWindow.on("close", (event) => {
+      if (closingPrompt || isQuitting) return;
+      if (shownPrompt?.kind === "decision") {
+        event.preventDefault();
+        return;
+      }
+      answerAssistantPrompt("cancel");
+    });
+    promptWindow.on("closed", () => {
+      promptWindow = null;
+      closingPrompt = false;
+    });
+  }
+  promptWindow.loadURL(`data:text/html;charset=utf-8,${encodeURIComponent(promptHtml(prompt))}`);
+  promptWindow.show();
+  promptWindow.focus();
+}
+
+function answerAssistantPrompt(action) {
+  const call = action && shownPrompt ? serverCallFor(action, shownPrompt) : null;
+  if (!call || !serverRpc) return;
+  serverRpc.call(call[0], call[1]).catch((error) => log(`Answering the assistant prompt failed: ${error.message}`));
 }
 
 function contentOrigins() {

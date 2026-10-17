@@ -525,7 +525,8 @@ export async function getMediaUsage(projectId, fileId) {
  * `projectDir`. `projectId` keys only the DB reads/writes (media + media_usage), so
  * any shell can drive it by supplying the right working dir — OSS getProjectDir(folder),
  * or hosted's per-user CloudStorageAdapter.getProjectBase(scope).
- * @param {{ projectId: string, projectDir: string }} args
+ * @param {{ projectId: string, projectDir: string, stampMissing?: boolean }} args - `stampMissing: false`
+ *   rebuilds without writing uuids into content files.
  * @returns {Promise<{success: boolean, message: string, skipped: Array<{source: string, reason: string}>}>}
  *   `skipped` lists content this pass could not read. The rebuilt rows are then
  *   INCOMPLETE — a file referenced only by skipped content looks unused. Callers
@@ -533,7 +534,7 @@ export async function getMediaUsage(projectId, fileId) {
  *   (media deletion) must refuse instead. See verifyFileUnused in contentCoordination.
  * @throws {Error} If media file read/write fails
  */
-export async function refreshAllMediaUsageFromDir({ projectId, projectDir }) {
+export async function refreshAllMediaUsageFromDir({ projectId, projectDir, stampMissing = true }) {
   try {
     const pagesDir = path.join(projectDir, "pages");
 
@@ -566,6 +567,7 @@ export async function refreshAllMediaUsageFromDir({ projectId, projectDir }) {
     // a fallback id that a later save would leave behind as a stale "in use" row.
     async function identityOf(filePath, data, fallback) {
       if (data?.uuid) return data.uuid;
+      if (!stampMissing) return fallback;
       const uuid = randomUUID();
       // Write a sibling temp file and rename over the original: a partial write (a full
       // disk, say) then leaves the content file untouched instead of truncating it.

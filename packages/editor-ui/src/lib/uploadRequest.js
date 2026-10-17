@@ -1,6 +1,7 @@
 import { API_URL } from "./config";
 import { getActiveProjectId } from "./activeProjectId";
 import { notifyMutationSuccess } from "./mutationEvents";
+import { getSiteGeneration, SITE_GENERATION_HEADER } from "./siteGeneration";
 
 function parseResponseBody(responseText) {
   if (!responseText) return null;
@@ -107,6 +108,8 @@ export async function uploadFormData(path, formData, { onProgress, signal } = {}
     if (projectId) {
       xhr.setRequestHeader("X-Project-Id", projectId);
     }
+    const generation = getSiteGeneration();
+    if (generation != null) xhr.setRequestHeader(SITE_GENERATION_HEADER, generation);
 
     xhr.send(formData);
   });

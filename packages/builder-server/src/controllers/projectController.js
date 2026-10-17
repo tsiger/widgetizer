@@ -49,6 +49,7 @@ import { scaffoldProjectContent } from "../utils/projectScaffold.js";
 
 import multer from "multer";
 import { readAppSettingsFile } from "./appSettingsController.js";
+import { rethrowIfLocked } from "../services/writeGate.js";
 
 // Make sure the projects directory exists
 async function ensureDirectories() {
@@ -312,6 +313,7 @@ export async function seedPresetMedia(folderName, projectId, presetMediaDir) {
       height: entry.height || null,
       metadata: { alt: entry.alt || "", title: entry.title || "", caption: entry.caption || "" },
       sizes: entry.sizes || {},
+      source: "preset",
     });
   }
 }
@@ -418,6 +420,7 @@ export async function getAllProjects(req, res) {
 
     res.json(enrichedProjects);
   } catch (error) {
+    rethrowIfLocked(error);
     console.error("Error getting projects:", error);
     res.status(500).json({ error: "Failed to get projects" });
   }
@@ -446,6 +449,7 @@ export async function getActiveProject(req, res) {
 
     res.json(activeProject || null);
   } catch (error) {
+    rethrowIfLocked(error);
     console.error("Error getting active project:", error);
     res.status(500).json({ error: "Failed to get active project" });
   }
@@ -606,6 +610,7 @@ export async function createProject(req, res) {
       wasSetAsActive: wasFirstProject,
     });
   } catch (error) {
+    rethrowIfLocked(error);
     console.error("Project creation error:", error);
     res.status(500).json({ error: error.message || "Failed to create project" });
   }
@@ -636,6 +641,7 @@ export async function setActiveProject(req, res) {
 
     res.json({ success: true });
   } catch (error) {
+    rethrowIfLocked(error);
     console.error("Error setting active project:", error);
     res.status(500).json({ error: "Failed to set active project" });
   }
@@ -841,6 +847,7 @@ export async function updateProject(req, res) {
       ...(folderLeftBehind && { folderLeftBehind }),
     });
   } catch (error) {
+    rethrowIfLocked(error);
     if (error?.code === "MEDIA_REFERENCE_MISSING") {
       return res.status(error.statusCode).json({ error: "Missing media", message: error.message, code: error.code });
     }
@@ -878,6 +885,7 @@ export async function deleteProject(req, res) {
       folderLeftBehind: result.folderLeftBehind,
     });
   } catch (error) {
+    rethrowIfLocked(error);
     console.error("Error deleting project:", error);
     res.status(500).json({ error: "Failed to delete project" });
   }
@@ -976,6 +984,7 @@ export async function duplicateProject(req, res) {
 
     res.status(201).json(newProject);
   } catch (error) {
+    rethrowIfLocked(error);
     console.error("Error duplicating project:", error);
     res.status(500).json({ error: error.message || "Failed to duplicate project" });
   }
@@ -1000,6 +1009,7 @@ export async function getProjectWidgets(req, res) {
     if (!lang) return;
     res.json(await resolveSchemaDefaults(schemas, storage, scope, lang));
   } catch (error) {
+    rethrowIfLocked(error);
     res.status(500).json({ error: `Failed to get project widgets: ${error.message}` });
   }
 }
@@ -1028,6 +1038,7 @@ export async function getProjectIcons(req, res) {
     // Full icons object (prefix + icons map).
     res.json(JSON.parse(content.toString("utf8")));
   } catch (error) {
+    rethrowIfLocked(error);
     console.error("Error getting project icons:", error);
     res.status(500).json({ error: "Failed to get project icons" });
   }
@@ -1177,6 +1188,7 @@ export async function exportProject(req, res) {
     // Finalize the archive
     await archive.finalize();
   } catch (error) {
+    rethrowIfLocked(error);
     console.error("Error exporting project:", error);
     if (!res.headersSent) {
       res.status(500).json({ error: error.message || "Failed to export project" });
@@ -1589,6 +1601,7 @@ export async function importProject(req, res) {
       throw error;
     }
   } catch (error) {
+    rethrowIfLocked(error);
     // A refused backup is the file's problem, not the server's.
     if (error.statusCode === 400) return res.status(400).json({ error: error.message });
     console.error("Error importing project:", error);
@@ -1619,6 +1632,7 @@ export async function getThemeUpdateStatus(req, res) {
     const status = await checkForUpdates(id);
     res.json(status);
   } catch (error) {
+    rethrowIfLocked(error);
     console.error("Error checking theme update status:", error);
     if (error.message.includes("not found")) {
       return res.status(404).json({ error: error.message });
@@ -1646,6 +1660,7 @@ export async function toggleProjectThemeUpdates(req, res) {
     const result = await toggleThemeUpdates(id, enabled);
     res.json(result);
   } catch (error) {
+    rethrowIfLocked(error);
     console.error("Error toggling theme updates:", error);
     if (error.message.includes("not found")) {
       return res.status(404).json({ error: error.message });
@@ -1667,6 +1682,7 @@ export async function applyProjectThemeUpdate(req, res) {
     const result = await applyThemeUpdate(id);
     res.json(result);
   } catch (error) {
+    rethrowIfLocked(error);
     console.error("Error applying theme update:", error);
     if (error.message.includes("not found")) {
       return res.status(404).json({ error: error.message });

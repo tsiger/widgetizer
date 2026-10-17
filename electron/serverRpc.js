@@ -36,14 +36,14 @@ export function createServerRpc(child, { deadlineMs = RPC_DEADLINE_MS } = {}) {
   child.once("exit", close);
 
   return {
-    call(method) {
+    call(method, params = {}) {
       if (closed) return Promise.reject(new Error("The server stopped."));
       const id = crypto.randomUUID();
       return new Promise((resolve, reject) => {
         const timer = setTimeout(() => settle(id, (entry) => entry.reject(new Error("The server didn't answer."))), deadlineMs);
         pending.set(id, { resolve, reject, timer });
         try {
-          child.postMessage({ type: "rpc", id, method });
+          child.postMessage({ type: "rpc", id, method, params });
         } catch (error) {
           settle(id, (entry) => entry.reject(error));
         }

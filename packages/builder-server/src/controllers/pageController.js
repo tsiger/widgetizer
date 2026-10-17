@@ -27,6 +27,7 @@ import {
   resolveTargetLanguage,
   serializeTranslationOps,
 } from "../services/translationService.js";
+import { rethrowIfLocked } from "../services/writeGate.js";
 
 // `index` and `home` both publish as the language's index.html, so a language
 // may hold only one of them. `ownSlug` is the page being renamed, which does not
@@ -67,7 +68,7 @@ async function readWidgetSchema(storage, scope, type) {
   }
 }
 
-async function enforcePaginationRules({ scope, storage, widgets }) {
+export async function enforcePaginationRules({ scope, storage, widgets }) {
   const paginators = [];
   for (const widget of Object.values(widgets || {})) {
     if (widget?.settings?.paginate !== true) continue;
@@ -205,7 +206,7 @@ async function claimPageSlug({ scope, storage, pageId, pageData, previousPageId,
  * the sweep was still going, and the sweep wrote a Greek page straight back. Related
  * writes have to share one section, so the lock belongs at the controller edge.
  */
-async function persistPageInSection({ scope, storage, pageId, pageData, previousPageId = null, lang, assetStorage }) {
+export async function persistPageInSection({ scope, storage, pageId, pageData, previousPageId = null, lang, assetStorage, beforeWrite }) {
   // Required, not optional. It used to default to null and skip the check, which
   // meant a caller that simply forgot to pass it lost the protection silently —
   // the page-details save did exactly that, and could store a deleted image as the
@@ -244,6 +245,7 @@ async function persistPageInSection({ scope, storage, pageId, pageData, previous
       nextPaths: extractMediaPathsFromPage(pageData),
     });
 
+    await beforeWrite?.();
     await storage.write(scope, pageKey(pageId, lang), JSON.stringify(withoutLanguage(pageData), null, 2));
 
     if (previousPageId && previousPageId !== pageId) {
@@ -318,6 +320,7 @@ async function clearRefsToDeletedPages(storage, scope, deleted, lang) {
     });
     return incomplete;
   } catch (cleanupError) {
+    rethrowIfLocked(cleanupError);
     console.warn(`Failed to clear references for deleted pages ${pageUuids.join(", ")}:`, cleanupError.message);
     return [{ key: "*", reason: cleanupError.message }];
   }
@@ -344,6 +347,7 @@ export async function getPage(req, res) {
     }
     return res.json({ ...pageData, language: lang.language });
   } catch (error) {
+    rethrowIfLocked(error);
     console.error("Error getting page:", error);
     res.status(500).json({ error: "Failed to get page" });
   }
@@ -497,6 +501,7 @@ export async function updatePage(req, res) {
       ...(movedFrom.length ? { listingAnchorMovedFrom: movedFrom } : {}),
     });
   } catch (error) {
+    rethrowIfLocked(error);
     if (respondMissingMedia(res, error)) return;
     console.error("Error updating page:", error);
     res.status(500).json({
@@ -544,6 +549,7 @@ export async function getAllPages(req, res) {
 
     res.json(pages);
   } catch (error) {
+    rethrowIfLocked(error);
     // Keep existing error handling for the route
     console.error("Error in getAllPages route:", error);
     res.status(500).json({ error: "Failed to get pages" });
@@ -590,6 +596,7 @@ export async function deletePage(req, res) {
     const warnings = referenceCleanupWarnings(found.incomplete);
     res.json({ success: true, ...(warnings ? { warnings } : {}) });
   } catch (error) {
+    rethrowIfLocked(error);
     console.error("Error deleting page:", error);
     res.status(500).json({ error: "Failed to delete page" });
   }
@@ -748,6 +755,7 @@ export async function createPage(req, res) {
 
     res.status(201).json(newPage);
   } catch (error) {
+    rethrowIfLocked(error);
     if (respondMissingMedia(res, error)) return;
     console.error("Error creating page:", error);
     res.status(500).json({ error: "Failed to create page" });
@@ -883,6 +891,7 @@ export async function savePageContent(req, res) {
         : {}),
     });
   } catch (error) {
+    rethrowIfLocked(error);
     if (respondMissingMedia(res, error)) return;
     console.error(`Error saving page content for ${id}:`, error);
     res.status(500).json({ error: "Failed to save page content" });
@@ -898,7 +907,7 @@ export async function savePageContent(req, res) {
  * a widget whose schema does not declare one can never hold an anchor. Each
  * language has its own listing pages, so the sweep stays inside the language.
  */
-async function clearListingAnchorsElsewhere({ scope, storage, keepPageId, widgets, lang }) {
+export async function clearListingAnchorsElsewhere({ scope, storage, keepPageId, widgets, lang }) {
   const claimed = new Set();
   for (const widget of Object.values(widgets || {})) {
     if (widget?.settings?.listing_anchor && widget.type) claimed.add(widget.type);
@@ -1030,6 +1039,7 @@ export async function duplicatePage(req, res) {
 
     res.status(201).json(newPage);
   } catch (error) {
+    rethrowIfLocked(error);
     if (respondMissingMedia(res, error)) return;
     console.error("Error duplicating page:", error);
     res.status(500).json({ error: "Failed to duplicate page" });
@@ -1103,6 +1113,7 @@ export async function createPageLanguageVersion(req, res) {
     if (!version) return res.status(404).json({ error: "Page not found" });
     res.status(201).json(version);
   } catch (error) {
+    rethrowIfLocked(error);
     if (error?.name === "TranslationError") {
       return res.status(error.status).json({ error: "Version not created", message: error.message });
     }

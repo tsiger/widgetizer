@@ -30,6 +30,7 @@ import usePageStore from "@widgetizer/editor-ui/stores/pageStore";
 import { registerProjectStore } from "@widgetizer/editor-ui/lib/activeProjectId";
 import { useStaleActiveProjectDetection } from "@widgetizer/editor-ui/hooks/useStaleActiveProjectDetection";
 import { handleActiveProjectChange } from "./lib/projectSwitchCoordinator";
+import { AssistantCoordinator } from "@widgetizer/assistant/editor";
 import "./i18n";
 
 // Register project store for apiFetch X-Project-Id header injection.
@@ -119,9 +120,11 @@ function AppWithToast() {
   return (
     <>
       <UpdateBanner />
-      <ConfirmProvider>
-        <RouterProvider router={router} />
-      </ConfirmProvider>
+      <AssistantCoordinator>
+        <ConfirmProvider>
+          <RouterProvider router={router} />
+        </ConfirmProvider>
+      </AssistantCoordinator>
       <LanguageInitializer />
       <ToastContainer />
     </>
