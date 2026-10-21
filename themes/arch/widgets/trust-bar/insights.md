@@ -1,83 +1,125 @@
-# Trust Bar Widget — Insights
+# trust-bar
 
-A horizontal strip of icon-plus-text items that communicates key selling points, guarantees, or differentiators at a glance.
+## Purpose
 
----
+A slim strip of three to five icon-plus-text items, one row across the page, that states selling points, guarantees or credentials at a glance. It has no heading of its own and is meant to sit under a hero or between larger sections as a quick credibility beat.
 
-## Settings Levers
+Each `item` is an icon, a short title and a one-line text. On desktop the items share the row equally with thin dividers between them; on phones they stack.
 
-| Setting | Values | Visual Effect |
-|---|---|---|
-| `icon_style` | `plain` / `outline` / `filled` | Plain shows a bare icon; outline adds a stroke border; filled places the icon on a solid background shape. Filled draws the most attention. |
-| `icon_size` | `sm` / `md` / `lg` (default) / `xl` | Controls how prominent icons are relative to the text. XL works when the bar is the hero's main supporting element; SM keeps it subtle. |
-| `icon_shape` | `sharp` / `rounded` / `circle` (default) | Shape of the icon container when using outline or filled style. Sharp feels corporate, rounded feels modern, circle feels friendly. |
-| `alignment` | `start` (default) / `center` | Start keeps icon and text side-by-side; center stacks icon above text. Center needs short titles to look clean. |
-| `show_dividers` | `true` (default) / `false` | Draws vertical border lines between items on desktop. Dividers add visual structure; removing them creates a more open, airy feel. |
-| `color_scheme` | `standard-primary` (default) / `standard-secondary` / `highlight-primary` / `highlight-secondary` | Standard inherits page background; highlight swaps to the alternate background. Secondary variants shift text or icon colors for contrast. |
-| `top_spacing` | `auto` (default), `small`, `none` | `small` reduces spacing for tighter rhythm; `none` removes it entirely for flush stacking |
-| `bottom_spacing` | `auto` (default), `small`, `none` | `small` reduces spacing for tighter rhythm; `none` removes it entirely for flush stacking |
+## When to use
 
----
+- Directly under the opening `banner`, `slideshow` or `split-hero` to back the headline with three or four proof points, or just above a `core-form` to settle last doubts.
+- Good for "licensed and insured", "free delivery over 50", "open seven days", years in business, awards and certifications. Bad for anything that needs a sentence of explanation; that is `icon-card-grid` or `icon-list`.
+- Never a page opener: it has no heading and reads as a strip, not a title.
+- A bridge element: it belongs between sections rather than being one. Use `top_spacing` `small` as its usual setting, and keep that choice the same everywhere on the site.
+- Needs three to five items. Two look thin, six squeeze on desktop because the row does not wrap at large widths.
+- Fits trades and home services, shops, restaurants, clinics, hotels and any local business that sells on trust.
 
-## Available Blocks
+## Pitfalls
 
-| Block Type | Key Settings | Notes |
-|---|---|---|
-| `item` | `icon` (icon picker), `title` (short text, default: "Feature title"), `text` (description, default: "Feature description") | Each item becomes one column on desktop, one row on mobile. The default setup ships four items. Title and text are both optional, so you can use icon-only or title-only layouts. |
+- `icon_style`, `icon_size` and `icon_shape` apply to every item at once; items cannot differ. `plain` is a bare icon, `outline` draws a ring, `filled` sits the icon on a solid accent shape. The shape only matters for `outline` and `filled`.
+- `alignment` `start` puts the icon beside the text; `center` stacks the icon above centred text and needs short titles, since every item becomes a narrow column.
+- `text` is one line of small type. Keep it to a handful of words; a sentence wraps into a second and third line and the items stop lining up.
+- An item with an empty `icon` simply has no icon, which is how a numbers strip works: put the figure in `title` and the label in `text`.
+- Under an image hero the hero's bottom spacing is padding inside its own image, so it contributes no gap; `top_spacing` `small` gives the docked-but-not-touching look. `none` there presses the bar against the image edge.
+- A highlight scheme turns the bar into a coloured band that pads inside itself. That is a strong move for a thin strip; it counts as one of the page's one or two highlight sections and must not touch another highlight band.
+- Icons are chosen by name from the theme's icon set; pick a concrete object (a delivery truck, a shield, a clock, a medal) rather than an abstract symbol the visitor has to decode.
 
----
+## Recipes
 
-## Layout Recipes
+### Why choose us, under the hero
 
-### 1. "Why Choose Us" Strip Below the Hero
+Four filled circular icons with short titles docked under an image hero. The user supplies four proof points of two or three words each with a short supporting line.
 
-- **Items:** 3-4 (e.g., "20 Years Experience," "Licensed & Insured," "Free Estimates," "5-Star Rated")
-- **Settings:** `icon_style: filled`, `icon_size: lg`, `icon_shape: circle`, `alignment: start`, `show_dividers: true`, `color_scheme: highlight-primary`
-- **Good for:** Immediately reinforcing credibility after the hero image and CTA.
+```json
+{
+  "type": "trust-bar",
+  "settings": {
+    "icon_style": "filled",
+    "icon_size": "lg",
+    "icon_shape": "circle",
+    "alignment": "start",
+    "show_dividers": true,
+    "color_scheme": "standard-primary",
+    "top_spacing": "small"
+  },
+  "blocks": [
+    { "type": "item", "settings": { "icon": "medal", "title": "Twenty years' experience", "text": "A short supporting line" } },
+    { "type": "item", "settings": { "icon": "shield", "title": "Licensed and insured", "text": "A short supporting line" } },
+    { "type": "item", "settings": { "icon": "clock", "title": "Same-day response", "text": "A short supporting line" } },
+    { "type": "item", "settings": { "icon": "star", "title": "Five-star rated", "text": "A short supporting line" } }
+  ]
+}
+```
 
-### 2. Compact Shipping & Returns Bar (E-Commerce)
+### Shop reassurance strip
 
-- **Items:** 3 (e.g., "Free Shipping Over $50," "30-Day Returns," "Secure Checkout")
-- **Settings:** `icon_style: plain`, `icon_size: sm`, `icon_shape: sharp`, `alignment: start`, `show_dividers: true`, `color_scheme: standard-primary`
-- **Good for:** Sitting just above the footer or below the product grid to reduce purchase anxiety.
+Three plain small icons about shipping, returns and payment, placed above the footer or under a product grid. The user supplies the three policies in a few words each.
 
-### 3. Centered Icon Showcase
+```json
+{
+  "type": "trust-bar",
+  "settings": {
+    "icon_style": "plain",
+    "icon_size": "sm",
+    "icon_shape": "sharp",
+    "alignment": "start",
+    "show_dividers": true,
+    "color_scheme": "standard-secondary",
+    "top_spacing": "small",
+    "bottom_spacing": "small"
+  },
+  "blocks": [
+    { "type": "item", "settings": { "icon": "truck-delivery", "title": "Free delivery", "text": "On orders over a set amount" } },
+    { "type": "item", "settings": { "icon": "package", "title": "Easy returns", "text": "Within 30 days" } },
+    { "type": "item", "settings": { "icon": "lock", "title": "Secure checkout", "text": "All major cards accepted" } }
+  ]
+}
+```
 
-- **Items:** 4-5 (e.g., "Organic Ingredients," "Cruelty-Free," "Eco Packaging," "Handmade," "Family Owned")
-- **Settings:** `icon_style: outline`, `icon_size: xl`, `icon_shape: circle`, `alignment: center`, `show_dividers: false`, `color_scheme: standard-secondary`
-- **Good for:** A standalone values section on an About page or midway through a long landing page.
+### Centred values row
 
-### 4. Minimal Dark Highlight Band
+Five outlined icons stacked above centred one-word titles, as a values section on an about page. The user supplies five values of one or two words; the text line is left empty.
 
-- **Items:** 3 (e.g., "Award-Winning Design," "Published in Arch Digest," "50+ Projects Completed")
-- **Settings:** `icon_style: plain`, `icon_size: md`, `icon_shape: rounded`, `alignment: start`, `show_dividers: false`, `color_scheme: highlight-secondary`, `top_spacing: none`, `bottom_spacing: none`
-- **Good for:** A full-width accent band that breaks up two light sections with a bold, confident statement.
+```json
+{
+  "type": "trust-bar",
+  "settings": {
+    "icon_style": "outline",
+    "icon_size": "xl",
+    "icon_shape": "circle",
+    "alignment": "center",
+    "show_dividers": false,
+    "color_scheme": "standard-primary"
+  },
+  "blocks": [
+    { "type": "item", "settings": { "icon": "leaf", "title": "Organic", "text": "" } },
+    { "type": "item", "settings": { "icon": "heart-handshake", "title": "Family run", "text": "" } },
+    { "type": "item", "settings": { "icon": "recycle", "title": "Low waste", "text": "" } },
+    { "type": "item", "settings": { "icon": "location", "title": "Local", "text": "" } },
+    { "type": "item", "settings": { "icon": "certificate", "title": "Certified", "text": "" } }
+  ]
+}
+```
 
-### 5. Service Guarantees Bar
+### Numbers band
 
-- **Items:** 4 (e.g., "Same-Day Response," "No Hidden Fees," "Background-Checked Staff," "Satisfaction Guaranteed")
-- **Settings:** `icon_style: filled`, `icon_size: md`, `icon_shape: rounded`, `alignment: start`, `show_dividers: true`, `color_scheme: standard-primary`
-- **Good for:** Placing directly above a contact form or booking widget to nudge conversions.
+A highlight band of three figures with no icons: the number in the title, the label beneath. The user supplies three figures they can stand behind.
 
-### 6. Stats / Numbers Strip
-
-- **Items:** 3-4 — use the `title` field for the number and `text` for the label (e.g., title: "1,200+", text: "Projects Delivered")
-- **Settings:** `icon_style: plain`, `icon_size: sm`, `icon_shape: sharp`, `alignment: center`, `show_dividers: true`, `color_scheme: highlight-primary`
-- **Good for:** Social proof section where big numbers tell the story. De-emphasize icons (or leave the icon field blank) so the numbers dominate.
-
-### 7. Certification / Badge Row
-
-- **Items:** 3-5 (e.g., "BBB A+ Rated," "EPA Certified," "Veteran Owned," "Google Guaranteed")
-- **Settings:** `icon_style: outline`, `icon_size: lg`, `icon_shape: sharp`, `alignment: center`, `show_dividers: false`, `color_scheme: standard-primary`
-- **Good for:** A quiet but authoritative section near the footer that signals third-party validation.
-
----
-
-## Differentiation Tips
-
-- **Strip it down.** You can omit the `text` field entirely and use only icon + title for a punchy, scannable bar that works at small sizes. This is great for mobile-first sites.
-- **Use it more than once.** Place a compact bar (small icons, no dividers, standard scheme) at the top of the page for shipping/guarantee info, and a larger centered version mid-page for brand values. Different settings make them read as distinct sections.
-- **Leverage color scheme to create visual breaks.** A highlight trust bar between two standard-background sections acts as a visual divider itself, so you can often remove a separate spacer or divider widget.
-- **Match icon style to the brand personality.** Filled circles feel approachable (great for home services, family businesses). Plain icons with sharp shapes feel precise and corporate (accounting, law, consulting). Outline with rounded shapes strikes a middle ground.
-- **Three items is often better than five.** On mobile, each item stacks vertically. More than four items pushes the trust bar into scroll territory. For mobile-heavy audiences, keep it tight.
-- **Dock it under the hero with `top_spacing: small`.** An image or filled hero spaces itself with internal padding, so it provides no external gap below — the trust bar must bring its own breathing room. `small` gives the docked-but-not-touching look that visually connects the main message to the supporting proof points; `none` there slams the bar against the hero's image edge. Reserve `none` for when the section above is unfilled and its own bottom margin already provides the gap, or when the bar shares a color scheme with the section above and should fuse into one band.
+```json
+{
+  "type": "trust-bar",
+  "settings": {
+    "icon_style": "plain",
+    "icon_size": "sm",
+    "alignment": "center",
+    "show_dividers": true,
+    "color_scheme": "highlight-primary"
+  },
+  "blocks": [
+    { "type": "item", "settings": { "icon": "", "title": "1,200+", "text": "Projects completed" } },
+    { "type": "item", "settings": { "icon": "", "title": "15", "text": "Years in business" } },
+    { "type": "item", "settings": { "icon": "", "title": "98%", "text": "Customers who return" } }
+  ]
+}
+```

@@ -91,6 +91,7 @@ export { enrichSeededRichtextLinksFromDir } from "./utils/linkEnrichment.js";
 export {
   listThemes,
   listThemePresets,
+  readPresetDetails,
   resolvePresetPaths,
   ensureThemesDirectory,
   buildLatestSnapshot,
@@ -130,6 +131,7 @@ export {
   resolveSchemaDefaults,
   readLabelLocale,
   readWidgetGuidance,
+  readThemeGuidance,
   readUploadBytes,
 } from "./services/siteReader.js";
 export { contentLanguage, projectLanguages, projectLanguageContexts } from "./utils/contentLanguage.js";

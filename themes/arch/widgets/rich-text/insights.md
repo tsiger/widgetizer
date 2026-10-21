@@ -1,70 +1,111 @@
-# Rich Text Widget
+# rich-text
 
-Flexible text content section that stacks headings, body copy, and call-to-action buttons in a single vertically-flowing column with alignment, width, and color scheme control.
+## Purpose
 
-## Settings levers
+A single column of headings, paragraphs, buttons and an optional countdown, with chosen width and alignment. It is Arch's standard inner-page opener and its general-purpose text section: intros, statements, long-form copy and calls to action.
 
-| Setting | Values | Visual effect |
-|---|---|---|
-| text_alignment | `start` (default), `center`, `end` | Aligns the entire content column left, center, or right within the section |
-| content_width | `narrow`, `medium` (default), `wide`, `fullwidth` | Controls the max-width of the text column; narrow creates a focused reading lane, fullwidth spans the entire container |
-| color_scheme | `standard-primary` (default), `standard-secondary`, `highlight-primary`, `highlight-secondary` | Swaps background and text colors; non-standard schemes add padded container backgrounds via `--widget-bg-color` |
-| image | image upload | Optional background image for the section |
-| overlay_color | color with alpha (default `#0a1e38bf`) | Tints the background image with a semi-transparent overlay for text readability |
-| top_spacing | `auto` (default), `small`, `none` | `small` reduces spacing for tighter rhythm; `none` removes it entirely for flush stacking |
-| bottom_spacing | `auto` (default), `small`, `none` | `small` reduces spacing for tighter rhythm; `none` removes it entirely for flush stacking |
+Blocks stack vertically in the order given. A `heading` block becomes the page heading when the section opens the page, and a sub-heading anywhere else. A `text` block holds rich text and can be small, uppercase and muted, which is how Arch builds an eyebrow line above a heading. A `button` block carries one or two buttons side by side. An optional background `image` turns the section into a tinted band with `overlay_color` over the picture.
 
-## Available blocks
+## When to use
 
-| Block | Key settings | Notes |
-|---|---|---|
-| heading | `text` (plain string), `size` (lg through 9xl, default 2xl) | Renders as `<h1>` when the widget is first on the page (index 1), otherwise `<h2>`; auto-escaped, no HTML allowed |
-| text | `text` (richtext/HTML), `size` (sm, base, lg), `uppercase` (bool), `muted` (bool) | Output uses `| raw` so DOMPurify-sanitized HTML is rendered; muted reduces opacity, uppercase transforms casing |
-| countdown | `target_date` (text, default "2027-01-01 00:00"), `expired_message` (text), `show_seconds` (bool, default true) | Displays a live countdown timer to the target date; shows the expired message once the date passes |
-| button | `link` + `link_2` (text, href, target), `style` / `style_2` (primary, secondary), `size` (small, medium, large, xlarge) | Supports up to two side-by-side buttons; either link can be left blank to show a single CTA; size applies to both buttons equally |
+- The default opener for every inner page whose header is transparent: a transparent header only works over `banner`, `slideshow` and `video-popup`, so `about`, `services`, `contact`, `news` and `projects` pages open with a `rich-text` title block instead (eyebrow text, big heading, one paragraph).
+- Good for a page intro before a grid, a mission or manifesto, legal and policy copy (a `medium` column with lists in one `text` block), a promotional band, a closing call to action, a countdown to a launch.
+- Bad for anything that needs columns, cards or media beside the text; use `split-content`, `image-text` or `card-grid`. For a hero with a photo use `banner`.
+- Sits above almost anything. A grid that follows an unfilled `rich-text` opener takes `top_spacing` `none`, because the opener's own bottom margin already supplies the gap.
+- Content: one heading, one to three short paragraphs and at most one `button` block. Long copy wants `content_width` `narrow` or `medium`; the column is for reading, not for walls of text.
+- Fits every industry; it carries the brand voice more than any other section.
 
-## Layout recipes
+## Pitfalls
 
-**1. "Bold statement hero" (homepage above the fold)**
-Settings: text_alignment `center`, content_width `medium`, color_scheme `highlight-primary`.
-Blocks: heading (size 5xl or 6xl) + text (size lg) + button (primary "Get Started" + secondary "Learn More", size large).
-Good for: making a strong first impression with a concise value proposition.
+- Heading sizes `6xl` and up suit one-line statements only; a two-line heading at `7xl` fills a phone screen. Keep openers at `5xl` or `6xl` with five words or fewer, and body sub-headings at `2xl` or `3xl`.
+- `text_alignment` `center` with `content_width` `wide` or `fullwidth` spreads short lines into an awkward ragged shape. Centre narrow or medium columns; keep wide ones left-aligned.
+- Only one `button` block per section. The first button is the main action and should be `primary`; make `link_2` `secondary`. Two primaries compete.
+- With a background `image` the section becomes filled and padded like a highlight band, the overlay default is a dark navy tint and the text turns light. A pale `overlay_color` with low opacity over a busy photo makes the text unreadable; keep the overlay dark or drop the image.
+- A background image does not make the section a hero for the transparent header. The header stays opaque over it.
+- Filled schemes (`standard-secondary`, `highlight-primary`, `highlight-secondary`) pad inside their own band, so `top_spacing` or `bottom_spacing` `none` removes padding inside the colour, not the gap to the neighbour. On an unfilled `standard-primary` section `none` really fuses it with the neighbour.
+- Do not stack two highlight bands back to back, and keep a page to one or two highlights. The closing call-to-action band is the usual place for `highlight-primary`.
+- A `countdown` block counts to `target_date` in the visitor's local time and shows `expired_message` afterwards; it does nothing else, so pair it with a heading and a button.
+- Rich text in `text` blocks is for paragraphs, lists and emphasis. Put headings in `heading` blocks so the page outline stays correct.
 
-**2. "About us narrative" (about page or mid-page story section)**
-Settings: text_alignment `start`, content_width `narrow`, color_scheme `standard-primary`.
-Blocks: heading (size 2xl) + text (size base, muted off) + text (size base, muted on for a secondary paragraph).
-Good for: longer readable prose where a narrow measure improves line length and readability.
+## Recipes
 
-**3. "Announcement banner" (promotions, seasonal notices)**
-Settings: text_alignment `center`, content_width `wide`, color_scheme `highlight-secondary`, top_spacing `none`, bottom_spacing `none`.
-Blocks: heading (size xl) + text (size sm, uppercase on) + button (primary, size small).
-Good for: a compact, eye-catching color band that interrupts the page flow to highlight a time-sensitive offer.
+### Inner-page opener
 
-**4. "Policy / legal text" (terms, privacy, refund pages)**
-Settings: text_alignment `start`, content_width `medium`, color_scheme `standard-primary`.
-Blocks: heading (size 2xl) + multiple text blocks (size base, muted off) stacked sequentially.
-Good for: long-form structured content that needs clear hierarchy without visual distraction.
+The standard title block for an inner page under a transparent header: eyebrow, large heading, one paragraph. No image needed.
 
-**5. "Centered mission statement" (nonprofit or brand manifesto)**
-Settings: text_alignment `center`, content_width `narrow`, color_scheme `standard-secondary`.
-Blocks: heading (size 3xl) + text (size lg, muted on).
-Good for: a single impactful sentence or short paragraph that communicates purpose; the accent background adds subtle visual separation.
+```json
+{
+  "type": "rich-text",
+  "settings": {
+    "text_alignment": "start",
+    "content_width": "wide",
+    "color_scheme": "standard-primary"
+  },
+  "blocks": [
+    { "type": "text", "settings": { "text": "<p>About us</p>", "size": "sm", "uppercase": true, "muted": true } },
+    { "type": "heading", "settings": { "text": "Built around the people we serve.", "size": "6xl" } },
+    { "type": "text", "settings": { "text": "<p>A short paragraph that says who you are, where you work and what visitors will find on this page.</p>", "size": "lg" } }
+  ]
+}
+```
 
-**6. "CTA strip" (conversion section between content blocks)**
-Settings: text_alignment `center`, content_width `medium`, color_scheme `highlight-primary`, top_spacing `none`, bottom_spacing `none`.
-Blocks: heading (size xl) + button (primary, size xlarge).
-Good for: a punchy call-to-action that sits between two other sections and drives clicks without paragraph text.
+### Closing call to action
 
-**7. "Feature explainer intro" (top of a features or services page)**
-Settings: text_alignment `start`, content_width `wide`, color_scheme `standard-primary`.
-Blocks: heading (size 3xl) + text (size lg) + button (secondary "View All Services", size medium).
-Good for: setting context before a grid of feature cards or service tiles below; the wide width gives breathing room alongside sidebars.
+A highlight band at the end of a page with one heading and two buttons; the primary leads to `contact`.
 
-## Differentiation tips
+```json
+{
+  "type": "rich-text",
+  "settings": {
+    "text_alignment": "center",
+    "content_width": "medium",
+    "color_scheme": "highlight-primary"
+  },
+  "blocks": [
+    { "type": "heading", "settings": { "text": "Ready to talk it through?", "size": "4xl" } },
+    { "type": "text", "settings": { "text": "<p>Tell us about the project and we will reply within two working days.</p>", "size": "lg" } },
+    { "type": "button", "settings": { "link": { "text": "Get in touch", "href": "contact.html" }, "style": "primary", "link_2": { "text": "See our services", "href": "services.html" }, "style_2": "secondary", "size": "large" } }
+  ]
+}
+```
 
-- **Stack multiple text blocks with alternating muted/normal** to create visual rhythm without adding extra widgets. A muted intro line above a normal-weight paragraph mimics a subtitle pattern cheaply.
-- **Pair highlight-secondary with no spacing** on both top and bottom to create a full-bleed color band. Follow it immediately with another rich-text widget using standard scheme and no top spacing for a sharp color transition.
-- **Use narrow width + center alignment** sparingly as a design signature. It creates a "pull quote" feel that stands out from wider sections above and below.
-- **Combine a large heading (5xl+) with small uppercase muted text** above it (place the text block first in block order) to create a super/eyebrow + headline pattern without needing a separate widget.
-- **Reserve the primary button style for one CTA per page** and use secondary everywhere else. When both button slots are used, put the main action in link (primary) and the softer alternative in link_2 (secondary) to create a clear visual hierarchy.
-- **Use the heading block for SEO-critical text** since it renders as an actual h1/h2 element, and keep decorative or secondary headings inside the richtext block using HTML heading tags where semantic weight matters less.
+### Mission statement
+
+One quotable paragraph on a soft band, centred and narrow so it reads like a pull quote.
+
+```json
+{
+  "type": "rich-text",
+  "settings": {
+    "text_alignment": "center",
+    "content_width": "narrow",
+    "color_scheme": "standard-secondary"
+  },
+  "blocks": [
+    { "type": "text", "settings": { "text": "<p>Our promise</p>", "size": "sm", "uppercase": true, "muted": true } },
+    { "type": "heading", "settings": { "text": "Good work, explained plainly, finished on time.", "size": "3xl" } },
+    { "type": "text", "settings": { "text": "<p>Two or three sentences on what that promise means in practice for a customer.</p>", "size": "base", "muted": true } }
+  ]
+}
+```
+
+### Launch countdown
+
+An announcement band with a live countdown and one button. Set `target_date` to the real launch moment.
+
+```json
+{
+  "type": "rich-text",
+  "settings": {
+    "text_alignment": "center",
+    "content_width": "medium",
+    "color_scheme": "highlight-secondary"
+  },
+  "blocks": [
+    { "type": "text", "settings": { "text": "<p>Opening soon</p>", "size": "sm", "uppercase": true } },
+    { "type": "heading", "settings": { "text": "Doors open this spring", "size": "5xl" } },
+    { "type": "countdown", "settings": { "target_date": "2027-01-01 00:00", "expired_message": "We are open!", "show_seconds": false } },
+    { "type": "button", "settings": { "link": { "text": "Join the waiting list", "href": "contact.html" }, "style": "primary", "size": "large" } }
+  ]
+}
+```

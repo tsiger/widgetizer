@@ -1,109 +1,72 @@
-# Image Widget Insights
+# image
 
-A single responsive image with optional link wrapping, full-width bleed support, and reveal-fade entrance animation.
+## Purpose
 
----
+A single photograph or graphic standing on its own, either contained at page width with rounded corners or bleeding edge to edge. It carries no heading, text or colour scheme: it is a visual beat between sections, not a section with a message.
 
-## Settings Levers
+The whole picture can be a link, in which case it only dims slightly on hover. A caption saved with the image in the media library appears under it automatically; there is no caption setting of its own.
 
-| Setting | Values | Visual Effect |
-|---------|--------|---------------|
-| **image** | Any uploaded image | The displayed photo or graphic. Falls back to a placeholder silhouette when empty. |
-| **link** | URL + optional `_blank` target | Wraps the image in an anchor. On hover the image fades to 90 % opacity, signaling clickability. |
-| **fullwidth** | `true` / `false` (default false) | **Off:** image is capped at `--container-max-width` with `border-radius: var(--radius-lg)` rounded corners, centered on the page. **On:** image bleeds edge-to-edge with no rounding and no max-width constraint. |
-| **top_spacing** | `auto` (default), `small`, `none` | `small` reduces spacing for tighter rhythm; `none` removes it entirely for flush stacking |
-| **bottom_spacing** | `auto` (default), `small`, `none` | Same as above for the bottom edge |
+## When to use
 
----
+- Role: a visual breather between two text-heavy sections, a single standout photo inside a case study, or a cinematic full-width strip that resets the page's rhythm.
+- Good for: portfolio and architecture pages, hospitality and food sites, long editorial pages that need a pause, a seasonal promo graphic that links to an offer.
+- Bad for: a hero with words on it (`banner`), several photos (`gallery`, `masonry-gallery`), or a picture that needs copy beside it (`image-text`, `image-callout`).
+- Opening a page: avoid it. The section has no heading, so the page would start without a title, and it does not support the header's transparent mode; only `banner`, `slideshow` and `video-popup` do.
+- Natural neighbours: `rich-text` above or below, `split-content`, or two `image-text` sections it separates.
+- Content needed: one strong image. It does all the work, so a weak or badly cropped photo has nowhere to hide.
 
-## Available Blocks
+## Pitfalls
 
-None. This widget has no repeatable block slots -- it renders exactly one image per instance.
+- This section is always unfilled, so its spacing is outside margin that a neighbour can rely on. Under a filled band (an image hero, a highlight section) use `top_spacing` `small` for a docked look; `none` presses the photo against the band's edge because the band's own padding sits inside its colour.
+- `fullwidth` removes the rounded corners and stretches the image to the viewport. It needs a wide, high-resolution file (at least 2000 px across) and a landscape shape; a portrait or square image becomes a towering block. Aim for roughly 2:1 or wider for a strip.
+- Contained mode shows the image at its natural proportions with rounded corners. It looks editorial between paragraphs; it looks lost if the image is small or low-contrast against the page.
+- The link gives no visual cue beyond a faint hover dim. If the picture must be clickable, bake the call to action into the graphic itself or place a `rich-text` section with a button next to it.
+- The caption comes from the media library entry, so clear or edit it there; it cannot be switched off from the section.
+- An empty image shows a placeholder, which is fine in the editor and wrong on a published site.
+- Do not stack several `image` sections to fake a gallery; each one adds its own spacing and the result is a column of gaps.
 
----
+## Recipes
 
-## Layout Recipes
+### Full-bleed photo strip
 
-### 1. Full-Bleed Hero Photograph
+A wide landscape photo across the whole viewport to break a long page. Supply one image at least 2000 px wide with a roughly 2:1 or wider shape and no important detail near the top or bottom edge.
 
-| Setting | Value |
-|---------|-------|
-| fullwidth | true |
-| top_spacing | none |
-| bottom_spacing | none |
-| link | (empty) |
+```json
+{
+  "type": "image",
+  "settings": { "fullwidth": true, "top_spacing": "auto", "bottom_spacing": "auto" }
+}
+```
 
-**Good for:** Landing pages that need an immersive first impression right below the header.
-**Tip:** Pair with a preceding "Hero" or "Banner" text widget and remove spacing on both so the photo feels continuous with the headline.
+### Contained editorial photo
 
-### 2. Contained Portfolio Showcase
+A rounded, page-width photo between two text sections, the way a magazine drops a picture into a feature. Supply one landscape or square image; portraits work only when the sections around it are long.
 
-| Setting | Value |
-|---------|-------|
-| fullwidth | false |
-| top_spacing | auto |
-| bottom_spacing | auto |
-| link | (empty) |
+```json
+{
+  "type": "image",
+  "settings": { "fullwidth": false, "top_spacing": "auto", "bottom_spacing": "auto" }
+}
+```
 
-**Good for:** Displaying a single standout project photo between text sections -- the rounded corners and centered max-width keep it feeling editorial rather than raw.
-**Tip:** Stack several of these between Richtext widgets to build a case-study page that reads like a magazine feature.
+### Clickable promo graphic
 
-### 3. Clickable Promo Banner
+A designed graphic (offer, event, announcement) that links to the page where the visitor can act. Supply an image that already shows the call to action in its artwork, since the link itself is invisible.
 
-| Setting | Value |
-|---------|-------|
-| fullwidth | true |
-| top_spacing | auto |
-| bottom_spacing | auto |
-| link | `/specials` or external URL, target `_blank` for external |
+```json
+{
+  "type": "image",
+  "settings": { "fullwidth": false, "link": { "text": "See the offer", "href": "services.html" } }
+}
+```
 
-**Good for:** Seasonal sale banners, event announcements, or sponsor graphics that need to link out.
-**Tip:** Design the image itself with a clear call-to-action baked in (e.g., "Book Now -- Spring Special"). The subtle hover opacity shift tells visitors it is clickable without needing a separate button.
+### Photo glued under a title section
 
-### 4. Tight Image + Text Stack
+A photo directly beneath an unfilled `rich-text` opener so the title and picture read as one block. Supply a landscape image; the opener's own bottom margin provides the gap, so the top spacing goes to `none`.
 
-| Setting | Value |
-|---------|-------|
-| fullwidth | false |
-| top_spacing | none |
-| bottom_spacing | none |
-| link | (empty) |
-
-**Good for:** Sandwiching a photo tightly between a heading widget above and a paragraph widget below, creating a compact content card feel within the page flow.
-**Tip:** Removing both spacings lets the rounded image sit snugly against neighboring widgets -- visually groups the trio as one cohesive block.
-
-### 5. Full-Bleed Section Divider
-
-| Setting | Value |
-|---------|-------|
-| fullwidth | true |
-| top_spacing | auto |
-| bottom_spacing | auto |
-| link | (empty) |
-
-**Good for:** Breaking up long pages with a dramatic full-width photograph that acts as a visual breather between content sections.
-**Tip:** Use a wide-aspect landscape image (at least 4:1 ratio) so it reads as a cinematic strip rather than a towering block. The standard auto spacing above and below keeps it from colliding with adjacent text.
-
-### 6. Linked Logo or Partner Badge (Contained)
-
-| Setting | Value |
-|---------|-------|
-| fullwidth | false |
-| top_spacing | auto |
-| bottom_spacing | auto |
-| link | Partner or certification URL, target `_blank` |
-
-**Good for:** Displaying a single certification badge, award logo, or partner emblem that links to the issuing organization.
-**Tip:** The contained mode with rounded corners gives the badge a polished card-like presentation. For multiple logos, use a gallery or columns widget instead.
-
----
-
-## Differentiation Tips
-
-- **Full-width is the main creative lever.** Toggling it changes the entire personality of the widget -- from a polished, contained editorial image to an immersive edge-to-edge bleed. Decide which mode serves the page's rhythm before uploading the photo.
-- **Spacing removal creates visual grouping.** Setting top or bottom spacing to `none` is how you fuse this widget with its neighbors. Use it intentionally to build compound sections (hero + photo, photo + caption) rather than leaving gaps.
-- **The link wrapping is invisible until hover.** There is no button or underline -- just a 90 % opacity fade on hover. This means linked images work best when the image itself contains visual cues (text overlays, arrows, or obvious CTAs). Do not rely on the link alone to communicate interactivity.
-- **Responsive srcset is automatic.** The widget generates multiple image sizes via the `{% image %}` tag with `srcset: true`. There is no manual sizing to configure -- the browser picks the best resolution. Full-width images use `100vw` sizing; contained images cap at `1420px`.
-- **Reveal animation is built in.** Every image enters with a `reveal-fade` class. This is not configurable per-instance, but it means the widget always feels alive on scroll without extra setup.
-- **The caption comes from the media library.** There is no caption setting on the widget: when the image has a media-library caption, it shows centered below the image, in the page's language. Clear it in the media library to remove it.
-- **No overlay support.** If you need text on top of the image, use a widget built for it rather than trying to hack text into the image file. Keep the image widget focused on what it does well: one clean photograph.
+```json
+{
+  "type": "image",
+  "settings": { "fullwidth": false, "top_spacing": "none", "bottom_spacing": "auto" }
+}
+```

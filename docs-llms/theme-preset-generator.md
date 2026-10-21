@@ -397,7 +397,7 @@ This gives you the palette of tools available. You do not need to read individua
 After Phase 0 is complete and you know which widgets the preset will use, read each chosen widget's files:
 
 1. `schema.json` — source of truth for setting ids, valid values, block types, block setting ids
-2. `insights.md` — guides role on page, spacing behavior, opener suitability, natural adjacent widgets, failure modes
+2. `insights.md` — **When to use** covers role on page, opener suitability, natural neighbours and content burden; **Pitfalls** covers spacing behaviour and failure modes; **Recipes** are schema-checked starting arrangements
 
 Do this for every widget in the plan. If an insight file is weak, the schema still governs validity.
 
@@ -826,25 +826,15 @@ Presets are built from section relationships, not widget inventory alone.
 
 ## 13. Widget Insights: What They Must Contain
 
-Each widget `insights.md` should eventually answer these questions clearly:
+Widget `insights.md` files follow the fixed format in `skills/widgetizer-theme/references/guidance.md` (Purpose, When to use, Pitfalls, Recipes), which the AI assistant serves and `npm run validate:theme` checks. For preset generation, read them for:
 
-- **Role on page**
-- **Best used for**
-- **Usually bad for**
-- **Opener suitability**
-- **Spacing behavior**
-- **Natural adjacent widgets**
-- **Industry fits**
-- **Common failure modes**
-- **Replacement patterns**
+- **Role on page, opener suitability, natural neighbours, content burden, industry fits** — under When to use
+- **Spacing behaviour, failure modes, interacting settings** — under Pitfalls
+- **Replacement patterns and starting arrangements** — under Recipes
 
-For preset generation, prioritize widgets whose insights explain:
+Recipes are validated against the schema but hold placeholder copy; never lift their text into a preset. If a widget's guidance does not explain this well, improve it in that format.
 
-- what kind of opener they make
-- how they interact with adjacent sections
-- what content burden they require
-
-If a widget insight file does not explain this well, improve the insight file.
+Each preset also ships `presets/<id>/insights.md` (Suits, Look, Adapting): write it after the preset is built, from the Phase 0 brief. It holds judgement only; never list the preset's pages or widgets in it.
 
 ---
 

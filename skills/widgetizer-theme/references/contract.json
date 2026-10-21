@@ -1780,5 +1780,20 @@
       600,
       700
     ]
+  },
+  "guidance": {
+    "file": "insights.md",
+    "widgetHeadings": [
+      "Purpose",
+      "When to use",
+      "Pitfalls",
+      "Recipes"
+    ],
+    "presetHeadings": [
+      "Suits",
+      "Look",
+      "Adapting"
+    ],
+    "recipeFence": "json"
   }
 }

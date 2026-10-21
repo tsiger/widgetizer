@@ -1,114 +1,95 @@
-# Features Split Widget
+# features-split
 
-A two-column split layout that pairs a heading area (eyebrow, title, description) on one side with a stacked list of icon-led feature items on the other, separated by an optional vertical divider line.
+## Purpose
 
----
+A two-column section: the heading group (eyebrow, title, description) on one side and a vertical list of icon-led features on the other, optionally separated by a thin vertical line. Use it when one strong statement needs three to five supporting points, such as who you serve, why choose us, or how the process works.
 
-## Settings Levers
+Each `feature` is one row of the list: icon, title, short richtext description. The heading column stays short and the list column carries the detail, so the eye reads the claim first and the proof second.
 
-| Setting | Values | Visual Effect |
-|---------|--------|---------------|
-| `eyebrow` | Any text | Small label above the headline; leave blank to hide entirely |
-| `eyebrow_uppercase` | `true` / `false` (default) | Uppercases the eyebrow text for a more formal label treatment |
-| `title` | Any text | Main headline; renders as `h1` when widget is first on the page, `h2` otherwise |
-| `description` | Any text | Supporting paragraph below the headline |
-| `heading_alignment` | `start`, `center` (default) | Controls whether the eyebrow-title-description block aligns left or centers within its column |
-| `content_position` | `start` (default), `end` | Determines which column holds the heading block; the feature list takes the opposite side. When set to `end`, the divider border flips to the right edge of the list |
-| `show_divider` | `true` (default) / `false` | Toggles a thin vertical border on the feature-list side, adding a clean editorial separation between the two columns |
-| `icon_style` | `plain` (default), `outline`, `filled` | Changes icon rendering: bare icon, outlined container, or solid-filled container |
-| `icon_size` | `sm`, `md`, `lg`, `xl` (default) | Scales the icon; `xl` default gives the icons visual weight as anchor points |
-| `icon_shape` | `sharp`, `rounded`, `circle` (default) | Container corner style when using outline or filled icon styles |
-| `color_scheme` | `standard-primary`, `standard-secondary`, `highlight-primary`, `highlight-secondary` | Background and text treatment; non-standard schemes add section padding and a visible background color |
-| `top_spacing` | `auto` (default), `small`, `none` | `small` reduces spacing for tighter rhythm; `none` removes it entirely for flush stacking |
-| `bottom_spacing` | `auto` (default), `small`, `none` | Same as above for the bottom edge |
+## When to use
 
----
+- The argument section of a home page or `services` page, after the opener and before social proof.
+- Good for: customer segments, differentiators, a three-to-five-step process, what a package includes, locations with a line each. Bad for: more than six points (use `icon-card-grid` or `icon-list`), points that need images (use `image-text` or `checkerboard`), a single paragraph (use `split-content`).
+- It can open a page: its title becomes the page heading when first. It cannot sit under a header with `transparent_on_hero`; only `banner`, `slideshow` and `video-popup` support the transparent header.
+- Natural neighbours: `banner` or `rich-text` above, `testimonials`, `key-figures` or `action-bar` below. Alternate `content_position` with the image side of a neighbouring `split-content` so the page zigzags.
+- Needs a title, ideally a one-sentence description, and three to five features with a title and one or two lines each.
+- Fits trades, agencies, clinics, salons, gyms, consultancies, multi-location businesses.
 
-## Available Blocks
+## Pitfalls
 
-| Block Type | Key Settings | Notes |
-|------------|-------------|-------|
-| `feature` | `icon` (icon picker), `title` (plain text), `description` (rich text) | Each feature renders as a list item with the icon to the left and title + description stacked to the right. The heading level of the title auto-adjusts (`h3` normally, `h2` if the widget-level title is blank). Description supports rich text formatting (bold, links, lists). |
+- Keep `heading_alignment` at `start`. The heading sits in a half-width column; centring it there floats the text away from both the edge and the list and looks accidental. `center` only works when the heading column is a short title alone.
+- Every feature title is printed even when empty, so give each `feature` a title; a blank one leaves an empty gap above its description.
+- The heading column is short and the list column is tall. With five long features the heading floats at the top with empty space beneath it; keep descriptions to one or two sentences, or cut to three or four features.
+- `show_divider` draws the line on the list side and flips with `content_position`. It suits sequential or categorical lists; turn it off for loosely related benefits where a softer feel is wanted.
+- `icon_style`, `icon_size` and `icon_shape` apply to all features at once. `plain` reads minimal, `outline` approachable, `filled` confident; pick one per site rather than per section. `icon_shape` only shows with `outline` or `filled`.
+- Below tablet width the two columns stack, heading first, so the section becomes a heading over a list; it is still fine, but do not rely on the side-by-side shape for meaning.
+- Any scheme other than `standard-primary` pads the content inside its own coloured band, so `top_spacing` and `bottom_spacing` set to `none` remove that inner padding; under a filled hero use `small`. This section often carries the page's main argument, so it is a reasonable candidate for a highlight scheme when the page has no other.
+- Replace the default eyebrow, title and description; they are template placeholders.
 
----
+## Recipes
 
-## Layout Recipes
+### Who we serve
 
-### 1. Who We Serve
+Three customer types with filled circular icons and a divider. The user supplies the segment names and a sentence on the value for each.
 
-**Settings:** `heading_alignment: start`, `content_position: start`, `show_divider: true`, `icon_style: filled`, `icon_size: xl`, `icon_shape: circle`, `color_scheme: standard-primary`
-**Blocks:** 3 features (e.g., Homeowners, Property Managers, Commercial Buildings)
+```json
+{
+  "type": "features-split",
+  "settings": { "eyebrow": "Who We Serve", "title": "Built for Every Kind of Property", "description": "Placeholder sentence on how the service adapts to each customer.", "heading_alignment": "start", "content_position": "start", "show_divider": true, "icon_style": "filled", "icon_size": "lg", "icon_shape": "circle", "color_scheme": "standard-primary" },
+  "blocks": [
+    { "type": "feature", "settings": { "icon": "home", "title": "Homeowners", "description": "<p>Placeholder line on what homeowners get.</p>" } },
+    { "type": "feature", "settings": { "icon": "building", "title": "Property Managers", "description": "<p>Placeholder line on what managers get.</p>" } },
+    { "type": "feature", "settings": { "icon": "users", "title": "Commercial Clients", "description": "<p>Placeholder line on what businesses get.</p>" } }
+  ]
+}
+```
 
-**Good for:** Communicating that the business serves distinct customer types, each with tailored value.
+### Why choose us
 
----
+The heading asks the question on the right, four plain-icon answers on the left, no divider, on the soft alternate surface. The user supplies four differentiators.
 
-### 2. Core Services Breakdown
+```json
+{
+  "type": "features-split",
+  "settings": { "eyebrow": "Why Us", "title": "Reasons People Stay With Us", "heading_alignment": "start", "content_position": "end", "show_divider": false, "icon_style": "plain", "icon_size": "md", "color_scheme": "standard-secondary" },
+  "blocks": [
+    { "type": "feature", "settings": { "icon": "shield", "title": "Licensed and Insured", "description": "<p>Placeholder reassurance line.</p>" } },
+    { "type": "feature", "settings": { "icon": "clock", "title": "On Time, Every Time", "description": "<p>Placeholder reassurance line.</p>" } },
+    { "type": "feature", "settings": { "icon": "certificate", "title": "Certified Team", "description": "<p>Placeholder reassurance line.</p>" } },
+    { "type": "feature", "settings": { "icon": "heart", "title": "Local and Independent", "description": "<p>Placeholder reassurance line.</p>" } }
+  ]
+}
+```
 
-**Settings:** `heading_alignment: center`, `content_position: start`, `show_divider: true`, `icon_style: outline`, `icon_size: lg`, `icon_shape: rounded`, `color_scheme: highlight-primary`
-**Blocks:** 4 features (e.g., Cuts & Color, Extensions, Treatments, Bridal)
+### How it works
 
-**Good for:** A services page where the heading side carries a strong value proposition and the list side enumerates what the business actually delivers.
+A four-step process; the divider reinforces the sequence and numbers lead each title. The user supplies the steps in order.
 
----
+```json
+{
+  "type": "features-split",
+  "settings": { "eyebrow": "Process", "title": "What Happens After You Get in Touch", "heading_alignment": "start", "content_position": "start", "show_divider": true, "icon_style": "filled", "icon_size": "md", "icon_shape": "sharp", "color_scheme": "standard-primary" },
+  "blocks": [
+    { "type": "feature", "settings": { "icon": "phone", "title": "1. Quick Call", "description": "<p>Placeholder line on the first conversation.</p>" } },
+    { "type": "feature", "settings": { "icon": "clipboard-list", "title": "2. Site Visit and Quote", "description": "<p>Placeholder line on the assessment.</p>" } },
+    { "type": "feature", "settings": { "icon": "calendar", "title": "3. Scheduled Work", "description": "<p>Placeholder line on booking the job.</p>" } },
+    { "type": "feature", "settings": { "icon": "checks", "title": "4. Walkthrough", "description": "<p>Placeholder line on sign-off.</p>" } }
+  ]
+}
+```
 
-### 3. Why Choose Us (Differentiators)
+### Core services on a highlight band
 
-**Settings:** `heading_alignment: start`, `content_position: end`, `show_divider: false`, `icon_style: plain`, `icon_size: md`, `icon_shape: sharp`, `color_scheme: standard-secondary`
-**Blocks:** 3-4 features (e.g., 24/7 Support, No Contracts, Local Team, Certified Experts)
+The main argument of a services page, outlined icons on the strongest surface. The user supplies three or four service names with a line each.
 
-**Good for:** A compact trust-building section near the bottom of a homepage where the heading asks a question and the features answer it.
-
----
-
-### 4. Process Steps
-
-**Settings:** `heading_alignment: start`, `content_position: start`, `show_divider: true`, `icon_style: filled`, `icon_size: md`, `icon_shape: sharp`, `color_scheme: standard-primary`
-**Blocks:** 3-5 features using numbered or sequential icons (e.g., clipboard, wrench, check-circle)
-
-**Good for:** Explaining a linear workflow so the visitor knows what to expect after contacting the business. The vertical divider line reinforces the sequential nature.
-
----
-
-### 5. Location or Department Highlights
-
-**Settings:** `heading_alignment: center`, `content_position: end`, `show_divider: true`, `icon_style: outline`, `icon_size: xl`, `icon_shape: circle`, `color_scheme: highlight-secondary`
-**Blocks:** 3 features (e.g., Downtown Office, Westside Clinic, Mobile Unit)
-
-**Good for:** Multi-location businesses that need to convey where they operate with a brief note about each location's specialties or hours.
-
----
-
-### 6. Membership Tiers Overview
-
-**Settings:** `heading_alignment: start`, `content_position: start`, `show_divider: false`, `icon_style: filled`, `icon_size: lg`, `icon_shape: rounded`, `color_scheme: standard-primary`
-**Blocks:** 3 features (e.g., Drop-In, Monthly, Unlimited) with brief descriptions of what each includes
-
-**Good for:** A softer alternative to a full pricing table when the business wants to outline tiers without showing prices publicly.
-
----
-
-### 7. Audience-Specific Value Props
-
-**Settings:** `heading_alignment: center`, `content_position: start`, `show_divider: true`, `icon_style: plain`, `icon_size: lg`, `icon_shape: circle`, `color_scheme: highlight-primary`
-**Blocks:** 2-3 features (e.g., For Adults, For Kids, For Seniors)
-
-**Good for:** Quickly segmenting messaging when a single business serves multiple audience groups with different needs.
-
----
-
-## Differentiation Tips
-
-- **Flip the content position** to break visual monotony when stacking multiple sections. If the section above has a left-aligned image or heading, set `content_position: end` on features-split so the eye moves in a Z-pattern down the page.
-
-- **Use the divider strategically.** Enable it when features represent a sequential process or distinct categories. Disable it when the features are loosely related benefits and you want a softer, less structured feel.
-
-- **Pair with a highlight color scheme** to visually separate this section from adjacent standard-background widgets. This works especially well when the features-split section is the primary conversion argument on the page.
-
-- **Keep block count between 3 and 5.** Two items look sparse in the vertical list; six or more creates a wall of text that undermines the split layout's readability advantage.
-
-- **Leverage the eyebrow for context switching.** When the main title is broad (e.g., "How We Help"), the eyebrow can specify the audience or context (e.g., "For Retail Businesses") without requiring a separate widget per segment.
-
-- **Choose icon style to match brand personality.** Plain icons feel minimal and modern, filled icons feel confident and corporate, outline icons feel approachable and lightweight. Match the choice to the overall site tone rather than varying it section by section.
-
-- **Combine with spacing overrides** to create a visually connected flow rather than disconnected blocks. Directly below an image or filled hero, use `top_spacing: small` — the hero's bottom spacing is internal padding, so features-split must bring its own gap, and `none` would press it against the hero's edge. Reserve `none` for fusion: an adjacent section sharing the same color scheme, or a `top_spacing: none` under an unfilled widget whose own bottom margin already provides the spacing.
+```json
+{
+  "type": "features-split",
+  "settings": { "eyebrow": "Services", "title": "Everything Under One Roof", "description": "Placeholder sentence on the breadth of the offer.", "heading_alignment": "start", "content_position": "start", "show_divider": true, "icon_style": "outline", "icon_size": "lg", "icon_shape": "rounded", "color_scheme": "highlight-primary" },
+  "blocks": [
+    { "type": "feature", "settings": { "icon": "sparkles", "title": "Service One", "description": "<p>Placeholder line.</p>" } },
+    { "type": "feature", "settings": { "icon": "leaf", "title": "Service Two", "description": "<p>Placeholder line.</p>" } },
+    { "type": "feature", "settings": { "icon": "star", "title": "Service Three", "description": "<p>Placeholder line.</p>" } }
+  ]
+}
+```

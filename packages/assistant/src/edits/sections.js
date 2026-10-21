@@ -1,6 +1,7 @@
 import crypto from "node:crypto";
 import { buildDefaultWidget, buildDefaultBlock } from "@widgetizer/core/widgetDefaults";
 import { settingValueProblems } from "@widgetizer/core/settingValues";
+import { listingSettingsFor } from "@widgetizer/core/listingSettings";
 import { canonicalJson } from "../snapshots/siteState.js";
 import { toolError } from "../errors.js";
 
@@ -21,6 +22,11 @@ function fail(index, message) {
 
 function settingsById(list) {
   return new Map((Array.isArray(list) ? list : []).filter((setting) => setting?.id && setting.type !== "header").map((setting) => [setting.id, setting]));
+}
+
+/** A section's own settings plus the listing controls the editor adds to collection listings. */
+function widgetSettings(schema) {
+  return settingsById([...(Array.isArray(schema.settings) ? schema.settings : []), ...listingSettingsFor(schema)]);
 }
 
 /**
@@ -114,7 +120,7 @@ export function applySectionOperations({ doc, kind, operations, schemas, context
         const schema = schemaOf(operation.type, index);
         const id = newWidgetId();
         const widget = buildDefaultWidget(operation.blocks ? { ...schema, defaultBlocks: [] } : schema, operation.type, newBlockId);
-        writeSettings(widget.settings, settingsById(schema.settings), operation.settings, `section "${operation.type}"`, index);
+        writeSettings(widget.settings, widgetSettings(schema), operation.settings, `section "${operation.type}"`, index);
         next.widgets[id] = widget;
         next.widgetsOrder = place(next.widgetsOrder, id, operation, index, "section");
         changes.added.push(id);
@@ -125,7 +131,7 @@ export function applySectionOperations({ doc, kind, operations, schemas, context
         const { id, widget } = sectionOf(operation.section, index);
         const schema = schemaOf(widget.type, index);
         widget.settings ??= {};
-        writeSettings(widget.settings, settingsById(schema.settings), operation.settings, `section "${id}"`, index);
+        writeSettings(widget.settings, widgetSettings(schema), operation.settings, `section "${id}"`, index);
         changes.updated.push(id);
         break;
       }

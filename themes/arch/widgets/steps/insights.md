@@ -1,84 +1,124 @@
-# Steps Widget — Insights
+# steps
 
-A numbered, zigzag timeline that pairs an image with a title, rich-text description, and optional CTA button for each step, connected by a vertical line and accent-colored badges.
+## Purpose
 
----
+A numbered, zigzag "how it works" sequence of up to eight steps, each with a title, a short rich-text description, an optional photo and an optional button, joined by a vertical line with numbered badges. It explains a process in order: booking, onboarding, a project method, what happens on the day.
 
-## Settings Levers
+Odd steps put the image on the left and the text on the right; even steps flip, so the eye moves down the page in a zigzag along the line of badges. On phones everything stacks in one centred column.
 
-| Setting | Values | Visual Effect |
-|---|---|---|
-| `eyebrow` | Any text (blank by default) | Small label above the headline; adds a category or context tag to the section |
-| `title` | Any text (default "How It Works") | Main section headline; renders as `h1` when widget is first on the page, `h2` otherwise |
-| `description` | Any text (blank by default) | Subtitle paragraph below the headline |
-| `eyebrow_uppercase` | `true` / `false` (default) | Uppercases the eyebrow text for a more formal label treatment |
-| `heading_alignment` | `start`, `center` (default) | Centers or left-aligns the eyebrow/title/description header block |
-| `color_scheme` | `standard-primary`, `standard-secondary`, `highlight-primary`, `highlight-secondary` | Controls background and text palette for the entire section. Non-standard schemes add a padded container and override `--widget-bg-color` |
-| `top_spacing` | `auto` (default), `small`, `none` | `small` reduces spacing for tighter rhythm; `none` removes it entirely for flush stacking |
-| `bottom_spacing` | `auto` (default), `small`, `none` | `small` reduces spacing for tighter rhythm; `none` removes it entirely for flush stacking |
+## When to use
 
----
+- A mid-page explainer on `index`, `services` or `about`, or the core of a "how it works" or new-client page.
+- Good for any ordered process with three to five stages: how a consultation works, what a project looks like from enquiry to handover, how an order is made, what to expect at a first visit.
+- Bad for unordered features (`icon-card-grid`, `card-grid`), for dated history (`timeline`), and for a compact three-number strip (`numbered-cards`). Bad for more than eight stages; split them or summarise.
+- It can open a page when it has a `title`, but it never supports a transparent header; under `transparent_on_hero` open with `banner` or `split-content` first.
+- Natural neighbours: `services-grid` or `split-hero` before it, `testimonials`, `pricing` or an `action-bar` after it, since a visitor who has understood the process is ready to act.
+- Needs three steps minimum to look like a sequence; three to five is the sweet spot. Each step needs a title and one to three sentences.
+- Fits clinics and therapists, trades and contractors, agencies and consultancies, makers, schools, event planners, cleaning and moving services.
 
-## Available Blocks
+## Pitfalls
 
-| Block Type | Key Settings | Notes |
-|---|---|---|
-| `step` | `image` (image picker), `title` (text), `description` (richtext), `button_link` (link with text, href, target) | Max 8 blocks. Odd steps render image-left / text-right; even steps flip to text-left / image-right, creating the zigzag pattern. On mobile (<750px) layout collapses to a single centered column. Each badge auto-numbers from 1. |
+- A step without an `image` leaves its image side empty, so the text sits on one half of the row with blank space on the other. Either give every step a photo or none; a mix looks unfinished. Without photos keep descriptions short so the empty halves do not grow tall.
+- Photos in a zigzag alternate sides, so pick pictures that read well whether they are left or right: avoid images whose subject faces outward off the page.
+- Photos display at their own proportions. Use the same shape for every step (all landscape or all square) or the rows become uneven.
+- `title` is set large; four to six words. The step number comes from position, so do not write "Step 1" into the title.
+- `description` is rich text; a paragraph or a short list, not both, and nothing that competes with the title.
+- Every `button_link` is a secondary-style button. One or two buttons across the whole sequence (usually on the last step) guide the visitor; a button on every step dilutes the ending.
+- The numbering restarts at one in every steps section. Two sections on one page means two "step one"s; use one section with more steps or a different section type for the second list.
+- `heading_alignment` `start` with an `eyebrow` reads editorial; `center` reads corporate. Both work, but match the neighbours.
+- This section carries content, not persuasion, so it rarely justifies a highlight surface. Prefer `standard-primary` or `standard-secondary`; a highlight scheme is defensible only when the process itself is the page's selling point.
+- Filled schemes pad inside their own band, so `top_spacing` `none` on a filled section removes its inner padding rather than the gap to the neighbour. Use `none` only directly under an unfilled `rich-text` opener.
 
----
+## Recipes
 
-## Layout Recipes
+### Three-step how it works
 
-### 1. Classic "How It Works" — 3 Steps, No Images
+The simplest version: three image-free steps that say "this is easy", closing with one button. No images needed.
 
-**Settings:** title "How It Works", heading_alignment center, color_scheme standard-primary
-**Blocks:** 3 steps with titles and short descriptions; leave image blank on all; no buttons.
-**Good for:** Explaining a simple booking or ordering flow.
+```json
+{
+  "type": "steps",
+  "settings": {
+    "title": "How it works",
+    "description": "Three steps from first call to finished job.",
+    "heading_alignment": "center",
+    "color_scheme": "standard-primary"
+  },
+  "blocks": [
+    { "type": "step", "settings": { "title": "Tell us what you need", "description": "<p>Call, email or use the form. We reply within one working day.</p>" } },
+    { "type": "step", "settings": { "title": "Get a fixed quote", "description": "<p>We visit, measure and send a written quote with no hidden extras.</p>" } },
+    { "type": "step", "settings": { "title": "We do the work", "description": "<p>On the agreed date, tidy, and finished with a walkthrough.</p>", "button_link": { "text": "Request a quote", "href": "contact.html" } } }
+  ]
+}
+```
 
-### 2. Portfolio Process Walkthrough — 4 Steps With Photos
+### Illustrated project process
 
-**Settings:** eyebrow "Our Process", title "From Concept to Completion", heading_alignment start, color_scheme standard-secondary
-**Blocks:** 4 steps each with a project photo (sketch, 3D render, construction, finished room), descriptive titles, and one-paragraph descriptions.
-**Good for:** Showcasing a creative or construction workflow where visuals prove credibility.
+Four photographed stages for a studio, builder or landscaper, left-aligned with an eyebrow on a soft band. Supply four landscape photos of the same shape, one per stage.
 
-### 3. Onboarding Funnel — 3 Steps With CTAs
+```json
+{
+  "type": "steps",
+  "settings": {
+    "eyebrow": "Our process",
+    "eyebrow_uppercase": true,
+    "title": "From first sketch to final walkthrough",
+    "heading_alignment": "start",
+    "color_scheme": "standard-secondary"
+  },
+  "blocks": [
+    { "type": "step", "settings": { "title": "Site visit and brief", "description": "<p>We walk the site with you and write down what matters most.</p>" } },
+    { "type": "step", "settings": { "title": "Concept and budget", "description": "<p>Sketches, a materials palette and a realistic cost range.</p>" } },
+    { "type": "step", "settings": { "title": "Detailed design", "description": "<p>Drawings for approval and for the people who will build it.</p>" } },
+    { "type": "step", "settings": { "title": "Build and handover", "description": "<p>Weekly updates, then a walkthrough and a year of aftercare.</p>", "button_link": { "text": "See finished projects", "href": "work.html" } } }
+  ]
+}
+```
 
-**Settings:** title "Get Started in Minutes", heading_alignment center, color_scheme highlight-primary
-**Blocks:** 3 steps (Book, Choose, Enjoy) each with a short description and a button_link ("Book Now", "See Options", "Get Started").
-**Good for:** Service businesses that need to drive bookings by showing simplicity.
+### What to expect at a first visit
 
-### 4. Before-and-After Timeline — 4 Steps With Contrast Images
+A reassurance sequence for clinics, therapists, dentists and salons: five short, image-free steps on the new-client page.
 
-**Settings:** eyebrow "The Journey", title "Your Transformation", heading_alignment center, color_scheme standard-primary
-**Blocks:** 4 steps showing progression photos (initial consultation, treatment plan, mid-progress, final result), each with a detailed richtext description.
-**Good for:** Demonstrating visible results over time to build trust.
+```json
+{
+  "type": "steps",
+  "settings": {
+    "eyebrow": "New patients",
+    "title": "What to expect",
+    "description": "Your first appointment, step by step.",
+    "heading_alignment": "center",
+    "color_scheme": "standard-primary"
+  },
+  "blocks": [
+    { "type": "step", "settings": { "title": "Book", "description": "<p>Online or by phone. Choose a time that suits you.</p>" } },
+    { "type": "step", "settings": { "title": "Arrive", "description": "<p>Come ten minutes early for a short form and a coffee.</p>" } },
+    { "type": "step", "settings": { "title": "Talk", "description": "<p>We listen first: history, concerns and what you want from the visit.</p>" } },
+    { "type": "step", "settings": { "title": "Examine", "description": "<p>A gentle check and clear explanations as we go.</p>" } },
+    { "type": "step", "settings": { "title": "Plan", "description": "<p>You leave with options, prices and no pressure.</p>", "button_link": { "text": "Book your first visit", "href": "contact.html" } } }
+  ]
+}
+```
 
-### 5. Highlighted FAQ Alternative — 5 Short Steps
+### How an order is made
 
-**Settings:** title "What to Expect", heading_alignment start, color_scheme highlight-secondary, top_spacing none
-**Blocks:** 5 steps with concise titles (Book, Prepare, Arrive, Experience, Follow-Up) and two-sentence descriptions; no images, no buttons.
-**Good for:** Reducing pre-visit anxiety by spelling out the customer journey in detail.
+A craft or product story in six photographed stages, for makers who justify their price with process. Supply six square workshop photos.
 
-### 6. Product Manufacturing Story — 6 Steps With Photos
-
-**Settings:** eyebrow "Craftsmanship", title "How Your Order Is Made", heading_alignment center, color_scheme standard-secondary
-**Blocks:** 6 steps each with a workshop/factory photo and a short paragraph (Source materials, Cut & shape, Assemble, Finish, Quality check, Ship).
-**Good for:** Artisan or DTC brands that want to justify premium pricing through transparency.
-
-### 7. Event Planning Flow — 4 Steps With Buttons
-
-**Settings:** title "Plan Your Event", heading_alignment center, color_scheme highlight-primary
-**Blocks:** 4 steps (Inquiry, Proposal, Planning, Event Day) with venue/decor images, descriptions, and buttons linking to contact form, sample menus, and gallery pages.
-**Good for:** Walking potential clients through a service engagement from first contact to delivery.
-
----
-
-## Differentiation Tips
-
-- **Use the zigzag to your advantage.** The alternating image/text layout already creates visual interest. Avoid making all images the same shape or tone; alternate between close-ups and wide shots to reinforce the left-right rhythm.
-- **Keep step count between 3 and 5 for most businesses.** More than 5 risks looking complicated. Reserve 6-8 steps for manufacturing or technical audiences who expect detail.
-- **Skip images when speed is the message.** A three-step, image-free version communicates "this is easy" faster than a version loaded with photos. Pair with the highlight color scheme to keep it visually engaging without imagery.
-- **Pair eyebrow + left alignment for editorial feel.** Center alignment reads as corporate; left-aligned with an eyebrow like "Our Approach" feels more personal and editorial, which suits studios and boutique agencies.
-- **Use buttons sparingly.** One or two CTAs across the entire step sequence (typically on the first and last step) guide without overwhelming. Putting a button on every step dilutes urgency.
-- **Tune spacing to chain sections.** Directly below an image or filled hero, use top_spacing small — the hero's bottom spacing is internal padding, so the steps widget must supply its own gap, and none would press the content against the hero's edge. Reserve none for true fusion: when the neighboring section shares the steps widget's color scheme and the two should read as one band, or when the widget above is unfilled and its own bottom margin already provides the gap.
-- **Color scheme as a section divider.** Switching to highlight or highlight-secondary makes the steps section feel like a distinct band on the page, which helps break up long one-column layouts without adding extra widgets.
+```json
+{
+  "type": "steps",
+  "settings": {
+    "eyebrow": "Craft",
+    "title": "How your piece is made",
+    "heading_alignment": "start",
+    "color_scheme": "standard-primary"
+  },
+  "blocks": [
+    { "type": "step", "settings": { "title": "Choosing the timber", "description": "<p>Boards selected for grain and colour, then dried for a year.</p>" } },
+    { "type": "step", "settings": { "title": "Cutting", "description": "<p>Every component cut by hand from one board so the grain runs through.</p>" } },
+    { "type": "step", "settings": { "title": "Joinery", "description": "<p>Traditional joints, no screws where a joint will do.</p>" } },
+    { "type": "step", "settings": { "title": "Assembly", "description": "<p>Glued, clamped and left overnight.</p>" } },
+    { "type": "step", "settings": { "title": "Finishing", "description": "<p>Three coats of oil, each rubbed back by hand.</p>" } },
+    { "type": "step", "settings": { "title": "Delivery", "description": "<p>Wrapped in blankets and placed where you want it.</p>", "button_link": { "text": "Commission a piece", "href": "contact.html" } } }
+  ]
+}
+```

@@ -1,174 +1,90 @@
-# Card Grid Widget Insights
+# card-grid
 
-A responsive grid of image-plus-text cards with optional carousel mode, suited for showcasing services, team members, products, or any repeating content block.
+## Purpose
 
----
+A grid of uniform cards, each with an optional image, a small label, a title, a richtext description and an optional button, for any set of equal items: services, programmes, locations, team members, packages or highlights. The general-purpose grid when no dedicated section fits.
 
-## Settings Levers
+One card design repeats across every item: `columns_desktop` sets how many sit side by side on large screens (two on tablets, one on phones), `aspect_ratio` crops every image alike, `image_position` puts the picture above or below the text, and `layout: carousel` turns the grid into a swipeable row with arrows.
 
-| Setting | Values | Visual Effect |
-|---|---|---|
-| `eyebrow` | Any text | Small label above the headline (e.g. "Our Services"). Leave blank to hide. |
-| `eyebrow_uppercase` | `true` / `false` (default) | Uppercases the eyebrow text for a more formal label treatment |
-| `title` | Any text | Main section headline. Renders as `<h1>` when the widget is first on the page, `<h2>` otherwise. |
-| `description` | Any text | Supporting paragraph below the headline. Leave blank to hide. |
-| `heading_alignment` | `start`, `center` (default) | Centers or left-aligns the eyebrow/title/description header block. |
-| `layout` | `grid` (default), `carousel` | Grid shows all cards at once; carousel adds prev/next navigation and horizontal scrolling. |
-| `columns_desktop` | 2 -- 5 (default 4) | Number of columns on desktop. Cards stack to fewer columns on smaller breakpoints automatically. |
-| `card_layout` | `box` (default), `flat` | Box gives cards a contained look with background/border treatment. Flat removes the card container for a more open feel. |
-| `alignment` | `start` (default), `center` | Left-aligns or centers the text and button inside each card. |
-| `image_position` | `top` (default), `bottom` | Places the card image above or below the text content. |
-| `aspect_ratio` | `auto`, `1/1`, `4/3` (default), `3/2`, `3/4`, `16/9` | Controls the crop shape of card images. Square for headshots, portrait for product shots, wide for landscapes. |
-| `color_scheme` | `standard-primary`, `standard-secondary`, `highlight-primary`, `highlight-secondary` | Standard uses page background. Accent variants add `bg-secondary` to cards and borders. Highlight variants add section-level padding and contrast. |
-| `top_spacing` | `auto` (default), `small`, `none` | `small` reduces spacing for tighter rhythm; `none` removes it entirely for flush stacking |
-| `bottom_spacing` | `auto` (default), `small`, `none` | Same as above for the bottom edge |
+## When to use
 
----
+- The main content block of a `services` or `about` page, or a showcase on the homepage after the hero.
+- Good for three to twelve equal items with a sentence or two each. For items that live as collection entries use `services-grid`, `news-grid` or `projects-grid` instead; for people use `profile-grid`; for icon-led points use `icon-card-grid`.
+- Not a page opener; its title would become the page title, so let a title section go first.
+- Sits well after `banner` or `split-content`, before `testimonials`, `key-figures` or an `action-bar`.
+- Needs one image per card in the same orientation, a short title and a description of similar length on every card. Cards without images work as plain text tiles.
+- Fits every industry; the card look (`box` or `flat`) and ratio carry the tone: square for people and products, `4 / 3` or `3 / 2` for places and services, `16 / 9` for wide scenes, `3 / 4` for tall product shots.
 
-## Available Blocks
+## Pitfalls
 
-| Block Type | Key Settings | Notes |
-|---|---|---|
-| `card` | `image` -- optional photo/graphic | Leave blank for icon-less text cards. Respects the widget-level `aspect_ratio` and `image_position`. |
-| | `subtitle` -- eyebrow text above the card title | Good for category labels ("Design", "Phase 1", price tiers). |
-| | `title` -- card heading | Heading level is automatically computed based on widget position and whether a section title exists. |
-| | `description` -- richtext body | Supports formatted text, lists, bold/italic. Rendered with DOMPurify + `raw` filter. |
-| | `button_link` -- CTA link with text, href, target | Renders as a secondary button. Set text blank to hide entirely. **Only use when cards genuinely link to dedicated pages.** Most small business presets should leave this blank — the card grid is a showcase, not a navigation hub. Don't add "Learn More" buttons just for the sake of it. |
+- The button on each card has a default label. Leave `button_link` text empty unless the card really leads to its own page; a grid of identical "Learn more" buttons pointing nowhere is worse than none.
+- Descriptions of different lengths give cards of different heights in the same row. Keep them within a sentence of each other.
+- `carousel` only pays off with more cards than columns; otherwise it adds arrows for nothing, and a grid reads faster on phones.
+- `aspect_ratio: auto` shows every image at its own proportions, so mixed photos break the row. Use it for cards without images or with identical images.
+- `card_layout: box` gets a tinted background and border on `standard-secondary` and `highlight-secondary`, a border only on `highlight-primary`; `flat` drops the frame and relies on whitespace, so flat cards without images look unfinished.
+- `image_position: bottom` puts the text first; a strong differentiator for quotes and bios, odd for photo-led services.
+- Any scheme other than `standard-primary` makes a filled band that pads inside itself; the section below needs its own `top_spacing`.
 
----
+## Recipes
 
-## Layout Recipes
+### Services overview
 
-### 1. Services Overview (3 columns, box cards)
+Three photo cards with a label, a title and two lines, no buttons. Needs three landscape photos in the same style.
 
-| Setting | Value |
-|---|---|
-| `columns_desktop` | 3 |
-| `card_layout` | box |
-| `alignment` | center |
-| `image_position` | top |
-| `aspect_ratio` | 4/3 |
-| `color_scheme` | standard-secondary |
-| `heading_alignment` | center |
+```json
+{
+  "type": "card-grid",
+  "settings": { "eyebrow": "Services", "title": "What we do", "heading_alignment": "center", "columns_desktop": 3, "card_layout": "box", "alignment": "start", "image_position": "top", "aspect_ratio": "4 / 3", "color_scheme": "standard-secondary" },
+  "blocks": [
+    { "type": "card", "settings": { "subtitle": "Homes", "title": "Interior painting", "description": "<p>Walls, ceilings and woodwork, with the furniture covered and the floors protected.</p>", "button_link": { "text": "", "href": "" } } },
+    { "type": "card", "settings": { "subtitle": "Homes", "title": "Exterior painting", "description": "<p>Weatherproof finishes for render, timber and metalwork.</p>", "button_link": { "text": "", "href": "" } } },
+    { "type": "card", "settings": { "subtitle": "Business", "title": "Commercial work", "description": "<p>Offices and shops, scheduled around your opening hours.</p>", "button_link": { "text": "", "href": "" } } }
+  ]
+}
+```
 
-**Good for:** Primary services page section where each card links to a dedicated service page.
+### Highlights carousel
 
----
+Six or more flat cards with wide images in a swipeable row: dishes, products, portfolio pieces. Needs one wide photo per card.
 
-### 2. Team / Staff Grid (4 columns, square portraits)
+```json
+{
+  "type": "card-grid",
+  "settings": { "title": "Seasonal favourites", "heading_alignment": "start", "layout": "carousel", "columns_desktop": 4, "card_layout": "flat", "alignment": "start", "aspect_ratio": "16 / 9" },
+  "blocks": [
+    { "type": "card", "settings": { "subtitle": "Spring", "title": "Asparagus and lemon", "description": "<p>Available April to June.</p>", "button_link": { "text": "", "href": "" } } },
+    { "type": "card", "settings": { "subtitle": "Summer", "title": "Tomato and basil", "description": "<p>From the garden, July to September.</p>", "button_link": { "text": "", "href": "" } } },
+    { "type": "card", "settings": { "subtitle": "Autumn", "title": "Pumpkin and sage", "description": "<p>October to December.</p>", "button_link": { "text": "", "href": "" } } }
+  ]
+}
+```
 
-| Setting | Value |
-|---|---|
-| `columns_desktop` | 4 |
-| `card_layout` | box |
-| `alignment` | center |
-| `aspect_ratio` | 1/1 |
-| `image_position` | top |
-| `color_scheme` | standard-primary |
+### Numbered steps
 
-Use `subtitle` for job title, `description` for a short bio, and hide the button or link to a full profile.
+Flat text cards with no images: the label carries the step number. Good for a short "how it works".
 
-**Good for:** Meet-the-team pages, staff directories, advisory boards.
+```json
+{
+  "type": "card-grid",
+  "settings": { "eyebrow": "How it works", "title": "Three steps, no surprises", "heading_alignment": "start", "columns_desktop": 3, "card_layout": "flat", "alignment": "start", "aspect_ratio": "auto" },
+  "blocks": [
+    { "type": "card", "settings": { "subtitle": "01", "title": "Call", "description": "<p>Tell us what you need.</p>", "button_link": { "text": "", "href": "" } } },
+    { "type": "card", "settings": { "subtitle": "02", "title": "Visit", "description": "<p>We measure and listen.</p>", "button_link": { "text": "", "href": "" } } },
+    { "type": "card", "settings": { "subtitle": "03", "title": "Quote", "description": "<p>A fixed price, in writing.</p>", "button_link": { "text": "", "href": "" } } }
+  ]
+}
+```
 
----
+### Linked locations
 
-### 3. Product / Menu Carousel (5 columns, wide images)
+Branch cards where each button really leads to its own page; one card per location. Needs one storefront photo each.
 
-| Setting | Value |
-|---|---|
-| `layout` | carousel |
-| `columns_desktop` | 4 |
-| `card_layout` | flat |
-| `alignment` | start |
-| `aspect_ratio` | 16/9 |
-| `image_position` | top |
-| `color_scheme` | standard-primary |
-
-Load 6-10 cards and let users swipe through. Works well when you have more items than fit on screen.
-
-**Good for:** Featured dishes, product highlights, portfolio pieces, seasonal specials.
-
----
-
-### 4. Pricing / Plan Comparison (3 columns, no images)
-
-| Setting | Value |
-|---|---|
-| `columns_desktop` | 3 |
-| `card_layout` | box |
-| `alignment` | center |
-| `image_position` | top |
-| `aspect_ratio` | auto |
-| `color_scheme` | highlight-secondary |
-| `heading_alignment` | center |
-
-Leave the card `image` blank. Use `subtitle` for the plan name, `title` for the price, and `description` for a bullet list of features. Button becomes "Choose Plan".
-
-**Good for:** SaaS pricing tables, membership tiers, service packages.
-
----
-
-### 5. Process / How-It-Works Steps (4 columns, flat layout)
-
-| Setting | Value |
-|---|---|
-| `columns_desktop` | 4 |
-| `card_layout` | flat |
-| `alignment` | start |
-| `image_position` | top |
-| `aspect_ratio` | 1/1 |
-| `color_scheme` | standard-primary |
-| `heading_alignment` | start |
-
-Use `subtitle` for step numbers ("01", "02", "03", "04"), `title` for the step name, and a one-sentence `description`. Hide the button.
-
-**Good for:** Explaining a workflow, onboarding steps, order process, how-to guides.
-
----
-
-### 6. Testimonial Cards (2 columns, bottom images)
-
-| Setting | Value |
-|---|---|
-| `columns_desktop` | 2 |
-| `card_layout` | box |
-| `alignment` | start |
-| `image_position` | bottom |
-| `aspect_ratio` | 1/1 |
-| `color_scheme` | highlight-primary |
-| `heading_alignment` | start |
-
-Put the quote in `description`, the person's name in `title`, and their role or company in `subtitle`. The portrait photo at the bottom grounds each testimonial.
-
-**Good for:** Client testimonials, case study previews, review showcases.
-
----
-
-### 7. Location / Branch Cards (3 columns, landscape images)
-
-| Setting | Value |
-|---|---|
-| `columns_desktop` | 3 |
-| `card_layout` | box |
-| `alignment` | start |
-| `image_position` | top |
-| `aspect_ratio` | 3/2 |
-| `color_scheme` | standard-secondary |
-| `heading_alignment` | center |
-
-Use a storefront photo as the image, the city or neighborhood as `title`, address and hours in `description`, and "Get Directions" as the button linking to Google Maps.
-
-**Good for:** Multi-location businesses, franchise directories, branch listings.
-
----
-
-## Differentiation Tips
-
-- **Box vs. Flat** is the biggest visual lever. Box cards feel structured and corporate; flat cards feel editorial and modern. Match the site's overall tone.
-- **Carousel only pays off at 5+ cards.** With 3-4 cards, grid is almost always cleaner because everything is visible at once without interaction.
-- **Image-bottom creates surprisingly interesting layouts.** It flips the typical card pattern — text becomes the entry point and the image becomes illustrative rather than dominant. Works for testimonials and bios, but also for service cards where the description matters more than the photo, or any card where you want the reader to engage with the text first. Use it as a differentiation lever across presets, not just for testimonials.
-- **Hiding optional fields changes the card's personality entirely.** No image + no button = a simple text tile. No subtitle + no description = an image gallery with titles. Experiment with which fields to leave blank.
-- **Default to no buttons for small business presets.** Most small businesses use card grids to showcase services, features, or highlights — not to link to individual pages for each one. Only add `button_link` when the industry genuinely needs per-card destinations (e.g., a real estate agent linking to property listings, or a SaaS product linking to feature docs). A grid of cards with empty "Learn More" buttons is worse than no buttons at all.
-- **Color scheme accent variants** add borders and secondary backgrounds to individual cards. This creates visual separation when you have many cards. On a highlight background, the accent variant makes cards pop as distinct objects rather than blending in.
-- **Aspect ratio choice should follow the content.** Square for people, 4/3 or 3/2 for places and products, 16/9 for wide scenic shots, 3/4 for tall product photography. Mixing ratios across a single grid looks unintentional, so pick one and stick with it.
-- **2-column layouts create a different reading rhythm** than 3 or 4. Two columns make each card feel substantial and article-like, which suits longer descriptions. Four or five columns push toward a scannable, icon-grid feel with minimal text.
+```json
+{
+  "type": "card-grid",
+  "settings": { "eyebrow": "Locations", "title": "Find us near you", "heading_alignment": "center", "columns_desktop": 3, "card_layout": "box", "alignment": "start", "aspect_ratio": "3 / 2", "color_scheme": "standard-secondary" },
+  "blocks": [
+    { "type": "card", "settings": { "subtitle": "North", "title": "Springfield", "description": "<p>12 Example Street. Open daily, 9 to 6.</p>", "button_link": { "text": "Visit this branch", "href": "contact.html" } } }
+  ]
+}
+```

@@ -1,74 +1,100 @@
-# Video Popup Widget
+# video-popup
 
-A full-width (or contained) hero-style background image with a centered play button that opens a YouTube or Vimeo video in a lightbox modal.
+## Purpose
 
-## Settings levers
+A full-width photograph under a colour overlay with one large play button in the middle; pressing anywhere on it opens a YouTube or Vimeo video in a lightbox over the page. It is the cinematic way to offer a video: the still image sets the mood and the visitor chooses to watch.
 
-| Setting | Values | Visual effect |
-|---------|--------|---------------|
-| `image` | Any uploaded image | The background photograph or still frame visible behind the overlay. Sets the entire mood of the section. |
-| `video_url` | YouTube or Vimeo URL (standard, short, or embed formats) | Determines the video that plays inside the modal. No visual change on the section itself. |
-| `video_title` | Free text (default: "Video") | Used as the accessible `aria-label` on the play button and as the modal title. Not rendered visually on the page. |
-| `overlay_color` | Any color with alpha (default: `#0a1e38bf`) | Tints the background image. Dark overlays add drama and improve play-button contrast; lighter or branded overlays shift the feeling entirely. |
-| `height` | `small` / `medium` (default) / `large` | Controls the vertical size of the section via a CSS class (`widget-height-*`). Small works for inline accents; large dominates the viewport. |
-| `fullwidth` | `true` / `false` (default: true) | When true the section bleeds edge-to-edge. When false it is capped at `--container-max-width` with rounded corners (`--radius-lg`), giving a card-like appearance. |
-| `play_button_style` | `light` (default) / `dark` | Switches the SVG circle-and-triangle play icon between white-on-transparent and dark-on-transparent. Choose based on overlay brightness. |
-| `top_spacing` | `auto` (default), `small`, `none` | `small` reduces spacing for tighter rhythm; `none` removes it entirely for flush stacking |
-| `bottom_spacing` | `auto` (default), `small`, `none` | `small` reduces spacing for tighter rhythm; `none` removes it entirely for flush stacking |
+The section has no text of its own, no heading and no caption. Its height is set in three steps from half the screen to a full screen, and it can bleed edge to edge or sit as a rounded card inside the content width.
 
-## Available blocks
+## When to use
 
-This widget has no configurable blocks. It is a single-purpose section: one background image, one overlay, one play button, one video.
+- A homepage or landing-page opener where a brand film or showreel is the main message, or a mid-page break on an about, portfolio or event page.
+- Good for one strong still and one video worth a full-screen viewing. Bad for tutorials, demos and anything that should play in place; that is `video-embed`.
+- Can open a page, and it supports the transparent header: when it is the first section and the header has `transparent_on_hero` on, the header floats over the image in its light styling. The image reaches the top edge on its own; `top_spacing` `none` only tightens the space inside it.
+- Because it carries no words, put a `rich-text` title or a `split-content` section before or after it to say what the video is; on an inner page under a transparent header, open with that text section and let the video follow.
+- Needs one high-resolution still (the image is most of the impact) and a YouTube or Vimeo link.
+- Fits venues, hospitality, weddings and events, architecture and design studios, agencies, fitness and wellness brands.
 
-## Layout recipes
+## Pitfalls
 
-**1. "Cinematic Hero" (above the fold)**
-- Settings: `height: large`, `fullwidth: true`, `overlay_color: #000000aa`, `play_button_style: light`
-- Image: wide-angle drone shot of the business location or landscape
-- Blocks: none
-- Good for: making the homepage feel like a film trailer, immediately communicating scale and ambition
+- The whole section is the button. Nothing else can be placed on it, and visitors cannot select text or follow links inside it.
+- `overlay_color` tints the whole image and must have transparency; a solid colour hides the photo completely. Darker overlays make the light play button read; a pale or white overlay needs `play_button_style` `dark`.
+- Without an `image` the section is a flat band in the overlay colour and the header's transparent state still engages, so an imageless popup as a page opener gives a washed-out header and an empty-looking band.
+- `height` `large` fills the visitor's screen. Use it only as the first section; mid-page it hides everything around it. `medium` suits a mid-page break, `small` a compact strip.
+- `fullwidth` off turns the section into a rounded card at the content width. That reads well mid-page and badly as an opener under a transparent header, where the header then floats over the page background beside the card.
+- Only YouTube and Vimeo links work. An unrecognised link leaves the play button doing nothing on the published site, so test a new link in the preview.
+- `video_title` is announced to screen-reader users and used as the lightbox title; name the video rather than leaving "Video".
+- The image fills the whole section, so its spacing lives inside the picture like a filled band's padding and contributes no gap outside it. The section below must bring its own breathing room with `top_spacing` `small`; `none` there butts it against the image edge.
 
-**2. "Behind the Scenes" (mid-page trust builder)**
-- Settings: `height: medium`, `fullwidth: false`, `overlay_color: #1a1a1a99`, `play_button_style: light`
-- Image: candid workshop or kitchen photo showing the team at work
-- Blocks: none
-- Good for: breaking up text-heavy pages with a contained, card-style video moment that feels approachable rather than cinematic
+## Recipes
 
-**3. "Brand Manifesto" (about page centrepiece)**
-- Settings: `height: large`, `fullwidth: true`, `overlay_color: brand primary at ~70% opacity (e.g. #2E5C8Abb)`, `play_button_style: light`
-- Image: abstract or close-up texture related to the brand (fabric, metal, water)
-- Blocks: none
-- Good for: reinforcing brand colour while inviting visitors to watch a founder story or mission video
+### Cinematic opener
 
-**4. "Quick Explainer" (services or product page)**
-- Settings: `height: small`, `fullwidth: false`, `overlay_color: #00000066`, `play_button_style: dark`, `top_spacing: none`, `bottom_spacing: none`
-- Image: screenshot or stylised product still
-- Blocks: none
-- Good for: embedding a short product demo or how-it-works clip inline without dominating the page. The small height and contained width keep it subordinate to surrounding content.
+A full-screen edge-to-edge hero as the first section of the homepage, sliding under a transparent header. The user supplies a wide, high-resolution still and the video link (placeholder below).
 
-**5. "Event Teaser" (landing page or announcement)**
-- Settings: `height: medium`, `fullwidth: true`, `overlay_color: #0a1e38bf` (default dark navy), `play_button_style: light`
-- Image: highlights reel still from last year's event -- crowd shot, stage lighting, keynote moment
-- Blocks: none
-- Good for: driving ticket sales or registrations by letting the energy of a previous event speak for itself
+```json
+{
+  "type": "video-popup",
+  "settings": {
+    "video_url": "https://www.youtube.com/watch?v=XXXXXXXXXXX",
+    "video_title": "Brand film",
+    "height": "large",
+    "fullwidth": true,
+    "play_button_style": "light",
+    "top_spacing": "none"
+  }
+}
+```
 
-**6. "Testimonial Spotlight" (social proof section)**
-- Settings: `height: medium`, `fullwidth: false`, `overlay_color: #ffffff33`, `play_button_style: dark`
-- Image: professional headshot or on-location portrait of the customer giving the testimonial
-- Blocks: none
-- Good for: placing a contained, light-overlay video testimonial between written reviews. The rounded-corner card style makes it feel personal rather than promotional.
+### Mid-page showreel card
 
-**7. "Process Walkthrough" (portfolio or case study page)**
-- Settings: `height: small`, `fullwidth: true`, `overlay_color: #1a1a1a55`, `play_button_style: light`, `bottom_spacing: none`
-- Image: time-lapse still or before/after composite of the project
-- Blocks: none
-- Good for: a compact, edge-to-edge strip that invites visitors to watch a project unfold. Removing bottom spacing lets the next section (e.g. a gallery or stats bar) flow directly underneath.
+A contained, rounded card at three-quarter height between two text sections on a portfolio or about page. The user supplies a behind-the-scenes still and the video link (placeholder below).
 
-## Differentiation tips
+```json
+{
+  "type": "video-popup",
+  "settings": {
+    "video_url": "https://www.youtube.com/watch?v=XXXXXXXXXXX",
+    "video_title": "Studio showreel",
+    "height": "medium",
+    "fullwidth": false,
+    "play_button_style": "light"
+  }
+}
+```
 
-- **Pair overlay colour with your brand palette.** The default navy is safe but generic. A deep burgundy, forest green, or even a semi-transparent white can make the same widget feel like a completely different site. Adjust play button style (light/dark) to maintain contrast.
-- **Use `fullwidth: false` more than you think.** The rounded-corner contained mode is underused. It turns the video popup into a card that sits inside the content flow rather than interrupting it, which works especially well on pages with multiple sections.
-- **Stack two video popups with different heights.** A `large` cinematic hero at the top and a `small` explainer further down the page create rhythm and avoid visual monotony without introducing a different widget type.
-- **Choose the still image carefully -- it is 90% of the impact.** The play button is small and minimal by design. The background image does all the heavy lifting before anyone clicks. Invest in a strong, high-resolution photograph rather than relying on the overlay to compensate.
-- **Remove spacing to create seamless transitions.** Setting `top_spacing: none` or `bottom_spacing: none` lets the video popup merge visually with adjacent full-width sections (headers, colour blocks, footers), creating a more editorial, magazine-style flow.
-- **Light overlays with dark play buttons flip the mood.** Most users default to dark overlays, but a subtle white or pastel overlay with a dark play button feels modern, airy, and unexpected -- great for wellness brands, minimalist portfolios, and lifestyle businesses.
+### Light, airy teaser
+
+A half-height strip with a pale overlay and a dark play button, for wellness, interiors or lifestyle brands with bright photography. The user supplies a bright still and the video link (placeholder below).
+
+```json
+{
+  "type": "video-popup",
+  "settings": {
+    "overlay_color": "#ffffff55",
+    "video_url": "https://www.youtube.com/watch?v=XXXXXXXXXXX",
+    "video_title": "A day at the studio",
+    "height": "small",
+    "fullwidth": false,
+    "play_button_style": "dark"
+  }
+}
+```
+
+### Event teaser strip
+
+A compact full-width strip glued to the section below it, for an event or launch page: last year's highlights invite this year's sign-up. The user supplies a crowd or stage still and the video link (placeholder below).
+
+```json
+{
+  "type": "video-popup",
+  "settings": {
+    "video_url": "https://www.youtube.com/watch?v=XXXXXXXXXXX",
+    "video_title": "Last year's highlights",
+    "height": "small",
+    "fullwidth": true,
+    "play_button_style": "light",
+    "bottom_spacing": "none"
+  }
+}
+```

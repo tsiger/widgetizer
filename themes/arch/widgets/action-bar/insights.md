@@ -1,84 +1,90 @@
-# Action Bar Widget
+# action-bar
 
-A horizontal call-to-action strip that pairs a headline and supporting text on the left with one or two buttons on the right, collapsing to a centered stack on mobile. Supports an optional background image with overlay (like banner), but in preset generation we never set the image — it works as a user-added upgrade, not a preset default.
+## Purpose
 
----
+A single-row call to action: a short headline and one line of text on the left, one or two buttons on the right. The compact closer that sends a visitor to the `contact` page, a booking link or a quote request after the content has made its case.
 
-## Settings Levers
+On phones the row stacks and centres. Text blocks follow their block order on the left; the `button` block always goes to the right, whatever position it has. With the default `highlight-primary` scheme it is a coloured band; an optional background photo with the overlay turns it into a small image strip.
 
-| Setting | Values | Visual Effect |
-|---------|--------|---------------|
-| `image` | any uploaded image | Background photo; when set the widget gains `has-bg-image` and `has-overlay` classes, triggering the overlay layer. Text renders over the image just like a banner, making the action bar feel like a mini-hero CTA. **Not used in preset generation** — this is a user-added enhancement, not something we generate with placeholder images |
-| `overlay_color` | any color with alpha (default `#0a1e38bf`) | Tint layer between background image and content. Only visible when `image` is set. Adjust hue and alpha to match brand or mood. **Not used in preset generation** |
-| `fullwidth` | `true` / `false` (default) | When true, removes the max-width constraint so the inner container stretches edge-to-edge. **Never use `fullwidth: true` in preset generation** — the contained version always looks better |
-| `color_scheme` | `standard-primary`, `standard-secondary`, `highlight-primary` (default), `highlight-secondary` | Controls background and text color pairing. `standard-primary` uses no padded container and no custom bg; the other three add padding and set `--widget-bg-color`. When a background image is set, the color scheme still controls text color tokens but the image replaces the solid background |
-| `top_spacing` | `auto` (default), `small`, `none` | `none` removes the top margin/padding so the bar sits flush against the widget above. `small` reduces spacing for tighter section rhythm |
-| `bottom_spacing` | `auto` (default), `small`, `none` | Same as above but for the bottom edge |
+## When to use
 
----
+- The closing conversion of a page: last section before the footer, or right after the section that answers the final objection (`accordion`, `pricing`, `comparison-table`).
+- Good for one clear next step. Bad for explaining anything: with more than a headline and one sentence it stops being a bar. Use `banner` for a tall, multi-block call to action.
+- Never a page opener.
+- Sits well after `testimonials`, `accordion`, `pricing` or a `card-grid`; on a `services` page it can also bridge two content sections as a low-key nudge on `standard-primary`.
+- Needs almost no content: a headline of up to about sixty characters, one sentence, one or two button labels. The user must supply a photo only for the image variant.
+- Fits every service business, clinics, studios, trades, agencies, restaurants (reservations) and software (free trial).
 
-## Available Blocks
+## Pitfalls
 
-Up to **4 blocks** total, in any combination.
+- The default scheme makes it one of the page's one or two highlight sections. Do not place it directly under another highlight or image section (a `banner` closer, a `testimonial-hero`); separate them with a standard surface, or switch this bar to `standard-secondary`.
+- On `standard-primary` with no image it has no band at all and reads as a plain text row. That is fine for a soft informational strip, but it will not feel like a call to action.
+- A long headline wraps and squeezes the buttons into a narrow column. Keep the heading to one line at `2xl`; sizes of `3xl` and above are for a few promotional words only.
+- Two buttons should be one `primary` and one `secondary`; two primaries compete. Add the second button only for a genuinely different path (call versus email).
+- The `text` block is muted by default so the headline leads. Turn `muted` off only when the sentence carries the essential information (a date, an address). `uppercase` suits a short tag, not a sentence.
+- `fullwidth` stretches the row to the viewport; the contained version almost always looks better.
+- With a background image the overlay sits between photo and text; a light photo needs the overlay kept dark or the white text disappears.
+- As a filled band, its spacing is padding inside the band. The section below needs its own `top_spacing`; set this bar's `top_spacing` to `none` only to fuse it with a same-scheme neighbour above.
 
-| Block Type | Key Settings | Notes |
-|------------|-------------|-------|
-| **heading** | `text` (plain text), `size` (lg through 9xl, default 2xl) | Renders as an `<h2>`. Only one is typical, but the schema allows multiples. Placed in the left content column. |
-| **text** | `text` (richtext/HTML), `size` (sm, base, lg), `uppercase` (bool), `muted` (bool, default true) | Richtext body copy rendered with `| raw`. `muted` lowers the text contrast for a softer supporting tone. Sits below the heading in the content column. |
-| **button** | `link` + `link_2` (each with text, href, target), `style` / `style_2` (primary or secondary), `size` (small, medium, large, xlarge) | Holds up to two buttons in a single block. Gap between them scales with the size setting. Rendered in the right-side actions column, so buttons are visually separated from the text content. |
+## Recipes
 
----
+### Closing call to action
 
-## Layout Recipes
+The standard page closer: headline, one sentence, one button to the `contact` page.
 
-### 1. Classic Appointment CTA
+```json
+{
+  "type": "action-bar",
+  "settings": { "color_scheme": "highlight-primary", "fullwidth": false },
+  "blocks": [
+    { "type": "heading", "settings": { "text": "Ready to talk it through?", "size": "2xl" } },
+    { "type": "text", "settings": { "text": "<p>Tell us about your project and we will reply within one working day.</p>", "size": "base", "muted": true } },
+    { "type": "button", "settings": { "link": { "text": "Get in touch", "href": "contact.html" }, "style": "primary", "size": "medium" } }
+  ]
+}
+```
 
-| | |
-|---|---|
-| **Blocks** | heading (2xl) + text (base, muted) + button (primary "Book Now", medium) |
-| **Settings** | `color_scheme: highlight-primary`, `fullwidth: false` |
-| **Good for** | Driving a single clear action at the bottom of a services or about page |
+### Two paths
 
-### 2. Dual-Path Conversion Bar
+Headline plus a primary and a secondary button for visitors who prefer different channels. Use the alternate highlight surface when `highlight-primary` is already taken on the page.
 
-| | |
-|---|---|
-| **Blocks** | heading (3xl) + button (primary "Get a Quote" + secondary "Call Us", large) |
-| **Settings** | `color_scheme: highlight-secondary`, `fullwidth: false` |
-| **Good for** | Giving visitors two entry points — one digital, one personal — to lower friction |
+```json
+{
+  "type": "action-bar",
+  "settings": { "color_scheme": "highlight-secondary" },
+  "blocks": [
+    { "type": "heading", "settings": { "text": "Book a visit or ask a question", "size": "3xl" } },
+    { "type": "button", "settings": { "link": { "text": "Book online", "href": "contact.html" }, "style": "primary", "link_2": { "text": "Call (555) 010-0100", "href": "tel:+15550100100" }, "style_2": "secondary", "size": "large" } }
+  ]
+}
+```
 
-### 3. Soft Informational Strip
+### Quiet notice
 
-| | |
-|---|---|
-| **Blocks** | heading (lg) + text (sm, muted, uppercase) |
-| **Settings** | `color_scheme: standard-secondary`, `fullwidth: false` |
-| **Good for** | Non-pushy announcements like new hours, a relocation notice, or a policy update. No button keeps it purely informational. |
+An informational strip with no button: new hours, a seasonal closure, a relocation. Soft surface, small type.
 
-### 4. Event / Launch Countdown Prompt
+```json
+{
+  "type": "action-bar",
+  "settings": { "color_scheme": "standard-secondary" },
+  "blocks": [
+    { "type": "heading", "settings": { "text": "New opening hours from next month", "size": "lg" } },
+    { "type": "text", "settings": { "text": "<p>We are open Tuesday to Saturday, 9 to 6. Closed on public holidays.</p>", "size": "sm", "muted": true } }
+  ]
+}
+```
 
-| | |
-|---|---|
-| **Blocks** | heading (3xl) + text (lg, muted: false) + button (primary "Reserve Your Spot" + secondary "Learn More", large) |
-| **Settings** | `color_scheme: highlight-secondary`, `fullwidth: false` |
-| **Good for** | Grand openings, product launches, webinars, or workshops where you want maximum presence |
+### Mid-page nudge
 
-### 5. Minimal Single-Line Nudge
+A low-contrast row between two content sections that points to a secondary page without shouting. Unfilled, so it inherits the page surface.
 
-| | |
-|---|---|
-| **Blocks** | heading (lg) + button (secondary "View Menu", small) |
-| **Settings** | `color_scheme: standard-primary`, `fullwidth: false`, `top_spacing: none` |
-| **Good for** | A lightweight, low-contrast nudge between two content-heavy sections, guiding without shouting |
-
----
-
-## Differentiation Tips
-
-- **One button vs. two.** A single primary button keeps the eye focused; add the second button only when there is a genuinely distinct alternative path (e.g., "Call" vs. "Email"). Two primary-styled buttons compete — always pair primary with secondary.
-- **Heading size signals urgency.** Sizes below 2xl read as informational; 3xl and above feel promotional. Match the size to the emotional temperature of the message.
-- **Muted text is your friend.** Leave it on for supporting copy so the heading and button remain the dominant elements. Turn it off only when the body text itself carries critical information (e.g., a date or address).
-- **Never use `fullwidth: true`.** The contained version always looks better. This is a hard rule for preset generation.
-- **Spacing collapse for visual continuity.** Set `top_spacing: none` when the action bar immediately follows a section with the same color scheme to make them feel like one unified block. This is especially effective for pairing with hero or feature sections.
-- **Skip the text block for brevity.** When the heading says it all ("Free consultation — limited spots"), dropping the text block entirely makes the bar punchier and faster to scan on mobile.
-- **Uppercase text for labels, not sentences.** The uppercase option on the text block works well for short tags like "LIMITED TIME" or "NEW LOCATION" but harms readability on anything longer than three or four words.
+```json
+{
+  "type": "action-bar",
+  "settings": { "color_scheme": "standard-primary", "top_spacing": "small", "bottom_spacing": "small" },
+  "blocks": [
+    { "type": "heading", "settings": { "text": "Curious how we work?", "size": "xl" } },
+    { "type": "button", "settings": { "link": { "text": "See our process", "href": "about.html" }, "style": "secondary", "size": "small" } }
+  ]
+}
+```

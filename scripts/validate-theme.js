@@ -20,6 +20,15 @@ import { Hash, TokenKind, toValueSync } from "liquidjs";
 import { createLiquidEngine } from "@widgetizer/render-engine";
 import { splitAssetRef } from "@widgetizer/core/assetUrl";
 import { settingValueProblems } from "@widgetizer/core/settingValues";
+import { LISTING_SETTING_IDS, listingSettingsFor } from "@widgetizer/core/listingSettings";
+import {
+  GUIDANCE_FILE,
+  PRESET_GUIDE_HEADINGS,
+  WIDGET_GUIDE_HEADINGS,
+  backtickedNames,
+  parsePresetGuide,
+  parseWidgetGuide,
+} from "@widgetizer/core/guidance";
 import { validateCollectionSchema } from "../packages/builder-server/src/services/collectionService.js";
 import { sanitizeVideoPath } from "../packages/builder-server/src/services/sanitizationService.js";
 import { buildContract } from "./build-theme-skill-contract.js";
@@ -153,7 +162,7 @@ export function validateTheme(dir) {
     "collection",
   ]);
   // The editor adds these two controls to a widget that declares a collection.
-  const INJECTED_LISTING_SETTINGS = { listing_anchor: "checkbox", paginate: "checkbox" };
+  const INJECTED_LISTING_SETTINGS = Object.fromEntries(LISTING_SETTING_IDS.map((id) => [id, "checkbox"]));
 
   const VERSION_RE = /^\d+\.\d+\.\d+$/;
   const SLUG_RE = /^[a-z0-9-]+$/;
@@ -289,6 +298,10 @@ export function validateTheme(dir) {
     collections: new Map(), // type → { schema, fields: Map(id → setting) }
     imageSizes: new Set(contract.imageSizes),
     usesEnqueue: false,
+    // Names guidance files may refer to in backticks, collected as the theme is read.
+    pageSlugs: new Set(),
+    menuIds: new Set(),
+    presetIds: new Set(),
   };
 
   // ---------------------------------------------------------------------------
@@ -1273,6 +1286,7 @@ export function validateTheme(dir) {
       if (!isObject(menu)) continue;
       const id = name.replace(/\.json$/, "");
       ids.add(id);
+      theme.menuIds.add(id);
       if (menu.id !== id) warn(file, "menu", `"id" should be "${id}" to match the file name.`);
       if (typeof menu.name !== "string" || menu.name === "")
         warn(file, "menu", 'Add a "name"; the editor lists menus by it.');
@@ -1336,7 +1350,7 @@ export function validateTheme(dir) {
     for (const [id, value] of Object.entries(isObject(values) ? values : {})) {
       const setting = definitions.get(id);
       if (!setting) continue;
-      if (setting.type === "link" && isObject(value) && typeof value.href === "string") {
+      if (pageSlugs && setting.type === "link" && isObject(value) && typeof value.href === "string") {
         const page = value.href.match(/^([a-z0-9-]+)\.html(?:[#?].*)?$/);
         if (page && !pageSlugs.has(page[1])) {
           warn(
@@ -1346,14 +1360,13 @@ export function validateTheme(dir) {
           );
         }
       }
-      if (setting.type === "menu" && typeof value === "string" && value !== "" && !menuIds.has(value)) {
+      if (menuIds && setting.type === "menu" && typeof value === "string" && value !== "" && !menuIds.has(value)) {
         warn(file, "missing-menu", `${where}: "${id}" names menu "${value}", but menus/${value}.json does not exist.`);
       }
     }
   }
 
-  function checkWidgetInstance(file, key, instance, pageSlugs, menuIds, { global = false } = {}) {
-    const where = `widget "${key}"`;
+  function checkWidgetInstance(file, key, instance, pageSlugs, menuIds, { global = false, where = `widget "${key}"` } = {}) {
     if (!isObject(instance) || typeof instance.type !== "string") {
       error(file, "template-shape", `${where} needs a "type".`);
       return;
@@ -1378,9 +1391,8 @@ export function validateTheme(dir) {
     }
 
     const settingDefinitions = new Map(definitions.settings);
-    if (definitions.collection) {
-      for (const [id, type] of Object.entries(INJECTED_LISTING_SETTINGS)) settingDefinitions.set(id, { id, type });
-    }
+    // The same listing controls the editor and the assistant offer this widget.
+    for (const setting of listingSettingsFor({ collection: definitions.collection })) settingDefinitions.set(setting.id, setting);
     checkSettingValues(file, instance.settings, settingDefinitions, where);
     checkLinkTargets(file, where, settingDefinitions, instance.settings, pageSlugs, menuIds);
 
@@ -1435,6 +1447,7 @@ export function validateTheme(dir) {
   function checkTemplates(dir, menuIds) {
     const pageFiles = listFiles(dir, ".json");
     const pageSlugs = new Set(pageFiles.map((name) => name.replace(/\.json$/, "")));
+    for (const slug of pageSlugs) theme.pageSlugs.add(slug);
 
     for (const name of pageFiles) {
       const file = path.join(dir, name);
@@ -1509,6 +1522,179 @@ export function validateTheme(dir) {
       else checkWidgetInstance(file, type, instance, pageSlugs, menuIds, { global: true });
     }
     return pageSlugs;
+  }
+
+  // ---------------------------------------------------------------------------
+  // Guidance files (insights.md): what the AI assistant reads about the theme
+  // ---------------------------------------------------------------------------
+
+  const NAME_RE = /^[a-z][a-z0-9_-]{2,}$/;
+  const RECIPE_MEDIA_TYPES = new Set(["image", "gallery", "file", "video"]);
+
+  /**
+   * Every name a guidance file may put in backticks: section and block types,
+   * setting ids and option values, collection types and fields, starter pages,
+   * menus and presets. Prose-looking tokens (spaces, dots, capitals) are not checked.
+   */
+  // Value words guidance writes in backticks that are not names of anything.
+  const GUIDANCE_LITERALS = ["true", "false", "null", "yes", "no", "href", "text", "target", "stack", "weight"];
+
+  function knownNames() {
+    const names = new Set([
+      ...GUIDANCE_LITERALS,
+      ...theme.pageSlugs,
+      ...theme.menuIds,
+      ...theme.presetIds,
+      ...theme.collections.keys(),
+    ]);
+    const addSettings = (settings) => {
+      for (const setting of settings.values()) {
+        names.add(setting.id);
+        for (const option of Array.isArray(setting.options) ? setting.options : []) {
+          const value = isObject(option) ? option.value : option;
+          if (typeof value === "string") names.add(value);
+        }
+      }
+    };
+    for (const settings of theme.groups.values()) addSettings(settings);
+    for (const [type, widget] of theme.widgets) {
+      names.add(type);
+      addSettings(widget.settings);
+      for (const [blockType, settings] of widget.blocks) {
+        names.add(blockType);
+        addSettings(settings);
+      }
+    }
+    for (const collection of theme.collections.values()) addSettings(collection.fields);
+    for (const type of Object.keys(CORE_WIDGETS)) {
+      names.add(type);
+      const definitions = definitionsForInstance(type);
+      if (!definitions) continue;
+      addSettings(definitions.settings);
+      for (const [blockType, settings] of definitions.blocks) {
+        names.add(blockType);
+        addSettings(settings);
+      }
+    }
+    for (const id of Object.keys(INJECTED_LISTING_SETTINGS)) names.add(id);
+    return names;
+  }
+
+  function checkGuideReferences(file, markdown, extra = []) {
+    const names = knownNames();
+    for (const name of extra) names.add(name);
+    for (const name of backtickedNames(markdown)) {
+      if (!NAME_RE.test(name) || names.has(name)) continue;
+      warn(
+        file,
+        "guidance-reference",
+        `\`${name}\` is not a section type, block type, setting, option, page, menu, collection or preset of this theme.${didYouMean(name, names)}`,
+      );
+    }
+  }
+
+  /** A recipe's example is a section as the editor stores it, minus ids: it must fit the widget's schema. */
+  function checkRecipe(file, type, widget, recipe) {
+    const where = `recipe "${recipe.name}"`;
+    if (recipe.error) {
+      error(file, "guidance-recipe", `${where}: ${recipe.error}.`);
+      return;
+    }
+    const example = recipe.example;
+    if (example.type !== undefined && example.type !== type)
+      error(file, "guidance-recipe", `${where}: "type" is ${JSON.stringify(example.type)}; this file belongs to "${type}".`);
+    for (const key of Object.keys(example)) {
+      if (!["type", "settings", "blocks"].includes(key))
+        warn(file, "guidance-recipe", `${where}: "${key}" is not part of a section; an example holds "type", "settings" and "blocks".`);
+    }
+    if (example.blocks !== undefined && !Array.isArray(example.blocks)) {
+      error(file, "guidance-recipe", `${where}: "blocks" must be an array of { "type", "settings" } in order.`);
+      return;
+    }
+    // A recipe is applied to any site, and uploads belong to one site's library:
+    // the recipe's notes name the images it needs instead.
+    const definitions = definitionsForInstance(type);
+    const rejectMedia = (values, settings, at) => {
+      for (const id of Object.keys(isObject(values) ? values : {})) {
+        const settingType = settings?.get(id)?.type;
+        if (RECIPE_MEDIA_TYPES.has(settingType))
+          error(
+            file,
+            "guidance-recipe",
+            `${where}${at}: "${id}" is ${settingType === "image" ? "an" : "a"} ${settingType} setting. Leave uploads out of examples and name the needed ${settingType === "gallery" ? "images" : settingType} in the recipe's notes.`,
+          );
+      }
+    };
+    rejectMedia(example.settings, definitions?.settings, "");
+    (Array.isArray(example.blocks) ? example.blocks : []).forEach((block, index) =>
+      rejectMedia(block?.settings, definitions?.blocks.get(block?.type), ` block ${index + 1}`),
+    );
+
+    const blocks = {};
+    const blocksOrder = [];
+    (example.blocks ?? []).forEach((block, index) => {
+      const id = `block-${index + 1}`;
+      blocks[id] = isObject(block) ? { type: block.type, settings: block.settings } : block;
+      blocksOrder.push(id);
+    });
+    const instance = { type, settings: example.settings, ...(example.blocks ? { blocks, blocksOrder } : {}) };
+    checkWidgetInstance(file, recipe.name, instance, null, null, { global: widget.isGlobal, where });
+  }
+
+  function checkWidgetGuides() {
+    for (const [type, widget] of theme.widgets) {
+      const file = path.join(widget.dir, GUIDANCE_FILE);
+      if (!isFile(file)) continue;
+      const guide = parseWidgetGuide(fs.readFileSync(file, "utf8"));
+      checkGuideReferences(file, guide.text);
+      if (!guide.structured) {
+        warn(
+          file,
+          "guidance-structure",
+          `Older free-form guidance: only its first paragraph is served as the section's purpose. Restructure it under ${WIDGET_GUIDE_HEADINGS.map((heading) => `## ${heading}`).join(", ")}.`,
+        );
+        continue;
+      }
+      if (guide.missing.length)
+        warn(file, "guidance-structure", `Missing ${guide.missing.map((heading) => `## ${heading}`).join(" and ")}.`);
+      if (guide.extraHeadings.length)
+        warn(
+          file,
+          "guidance-structure",
+          `${guide.extraHeadings.map((heading) => `## ${heading}`).join(", ")} will not be served. Keys, options and defaults come from schema.json; put what a schema cannot say under the fixed headings.`,
+        );
+      const names = new Set();
+      for (const recipe of guide.recipes) {
+        if (names.has(recipe.name)) error(file, "guidance-recipe", `Two recipes are named "${recipe.name}".`);
+        names.add(recipe.name);
+        checkRecipe(file, type, widget, recipe);
+      }
+    }
+  }
+
+  function checkThemeGuide() {
+    const file = path.join(themeRoot, GUIDANCE_FILE);
+    if (!isFile(file)) return;
+    const text = fs.readFileSync(file, "utf8");
+    if (!text.trim()) {
+      warn(file, "guidance-structure", "The theme guide is empty.");
+      return;
+    }
+    checkGuideReferences(file, text);
+  }
+
+  function checkPresetGuide(file, pageSlugs, menuIds) {
+    const guide = parsePresetGuide(fs.readFileSync(file, "utf8"));
+    if (!guide.title) warn(file, "guidance-structure", "Start with a # heading naming the preset.");
+    if (guide.missing.length)
+      error(
+        file,
+        "guidance-structure",
+        `A preset guide needs ${PRESET_GUIDE_HEADINGS.map((heading) => `## ${heading}`).join(", ")}; missing ${guide.missing.map((heading) => `## ${heading}`).join(" and ")}.`,
+      );
+    if (guide.extraHeadings.length)
+      warn(file, "guidance-structure", `${guide.extraHeadings.map((heading) => `## ${heading}`).join(", ")} will not be served.`);
+    checkGuideReferences(file, guide.text, [...pageSlugs, ...menuIds]);
   }
 
   // ---------------------------------------------------------------------------
@@ -1599,6 +1785,7 @@ export function validateTheme(dir) {
       }
       if (ids.has(preset.id)) error(file, "presets", `Preset id "${preset.id}" is listed twice.`);
       ids.add(preset.id);
+      theme.presetIds.add(preset.id);
     }
     if (registry.default !== undefined && !ids.has(registry.default))
       error(file, "presets", `"default" is "${registry.default}", which is not a listed preset.`);
@@ -1654,10 +1841,11 @@ export function validateTheme(dir) {
       }
 
       const menuIds = isDir(path.join(dir, "menus")) ? checkMenus(path.join(dir, "menus")) : rootMenuIds;
-      checkTemplates(
+      const pageSlugs = checkTemplates(
         isDir(path.join(dir, "templates")) ? path.join(dir, "templates") : path.join(themeRoot, "templates"),
         menuIds,
       );
+      if (isFile(path.join(dir, GUIDANCE_FILE))) checkPresetGuide(path.join(dir, GUIDANCE_FILE), pageSlugs, menuIds);
 
       for (const type of listDirs(path.join(dir, "collections"))) {
         const collection = theme.collections.get(type);
@@ -1796,6 +1984,9 @@ export function validateTheme(dir) {
     }
     checkTemplates(path.join(themeRoot, "templates"), menuIds);
     checkPresets(menuIds);
+    // After presets, so guidance may name any starter page or menu.
+    checkWidgetGuides();
+    checkThemeGuide();
     checkUpdates();
     checkPackage();
   }

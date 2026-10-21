@@ -1,4 +1,6 @@
 import { toolError } from "../errors.js";
+import { clip, firstParagraph, parseWidgetGuide } from "@widgetizer/core/guidance";
+import { listingSettingsFor } from "@widgetizer/core/listingSettings";
 import {
   RESULT_BUDGET_CHARS,
   collectUploadPaths,
@@ -44,16 +46,58 @@ export function settingDto(setting, locale) {
 
 export const isEditable = (setting) => setting?.id && setting.type !== "header";
 
-/** The opening paragraph of a guidance file, which says what the section is for. */
+/** What the section is for, in a line: the first paragraph of its guidance's Purpose (or of an older free-form file). */
 function purposeOf(guidance) {
   if (!guidance) return null;
-  const paragraph = guidance
-    .split(/\n\s*\n/)
-    .map((block) => block.trim())
-    .find((block) => block && !block.startsWith("#") && !block.startsWith("---") && !block.startsWith("|"));
-  if (!paragraph) return null;
-  const text = paragraph.replace(/\s+/g, " ");
-  return text.length > PURPOSE_CHARS ? `${text.slice(0, PURPOSE_CHARS - 1)}…` : text;
+  const guide = parseWidgetGuide(guidance);
+  return clip(guide.structured ? firstParagraph(guide.purpose) : guide.purpose, PURPOSE_CHARS);
+}
+
+/**
+ * A widget's guidance as served: the fixed sections and the recipe names (an
+ * assistant asks for one recipe at a time), or an older free-form file in parts.
+ */
+// How to apply a recipe. A page section is added whole; the header and footer
+// already exist once per site, so their recipes are applied as changes to them.
+const RECIPE_USE = {
+  page:
+    "The example is a section without ids: add it with edit_sections (op add, with its type, settings and blocks). Then replace the placeholder text, point links at pages the site has, and add the images the notes name.",
+  global:
+    "The site already has exactly one of these, so it can't be added. Read it with read_site_part, then call edit_sections with part and that version: op update with the example's settings, and addBlock / updateBlock / removeBlock / moveBlock until its blocks match the example's. Then replace the placeholder text, point links at pages the site has, and add the images the notes name.",
+};
+
+function guidanceDto(guidance, { source, part, recipe: recipeName, type, global = false }) {
+  if (!guidance) return null;
+  const guide = parseWidgetGuide(guidance);
+  if (recipeName) {
+    const recipe = guide.structured ? guide.recipes.find((candidate) => candidate.name === recipeName) : null;
+    if (!recipe) {
+      const names = guide.structured ? guide.recipes.map((r) => r.name) : [];
+      throw toolError("RECIPE_NOT_FOUND", `There's no recipe "${recipeName}". Recipes: ${listAvailable(names)}.`);
+    }
+    return {
+      source,
+      advisory: true,
+      recipe: {
+        name: recipe.name,
+        notes: recipe.intro,
+        // The format lets an example leave its type out; the edit needs it.
+        example: recipe.example ? { type, ...recipe.example } : null,
+        ...(recipe.error ? { problem: recipe.error } : {}),
+        howToUse: global ? RECIPE_USE.global : RECIPE_USE.page,
+      },
+    };
+  }
+  if (!guide.structured) return { source, advisory: true, ...textPart(guide.text, part) };
+  return {
+    source,
+    advisory: true,
+    purpose: guide.purpose,
+    whenToUse: guide.whenToUse,
+    pitfalls: guide.pitfalls,
+    recipes: guide.recipes.map((entry) => ({ name: entry.name, notes: clip(entry.intro, 200) })),
+    ...(guide.recipes.length ? { note: "Ask again with recipe: <name> for a recipe's example." } : {}),
+  };
 }
 
 export const readLookTool = {
@@ -160,21 +204,22 @@ export const sectionDetailsTool = {
   name: "section_details",
   title: "Section details",
   description:
-    "One section type's settings (types, options, ranges, defaults in the given language), its blocks and limits, and the theme's guidance for using it. Guidance is advisory; the user's request comes first. Long guidance comes in parts; a very large section lists its blocks for you to read one at a time with block.",
+    "One section type's settings (types, options, ranges, defaults in the given language), its blocks and limits, and the theme's guidance for using it: purpose, when to use, pitfalls and the names of ready-made recipes. Ask with recipe for one recipe's example. Guidance is advisory; the user's request comes first. A very large section lists its blocks for you to read one at a time with block.",
   inputSchema: {
     type: "object",
     properties: {
       type: { type: "string", minLength: 1, maxLength: 100, description: "A section type from theme_catalog." },
       language: { ...languageArg, description: "Which language's default texts to show (defaults to the main language)." },
       block: { type: "string", minLength: 1, maxLength: 100, description: "Only this block type's settings." },
-      part: partArg,
+      recipe: { type: "string", minLength: 1, maxLength: 200, description: "A recipe name from this section's guidance: returns its example." },
+      part: { ...partArg, description: "For a theme whose guidance is one long text: which part to return." },
     },
     required: ["type"],
     additionalProperties: false,
   },
   annotations: { readOnlyHint: true, openWorldHint: false },
   async run(ctx) {
-    const { type, language, block: onlyBlock, part = 1 } = ctx.args;
+    const { type, language, block: onlyBlock, recipe, part = 1 } = ctx.args;
     const { scope, project } = await ctx.openSite();
     const lang = ctx.language(language);
     const [schemas, locale] = await Promise.all([ctx.reader.widgetSchemas(scope, lang), ctx.reader.labelLocale(scope)]);
@@ -196,23 +241,19 @@ export const sectionDetailsTool = {
     }
 
     const guidance = await ctx.reader.widgetGuidance(scope, schema).catch(() => null);
-    const guidancePart = guidance ? textPart(guidance, part) : null;
+    const source = schema.source?.kind === "core" ? `Widgetizer ${ctx.appInfo.version}` : `${project.theme} ${project.themeVersion ?? ""}`.trim();
+    if (recipe && !guidance) throw toolError("RECIPE_NOT_FOUND", `${type} has no guidance, so no recipes.`);
+    if (recipe) return { data: { ...ctx.about(lang), type, guidance: guidanceDto(guidance, { source, part, recipe, type, global: schema.source?.kind === "global" }) } };
     const result = {
       ...ctx.about(lang),
       type,
       name: label(schema.displayName, locale) ?? type,
       placement: schema.source?.kind === "global" ? "header/footer" : "page",
-      settings: (schema.settings ?? []).filter(isEditable).map((setting) => settingDto(setting, locale)),
+      settings: [...(schema.settings ?? []), ...listingSettingsFor(schema)].filter(isEditable).map((setting) => settingDto(setting, locale)),
       blocks: (schema.blocks ?? []).map(blockDto),
       ...(schema.maxBlocks !== undefined ? { maxBlocks: schema.maxBlocks } : {}),
       ...(CORE_CAVEATS[type] ? { caveat: CORE_CAVEATS[type] } : {}),
-      guidance: guidancePart
-        ? {
-            source: schema.source?.kind === "core" ? `Widgetizer ${ctx.appInfo.version}` : `${project.theme} ${project.themeVersion ?? ""}`.trim(),
-            advisory: true,
-            ...guidancePart,
-          }
-        : null,
+      guidance: guidanceDto(guidance, { source, part }),
     };
     if (JSON.stringify(result).length > RESULT_BUDGET_CHARS) {
       result.blocks = result.blocks.map(({ type: blockType, name, settings }) => ({
@@ -223,5 +264,41 @@ export const sectionDetailsTool = {
       }));
     }
     return { data: result };
+  },
+};
+
+export const themeGuideTool = {
+  name: "theme_guide",
+  title: "Theme guide",
+  description:
+    "How the open site's theme composes pages, written by the theme's author: what its colour schemes mean, spacing, which sections open a page, header and footer, collections, dos and don'ts. Read it before building or restructuring pages. Advisory; the user's request comes first. Long guides come in parts.",
+  inputSchema: {
+    type: "object",
+    properties: { part: partArg },
+    additionalProperties: false,
+  },
+  annotations: { readOnlyHint: true, openWorldHint: false },
+  async run(ctx) {
+    const { part = 1 } = ctx.args;
+    const { scope, project } = await ctx.openSite();
+    const guidance = typeof ctx.reader.themeGuidance === "function" ? await ctx.reader.themeGuidance(scope).catch(() => null) : null;
+    const theme = { id: project.theme, version: project.themeVersion ?? null };
+    if (!guidance?.trim()) {
+      return {
+        data: {
+          ...ctx.about(),
+          theme,
+          guidance: null,
+          note: "This theme ships no composition guide. Go by section_details and the section purposes in theme_catalog.",
+        },
+      };
+    }
+    return {
+      data: {
+        ...ctx.about(),
+        theme,
+        guidance: { source: `${project.theme} ${project.themeVersion ?? ""}`.trim(), advisory: true, ...textPart(guidance, part) },
+      },
+    };
   },
 };

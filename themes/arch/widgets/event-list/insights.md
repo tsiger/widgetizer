@@ -1,77 +1,89 @@
-# Event List Widget
+# event-list
 
-A date-driven list of upcoming events, each shown as a card with a prominent day/month badge, location, description, and call-to-action button.
+## Purpose
 
----
+A vertical list of upcoming events, one card per row, each led by a large day-and-month badge, with the event name, a location line, an optional richtext description and a button. Use it for a handful of dated happenings: workshops, open days, gigs, classes, fundraisers.
 
-## Settings Levers
+The badge is the point: it tells visitors at a glance that this content is time-bound. Cards stack full-width, so the list grows tall quickly; it is a curated "next few" rather than a full calendar.
 
-| Setting | Values | Visual Effect |
-|---------|--------|---------------|
-| `eyebrow` | Any text (blank by default) | Small label above the headline, useful for "What's On" or "Save the Date" framing |
-| `eyebrow_uppercase` | `true` / `false` (default) | Uppercases the eyebrow text for a more formal label treatment |
-| `title` | Any text (default "Upcoming Events") | Section headline; renders as `<h1>` when the widget is the first on the page, `<h2>` otherwise |
-| `description` | Any text (blank by default) | Paragraph below the headline for context or a short invitation |
-| `heading_alignment` | `start`, `center` (default) | Left-aligns the header block for editorial layouts; center works for standalone sections |
-| `color_scheme` | `standard-primary`, `standard-secondary`, `highlight-primary`, `highlight-secondary` | **standard** -- no card background or border. **standard-secondary** -- adds secondary background + border to each card. **highlight** -- tinted section background + card border. **highlight-secondary** -- tinted section background + secondary card fill + border |
-| `top_spacing` | `auto` (default), `small`, `none` | `small` reduces spacing for tighter rhythm; `none` removes it entirely for flush stacking |
-| `bottom_spacing` | `auto` (default), `small`, `none` | Same as above for the bottom edge |
+## When to use
 
----
+- The main section of an `events` page, or a "what's on" block on the home page between the opener and the closing call to action.
+- Good for: three to six dated events with a place and a short pitch; a one-evening programme (doors, dinner, auction) using the badge for times. Bad for: a weekly timetable (use `schedule-table` or `class-schedule`), a long archive, undated announcements (use `card-grid` or `news-grid`).
+- It can open a page: its title becomes the page heading when first. It cannot sit under a header with `transparent_on_hero`; only `banner`, `slideshow` and `video-popup` support the transparent header.
+- Natural neighbours: `banner` or `rich-text` above, `countdown` for the headline event, `map` or `contact-details` after, `action-bar` to close.
+- Needs a day, a month and a title per event; location and description are optional. Three to five events feel curated; more than eight reads as a database dump.
+- Fits venues, studios, gyms, schools, galleries, churches and community groups, restaurants with themed nights.
 
-## Available Blocks
+## Pitfalls
 
-| Block Type | Key Settings | Notes |
-|------------|-------------|-------|
-| `event` | `day` (text, e.g. "15"), `month` (text, e.g. "Dec"), `title`, `location`, `description` (richtext), `button_link` (text + href + target) | Each block renders as one event card. The date badge is always visible. Description supports rich text (sanitized HTML). The button is a secondary-style link; leave its text blank to hide it entirely. |
+- Dates are typed text, not a calendar. Nothing hides an event once it has passed, so someone must remove or update the blocks; stale events are worse than none.
+- Keep `day` to a number and `month` to a three-letter abbreviation. The badge is a fixed square; "15th" or "September" overflows it.
+- The badge shows no year and no time. Put the time in `location` ("Main Hall, 7pm"), and for events far ahead put the year in the title or description.
+- Button text is the signal: "Get Tickets", "RSVP", "Register" and "Learn More" set very different expectations. Leave the button text blank to hide the button entirely.
+- Descriptions are optional. Leave them empty for an at-a-glance agenda; for events that need selling, one or two sentences is enough, since each card is a full row and long text makes the list very tall.
+- On `standard-primary` the cards have no border or fill; `standard-secondary` and the highlight schemes outline each card, which helps on busy pages. Any scheme other than `standard-primary` pads the list inside its own coloured band, so `top_spacing` and `bottom_spacing` set to `none` remove that inner padding; under a filled hero use `small`.
 
----
+## Recipes
 
-## Layout Recipes
+### What's on
 
-### 1. Simple Upcoming-Events Section
-- **Settings**: title "Upcoming Events", heading_alignment center, color_scheme standard-primary
-- **Blocks**: 3 events with day/month, title, location, and "Learn More" buttons
-- **Good for**: Default starting point on any site that hosts occasional events
+The default starting point: three events with place and time and a neutral button. The user supplies the dates, names, locations and links.
 
-### 2. Workshop Schedule with Accent Cards
-- **Settings**: eyebrow "Workshops", title "Hands-On Sessions", heading_alignment start, color_scheme standard-secondary
-- **Blocks**: 4-6 events, each with a description paragraph explaining what attendees will learn and a "Reserve a Spot" button
-- **Good for**: Highlighting educational or training events where the description copy matters
+```json
+{
+  "type": "event-list",
+  "settings": { "title": "Upcoming Events", "heading_alignment": "center", "color_scheme": "standard-primary" },
+  "blocks": [
+    { "type": "event", "settings": { "day": "12", "month": "Mar", "title": "Placeholder Event One", "location": "Main Hall, 7pm", "button_link": { "text": "Learn More", "href": "contact.html" } } },
+    { "type": "event", "settings": { "day": "26", "month": "Mar", "title": "Placeholder Event Two", "location": "Studio Two, 10am", "button_link": { "text": "Learn More", "href": "contact.html" } } },
+    { "type": "event", "settings": { "day": "9", "month": "Apr", "title": "Placeholder Event Three", "location": "Online", "button_link": { "text": "Learn More", "href": "contact.html" } } }
+  ]
+}
+```
 
-### 3. Highlighted Concert / Performance Calendar
-- **Settings**: eyebrow "Live Music", title "What's On", heading_alignment center, color_scheme highlight-secondary, top_spacing small (docked below an image hero — the hero's bottom spacing is internal padding, so `small` supplies the gap; use `none` only if the hero shares the same highlight scheme and the two should fuse into one band)
-- **Blocks**: 5-8 events, location set to venue + time, button text "Get Tickets"
-- **Good for**: Venues that rotate acts frequently and want a bold, attention-grabbing listing
+### Workshops with descriptions
 
-### 4. Minimal Agenda (No Descriptions)
-- **Settings**: title "Schedule", heading_alignment start, color_scheme standard-primary
-- **Blocks**: 3-5 events with day/month, title, and location only -- leave description and button_link blank
-- **Good for**: A clean at-a-glance schedule where visitors just need dates, names, and places
+Educational sessions where the pitch matters, on a soft surface with outlined cards. The user supplies a one- or two-sentence description per workshop.
 
-### 5. Seasonal Open-House Dates
-- **Settings**: eyebrow "Visit Us", title "Open House Dates", description "Come tour our space and meet the team.", heading_alignment center, color_scheme highlight-primary
-- **Blocks**: 2-3 events with short descriptions and "RSVP" buttons
-- **Good for**: Driving foot traffic to periodic in-person visits
+```json
+{
+  "type": "event-list",
+  "settings": { "eyebrow": "Workshops", "title": "Hands-On Sessions", "heading_alignment": "start", "color_scheme": "standard-secondary" },
+  "blocks": [
+    { "type": "event", "settings": { "day": "4", "month": "May", "title": "Introduction Workshop", "location": "Workshop Room, 6pm to 8pm", "description": "<p>Placeholder description of what participants will learn and take home.</p>", "button_link": { "text": "Reserve a Spot", "href": "contact.html" } } },
+    { "type": "event", "settings": { "day": "18", "month": "May", "title": "Intermediate Workshop", "location": "Workshop Room, 6pm to 8pm", "description": "<p>Placeholder description of the follow-on session.</p>", "button_link": { "text": "Reserve a Spot", "href": "contact.html" } } }
+  ]
+}
+```
 
-### 6. Class & Program Schedule
-- **Settings**: eyebrow "This Month", title "Classes & Programs", heading_alignment start, color_scheme standard-secondary
-- **Blocks**: 4-6 events for recurring classes or programs with descriptions outlining what participants will do, buttons linking to registration or booking
-- **Good for**: Businesses that run scheduled classes, sessions, or programs and want a clear upcoming lineup
+### Minimal agenda
 
-### 7. Fundraiser Gala Timeline
-- **Settings**: eyebrow "Annual Gala", title blank (rely on a hero above), heading_alignment start, color_scheme highlight-secondary, top_spacing none if the hero above uses the same highlight-secondary scheme (the two fuse into one band), otherwise small — an image hero's bottom spacing is internal padding, so `none` under it presses the list against the image edge
-- **Blocks**: 3-4 events representing gala milestones (Cocktail Hour, Dinner, Auction, After-Party), descriptions painting the scene, button text "Buy Table"
-- **Good for**: Giving donors a vivid sense of the evening's flow
+Dates, names and places only; no descriptions or buttons. The user supplies three to five entries.
 
----
+```json
+{
+  "type": "event-list",
+  "settings": { "title": "Schedule", "heading_alignment": "start", "color_scheme": "standard-primary" },
+  "blocks": [
+    { "type": "event", "settings": { "day": "3", "month": "Jun", "title": "Placeholder Session", "location": "Room A, 9am", "button_link": { "text": "", "href": "" } } },
+    { "type": "event", "settings": { "day": "10", "month": "Jun", "title": "Placeholder Session", "location": "Room A, 9am", "button_link": { "text": "", "href": "" } } },
+    { "type": "event", "settings": { "day": "17", "month": "Jun", "title": "Placeholder Session", "location": "Room B, 9am", "button_link": { "text": "", "href": "" } } }
+  ]
+}
+```
 
-## Differentiation Tips
+### Highlighted gig calendar
 
-- **Date badge is the star.** Unlike a generic card grid, the oversized day + month badge instantly communicates "this is time-sensitive." Use short month abbreviations (Jan, Feb) and numeric days to keep the badge scannable.
-- **Pair with a hero or banner above.** Use a highlight color scheme with top_spacing small so the events section feels like a continuation of the page's main message, not a bolted-on afterthought. An image or filled hero spaces itself with internal padding, so `small` provides the docked look; drop to `none` only when the hero shares the same color scheme and the two sections should read as a single band.
-- **Keep event count intentional.** Three to five events feels curated; more than eight starts to feel like an unfiltered database dump. If you have many events, show only the next few and link to a full calendar page.
-- **Location doubles as context.** The location field is free text -- use it for "Online" vs. a city name, or append a time ("Brooklyn, NY -- 7 PM"). This single line often answers the two biggest questions visitors have: where and when.
-- **Rich-text descriptions are optional power.** For simple listings, skip the description entirely for a tighter layout. For events that need selling (workshops, galas), use a one- or two-sentence pitch in the description to drive registrations.
-- **Button text signals intent.** "Register Now," "Get Tickets," "RSVP," and "Learn More" set very different expectations. Match the button label to the action visitors will actually take on the linked page.
-- **Color-scheme accent variants add card separation.** On pages with lots of content sections, switching to standard-secondary or highlight-secondary gives each event card a visible boundary, preventing the list from blending into surrounding widgets.
+A bold listing for a venue, docked under an image opener; add five to eight entries. The user supplies the acts, times and ticket links.
+
+```json
+{
+  "type": "event-list",
+  "settings": { "eyebrow": "Live Music", "title": "What's On", "heading_alignment": "center", "color_scheme": "highlight-secondary", "top_spacing": "small" },
+  "blocks": [
+    { "type": "event", "settings": { "day": "7", "month": "Oct", "title": "Placeholder Act", "location": "Doors 8pm", "button_link": { "text": "Get Tickets", "href": "contact.html" } } },
+    { "type": "event", "settings": { "day": "14", "month": "Oct", "title": "Placeholder Act", "location": "Doors 8pm", "button_link": { "text": "Get Tickets", "href": "contact.html" } } }
+  ]
+}
+```

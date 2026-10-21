@@ -1,175 +1,82 @@
-# Content Switcher Widget
+# content-switcher
 
-Tabbed or toggle-based card grid that lets visitors flip between 2-3 groups of items without leaving the section -- built for pricing tiers, service comparisons, or any "pick a lens" pattern.
+## Purpose
 
----
+A card grid with a switch above it: visitors flip between two groups of cards (a toggle) or three (tabs) without leaving the section. Built for monthly/yearly plans, services for different audiences, or any "pick a lens" comparison where each view has its own set of cards.
 
-## Settings Levers
+Every card belongs to exactly one view through its `target_option`, so each view needs its own complete set of `item` blocks. A card shows an optional image, title, a large price line, richtext body and a secondary button. Text inside cards is centred.
 
-| Setting | Values | Visual Effect |
-|---------|--------|---------------|
-| `eyebrow` | Any text | Small label above the headline (e.g., "Pricing", "Our Plans"). Omit to hide. |
-| `eyebrow_uppercase` | `true` / `false` (default) | Uppercases the eyebrow text for a more formal label treatment |
-| `title` | Any text | Section headline. Renders as `<h1>` when the widget is the first on the page, `<h2>` otherwise. |
-| `description` | Any text | Paragraph below the headline providing context. Omit to hide. |
-| `heading_alignment` | `start`, `center` (default) | Centers or left-aligns the header block **and** the switcher buttons. Left alignment gives a more editorial feel. |
-| `switcher_type` | `toggle` (default), `tabs` | **Toggle** shows exactly 2 options. **Tabs** unlocks a third option button, allowing 3 content groups. |
-| `option_1_label` | Text | Label for the first switcher button (e.g., "Monthly"). Leave blank to hide the entire first tab and its panel. |
-| `option_2_label` | Text | Label for the second button (e.g., "Yearly"). |
-| `option_3_label` | Text | Label for the third button. Only visible when `switcher_type` is `tabs`. |
-| `columns` | 2 -- 5 (default 3) | Number of card columns on desktop. Cards stack on mobile regardless. |
-| `aspect_ratio` | `auto`, `1/1`, `4/3` (default), `3/2`, `3/4`, `16/9` | Constrains card image proportions. Use `auto` when cards have no images or images vary. |
-| `color_scheme` | `standard-primary`, `standard-secondary`, `highlight-primary`, `highlight-secondary` | **standard** = transparent background, no card border. **standard-secondary** = transparent background + card gets a secondary bg and border. **highlight** = full-width background + card border. **highlight-secondary** = full-width bg + card secondary bg and border. |
-| `top_spacing` | `auto` (default), `small`, `none` | `small` reduces spacing for tighter rhythm; `none` removes it entirely for flush stacking |
-| `bottom_spacing` | `auto` (default), `small`, `none` | Same as above for the bottom edge |
+## When to use
 
----
+- Mid-page on a `pricing` or `services` page, or as the offer section of a landing page.
+- Good for: billing cycles, residential vs commercial, adults vs kids, dine-in vs takeaway, before/after image pairs. Bad for: a single list of services (use `icon-card-grid`), a feature matrix (use `comparison-table`), one plan set with a featured column (use `pricing`).
+- It can open a page: its title becomes the page heading when it is first. Under a header with `transparent_on_hero` it cannot, because only `banner`, `slideshow` and `video-popup` support the transparent header.
+- Natural neighbours: an `accordion` of questions directly below, an `action-bar` after it, `testimonials` before it.
+- Needs at least two cards per view; three cards per view with `columns` set to 3 is the classic shape. Views with very different card counts make the section jump in height when switched.
+- Fits gyms, studios, salons, agencies, software services, restaurants with distinct formats, retailers with a natural two-way split.
 
-## Available Blocks
+## Pitfalls
 
-| Block Type | Key Settings | Notes |
-|------------|-------------|-------|
-| `item` | `title` (text), `text` (richtext), `image`, `price` (text), `link` (url + label), `target_option` (1, 2, or 3) | Each item card. **`target_option`** assigns the card to a specific switcher panel. You need a full set of cards per option group -- cards are not shared across tabs. Price renders in a large bold heading style. Link renders as a secondary button at the card bottom. All fields are optional; omit image and price for a text-only card. |
+- `toggle` shows two views; `tabs` is what unlocks `option_3_label`. A third label set while `switcher_type` is `toggle` is silently ignored, and cards with `target_option` `3` are then unreachable.
+- Never leave `option_1_label` blank: the first view is the one shown on load, and without its button nothing is visible until a visitor clicks another option. Blank out `option_3_label` instead when you want fewer views.
+- Cards are not shared. The same offer in two views means two `item` blocks with different `target_option` values, which also lets the title, price and text differ per view.
+- `price` is set very large. It dominates the card, so use it only for a real price or a short figure such as a duration; leave it blank for portfolios and catalogues and the card tightens up.
+- `aspect_ratio` only matters when cards carry images. Use `auto` for text-only cards and give every image in a view the same ratio, or the row bottoms go ragged.
+- Keep `columns` at or below the number of cards per view: four columns with three cards leaves a hole. Five columns only suit short, image-led cards.
+- On `standard-secondary` and the two highlight schemes cards get a border and a filled background; on `standard-primary` cards float on the page with no outline. Any scheme other than `standard-primary` also pads the whole section inside its own coloured band, so `top_spacing` and `bottom_spacing` set to `none` remove that inner padding. Under a filled hero use `small`.
+- Button text falls back to a generic label when only an `href` is given; always write the link `text`. Keep card titles to a few words and the body to one short paragraph or a short list.
 
----
+## Recipes
 
-## Layout Recipes
+### Monthly or yearly plans
 
-### 1. Membership / Class Pass Pricing Toggle
+Three plans, two billing cycles. The user supplies the plan names, what each includes and the real prices; no images needed.
 
-| Setting | Value |
-|---------|-------|
-| `switcher_type` | `toggle` |
-| `option_1_label` | Monthly |
-| `option_2_label` | Class Pack |
-| `columns` | 3 |
-| `heading_alignment` | `center` |
-| `color_scheme` | `standard-secondary` |
-| `aspect_ratio` | `auto` |
+```json
+{
+  "type": "content-switcher",
+  "settings": { "eyebrow": "Membership", "title": "Choose Your Plan", "switcher_type": "toggle", "option_1_label": "Monthly", "option_2_label": "Yearly", "columns": 3, "aspect_ratio": "auto", "color_scheme": "standard-secondary" },
+  "blocks": [
+    { "type": "item", "settings": { "title": "Starter", "price": "$00/mo", "text": "<p>Placeholder summary of the plan.</p>", "link": { "text": "Get Started", "href": "contact.html" }, "target_option": "1" } },
+    { "type": "item", "settings": { "title": "Standard", "price": "$00/mo", "text": "<p>Placeholder summary of the plan.</p>", "link": { "text": "Get Started", "href": "contact.html" }, "target_option": "1" } },
+    { "type": "item", "settings": { "title": "Unlimited", "price": "$00/mo", "text": "<p>Placeholder summary of the plan.</p>", "link": { "text": "Get Started", "href": "contact.html" }, "target_option": "1" } },
+    { "type": "item", "settings": { "title": "Starter", "price": "$00/yr", "text": "<p>Placeholder summary, billed yearly.</p>", "link": { "text": "Get Started", "href": "contact.html" }, "target_option": "2" } },
+    { "type": "item", "settings": { "title": "Standard", "price": "$00/yr", "text": "<p>Placeholder summary, billed yearly.</p>", "link": { "text": "Get Started", "href": "contact.html" }, "target_option": "2" } },
+    { "type": "item", "settings": { "title": "Unlimited", "price": "$00/yr", "text": "<p>Placeholder summary, billed yearly.</p>", "link": { "text": "Get Started", "href": "contact.html" }, "target_option": "2" } }
+  ]
+}
+```
 
-Create 3 item blocks per option (6 total). Use `price` for dollar amounts and `text` for what's included. Add "Sign Up" links.
+### Services by audience, three tabs
 
-**Good for:** Businesses with recurring memberships and drop-in alternatives.
+Three customer segments, each with its own service line-up and quote button; add two or three cards per tab. The user supplies the segment names and the services; no prices or images.
 
----
+```json
+{
+  "type": "content-switcher",
+  "settings": { "eyebrow": "Services", "title": "Built for the Way You Work", "switcher_type": "tabs", "option_1_label": "Residential", "option_2_label": "Commercial", "option_3_label": "Industrial", "columns": 3, "aspect_ratio": "auto", "color_scheme": "standard-primary" },
+  "blocks": [
+    { "type": "item", "settings": { "title": "Home Service", "text": "<ul><li>Placeholder scope item</li><li>Placeholder scope item</li></ul>", "link": { "text": "Request a Quote", "href": "contact.html" }, "target_option": "1" } },
+    { "type": "item", "settings": { "title": "Office Service", "text": "<ul><li>Placeholder scope item</li><li>Placeholder scope item</li></ul>", "link": { "text": "Request a Quote", "href": "contact.html" }, "target_option": "2" } },
+    { "type": "item", "settings": { "title": "Plant Service", "text": "<ul><li>Placeholder scope item</li><li>Placeholder scope item</li></ul>", "link": { "text": "Request a Quote", "href": "contact.html" }, "target_option": "3" } }
+  ]
+}
+```
 
-### 2. Three-Tier Service Packages with Tabs
+### Before and after pairs
 
-| Setting | Value |
-|---------|-------|
-| `switcher_type` | `tabs` |
-| `option_1_label` | Residential |
-| `option_2_label` | Commercial |
-| `option_3_label` | Industrial |
-| `columns` | 3 |
-| `heading_alignment` | `center` |
-| `color_scheme` | `highlight-secondary` |
-| `aspect_ratio` | `auto` |
+Two columns, each project in the same grid position in both views, no prices. The user supplies matching before and after photos (same orientation) for two to four projects.
 
-Each tab shows a different audience's service lineup. Use `text` richtext for bullet-pointed scope descriptions and `link` for "Request a Quote."
+```json
+{
+  "type": "content-switcher",
+  "settings": { "eyebrow": "Results", "title": "See the Difference", "heading_alignment": "start", "switcher_type": "toggle", "option_1_label": "Before", "option_2_label": "After", "columns": 2, "aspect_ratio": "3 / 2", "color_scheme": "standard-primary" },
+  "blocks": [
+    { "type": "item", "settings": { "title": "Project One", "text": "", "target_option": "1" } },
+    { "type": "item", "settings": { "title": "Project Two", "text": "", "target_option": "1" } },
+    { "type": "item", "settings": { "title": "Project One", "text": "", "target_option": "2" } },
+    { "type": "item", "settings": { "title": "Project Two", "text": "", "target_option": "2" } }
+  ]
+}
+```
 
-**Good for:** Service businesses that serve multiple market segments from one page.
-
----
-
-### 3. Before / After Portfolio Showcase
-
-| Setting | Value |
-|---------|-------|
-| `switcher_type` | `toggle` |
-| `option_1_label` | Before |
-| `option_2_label` | After |
-| `columns` | 2 |
-| `heading_alignment` | `start` |
-| `color_scheme` | `standard-primary` |
-| `aspect_ratio` | `3/2` |
-
-Pair images across both options so the same project appears in the same grid position. Use `title` for the project name and leave `price` blank.
-
-**Good for:** Transformation-driven businesses that need to show results visually.
-
----
-
-### 4. Dine-In / Takeout / Catering Menus
-
-| Setting | Value |
-|---------|-------|
-| `switcher_type` | `tabs` |
-| `option_1_label` | Dine-In |
-| `option_2_label` | Takeout |
-| `option_3_label` | Catering |
-| `columns` | 4 |
-| `heading_alignment` | `center` |
-| `color_scheme` | `highlight-primary` |
-| `aspect_ratio` | `1/1` |
-
-Use `image` for dish photos, `title` for the dish name, `price` for the price, and `text` for a short description. Link to an online ordering page.
-
-**Good for:** Restaurants and food businesses with distinct service formats.
-
----
-
-### 5. Adults / Kids Service Split
-
-| Setting | Value |
-|---------|-------|
-| `switcher_type` | `toggle` |
-| `option_1_label` | Adults |
-| `option_2_label` | Kids |
-| `columns` | 3 |
-| `heading_alignment` | `center` |
-| `color_scheme` | `standard-secondary` |
-| `aspect_ratio` | `auto` |
-
-Each tab shows services tailored to the audience. Use `price` for per-session or package pricing and `text` for what's included.
-
-**Good for:** Businesses that serve both adults and children with different offerings or pricing.
-
----
-
-### 6. Location-Based Service Catalog
-
-| Setting | Value |
-|---------|-------|
-| `switcher_type` | `tabs` |
-| `option_1_label` | Downtown |
-| `option_2_label` | Westside |
-| `option_3_label` | Northshore |
-| `columns` | 3 |
-| `heading_alignment` | `start` |
-| `color_scheme` | `highlight-secondary` |
-| `aspect_ratio` | `4/3` |
-
-Each tab shows the services or classes available at a specific location. Use `image` for location/facility photos and `link` for booking.
-
-**Good for:** Multi-location businesses where offerings differ by branch.
-
----
-
-### 7. Product Lines by Category
-
-| Setting | Value |
-|---------|-------|
-| `switcher_type` | `toggle` |
-| `option_1_label` | Shop Dogs |
-| `option_2_label` | Shop Cats |
-| `columns` | 4 |
-| `heading_alignment` | `center` |
-| `color_scheme` | `standard-primary` |
-| `aspect_ratio` | `1/1` |
-
-Product images with titles and prices. Link each card to a product detail page or external shop. No richtext needed -- keep cards visual and scannable.
-
-**Good for:** Small retailers or makers who have a natural two-way product split.
-
----
-
-## Differentiation Tips
-
-- **Toggle vs. Tabs is a content decision.** Use toggle (2 options) when the choice is binary -- monthly/yearly, before/after, basic/pro. Use tabs (3 options) when you have three genuinely distinct groups. Do not force a third tab just because it exists.
-- **Cards are duplicated, not shared.** Each tab panel maintains its own set of item blocks. If you want the same card in two tabs, you must create two separate item blocks with different `target_option` values. This is intentional -- it lets you customize titles, prices, and descriptions per option.
-- **Price is optional but prominent.** When `price` is present it dominates the card visually. If you are not showing prices (e.g., a portfolio or catalog), leave the field blank and the layout adjusts cleanly.
-- **Pair this widget with a FAQ below it.** Pricing and service comparison sections naturally generate questions. A FAQ widget directly underneath (with `top_spacing: none` on the FAQ) creates a seamless flow.
-- **Left-align for editorial pages, center for landing pages.** Left-aligned headers with a toggle feel like part of a content page. Centered headers with accent cards feel like a standalone pricing section.
-- **Use `highlight-secondary` to make the section feel like a self-contained module.** The background color plus card borders create strong visual separation from surrounding content -- useful when the switcher lives mid-page between other widgets.
-- **Keep column count proportional to content.** 2 columns for comparison pairs, 3 for classic pricing tiers, 4-5 for lightweight catalog grids with images. Avoid 5 columns if cards contain long text -- it gets cramped.

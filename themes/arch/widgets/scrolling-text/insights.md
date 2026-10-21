@@ -1,149 +1,115 @@
-# Scrolling Text Widget — Insights
+# scrolling-text
 
-## Description
+## Purpose
 
-An infinite-scroll marquee strip that repeats a short phrase across the viewport, optionally rotated at an angle, used as a visual divider or attention-grabbing banner between page sections.
+A slim, endlessly scrolling strip that repeats one short phrase across the full width, optionally tilted. It is a decorative divider or a one-line announcement between sections, not a place for information people must read.
 
----
+The phrase repeats many times with a separator glyph between copies, so the strip is always full however wide the screen. It paints its own band colour and text colour rather than using a colour scheme, and it has no heading and no blocks.
 
-## Settings Levers
+## When to use
 
-| Setting | Type / Values | Visual Effect |
-|---|---|---|
-| **text** | Free text (default: "We build modern brands.") | The phrase that repeats across the strip. Keep it short for best rhythm. |
-| **separator** | Free text (default: star symbol) | Glyph shown at 60% opacity between each text repetition. Leave blank to remove. |
-| **speed** | Range 1 -- 20 (default: 8) | Higher = faster scroll. Internally mapped to a CSS duration (lower duration = faster). 1 is a slow crawl, 20 is rapid. |
-| **rotate** | Range -15 to 15 degrees (default: -5) | Tilts the entire strip. Negative = top-left to bottom-right slant. 0 = perfectly horizontal. |
-| **font_size** | sm / md / lg / xl (default: md) | Maps to CSS custom-property tiers from base up to 3xl. xl dominates the viewport. |
-| **bg_color** | Color with alpha (default: #1e3a8a, deep blue) | Strip background. Alpha support means you can make it semi-transparent over the section behind it. |
-| **text_color** | Color (default: #ffffff) | Color for both the text and the separator. |
-| **top_spacing** | auto (default) / small / none | Controls padding above the strip wrapper. small reduces spacing for tighter rhythm; none removes it entirely for flush stacking. |
-| **bottom_spacing** | auto (default) / small / none | Controls padding below the strip wrapper. small reduces spacing for tighter rhythm; none removes it entirely for flush stacking. |
+- A bridge element: between a hero and the first content section, between two long sections, or just before the footer. It is a `small` spacing candidate by nature.
+- Good for brand mottos, availability notices ("Now booking spring projects"), a product line-up, city names, or a repeated word that sets a mood.
+- Bad for anything factual: dates, prices, phone numbers, legal text. Moving text is hard to read and skipped by many visitors.
+- It cannot open a page: there is no heading, so the page would have no title. Under a transparent header it is not a hero either.
+- Natural neighbours: `banner`, `split-hero`, `gallery`, `card-grid`, `logo-cloud`, `trust-bar`. Do not stack it next to `trust-bar` or `logo-cloud`; two strips in a row read as clutter.
+- One per page. Two is already a pattern; three is noise.
+- Fits creative studios, agencies, cafés, breweries, fashion and lifestyle brands, event venues, gyms. Rare on law, finance and medical sites.
 
----
+## Pitfalls
 
-## Available Blocks
+- Keep `text` to three to six words. The phrase repeats twenty times, so a sentence becomes a wall of moving text that nobody can follow.
+- `speed` is a feeling, not a reading speed: low values crawl (a full loop takes well over a minute), high values race. Mid values suit mottos; push high only for playful, urgent strips.
+- `rotate` is the signature move, but the strip needs room above and below to tilt into. That room is what `auto` spacing provides. With `top_spacing` or `bottom_spacing` set to `none` the tilted strip's corners are cut off, so use `none` only with `rotate` at 0.
+- Even at `rotate` 0, `none` on both sides glues the band to its neighbours; that is the right look only between two filled sections of a related colour.
+- Contrast is entirely yours: `bg_color` and `text_color` are free colours with no scheme behind them. Check the pair on the actual page, especially a semi-transparent `bg_color` over a dark neighbouring band.
+- A transparent or near-transparent `bg_color` turns the strip into floating text; it then needs a `text_color` that reads on the page background, and rotation looks odd without a visible band.
+- `font_size` `xl` dominates the screen on phones; reserve it for very short phrases (one or two words).
+- Emoji separators render differently on every device; a simple glyph (star, bullet, slash, dash) is safer.
+- The strip is animated. Visitors who have asked their system to reduce motion may see it still; keep the content non-essential so nothing is lost.
 
-This widget has **no blocks**. All content is controlled through the top-level settings above.
+## Recipes
 
----
+### Angled brand motto
 
-## Layout Recipes
+A tilted accent strip under the hero of a studio or agency home page. Set the brand accent as the band colour; no images needed.
 
-### 1. The Angled Accent Strip
+```json
+{
+  "type": "scrolling-text",
+  "settings": {
+    "text": "We build modern brands",
+    "separator": "★",
+    "speed": 7,
+    "rotate": -4,
+    "font_size": "md",
+    "bg_color": "#1e3a8a",
+    "text_color": "#ffffff",
+    "top_spacing": "small",
+    "bottom_spacing": "small"
+  }
+}
+```
 
-| Setting | Value |
-|---|---|
-| text | "Now Accepting New Clients" |
-| separator | (bullet or dash) |
-| speed | 6 |
-| rotate | -3 |
-| font_size | md |
-| bg_color | Brand accent color |
-| text_color | #ffffff |
-| top_spacing | none |
-| bottom_spacing | none |
+### Flat announcement band
 
-**Good for:** Placing between a hero section and the services grid to announce availability without a full banner. The slight angle adds energy without overwhelming the layout.
+A level strip for an availability or seasonal note between two content sections. Zero rotation lets it sit flush against a filled band below.
 
----
+```json
+{
+  "type": "scrolling-text",
+  "settings": {
+    "text": "Now booking spring projects",
+    "separator": "•",
+    "speed": 9,
+    "rotate": 0,
+    "font_size": "lg",
+    "bg_color": "#0f766e",
+    "text_color": "#ffffff",
+    "top_spacing": "auto",
+    "bottom_spacing": "none"
+  }
+}
+```
 
-### 2. Bold Sale Takeover
+### Quiet divider
 
-| Setting | Value |
-|---|---|
-| text | "Summer Sale -- 30% Off Everything" |
-| separator | (fire or sparkle emoji) |
-| speed | 12 |
-| rotate | 0 |
-| font_size | xl |
-| bg_color | #dc2626 (bright red) |
-| text_color | #ffffff |
-| top_spacing | none |
-| bottom_spacing | none |
+A slow, small, low-contrast strip that works as a textured rule between portfolio or long-form sections. The band is a faint tint of the page.
 
-**Good for:** Inserting at the very top of the page as a full-width urgency banner. Zero rotation and large text make it scan like a news ticker. High speed keeps the eye moving.
+```json
+{
+  "type": "scrolling-text",
+  "settings": {
+    "text": "Design · Build · Care",
+    "separator": "—",
+    "speed": 3,
+    "rotate": 0,
+    "font_size": "sm",
+    "bg_color": "#1e3a8a14",
+    "text_color": "#1e3a8a",
+    "top_spacing": "small",
+    "bottom_spacing": "small"
+  }
+}
+```
 
----
+### Big playful word
 
-### 3. Subtle Brand Whisper
+A single oversized word tilted the other way, for brands with personality: a brewery, a skate shop, a music venue. Supply nothing but the word.
 
-| Setting | Value |
-|---|---|
-| text | "Crafted with care in Portland" |
-| separator | (empty -- no separator) |
-| speed | 3 |
-| rotate | 0 |
-| font_size | sm |
-| bg_color | Brand color at low alpha, e.g. rgba with 0.08 opacity |
-| text_color | Muted gray or brand color |
-| top_spacing | auto |
-| bottom_spacing | auto |
-
-**Good for:** A quiet, textural divider between content sections. The slow speed and small text make it feel ambient rather than promotional. Semi-transparent background lets it blend into the page.
-
----
-
-### 4. Diagonal Event Countdown
-
-| Setting | Value |
-|---|---|
-| text | "Grand Opening June 15th" |
-| separator | star symbol |
-| speed | 8 |
-| rotate | -5 |
-| font_size | lg |
-| bg_color | #000000 |
-| text_color | #facc15 (gold/yellow) |
-| top_spacing | none |
-| bottom_spacing | none |
-
-**Good for:** Placed above the footer or between the about section and a contact form to build anticipation for a specific date. The black-and-gold contrast draws the eye. Default rotation gives it the "caution tape" energy that signals something is happening.
-
----
-
-### 5. Testimonial Highlight Ribbon
-
-| Setting | Value |
-|---|---|
-| text | "Rated 5 Stars by 200+ Happy Customers" |
-| separator | (star symbol) |
-| speed | 5 |
-| rotate | 2 |
-| font_size | md |
-| bg_color | #065f46 (deep green) |
-| text_color | #ffffff |
-| top_spacing | auto |
-| bottom_spacing | auto |
-
-**Good for:** Positioned just before a testimonials or reviews section to prime the visitor with a social-proof headline. The positive rotation (tilting upward left-to-right) gives a subtle optimistic feel.
-
----
-
-### 6. Minimalist Horizontal Rule
-
-| Setting | Value |
-|---|---|
-| text | Single word or short phrase, e.g. "Design" |
-| separator | (long dash or middot) |
-| speed | 2 |
-| rotate | 0 |
-| font_size | sm |
-| bg_color | Transparent or near-transparent |
-| text_color | Light gray (#d1d5db) |
-| top_spacing | none |
-| bottom_spacing | none |
-
-**Good for:** Replacing a plain `<hr>` between portfolio pieces or long-form content sections. At very slow speed and small size, it functions almost like a decorative border rather than a headline. Works best when the page already has strong visual content and just needs gentle separation.
-
----
-
-## Differentiation Tips
-
-- **Rotation is the signature move.** Most marquee widgets scroll flat. Even a small -3 to -5 degree tilt transforms the strip from a generic ticker into a design-forward element that feels intentional. Use it.
-- **Separator choice sets the tone.** A star feels playful, a bullet feels corporate, an emoji feels casual, and no separator at all feels refined. Match it to the brand voice.
-- **Speed signals intent.** Fast (10+) says "urgency, sale, action." Slow (1--4) says "ambient, crafted, calm." The default 8 is a safe middle. Push it to the extremes for a stronger personality.
-- **Semi-transparent backgrounds unlock layering.** Because bg_color supports alpha, you can overlay the strip on a hero image or colored section below it. This is especially powerful when combined with `top_spacing: none` and `bottom_spacing: none` to eliminate the gap.
-- **Pair rotation with flush spacing.** The angled strip looks best when it bleeds into neighboring sections (both spacings set to none). With auto spacing, the padding can make the rotation feel disconnected from the rest of the layout.
-- **Keep the text short.** The phrase repeats 20 times in the markup. Long sentences create a wall of text that is hard to read at scroll speed. Aim for 3--6 words maximum.
-- **Use it sparingly.** One scrolling strip per page is a statement. Two is a design system. Three is a headache. On most small business sites, a single placement between hero and content is the sweet spot.
+```json
+{
+  "type": "scrolling-text",
+  "settings": {
+    "text": "Fresh",
+    "separator": "/",
+    "speed": 12,
+    "rotate": 3,
+    "font_size": "xl",
+    "bg_color": "#f59e0b",
+    "text_color": "#111827",
+    "top_spacing": "auto",
+    "bottom_spacing": "auto"
+  }
+}
+```

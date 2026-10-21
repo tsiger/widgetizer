@@ -1,98 +1,111 @@
-# Footer Widget — Insights
+# footer
 
-Configurable multi-column footer with logo, text, navigation, and social blocks arranged on a 5-column desktop grid.
+## Purpose
 
----
+The site's closing band on every page: up to four columns chosen from logo and blurb, free text, a link list, social icons, business details and certification badges, with a small copyright line underneath. It is a global part: one footer, shared by every page.
 
-## Settings Levers
+By default it is a dark `highlight-primary` band that ends the page firmly; on a standard surface it fades into the page instead.
 
-| Setting | Values | Visual Effect |
-|---|---|---|
-| `copyright` | Any text / blank | When filled, renders a copyright line below the columns and adds bottom padding. When blank, the footer collapses to a compact block of columns only |
-| `layout` | `first-featured` (default), `last-featured`, `equal` | Controls column sizing. `first-featured` makes the first block span wider; `last-featured` makes the last block wider; `equal` gives all blocks the same width. Use `first-featured` when the logo/brand block leads; `last-featured` when you want social or a CTA to dominate |
-| `color_scheme` | `standard-primary`, `standard-secondary`, `highlight-primary` (default), `highlight-secondary` | `standard-primary` uses the page's default background so the footer blends in. `highlight-primary` creates a strong contrast band at the bottom. `highlight-secondary` is the most visually prominent option |
+## When to use
 
----
+- Every site has exactly one. Build it after the menus and the Project details exist, because `menu_block`, `social_block` and `business_details` draw on them.
+- Three or four columns suit most sites: `logo_text` with a one-sentence blurb, a `menu_block`, then contact details and social icons. A single `logo_text` column makes a quiet signature footer for portfolios.
+- Use `business_details` rather than typing an address into a `text_block`; it reads the address, phone, email and opening hours from Project details so they stay in step with what search engines are told.
+- `text_block` is for anything else: a short contact note, a registration number, a service area, a newsletter sentence.
+- `badges_block` is for third-party marks such as certifications, memberships and awards; it needs the badge images.
+- `copyright` holds the legal line only: year, business name, rights statement, perhaps a privacy link.
 
-## Available Blocks
+## Pitfalls
 
-Up to **4 blocks** can be added. Column sizing is controlled by the `layout` setting (`first-featured` / `last-featured` / `equal`).
+- The footer takes at most four blocks. A fifth cannot be added; combine contact and hours in `business_details` to free a column.
+- `layout` decides column widths: `first-featured` gives the first block a double column, `last-featured` the last, `equal` shares the width evenly. Put the block that carries the most text, usually `logo_text`, in the featured position; a featured `social_block` is a row of icons floating in empty space.
+- Blocks are laid out in their order, left to right. On phones they stack in the same order, so the most useful column (contact or menu) should not be last.
+- `menu_block` shows a flat list; submenus of the chosen menu are hidden. Point it at a shallow menu such as `footer-menu`, not at the nested `main-menu`.
+- `social_block` shows the profiles entered in Project details, or failing that the theme's social settings, with no per-block choice. With none set the column is just its title, so remove the block or fill in the profiles.
+- `business_details` and `social_block` render nothing from an empty Project details, which looks fine in the editor but leaves a bare title on the published site.
+- `copyright` left blank removes the line and its divider, and the footer closes with even padding; a line with only spaces still counts as blank.
+- `logo_width` sizes the footer logo separately from the header's. A small mark reads well at 80 to 120; a wide wordmark may need 200 or more. Supply a light logo version when the footer is on a highlight scheme.
+- `badges_block` images are capped by `max_height`; mixed badge shapes line up by height, so wide badges look larger than square ones. A `badge_1_link` and its siblings are optional; link only to pages that verify the badge.
+- Colour scheme continuity matters: if the last section of most pages is already a highlight band, a footer in the same highlight fuses with it into one tall block. Pick the other highlight or a standard surface, and keep the choice consistent across the site.
 
-| Block Type | Key Settings | Notes |
-|---|---|---|
-| `logo_text` | `logo` (image), `logo_text` (text fallback), `logo_width` (50-300 px), `text` (richtext) | Displays an image logo when provided; falls back to a styled text logo. The richtext area below is ideal for a tagline or short company description. Logo width slider prevents oversized logos from dominating the column |
-| `text_block` | `title`, `text` (richtext) | General-purpose column. Title renders as an h3 heading. Richtext supports paragraphs, links, line breaks. Good for contact info, hours, addresses |
-| `menu_block` | `title`, `menu` (menu reference, default `footer-menu`) | Pulls a site menu by name. Submenus are hidden by design, keeping the footer flat and scannable |
-| `social_block` | `title` | Renders the project's social profiles (Project details) when any are set, otherwise the global `theme.social` config. No per-block icon selection; the icon set is site-wide |
-| `business_details` | `title`, `show_address`, `show_contact`, `show_hours` (checkboxes, all on by default) | Draws the address, phone, email and opening hours entered in Project details, so they stay in step with what search engines read. Consecutive days with the same hours collapse into one line ("Mon–Fri"). Renders nothing on the published site when no details are set |
+## Recipes
 
----
+### Classic four columns
 
-## Layout Recipes
+Brand, contact, links and social on the default dark band with the brand column featured. The user supplies a light logo image, the blurb and the profiles in Project details.
 
-### 1. Classic Four-Column
+```json
+{
+  "type": "footer",
+  "settings": {
+    "copyright": "<p>© 2026 Business name. All rights reserved.</p>",
+    "layout": "first-featured",
+    "color_scheme": "highlight-primary"
+  },
+  "blocks": [
+    { "type": "logo_text", "settings": { "logo_text": "Business name", "logo_width": 120, "text": "<p>One sentence on what the business does and where.</p>" } },
+    { "type": "business_details", "settings": { "title": "Visit us", "show_address": true, "show_contact": true, "show_hours": true } },
+    { "type": "menu_block", "settings": { "title": "Explore", "menu": "footer-menu" } },
+    { "type": "social_block", "settings": { "title": "Follow" } }
+  ]
+}
+```
 
-| Block 1 | Block 2 | Block 3 | Block 4 |
-|---|---|---|---|
-| logo_text | text_block | menu_block | social_block |
+### Local business with hours
 
-- **Settings:** `color_scheme: highlight-primary`, copyright filled, logo_width ~100 px, text_block title "Contact", menu_block title "Quick Links", social_block title "Follow Us"
-- **Good for:** Businesses that need a professional, balanced footer covering branding, contact details, navigation, and social presence in one row
+Address, phone and opening hours lead the footer on a soft surface, for shops, cafés, clinics and salons. The user fills the address, phone, email and opening hours in Project details.
 
-### 2. Brand-Forward Minimal
+```json
+{
+  "type": "footer",
+  "settings": {
+    "copyright": "<p>© 2026 Business name</p>",
+    "layout": "first-featured",
+    "color_scheme": "standard-secondary"
+  },
+  "blocks": [
+    { "type": "business_details", "settings": { "title": "Find us", "show_address": true, "show_contact": true, "show_hours": true } },
+    { "type": "menu_block", "settings": { "title": "Pages", "menu": "footer-menu" } },
+    { "type": "logo_text", "settings": { "logo_text": "Business name", "text": "<p>A one-line description of the place.</p>" } }
+  ]
+}
+```
 
-| Block 1 | Block 2 |
-|---|---|
-| logo_text (wide richtext blurb) | social_block |
+### Signature footer
 
-- **Settings:** `color_scheme: highlight-secondary`, copyright filled, logo_width 200 px, logo_text richtext with a two-sentence mission statement
-- **Good for:** Creative studios and personal brands where the footer reinforces identity more than navigation
+A single brand column with a short statement, for portfolios and studios that want a quiet ending. The user supplies the logo image or site name and one sentence.
 
-### 3. Contact-Heavy Service Footer
+```json
+{
+  "type": "footer",
+  "settings": {
+    "copyright": "<p>© 2026 Studio name</p>",
+    "layout": "equal",
+    "color_scheme": "standard-primary"
+  },
+  "blocks": [
+    { "type": "logo_text", "settings": { "logo_text": "Studio name", "logo_width": 160, "text": "<p>One sentence that says what the studio stands for.</p>" } }
+  ]
+}
+```
 
-| Block 1 | Block 2 | Block 3 |
-|---|---|---|
-| logo_text | text_block ("Hours") | text_block ("Visit Us") |
+### Credentials and contact
 
-- **Settings:** `color_scheme: standard-secondary`, copyright filled. First text_block lists weekday and weekend hours. Second text_block has address, phone, and email. No menu or social blocks
-- **Good for:** Brick-and-mortar businesses where visitors primarily need location and availability info
+Brand, a plain contact note, certification badges and social icons on the second highlight surface, for trades and professional services. The user supplies two to four badge images and a light logo.
 
-### 4. Navigation-Dense Footer
-
-| Block 1 | Block 2 | Block 3 | Block 4 |
-|---|---|---|---|
-| logo_text | menu_block ("Services") | menu_block ("Company") | social_block |
-
-- **Settings:** `color_scheme: highlight-primary`, copyright filled, two separate menu_block instances pointing at different menus (e.g., `services-menu` and `company-menu`)
-- **Good for:** Sites with many pages where the footer doubles as a secondary sitemap
-
-### 5. Minimalist Single-Line
-
-| Block 1 |
-|---|
-| logo_text |
-
-- **Settings:** `color_scheme: standard-primary`, copyright filled with the legal line, logo_text only (no richtext body), logo_width kept small (~80 px)
-- **Good for:** Sites that want a quiet, unobtrusive footer that stays out of the way
-
-### 6. Community and Social Hub
-
-| Block 1 | Block 2 | Block 3 |
-|---|---|---|
-| logo_text | text_block ("Newsletter / Join Us" blurb) | social_block |
-
-- **Settings:** `color_scheme: highlight-secondary`, copyright filled. text_block richtext includes a CTA sentence and an email link. social_block title "Connect With Us"
-- **Good for:** Organizations that want the footer to drive community engagement rather than just close the page
-
----
-
-## Differentiation Tips
-
-- **Color scheme is the single biggest mood lever.** `highlight-primary` and `highlight-secondary` create a strong visual endpoint. `standard-primary` makes the footer nearly invisible, useful when the last content section already has a dark background.
-- **Omit the copyright text to get a compact footer.** When copyright is blank the widget switches to a symmetric 8 rem padding block. This works well for sites that handle legal text elsewhere or want a tidier bottom edge.
-- **Prefer business_details over a hand-typed text_block for address and hours.** The details come from Project details, so changing them there updates the footer and the structured data together.
-- **Use two text_blocks instead of one when contact info is complex.** Splitting hours and address into separate columns improves scannability on desktop and stacks cleanly on mobile.
-- **Logo width matters more than people expect.** A 50 px logo keeps the column compact and text-dominant; 200+ px turns the column into a visual brand anchor. Match the size to the footer's role: navigation-focused footers want a smaller logo, brand-focused footers want a larger one.
-- **The social_block pulls icons globally.** You cannot show different social icons per page. If a client needs platform-specific links (e.g., Yelp for a restaurant but Behance for a portfolio), configure the global theme social settings to include all relevant platforms.
-- **Menu blocks hide submenus intentionally.** The footer renders a flat list. If the client's sitemap is deep, create a dedicated shallow menu specifically for the footer rather than reusing the header's nested menu.
-- **Pair `highlight-secondary` with a single logo_text block for maximum brand impact.** The accent tint plus a large logo creates a footer that reads as a signature rather than a utility bar.
+```json
+{
+  "type": "footer",
+  "settings": {
+    "copyright": "<p>© 2026 Business name. Registered in Springfield, no. 0000000.</p>",
+    "layout": "equal",
+    "color_scheme": "highlight-secondary"
+  },
+  "blocks": [
+    { "type": "logo_text", "settings": { "logo_text": "Business name", "text": "<p>Serving Springfield and the surrounding area.</p>" } },
+    { "type": "text_block", "settings": { "title": "Contact", "text": "<p>hello@example.com</p><p>(555) 010-0100</p>" } },
+    { "type": "badges_block", "settings": { "title": "Accredited by", "max_height": 50 } },
+    { "type": "social_block", "settings": { "title": "Elsewhere" } }
+  ]
+}
+```

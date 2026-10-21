@@ -1,100 +1,173 @@
-# Slideshow Widget Insights
+# slideshow
 
-Full-width rotating banner carousel with up to 5 slides, each supporting a background image, overlay, headline, body text, and dual CTAs.
+## Purpose
 
-## Settings levers
+A full-width hero carousel of up to five slides, each with its own photo, tinted overlay, headline, short text and up to two buttons. It opens a home page that has several messages or several strong photographs to rotate through, and it supports the transparent header.
 
-| Setting | Values | Visual effect |
-|---------|--------|---------------|
-| height | `auto`, `small`, `medium`, `large` | Controls the vertical size of the slideshow container. `auto` adds internal padding instead of a fixed height; `small`/`medium`/`large` apply preset height classes for increasingly dramatic hero presence. |
-| fullwidth | `true` / `false` | When true (default), the slideshow spans edge-to-edge. When false, the slideshow is constrained to the site's content width with visible margins. |
-| autoplay | `true` (default) / `false` | Enables automatic slide rotation. When off, visitors must use arrows or dots to navigate. |
-| autoplay_speed | `3000`--`10000` ms (step 1000, default `5000`) | Duration each slide is visible before advancing. Lower values create energy; higher values give visitors time to read longer copy. |
+Slides advance automatically or by arrows and dots; a pause button appears when autoplay is on. A slide with an image is painted with the overlay colour so the text reads over the photo; a slide without an image is a flat band in its own colour scheme. The headline of the first slide becomes the page title when the slideshow is the first section.
 
-## Available blocks
+## When to use
 
-| Block | Key settings | Notes |
-|-------|-------------|-------|
-| **slide** (max 5) | `image` -- background photo | When present, adds `has-bg-image` and `has-overlay` classes; the overlay color is layered on top. Without an image the slide uses its color scheme background. |
-| | `heading_text` | Main headline. Rendered as `<h1>` on the very first slide of the first widget on the page, `<h2>` otherwise -- important for SEO. |
-| | `heading_size` (`lg` -- `9xl`, default `5xl`) | Tailwind-scale type sizing. Smaller sizes work for informational slides; `5xl`+ for bold hero statements. |
-| | `alignment` (`start`, `center` (default)) | Positions headline, body text, and buttons per slide. `center` creates a classic hero feel; `start` left-aligns everything for an editorial or portfolio look. |
-| | `vertical_alignment` (`start`, `center` (default), `end`) | Vertically positions the slide content within the container -- top, middle, or bottom. |
-| | `text_content` | Supporting paragraph beneath the headline. |
-| | `text_size` (`sm`, `base`, `lg` (default)) | Controls body text prominence. |
-| | `text_uppercase` | Applies uppercase transform -- useful for short taglines or category labels. |
-| | `text_muted` | Reduces text opacity for a softer, less dominant subheading. |
-| | `button_link` / `button_link_2` | Primary and optional secondary CTA. Each link has `text`, `href`, and `target`. |
-| | `button_style` / `button_style_2` (`primary`, `secondary`) | Visual weight of each button. Primary is filled/solid; secondary is outline/ghost. |
-| | `button_size` (`small`, `medium`, `large`, `xlarge`) | Shared size for both buttons. |
-| | `overlay_color` (color with alpha) | Tints the background image. Default is a deep navy at ~75% opacity (`#0a1e38bf`). Changing hue or reducing opacity dramatically shifts mood. |
-| | `color_scheme` (`standard-primary`, `standard-secondary`, `highlight-primary`, `highlight-secondary`) | Drives the overall palette for the slide -- backgrounds, text colors, and button colors all follow the scheme. Each slide can use a different scheme. |
+- A page opener, almost always on `index`. It is one of the three sections that support the header's `transparent_on_hero` mode (with `banner` and `video-popup`).
+- Good for businesses with several equally important offers or spaces: hotels and venues, restaurants with a menu and an events side, schools, retailers, multi-service studios, festivals.
+- Bad for a single message (use `banner`), for a split photo-and-text opener (`split-hero`), and for anything that must be read in full, since slides move on.
+- Natural neighbours below: `trust-bar` or `logo-cloud` with `top_spacing` `small`, then `services-grid`, `card-grid` or `image-text`.
+- Needs one to three slides with real photos and one short sentence each. Five slides is the limit and rarely worth it: most visitors see only the first one or two.
+- Fits hospitality, tourism, retail, education, events, fitness, real estate. Rare on professional-services sites, where one still hero does the job.
 
-## Layout recipes
+## Pitfalls
 
-**1. "Bold single hero" (homepage anchor)**
-- 1 slide, height `large`, fullwidth `true`, alignment `center`
-- heading_size `7xl`, text_size `lg`, single primary button `large`
-- Dark overlay (`#000000aa`) over a high-contrast photograph
-- color_scheme `highlight-primary`
-- Good for: Immediate brand statement. Works for architecture firms, law offices, luxury spas, boutique hotels.
+- Visitors read slide one; treat it as the real hero and put the primary call to action there. Later slides are bonuses, not places for essential information.
+- Under a transparent header the first section must give the header something to sit on. A slideshow whose first slide has a photo and a dark `overlay_color` is fine; a first slide with no image and a light `color_scheme` (`standard-primary`, `standard-secondary`) puts the header's light over-image styling on a light background and it washes out. Give the first slide a photo or a highlight scheme.
+- The section takes its background from the first slide's `color_scheme`, so the editor preview around the carousel follows slide one.
+- `height` `auto` sizes each slide to its content, so slides with different amounts of text change height as they rotate and the page jumps. Pick `small`, `medium` or `large` for a fixed height (about half, three quarters and the full screen), and keep the text short enough to fit inside `small` on a phone.
+- `overlay_color` applies only when the slide has an image. The default is a deep, fairly opaque tint that keeps text readable but hides much of the photo; lower its opacity for a photo-forward look and compensate with a shorter headline, or raise it for busy photos.
+- `heading_size` `7xl` and above fits two or three words. Long headlines at that size wrap into four lines on phones and push the buttons below the fold.
+- `autoplay_speed` must cover reading time: a headline plus two lines of text plus two buttons needs the upper range; image-only slides can rotate faster.
+- `fullwidth` off keeps the carousel inside the content width with page margins; it then no longer works as a bleed hero and should not open a page under a transparent header.
+- `vertical_alignment` `end` puts the text near the bottom edge, where a bottom-heavy photo (people, products) collides with it. Choose photos with quiet areas where the text will land.
+- Two buttons per slide is the maximum; `button_size` is shared by both buttons on that slide.
 
-**2. "Dual-CTA storefront" (product launch)**
-- 2 slides, height `medium`, fullwidth `true`, alignment `center`, autoplay `true`, speed `6000`
-- Each slide: heading_size `5xl`, both buttons active (primary "Shop Now" + secondary "Learn More"), button_size `medium`
-- Slide 1 `highlight-primary`, Slide 2 `highlight-secondary` for variety
-- Good for: Promoting two key offers simultaneously. Retail shops, bakeries, florists, online stores.
+## Recipes
 
-**3. "Left-aligned editorial" (services overview)**
-- 3 slides, height `medium`, fullwidth `true`, alignment `start`
-- heading_size `4xl`, text_size `lg`, text_muted `true`, single secondary button `medium`
-- Lighter overlay (`#00000040`) to let photography show through
-- Good for: Professional services that want to feel approachable, not salesy. Consultancies, accounting firms, veterinary clinics, dental clinics.
+### Single bold hero
 
-**4. "Compact announcement bar" (promotions / events)**
-- 2--3 slides, height `small`, fullwidth `false` (constrained), alignment `center`
-- heading_size `2xl`, text_size `sm`, text_uppercase `true`, no body text or very short tagline
-- Single primary button `small`
-- No background images -- rely on color_scheme `standard-secondary` and `highlight-secondary` alternating
-- autoplay `true`, speed `4000` for quick rotation
-- Good for: Time-sensitive promos, event countdowns, seasonal notices. Restaurants, fitness studios, salons, event venues.
+One slide, full screen, centred, one primary button: a `banner` alternative that keeps the slideshow's full-bleed treatment. Supply one wide, high-contrast photo.
 
-**5. "Full-bleed photo story" (portfolio / about)**
-- 4--5 slides, height `large`, fullwidth `true`, alignment `center`, autoplay `true`, speed `8000`
-- heading_size `6xl`, no body text, no buttons -- purely visual with a single headline per slide
-- Very light overlay (`#00000020`) to keep images vivid
-- Mix of color schemes across slides to give each image its own mood
-- Good for: Telling a visual brand story. Photographers, interior designers, wedding venues, travel agencies, real estate agents.
+```json
+{
+  "type": "slideshow",
+  "settings": {
+    "height": "large",
+    "fullwidth": true,
+    "autoplay": false
+  },
+  "blocks": [
+    {
+      "type": "slide",
+      "settings": {
+        "heading_text": "Spaces made for staying",
+        "text_content": "Rooms, dining and gardens in the heart of the old town.",
+        "button_link": { "text": "Check availability", "href": "contact.html" },
+        "alignment": "center",
+        "vertical_alignment": "center",
+        "heading_size": "7xl",
+        "text_size": "lg",
+        "button_style": "primary",
+        "button_size": "large",
+        "color_scheme": "highlight-primary"
+      }
+    }
+  ]
+}
+```
 
-**6. "Text-forward brand pitch" (no images)**
-- 2 slides, height `medium`, fullwidth `true`, alignment `center`
-- No background images; alternate between `highlight-primary` and `standard-secondary` color schemes for contrast
-- heading_size `8xl`, text_size `lg`, single primary button `xlarge`
-- Good for: Service businesses without strong photography. Tutoring services, cleaning companies, bookkeeping firms, mobile notaries.
+### Two offers rotating
 
-**7. "Seasonal campaign rotator" (multi-offer)**
-- 5 slides (max), height `medium`, fullwidth `true`, alignment `center`, autoplay `true`, speed `5000`
-- Each slide has a unique background image, unique overlay color tint (warm amber for summer, cool blue for winter, etc.), heading_size `5xl`
-- Dual buttons on every slide: primary "Shop the Sale" + secondary "See Details"
-- button_size `large`
-- Good for: Businesses with multiple active promotions or product lines. Gift shops, garden centers, clothing boutiques, pet stores, home decor retailers.
+A hospitality home page with one slide per experience, the first with a primary and a secondary button. Supply one landscape photo per slide with a calm area behind the text.
 
-**8. "Minimal single-slide hero with muted subtitle" (professional landing)**
-- 1 slide, height `large`, fullwidth `true`, alignment `start`
-- heading_size `9xl` (maximum impact), text_content as a short one-liner, text_size `sm`, text_muted `true`, text_uppercase `true`
-- Single secondary button `medium` for understated elegance
-- Dark background image with heavy overlay (`#0a1e38e0`)
-- color_scheme `highlight-primary`
-- Good for: High-end professional presence where restraint signals quality. Architects, private wealth advisors, fine dining restaurants, bespoke tailors.
+```json
+{
+  "type": "slideshow",
+  "settings": {
+    "height": "medium",
+    "fullwidth": true,
+    "autoplay": true,
+    "autoplay_speed": 7000
+  },
+  "blocks": [
+    {
+      "type": "slide",
+      "settings": {
+        "heading_text": "Dinner worth the drive",
+        "text_content": "Seasonal menus from our kitchen garden.",
+        "button_link": { "text": "See the menu", "href": "menu.html" },
+        "button_link_2": { "text": "Book a table", "href": "contact.html" },
+        "alignment": "start",
+        "heading_size": "5xl",
+        "button_style": "primary",
+        "button_style_2": "secondary",
+        "color_scheme": "highlight-primary"
+      }
+    },
+    {
+      "type": "slide",
+      "settings": {
+        "heading_text": "Celebrate with us",
+        "text_content": "Private rooms for twelve to one hundred and twenty guests.",
+        "button_link": { "text": "Plan an event", "href": "contact.html" },
+        "alignment": "start",
+        "heading_size": "5xl",
+        "button_style": "primary",
+        "color_scheme": "highlight-secondary"
+      }
+    }
+  ]
+}
+```
 
-## Differentiation tips
+### Photo story without buttons
 
-- Vary the **height** setting across presets -- do not default everything to `large`. A `small` slideshow above a content-heavy page feels very different from a `large` full-bleed hero.
-- Alternate **alignment** between `center` and `start` across different page presets. Left-aligned text creates an editorial feel that immediately distinguishes one preset from another.
-- Use **image-free slides** in at least one preset. Relying on color schemes alone (especially `standard-secondary` or `highlight-secondary`) produces a graphic, modern look that stands apart from photo-heavy banners.
-- Change the **number of slides** deliberately. A single-slide hero with no navigation arrows is a completely different component psychologically than a 5-slide auto-rotating carousel.
-- Exploit the **overlay_color** setting beyond the default navy. A warm overlay (`#3b1a00a0`) over a food photo evokes a very different mood than a cool overlay (`#001a33b0`) over a cityscape. Adjust the alpha channel to control how much of the image shows through.
-- Mix **button configurations**: some presets should have no buttons (visual-only), some one button, some two. Varying button_style (primary vs secondary) and button_size (small vs xlarge) also prevents visual repetition.
-- Use **text_uppercase** and **text_muted** sparingly and intentionally. An uppercase muted subtitle under a massive headline gives a refined, luxury feel; saving this combination for specific presets keeps it distinctive.
-- Vary **autoplay_speed** to match the content density of each preset. Image-only slides can rotate quickly (3000--4000 ms), while slides with long text and dual CTAs need more reading time (7000--10000 ms).
-- Alternate **color_scheme** within a single slideshow instance to give each slide its own personality, especially in presets with 3+ slides.
+Three image slides with a single word each and no text or buttons, for photographers, venues and designers. Lower the overlay so the photos carry the section; supply three strong landscape images.
+
+```json
+{
+  "type": "slideshow",
+  "settings": {
+    "height": "large",
+    "fullwidth": true,
+    "autoplay": true,
+    "autoplay_speed": 4000
+  },
+  "blocks": [
+    { "type": "slide", "settings": { "overlay_color": "#0a1e3866", "heading_text": "Light", "text_content": "", "button_link": { "text": "", "href": "" }, "heading_size": "8xl", "vertical_alignment": "end", "alignment": "start", "color_scheme": "highlight-primary" } },
+    { "type": "slide", "settings": { "overlay_color": "#0a1e3866", "heading_text": "Space", "text_content": "", "button_link": { "text": "", "href": "" }, "heading_size": "8xl", "vertical_alignment": "end", "alignment": "start", "color_scheme": "highlight-primary" } },
+    { "type": "slide", "settings": { "overlay_color": "#0a1e3866", "heading_text": "Material", "text_content": "", "button_link": { "text": "", "href": "" }, "heading_size": "8xl", "vertical_alignment": "end", "alignment": "start", "color_scheme": "highlight-primary" } }
+  ]
+}
+```
+
+### Imageless announcement rotator
+
+Two short slides without photos on highlight bands, constrained to the content width, for a notice strip further down a page or an opener on a site with a solid header. Not for a transparent header.
+
+```json
+{
+  "type": "slideshow",
+  "settings": {
+    "height": "small",
+    "fullwidth": false,
+    "autoplay": true,
+    "autoplay_speed": 5000
+  },
+  "blocks": [
+    {
+      "type": "slide",
+      "settings": {
+        "heading_text": "Spring timetable now live",
+        "text_content": "New evening classes on Tuesdays and Thursdays.",
+        "button_link": { "text": "See classes", "href": "classes.html" },
+        "heading_size": "3xl",
+        "text_size": "base",
+        "text_uppercase": false,
+        "button_style": "primary",
+        "button_size": "small",
+        "color_scheme": "highlight-primary"
+      }
+    },
+    {
+      "type": "slide",
+      "settings": {
+        "heading_text": "Open day, first Saturday of the month",
+        "text_content": "Try any class free. No booking needed.",
+        "button_link": { "text": "Find out more", "href": "contact.html" },
+        "heading_size": "3xl",
+        "text_size": "base",
+        "button_style": "primary",
+        "button_size": "small",
+        "color_scheme": "highlight-secondary"
+      }
+    }
+  ]
+}
+```

@@ -1,91 +1,96 @@
-# Key Figures Widget
+# key-figures
 
-Animated statistics strip that counts up numbers on scroll, used to build instant credibility with visitors.
+## Purpose
 
----
+A row of big numbers with short labels, such as years in business, clients served or a satisfaction score, that count up when they scroll into view. It is a compact credibility strip under a hero or a results block on a service page.
 
-## Settings Levers
+Each figure is a `number`, a static `suffix` such as "+" or "%", a `label` and an optional one-line `description`. Figures sit in a grid or, for many of them, in a carousel with arrows. `card_layout` decides whether each figure is boxed or floats freely on the section surface.
 
-| Setting | Values | Visual Effect |
-|---------|--------|---------------|
-| `eyebrow` | Any text | Small label above the headline, adds context like "Our Track Record" |
-| `eyebrow_uppercase` | `true` / `false` (default) | Uppercases the eyebrow text for a more formal label treatment |
-| `title` | Any text (default "By The Numbers") | Section headline; rendered as h1 when the widget is first on the page, h2 otherwise |
-| `description` | Any text | Paragraph below the headline for framing the stats |
-| `heading_alignment` | `start`, `center` (default) | Controls whether the header block sits flush-left or centered; left works better when the widget follows a text-heavy section |
-| `layout` | `grid`, `carousel` | Grid shows all figures at once; carousel adds prev/next arrows and swipeable track, better when you have 5+ figures |
-| `columns_desktop` | 2 -- 5 | Number of columns on desktop; mobile always stacks. 4 is the sweet spot for most sites; 2 gives each stat more breathing room |
-| `card_layout` | `box`, `flat` | Box adds padding and (depending on color scheme) a background/border to each card; flat removes all card chrome for a minimal look |
-| `animate` | true / false | Enables the odometer count-up animation on scroll. Respects prefers-reduced-motion. Resets and replays when scrolled out and back in |
-| `color_scheme` | `standard-primary`, `standard-secondary`, `highlight-primary`, `highlight-secondary` | Standard uses page background; accent adds secondary background to cards; highlight inverts to the theme highlight palette; highlight-secondary combines both |
-| `top_spacing` | `auto` (default), `small`, `none` | `small` reduces spacing for tighter rhythm; `none` removes it entirely for flush stacking |
-| `bottom_spacing` | `auto` (default), `small`, `none` | `small` reduces spacing for tighter rhythm; `none` removes it entirely for flush stacking |
+## When to use
 
----
+- Role: a quick proof point between the opener and the first long section, or a "results" moment before the call to action.
+- Good for: trades and agencies (projects, years, repeat clients), clinics and studios (patients, practitioners, rating), non-profits (funds, volunteers, communities), any `about` page.
+- Bad for: numbers that need explanation or sources (use `rich-text` or `data-table`), prices (`pricing`), or more than six figures.
+- Opening a page: no. The numbers mean nothing before the visitor knows what the business is, and the section does not support the header's transparent mode, which only `banner`, `slideshow` and `video-popup` support.
+- Natural neighbours: directly under `banner` or `split-hero` as a strip, after `testimonials` as hard evidence, before `action-bar`.
+- Content needed: three or four figures the business can stand behind; this is the smallest section in the theme and works with no heading at all.
 
-## Available Blocks
+## Pitfalls
 
-| Block Type | Key Settings | Notes |
-|------------|-------------|-------|
-| `figure` | `number` -- the numeric value (string, e.g. "500") | Drives the odometer animation target. Can include non-digit characters like commas or decimals within the number string |
-| | `suffix` -- text appended after the number (e.g. "+", "%", "/7") | Displayed as static characters next to the animated digits |
-| | `label` -- short heading below the number (e.g. "Happy Clients") | Rendered as h3 (or h2 when widget has no title) |
-| | `description` -- supporting detail (e.g. "And growing every day") | Optional one-liner beneath the label, rendered as body-small text |
+- Only digits animate; commas, dots and slashes inside `number` stay still and words do not count up at all. Put units in `suffix` ("+", "%", "k", "/5") and keep `number` numeric ("4.9", "1,200").
+- The count-up runs when the section scrolls into view. If it sits in the first screen it plays before anyone looks; turn `animate` off there. Visitors who prefer reduced motion see the final numbers at once.
+- Three or four figures hit hardest. Five columns shrink the numbers; `carousel` hides figures behind arrows and is only worth it from six figures up, where `columns_desktop` is how many show at once.
+- `card_layout` `box` on `standard-primary` adds padding but no fill or border, so it looks like `flat` with more air; the boxed look needs `standard-secondary` or a highlight scheme. `flat` on a highlight scheme gives bold floating numbers.
+- A `color_scheme` other than `standard-primary` makes the section a filled band whose spacing is padding inside its colour. The strip is a natural `small` spacing candidate; under a filled hero use `small`, and `none` only under an unfilled opener.
+- Labels of one to three words; `description` of at most eight ("Since 2015", "Across three cities"). Omit it when the label is self-explanatory.
+- Figures are claims; use real, current numbers. A row of identical magnitudes ("500 / 600 / 700") reads as padding; vary them.
+- Without a `title` the labels become the section's headings, which is fine for a strip; with a `title`, keep it short ("By the numbers").
 
----
+## Recipes
 
-## Layout Recipes
+### Trust strip under the hero
 
-### 1. The Trust Bar
+Four flat figures with no heading, docked under a filled hero. Supply four numbers with units; no images needed.
 
-**Settings:** 4 figures, grid, 4 columns, flat card layout, standard-primary color scheme, heading alignment center, animate on.
-**Blocks:** Years in Business / Clients Served / Projects Completed / Satisfaction Rate.
-**Good for:** Placing right below the hero on a homepage to establish credibility before the visitor scrolls further.
+```json
+{
+  "type": "key-figures",
+  "settings": { "title": "", "layout": "grid", "columns_desktop": 4, "card_layout": "flat", "animate": true, "color_scheme": "standard-primary", "top_spacing": "small", "bottom_spacing": "small" },
+  "blocks": [
+    { "type": "figure", "settings": { "number": "12", "suffix": "+", "label": "Years in business" } },
+    { "type": "figure", "settings": { "number": "850", "suffix": "+", "label": "Projects completed" } },
+    { "type": "figure", "settings": { "number": "4.9", "suffix": "/5", "label": "Average rating" } },
+    { "type": "figure", "settings": { "number": "98", "suffix": "%", "label": "Repeat clients" } }
+  ]
+}
+```
 
-### 2. Impact Dashboard
+### Results block
 
-**Settings:** 3 figures, grid, 3 columns, box card layout, highlight-primary color scheme, heading alignment start, animate on. Set eyebrow to something like "Our Impact" and add a description paragraph.
-**Blocks:** Homes Sold / Average Days on Market / Total Sales Volume.
-**Good for:** A dedicated results section on a landing page where the numbers themselves are the selling point.
+Three boxed figures with a heading and a description on a highlight surface, as the page's evidence moment. Supply three outcome numbers and a one-line context for each.
 
-### 3. Scrolling Social Proof
+```json
+{
+  "type": "key-figures",
+  "settings": { "eyebrow": "Results", "title": "What our clients see", "description": "Figures from the last twelve months of completed work.", "heading_alignment": "start", "layout": "grid", "columns_desktop": 3, "card_layout": "box", "animate": true, "color_scheme": "highlight-primary" },
+  "blocks": [
+    { "type": "figure", "settings": { "number": "40", "suffix": "%", "label": "Faster turnaround", "description": "Compared with the previous process" } },
+    { "type": "figure", "settings": { "number": "1,200", "suffix": "+", "label": "Hours saved", "description": "Across all client accounts" } },
+    { "type": "figure", "settings": { "number": "30", "suffix": "", "label": "Active clients", "description": "In three cities" } }
+  ]
+}
+```
 
-**Settings:** 6-8 figures, carousel layout, 4 columns, box card layout, standard-secondary color scheme, animate on.
-**Blocks:** Mix of achievement stats like Certifications / 5-Star Reviews / Repeat Customers / Awards Won / Countries Served / Team Members.
-**Good for:** Service pages where you have more proof points than a grid can comfortably fit without shrinking the numbers.
+### Two numbers inside a story
 
-### 4. Minimal Duo
+A pair of large figures on a soft surface between two text sections of an `about` page. Supply two numbers that summarise the story.
 
-**Settings:** 2 figures, grid, 2 columns, flat card layout, standard-primary color scheme, heading alignment start, animate on. Remove spacing top/bottom (set both to none) so it sits tight between content sections.
-**Blocks:** Two high-impact numbers, e.g. "15+ Years Experience" and "3,000+ Clients".
-**Good for:** About pages or sidebar-style callouts where you want a quick credibility bump without a full stats section.
+```json
+{
+  "type": "key-figures",
+  "settings": { "title": "", "layout": "grid", "columns_desktop": 2, "card_layout": "flat", "animate": true, "color_scheme": "standard-secondary", "heading_alignment": "start" },
+  "blocks": [
+    { "type": "figure", "settings": { "number": "2015", "suffix": "", "label": "Founded" } },
+    { "type": "figure", "settings": { "number": "3,000", "suffix": "+", "label": "Clients since" } }
+  ]
+}
+```
 
-### 5. Highlighted Hero Stats
+### Carousel of proof points
 
-**Settings:** 3 figures, grid, 3 columns, box card layout, highlight-secondary color scheme, heading alignment center, animate on. Use a punchy title like "Why Choose Us" with no description to keep it tight.
-**Blocks:** Response Time ("< 1" suffix "hr") / Jobs Completed ("99.9" suffix "%") / Customers ("2,500" suffix "+").
-**Good for:** Placing directly below a hero or CTA section on a service homepage, using the highlight background to create visual separation.
+Six or more figures that would not fit one row, shown four at a time with arrows. Supply six to eight numbers; keep labels to two words so the cards stay even.
 
-### 6. Full-Width Campaign Strip
-
-**Settings:** 5 figures, grid, 5 columns, flat card layout, highlight-primary color scheme, animate on. No title, no eyebrow, no description -- just the numbers. Set top and bottom spacing to none.
-**Blocks:** Campaign metrics like Funds Raised / Volunteers / Events Held / Communities Reached / Meals Served.
-**Good for:** A bold data band across a fundraising or campaign page that speaks for itself without any header copy.
-
-### 7. Before-and-After Comparison
-
-**Settings:** 4 figures, grid, 4 columns, box card layout, standard-secondary color scheme, heading alignment center, animate on. Title: "The Results Speak". Use the description field on each block to explain what the number means.
-**Blocks:** Weight Lost ("1,200" suffix "lbs") with description "Total client results" / Sessions Completed / Retention Rate / Client Satisfaction.
-**Good for:** Results-oriented pages where each number needs a short explanation to land properly.
-
----
-
-## Differentiation Tips
-
-- **Suffix creativity matters.** Go beyond "+" and "%". Suffixes like "/5", "x", "hrs", "M", or even short words make the stat more specific and memorable. "4.9/5" reads better than "98%".
-- **Fewer figures hit harder.** Three or four well-chosen stats outperform six generic ones. Pick numbers that would surprise the visitor or that they can compare against competitors.
-- **Pair flat + highlight for drama.** Using flat card layout with a highlight color scheme creates floating numbers on a bold background -- no card borders, just pure contrast.
-- **Turn off animation for above-the-fold placement.** If the widget loads inside the initial viewport, the count-up animation happens before the user is ready to watch. Consider disabling animate and letting the numbers just appear.
-- **Use the description field sparingly.** A label like "Happy Clients" is self-explanatory. Only add a description when the number needs context, like "Since 2018" or "Across 12 states".
-- **Mix number magnitudes.** A row of "500+ / 98% / 24/7 / 10+" is visually more interesting than "500 / 600 / 700 / 800" because the varying digit counts create natural rhythm in the odometer animation.
-- **Collapse spacing to merge with adjacent sections.** Setting top or bottom spacing to none lets you visually attach the stats strip to a hero, CTA, or testimonial section above or below it, creating one unified block instead of isolated sections.
+```json
+{
+  "type": "key-figures",
+  "settings": { "title": "Our track record", "layout": "carousel", "columns_desktop": 4, "card_layout": "box", "animate": true, "color_scheme": "standard-secondary" },
+  "blocks": [
+    { "type": "figure", "settings": { "number": "15", "suffix": "+", "label": "Years" } },
+    { "type": "figure", "settings": { "number": "2,400", "suffix": "", "label": "Projects" } },
+    { "type": "figure", "settings": { "number": "35", "suffix": "", "label": "Team members" } },
+    { "type": "figure", "settings": { "number": "12", "suffix": "", "label": "Awards" } },
+    { "type": "figure", "settings": { "number": "4", "suffix": "", "label": "Offices" } },
+    { "type": "figure", "settings": { "number": "97", "suffix": "%", "label": "Recommend us" } }
+  ]
+}
+```

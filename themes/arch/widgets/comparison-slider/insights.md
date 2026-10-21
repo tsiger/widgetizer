@@ -1,178 +1,73 @@
-# Comparison Slider Widget — Insights
+# comparison-slider
 
-## Description
+## Purpose
 
-Interactive before/after image slider that lets visitors drag a handle to reveal the difference between two states, available in horizontal or vertical orientation.
+A before-and-after frame: two photos of the same scene laid over each other, with a handle the visitor drags to reveal one or the other. For renovations, cleaning, landscaping, detailing, restoration, retouching and redesigns, where the change itself is the proof.
 
----
+One pair per section, set in the section's own settings; there are no blocks. The frame is always landscape (16 by 9) and both photos are cropped to fill it. `orientation: horizontal` splits left and right with the after photo on the right; `vertical` splits top and bottom with the after photo on top. Floating `before_label` and `after_label` badges sit in the corners and the heading group above is optional.
 
-## Settings Levers
+## When to use
 
-| Setting | Values | Visual Effect |
-|---|---|---|
-| `eyebrow` | Any text (blank by default) | Small label above the headline; adds context like "Our Work" or "Results" |
-| `eyebrow_uppercase` | `true` / `false` (default) | Uppercases the eyebrow text for a more formal label treatment |
-| `title` | Any text (default: "See the Transformation") | Main headline above the slider |
-| `description` | Any text (blank by default) | Supporting paragraph below the headline |
-| `heading_alignment` | `start`, `center` | Controls whether the eyebrow/title/description block is centered or left-aligned |
-| `before_image` | Image reference | The image shown on the left (horizontal) or bottom (vertical) side |
-| `after_image` | Image reference | The image shown on the right (horizontal) or top (vertical) side |
-| `before_label` | Any text (default: "Before") | Overlay badge on the before side of the slider |
-| `after_label` | Any text (default: "After") | Overlay badge on the after side of the slider |
-| `content_width` | `wide` (default), `fullwidth` | Controls the max-width of the slider container. `wide` keeps it within the standard content width; `fullwidth` stretches it edge-to-edge |
-| `orientation` | `horizontal`, `vertical` | Horizontal splits left/right (16:9 aspect). Vertical splits top/bottom (9:16 aspect, narrower max-width) |
-| `initial_position` | 0 -- 100 % (step 5, default 50) | Where the divider sits on load; 0 = all "before" visible, 100 = all "after" visible |
-| `show_labels` | true / false (default true) | Toggles the floating Before/After badges inside the image |
-| `color_scheme` | `standard-primary`, `standard-secondary`, `highlight-primary`, `highlight-secondary` | Background and container treatment; non-standard schemes add padded container and swap background color |
-| `top_spacing` | `auto` (default), `small`, `none` | `small` reduces spacing for tighter rhythm; `none` removes it entirely for flush stacking |
-| `bottom_spacing` | `auto` (default), `small`, `none` | Same as above for the bottom edge |
+- A proof section on a `services` page or a project page, or a single showpiece on the homepage after the hero.
+- Good for one dramatic pair. Bad for several pairs in a row (use a `gallery` or `projects-grid` instead of stacking sliders) and for photos that were not taken from the same spot.
+- Not a page opener.
+- Sits well after `split-content` or `rich-text` that explains the service, before `testimonials` or an `action-bar`. A heading-less instance makes a strong visual break between two text-heavy sections.
+- Needs exactly two photos with identical framing, lens and lighting, ideally shot on a tripod from a marked position, in landscape with the subject away from the centre line where the handle rests.
+- Fits trades and renovation, interiors, cleaning, landscaping, car detailing, furniture and art restoration, photographers and retouchers, design agencies (old site versus new).
 
----
+## Pitfalls
 
-## Available Blocks
+- Any shift in camera position shows as a jump at the divider and undermines the whole effect. Reject pairs that do not line up.
+- `initial_position` is where the divider starts, measured from the left (or the top). The after photo fills the far side, so a low value such as 25 leads with the result and a high value such as 75 leads with the starting state; 50 is neutral.
+- Portrait photos do not get a portrait frame; `vertical` changes the drag direction only. Use it when the change runs top to bottom (a ceiling, a wall, a hedge line), and keep portrait shots for `image-text` or `gallery`.
+- A vertical drag fights page scrolling on phones; prefer `horizontal` unless the subject demands otherwise.
+- The handle covers the middle of the frame; keep the most telling detail off centre, and do not rely on small differences that only show at full size.
+- Relabel the badges when "Before" and "After" are too generic ("Original" and "Restored", "Winter" and "Summer"); turn `show_labels` off when the photos already carry captions.
+- `content_width: fullwidth` stretches the frame to the full content column; the default keeps a slightly narrower reading width that matches text sections above and below.
+- Any scheme other than `standard-primary` makes a filled band that pads inside itself; a highlight scheme is justified only when the slider is the page's key proof.
 
-This widget has **no blocks**. All content is configured through top-level settings only. There is a single before/after pair per widget instance.
+## Recipes
 
----
+### Project reveal
 
-## Layout Recipes
+A single renovation or landscaping project with a centred heading and the handle in the middle. Needs two aligned landscape photos.
 
-### 1. Classic Before/After Portfolio Piece
+```json
+{
+  "type": "comparison-slider",
+  "settings": { "eyebrow": "Recent project", "title": "See the transformation", "description": "Drag the handle to compare.", "heading_alignment": "center", "before_label": "Before", "after_label": "After", "orientation": "horizontal", "initial_position": 50, "show_labels": true }
+}
+```
 
-| Parameter | Value |
-|---|---|
-| `orientation` | horizontal |
-| `heading_alignment` | center |
-| `initial_position` | 50 |
-| `show_labels` | true |
-| `color_scheme` | standard-primary |
-| `eyebrow` | Our Work |
-| `title` | See the Transformation |
+### Lead with the result
 
-**Good for:** Showcasing a single flagship project front and center.
+The divider starts near the left so the finished state dominates on load and the visitor drags to uncover the starting point. Labels renamed for restoration work.
 
----
+```json
+{
+  "type": "comparison-slider",
+  "settings": { "eyebrow": "Restoration", "title": "Brought back to life", "heading_alignment": "start", "before_label": "As found", "after_label": "Restored", "orientation": "horizontal", "initial_position": 25, "show_labels": true, "color_scheme": "standard-secondary" }
+}
+```
 
-### 2. Product Restoration Showcase
+### Top-to-bottom reveal
 
-| Parameter | Value |
-|---|---|
-| `orientation` | horizontal |
-| `heading_alignment` | start |
-| `initial_position` | 25 |
-| `show_labels` | true |
-| `before_label` | Damaged |
-| `after_label` | Restored |
-| `color_scheme` | highlight-primary |
+A change that runs vertically, such as a repainted ceiling and wall or a cleared hedge line. Keep the pair landscape.
 
-**Good for:** Drawing the eye to the "after" result by starting the slider mostly on the before side, so the dramatic improvement is the first thing visitors notice.
+```json
+{
+  "type": "comparison-slider",
+  "settings": { "title": "From overgrown to open", "heading_alignment": "center", "before_label": "Overgrown", "after_label": "Landscaped", "orientation": "vertical", "initial_position": 50, "show_labels": true }
+}
+```
 
----
+### Silent break
 
-### 3. Vertical Skincare / Cosmetic Result
+No heading, full content width, between two text sections. The photos do the talking; keep the labels so the frame explains itself.
 
-| Parameter | Value |
-|---|---|
-| `orientation` | vertical |
-| `heading_alignment` | center |
-| `initial_position` | 50 |
-| `show_labels` | true |
-| `before_label` | Day 1 |
-| `after_label` | Week 8 |
-| `color_scheme` | standard-secondary |
-| `eyebrow` | Real Results |
-
-**Good for:** Portrait-oriented photos where a top-to-bottom reveal feels natural, such as face or body shots.
-
----
-
-### 4. Seasonal Curb Appeal
-
-| Parameter | Value |
-|---|---|
-| `orientation` | horizontal |
-| `heading_alignment` | center |
-| `initial_position` | 70 |
-| `show_labels` | true |
-| `before_label` | Winter |
-| `after_label` | Summer |
-| `color_scheme` | standard-primary |
-| `title` | Year-Round Curb Appeal |
-| `description` | Drag to see the difference a full-service landscape plan makes. |
-
-**Good for:** Showing the same property across seasons to emphasize ongoing maintenance value. Starting at 70 % lets the "summer" side dominate on load.
-
----
-
-### 5. Clean vs. Dirty — No-Headline Impact
-
-| Parameter | Value |
-|---|---|
-| `orientation` | horizontal |
-| `heading_alignment` | center |
-| `initial_position` | 50 |
-| `show_labels` | true |
-| `before_label` | Before Cleaning |
-| `after_label` | After Cleaning |
-| `color_scheme` | highlight-secondary |
-| `title` | *(leave blank)* |
-| `top_spacing` | none |
-| `bottom_spacing` | none |
-
-**Good for:** A full-bleed visual break between text-heavy sections. Removing the headline and spacing lets the image speak for itself.
-
----
-
-### 6. Interior Design Room Makeover
-
-| Parameter | Value |
-|---|---|
-| `orientation` | horizontal |
-| `heading_alignment` | start |
-| `initial_position` | 40 |
-| `show_labels` | true |
-| `before_label` | Original |
-| `after_label` | Redesigned |
-| `color_scheme` | standard-secondary |
-| `eyebrow` | Case Study |
-| `title` | Living Room Reimagined |
-| `description` | A full redesign completed in under three weeks. |
-
-**Good for:** Telling a mini story with eyebrow, title, and description that gives context before the visitor interacts with the slider.
-
----
-
-### 7. Dental / Smile Makeover
-
-| Parameter | Value |
-|---|---|
-| `orientation` | horizontal |
-| `heading_alignment` | center |
-| `initial_position` | 40 |
-| `show_labels` | true |
-| `before_label` | Before Treatment |
-| `after_label` | Your New Smile |
-| `color_scheme` | standard-secondary |
-| `eyebrow` | Patient Results |
-| `title` | Smile Transformations |
-| `content_width` | wide |
-
-**Good for:** Showing treatment outcomes where the result speaks louder than any copy. Starting at 40% lets the "after" side dominate on load.
-
----
-
-## Differentiation Tips
-
-1. **Relabel the badges.** "Before/After" is the default but often too generic. Labels like "January / June", "Stock / Custom", or "Standard / Premium" tell a story and make the widget feel purposeful rather than templated.
-
-2. **Bias the starting position.** Setting `initial_position` to 20--30 % shows mostly the "before" state, prompting curiosity. Setting it to 70--80 % leads with the impressive result. A 50/50 split is safe but forgettable.
-
-3. **Use vertical orientation for portraits.** Faces, full-body shots, and tall product photos (bottles, doors, pillars) look awkward squished into a 16:9 frame. Switching to vertical gives them the 9:16 space they need and visually breaks up a page full of landscape sections.
-
-4. **Strip the header for visual punch.** When the slider sits between two content-heavy sections, leaving the title, eyebrow, and description blank creates a breathing space that draws attention purely through interaction.
-
-5. **Pair color schemes with intent.** Use `highlight-primary` or `highlight-secondary` when the slider is the hero of the page (services page, case study). Use `standard-primary` when it is one proof point among many, so it does not compete with surrounding sections.
-
-6. **Match spacing to neighbors.** Set `top_spacing` or `bottom_spacing` to `none` when the widget sits directly above or below another section with its own colored background, avoiding a double-gap that breaks visual flow.
-
-7. **Shoot photos from the same angle.** The widget works best when both images share identical framing and lighting. Even a slight shift in camera position will create a jarring jump at the divider line and undermine credibility.
+```json
+{
+  "type": "comparison-slider",
+  "settings": { "eyebrow": "", "title": "", "description": "", "before_label": "Before cleaning", "after_label": "After cleaning", "content_width": "fullwidth", "orientation": "horizontal", "initial_position": 60, "show_labels": true, "top_spacing": "small", "bottom_spacing": "small" }
+}
+```

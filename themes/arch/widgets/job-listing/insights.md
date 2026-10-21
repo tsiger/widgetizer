@@ -1,87 +1,77 @@
-# Job Listing Widget — Insights
+# job-listing
 
-## Description
+## Purpose
 
-A filterable careers section that displays open positions as stacked cards with department, location, and employment-type metadata, plus optional department filter buttons.
+A careers list: each open role is a card with its title, department, location and an employment-type badge, plus an apply button. An optional row of filter buttons is built automatically from the departments typed into the cards. It is the core of a careers page or a hiring band on an `about` page.
 
----
+The section only displays what is typed into it. It does not collect applications or connect to a hiring system; each `apply_link` sends the candidate to an email address, an external form or a page of the site with a form.
 
-## Settings Levers
+## When to use
 
-| Setting | Values | Visual Effect |
-|---|---|---|
-| `eyebrow` | Any text (default "Join Our Team") | Small label above the headline; omit to hide |
-| `eyebrow_uppercase` | `true` / `false` (default) | Uppercases the eyebrow text for a more formal label treatment |
-| `title` | Any text (default "Open Positions") | Section headline; renders as `h1` when the widget is the first on the page, `h2` otherwise |
-| `description` | Any text (default blank) | Subtext paragraph below the headline |
-| `heading_alignment` | `start`, `center` (default) | Controls whether the header block and filter buttons align left or center |
-| `show_filters` | `true` (default), `false` | Toggles the department filter button bar; departments are auto-extracted from blocks |
-| `color_scheme` | `standard-primary`, `standard-secondary`, `highlight-primary`, `highlight-secondary` | `standard-primary` = transparent bg, no card borders. `standard-secondary` = cards get a secondary bg fill + border. `highlight-primary` = section-level colored bg + card borders. `highlight-secondary` = colored bg + filled cards + borders |
-| `top_spacing` | `auto` (default), `small`, `none` | `small` reduces spacing for tighter rhythm; `none` removes it entirely for flush stacking |
-| `bottom_spacing` | `auto` (default), `small`, `none` | Same as above for the bottom edge |
+- Role: the main content of a careers page, or a short "we are hiring" block near the end of an `about` page or homepage.
+- Good for: any business that hires publicly: restaurants and hotels, clinics, agencies, trades, shops with seasonal staff, organisations recruiting interns.
+- Bad for: a single role (a `split-content` section with a button says it better), the job descriptions themselves (link to them), anything that is not a job.
+- Opening a page: acceptable for a careers page, since the `title` becomes the page heading when the section is first, though a `rich-text` or `split-content` culture statement above it gives candidates a reason to scroll. It does not support the header's transparent mode, which only `banner`, `slideshow` and `video-popup` support.
+- Natural neighbours: `key-figures` or `icon-card-grid` for benefits, `profile-grid` or `team-highlight` for the people, `accordion` for hiring questions, `action-bar` for "no suitable role? write to us".
+- Content needed: at least two roles for the list to look like a list; four or more before filters earn their place.
 
----
+## Pitfalls
 
-## Available Blocks
+- `all_positions_text` is the label of the first filter button, the one that shows every role, and it has no default. Set it ("All roles") whenever `show_filters` is on, or that button renders empty.
+- Filters come from the `department` text matched without regard to case, so "Kitchen" and "kitchen" are one filter but "Front of House" and "Front-of-house" are two. Spell each department identically on every card.
+- A filter row with one department, or with fewer than about four roles, is clutter; turn `show_filters` off.
+- An `apply_link` with no text hides the button and leaves a card the visitor cannot act on. Point every link at a real destination, typically an email address or the `contact` page form, and open external forms in a new tab.
+- Format locations consistently across the cards; "Remote" and a city name in the same style.
+- `type` is a fixed badge of four values; put shift patterns or hours in the role title or the linked description.
+- On `standard-primary` the cards have no borders and read as a plain list; the other schemes give the cards a fill or border and make the section a filled band whose spacing is padding inside its colour.
+- A highlight surface fits a hiring band on a homepage where recruiting is the page's call to action; on a careers page the list is the content, so keep it on a standard surface.
+- The `eyebrow` is the place for urgency ("Hiring this season"); keep counts or pay out of the `title` unless they are current.
 
-| Block Type | Key Settings | Notes |
-|---|---|---|
-| `job` | `title` (text), `department` (text), `location` (text), `type` (select), `apply_link` (link) | Each block is one job card. `type` options: full-time, part-time, contract, internship. The `department` value feeds the auto-generated filter buttons. `apply_link` supports external URLs and new-tab targeting. |
+## Recipes
 
----
+### Careers board with filters
 
-## Layout Recipes
+A full careers page list with roles across several departments. Supply the role titles, a consistent department and location per role, and an application email or form link.
 
-### 1. Minimal Careers Page
+```json
+{
+  "type": "job-listing",
+  "settings": { "eyebrow": "Careers", "title": "Open positions", "description": "Find a role that fits you and apply in a few minutes.", "heading_alignment": "center", "show_filters": true, "all_positions_text": "All roles", "color_scheme": "standard-primary" },
+  "blocks": [
+    { "type": "job", "settings": { "title": "Front desk coordinator", "department": "Operations", "location": "Example City", "type": "full-time", "apply_link": { "text": "Apply", "href": "mailto:hello@example.com" } } },
+    { "type": "job", "settings": { "title": "Service technician", "department": "Field", "location": "Example City", "type": "full-time", "apply_link": { "text": "Apply", "href": "mailto:hello@example.com" } } },
+    { "type": "job", "settings": { "title": "Weekend assistant", "department": "Operations", "location": "Example City", "type": "part-time", "apply_link": { "text": "Apply", "href": "mailto:hello@example.com" } } },
+    { "type": "job", "settings": { "title": "Marketing intern", "department": "Marketing", "location": "Remote", "type": "internship", "apply_link": { "text": "Apply", "href": "mailto:hello@example.com" } } }
+  ]
+}
+```
 
-- **Settings:** eyebrow blank, title "We're Hiring", description blank, heading_alignment center, show_filters false, color_scheme standard-primary
-- **Blocks:** 2-3 job blocks
-- **Good for:** Small teams with only a handful of roles who want a clean, no-frills listing
+### Short list without filters
 
-### 2. Department-Filtered Careers Board
+Two or three roles for a small team, with no filter row. Supply the roles and one application destination.
 
-- **Settings:** eyebrow "Careers", title "Open Positions", description "Find your next role with us.", heading_alignment center, show_filters true, color_scheme standard-secondary
-- **Blocks:** 6-10 job blocks across 3-4 departments (Front of House, Kitchen, Management, Events)
-- **Good for:** Growing businesses with multiple departments that need visitors to quickly narrow by team
+```json
+{
+  "type": "job-listing",
+  "settings": { "eyebrow": "", "title": "We are hiring", "heading_alignment": "start", "show_filters": false, "color_scheme": "standard-primary" },
+  "blocks": [
+    { "type": "job", "settings": { "title": "Experienced stylist", "department": "Salon", "location": "Example City", "type": "full-time", "apply_link": { "text": "Apply", "href": "contact.html" } } },
+    { "type": "job", "settings": { "title": "Reception, weekends", "department": "Salon", "location": "Example City", "type": "part-time", "apply_link": { "text": "Apply", "href": "contact.html" } } }
+  ]
+}
+```
 
-### 3. Highlighted Single-Department Banner
+### Hiring band on the about page
 
-- **Settings:** eyebrow "Now Hiring", title "Join Our Kitchen Team", description blank, heading_alignment start, show_filters false, color_scheme highlight-primary
-- **Blocks:** 2-4 job blocks all in the same department, mix of full-time and part-time
-- **Good for:** A prominent "we're hiring" band embedded on a homepage rather than a dedicated careers page
+A highlighted strip of one or two roles near the end of an `about` page, where recruiting is the page's call to action. Supply the roles; the highlight surface is the page's single emphasis moment here.
 
-### 4. Internship & Entry-Level Showcase
-
-- **Settings:** eyebrow "Start Here", title "Internship & Early-Career Openings", description "Kickstart your career with hands-on experience.", heading_alignment center, show_filters true, color_scheme standard-primary
-- **Blocks:** 4-6 job blocks, type set to internship or full-time, departments like Styling, Reception, Training
-- **Good for:** Organizations that recruit junior talent seasonally and want a dedicated landing section
-
-### 5. Multi-Location Franchise Hiring
-
-- **Settings:** eyebrow blank, title "Positions Near You", description blank, heading_alignment start, show_filters true, color_scheme highlight-secondary
-- **Blocks:** 6-8 job blocks with varied locations (city names) and departments like Service, Management, Warehouse
-- **Good for:** Businesses with multiple physical locations that want visitors to scan by department and see where roles are
-
-### 6. Contract & Freelance Opportunities Board
-
-- **Settings:** eyebrow "Freelance With Us", title "Current Projects", description "We partner with independent contractors for specific engagements.", heading_alignment center, show_filters false, color_scheme standard-secondary
-- **Blocks:** 3-5 job blocks, type set to contract, locations set to "Remote"
-- **Good for:** Businesses that cycle through project-based contractors and want a public roster
-
-### 7. Compact Footer-Adjacent Hiring Strip
-
-- **Settings:** eyebrow blank, title "Join Us", description blank, heading_alignment start, show_filters false, color_scheme highlight-primary, top_spacing none, bottom_spacing none
-- **Blocks:** 1-2 job blocks
-- **Good for:** A tight, attention-grabbing strip placed just above the footer to catch visitors before they leave
-
----
-
-## Differentiation Tips
-
-- **Use the department field strategically.** Even if you only have one department, giving it a clear name (e.g., "Front of House" instead of "General") makes the listing feel more organized and intentional.
-- **Link apply buttons to real destinations.** Point `apply_link` to a Google Form, Typeform, BambooHR page, or a mailto link. A dead "#" link undermines credibility instantly.
-- **Pair with a hero or rich-text widget above.** A job listing on its own can feel transactional. Adding a short culture statement, team photo, or benefits summary above it gives candidates a reason to scroll down.
-- **Turn off filters when you have fewer than four positions.** Filter buttons with only one or two departments add clutter without utility. Let the cards speak for themselves.
-- **Use the highlight color schemes to make the section pop on long pages.** On a homepage where the careers block sits between other standard-background sections, switching to `highlight-primary` or `highlight-secondary` creates a clear visual break that draws eyes to your openings.
-- **Keep location values consistent.** If one card says "NYC" and another says "New York, NY", the listing looks sloppy. Pick a format and stick to it across all blocks.
-- **Leverage the eyebrow for urgency.** Swap the default "Join Our Team" for something time-sensitive like "Hiring This Month" or "3 Roles Open" to create a sense of immediacy.
+```json
+{
+  "type": "job-listing",
+  "settings": { "eyebrow": "Join the team", "title": "Two roles open this season", "heading_alignment": "start", "show_filters": false, "color_scheme": "highlight-primary" },
+  "blocks": [
+    { "type": "job", "settings": { "title": "Kitchen team member", "department": "Kitchen", "location": "Example City", "type": "full-time", "apply_link": { "text": "Apply", "href": "mailto:hello@example.com" } } },
+    { "type": "job", "settings": { "title": "Events assistant", "department": "Events", "location": "Example City", "type": "contract", "apply_link": { "text": "Apply", "href": "mailto:hello@example.com" } } }
+  ]
+}
+```

@@ -865,6 +865,66 @@ export async function getThemePresets(req, res) {
  * it is safe to expose from any shell via the package barrel.
  * @returns {Promise<Array<object>>}
  */
+/**
+ * One preset as an assistant sees it when choosing a starting point: its registry
+ * entry, the hand-written guidance (presets/<id>/insights.md) and the inventory
+ * derived from its files, so the two can't drift apart. Read from the installed
+ * theme source like listThemePresets, since presets are not copied into projects.
+ * @returns {Promise<object|null>} null when the theme has no such preset
+ */
+export async function readPresetDetails(themeId, presetId) {
+  if (!isSafePathSegment(themeId) || !isSafePathSegment(presetId)) return null;
+  const registry = await listThemePresets(themeId);
+  const entry = registry.presets.find((preset) => preset.id === presetId);
+  if (!entry) return null;
+
+  const sourceDir = await getThemeSourceDir(themeId);
+  const presetDir = path.join(sourceDir, "presets", presetId);
+  const hasOwnFolder = await fs.pathExists(presetDir);
+  const jsonNames = async (dir) => {
+    try {
+      return (await fs.readdir(dir))
+        .filter((name) => name.endsWith(".json") && !name.startsWith("_"))
+        .map((name) => name.replace(/\.json$/, ""))
+        .sort();
+    } catch {
+      return [];
+    }
+  };
+
+  // The same fallbacks resolvePresetPaths applies when the project is created.
+  const templatesDir =
+    hasOwnFolder && (await fs.pathExists(path.join(presetDir, "templates"))) ? path.join(presetDir, "templates") : path.join(sourceDir, "templates");
+  const menusDir = hasOwnFolder && (await fs.pathExists(path.join(presetDir, "menus"))) ? path.join(presetDir, "menus") : path.join(sourceDir, "menus");
+
+  const collections = {};
+  if (hasOwnFolder) {
+    const types = await fs.readdir(path.join(presetDir, "collections")).catch(() => []);
+    for (const type of types) {
+      const items = await jsonNames(path.join(presetDir, "collections", type));
+      if (items.length) collections[type] = items.length;
+    }
+  }
+
+  let guidance = null;
+  if (hasOwnFolder) {
+    try {
+      guidance = await fs.readFile(path.join(presetDir, "insights.md"), "utf8");
+    } catch {
+      guidance = null;
+    }
+  }
+
+  const { hasScreenshot: _hasScreenshot, ...preset } = entry;
+  return {
+    ...preset,
+    pages: await jsonNames(templatesDir),
+    menus: await jsonNames(menusDir),
+    collections,
+    guidance,
+  };
+}
+
 export async function listThemes() {
   const userThemesDir = getThemesDir();
 

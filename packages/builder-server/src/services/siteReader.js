@@ -195,6 +195,12 @@ export async function readLabelLocale(storage, scope) {
 
 const GUIDANCE_FILE = "insights.md";
 
+/** The theme's composition guide (its root insights.md), from the site's copy of the theme; null when it has none. */
+export async function readThemeGuidance(storage, scope) {
+  const buf = await storage.read(scope, GUIDANCE_FILE);
+  return buf == null ? null : buf.toString("utf8");
+}
+
 /** A widget's own guidance notes, from the site's copy of the theme (or the app for core widgets). */
 export async function readWidgetGuidance(storage, scope, schema) {
   const source = schema?.source;

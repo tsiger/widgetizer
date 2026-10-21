@@ -52,6 +52,7 @@ Read [structure and lifecycle](references/theme-structure-and-lifecycle.md) befo
 | Widget schemas, blocks, setting types, editor attributes | [Widgets and settings](references/widgets-and-settings.md) |
 | CSS/JS files, icons, images, widget JavaScript, editor events | [Assets and browser behavior](references/assets-and-browser-behavior.md) |
 | Starter pages, menus, collections, pagination, presets | [Templates, collections, and presets](references/templates-collections-and-presets.md) |
+| Guidance for AI assistants (`insights.md` for the theme, widgets and presets) | [Guidance files](references/guidance.md) |
 | Editor labels, visitor-facing words, languages | [Localization](references/localization.md) |
 | Shipping changes to a theme people already use | [Structure and lifecycle](references/theme-structure-and-lifecycle.md#distributed-updates) |
 

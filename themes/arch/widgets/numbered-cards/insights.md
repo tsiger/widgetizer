@@ -1,159 +1,109 @@
-# Numbered Cards Widget — Insights
+# numbered-cards
 
-## Description
+## Purpose
 
-Displays a sequence of numbered steps or phases as zero-padded cards (01, 02, 03 ...) with a title and rich-text description per step, ideal for communicating processes, workflows, and how-it-works sections.
+A row of numbered cards (01, 02, 03 …) each with a short title and a rich-text description, for explaining a process, a method or how working together goes. The numbers are generated from the order of the `step` blocks, so reordering renumbers.
 
----
+The large muted number is the visual anchor of every card; the title and description sit beneath it. Cards show in a grid or, for longer sequences, in a swipeable carousel with previous and next buttons. `card_layout` `box` draws each step as a card; `flat` drops the card and lets the numbers and whitespace carry the structure.
 
-## Settings Levers
+## When to use
 
-| Setting | Values | Visual Effect |
-|---------|--------|---------------|
-| `eyebrow` | any text | Small label above the headline, useful for category tags like "How It Works" or "Our Approach" |
-| `eyebrow_uppercase` | `true` / `false` (default) | Uppercases the eyebrow text for a more formal label treatment |
-| `title` | any text (default "Our Process") | Main section headline; renders as `<h1>` when the widget is the first on the page, `<h2>` otherwise |
-| `description` | any text | Subtitle paragraph below the headline for additional context |
-| `heading_alignment` | `start`, `center` (default) | Controls whether the eyebrow, title, and description align left or center; left is better for asymmetric layouts |
-| `layout` | `grid` / `carousel` | Grid shows all cards at once; carousel adds prev/next navigation and reveals cards in a swipeable track |
-| `columns_desktop` | 2 -- 5 (default 4) | Number of columns on desktop; fewer columns = wider cards with more breathing room |
-| `card_layout` | `box` / `flat` | Box renders cards with a background fill and border (on accent/highlight schemes); flat removes the card container for a cleaner, minimal look |
-| `alignment` | `start` / `center` | Aligns the number, title, and description inside each card to the left edge or center |
-| `color_scheme` | `standard-primary` / `standard-secondary` / `highlight-primary` / `highlight-secondary` | Standard uses the default page background; accent adds a secondary fill to cards; highlight inverts the section background; highlight-secondary combines both |
-| `top_spacing` | `auto` (default), `small`, `none` | `small` reduces spacing for tighter rhythm; `none` removes it entirely for flush stacking |
-| `bottom_spacing` | `auto` (default), `small`, `none` | `small` reduces spacing for tighter rhythm; `none` removes it entirely for flush stacking |
+- Mid-page explainer on `index`, `services` or a `process` page: "how it works" between the offer and the proof. It also closes a service page well, right before the call to action.
+- Good for three to five sequential steps with one sentence each; also for ordered principles or phases of an engagement.
+- Bad for unordered features (use `icon-card-grid` or `card-grid`), for a long chronology (`timeline`) and for steps that need pictures (`steps`).
+- Can open a page when it has a `title`, but it is better placed after a `rich-text` opener with `top_spacing` `none`. It never supports a transparent header; only `banner`, `slideshow` and `video-popup` do.
+- Sits well after `rich-text`, `split-content` or `image-text`, and before `testimonials` or a `rich-text` call to action.
+- Needs as many `step` blocks as `columns_desktop`, or a multiple of it, so no card sits alone on a last row. Three steps, three columns; four steps, four columns.
+- Fits consultancies, agencies, contractors, clinics, movers, wedding planners, any service with a defined journey.
 
----
+## Pitfalls
 
-## Available Blocks
+- Match `columns_desktop` to the number of steps. Five steps in four columns leave an orphan; four steps in five columns leave a hole.
+- Titles should be two or three words; the number is already large, and a two-line title pushes descriptions out of line across the row. Keep descriptions to one or two sentences each so cards end at the same height.
+- `layout` `carousel` only earns its buttons when there are more steps than columns. With four steps and four columns nothing scrolls and the arrows sit disabled. Use the carousel from six steps up.
+- `card_layout` `box` on `standard-primary` shows a plain card on the page background; on `standard-secondary` and `highlight-secondary` cards get a soft fill and a border, on `highlight-primary` a border only. `flat` ignores all of that and spaces the columns wider.
+- `alignment` `center` centres the number, title and description inside each card; it works with short titles and `heading_alignment` `center`. Left-aligned cards under a centred heading look unbalanced.
+- Filled schemes pad inside their own band; `top_spacing` or `bottom_spacing` `none` removes the inner padding, not the gap to the neighbour. Use `none` only directly under an unfilled `rich-text` opener.
+- Highlight bands belong to high-value content. A process is explanatory, so it usually stays on `standard-primary` or `standard-secondary`; make it a highlight only when it is the page's main message.
+- Rich text in `description` allows bold phrases and a short list, but a bulleted list in every card turns the row into a wall. Steps that need a paragraph and a list each want `columns_desktop` 2.
 
-| Block Type | Key Settings | Notes |
-|------------|-------------|-------|
-| `step` | `title` (text), `description` (richtext) | Each step becomes one numbered card. The number is auto-generated from the block order (01, 02, 03 ...). Richtext description supports bold, links, and lists inside each card. Reorder blocks to change numbering. The widget ships with four default steps: Consultation, Planning, Execution, Delivery. |
+## Recipes
 
----
+### Four-step process
 
-## Layout Recipes
+The classic "how we work" row on a soft band, centred, one sentence per step. No images needed.
 
-### 1. Four-Step Service Process
+```json
+{
+  "type": "numbered-cards",
+  "settings": {
+    "eyebrow": "How it works",
+    "title": "From first call to finished job",
+    "heading_alignment": "center",
+    "layout": "grid",
+    "columns_desktop": 4,
+    "card_layout": "box",
+    "alignment": "center",
+    "color_scheme": "standard-secondary"
+  },
+  "blocks": [
+    { "type": "step", "settings": { "title": "Consultation", "description": "<p>We listen, look at the space and agree what success looks like.</p>" } },
+    { "type": "step", "settings": { "title": "Plan", "description": "<p>You receive a written plan with scope, timing and a fixed quote.</p>" } },
+    { "type": "step", "settings": { "title": "Build", "description": "<p>Our own crew does the work and keeps you updated every day.</p>" } },
+    { "type": "step", "settings": { "title": "Handover", "description": "<p>We walk through the result together and stay reachable afterwards.</p>" } }
+  ]
+}
+```
 
-| Setting | Value |
-|---------|-------|
-| `heading_alignment` | `center` |
-| `layout` | `grid` |
-| `columns_desktop` | `4` |
-| `card_layout` | `box` |
-| `alignment` | `center` |
-| `color_scheme` | `standard-secondary` |
-| Blocks | 4 steps |
+### Three flat principles
 
-**Good for:** Explaining how you work with clients from inquiry to delivery. The center alignment and boxed cards give each step equal weight.
+Three editorial, left-aligned statements without card boxes; the numbers do the structuring. Works under a `rich-text` opener.
 
----
+```json
+{
+  "type": "numbered-cards",
+  "settings": {
+    "eyebrow": "What we believe",
+    "title": "Three rules we never bend",
+    "heading_alignment": "start",
+    "layout": "grid",
+    "columns_desktop": 3,
+    "card_layout": "flat",
+    "alignment": "start",
+    "color_scheme": "standard-primary",
+    "top_spacing": "none"
+  },
+  "blocks": [
+    { "type": "step", "settings": { "title": "Clarity first", "description": "<p>Every quote and every update is written in plain language.</p>" } },
+    { "type": "step", "settings": { "title": "One team", "description": "<p>The people who plan the work are the people who do it.</p>" } },
+    { "type": "step", "settings": { "title": "Finish properly", "description": "<p>A job ends when you are happy, not when the invoice is sent.</p>" } }
+  ]
+}
+```
 
-### 2. Three-Column Highlight Strip
+### Six-step carousel
 
-| Setting | Value |
-|---------|-------|
-| `heading_alignment` | `center` |
-| `layout` | `grid` |
-| `columns_desktop` | `3` |
-| `card_layout` | `flat` |
-| `alignment` | `center` |
-| `color_scheme` | `highlight-primary` |
-| Blocks | 3 steps |
+A longer onboarding sequence that would crowd the page as a grid; three cards visible, the rest reachable with the arrows.
 
-**Good for:** A bold, attention-grabbing band across the page that walks visitors through a simple 3-phase journey. The highlight background sets it apart from surrounding sections.
-
----
-
-### 3. Five-Step Onboarding Timeline
-
-| Setting | Value |
-|---------|-------|
-| `heading_alignment` | `start` |
-| `layout` | `grid` |
-| `columns_desktop` | `5` |
-| `card_layout` | `flat` |
-| `alignment` | `start` |
-| `color_scheme` | `standard-primary` |
-| Blocks | 5 steps |
-
-**Good for:** Compact, left-aligned timeline for detailed onboarding or enrollment processes where each step is brief.
-
----
-
-### 4. Two-Column Deep Dive
-
-| Setting | Value |
-|---------|-------|
-| `heading_alignment` | `start` |
-| `layout` | `grid` |
-| `columns_desktop` | `2` |
-| `card_layout` | `box` |
-| `alignment` | `start` |
-| `color_scheme` | `highlight-secondary` |
-| Blocks | 4 steps |
-
-**Good for:** When each step needs a longer description (paragraph or bulleted list inside the richtext). Two wide columns give the text room to breathe.
-
----
-
-### 5. Carousel Walkthrough
-
-| Setting | Value |
-|---------|-------|
-| `heading_alignment` | `center` |
-| `layout` | `carousel` |
-| `columns_desktop` | `3` |
-| `card_layout` | `box` |
-| `alignment` | `center` |
-| `color_scheme` | `standard-secondary` |
-| Blocks | 6+ steps |
-
-**Good for:** Longer processes that would crowd the page as a grid. The carousel lets visitors swipe through at their own pace without overwhelming them.
-
----
-
-### 6. Minimal Flat Steps
-
-| Setting | Value |
-|---------|-------|
-| `heading_alignment` | `center` |
-| `layout` | `grid` |
-| `columns_desktop` | `4` |
-| `card_layout` | `flat` |
-| `alignment` | `start` |
-| `color_scheme` | `standard-primary` |
-| Blocks | 4 steps |
-
-**Good for:** Understated "how it works" section that blends into the page without heavy card styling. The large numbers do the visual work on their own.
-
----
-
-### 7. Accented Left-Aligned Trio
-
-| Setting | Value |
-|---------|-------|
-| `heading_alignment` | `start` |
-| `layout` | `grid` |
-| `columns_desktop` | `3` |
-| `card_layout` | `box` |
-| `alignment` | `start` |
-| `color_scheme` | `standard-secondary` |
-| `top_spacing` | `none` |
-| Blocks | 3 steps |
-
-**Good for:** Stacking directly below a hero or CTA section (top spacing removed) with a left-aligned header that reads naturally alongside the cards.
-
----
-
-## Differentiation Tips
-
-- **Numbers are the hero.** The zero-padded numbers (01, 02 ...) are styled at the largest heading scale. Keep step titles short so the numbers stay dominant and scannable.
-- **Flat vs. box is a bigger decision than it looks.** Box cards create visual separation and work well over highlight backgrounds. Flat cards feel editorial and let whitespace do the heavy lifting -- choose flat when the surrounding page already has strong structure.
-- **Use the carousel only when you truly have many steps.** For 3-4 steps, grid is almost always better. Switch to carousel at 5+ steps or when you want to avoid visual overwhelm on mobile.
-- **Pair color schemes with adjacent sections.** A `highlight-primary` numbered-cards widget sandwiched between two `standard-primary` sections creates a natural focal point. Avoid stacking two highlight sections back to back.
-- **Richtext descriptions unlock more than plain text.** Because the description field supports rich text, you can embed short bulleted lists, bold key terms, or inline links inside each step -- useful for steps that need a bit more detail without a separate FAQ.
-- **Heading alignment should match the page rhythm.** If the rest of the page uses left-aligned headers, keep `heading_alignment` set to `start` for consistency. Reserve center alignment for standalone, symmetrical sections.
-- **Two columns for depth, four or five for scanning.** If each step is a single sentence, go wide (4-5 cols). If steps contain a paragraph of explanation, drop to 2-3 columns so line lengths stay comfortable.
+```json
+{
+  "type": "numbered-cards",
+  "settings": {
+    "title": "Your first six weeks",
+    "heading_alignment": "center",
+    "layout": "carousel",
+    "columns_desktop": 3,
+    "card_layout": "box",
+    "alignment": "start",
+    "color_scheme": "standard-primary"
+  },
+  "blocks": [
+    { "type": "step", "settings": { "title": "Welcome call", "description": "<p>Meet your coordinator and set goals.</p>" } },
+    { "type": "step", "settings": { "title": "Assessment", "description": "<p>A baseline so progress can be measured.</p>" } },
+    { "type": "step", "settings": { "title": "Plan", "description": "<p>A weekly schedule built around your calendar.</p>" } },
+    { "type": "step", "settings": { "title": "First sessions", "description": "<p>Short, supervised, and adjusted as we go.</p>" } },
+    { "type": "step", "settings": { "title": "Check-in", "description": "<p>Halfway review and any changes needed.</p>" } },
+    { "type": "step", "settings": { "title": "Next steps", "description": "<p>Where to go from here, with options laid out.</p>" } }
+  ]
+}
+```

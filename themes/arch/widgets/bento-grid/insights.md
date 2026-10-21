@@ -1,121 +1,78 @@
-# Bento Grid Widget
+# bento-grid
 
-A flexible tiled grid for showcasing features, services, or highlights in an asymmetric, visually weighted layout.
+## Purpose
 
----
+A mosaic of tiles of different sizes on a four-column grid, for showcasing a handful of features, services, spaces or highlights where one or two items deserve more room than the rest. Each tile holds a short title and a line of text, optionally over a photo or a flat colour, and can link to a page.
 
-## Settings Levers
+Tiles are sized with `col_span` (one to four columns) and `row_span` (one or two rows). A tile with an image becomes a photo card with an overlay; a tile with a `background_color` is a flat colour card; a tile with neither is an outlined card on the section surface. Text sits at the bottom of every tile. On phones the grid becomes a single column and the spans are ignored.
 
-| Setting | Values | Visual Effect |
-|---------|--------|---------------|
-| `eyebrow` | Any text | Small label above the headline; adds context or category framing |
-| `eyebrow_uppercase` | `true` / `false` (default) | Uppercases the eyebrow text for a more formal label treatment |
-| `title` | Any text (default: "Feature Spotlight") | Section headline; renders as `h1` when the widget is first on the page, `h2` otherwise |
-| `description` | Any text | Supporting paragraph below the headline |
-| `heading_alignment` | `start`, `center` (default) | Controls whether the section header block sits left-aligned or centered above the grid |
-| `gap` | `0`, `--space-sm`, `--space-md` (default), `--space-lg`, `--space-xl` | Gutter size between tiles; `0` gives a seamless mosaic, larger values add breathing room |
-| `color_scheme` | `standard-primary`, `standard-secondary`, `highlight-primary`, `highlight-secondary` | Section-level palette; highlight schemes swap background/foreground for contrast sections |
-| `top_spacing` | `auto` (default), `small`, `none` | `small` reduces spacing for tighter rhythm; `none` removes it entirely for flush stacking |
-| `bottom_spacing` | `auto` (default), `small`, `none` | Same as above for the bottom edge |
+## When to use
 
----
+- A showcase in the upper half of a homepage or an `about` page, after the hero and before the detail sections.
+- Good for four to eight items with a clear hierarchy (one flagship, several supporting). Bad for equal items with longer copy (`card-grid`, `services-grid`), for many photos (`gallery`, `masonry-gallery`) and for lists that need buttons.
+- Not a page opener.
+- Sits well after a `banner` or `split-content` intro and before `key-figures`, `testimonials` or an `action-bar`.
+- Needs a title of two to five words and one sentence per tile; at least one or two tiles with strong photos. Flat and outlined tiles need no images.
+- Fits agencies, studios, software, hospitality (rooms and amenities), venues, real estate, schools and makers who want a magazine-like feel.
 
-## Available Blocks
+## Pitfalls
 
-| Block Type | Key Settings | Notes |
-|------------|-------------|-------|
-| **item** | `title`, `text`, `image`, `link` (content); `col_span` 1-4, `row_span` 1-2 (layout); `background_color`, `overlay_color`, `text_color`, `alignment` (display) | The only block type. Each tile is one item. An image turns the tile into a background-image card with a customizable overlay. A background color without an image creates a flat colored tile. If neither is set, the tile gets a subtle border instead. Tiles with a `link` render as `<a>` elements. |
+- Plan complete rows: the spans in each row must add up to four, and a `row_span: 2` tile takes two columns' worth of height, so the tiles beside it must fill two rows (for example two tiles of `col_span: 2`). Leftover gaps look like a bug.
+- `text_color` must match the tile, not the section: `light` on photos and dark fills, `dark` on outlined and pale fills. The overlay darkens every photo tile, so `light` is almost always right there.
+- On `highlight-primary` or `highlight-secondary`, give every tile a photo or a `background_color`. An outlined tile has no fill, so `dark` text sits directly on the dark band and disappears.
+- Mix tile kinds. All photo tiles turn noisy; all outlined tiles look unfinished. One photo per row with flat or outlined neighbours gives rhythm.
+- The `text` field is plain text: one or two short lines. Long text pushes the title up and crowds the small tiles.
+- `link` makes the whole tile clickable and adds a zoom on hover. Link all tiles or none, so the visitor does not have to guess which are clickable.
+- `gap: 0` gives a seamless mosaic that only works when every tile has a photo or fill; with outlined tiles the borders double up.
+- Any scheme other than `standard-primary` makes a filled band that pads inside itself; the section below needs its own `top_spacing`.
 
----
+## Recipes
 
-## Layout Recipes
+### Spotlight and two details
 
-The grid is 4 columns on desktop and collapses to a single column on mobile. Every recipe below assumes desktop and totals to row-complete arrangements (columns add up to 4 per row).
+One large photo tile on the left, two flat tiles stacked on the right. Needs one strong landscape or square photo for the first tile.
 
-### 1. Hero Spotlight + Supporting Details
+```json
+{
+  "type": "bento-grid",
+  "settings": { "eyebrow": "What we do", "title": "Three ways we can help", "heading_alignment": "start", "gap": "var(--space-md)" },
+  "blocks": [
+    { "type": "item", "settings": { "title": "Full renovations", "text": "From the first sketch to the last coat of paint.", "col_span": 2, "row_span": 2, "text_color": "light", "alignment": "start", "link": { "text": "Renovations", "href": "services.html" } } },
+    { "type": "item", "settings": { "title": "Kitchens", "text": "Designed around how you cook.", "col_span": 2, "row_span": 1, "background_color": "#1f3a5f", "text_color": "light", "link": { "text": "Kitchens", "href": "services.html" } } },
+    { "type": "item", "settings": { "title": "Repairs", "text": "Small jobs, done the same week.", "col_span": 2, "row_span": 1, "text_color": "dark", "link": { "text": "Repairs", "href": "services.html" } } }
+  ]
+}
+```
 
-| Tile | col_span | row_span | Purpose |
-|------|----------|----------|---------|
-| Main feature | 2 | 2 | Large image tile, light text, overlay |
-| Detail A | 2 | 1 | Flat color tile, dark text |
-| Detail B | 2 | 1 | Flat color tile, dark text |
+### Wide strip and three cards
 
-**Good for:** Announcing a flagship product, seasonal promotion, or new location opening.
+A full-width photo tile as the headline, then three cards beneath it (one wider for longer copy). One wide photo needed.
 
-### 2. Equal Quarters
+```json
+{
+  "type": "bento-grid",
+  "settings": { "eyebrow": "This season", "title": "What is on", "heading_alignment": "start", "gap": "var(--space-md)", "color_scheme": "standard-secondary" },
+  "blocks": [
+    { "type": "item", "settings": { "title": "Summer programme", "text": "Workshops and open evenings, June to August.", "col_span": 4, "row_span": 1, "text_color": "light", "alignment": "center" } },
+    { "type": "item", "settings": { "title": "Workshops", "text": "Weekly, all levels.", "col_span": 1, "row_span": 1, "text_color": "dark" } },
+    { "type": "item", "settings": { "title": "Open evenings", "text": "First Friday of the month.", "col_span": 1, "row_span": 1, "text_color": "dark" } },
+    { "type": "item", "settings": { "title": "Members", "text": "Priority booking and a discount on every course.", "col_span": 2, "row_span": 1, "background_color": "#1f3a5f", "text_color": "light" } }
+  ]
+}
+```
 
-| Tile | col_span | row_span | Purpose |
-|------|----------|----------|---------|
-| Service A | 2 | 1 | Each tile highlights one offering |
-| Service B | 2 | 1 | |
-| Service C | 2 | 1 | |
-| Service D | 2 | 1 | |
+### Seamless mosaic
 
-**Good for:** Presenting core service categories at a glance with no single item dominating.
+Photo tiles with no gap for a premium, magazine-like block: one tall tile and two squares. Needs three photos; every tile must have an image.
 
-### 3. Wide Banner + Three Cards
-
-| Tile | col_span | row_span | Purpose |
-|------|----------|----------|---------|
-| Banner | 4 | 1 | Full-width image tile with headline and CTA link |
-| Card A | 1 | 1 | Supporting detail |
-| Card B | 1 | 1 | Supporting detail |
-| Card C | 2 | 1 | Slightly wider card for longer copy |
-
-**Good for:** A portfolio intro or event announcement followed by quick-hit details.
-
-### 4. Feature Matrix (6 tiles)
-
-| Tile | col_span | row_span | Purpose |
-|------|----------|----------|---------|
-| Tile 1 | 1 | 1 | Compact feature |
-| Tile 2 | 1 | 1 | Compact feature |
-| Tile 3 | 2 | 1 | Wider feature with image |
-| Tile 4 | 2 | 1 | Wider feature with image |
-| Tile 5 | 1 | 1 | Compact feature |
-| Tile 6 | 1 | 1 | Compact feature |
-
-**Good for:** SaaS-style feature breakdowns or a "Why choose us" section.
-
-### 5. Asymmetric Storytelling
-
-| Tile | col_span | row_span | Purpose |
-|------|----------|----------|---------|
-| Hero image | 3 | 2 | Dominant photo tile, light text, overlay |
-| Stat A | 1 | 1 | Key number or award |
-| Stat B | 1 | 1 | Key number or award |
-
-**Good for:** "About us" sections that lead with a strong visual and pair it with proof points.
-
-### 6. Content Dashboard
-
-| Tile | col_span | row_span | Purpose |
-|------|----------|----------|---------|
-| Primary | 2 | 2 | Image tile linking to latest blog post or case study |
-| Secondary A | 1 | 1 | Colored tile linking to second article |
-| Secondary B | 1 | 1 | Colored tile linking to third article |
-| Secondary C | 1 | 1 | Colored tile linking to fourth article |
-| Secondary D | 1 | 1 | Colored tile linking to fifth article |
-
-**Good for:** A curated content hub on a homepage, replacing a traditional blog roll.
-
-### 7. Minimal Duo
-
-| Tile | col_span | row_span | Purpose |
-|------|----------|----------|---------|
-| Left | 2 | 1 | Image-backed tile |
-| Right | 2 | 1 | Flat colored tile with copy |
-
-**Good for:** A simple before/after, problem/solution, or two-service split.
-
----
-
-## Differentiation Tips
-
-- **Mix image tiles with flat-color tiles.** A grid where every tile has a background image becomes noisy. Alternate between photo tiles (with overlay + light text) and solid-color tiles (dark text) to create visual rhythm.
-- **Use col_span 3 + 1 sparingly.** A 3:1 ratio draws the eye hard to the left; reserve it for a single hero moment per page, not repeated in every section.
-- **Let gap do the work.** Setting gap to `0` with border-free image tiles produces a magazine-style mosaic that feels premium. Setting it to `--space-lg` or `--space-xl` feels open and editorial.
-- **Pair with heading_alignment start** when the grid follows a narrative flow (top-to-bottom reading). Use center alignment when tiles are more of an unordered showcase.
-- **Keep overlay colors intentional.** The default overlay `#0a1e38bf` is a deep navy at 75% opacity. Swap it for a brand color at 60-70% opacity to tint photos toward your palette without losing legibility.
-- **Link every tile or none.** Mixing linked and non-linked tiles confuses visitors about what is clickable. If only some tiles need links, give all tiles a consistent hover state by using background colors or images on every tile.
-- **Use row_span 2 to anchor the grid.** A single tall tile (col_span 2, row_span 2) surrounded by smaller tiles creates a natural focal point. Without it, the grid can feel like a flat, undifferentiated checkerboard.
+```json
+{
+  "type": "bento-grid",
+  "settings": { "title": "", "description": "", "gap": "0" },
+  "blocks": [
+    { "type": "item", "settings": { "title": "The main hall", "text": "Seats 200.", "col_span": 3, "row_span": 2, "text_color": "light" } },
+    { "type": "item", "settings": { "title": "The bar", "text": "", "col_span": 1, "row_span": 1, "text_color": "light" } },
+    { "type": "item", "settings": { "title": "The terrace", "text": "", "col_span": 1, "row_span": 1, "text_color": "light" } }
+  ]
+}
+```

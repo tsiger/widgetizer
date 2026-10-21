@@ -1,155 +1,134 @@
-# Team Highlight Widget — Insights
+# team-highlight
 
-A split-layout team section with a sticky intro column (eyebrow, headline, description, optional signature image) on the left and a responsive member photo grid on the right.
+## Purpose
 
----
+A team section with a pinned introduction on the left (eyebrow, heading, paragraph and an optional signature image) and a grid of people on the right: photo, name, role, an optional speciality line, a short bio and social links. It puts faces to the business on an `about` or `team` page.
 
-## Settings Levers
+The intro column stays in view while the grid scrolls, so a longer team reads as one section with a steady headline. Photos share one crop shape set by `image_ratio`.
 
-| Setting | Values | Visual Effect |
-|---------|--------|---------------|
-| `eyebrow` | Any text (default "Meet Our Team") | Small label above the headline; omit to tighten the intro stack |
-| `eyebrow_uppercase` | `true` / `false` (default) | Uppercases the eyebrow text for a more formal label treatment |
-| `title` | Any text (default "Our leaders") | Main headline; renders as `h1` when the widget is first on the page, `h2` otherwise |
-| `description` | Textarea (default provided) | Supporting paragraph below the headline |
-| `heading_alignment` | `start` / **`center`** | Controls whether the intro text block is left-aligned or centered |
-| `signature_image` | Image upload | Displays below the intro text (max-width 18 rem) — great for a founder's handwritten signature or a small brand mark |
-| `columns_desktop` | **2** / 3 / 4 (range) | Number of member columns on desktop (mobile always collapses to 2) |
-| `image_ratio` | **`portrait`** (3:4) / `square` (1:1) / `auto` (natural) | Crop shape for every member photo; portrait feels editorial, square feels modern, auto preserves originals |
-| `color_scheme` | **`standard-primary`** / `standard-secondary` / `highlight-primary` / `highlight-secondary` | Background and text color palette; highlight variants add a padded container background |
-| `top_spacing` | **`auto`** (default), `small`, `none` | `small` reduces spacing for tighter rhythm; `none` removes it entirely for flush stacking |
-| `bottom_spacing` | **`auto`** (default), `small`, `none` | `small` reduces spacing for tighter rhythm; `none` removes it entirely for flush stacking |
+## When to use
 
----
+- The people section on `about`, a dedicated `team` page, or a "meet the founders" moment on `index` for very small businesses.
+- Good for two to twelve named people with consistent photos: clinics, law and accounting firms, agencies, salons, schools, trades with a crew, restaurants with a kitchen team.
+- Bad for a flat directory of twenty or more (`profile-grid`), for people without photos, and for teams that change weekly; every card is a block someone must edit.
+- It can open a `team` page when it has a `title`, but it never supports a transparent header; under `transparent_on_hero` open with `split-content` or `banner` first.
+- Natural neighbours: `rich-text` or `split-content` story above, `key-figures`, `testimonials` or an `action-bar` ("Work with us") below.
+- Needs an intro with at least a heading and a sentence, plus two to eight `member` blocks. Even numbers fill two columns; multiples of three fill three.
+- Fits any business that sells trust in people. Less useful for product shops and venues.
 
-## Available Blocks
+## Pitfalls
 
-| Block Type | Key Settings | Notes |
-|------------|-------------|-------|
-| `member` | `photo` (image), `name` (text, default "John Doe"), `role` (text, default "Team Member"), `link` (URL + new-tab toggle) | Each block is one team member card. Photo hover-scales on linked cards; name color shifts to the accent on hover. Heading level auto-adjusts (`h3` when a widget title exists, `h2` when it does not). |
+- The intro column is pinned on wide screens, which looks right only when the intro has enough in it (eyebrow, heading, a two- or three-line paragraph, ideally the `signature_image`). A lone heading beside a tall grid looks lost; add a description or switch `heading_alignment` to `center`.
+- `columns_desktop` counts columns inside the right-hand grid, which is about sixty per cent of the width. Two columns give large portraits; four give small ones, so pair four with `square` and short names.
+- A `member` without a `photo` shows a placeholder portrait. Shoot everyone or nobody, and shoot them alike: same background, same framing, same light. `image_ratio` crops every photo the same way, so a mix of head-and-shoulders and full-length shots crops badly. `auto` keeps each photo's own shape and makes the grid ragged; use it only when all photos already match.
+- `specialty` shows in the accent colour under the role; it is for a discipline or focus ("Implants", "Family law"), not a second job title. `bio` is small text under that: one or two sentences, or cards grow to different heights.
+- `link` wraps the photo, name and role, so it should go to a real page (a bio page, a professional profile). Linking some members and not others gives an inconsistent hover.
+- Social fields take full profile addresses, one per network, and open in a new tab; `email` takes an address only. Fill at most two or three per person or the row of icons outgrows the name.
+- Names and roles are not prefilled placeholders you can leave; the defaults are sample names and must be replaced.
+- Photos of people on a highlight scheme sit on a dark band, which can make skin tones look flat; `standard-primary` or `standard-secondary` is usually kinder. Use a highlight scheme only when the team is the page's main message.
+- Filled schemes pad inside their own band, so `top_spacing` `none` on a filled section removes its inner padding rather than the gap to the section above; use `none` only directly under an unfilled `rich-text` opener.
 
-Default blocks ship with 4 members (CEO, CMO, CTO, Head of Design) — enough to fill a 2-column grid without looking empty.
+## Recipes
 
----
+### Founding pair
 
-## Layout Recipes
+Two founders in large portraits with a personal intro and a signature under it. Supply two upright portraits in the same style and a signature image on a transparent background.
 
-### 1. Founder Duo
+```json
+{
+  "type": "team-highlight",
+  "settings": {
+    "eyebrow": "The founders",
+    "title": "Two people, one workshop",
+    "description": "We started the studio in a shared garage in 2015 and still make everything ourselves.",
+    "heading_alignment": "start",
+    "columns_desktop": 2,
+    "image_ratio": "portrait",
+    "color_scheme": "standard-primary"
+  },
+  "blocks": [
+    { "type": "member", "settings": { "name": "Alex Sample", "role": "Co-founder", "specialty": "Design", "bio": "Trained as an architect, happiest at the drawing board." } },
+    { "type": "member", "settings": { "name": "Sam Example", "role": "Co-founder", "specialty": "Making", "bio": "Twenty years at the bench and counting." } }
+  ]
+}
+```
 
-| Parameter | Value |
-|-----------|-------|
-| `columns_desktop` | 2 |
-| `image_ratio` | portrait |
-| `heading_alignment` | start |
-| `signature_image` | Founder's handwritten signature |
-| Blocks | 2 members |
+### Clinic team
 
-**Good for:** Co-founder story, husband-and-wife businesses, small studios.
+Six practitioners in three columns with speciality lines, for clinics, dentists and therapy practices. Supply six square head-and-shoulders photos on the same background.
 
----
+```json
+{
+  "type": "team-highlight",
+  "settings": {
+    "eyebrow": "Meet the team",
+    "title": "The people who will look after you",
+    "description": "Every practitioner is registered, insured and continues training each year.",
+    "heading_alignment": "start",
+    "columns_desktop": 3,
+    "image_ratio": "square",
+    "color_scheme": "standard-secondary"
+  },
+  "blocks": [
+    { "type": "member", "settings": { "name": "Dr A. Sample", "role": "Principal dentist", "specialty": "Implants" } },
+    { "type": "member", "settings": { "name": "Dr B. Sample", "role": "Associate dentist", "specialty": "Children" } },
+    { "type": "member", "settings": { "name": "C. Sample", "role": "Hygienist", "specialty": "Gum health" } },
+    { "type": "member", "settings": { "name": "D. Sample", "role": "Hygienist", "specialty": "Whitening" } },
+    { "type": "member", "settings": { "name": "E. Sample", "role": "Practice manager", "specialty": "Your first visit" } },
+    { "type": "member", "settings": { "name": "F. Sample", "role": "Reception", "specialty": "Appointments" } }
+  ]
+}
+```
 
-### 2. Leadership Grid
+### Linked advisors
 
-| Parameter | Value |
-|-----------|-------|
-| `columns_desktop` | 3 |
-| `image_ratio` | square |
-| `heading_alignment` | center |
-| `color_scheme` | highlight-primary |
-| Blocks | 6 members |
+Three or four advisors or partners with professional profile links and a short bio each, centred intro, for consultancies, start-ups and nonprofits. Supply matching upright portraits.
 
-**Good for:** Mid-size companies that want to show depth without overwhelming the page.
+```json
+{
+  "type": "team-highlight",
+  "settings": {
+    "eyebrow": "Advisory board",
+    "title": "Guided by experience",
+    "description": "Independent advisors who meet the team quarterly.",
+    "heading_alignment": "center",
+    "columns_desktop": 3,
+    "image_ratio": "portrait",
+    "color_scheme": "standard-primary"
+  },
+  "blocks": [
+    { "type": "member", "settings": { "name": "J. Sample", "role": "Chair", "bio": "Former head of a regional hospital trust.", "linkedin": "https://www.linkedin.com/in/example" } },
+    { "type": "member", "settings": { "name": "K. Sample", "role": "Finance", "bio": "Chartered accountant and charity treasurer.", "linkedin": "https://www.linkedin.com/in/example" } },
+    { "type": "member", "settings": { "name": "L. Sample", "role": "Community", "bio": "Thirty years in local youth work.", "linkedin": "https://www.linkedin.com/in/example" } }
+  ]
+}
+```
 
----
+### Compact crew strip
 
-### 3. Full Roster Board
+A no-frills four-column row near the end of an `about` page: faces, names, roles, nothing else. Supply eight square photos.
 
-| Parameter | Value |
-|-----------|-------|
-| `columns_desktop` | 4 |
-| `image_ratio` | square |
-| `heading_alignment` | start |
-| `color_scheme` | standard-primary |
-| Blocks | 8-12 members |
-
-**Good for:** Showing the entire team when headcount is a selling point (trust signal).
-
----
-
-### 4. Editorial Spotlight
-
-| Parameter | Value |
-|-----------|-------|
-| `columns_desktop` | 2 |
-| `image_ratio` | portrait |
-| `heading_alignment` | start |
-| `color_scheme` | highlight-secondary |
-| `eyebrow` | "The People Behind the Work" |
-| Blocks | 3-4 members, each with a link to a personal bio page |
-
-**Good for:** Creative businesses that want a magazine-feel introduction to key people.
-
----
-
-### 5. Minimal Team Strip
-
-| Parameter | Value |
-|-----------|-------|
-| `columns_desktop` | 4 |
-| `image_ratio` | square |
-| `heading_alignment` | center |
-| `eyebrow` | *(empty)* |
-| `description` | *(empty)* |
-| `title` | "Our Team" |
-| `top_spacing` | none |
-| Blocks | 4 members, no links |
-
-**Good for:** A compact, no-frills team section near the footer — just faces, names, and roles.
-
----
-
-### 6. Linked Advisors Panel
-
-| Parameter | Value |
-|-----------|-------|
-| `columns_desktop` | 3 |
-| `image_ratio` | portrait |
-| `heading_alignment` | start |
-| `color_scheme` | standard-secondary |
-| `eyebrow` | "Advisory Board" |
-| Blocks | 3-6 members, each linked to a LinkedIn profile (new tab) |
-
-**Good for:** Startups and nonprofits that want to showcase credibility through advisors or board members.
-
----
-
-### 7. Solo Founder Hero
-
-| Parameter | Value |
-|-----------|-------|
-| `columns_desktop` | 2 |
-| `image_ratio` | auto |
-| `heading_alignment` | start |
-| `signature_image` | Signature or small logo |
-| `description` | A personal founder statement |
-| Blocks | 1 member |
-
-**Good for:** Solopreneurs and personal brands where a single large portrait next to a personal message creates an intimate feel.
-
----
-
-## Differentiation Tips
-
-- **Use the signature image.** Most team sections are interchangeable grids. Adding a handwritten signature or a small brand mark below the intro text immediately sets this widget apart and adds a personal, human touch.
-
-- **Pair image ratio with the mood.** Portrait photos shot with shallow depth of field feel editorial and high-end. Square crops feel clean and contemporary. Use `auto` only when you have inconsistent source photography and cannot reshoot.
-
-- **The sticky intro is the secret weapon.** On desktop the intro column stays fixed while the member grid scrolls. This works best when the intro has enough content (eyebrow + headline + description + signature) to anchor the left side. If the intro is too sparse, the stickiness looks odd — either add a signature image or switch to `heading_alignment: center` which visually balances a shorter intro.
-
-- **Link strategically.** Member links are optional. Link only when there is a meaningful destination (a bio page, a LinkedIn profile, a personal site). Linking every card to nowhere erodes trust. When links are present, the hover animation (photo scale + name accent color) provides a clear affordance.
-
-- **Control density with columns.** Two columns feel spacious and premium. Three columns are the workhorse layout for 6-9 people. Four columns pack in large teams but shrink photos — pair with square crops so faces stay readable at smaller sizes.
-
-- **Use color scheme to create contrast.** If the sections above and below are on a standard background, switching this widget to `highlight-primary` or `highlight-secondary` visually separates the team from surrounding content and draws the eye.
-
-- **Remove spacing to stack sections.** Set `top_spacing` or `bottom_spacing` to `none` when you want this widget to flow seamlessly into an adjacent section that shares the same color scheme — useful for building a cohesive "about" page sequence.
+```json
+{
+  "type": "team-highlight",
+  "settings": {
+    "eyebrow": "",
+    "title": "The crew",
+    "description": "Eight people, one van each, all local.",
+    "heading_alignment": "start",
+    "columns_desktop": 4,
+    "image_ratio": "square",
+    "color_scheme": "standard-primary"
+  },
+  "blocks": [
+    { "type": "member", "settings": { "name": "A. Sample", "role": "Lead electrician" } },
+    { "type": "member", "settings": { "name": "B. Sample", "role": "Electrician" } },
+    { "type": "member", "settings": { "name": "C. Sample", "role": "Electrician" } },
+    { "type": "member", "settings": { "name": "D. Sample", "role": "Apprentice" } },
+    { "type": "member", "settings": { "name": "E. Sample", "role": "Plumber" } },
+    { "type": "member", "settings": { "name": "F. Sample", "role": "Plumber" } },
+    { "type": "member", "settings": { "name": "G. Sample", "role": "Scheduler" } },
+    { "type": "member", "settings": { "name": "H. Sample", "role": "Office" } }
+  ]
+}
+```

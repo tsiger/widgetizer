@@ -1,156 +1,72 @@
-# Embed Widget Insights
+# embed
 
-## Description
+## Purpose
 
-A flexible container for injecting raw HTML, iframes, or third-party embed codes into a page, wrapped with an optional eyebrow/title/description header and configurable width and alignment.
+A container for third-party code: a booking calendar, a newsletter form, a payment button, a social feed, a review widget. It drops the pasted snippet onto the page under the usual heading group, at a chosen width and alignment. Use it when no dedicated section exists for the content.
 
----
+The snippet is shown as-is, so the section looks like whatever the provider renders. An optional background image with a colour overlay turns the whole section into a filled band, which is the only way this section carries visual weight of its own.
 
-## Settings Levers
+## When to use
 
-| Setting | Values | Visual Effect |
-|---|---|---|
-| `eyebrow` | Any text (blank by default) | Small label above the title; adds a subtle category or context tag above the embed |
-| `eyebrow_uppercase` | `true` / `false` (default) | Uppercases the eyebrow text for a more formal label treatment |
-| `title` | Any text (default "Watch Our Video") | Large headline rendered as `<h1>` when widget is first on page, `<h2>` otherwise |
-| `description` | Any text (default placeholder sentence) | Supporting paragraph below the title, sets expectation for the embedded content |
-| `heading_alignment` | `start`, `center` (default) | Shifts eyebrow/title/description to the left edge or centers them above the embed |
-| `code` | Raw HTML / iframe / embed snippet | The actual embedded content; rendered unescaped inside the embed wrapper |
-| `max_width` | `narrow`, `medium`, `wide`, `fullwidth` | Controls horizontal spread of the content area (maps to `widget-content-sm/md/lg` or no cap) |
-| `alignment` | `start`, `center`, `end` | Positions the embed block horizontally within its container via flexbox alignment |
-| `color_scheme` | `standard-primary`, `standard-secondary`, `highlight-primary`, `highlight-secondary` | Changes background and text color palette; non-standard schemes add padded container |
-| `top_spacing` | `auto` (default), `small`, `none` | `small` reduces spacing for tighter rhythm; `none` removes it entirely for flush stacking |
-| `bottom_spacing` | `auto` (default), `small`, `none` | Same as above for the bottom edge |
+- Mid-page on a `contact`, `book` or `services` page, wherever the visitor should act inside the site instead of leaving it.
+- Good for: booking and scheduling tools, payment or donation buttons, newsletter sign-ups, live review or social feeds, a widget from a service the business already uses. Bad for: a map (use `map`), a hosted video (use `video-embed` or `video-popup`), a contact form (use `core-form`), anything you could build with ordinary sections.
+- It can open a page, but should not: a cold iframe is a weak opener and it does not support the transparent header (only `banner`, `slideshow` and `video-popup` do). Place a title section above it.
+- Natural neighbours: `rich-text` explaining what the tool does, `contact-details` beside a booking tool, `accordion` for questions, `action-bar` elsewhere on the page for visitors who skip the tool.
+- Needs one working snippet from the provider and, ideally, a one-line description setting expectations.
+- Fits salons, clinics, studios, nonprofits, restaurants with online reservations, any business that lives in a third-party tool.
 
----
+## Pitfalls
 
-## Available Blocks
+- Replace the default title and description; they are template placeholders and the default `code` is a sample box, not real content. If the embedded tool carries its own heading, leave `title` blank.
+- Paste only the snippet the provider gives you. Extra wrappers or inline styles fight the section's own width handling. The section caps an iframe to the container width but keeps the height the snippet asks for, so a fixed tall height leaves empty space on phones.
+- Match `max_width` to the tool: `narrow` for a payment button or sign-up form, `medium` for a booking calendar, `wide` for a feed, `fullwidth` only for something that is designed to stretch. `alignment` has no visible effect at `fullwidth`.
+- Third-party scripts load from the provider's servers, may track visitors and may need a consent notice. Check the snippet works on the published site, not just in the editor preview.
+- Setting an `image` makes the section a filled band with the `overlay_color` on top, regardless of `color_scheme`. Keep the overlay dark enough that the heading stays readable, and expect the embedded tool to render in its own colours, which may clash with a photo.
+- Any scheme other than `standard-primary`, or any background image, pads the content inside its own band, so `top_spacing` and `bottom_spacing` set to `none` remove that inner padding; under a filled section above use `small`. As a utility section it usually belongs on a standard surface; reserve a highlight scheme for the one booking or donation tool the page is built around.
+- `heading_alignment` set to `start` suits tools and forms; keep `center` for showcase content such as a feed.
 
-This widget has no blocks. All content is controlled through settings alone.
+## Recipes
 
----
+### Booking calendar
 
-## Layout Recipes
+A centred scheduling tool with a short explanation above it. The user supplies the provider's booking snippet in place of the placeholder markup.
 
-### 1. Hero Video Intro
+```json
+{
+  "type": "embed",
+  "settings": { "title": "Book Your Appointment", "description": "Pick a time that works for you. Confirmation arrives by email.", "heading_alignment": "center", "code": "<div class=\"example-placeholder\"><p>Booking calendar placeholder</p></div>", "max_width": "medium", "alignment": "center", "color_scheme": "standard-primary" }
+}
+```
 
-| Setting | Value |
-|---|---|
-| `eyebrow` | "See It In Action" |
-| `title` | "How We Build Custom Furniture" |
-| `description` | "A 90-second look inside our workshop." |
-| `heading_alignment` | center |
-| `code` | YouTube or Vimeo iframe |
-| `max_width` | wide |
-| `alignment` | center |
-| `color_scheme` | standard-primary |
-| `top_spacing` | auto |
-| `bottom_spacing` | auto |
+### Donation button on a highlight band
 
-**Good for:** Above-the-fold product or brand video that immediately shows the business in motion.
+The one conversion tool a campaign page is built around, given the strongest surface. The user supplies the payment provider's snippet.
 
----
+```json
+{
+  "type": "embed",
+  "settings": { "eyebrow": "Support the Work", "title": "Make a Donation", "description": "Every contribution goes straight to the programme.", "heading_alignment": "center", "code": "<div class=\"example-placeholder\"><p>Donation form placeholder</p></div>", "max_width": "narrow", "alignment": "center", "color_scheme": "highlight-primary" }
+}
+```
 
-### 2. Booking Calendar Strip
+### Newsletter sign-up, left-aligned
 
-| Setting | Value |
-|---|---|
-| `eyebrow` | (blank) |
-| `title` | "Book Your Appointment" |
-| `description` | "Pick a time that works for you." |
-| `heading_alignment` | center |
-| `code` | Calendly / Acuity inline embed |
-| `max_width` | medium |
-| `alignment` | center |
-| `color_scheme` | highlight-primary |
-| `top_spacing` | auto |
-| `bottom_spacing` | auto |
+A small form docked under a text section, reading like part of the page rather than a separate block. The user supplies the newsletter provider's form snippet.
 
-**Good for:** Dedicated scheduling section on a services page so visitors can book without leaving the site.
+```json
+{
+  "type": "embed",
+  "settings": { "title": "Stay in the Loop", "description": "A short monthly note. Unsubscribe any time.", "heading_alignment": "start", "code": "<div class=\"example-placeholder\"><p>Sign-up form placeholder</p></div>", "max_width": "narrow", "alignment": "start", "color_scheme": "standard-secondary", "top_spacing": "small" }
+}
+```
 
----
+### Social feed
 
-### 3. Google Map Pinned Left
+A wide live feed that keeps the page feeling current. The user supplies the feed provider's snippet; the section title replaces any heading the feed lacks.
 
-| Setting | Value |
-|---|---|
-| `eyebrow` | "Visit Us" |
-| `title` | "Our Location" |
-| `description` | "123 Main St, Portland, OR" |
-| `heading_alignment` | start |
-| `code` | Google Maps iframe (fixed height, 100% width) |
-| `max_width` | fullwidth |
-| `alignment` | start |
-| `color_scheme` | standard-primary |
-| `top_spacing` | none |
-| `bottom_spacing` | none |
-
-**Good for:** Contact or footer area where the map spans the full width and the heading sits left-aligned like an address block.
-
----
-
-### 4. Social Proof Feed
-
-| Setting | Value |
-|---|---|
-| `eyebrow` | "Follow Along" |
-| `title` | "What We've Been Up To" |
-| `description` | (blank) |
-| `heading_alignment` | center |
-| `code` | Instagram or Facebook feed embed (e.g., Elfsight, Smash Balloon, or native embed) |
-| `max_width` | wide |
-| `alignment` | center |
-| `color_scheme` | standard-secondary |
-| `top_spacing` | auto |
-| `bottom_spacing` | auto |
-
-**Good for:** A social media gallery section that keeps the site feeling current without manual updates.
-
----
-
-### 5. Review / Testimonial Carousel
-
-| Setting | Value |
-|---|---|
-| `eyebrow` | (blank) |
-| `title` | "What Our Clients Say" |
-| `description` | "Real reviews from real customers." |
-| `heading_alignment` | center |
-| `code` | Google Reviews or Yelp widget embed |
-| `max_width` | narrow |
-| `alignment` | center |
-| `color_scheme` | highlight-secondary |
-| `top_spacing` | auto |
-| `bottom_spacing` | auto |
-
-**Good for:** A focused, trust-building section that pulls live reviews from a third-party platform.
-
----
-
-### 6. Payment / Donation Form
-
-| Setting | Value |
-|---|---|
-| `eyebrow` | "Support Our Mission" |
-| `title` | "Make a Donation" |
-| `description` | "Every contribution helps us serve the community." |
-| `heading_alignment` | center |
-| `code` | Stripe Payment Links iframe or PayPal donate button embed |
-| `max_width` | narrow |
-| `alignment` | center |
-| `color_scheme` | highlight-primary |
-| `top_spacing` | auto |
-| `bottom_spacing` | auto |
-
-**Good for:** A contained, centered payment form that feels intentional rather than bolted on.
-
----
-
-## Differentiation Tips
-
-- **Drop the default title.** The default "Watch Our Video" screams template. Replace it with something specific to the business or remove it entirely if the embed is self-explanatory.
-- **Match max_width to the embed's natural aspect ratio.** A narrow Calendly widget looks lost at fullwidth. A panoramic Google Map looks cramped at narrow. Let the content dictate the container.
-- **Use `heading_alignment: start` for utilitarian embeds.** Maps, forms, and booking tools feel more grounded with left-aligned headers. Save center alignment for showcase content like videos and social feeds.
-- **Stack spacing intentionally.** Set `top_spacing: none` to avoid a double gap only when the widget above is unfilled — its own bottom margin already provides the spacing. Below an image hero or another filled full-bleed widget, use `top_spacing: small` instead: a filled section's bottom spacing is internal padding, so `none` there presses the embed against its edge. Use `bottom_spacing: none` when a CTA section follows immediately and should read as part of the same moment.
-- **Lean on color_scheme to create visual separation.** A `highlight-primary` or `highlight-secondary` background makes an embed section feel like a distinct zone rather than just another block of content. This is especially effective for booking and payment embeds where you want the visitor to pause and take action.
-- **Keep the code field clean.** Paste only the embed snippet itself. Wrapping it in extra divs or inline styles beyond what the provider gives you often fights the widget's own responsive handling.
+```json
+{
+  "type": "embed",
+  "settings": { "eyebrow": "Follow Along", "title": "Latest from the Studio", "heading_alignment": "center", "code": "<div class=\"example-placeholder\"><p>Social feed placeholder</p></div>", "max_width": "wide", "alignment": "center", "color_scheme": "standard-primary" }
+}
+```

@@ -1,81 +1,107 @@
-# Testimonial Slider
+# testimonial-slider
 
-A single-quote carousel that cross-fades between customer testimonials, with optional star ratings, avatars, and pagination dots.
+## Purpose
 
----
+A single-quote carousel: one centred testimonial at a time, with optional star rating, round avatar, name and role, cross-fading to the next with pagination dots. It gives a page one calm social-proof moment that cycles through up to eight voices without taking the space of a grid.
 
-## Settings Levers
+Each quote is set in large centred type, so the section is about reading one person at a time. With one quote the dots disappear and it becomes a static pull-quote.
 
-| Setting | Values | Visual Effect |
-|---------|--------|---------------|
-| `autoplay` | `true` (default) / `false` | Slides advance automatically when enabled; pauses on manual interaction when disabled |
-| `autoplay_speed` | `3000`--`10000` ms, step 1000 (default `5000`) | Controls dwell time per slide; lower values feel urgent, higher values let readers finish long quotes |
-| `color_scheme` | `standard-primary` / `standard-secondary` / `highlight-primary` / `highlight-secondary` | `standard-primary` inherits page background with no extra padding. The other three add a padded container and swap `--bg-primary`, giving a distinct band of color behind the quotes |
-| `top_spacing` | `auto` (default), `small`, `none` | `small` reduces spacing for tighter rhythm; `none` removes it entirely for flush stacking |
-| `bottom_spacing` | `auto` (default), `small`, `none` | `small` reduces spacing for tighter rhythm; `none` removes it entirely for flush stacking |
+## When to use
 
----
+- A compact proof beat between content sections, or directly under an image hero to validate the hero's promise.
+- Good for three to five quotes of similar length that each stand alone. Bad for showing many reviews at once or for comparing them; use `testimonials` for a grid.
+- Can open a page only in the sense that it renders; it has no heading, so put a `rich-text` title section before it instead.
+- Pairs well with `trust-bar`, `logo-cloud` and `key-figures`, and as the step before a closing `action-bar` or a `core-form`.
+- Needs one to eight `quote` blocks; a name per quote; a role line and avatar are optional but a real face raises trust noticeably.
+- Fits service businesses, local trades, clinics, coaches, hospitality and any high-ticket service where one story at a time is persuasive.
 
-## Available Blocks
+## Pitfalls
 
-| Block Type | Key Settings | Notes |
-|------------|-------------|-------|
-| `quote` | `quote` (textarea), `avatar` (image), `name` (text), `title` (text), `rating` (select: blank / 3 / 4 / 5, default `5`) | Max 8 blocks. Rating renders filled/empty stars out of 5. Avatar is circular (64px desktop, 48px mobile). Omitting rating hides the star row entirely. Omitting avatar still looks clean because the layout stacks vertically around the name/title. |
+- Slides sit on top of one another and the section takes the height of the active quote, so quotes of very different lengths make the page below jump as the slider advances. Keep them within a sentence of each other.
+- The quote is plain text at extra-large size. Two sentences is the comfortable maximum; a paragraph overflows the viewer's patience before `autoplay_speed` moves on.
+- Match `autoplay_speed` to length: a one-liner reads in four seconds, two sentences need seven or more. Turn `autoplay` off when visitors must act on the quote (a link next to it, a form below).
+- There is no pause on hover, so a reader who is mid-sentence loses the slide; shorter quotes and slower speeds are the only cure.
+- `rating` shows stars out of five with the empty ones greyed. Leave it blank to hide the row entirely rather than giving everyone five stars; a lone four-star review makes the set believable.
+- An avatar is cropped to a small circle, so faces must be centred and close up; a logo or wide photo there becomes an unreadable disc. Leave `avatar` empty rather than use a stock photo.
+- Filled schemes pad inside their own band. Under an image hero use `top_spacing` `small`, not `none`, so the slider does not collide with the hero's edge; `none` fits only when the section above is unfilled and already provides the gap, or shares the same scheme and should fuse.
+- Two highlight sections should not touch. If the slider is a highlight band, the sections above and below stay on standard surfaces.
 
----
+## Recipes
 
-## Layout Recipes
+### Three-voice proof band
 
-### 1. The Trust Trio
+A homepage proof moment on the strongest surface with three short quotes and no avatars. The user supplies three quotes, names and roles.
 
-Three 5-star reviews from recognizable local roles (e.g., "Owner, Main St Bakery"). Autoplay on, speed 5000 ms, `standard-primary` color scheme. No avatars needed.
+```json
+{
+  "type": "testimonial-slider",
+  "settings": {
+    "autoplay": true,
+    "autoplay_speed": 5000,
+    "color_scheme": "highlight-primary"
+  },
+  "blocks": [
+    { "type": "quote", "settings": { "quote": "A short quote from a customer goes here.", "name": "Customer name", "title": "Role, company", "rating": "5" } },
+    { "type": "quote", "settings": { "quote": "A short quote from a customer goes here.", "name": "Customer name", "title": "Role, company", "rating": "4" } },
+    { "type": "quote", "settings": { "quote": "A short quote from a customer goes here.", "name": "Customer name", "title": "Role, company", "rating": "5" } }
+  ]
+}
+```
 
-**Good for:** Landing pages that need quick social proof without heavy imagery.
+### Faces-first under the hero
 
-### 2. Faces-First Carousel
+Docked under an image `banner` with a slower cadence so visitors register each face. The user supplies a close-up headshot per quote plus the quotes, names and roles.
 
-Five testimonials, each with a headshot avatar. Autoplay on, speed 6000 ms to give visitors time to register the face. `highlight-primary` color scheme to create a distinct band that draws the eye.
+```json
+{
+  "type": "testimonial-slider",
+  "settings": {
+    "autoplay": true,
+    "autoplay_speed": 7000,
+    "color_scheme": "standard-secondary",
+    "top_spacing": "small"
+  },
+  "blocks": [
+    { "type": "quote", "settings": { "quote": "A short quote from a customer goes here.", "name": "Customer name", "title": "Role, company", "rating": "" } },
+    { "type": "quote", "settings": { "quote": "A short quote from a customer goes here.", "name": "Customer name", "title": "Role, company", "rating": "" } }
+  ]
+}
+```
 
-**Good for:** Service businesses where personal connection matters and real photos build trust.
+### Single pull-quote
 
-### 3. Slow-Burn Single Review
+One quote, no dots, no movement: an editorial pause between a services section and the contact form. The user supplies the one quote and its attribution.
 
-One long, detailed testimonial. Autoplay off (only one slide, so pagination dots hide automatically). `highlight-secondary` color scheme for maximum contrast. Pair it between a services section and a contact form.
+```json
+{
+  "type": "testimonial-slider",
+  "settings": {
+    "autoplay": false,
+    "color_scheme": "standard-primary"
+  },
+  "blocks": [
+    { "type": "quote", "settings": { "quote": "A longer, two-sentence quote from a customer goes here. It can carry one concrete detail.", "name": "Customer name", "title": "Role, company", "rating": "" } }
+  ]
+}
+```
 
-**Good for:** High-ticket services where a single powerful story outweighs volume.
+### Quick review ticker
 
-### 4. Social-Proof Speed Strip
+Four to eight one-sentence quotes on a fast cycle with stars showing, for a page that already has plenty of content and needs a brisk credibility beat. The user supplies the very short quotes.
 
-Six to eight short one-sentence quotes. Autoplay on, speed 3000 ms so they cycle fast. `standard-secondary` scheme with `top_spacing: none` and `bottom_spacing: none` so it sits flush between content blocks like a ticker.
-
-**Good for:** Pages that already have lots of content and need a compact credibility beat.
-
-### 5. Star-Rated Showcase
-
-Four reviews with explicit star ratings (mix of 4 and 5 stars to feel authentic). Autoplay on, speed 5000 ms. `standard-primary` color scheme so the stars themselves provide the visual punch. Avatars omitted to keep the focus on the rating and the quote text.
-
-**Good for:** Businesses that also appear on Google or Yelp and want their site reviews to feel consistent with those platforms.
-
-### 6. Hero Follow-Up
-
-Two to three testimonials placed directly below a hero widget. `highlight-primary` scheme, `top_spacing: small` so the slider docks close under the hero — an image hero's bottom spacing is internal padding, so `none` would press the slider against the image edge (`none` only works if the hero shares the same highlight scheme and the two should fuse into one band). Autoplay on, speed 7000 ms for a calm cadence. Include avatars and titles.
-
-**Good for:** Homepage designs where the hero makes a promise and the testimonials immediately validate it.
-
-### 7. Closing Argument
-
-Three testimonials positioned just above the footer. `standard-secondary` scheme, `bottom_spacing: none`. Autoplay on, speed 5000 ms. Short punchy quotes, no avatars, 5-star ratings.
-
-**Good for:** Reinforcing trust right before the visitor decides to leave or take action on a contact/booking link in the footer.
-
----
-
-## Differentiation Tips
-
-- **Mix ratings deliberately.** Throwing in a 4-star review among 5-star ones makes the whole set feel more believable. A wall of perfect scores triggers skepticism.
-- **Keep quotes conversational.** Short sentences with specific details ("cut our water bill by 30%") outperform generic praise ("great service, highly recommend"). Edit customer quotes down to the strongest sentence or two.
-- **Use titles that signal relevance.** "Owner, Downtown Cafe" tells a prospect more than "John D." Titles also explain why the reviewer's opinion should matter.
-- **Avatars are optional but powerful.** A real headshot increases trust substantially, but a generic placeholder does the opposite. If you do not have a real photo, leave the avatar blank rather than using a stock image.
-- **Pair with a color scheme that contrasts the surrounding sections.** If the sections above and below use `standard-primary`, switch the testimonial slider to `highlight-primary` or `highlight-secondary` so it reads as a distinct social-proof moment rather than blending in.
-- **Adjust autoplay speed to quote length.** A two-sentence quote needs maybe 4000 ms. A full paragraph needs 7000-8000 ms. If visitors cannot finish reading before the slide changes, autoplay hurts rather than helps.
-- **One testimonial is a valid choice.** A single powerful quote with no pagination dots looks intentional and editorial, not empty. It works especially well for niche businesses that have one marquee client story.
+```json
+{
+  "type": "testimonial-slider",
+  "settings": {
+    "autoplay": true,
+    "autoplay_speed": 4000,
+    "color_scheme": "standard-secondary"
+  },
+  "blocks": [
+    { "type": "quote", "settings": { "quote": "A one-sentence quote goes here.", "name": "Customer name", "title": "Role, company", "rating": "5" } },
+    { "type": "quote", "settings": { "quote": "A one-sentence quote goes here.", "name": "Customer name", "title": "Role, company", "rating": "5" } },
+    { "type": "quote", "settings": { "quote": "A one-sentence quote goes here.", "name": "Customer name", "title": "Role, company", "rating": "4" } },
+    { "type": "quote", "settings": { "quote": "A one-sentence quote goes here.", "name": "Customer name", "title": "Role, company", "rating": "5" } }
+  ]
+}
+```

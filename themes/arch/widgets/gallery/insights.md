@@ -1,73 +1,117 @@
-# Gallery Widget
+# gallery
 
-Responsive image gallery with grid or carousel layout, lightbox viewing, optional staggered masonry effect, and hover-reveal captions.
+## Purpose
 
-## Settings levers
+A photo gallery: a grid or a scrolling carousel of images that open full-size in a lightbox, with optional captions revealed on hover. Use it to show work, spaces, products or events when the pictures are the content and nothing needs to link anywhere.
 
-| Setting | Values | Visual effect |
-|---|---|---|
-| `eyebrow` | Any text (optional) | Small label above the title, adds editorial context |
-| `eyebrow_uppercase` | `true` / `false` (default) | Uppercases the eyebrow text for a more formal label treatment |
-| `title` | Any text (default "Project Gallery") | Section heading; renders as h1 if first widget on page, h2 otherwise |
-| `description` | Any text (optional) | Paragraph below the title, sets expectations for the gallery |
-| `heading_alignment` | `start`, `center` (default) | Left-aligns the header block for editorial layouts or centers it for showcase pages |
-| `layout` | `grid` (default), `carousel` | Grid shows all images at once in a responsive grid; carousel displays a horizontal scrollable strip with prev/next arrows |
-| `columns_desktop` | 2 -- 5 (default 4) | Number of columns on desktop; fewer columns mean larger thumbnails and more visual weight per image |
-| `staggered` | `true` / `false` (default) | Even-numbered cards drop down by a large vertical offset, creating a masonry-like rhythm; only visible at 750px+ |
-| `aspect_ratio` | `auto`, `contain`, `1/1`, `4/3` (default), `3/2`, `3/4`, `16/9` | Controls thumbnail cropping. Auto uses native proportions, contain fits the full image inside a fixed height, fixed ratios crop to uniform cards |
-| `color_scheme` | `standard-primary` (default), `standard-secondary`, `highlight-primary`, `highlight-secondary` | Switches the section background and text colors using theme palette variables |
-| `top_spacing` | `auto` (default), `small`, `none` | `small` reduces spacing for tighter rhythm; `none` removes it entirely for flush stacking |
-| `bottom_spacing` | `auto` (default), `small`, `none` | Same as above for the bottom edge |
+The grid can be uniform (every thumbnail cropped to the same ratio) or organic (native proportions with alternate columns dropped down). Visitors click any image to browse the whole set with arrow keys and captions.
 
-## Available blocks
+## When to use
 
-| Block | Key settings | Notes |
-|---|---|---|
-| image | `image` (image picker), `caption` (text) | The only block type. Each block is one gallery item. Caption appears on hover inside a dark gradient overlay at the bottom of the card and under the image in the lightbox. A blank caption falls back to the image's media-library caption. Images without a caption still open in the lightbox on click. Responsive srcset is generated automatically at medium size. |
+- The main section of a `gallery` or `portfolio` page, or a proof strip on a home, `about` or `services` page.
+- Good for: portfolios, venues and rooms, finished jobs, dishes, team and event photos, product lookbooks. Bad for: images that should lead to their own pages (use `projects-grid` or `card-grid`), images needing always-visible text (use `card-grid` or `checkerboard`), a Pinterest-style column flow (use `masonry-gallery`).
+- It can open a page: its title becomes the page heading when first. It cannot sit under a header with `transparent_on_hero`; only `banner`, `slideshow` and `video-popup` support the transparent header.
+- Natural neighbours: `rich-text` or `banner` above, `testimonials` or `action-bar` below, a `trust-bar` after a compact proof strip.
+- Needs at least as many images as columns; six to twelve is the sweet spot. Captions are optional.
+- Fits photographers, architects and designers, builders and landscapers, restaurants, hotels and venues, salons, makers.
 
-## Layout recipes
+## Pitfalls
 
-**1. "Portfolio Wall" (creative professional)**
-Settings: layout `grid`, columns_desktop `3`, aspect_ratio `4/3`, staggered `true`, heading_alignment `start`, color_scheme `standard-primary`.
-Blocks: 6--9 project photos with captions naming each project.
-Good for: photographers, architects, interior designers, illustrators.
+- Captions appear only on hover, so touch-screen visitors never see them until the lightbox opens. Treat captions as supplementary; information that matters belongs in a section that shows text permanently.
+- A blank `caption` falls back to the caption stored with the image in the media library, so an unexpected caption usually comes from there. An `image` block with no photo shows a placeholder graphic on the published site; remove empty blocks.
+- Every click opens the lightbox. On a page where you want visitors to move on to project pages, that slows them down; use a linking grid instead.
+- `aspect_ratio` set to `auto` keeps native proportions and leaves ragged row bottoms unless `staggered` is on; `contain` fits each whole image into a fixed-height box, which letterboxes mixed shapes. Fixed ratios crop, and `1 / 1` at four or five columns is the most forgiving choice for mixed-quality photos.
+- `staggered` is designed for the grid and only shows on tablet width and up; leave it off for `carousel`.
+- The grid is two-up on tablets and one-up on phones, where every image is full width. Keep the image count a multiple of `columns_desktop` and remember that a 12-image gallery is 12 full-width photos on a phone.
+- `carousel` uses `columns_desktop` as the number of visible slides. Two visible slides at `16 / 9` give a cinematic strip; more than three visible slides make a carousel pointless, use the grid.
+- Any scheme other than `standard-primary` pads the grid inside its own coloured band, so `top_spacing` and `bottom_spacing` set to `none` remove that inner padding; under a filled hero use `small`. A highlight scheme makes the gallery a scroll landmark between text-heavy sections, but photos with their own strong colours can fight a dark band.
 
-**2. "Before & After Strip" (service showcase)**
-Settings: layout `carousel`, columns_desktop `2`, aspect_ratio `3/2`, staggered `false`, heading_alignment `center`.
-Blocks: 6--8 images alternating before/after shots, captions labeling each ("Kitchen -- Before", "Kitchen -- After").
-Good for: showing transformation results without overwhelming the page.
+## Recipes
 
-**3. "Product Lookbook" (retail/e-commerce)**
-Settings: layout `grid`, columns_desktop `4`, aspect_ratio `1/1`, staggered `false`, color_scheme `highlight-primary`, heading_alignment `center`, eyebrow "New Collection".
-Blocks: 8 square product shots, captions with product names.
-Good for: seasonal launches, catalog browsing, lifestyle product display.
+### Portfolio wall
 
-**4. "Team at Work" (company culture)**
-Settings: layout `grid`, columns_desktop `3`, aspect_ratio `16/9`, staggered `false`, heading_alignment `start`, color_scheme `standard-secondary`.
-Blocks: 6 candid workplace or event photos, captions optional.
-Good for: about-us pages where showing the team and workspace builds trust.
+Three columns, staggered, left-aligned heading, captions naming each project. The user supplies six to nine landscape project photos.
 
-**5. "Full-Width Cinema Reel" (visual impact)**
-Settings: layout `carousel`, columns_desktop `2`, aspect_ratio `16/9`, staggered `false`, top_spacing `none`, bottom_spacing `none`, color_scheme `highlight-primary`.
-Blocks: 5--7 wide cinematic images, short captions.
-Good for: hero-adjacent storytelling, event recaps, travel highlights.
+```json
+{
+  "type": "gallery",
+  "settings": { "eyebrow": "Selected Work", "title": "Recent Projects", "heading_alignment": "start", "layout": "grid", "columns_desktop": 3, "staggered": true, "aspect_ratio": "4 / 3", "color_scheme": "standard-primary" },
+  "blocks": [
+    { "type": "image", "settings": { "caption": "Project one" } },
+    { "type": "image", "settings": { "caption": "Project two" } },
+    { "type": "image", "settings": { "caption": "Project three" } },
+    { "type": "image", "settings": { "caption": "Project four" } },
+    { "type": "image", "settings": { "caption": "Project five" } },
+    { "type": "image", "settings": { "caption": "Project six" } }
+  ]
+}
+```
 
-**6. "Mosaic Feature" (editorial/blog)**
-Settings: layout `grid`, columns_desktop `4`, aspect_ratio `auto`, staggered `true`, heading_alignment `start`.
-Blocks: 8+ images of varying native proportions; captions describe each scene.
-Good for: mixed-media storytelling where image proportions differ naturally.
+### Product lookbook
 
-**7. "Minimal Proof" (service-based landing page)**
-Settings: layout `grid`, columns_desktop `5`, aspect_ratio `1/1`, staggered `false`, heading_alignment `center`, eyebrow "Our Work", color_scheme `standard-primary`.
-Blocks: 5 images, no captions.
-Good for: a compact trust strip that shows volume of work without taking up much vertical space.
+Square crops in four tidy columns on the strongest surface. The user supplies eight square-friendly product or dish photos; captions carry the names.
 
-## Differentiation tips
+```json
+{
+  "type": "gallery",
+  "settings": { "eyebrow": "New Season", "title": "The Collection", "heading_alignment": "center", "layout": "grid", "columns_desktop": 4, "staggered": false, "aspect_ratio": "1 / 1", "color_scheme": "highlight-primary" },
+  "blocks": [
+    { "type": "image", "settings": { "caption": "Item one" } },
+    { "type": "image", "settings": { "caption": "Item two" } },
+    { "type": "image", "settings": { "caption": "Item three" } },
+    { "type": "image", "settings": { "caption": "Item four" } }
+  ]
+}
+```
 
-- **Staggered + auto aspect ratio** is the most organic-feeling combination. Use it when images have different native proportions and you want the layout to feel curated rather than mechanical.
-- **Carousel at 2 columns with 16/9** creates a cinematic feel that works well right below a hero section, especially with both spacing values set to `none` so the gallery bleeds into surrounding content.
-- Captions are hover-only, so they should be supplementary, not essential. If the caption carries critical information (like a price or a CTA), consider using a different widget where the text is always visible.
-- Pair the eyebrow with a left-aligned heading to create an editorial hierarchy that feels more intentional than a centered title alone.
-- The lightbox fires on every image click. If the gallery sits on a page where you want users to navigate away (e.g., to individual project pages), the lightbox may slow that intent down -- in those cases a card-based widget with links may serve better.
-- Square aspect ratio at 4--5 columns is the safest default for mixed-quality photography because the tight crop hides composition problems and the small size forgives resolution issues.
-- Use `highlight-primary` or `highlight-secondary` color schemes to visually separate the gallery from adjacent text-heavy sections; the background color change acts as a natural scroll landmark.
+### Cinematic carousel
+
+Two wide slides visible at a time, docked under an opener. The user supplies five to seven wide photos (event recap, venue, landscapes).
+
+```json
+{
+  "type": "gallery",
+  "settings": { "title": "The Space", "heading_alignment": "center", "layout": "carousel", "columns_desktop": 2, "staggered": false, "aspect_ratio": "16 / 9", "color_scheme": "standard-primary", "top_spacing": "small" },
+  "blocks": [
+    { "type": "image", "settings": { "caption": "" } },
+    { "type": "image", "settings": { "caption": "" } },
+    { "type": "image", "settings": { "caption": "" } },
+    { "type": "image", "settings": { "caption": "" } }
+  ]
+}
+```
+
+### Mixed proportions mosaic
+
+Native proportions plus stagger for an editorial, curated feel. The user supplies eight or more photos of deliberately varied shapes.
+
+```json
+{
+  "type": "gallery",
+  "settings": { "eyebrow": "Behind the Scenes", "title": "Life at the Studio", "heading_alignment": "start", "layout": "grid", "columns_desktop": 4, "staggered": true, "aspect_ratio": "auto", "color_scheme": "standard-secondary" },
+  "blocks": [
+    { "type": "image", "settings": { "caption": "Placeholder scene" } },
+    { "type": "image", "settings": { "caption": "Placeholder scene" } },
+    { "type": "image", "settings": { "caption": "Placeholder scene" } },
+    { "type": "image", "settings": { "caption": "Placeholder scene" } }
+  ]
+}
+```
+
+### Compact proof strip
+
+Five squares, no captions, reduced spacing: shows volume of work without taking the page over. The user supplies exactly five photos.
+
+```json
+{
+  "type": "gallery",
+  "settings": { "eyebrow": "Our Work", "title": "", "layout": "grid", "columns_desktop": 5, "staggered": false, "aspect_ratio": "1 / 1", "color_scheme": "standard-primary", "top_spacing": "small", "bottom_spacing": "small" },
+  "blocks": [
+    { "type": "image", "settings": { "caption": "" } },
+    { "type": "image", "settings": { "caption": "" } },
+    { "type": "image", "settings": { "caption": "" } },
+    { "type": "image", "settings": { "caption": "" } },
+    { "type": "image", "settings": { "caption": "" } }
+  ]
+}
+```

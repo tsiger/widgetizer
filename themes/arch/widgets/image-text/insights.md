@@ -1,156 +1,98 @@
-# Image-Text Widget Insights
+# image-text
 
-A side-by-side split layout that pairs a single image with a flexible stack of content blocks, supporting left/right image placement and independent color schemes for the text panel.
+## Purpose
 
----
+The theme's everyday split section: a photo on one side and a stack of content blocks on the other, from heading, text and buttons to a feature list, an icon, a star rating, numbered steps, a countdown or a small inline image. Use it for any "one picture, one message" moment: an about story, a service detail, a feature explanation.
 
-## Settings Levers
+On desktop the halves sit side by side; on phones the image stacks above the text. With `content_color_scheme` at `none` the text sits directly on the section surface and the photo keeps its natural shape in a thin rounded frame. With a scheme chosen, the text gets its own padded panel and, on desktop, photo and panel lock together edge to edge with square corners, the image cropped to the panel's height, like a magazine spread.
 
-| Setting | Values | Visual Effect |
-|---------|--------|---------------|
-| `image` | Any uploaded image | The hero visual occupying 50% width on desktop, full width on mobile |
-| `image_position` | `start` (default), `end` | Swaps which side the image sits on; `end` reverses the flexbox direction |
-| `text_position` | `flex-start`, `center` (default), `flex-end` | Vertically aligns the text column to the top, middle, or bottom of the image |
-| `color_scheme` | `standard-primary`, `standard-secondary`, `highlight-primary`, `highlight-secondary` | Background and text colors for the entire widget section |
-| `content_color_scheme` | `none` (default), `standard-primary`, `standard-secondary`, `highlight-primary`, `highlight-secondary` | When set to anything other than `none`, gives the text column its own padded, rounded background panel. On desktop, the image and text panel stretch edge-to-edge with no gap and squared-off corners, creating a magazine-style card |
-| `top_spacing` | `auto` (default), `small`, `none` | `small` reduces spacing for tighter rhythm; `none` removes it entirely for flush stacking |
-| `bottom_spacing` | `auto` (default), `small`, `none` | Same as above for the bottom edge |
+## When to use
 
----
+- Role: the flexible body section that does most of a page's explaining, used once or several times in alternating directions.
+- Good for: nearly every industry; an `about` story, one section per service, a feature walk-through, a how-it-works list with numbered steps, a featured review, an event with a countdown.
+- Bad for: several equal items (`card-grid`, `image-tabs`), a hero (`banner`), text-only passages (`rich-text`), the overlapping-card look (`image-callout`).
+- Opening a page: fine for inner pages, since the `heading` block becomes the page title when the section is first. It does not support the header's transparent mode, which only `banner`, `slideshow` and `video-popup` support.
+- Natural neighbours: another `image-text` with the opposite `image_position`, `key-figures`, `testimonials`, `action-bar`.
+- Content needed: one photo, a heading of up to eight words, 40 to 100 words of text, optionally a button or two.
 
-## Available Blocks
+## Pitfalls
 
-Blocks are stacked vertically inside the text column. Mix and order freely.
+- With a content panel the photo is cropped to the panel's height; long text means a heavily cropped picture. Keep the subject centred and the text under about 100 words.
+- Without a panel the photo shows at its natural ratio, so a tall portrait beside a short column leaves empty space; `text_position` then aligns the text to the top, middle or bottom of the image.
+- `content_color_scheme` equal to `color_scheme` gives an invisible panel that still removes the frame and the gap; choose a contrasting surface or leave it at `none`. A highlight panel counts as one of the page's one or two highlight moments.
+- A `color_scheme` other than `standard-primary` makes the section a filled band whose spacing is padding inside its colour; the panel alone does not.
+- Label pattern: a `text` block with `size` `sm`, `muted` and `uppercase` above the `heading`, two or three words. Headings above `3xl` wrap badly in a half-width column.
+- `features` lines starting with `+` get a check, `-` a cross, plain lines no icon; five lines at most. `numbered-item` blocks number themselves in order; three or four fit beside a photo.
+- The `countdown` block takes `target_date` as year-month-day and 24-hour time, for example "2027-06-01 18:00", read in the visitor's local time; afterwards it shows `expired_message`.
+- The inline `image` block is for a logo, badge or signature at 10 to 25 percent `width`, not a second photo. A `rating` block shows stars only; add a `text` block saying who is rating what.
+- In the `button` block the second link appears only when it has text, and `small` is the standard button size.
+- When stacking two of these, alternate `image_position`; fuse them with `none` on the touching edges only when both are unfilled.
 
-| Block Type | Key Settings | Notes |
-|------------|-------------|-------|
-| **heading** | `text`, `size` (lg through 9xl) | Renders as `<h1>` when the widget is the first on the page, `<h2>` otherwise. The main title of the section. |
-| **text** | `text` (richtext), `size` (sm/base/lg), `uppercase`, `muted` | General paragraph or label. Use `muted` + `sm` + `uppercase` for eyebrow/kicker text above a heading. Richtext supports inline formatting. |
-| **button** | `link` + optional `link_2`, `style` / `style_2` (primary/secondary), `size` (small/medium/large/xlarge) | Supports one or two side-by-side CTAs. Pair a primary action with a secondary fallback. |
-| **features** | `features` (newline-separated list) | Prefix lines with `+` for a check icon or `-` for an x icon. Plain lines get no icon. Great for quick benefit lists. |
-| **countdown** | `target_date` (datetime string), `expired_message` (text), `show_seconds` (true/false) | Inline countdown timer that ticks toward a target date. Useful for promotions, launches, or event deadlines paired with an image. |
-| **icon** | `icon`, `style` (plain/outline/filled), `size` (sm-xl), `shape` (sharp/rounded/circle) | Decorative icon badge above the heading. Useful for branding a section with a visual anchor. |
-| **image** | `image`, `width` (5-100%) | Inline image inside the text column, like a logo, badge, or certification mark. Independent of the main widget image. |
-| **rating** | `rating` (3-5 stars) | Star rating display. Ideal for review snippets or trust signals. |
-| **numbered-item** | `title`, `description`, `size` (small-xlarge), `shape` (sharp/rounded/circle) | Auto-incrementing numbered badge with title and description. Stack several to create a step-by-step process. |
+## Recipes
 
----
+### About story
 
-## Layout Recipes
+Founder or company story with a label, heading, paragraph and a quiet button. Supply one landscape or square photo of the people or the place.
 
-### 1. About-Us Story Block
+```json
+{
+  "type": "image-text",
+  "settings": { "image_position": "end", "text_position": "center", "color_scheme": "standard-primary", "content_color_scheme": "none" },
+  "blocks": [
+    { "type": "text", "settings": { "text": "<p>Our story</p>", "size": "sm", "muted": true, "uppercase": true } },
+    { "type": "heading", "settings": { "text": "How the business began", "size": "2xl" } },
+    { "type": "text", "settings": { "text": "<p>Two or three sentences about the founding, the people and what they set out to do.</p>", "size": "base" } },
+    { "type": "button", "settings": { "link": { "text": "Meet the team", "href": "about.html" }, "style": "secondary", "size": "medium" } }
+  ]
+}
+```
 
-| Setting | Value |
-|---------|-------|
-| `image_position` | `end` |
-| `text_position` | `center` |
-| `color_scheme` | `standard-primary` |
-| `content_color_scheme` | `none` |
-| Blocks | text (muted, sm, uppercase) as eyebrow "Our Story" > heading (2xl) > text (base) > button (secondary, "Meet the Team") |
+### Service with benefits
 
-**Good for:** Founder story, company history, mission statement.
+One service explained with a short pitch, a check list and two buttons. Supply a landscape photo of the service being delivered.
 
----
+```json
+{
+  "type": "image-text",
+  "settings": { "image_position": "start", "text_position": "center", "color_scheme": "standard-secondary", "content_color_scheme": "none" },
+  "blocks": [
+    { "type": "heading", "settings": { "text": "A service that fits your day", "size": "2xl" } },
+    { "type": "text", "settings": { "text": "<p>One or two sentences on what the service is and the outcome it delivers.</p>", "size": "base" } },
+    { "type": "features", "settings": { "features": "+ Fixed, written quote\n+ Flexible appointment times\n+ Tidy, insured team" } },
+    { "type": "button", "settings": { "link": { "text": "Book a visit", "href": "contact.html" }, "style": "primary", "link_2": { "text": "All services", "href": "services.html" }, "style_2": "secondary", "size": "medium" } }
+  ]
+}
+```
 
-### 2. Product Feature Highlight
+### How it works in three steps
 
-| Setting | Value |
-|---------|-------|
-| `image_position` | `start` |
-| `text_position` | `center` |
-| `color_scheme` | `standard-primary` |
-| `content_color_scheme` | `none` |
-| Blocks | icon (filled, md, circle) > heading (3xl) > text (base) > features (+ lines) > button (primary "Get Started" + secondary "Learn More") |
+Numbered steps beside a photo, aligned to the top so the list reads from the image's top edge. Supply a portrait or square photo.
 
-**Good for:** Service or product detail page sections where features need visual emphasis.
+```json
+{
+  "type": "image-text",
+  "settings": { "image_position": "end", "text_position": "flex-start", "color_scheme": "standard-primary", "content_color_scheme": "none" },
+  "blocks": [
+    { "type": "heading", "settings": { "text": "Three steps from enquiry to done", "size": "2xl" } },
+    { "type": "numbered-item", "settings": { "title": "Tell us what you need", "description": "A short line on the first step.", "size": "medium", "shape": "circle" } },
+    { "type": "numbered-item", "settings": { "title": "Get a plan and a quote", "description": "A short line on the second step.", "size": "medium", "shape": "circle" } },
+    { "type": "numbered-item", "settings": { "title": "We do the work", "description": "A short line on the third step.", "size": "medium", "shape": "circle" } }
+  ]
+}
+```
 
----
+### Featured review card
 
-### 3. Trust-Building Testimonial Card
+A star rating and a pull quote on a highlight panel locked to the photo. Supply a landscape photo of the finished work; this is a highlight moment, so use it once per page.
 
-| Setting | Value |
-|---------|-------|
-| `image_position` | `start` |
-| `text_position` | `center` |
-| `color_scheme` | `highlight-primary` |
-| `content_color_scheme` | `highlight-secondary` |
-| Blocks | rating (5) > heading (xl) as pull-quote > text (base, muted) as attribution > image (width 15%) as client logo |
-
-**Good for:** Featured review, case study teaser, customer spotlight.
-
----
-
-### 4. Step-by-Step Process Explainer
-
-| Setting | Value |
-|---------|-------|
-| `image_position` | `end` |
-| `text_position` | `flex-start` |
-| `color_scheme` | `standard-secondary` |
-| `content_color_scheme` | `none` |
-| Blocks | text (muted, sm, uppercase) "How It Works" > heading (2xl) > numbered-item x3 (medium, circle) > button (primary, "Book Now") |
-
-**Good for:** Explaining a service workflow, onboarding steps, booking process.
-
----
-
-### 5. Portfolio / Project Showcase
-
-| Setting | Value |
-|---------|-------|
-| `image_position` | `start` |
-| `text_position` | `flex-end` |
-| `color_scheme` | `standard-primary` |
-| `content_color_scheme` | `standard-secondary` |
-| Blocks | text (sm, muted, uppercase) as category label > heading (2xl) > text (base) describing the project > button (secondary, "View Project") |
-
-**Good for:** Architecture portfolio pieces, photography projects, interior design case studies.
-
----
-
-### 6. Service Offering with Benefits
-
-| Setting | Value |
-|---------|-------|
-| `image_position` | `end` |
-| `text_position` | `center` |
-| `color_scheme` | `highlight-primary` |
-| `content_color_scheme` | `none` |
-| Blocks | icon (outline, lg, rounded) > heading (3xl) > text (lg) as value proposition > features (+ and - lines comparing included vs. not included) > button (primary, xlarge, "Get a Quote") |
-
-**Good for:** Service page hero, pricing tier explanation, package comparison.
-
----
-
-### 7. Event or Class Promotion
-
-| Setting | Value |
-|---------|-------|
-| `image_position` | `start` |
-| `text_position` | `center` |
-| `color_scheme` | `standard-primary` |
-| `content_color_scheme` | `highlight-primary` |
-| `top_spacing` | `none` |
-| Blocks | heading (2xl) > text (base) with event details > features (+ lines for what's included) > button (primary "Register Now" + secondary "See Schedule") |
-
-**Good for:** Workshop promo, class schedule teaser, seasonal event callout.
-
----
-
-## Differentiation Tips
-
-- **Alternate image sides when stacking multiple image-text widgets.** Place the first with `image_position: start`, the next with `end`, and so on. This creates a zigzag rhythm that keeps long pages from feeling monotonous.
-
-- **Use `content_color_scheme` for visual weight.** Setting it to a value other than `none` turns the text column into a distinct card panel. This is the widget's most unique visual mode -- on desktop the image and panel lock together edge-to-edge with no gap and no border-radius, producing a magazine-spread look that most split-layout widgets cannot replicate.
-
-- **Combine `text_position: flex-start` with a tall image** to pin content to the top, leaving breathing room below. This works well when the image is a vertical portrait or a tall product shot.
-
-- **Eyebrow + heading + body is a reliable content hierarchy.** Use a muted/uppercase/sm text block as the eyebrow, then a heading, then a base-size text block. This three-layer stack gives readers a scannable entry point before committing to the paragraph.
-
-- **Numbered items replace the need for a separate "how it works" widget.** Three numbered-item blocks with circle badges and short descriptions communicate a process clearly without requiring a dedicated process or timeline widget.
-
-- **Features block with `+`/`-` prefixes creates instant comparison.** Mixing check and x icons in a single features list is a fast way to show what's included versus what's not, useful for pricing tiers or plan differences without needing a full comparison table.
-
-- **The inline image block is for logos and badges, not hero imagery.** Keep its width small (10-25%) for certification marks, partner logos, or award badges that add credibility without competing with the main image.
-
-- **Collapse spacing to chain sections.** Set `bottom_spacing: none` on one image-text widget and `top_spacing: none` on the next to make them appear as a single continuous section, useful for before/after or multi-step narratives.
+```json
+{
+  "type": "image-text",
+  "settings": { "image_position": "start", "text_position": "center", "color_scheme": "standard-primary", "content_color_scheme": "highlight-primary" },
+  "blocks": [
+    { "type": "rating", "settings": { "rating": "5" } },
+    { "type": "heading", "settings": { "text": "A short quote from a client goes here, one or two lines long.", "size": "xl" } },
+    { "type": "text", "settings": { "text": "<p>Customer name, Example City</p>", "size": "sm", "muted": true } }
+  ]
+}
+```

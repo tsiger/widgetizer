@@ -1,102 +1,116 @@
-# Split Hero
+# split-hero
 
-A full-width, two-column hero section that pairs a large background image (50%) with a vertically centered content area (50%), supporting flexible block combinations and image placement on either side.
+## Purpose
 
-## Settings levers
+A tall hero split in two: a photograph fills one half edge to edge, and a stack of blocks (label, heading, text, feature list, buttons, countdown, rating) sits vertically centred in the other. It opens a page with a photo and a message side by side instead of text over an image.
 
-| Setting | Values | Visual effect |
-|---------|--------|---------------|
-| image | Image upload | The background image filling the left or right half; uses a placeholder landscape if empty |
-| overlay_color | Any color with alpha | Tints or darkens the image half -- useful for ensuring contrast or adding mood (e.g. semi-transparent black for cinematic feel, brand color at 30% for tinting) |
-| image_position | `start` (default), `end` | Swaps which side the photo appears on; `end` reverses the flex direction on desktop |
-| color_scheme | `standard-primary`, `standard-secondary`, `highlight-primary`, `highlight-secondary` | Controls the background/text palette of the content half; non-standard schemes add a `has-highlight-background` class that tints the content area |
-| top_spacing | `auto` (default), `small`, `none` | `small` reduces spacing for tighter rhythm; `none` removes it entirely for flush stacking |
-| bottom_spacing | `auto` (default), `small`, `none` | `small` reduces spacing for tighter rhythm; `none` removes it entirely for flush stacking |
+The photo half is a background fill, cropped to the half's height, with an optional tint from `overlay_color`. The content half takes the section's colour scheme. On phones the photo sits on top and the content follows.
 
-## Available blocks
+## When to use
 
-| Block | Key settings | Notes |
-|-------|-------------|-------|
-| **heading** | `text` (plain text), `size` (lg through 9xl) | Renders as `<h1>` when the widget is the first on the page, `<h2>` otherwise; size maps to typographic scale classes |
-| **text** | `text` (richtext/HTML), `size` (sm, base, lg), `uppercase` (bool), `muted` (bool) | Versatile paragraph or label block; `muted` reduces opacity for secondary text; `uppercase` + `sm` size is great for kickers/eyebrows above a heading |
-| **features** | `features` (textarea, one per line) | Lines starting with `+` get a check icon, lines starting with `-` get an x icon, plain lines render without icons; ideal for quick benefit lists |
-| **rating** | `rating` (5 (default), 4, 3) | Displays a star rating row; useful for social proof near a heading or testimonial quote |
-| **image** | `image` (upload), `width` (5-100%, default 20) | Inline image block within the content column; handy for logos, badges, or trust marks |
-| **icon** | `icon` (icon picker, default "star"), `style` (plain (default), outline, filled), `size` (sm, md (default), lg, xl), `shape` (sharp, rounded, circle (default)) | Decorative icon block; filled + circle creates a badge look, plain keeps it minimal |
-| **numbered-item** | `title` (text), `description` (text), `size` (small, medium (default), large, xlarge), `shape` (sharp, rounded, circle (default)) | Numbered step block; auto-increments based on position; great for process steps in a hero |
-| **countdown** | `target_date` (text, default "2027-01-01 00:00"), `expired_message` (text, default "The wait is over!"), `show_seconds` (true (default) / false) | Live countdown timer block; ideal for launch dates or event heroes |
-| **button** | `link` + `link_2` (text, href, target), `style`/`style_2` (primary, secondary), `size` (small, medium, large, xlarge) | Supports up to two side-by-side buttons with independent style control; primary is filled, secondary is outlined |
+- A page opener for `index` or a landing page, and a strong mid-page story section on `about` or `services`.
+- Good for businesses with one hero-worthy photo and a message that needs more than a headline: a short paragraph, three benefits, two buttons. Also for launches and events, where the `countdown` block gives it a reason to exist.
+- Bad for text over a photo (`banner`), for several rotating messages (`slideshow`), and for small photo-and-text sections mid-page (`image-text`, which is lighter).
+- It never engages the transparent header. Under `transparent_on_hero` the header simply stays solid above it, which makes split-hero a safe opener on any page, with or without a photo.
+- Natural neighbours: `trust-bar` or `logo-cloud` with `top_spacing` `small` right under it, then `services-grid`, `card-grid` or `steps`.
+- Needs one excellent photo and three to five blocks. It fills most of a laptop screen, so one per page is the rule.
+- Fits consultancies, clinics, architects, trades, software and product launches, schools, event pages.
 
-## Layout recipes
+## Pitfalls
 
-**1. "The Bold Welcome" (homepage hero)**
-- image_position: start
-- color_scheme: standard-primary
-- overlay_color: none
-- top_spacing: none, bottom_spacing: auto
-- Blocks: text (sm, muted, uppercase: "Welcome to Our Studio") > heading (4xl) > text (base) > button (primary "Book a Tour" + secondary "View Portfolio")
-- Good for: Homepage first impression with a strong photo and clear CTA
+- The photo half is cropped, hard: tall and narrow on desktop, short and wide on phones. The subject must sit near the centre with room around it; a face at the edge or a product at the bottom is cut on one screen size or the other. Wide group photos and images with text do not survive.
+- No `image` leaves a placeholder photo in the hero. Always supply one.
+- `color_scheme` colours only the content half. A highlight scheme gives the hero a dark text half beside the photo; `standard-primary` keeps it light. The photo half never changes colour, so check the seam between a dark scheme and a bright photo.
+- `overlay_color` is off by default; the photo shows as shot. Add a tint only to tame a busy or very bright photo, and keep it light, since there is no text over the photo to protect.
+- The content column is vertically centred, so a long stack of blocks makes the hero taller than the screen and the photo stretches with it. Five blocks is plenty; one heading, one paragraph, one button block is the classic.
+- `heading` at `5xl` or above fits two or three words beside a photo; `2xl` to `4xl` suits a sentence-length heading. A secondary split-hero deeper on a page should drop a size or two below the opener.
+- `text` with `sm`, `uppercase` and `muted` makes a label above the heading; use one label, not several.
+- `features` lines starting with a plus sign get a check mark, lines starting with a minus sign get a cross. Three to five short lines; long lines wrap awkwardly in half the width.
+- `countdown` needs `target_date` written as year-month-day and time, for example 2027-03-15 09:00. Once the date passes only `expired_message` shows, so plan to replace the block.
+- `button` defaults to the secondary style; set `style` to `primary` for the main action. Two buttons share one size.
+- `top_spacing` `none` is right only for a first section the page should start with flush; otherwise leave `auto`. Filled schemes pad inside the content half, so `none` there removes inner padding rather than the gap to a neighbour.
 
-**2. "The Dark Cinematic" (brand story section)**
-- image_position: end
-- color_scheme: highlight-primary
-- overlay_color: rgba(0,0,0,0.35)
-- top_spacing: auto, bottom_spacing: auto
-- Blocks: heading (3xl) > text (lg) > button (primary large "Discover Our Story")
-- Good for: Mid-page storytelling section that feels immersive and editorial
+## Recipes
 
-**3. "The Benefit Breakdown" (service overview)**
-- image_position: start
-- color_scheme: standard-secondary
-- overlay_color: none
-- Blocks: text (sm, muted, uppercase: "Why Choose Us") > heading (2xl) > features ("+ Same-day appointments\n+ Board-certified specialists\n+ Family-friendly office\n+ Insurance accepted") > button (primary medium "Schedule a Visit")
-- Good for: Highlighting service advantages with scannable checkmarks alongside a friendly team photo
+### Home-page welcome
 
-**4. "The Minimal Invite" (event or launch)**
-- image_position: end
-- color_scheme: standard-primary
-- overlay_color: rgba(255,255,255,0.15)
-- top_spacing: none, bottom_spacing: none
-- Blocks: text (sm, uppercase, muted: "June 14, 2026") > heading (5xl) > text (base: one short sentence) > button (secondary medium "RSVP Now")
-- Good for: Single-event landing page or product launch announcement with maximum whitespace and elegance
+The classic opener: label, heading, two sentences, primary and secondary buttons, photo on the left. Supply one upright or square photo with a centred subject.
 
-**5. "The Trust Builder" (about page)**
-- image_position: start
-- color_scheme: highlight-secondary
-- overlay_color: rgba(0,0,0,0.2)
-- Blocks: heading (2xl) > text (base: two-sentence bio or mission) > features ("+ 20 years of experience\n+ 500+ projects completed\n+ Award-winning team") > button (primary "Meet the Team" + secondary "Our Process")
-- Good for: About or credentials section that combines narrative with proof points
+```json
+{
+  "type": "split-hero",
+  "settings": {
+    "image_position": "start",
+    "color_scheme": "standard-primary",
+    "top_spacing": "none"
+  },
+  "blocks": [
+    { "type": "text", "settings": { "text": "<p>Family dental care</p>", "size": "sm", "uppercase": true, "muted": true } },
+    { "type": "heading", "settings": { "text": "Gentle dentistry for every age", "size": "4xl" } },
+    { "type": "text", "settings": { "text": "<p>Same-week appointments, clear prices and a team that explains everything before it happens.</p>", "size": "base" } },
+    { "type": "button", "settings": { "link": { "text": "Book a visit", "href": "contact.html" }, "style": "primary", "link_2": { "text": "Our services", "href": "services.html" }, "style_2": "secondary", "size": "medium" } }
+  ]
+}
+```
 
-**6. "The Quick Pitch" (landing page above the fold)**
-- image_position: end
-- color_scheme: standard-primary
-- overlay_color: none
-- top_spacing: none, bottom_spacing: none
-- Blocks: heading (6xl) > text (lg) > button (primary xlarge "Get Started Free")
-- Good for: Conversion-focused landing page with oversized heading and a single dominant CTA; no distractions
+### Benefits beside a team photo
 
-**7. "The Warm Introduction" (services or menu page)**
-- image_position: start
-- color_scheme: standard-secondary
-- overlay_color: rgba(0,0,0,0.1)
-- Blocks: text (sm, muted: "Our Services") > heading (3xl) > text (base: short paragraph describing the service philosophy) > button (secondary medium "View Full Menu")
-- Good for: Top-of-page orientation section that sets context before detailed content below
+Mid-page on `services` or `about`: a short heading, a check-marked list of reasons and one button, photo on the right. Supply a warm team or workplace photo.
 
-**8. "The Comparison Closer" (pricing or packages page)**
-- image_position: end
-- color_scheme: highlight-primary
-- overlay_color: none
-- Blocks: text (sm, uppercase, muted: "What's Included") > heading (2xl) > features ("+ Unlimited revisions\n+ Dedicated project manager\n+ 30-day money-back guarantee\n- No hidden fees\n- No long-term contracts") > button (primary large "Choose Your Plan")
-- Good for: Pre-pricing persuasion section mixing positive checks with reassuring "no negatives" using the x-icon lines
+```json
+{
+  "type": "split-hero",
+  "settings": {
+    "image_position": "end",
+    "color_scheme": "standard-secondary"
+  },
+  "blocks": [
+    { "type": "text", "settings": { "text": "<p>Why clients stay</p>", "size": "sm", "uppercase": true, "muted": true } },
+    { "type": "heading", "settings": { "text": "Built around your schedule", "size": "3xl" } },
+    { "type": "features", "settings": { "features": "+ Evening and weekend slots\n+ One named contact\n+ Fixed quotes, no surprises\n+ Work guaranteed for two years" } },
+    { "type": "button", "settings": { "link": { "text": "Get a quote", "href": "contact.html" }, "style": "primary", "size": "medium" } }
+  ]
+}
+```
 
-## Differentiation tips
+### Launch countdown
 
-- Alternate `image_position` between `start` and `end` when using multiple split-hero instances on the same page to create a zigzag visual rhythm and avoid a monotonous layout.
-- Vary `color_scheme` across instances -- pair a `standard-primary` hero at the top with a `highlight-primary` or `highlight-secondary` one further down the page to create clear visual section breaks.
-- Change the block composition rather than just the text: one instance might use heading + text + button, while the next uses heading + features + button. Avoid repeating the same block stack verbatim.
-- Use `overlay_color` strategically and sparingly -- reserve dark overlays for atmospheric or cinematic sections and leave others clean. If every hero has the same overlay it flattens the page.
-- Scale heading sizes intentionally: the primary page hero might use 4xl-6xl, while a secondary split-hero deeper on the page should drop to 2xl-3xl to maintain clear hierarchy.
-- Mix button configurations: use dual buttons (primary + secondary) for decision points, but switch to a single button for simpler calls to action. Not every split-hero needs two buttons.
-- Vary the text block role: use the text block as a muted uppercase kicker above the heading in one instance, and as a body paragraph below the heading in another. This prevents the "label + title + paragraph" formula from becoming stale.
-- Leverage the features block as a differentiator -- most hero widgets do not have a built-in checklist, so using it in one or two instances (but not all) adds variety and scannable content.
-- When stacking two split-heroes back to back, set `bottom_spacing: none` on the first and `top_spacing: none` on the second to create a seamless edge-to-edge pair with no gap.
+An event or opening page: the date as a label, a big heading, a live countdown and one button, on a dark content half. Supply an atmospheric photo; a light tint calms it.
+
+```json
+{
+  "type": "split-hero",
+  "settings": {
+    "overlay_color": "#0a1e3833",
+    "image_position": "start",
+    "color_scheme": "highlight-primary",
+    "top_spacing": "none"
+  },
+  "blocks": [
+    { "type": "text", "settings": { "text": "<p>Opening 15 March</p>", "size": "sm", "uppercase": true, "muted": true } },
+    { "type": "heading", "settings": { "text": "A new home for the gallery", "size": "5xl" } },
+    { "type": "countdown", "settings": { "target_date": "2027-03-15 10:00", "expired_message": "We are open. Come and see.", "show_seconds": false } },
+    { "type": "button", "settings": { "link": { "text": "Join the opening", "href": "contact.html" }, "style": "primary", "size": "large" } }
+  ]
+}
+```
+
+### Quiet brand story
+
+A restrained section for an `about` page: one heading, one paragraph, a star rating as a nod to reviews, no buttons. Supply a calm detail photo rather than a portrait.
+
+```json
+{
+  "type": "split-hero",
+  "settings": {
+    "image_position": "end",
+    "color_scheme": "standard-primary"
+  },
+  "blocks": [
+    { "type": "heading", "settings": { "text": "Twenty years, one workshop", "size": "3xl" } },
+    { "type": "text", "settings": { "text": "<p>We started with a bench and a borrowed van. The bench is still here.</p><p>Everything we sell is made within fifty metres of where you are reading this.</p>", "size": "lg" } },
+    { "type": "rating", "settings": { "rating": "5" } },
+    { "type": "text", "settings": { "text": "<p>Rated by our customers on independent review sites.</p>", "size": "sm", "muted": true } }
+  ]
+}
+```

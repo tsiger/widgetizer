@@ -1,89 +1,96 @@
-# Table Widget — Insights
+# data-table
 
-A generic content table for rows-and-columns information: rate sheets, tuition tables, size charts, service details, seasonal prices. Each row is a `row` block; the number of columns (2-4) is a widget setting, kept low so tables stay readable on phones.
+## Purpose
 
----
+A plain rows-and-columns table for information that is naturally tabular: rate sheets, prices by size, tuition by programme, size charts, seasonal rates, "good to know" fact sheets. Two to four columns, an optional header row and a small footnote underneath.
 
-## Settings Levers
+Each `row` block is one table row; the column headings live in the section settings, not in the blocks. The table sits inside a chosen content width under the usual heading group, so it reads as a tidy sheet rather than a full-width spreadsheet.
 
-| Setting | Values | Visual Effect |
-|---|---|---|
-| `eyebrow` | Any text (blank by default) | Small label above the headline; adds a category/context line |
-| `eyebrow_uppercase` | `true` / `false` (default) | Uppercases the eyebrow text for a more formal label treatment |
-| `title` | Any text (default "Rates") | Main headline; renders as h1 when the widget is first on the page, h2 otherwise |
-| `description` | Any text (blank by default) | Paragraph beneath the headline for extra context |
-| `heading_alignment` | `start`, `center` (default) | Controls whether the eyebrow/title/description block is left-aligned or centered |
-| `columns` | `2` (default), `3`, `4` | How many columns render. Row cells beyond this count are kept but not shown |
-| `show_header` | `true` (default) / `false` | Toggles the bold header row. Turn off for plain key-value sheets |
-| `column_1_header` … `column_4_header` | Any text (defaults "Service" / "Price" / blank / blank) | Header labels for each rendered column |
-| `note` | Any text (blank by default) | Small muted footnote below the table ("Prices include VAT") |
-| `style` | `lines` (default), `striped`, `plain` | `lines`: hairline row dividers with a strong header underline. `striped`: zebra rows. `plain`: no dividers at all |
-| `first_column_emphasis` | `true` (default) / `false` | Bolds the first column in heading color, like a spec sheet's label column |
-| `align_last_column` | `start` (default), `end` | `end` right-aligns the last column — use it whenever the last column is a price or number |
-| `content_width` | `narrow`, `medium` (default), `wide` | Table container width via the theme's `widget-content-sm/md/lg` classes. Narrow reads best for 2-column tables |
-| `color_scheme` | `standard-primary`, `standard-secondary`, `highlight-primary`, `highlight-secondary` | Background and text theming; non-standard schemes add padded container |
-| `top_spacing` / `bottom_spacing` | `auto` (default), `small`, `none` | Section spacing rhythm controls |
+## When to use
 
----
+- Mid-page on a `pricing`, `services`, `tuition` or `visit` page, after the section that explains the offer and before an `action-bar` or `accordion`.
+- Good for: one price per service, prices that vary by size or length, programme/schedule/rate rows, key-value fact sheets. Bad for: dishes or services with descriptions (use `priced-list`), "pick a plan" with buttons and a featured column (use `comparison-table` or `pricing`), opening hours (use `schedule-table`, which highlights today).
+- It can open a page, but rarely should: lead with a `rich-text` or `split-content` title section and let the table follow.
+- Natural neighbours: `rich-text` above, `accordion` or `action-bar` below, a second table with its own title when one would run long.
+- Needs three to ten rows. Two shorter tables with their own titles scan better than one long one.
+- Fits trades, salons, groomers, clinics, schools and studios, hotels and rentals, venues.
 
-## Available Blocks
+## Pitfalls
 
-| Block Type | Key Settings | Notes |
-|---|---|---|
-| `row` | `cell_1`, `cell_2`, `cell_3`, `cell_4` (all text) | One table row. `cell_1` and `cell_2` always render; `cell_3` shows when `columns` is 3+, `cell_4` when `columns` is 4. Cells beyond the active column count are kept but hidden, so lowering the column count never destroys data. |
+- Set `align_last_column` to `end` whenever the last column holds prices or numbers. Ragged-left figures are the clearest sign of an amateur table.
+- Match `content_width` to the column count: `narrow` for two columns (full width puts half a page of air between label and value), `medium` for three, `wide` or `fullwidth` only for four columns of real text.
+- Cells beyond the chosen `columns` are kept but not shown, so lowering the count never destroys data; raising it reveals whatever was typed there earlier. Fill `column_3_header` and `column_4_header` when you add columns, or the header row has blank cells.
+- `striped` draws its stripes in the page's secondary colour, so on `standard-secondary` and `highlight-secondary` the stripes merge with the band and vanish. Use `lines` there.
+- Three- and four-column tables scroll sideways on phones. That is expected, but keep cell text short so most of the table fits without scrolling.
+- Cells are plain text: no links, bold or line breaks. If a cell wants formatting, the content belongs in a different section.
+- `first_column_emphasis` bolds the first column like a label column; turn it off when the first column is just another value. Turn `show_header` off for key-value sheets.
+- Any scheme other than `standard-primary` pads the table inside its own coloured band, so `top_spacing` and `bottom_spacing` set to `none` remove that inner padding; under a filled section use `small`. A utility table almost always belongs on a standard surface.
 
-Column **headings** live in the widget settings (`column_1_header` …), not in the blocks — they are a single non-repeating row. Column **cells** live in each `row` block.
+## Recipes
 
----
+### Simple rate sheet
 
-## When to Use This Widget (and When Not To)
+One price per service, right-aligned, narrow. The user supplies the service names, prices and the footnote.
 
-- **Prices attached to named dishes/services with descriptions** → use `priced-list` (it's menu-shaped).
-- **"Pick a plan" with per-plan buttons and a featured column** → use `comparison-table` or `pricing`.
-- **Opening hours** → use `schedule-table` (it highlights today automatically).
-- **Everything else tabular** → this widget. If you're tempted to fake a table with stacked text widgets or a richtext blob, this is the tool.
+```json
+{
+  "type": "data-table",
+  "settings": { "title": "Rates", "columns": "2", "column_1_header": "Service", "column_2_header": "Price", "note": "Placeholder note about what prices include.", "style": "lines", "align_last_column": "end", "content_width": "narrow" },
+  "blocks": [
+    { "type": "row", "settings": { "cell_1": "Service one", "cell_2": "$00" } },
+    { "type": "row", "settings": { "cell_1": "Service two", "cell_2": "$00" } },
+    { "type": "row", "settings": { "cell_1": "Service three", "cell_2": "$00" } },
+    { "type": "row", "settings": { "cell_1": "Service four", "cell_2": "$00" } }
+  ]
+}
+```
 
----
+### Prices by size
 
-## Layout Recipes
+The classic case a one-price list cannot express: the same service at three sizes or lengths. The user supplies the services and a price per size.
 
-### 1. Simple Rate Sheet
+```json
+{
+  "type": "data-table",
+  "settings": { "eyebrow": "Pricing", "title": "Grooming by Size", "columns": "4", "column_1_header": "Service", "column_2_header": "Small", "column_3_header": "Medium", "column_4_header": "Large", "style": "striped", "align_last_column": "end", "content_width": "medium", "color_scheme": "standard-primary" },
+  "blocks": [
+    { "type": "row", "settings": { "cell_1": "Bath and brush", "cell_2": "$00", "cell_3": "$00", "cell_4": "$00" } },
+    { "type": "row", "settings": { "cell_1": "Full groom", "cell_2": "$00", "cell_3": "$00", "cell_4": "$00" } },
+    { "type": "row", "settings": { "cell_1": "Nail trim", "cell_2": "$00", "cell_3": "$00", "cell_4": "$00" } }
+  ]
+}
+```
 
-- **Blocks:** 4-6 `row` blocks, `cell_1` = service, `cell_2` = price
-- **Settings:** `columns: 2`, headers "Service" / "Price", `align_last_column: end`, `style: lines`, `content_width: narrow`, `note: "Prices include VAT"`
-- **Good for:** Trades, salons, cleaners — any flat list of services with one price each.
+### Programme and schedule table
 
-### 2. Prices by Size or Length
+Programme, when it runs, what it costs per month; the label column stays emphasised. The user supplies the programmes, schedules and rates.
 
-- **Blocks:** `row` blocks with `cell_1` = service and `cell_2`/`cell_3`/`cell_4` = per-size prices
-- **Settings:** `columns: 3` or `4`, headers like "Service" / "Small" / "Medium" / "Large", `align_last_column: end`, `style: striped`
-- **Good for:** Dog grooming by breed size, hair services by length, portion sizes. The classic case a one-price-per-line list can't express.
+```json
+{
+  "type": "data-table",
+  "settings": { "title": "Programmes", "heading_alignment": "start", "columns": "3", "column_1_header": "Programme", "column_2_header": "Schedule", "column_3_header": "Monthly rate", "style": "lines", "first_column_emphasis": true, "align_last_column": "end", "content_width": "medium" },
+  "blocks": [
+    { "type": "row", "settings": { "cell_1": "Toddlers", "cell_2": "Mon, Wed, Fri mornings", "cell_3": "$00" } },
+    { "type": "row", "settings": { "cell_1": "Preschool", "cell_2": "Mon to Fri, half day", "cell_3": "$00" } },
+    { "type": "row", "settings": { "cell_1": "After school", "cell_2": "Mon to Fri, 3pm to 6pm", "cell_3": "$00" } }
+  ]
+}
+```
 
-### 3. Tuition / Program Table
+### Good-to-know fact sheet
 
-- **Blocks:** `row` blocks, `cell_1` = program, `cell_2` = schedule, `cell_3` = monthly rate
-- **Settings:** `columns: 3`, headers "Program" / "Schedule" / "Monthly rate", `style: lines`, `first_column_emphasis: true`
-- **Good for:** Daycares, studios, gyms with programs that differ by age group or schedule.
+A headerless key-value sheet for practical details such as parking, minimum age or deposits. The user supplies the labels and values.
 
-### 4. Key-Value Info Sheet
+```json
+{
+  "type": "data-table",
+  "settings": { "title": "Good to Know", "heading_alignment": "start", "columns": "2", "show_header": false, "style": "plain", "content_width": "narrow" },
+  "blocks": [
+    { "type": "row", "settings": { "cell_1": "Parking", "cell_2": "Free on site" } },
+    { "type": "row", "settings": { "cell_1": "Minimum age", "cell_2": "16" } },
+    { "type": "row", "settings": { "cell_1": "Deposit", "cell_2": "Placeholder policy" } },
+    { "type": "row", "settings": { "cell_1": "Cancellations", "cell_2": "24 hours notice" } }
+  ]
+}
+```
 
-- **Blocks:** `row` blocks, `cell_1` = label, `cell_2` = value
-- **Settings:** `columns: 2`, `show_header: false`, `style: plain` or `lines`, `content_width: narrow`, `heading_alignment: start`
-- **Good for:** "Good to know" blocks — parking, minimum age, deposits, cancellation policy. Reads like a structured fact list, not a data table.
-
-### 5. Seasonal Rates
-
-- **Blocks:** `row` blocks, `cell_1` = room, `cell_2` = low-season price, `cell_3` = high-season price
-- **Settings:** `columns: 3`, headers "Room" / "Low season" / "High season", `align_last_column: end`, `color_scheme: standard-secondary`
-- **Good for:** Hotels, rentals, venues with date-dependent pricing.
-
----
-
-## Differentiation Tips
-
-- **Right-align the last column whenever it holds numbers.** Ragged-left prices are the single biggest "amateur table" tell.
-- **Narrow width for 2 columns.** A two-column table stretched across the full container puts half a page of dead air between label and value.
-- **Striped style needs the primary color scheme.** On `standard-secondary` the stripe color matches the background and disappears — use `lines` there instead.
-- **Don't exceed ~10 rows without a note or grouping.** Two shorter tables with their own titles scan better than one long one.
-- **Cells are plain text only.** No links, bold, or line breaks inside cells — if a cell wants formatting, the content probably belongs in a different widget.
-- **3- and 4-column tables scroll sideways on phones.** That's expected and fine, but keep cell text short so most of the table fits without scrolling.

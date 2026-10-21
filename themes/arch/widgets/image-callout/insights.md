@@ -1,87 +1,94 @@
-# Image Callout Widget — Insights
+# image-callout
 
-A split-layout section that overlaps a large image with a bordered content card, designed for high-impact storytelling moments that pair a strong visual with a focused message and call to action.
+## Purpose
 
----
+A large photo with a bordered content card that overlaps it on desktop, built for one focused message: a heading, a short paragraph, an optional feature list and one or two buttons. Use it for a single high-value statement such as a service spotlight, a promotion or a credibility block.
 
-## Settings Levers
+On desktop the card sits over the inner edge of the picture; on tablets and phones the image stacks above the card. The card always has its own surface, chosen with `content_color_scheme`, so it reads as an object placed on the photo rather than text beside it. The photo is cropped to fill its half.
 
-| Setting | Values | Visual Effect |
-|---|---|---|
-| `image` | Any uploaded image | The hero-sized photo or illustration that fills the image half; sets the emotional tone of the entire section |
-| `image_position` | `start` (default), `end` | Controls whether the image sits on the left with content overlapping from the right, or vice versa. Alternating position between consecutive image-callout widgets creates a zigzag rhythm down the page |
-| `color_scheme` | `standard-primary`, `standard-secondary`, `highlight-primary`, `highlight-secondary` | `standard-primary` keeps a transparent outer wrapper (content blends with page background). The other three add a padded, colored container behind the entire widget, making it read as a distinct band on the page |
-| `top_spacing` | `auto` (default), `small`, `none` | `small` reduces spacing for tighter rhythm; `none` removes it entirely for flush stacking |
-| `bottom_spacing` | `auto` (default), `small`, `none` | Same as above for the bottom edge |
+## When to use
 
----
+- Role: the "one thing to know" moment on a page: the lead service, the current promotion, the reason to trust the business.
+- Good for: service businesses, hospitality, clinics and studios, campaign pages, an `about` page introducing the founder or team with one photo.
+- Bad for: several equal items (`card-grid`, `image-tabs`), long copy (`image-text`, `rich-text`), or an opener that needs the header's transparent mode, which only `banner`, `slideshow` and `video-popup` support.
+- Opening a page: possible, since the `heading` block becomes the page title when the section is first, but `banner` or a `rich-text` title is usually the better opener.
+- Natural neighbours: a `trust-bar` or `key-figures` strip, `testimonials`, a `rich-text` paragraph. Two callouts with alternating `image_position` make a zigzag story.
+- Content needed: one strong photo, a heading of up to eight words, up to about sixty words of text, optionally three to five feature lines and one or two buttons.
 
-## Available Blocks
+## Pitfalls
 
-Blocks are placed inside the overlapping content card and rendered in the order they appear. Mix and match freely.
+- The card hides a slice of the photo. With `image_position` `start` the card covers the photo's right portion; with `end` it covers the left. Keep the subject on the far side and away from the overlapped edge.
+- The photo is cropped to the card's height. Long text makes a tall card and a heavily cropped picture; keep the heading short and the text to a few sentences.
+- `content_color_scheme` identical to `color_scheme` makes the card almost disappear, leaving only its border. Pair a `standard-primary` section with a `highlight-primary` card, or a highlight band with a `standard-primary` card.
+- Both the section and the card are surfaces. A highlight card on a highlight band is two emphasis surfaces in one place; count the callout as one of the page's one or two highlight moments.
+- A `color_scheme` other than `standard-primary` makes the section a filled band, so its spacing is padding inside the colour; a neighbour below needs `small` top spacing of its own.
+- `features` lines starting with `+` get a check, `-` a cross, plain lines no icon. Keep to five lines or fewer.
+- `heading` sizes above `3xl` wrap awkwardly inside the card on tablets. In the `button` block the second link appears only when it has text, and `small` is the standard button size.
+- A `text` block with `size` `sm` and `muted` above the heading works as a label of two or three words.
 
-| Block Type | Key Settings | Notes |
-|---|---|---|
-| **heading** | `text`, `size` (lg through 9xl, default 2xl) | Renders as `<h1>` when the widget is the first on the page, `<h2>` otherwise. Use 2xl-3xl for most cases; reserve 4xl+ for hero-level callouts |
-| **text** | `text` (richtext), `size` (sm / base / lg), `uppercase`, `muted` | Versatile block. A small + muted text block above the heading works as a kicker/eyebrow label. A base-size block below the heading serves as the supporting paragraph |
-| **features** | `features` (one per line, prefix `+` for check icon, `-` for x icon) | Bullet list with icons. Great for summarizing benefits, included items, or comparison points. Lines without a prefix render as plain items |
-| **button** | `link` + optional `link_2`, `style` / `style_2` (primary / secondary) per link, `size` (small / medium / large / xlarge) | Supports one or two side-by-side buttons. Pair a primary CTA with a secondary "Learn More" for a classic dual-action pattern |
+## Recipes
 
----
+### Service spotlight
 
-## Layout Recipes
+Introduces one core service with a label, a heading, a short paragraph and a primary button. Supply a landscape photo of the work with its subject in the left half.
 
-### 1. Service Spotlight
+```json
+{
+  "type": "image-callout",
+  "settings": { "image_position": "start", "color_scheme": "standard-primary", "content_color_scheme": "standard-secondary" },
+  "blocks": [
+    { "type": "text", "settings": { "text": "<p>What we do</p>", "size": "sm", "muted": true } },
+    { "type": "heading", "settings": { "text": "A service built around your schedule", "size": "2xl" } },
+    { "type": "text", "settings": { "text": "<p>A short paragraph explaining the service, who it is for and what makes the approach different. Two or three sentences are enough.</p>", "size": "base" } },
+    { "type": "button", "settings": { "link": { "text": "Explore the service", "href": "services.html" }, "style": "primary", "size": "medium" } }
+  ]
+}
+```
 
-**Blocks:** kicker text (sm, muted) + heading (2xl) + paragraph text (base) + button (primary, medium)
-**Settings:** image_position `start`, color_scheme `standard-primary`
-**Good for:** Introducing a single core service with a compelling photo — e.g., a plumber at work, a finished kitchen remodel, a team in action.
+### Credibility block
 
-### 2. Before/After Feature Comparison
+Replaces a paragraph of reassurance with a scannable list of proof points. Supply a candid photo of the team or workspace with its subject on the right.
 
-**Blocks:** heading (2xl) + features list (mix of `+` and `-` prefixed lines) + button (secondary, medium)
-**Settings:** image_position `end`, color_scheme `highlight-primary`
-**Good for:** Showing what's included vs. what competitors lack, or comparing a basic vs. premium service tier. The check/x icons make the comparison scannable at a glance.
+```json
+{
+  "type": "image-callout",
+  "settings": { "image_position": "end", "color_scheme": "standard-secondary", "content_color_scheme": "standard-primary" },
+  "blocks": [
+    { "type": "text", "settings": { "text": "<p>Why choose us</p>", "size": "sm", "muted": true, "uppercase": true } },
+    { "type": "heading", "settings": { "text": "Reasons clients stay with us", "size": "2xl" } },
+    { "type": "features", "settings": { "features": "+ Certified and insured team\n+ Clear written estimates\n+ Work guaranteed in writing\n+ One point of contact from start to finish" } },
+    { "type": "button", "settings": { "link": { "text": "Meet the team", "href": "about.html" }, "style": "secondary", "size": "medium" } }
+  ]
+}
+```
 
-### 3. Zigzag Story Pair (use two widgets)
+### Promotion band
 
-**Widget A:** image_position `start`, color_scheme `standard-primary`, top/bottom spacing `auto`
-**Widget B:** image_position `end`, color_scheme `standard-primary`, top_spacing `none`
-**Blocks (each):** kicker text + heading (2xl) + paragraph text + button
-**Good for:** An About page that walks visitors through the company story in two beats — origin on the left, mission on the right — creating visual rhythm without repetition.
+A highlighted card for a limited offer or an announcement, with a large primary button. Supply a bright, on-brand photo; the card sits on the strongest surface, so this should be the page's main conversion moment.
 
-### 4. Promotional Banner
+```json
+{
+  "type": "image-callout",
+  "settings": { "image_position": "start", "color_scheme": "standard-primary", "content_color_scheme": "highlight-primary" },
+  "blocks": [
+    { "type": "heading", "settings": { "text": "Seasonal offer for new clients", "size": "3xl" } },
+    { "type": "text", "settings": { "text": "<p>One sentence that states the offer plainly and when it ends.</p>", "size": "lg" } },
+    { "type": "button", "settings": { "link": { "text": "Claim the offer", "href": "contact.html" }, "style": "primary", "link_2": { "text": "See all services", "href": "services.html" }, "style_2": "secondary", "size": "large" } }
+  ]
+}
+```
 
-**Blocks:** heading (3xl) + paragraph text (lg) + button (primary, large)
-**Settings:** image_position `start`, color_scheme `highlight-secondary`
-**Good for:** A seasonal promotion, grand opening announcement, or limited-time offer. The accent background and large button size create urgency. Use a vibrant, on-brand photo.
+### Second beat of a zigzag pair
 
-### 5. Credibility Builder
+The second of two callouts placed back to back, flipped to the other side and fused to the first with `none` top spacing. Supply a photo with its subject in the right half; the first callout uses `image_position` `start` and the same surfaces.
 
-**Blocks:** kicker text ("Why Choose Us", sm, muted) + heading (2xl) + features list (all `+` prefixed) + button (secondary, medium)
-**Settings:** image_position `end`, color_scheme `standard-secondary`
-**Good for:** A trust section on a homepage or landing page. The features list replaces a paragraph with concrete proof points (certifications, guarantees, years of experience).
-
-### 6. Portfolio / Case Study Teaser
-
-**Blocks:** kicker text ("Recent Project", sm, muted, uppercase) + heading (3xl) + paragraph text (base) + button pair (primary "View Project" + secondary "All Work")
-**Settings:** image_position `start`, color_scheme `standard-primary`
-**Good for:** Showcasing a single standout project with a hero photo, short description, and dual navigation — one link to the case study, another to the full portfolio.
-
-### 7. Team / Founder Introduction
-
-**Blocks:** heading (2xl) + paragraph text (base) + button (secondary, small, "Meet the Team")
-**Settings:** image_position `end`, color_scheme `standard-primary`
-**Good for:** A personal, human-centered section on an About or homepage. Use a candid team photo or founder portrait. Keep the copy warm and brief.
-
----
-
-## Differentiation Tips
-
-- **Overlap is the signature.** On desktop the content card deliberately overlaps the image by several columns. This is what separates Image Callout from a generic two-column image+text widget. Lean into it by choosing images with visual weight on the non-overlapped side so the card doesn't obscure the focal point.
-- **Kicker + heading + paragraph is the power stack.** The default blocks demonstrate this pattern for a reason: a small muted text block above the heading acts as a category label or eyebrow, giving the heading context before the visitor even reads it.
-- **Features block replaces bullet paragraphs.** Whenever you are tempted to write a paragraph that is really just a list of benefits, switch to a features block instead. The check icons add visual credibility and the list is far easier to scan on mobile.
-- **Dual buttons earn their space here.** Because the content card has generous padding and visual weight, it can comfortably hold two side-by-side buttons without feeling cramped. Use this for divergent user intents (e.g., "Book Now" primary + "See Pricing" secondary).
-- **Alternate image position to break monotony.** If you use more than one image-callout on a page, flip `image_position` between them. The zigzag creates a natural reading rhythm and prevents the layout from feeling like a repeating template.
-- **Color scheme controls prominence.** Use `standard-primary` when the callout lives among other colored sections and needs to breathe. Switch to `highlight-primary` or an accent variant when the callout is the single most important conversion moment on the page and needs a background band to visually separate it.
-- **Collapse spacing for editorial flow.** Setting top or bottom spacing to `none` between consecutive image-callouts (or between a hero and a callout) removes the gap and makes the page feel like a continuous narrative rather than a stack of independent sections.
+```json
+{
+  "type": "image-callout",
+  "settings": { "image_position": "end", "color_scheme": "standard-primary", "content_color_scheme": "standard-secondary", "top_spacing": "none" },
+  "blocks": [
+    { "type": "heading", "settings": { "text": "Where the business is heading next", "size": "2xl" } },
+    { "type": "text", "settings": { "text": "<p>A paragraph continuing the story begun in the section above.</p>", "size": "base" } }
+  ]
+}
+```

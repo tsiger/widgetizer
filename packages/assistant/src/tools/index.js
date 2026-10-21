@@ -1,7 +1,7 @@
 import { GUIDANCE } from "../guidance.js";
-import { statusTool, listSitesTool, openSiteTool, createSiteTool } from "./sites.js";
+import { statusTool, listSitesTool, openSiteTool, createSiteTool, listThemesTool, presetDetailsTool } from "./sites.js";
 import { siteOverviewTool, readPageTool, readSitePartTool, readMenusTool } from "./content.js";
-import { readLookTool, themeCatalogTool, sectionDetailsTool } from "./theme.js";
+import { readLookTool, themeCatalogTool, sectionDetailsTool, themeGuideTool } from "./theme.js";
 import { listMediaTool, viewImageTool } from "./media.js";
 import { readCollectionsTool } from "./collections.js";
 import { previewPageTool } from "./preview.js";
@@ -13,7 +13,7 @@ export const guidanceTool = {
   name: "get_guidance",
   title: "Guidance",
   description:
-    "Short Widgetizer guidance for a kind of task: core (the working rules; read once per conversation), writing, seo, translation, images or accessibility. Advisory: the user's wishes come first.",
+    "Short Widgetizer guidance for a kind of task: core (the working rules; read once per conversation), writing, seo, translation, images, accessibility or new_site (choosing a theme and preset). Advisory: the user's wishes come first.",
   inputSchema: {
     type: "object",
     properties: { topic: { type: "string", enum: Object.keys(GUIDANCE), description: "Which guidance to read." } },
@@ -36,6 +36,7 @@ export const builtinTools = [
   readLookTool,
   themeCatalogTool,
   sectionDetailsTool,
+  themeGuideTool,
   listMediaTool,
   viewImageTool,
   readCollectionsTool,
@@ -44,6 +45,8 @@ export const builtinTools = [
   ...jobTools,
   editSectionsTool,
   ...familyTools,
+  listThemesTool,
+  presetDetailsTool,
   openSiteTool,
   createSiteTool,
 ];

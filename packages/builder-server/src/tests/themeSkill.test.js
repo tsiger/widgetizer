@@ -191,15 +191,88 @@ describe("theme skill starter theme", () => {
 });
 
 describe("bundled themes follow the rules the skill teaches", () => {
+  const ARCH = path.join(REPO_ROOT, "themes", "arch");
+
   it("Arch has no validator errors, in the theme or in any preset", () => {
-    const errors = validate(path.join(REPO_ROOT, "themes", "arch")).findings.filter(
-      (finding) => finding.level === "error",
-    );
+    const errors = validate(ARCH).findings.filter((finding) => finding.level === "error");
     assert.deepEqual(
       errors.map((finding) => `${finding.file}: [${finding.rule}] ${finding.message}`),
       [],
       "Run: npm run validate:theme -- themes/arch",
     );
+  });
+
+  // The assistant serves these files; a bundled theme must ship them complete and
+  // clean, while third-party themes may leave them out (see references/guidance.md).
+  it("Arch ships structured guidance for the theme, every widget and every preset, with no guidance findings", async () => {
+    const { parseWidgetGuide, parsePresetGuide } = await import("@widgetizer/core/guidance");
+    const widgetDirs = [
+      ...(await fs.readdir(path.join(ARCH, "widgets"))).filter((name) => name !== "global").map((name) => path.join(ARCH, "widgets", name)),
+      path.join(ARCH, "widgets", "global", "header"),
+      path.join(ARCH, "widgets", "global", "footer"),
+    ];
+    const problems = [];
+    for (const dir of widgetDirs) {
+      const file = path.join(dir, "insights.md");
+      if (!(await fs.pathExists(file))) {
+        problems.push(`${path.relative(ARCH, file)}: missing`);
+        continue;
+      }
+      const guide = parseWidgetGuide(await fs.readFile(file, "utf8"));
+      if (guide.missing.length) problems.push(`${path.relative(ARCH, file)}: missing ${guide.missing.join(", ")}`);
+      if (guide.recipes.length === 0) problems.push(`${path.relative(ARCH, file)}: no recipes`);
+    }
+    const presetsDir = path.join(ARCH, "presets");
+    for (const id of (await fs.readdir(presetsDir, { withFileTypes: true })).filter((entry) => entry.isDirectory()).map((entry) => entry.name)) {
+      const file = path.join(presetsDir, id, "insights.md");
+      if (!(await fs.pathExists(file))) {
+        problems.push(`presets/${id}/insights.md: missing`);
+        continue;
+      }
+      const guide = parsePresetGuide(await fs.readFile(file, "utf8"));
+      if (guide.missing.length) problems.push(`presets/${id}/insights.md: missing ${guide.missing.join(", ")}`);
+    }
+    assert.ok(await fs.pathExists(path.join(ARCH, "insights.md")), "themes/arch/insights.md (the composition guide) is missing");
+    const guidanceFindings = validate(ARCH)
+      .findings.filter((finding) => finding.rule.startsWith("guidance-"))
+      .map((finding) => `${finding.file}: [${finding.rule}] ${finding.message}`);
+    assert.deepEqual([...problems, ...guidanceFindings], []);
+  });
+
+  it("the core form widget's guidance is structured and its recipes fit its schema", async () => {
+    const { parseWidgetGuide } = await import("@widgetizer/core/guidance");
+    const { settingValueProblems } = await import("@widgetizer/core/settingValues");
+    const dir = path.join(REPO_ROOT, "packages", "core", "src", "widgets", "core-form");
+    const schema = await fs.readJson(path.join(dir, "schema.json"));
+    const guide = parseWidgetGuide(await fs.readFile(path.join(dir, "insights.md"), "utf8"));
+    assert.deepEqual(guide.missing, []);
+    assert.ok(guide.recipes.length > 0);
+    assert.match(guide.pitfalls, /Widgetizer Hosting/);
+    const byId = (settings = []) => new Map(settings.filter((setting) => setting.type !== "header").map((setting) => [setting.id, setting]));
+    const widgetSettings = byId(schema.settings);
+    const blockSettings = new Map((schema.blocks ?? []).map((block) => [block.type, byId(block.settings)]));
+    const problems = [];
+    const checkValues = (where, values, definitions) => {
+      for (const [id, value] of Object.entries(values ?? {})) {
+        const setting = definitions.get(id);
+        if (!setting) problems.push(`${where}: unknown setting "${id}"`);
+        else for (const problem of settingValueProblems(setting, value)) problems.push(`${where}: "${id}" ${problem}`);
+      }
+    };
+    for (const recipe of guide.recipes) {
+      if (recipe.error) {
+        problems.push(`${recipe.name}: ${recipe.error}`);
+        continue;
+      }
+      if (recipe.example.type !== undefined && recipe.example.type !== "core-form") problems.push(`${recipe.name}: type ${recipe.example.type}`);
+      checkValues(recipe.name, recipe.example.settings, widgetSettings);
+      (recipe.example.blocks ?? []).forEach((block, index) => {
+        const definitions = blockSettings.get(block?.type);
+        if (!definitions) problems.push(`${recipe.name} block ${index + 1}: unknown block type "${block?.type}"`);
+        else checkValues(`${recipe.name} block ${index + 1}`, block.settings, definitions);
+      });
+    }
+    assert.deepEqual(problems, []);
   });
 });
 
@@ -549,5 +622,98 @@ echo local_title
     const first = validateTheme(STARTER_DIR);
     first.findings.push({ level: "error", message: "caller-owned result" });
     assert.deepEqual(validateTheme(STARTER_DIR).findings, []);
+  });
+});
+
+describe("theme skill validator checks guidance files", () => {
+  const RECIPE = (example) => `# hero
+
+## Purpose
+
+A page opener.
+
+## When to use
+
+- First on a page.
+
+## Pitfalls
+
+- Keep the \`heading\` short.
+
+## Recipes
+
+### Plain opener
+
+Needs one photo.
+
+\`\`\`json
+${JSON.stringify(example, null, 2)}
+\`\`\`
+`;
+
+  it("accepts a structured widget guide whose recipe fits the schema", async () => {
+    const findings = await findingsAfter("guide-ok", (dir) =>
+      fs.writeFile(
+        path.join(dir, "widgets", "hero", "insights.md"),
+        RECIPE({ type: "hero", settings: { heading: "Welcome", image_position: "end" } }),
+      ),
+    );
+    assert.deepEqual(findings.filter((finding) => finding.rule.startsWith("guidance-")), []);
+  });
+
+  it("rejects a recipe with an unknown setting, a bad option or the wrong type", async () => {
+    const findings = await findingsAfter("guide-bad-recipe", (dir) =>
+      fs.writeFile(
+        path.join(dir, "widgets", "hero", "insights.md"),
+        RECIPE({ type: "banner", settings: { headline: "x", image_position: "left" } }),
+      ),
+    );
+    const messages = findings.filter((finding) => finding.level === "error").map((finding) => `[${finding.rule}] ${finding.message}`);
+    assert.ok(messages.some((message) => message.includes('[guidance-recipe] recipe "Plain opener": "type" is "banner"')), messages.join("\n"));
+    assert.ok(messages.some((message) => message.includes('[unknown-setting] recipe "Plain opener": "headline"')), messages.join("\n"));
+    assert.ok(messages.some((message) => message.includes('[setting-value] recipe "Plain opener": "image_position"')), messages.join("\n"));
+  });
+
+  it("warns about an older free-form guide and about names that exist nowhere in the theme", async () => {
+    const findings = await findingsAfter("guide-legacy", (dir) =>
+      fs.writeFile(path.join(dir, "widgets", "hero", "insights.md"), "# Hero\n\nA big opener.\n\n## Settings\n\nUse `headline_size` and `heading`.\n"),
+    );
+    const rules = findings.map((finding) => `[${finding.rule}] ${finding.message}`);
+    assert.ok(rules.some((rule) => rule.startsWith("[guidance-structure] Older free-form guidance")), rules.join("\n"));
+    assert.ok(rules.some((rule) => rule.startsWith("[guidance-reference] `headline_size`")), rules.join("\n"));
+    assert.ok(!rules.some((rule) => rule.startsWith("[guidance-reference] `heading`")), rules.join("\n"));
+    assert.ok(findings.every((finding) => finding.level === "warning"));
+  });
+
+  it("rejects uploads in a recipe example, on the section and on its blocks", async () => {
+    const findings = await findingsAfter("guide-media", async (dir) => {
+      await fs.writeFile(
+        path.join(dir, "widgets", "hero", "insights.md"),
+        RECIPE({ type: "hero", settings: { heading: "Welcome", image: "/uploads/images/does-not-exist.jpg" } }),
+      );
+      const accordion = path.join(dir, "widgets", "accordion", "schema.json");
+      const schema = await fs.readJson(accordion);
+      schema.blocks[0].settings.push({ type: "image", id: "photo", label: "Photo" });
+      await fs.writeJson(accordion, schema, { spaces: 2 });
+      await fs.writeFile(
+        path.join(dir, "widgets", "accordion", "insights.md"),
+        RECIPE({
+          type: "accordion",
+          blocks: [{ type: "item", settings: { question: "Q", photo: "/uploads/images/a.jpg" } }],
+        }).replace("# hero", "# accordion"),
+      );
+    });
+    const messages = findings.filter((finding) => finding.rule === "guidance-recipe").map((finding) => finding.message);
+    assert.ok(messages.some((message) => message.includes('recipe "Plain opener": "image" is an image setting')), messages.join("\n"));
+    assert.ok(messages.some((message) => message.includes('recipe "Plain opener" block 1: "photo" is an image setting')), messages.join("\n"));
+  });
+
+  it("requires the three headings of a preset guide", async () => {
+    const findings = await findingsAfter("guide-preset", async (dir) => {
+      await fs.outputJson(path.join(dir, "presets", "presets.json"), { default: "demo", presets: [{ id: "demo", name: "Demo" }] });
+      await fs.outputFile(path.join(dir, "presets", "demo", "insights.md"), "# Demo\n\n## Suits\n\nAnyone.\n\n## Look\n\nPlain.\n");
+    });
+    const errors = findings.filter((finding) => finding.level === "error").map((finding) => `${finding.file}: [${finding.rule}] ${finding.message}`);
+    assert.deepEqual(errors, ["presets/demo/insights.md: [guidance-structure] A preset guide needs ## Suits, ## Look, ## Adapting; missing ## Adapting."]);
   });
 });

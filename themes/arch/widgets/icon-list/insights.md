@@ -1,81 +1,102 @@
-# Icon List Widget — Insights
+# icon-list
 
-A grid or carousel of icon+label items used to communicate features, amenities, services, or capabilities at a glance.
+## Purpose
 
----
+A compact strip or grid of icon-and-label items, each centred with an optional one-line note: amenities, inclusions, facilities, quick reasons to choose you. The lightest way to say "we have all of this" at a glance, without cards, buttons or paragraphs.
 
-## Settings Levers
+Two to eight columns on wide screens, as a grid or a scrolling carousel. Icons share one style, size and shape, and the label uses the heading font so even an icon-only strip reads cleanly.
 
-| Setting | Values | Visual Effect |
-|---|---|---|
-| `eyebrow` | any text | Small label above the headline — adds context like "What We Offer" or "Included With Every Stay" |
-| `eyebrow_uppercase` | `true` / `false` (default) | Uppercases the eyebrow text for a more formal label treatment |
-| `title` | any text | Section headline (renders as `<h1>` when first widget on page, `<h2>` otherwise) |
-| `description` | any text | Supporting paragraph below the headline |
-| `heading_alignment` | `start`, **`center`** | Left-aligns the header block for editorial feel; center (default) is formal and symmetrical |
-| `layout` | **`grid`**, `carousel` | Grid shows all items at once; carousel adds prev/next navigation and horizontal scrolling |
-| `columns_desktop` | 2 -- 8 (default **4**) | Number of columns at 1200 px+. Lower values = larger icons with more breathing room; higher values = dense, scannable lists |
-| `icon_style` | **`plain`**, `outline`, `filled` | Plain is minimal (icon only), outline adds a border ring, filled puts the icon on a solid background shape |
-| `icon_size` | `sm`, `md`, `lg`, **`xl`** | Controls icon dimensions. Smaller sizes suit dense grids (6--8 cols); larger sizes suit hero-style feature callouts (2--3 cols) |
-| `icon_shape` | `sharp`, `rounded`, **`circle`** | Shape of the outline/filled container. Sharp = square corners, rounded = soft corners, circle = pill/circle |
-| `color_scheme` | **`standard-primary`**, `standard-secondary`, `highlight-primary`, `highlight-secondary` | Standard uses page background; highlight flips to contrast background. Accent variants tint the section for visual separation |
-| `top_spacing` | **`auto`**, `small`, `none` | `small` reduces spacing for tighter rhythm; `none` removes it entirely for flush stacking |
-| `bottom_spacing` | **`auto`**, `small`, `none` | Same as above for the bottom edge |
+## When to use
 
----
+- A bridge section: between the opener and the first content block, or between two text-heavy sections, on home, `services`, `rooms` or `visit` pages.
+- Good for: amenities and facilities, what a package includes, trust points, a pictogram overview of services. Bad for: anything needing a sentence or two per item (use `icon-card-grid`), links (use `card-grid`), a heading-plus-list argument (use `features-split`).
+- It can open a page, but should not: it has no weight as an opener and does not support the transparent header (only `banner`, `slideshow` and `video-popup` do).
+- Natural neighbours: `banner` above with `top_spacing` set to `small`, `split-content` or `image-text` below, `trust-bar` as an alternative when the items are logos rather than icons.
+- Needs four to twelve items with a one- or two-word label; descriptions optional and short. Keep the count a multiple of the column count.
+- Fits hotels and rentals, venues, gyms and spas, coworking spaces, trades, clinics.
 
-## Available Blocks
+## Pitfalls
 
-| Block Type | Key Settings | Notes |
-|---|---|---|
-| `item` | `icon` (icon picker), `title` (text), `description` (text) | Each item is one icon card. Description is optional — omitting it produces a tighter, icon+label-only layout. Default set ships with 12 hospitality-themed items (Wi-Fi, Parking, Pool, etc.) |
+- Descriptions are plain text, small and muted: one short line, no formatting, no links. The moment an item needs more, this is the wrong section.
+- Icon-only versus icon-plus-description is the biggest mood shift. Dropping descriptions turns the section into a scannable pictogram strip; adding them makes it a mini feature grid. Decide once per section; mixing items with and without notes leaves ragged gaps.
+- `columns_desktop` applies on wide screens only. On laptops and tablets the grid reflows to fewer columns regardless, and on phones it is two across, so eight items make four rows on a phone.
+- Match `icon_size` to density: `xl` or `lg` for two to four columns, `sm` or `md` for six to eight. Small icons in four or five wide columns look lost; large icons in eight columns crowd.
+- `icon_shape` only shows with `outline` or `filled`. `filled` with `sharp` reads bold and technical; `plain` with `circle` reads light and hospitable. Match the site, not the section.
+- `carousel` uses `columns_desktop` as the number of visible items; it earns its place above eight items, otherwise the grid is easier to scan.
+- This is a lightweight bridge section, so `small` spacing is the natural setting. Any scheme other than `standard-primary` pads the items inside its own coloured band, so `top_spacing` and `bottom_spacing` set to `none` remove that inner padding; under a filled hero use `small`, not `none`.
+- The eyebrow and title are optional; an icon-only strip often reads best with an eyebrow alone or no heading at all.
 
----
+## Recipes
 
-## Layout Recipes
+### Amenities bar
 
-### 1. Hotel Amenities Banner
-- **Settings**: layout `grid`, columns_desktop `6`, icon_style `plain`, icon_size `lg`, icon_shape `circle`, heading_alignment `center`, color_scheme `highlight-primary`
-- **Blocks**: 6--12 items, title only (no description) — Wi-Fi, Parking, Pool, Gym, Spa, Pet Friendly
-- **Good for**: Communicating included amenities quickly without reading
+Six icon-only items on the strongest surface, meant to be read without reading. The user supplies the amenity names.
 
-### 2. Core Services Showcase
-- **Settings**: layout `grid`, columns_desktop `3`, icon_style `filled`, icon_size `xl`, icon_shape `rounded`, heading_alignment `start`, color_scheme `standard-primary`
-- **Blocks**: 3--6 items with both title and description — e.g., "Deep Cleaning / Thorough top-to-bottom clean for your home"
-- **Good for**: Homepage services section where each service needs a short explanation
+```json
+{
+  "type": "icon-list",
+  "settings": { "eyebrow": "Included With Every Stay", "heading_alignment": "center", "layout": "grid", "columns_desktop": 6, "icon_style": "plain", "icon_size": "lg", "icon_shape": "circle", "color_scheme": "highlight-primary", "top_spacing": "small", "bottom_spacing": "small" },
+  "blocks": [
+    { "type": "item", "settings": { "icon": "wifi", "title": "Free Wi-Fi" } },
+    { "type": "item", "settings": { "icon": "parking", "title": "Parking" } },
+    { "type": "item", "settings": { "icon": "pool", "title": "Pool" } },
+    { "type": "item", "settings": { "icon": "barbell", "title": "Gym" } },
+    { "type": "item", "settings": { "icon": "coffee", "title": "Breakfast" } },
+    { "type": "item", "settings": { "icon": "paw", "title": "Pet Friendly" } }
+  ]
+}
+```
 
-### 3. Why Choose Us — Trust Strip
-- **Settings**: layout `grid`, columns_desktop `4`, icon_style `outline`, icon_size `md`, icon_shape `circle`, heading_alignment `center`, color_scheme `standard-secondary`
-- **Blocks**: 4 items, title only — "Licensed & Insured", "Free Estimates", "Same-Day Service", "Satisfaction Guaranteed"
-- **Good for**: Trust-building strip placed between hero and content sections
+### Trust strip under the opener
 
-### 4. Treatment Menu (Carousel)
-- **Settings**: layout `carousel`, columns_desktop `4`, icon_style `plain`, icon_size `xl`, icon_shape `circle`, heading_alignment `center`, color_scheme `highlight-secondary`
-- **Blocks**: 8--12 items with title and short description — "Deep Tissue / 60 min session", "Hot Stone / Relaxation therapy"
-- **Good for**: Browsable service menus that exceed comfortable grid display
+Four reassurance points docked under a hero. The user supplies four short claims that are true for the business.
 
-### 5. What's Included — Service Breakdown
-- **Settings**: layout `grid`, columns_desktop `4`, icon_style `outline`, icon_size `lg`, icon_shape `sharp`, heading_alignment `start`, color_scheme `standard-primary`
-- **Blocks**: 8 items with title and description — "Initial Consultation / We assess your needs", "Detailed Quote / Transparent pricing upfront"
-- **Good for**: Detailing what a service package includes so customers know exactly what they're getting
+```json
+{
+  "type": "icon-list",
+  "settings": { "heading_alignment": "center", "layout": "grid", "columns_desktop": 4, "icon_style": "outline", "icon_size": "md", "icon_shape": "circle", "color_scheme": "standard-secondary", "top_spacing": "small", "bottom_spacing": "small" },
+  "blocks": [
+    { "type": "item", "settings": { "icon": "shield", "title": "Licensed and Insured" } },
+    { "type": "item", "settings": { "icon": "clock", "title": "Same-Week Appointments" } },
+    { "type": "item", "settings": { "icon": "certificate", "title": "Certified Team" } },
+    { "type": "item", "settings": { "icon": "thumb-up", "title": "Satisfaction Promise" } }
+  ]
+}
+```
 
-### 6. Facilities at a Glance (Dense Grid)
-- **Settings**: layout `grid`, columns_desktop `8`, icon_style `plain`, icon_size `sm`, icon_shape `circle`, heading_alignment `center`, color_scheme `highlight-primary`
-- **Blocks**: 8--16 items, title only — compact pictogram strip
-- **Good for**: Space-efficient listing where quantity matters more than detail (event venues, coworking spaces)
+### Services with a line each
 
-### 7. Process Steps
-- **Settings**: layout `grid`, columns_desktop `3`, icon_style `filled`, icon_size `xl`, icon_shape `circle`, heading_alignment `center`, color_scheme `standard-secondary`
-- **Blocks**: 3 items with title and description — "1. Consult / Tell us your vision", "2. Design / We craft the plan", "3. Build / We bring it to life"
-- **Good for**: Explaining a simple workflow or engagement process
+Three large filled icons with a short note, left-aligned heading. The user supplies three services and a few words on each.
 
----
+```json
+{
+  "type": "icon-list",
+  "settings": { "eyebrow": "Services", "title": "What We Offer", "heading_alignment": "start", "layout": "grid", "columns_desktop": 3, "icon_style": "filled", "icon_size": "xl", "icon_shape": "rounded", "color_scheme": "standard-primary" },
+  "blocks": [
+    { "type": "item", "settings": { "icon": "home", "title": "Service One", "description": "Placeholder note in a few words" } },
+    { "type": "item", "settings": { "icon": "leaf", "title": "Service Two", "description": "Placeholder note in a few words" } },
+    { "type": "item", "settings": { "icon": "sparkles", "title": "Service Three", "description": "Placeholder note in a few words" } }
+  ]
+}
+```
 
-## Differentiation Tips
+### Dense facilities grid
 
-- **Icon-only vs. icon+description** is the biggest mood shift. Dropping descriptions turns the widget into a scannable pictogram strip; adding them turns it into a mini feature-card section. Decide based on whether visitors need explanation or just recognition.
-- **Filled + sharp** creates a bold, modern, "tech product" feel. **Plain + circle** feels lighter and more hospitality-oriented. Match icon_style and icon_shape to the brand personality.
-- **Carousel layout** is not just for overflow. Even with 4 items, carousel adds interactivity and draws attention. Use it when the icon list is the primary content of a section, not a supporting element.
-- **Column count drives information density.** 2--3 columns with xl icons works as a hero-adjacent feature callout. 6--8 columns with sm icons works as a compact amenities bar. Avoid mid-range (4--5 columns) with sm icons — the items feel lost in whitespace.
-- **Color scheme layering**: Alternate between `standard-primary` and `highlight-primary` across consecutive widgets to create visual rhythm on long pages. Use accent variants when the icon list sits between two same-background widgets and needs separation without a hard break.
-- **Eyebrow text** is underused. Adding a short eyebrow like "Everything Included" or "Our Process" above the headline gives the section editorial polish and helps with scan-reading on mobile.
+Eight small pictograms for a venue or coworking space; add up to sixteen. The user supplies the facility names.
+
+```json
+{
+  "type": "icon-list",
+  "settings": { "title": "Facilities at a Glance", "heading_alignment": "center", "layout": "grid", "columns_desktop": 8, "icon_style": "plain", "icon_size": "sm", "icon_shape": "circle", "color_scheme": "standard-primary" },
+  "blocks": [
+    { "type": "item", "settings": { "icon": "wifi", "title": "Wi-Fi" } },
+    { "type": "item", "settings": { "icon": "coffee", "title": "Kitchen" } },
+    { "type": "item", "settings": { "icon": "parking", "title": "Parking" } },
+    { "type": "item", "settings": { "icon": "lock", "title": "Lockers" } },
+    { "type": "item", "settings": { "icon": "presentation", "title": "Meeting Rooms" } },
+    { "type": "item", "settings": { "icon": "headphones", "title": "Quiet Zone" } },
+    { "type": "item", "settings": { "icon": "bike", "title": "Bike Storage" } },
+    { "type": "item", "settings": { "icon": "sun", "title": "Terrace" } }
+  ]
+}
+```

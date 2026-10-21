@@ -1,150 +1,72 @@
-# Countdown Widget Insights
+# countdown
 
-A time-based countdown section that ticks toward a target date, displaying days/hours/minutes/seconds with optional heading text, a CTA button, and an expiry message.
+## Purpose
 
----
+A timer that counts down to one moment: an opening, a launch, a sale ending, a registration deadline. It shows days, hours, minutes and optionally seconds under a heading, with room for a short richtext note and one button; once the moment passes, the digits are replaced by an expiry message.
 
-## Settings Levers
+The whole block is centred by default. `cards` puts each unit in its own bordered box, which reads as a self-contained section; `minimal` shows large bare numbers separated by colons, which sits quietly between other content.
 
-| Setting | Values | Visual Effect |
-|---|---|---|
-| `eyebrow` | Any text (blank by default) | Small label above the headline -- adds context like "Limited Time" or "Grand Opening" |
-| `eyebrow_uppercase` | `true` / `false` (default) | Uppercases the eyebrow text for a more formal label treatment |
-| `title` | Any text (default "Coming Soon") | Main headline rendered as h1 (first widget) or h2 |
-| `description` | Any text (blank by default) | Paragraph below the headline for extra detail |
-| `heading_alignment` | `start`, `center` (default) | Centers or left-aligns the entire block including the timer digits |
-| `target_date` | Datetime string, e.g. `2027-01-01 00:00` | The moment the counter reaches zero |
-| `expired_message` | Any text (default "The wait is over!") | Accent-colored message that replaces the digits once the target passes |
-| `text` | Richtext (blank by default) | Additional richtext content below the timer and above the button. Good for extra details, terms, or a short promotional message |
-| `button` | Link object (text + href + optional target) | CTA button below the timer; hidden when text is blank |
-| `show_seconds` | `true` (default) / `false` | Adds or removes the seconds column and its separator |
-| `style` | `cards` (default), `minimal` | Cards: bordered rounded boxes per unit. Minimal: larger bare numbers separated by colons |
-| `color_scheme` | `standard-primary`, `standard-secondary`, `highlight-primary`, `highlight-secondary` | Controls background and card fill; accent variants give cards a secondary background |
-| `top_spacing` | `auto` (default), `small`, `none` | `small` reduces spacing for tighter rhythm; `none` removes it entirely for flush stacking |
-| `bottom_spacing` | `auto` (default), `small`, `none` | Same as above for the bottom edge |
+## When to use
 
----
+- A short, urgent moment on a home page or landing page, above the main call to action or directly under an opener.
+- Good for: grand openings, seasonal menus, enrolment cut-offs, event registration, a new location. Bad for: anything without a real date, dates more than a few months out, and recurring weekly events (use `event-list` or `schedule-table`).
+- It can open a page: its title becomes the page heading when it is first. It cannot sit under a header with `transparent_on_hero`; only `banner`, `slideshow` and `video-popup` support the transparent header. A `banner` can also carry a countdown of its own when the timer should sit on an image.
+- Natural neighbours: `banner` or `rich-text` above, `action-bar`, `event-list` or `pricing` below, `trust-bar` after it.
+- Needs almost no content: an eyebrow, a title, one line of description, a button label and the date.
+- Fits shops, restaurants, gyms, studios, schools, venues, nonprofits with a campaign.
 
-## Available Blocks
+## Pitfalls
 
-This widget has no configurable blocks. All content is controlled through top-level settings.
+- `target_date` is read by the visitor's browser in the visitor's local time zone. Write it as `2027-06-01 18:00`; a date without a time counts down to midnight, and wording such as "6pm" or a month name is not understood and the timer never starts.
+- The section stays on the page after the date passes. A dead timer with no next step wastes prime space: write an `expired_message` that drives the next action ("Doors are open, book your first visit") and keep the `button` pointing somewhere useful afterwards, or remove the section on the day.
+- Turn `show_seconds` off for dates more than a week away. Seconds racing on a 40-day countdown feel meaningless; they earn their place in the last day or two.
+- `heading_alignment` set to `start` left-aligns everything, including the digits and the button, not just the heading. Use it only when the surrounding sections are left-aligned too.
+- Any scheme other than `standard-primary` pads the content inside its own coloured band, so `top_spacing` and `bottom_spacing` set to `none` remove that inner padding; under a filled hero use `small`. On `standard-secondary` and `highlight-secondary` the `cards` get a filled background, which makes the digits stand out most; on the highlight schemes with `minimal` the digits rely on text contrast alone.
+- The `text` note sits between the digits and the button. Keep it to one or two short lines (terms, "limited places") or the button drops below the fold on phones.
+- Use a short, specific eyebrow ("Opening 1 June", "Ends Sunday") and one title; the description is optional and best left empty when the eyebrow already says when.
 
----
+## Recipes
 
-## Layout Recipes
+### Grand opening
 
-### 1. Grand Opening Announcement
+A standalone announcement in bordered cards on the strongest surface, pointing to directions or a booking page. The user supplies the opening date and a one-line invitation.
 
-| Setting | Value |
-|---|---|
-| `eyebrow` | "Save the Date" |
-| `title` | "We're Opening Our Doors" |
-| `description` | "Join us for the ribbon cutting -- refreshments, live music, and exclusive day-one deals." |
-| `style` | `cards` |
-| `color_scheme` | `highlight-primary` |
-| `button` | "Get Directions" linking to Google Maps |
-| `show_seconds` | `false` |
-| `heading_alignment` | `center` |
+```json
+{
+  "type": "countdown",
+  "settings": { "eyebrow": "Save the Date", "title": "We're Opening Our Doors", "description": "Join us for the opening day with tours, tastings and a few surprises.", "target_date": "2027-06-01 10:00", "expired_message": "We're open. Come and visit!", "show_seconds": false, "style": "cards", "color_scheme": "highlight-primary", "button": { "text": "Get Directions", "href": "contact.html" } }
+}
+```
 
-**Good for:** Building anticipation for a physical location launch.
+### Sale ending strip
 
----
+A quiet, left-aligned `minimal` timer with seconds running, meant for the final days of an offer. The user supplies the offer wording and the end date.
 
-### 2. Limited-Time Promotion Strip
+```json
+{
+  "type": "countdown",
+  "settings": { "eyebrow": "Ends Sunday", "title": "Placeholder Offer Ends Soon", "heading_alignment": "start", "target_date": "2027-03-14 23:59", "expired_message": "This offer has ended. Join the list for the next one.", "show_seconds": true, "style": "minimal", "color_scheme": "standard-secondary", "top_spacing": "small", "bottom_spacing": "small", "button": { "text": "Book Now", "href": "contact.html" } }
+}
+```
 
-| Setting | Value |
-|---|---|
-| `eyebrow` | "Ends This Weekend" |
-| `title` | "20% Off All Services" |
-| `description` | (blank) |
-| `style` | `minimal` |
-| `color_scheme` | `standard-secondary` |
-| `button` | "Book Now" linking to contact/booking page |
-| `show_seconds` | `true` |
-| `top_spacing` | `none` |
-| `bottom_spacing` | `none` |
-| `heading_alignment` | `start` |
+### Registration deadline
 
-**Good for:** Short-duration promotions where the ticking clock creates real urgency.
+For a course, workshop or event with a firm cut-off; the note carries the terms. The user supplies the programme name, the deadline and the terms line.
 
----
+```json
+{
+  "type": "countdown",
+  "settings": { "eyebrow": "Places Limited", "title": "Spring Workshop Series", "description": "Registration closes when the timer reaches zero.", "target_date": "2027-04-30 17:00", "expired_message": "Registration is closed. Join the waitlist for the next series.", "text": "<p>Early registrations include a free introductory session.</p>", "show_seconds": false, "style": "cards", "color_scheme": "standard-primary", "button": { "text": "Register Now", "href": "contact.html" } }
+}
+```
 
-### 3. Event Registration Deadline
+### New location teaser
 
-| Setting | Value |
-|---|---|
-| `eyebrow` | "Early Bird Pricing" |
-| `title` | "Annual Fundraiser Gala" |
-| `description` | "Register before the deadline to lock in discounted tickets." |
-| `style` | `cards` |
-| `color_scheme` | `standard-primary` |
-| `button` | "Reserve Your Seat" linking to registration form |
-| `show_seconds` | `false` |
-| `heading_alignment` | `center` |
+A softer "coming soon" that collects interest before the doors open. The user supplies the location name and the planned opening date.
 
-**Good for:** Driving early registrations by making the cutoff date tangible.
-
----
-
-### 4. New Service or Location Launch
-
-| Setting | Value |
-|---|---|
-| `eyebrow` | "Coming Soon" |
-| `title` | "New Location in Westside" |
-| `description` | "We're expanding. Be the first to book at our new studio." |
-| `style` | `minimal` |
-| `color_scheme` | `highlight-secondary` |
-| `button` | "Get Notified" linking to contact page |
-| `show_seconds` | `false` |
-| `heading_alignment` | `center` |
-| `expired_message` | "We're open -- book your first visit!" |
-
-**Good for:** Building anticipation for a new location, service, or menu launch.
-
----
-
-### 5. Seasonal Menu / Offering Countdown
-
-| Setting | Value |
-|---|---|
-| `eyebrow` | "Coming This Friday" |
-| `title` | "Holiday Menu Available Soon" |
-| `description` | (blank) |
-| `style` | `cards` |
-| `color_scheme` | `highlight-primary` |
-| `button` | "See the Full Menu" linking to menu page |
-| `show_seconds` | `false` |
-| `heading_alignment` | `start` |
-
-**Good for:** Seasonal rotations where you want repeat visitors checking back.
-
----
-
-### 6. Class or Workshop Registration Deadline
-
-| Setting | Value |
-|---|---|
-| `eyebrow` | "Spots Limited" |
-| `title` | "Fall Workshop Series" |
-| `description` | "Registration closes when the timer hits zero. Reserve your spot today." |
-| `style` | `cards` |
-| `color_scheme` | `standard-primary` |
-| `button` | "Register Now" linking to booking page |
-| `show_seconds` | `false` |
-| `heading_alignment` | `center` |
-| `expired_message` | "Registration is closed — join the waitlist for the next session." |
-
-**Good for:** Driving enrollment for classes, workshops, or seasonal programs with a firm cutoff.
-
----
-
-## Differentiation Tips
-
-- **Pair the eyebrow with a short, punchy phrase** ("48 Hours Left", "Doors Open Dec 1") rather than generic labels. The eyebrow is the first thing the eye hits above the headline, so it should carry real information.
-- **Use `minimal` style for inline urgency and `cards` style for standalone sections.** Minimal works best sandwiched between other content with spacing set to `none` on both ends. Cards command their own visual block and benefit from a highlight color scheme.
-- **Turn off seconds for dates more than a week out.** Watching seconds tick on a 30-day countdown feels meaningless. Save the seconds column for last-48-hours urgency where every tick matters.
-- **Write expired messages that drive action, not just announce completion.** "The wait is over!" is fine, but "Doors are open -- walk in today!" or "Sale ended -- join the list for the next one" keeps the widget useful after zero.
-- **Combine `highlight-secondary` with `cards` for maximum visual weight.** The secondary background fill on the cards creates strong contrast, making the digits pop. Use this when the countdown is the hero of the page, not a supporting element.
-- **Left-align when the countdown sits beside other left-aligned content** (text blocks, feature lists). Center-align when it occupies a full-width standalone section. Mixing alignment with surrounding content looks unintentional.
-- **Set a meaningful `expired_message` and `button` combination.** After the countdown ends, the widget stays on the page. A dead timer with no next step wastes prime screen space. Always pair the expiry state with a redirect or follow-up action.
+```json
+{
+  "type": "countdown",
+  "settings": { "eyebrow": "Coming Soon", "title": "A Second Studio Is on Its Way", "description": "Be the first to book when the new space opens.", "target_date": "2027-09-01 09:00", "expired_message": "The new studio is open. Book your first visit.", "show_seconds": false, "style": "minimal", "color_scheme": "highlight-secondary", "button": { "text": "Get Notified", "href": "contact.html" } }
+}
+```

@@ -1,171 +1,95 @@
-# Icon Card Grid Widget
+# icon-card-grid
 
-A flexible icon-plus-text card grid for showcasing services, features, or value propositions in a scannable, visually consistent layout.
+## Purpose
 
----
+A grid of icon-led cards, each with an optional small subtitle, a title, a richtext description and an optional button. The workhorse "what we do" section: services, features, benefits or process steps laid out in two to five columns, as boxed cards or a flat, borderless list.
 
-## Settings Levers
+A carousel variant scrolls the cards sideways, and a featured photo can sit beside a two-column grid when the section needs an image. Icons share one style, size and shape across the section.
 
-| Setting | Values | Visual Effect |
-|---------|--------|---------------|
-| `eyebrow` | Any text | Small label above the main headline (e.g. "Our Services"). Leave blank to hide. |
-| `eyebrow_uppercase` | `true` / `false` (default) | Uppercases the eyebrow text for a more formal label treatment |
-| `title` | Any text | Primary section headline. Renders as `<h1>` when the widget is first on the page, `<h2>` otherwise. |
-| `description` | Any text | Subheading paragraph below the title. Useful for a one-sentence value statement. |
-| `heading_alignment` | `start`, `center` (default) | Centers or left-aligns the eyebrow/title/description header block. Left works better when a featured image is present. |
-| `featured_image` | Image or blank | Adds a large photo beside the card grid in a 50/50 split layout. Forces grid to 2 columns. Available but **not used in preset generation** — this is a user-added enhancement. |
-| `featured_image_position` | `start` (default), `end` | Places the featured image on the left or right of the card grid. Only relevant when `featured_image` is set. |
-| `layout` | `grid` (default), `carousel` | Grid shows all cards at once; carousel makes them horizontally scrollable with prev/next buttons. |
-| `columns_desktop` | 2--5 (default 4) | Number of columns on desktop. Ignored when featured image is set (locked to 2) or in carousel mode (used as visible slide count). |
-| `card_layout` | `box` (default), `flat` | Box gives cards a contained background/border treatment. Flat removes the card chrome for a more minimal look. |
-| `alignment` | `start` (default), `center` | Left-aligns or centers icon, text, and button inside each card. |
-| `icon_style` | `plain` (default), `outline`, `filled` | Plain shows the raw icon. Outline adds a border ring. Filled places the icon on a solid background circle/shape. |
-| `icon_size` | `sm`, `md`, `lg` (default), `xl` | Scales the icon from subtle to dominant. |
-| `icon_shape` | `sharp`, `rounded`, `circle` (default) | Controls the corner radius of the outline/filled icon container. Only visible when icon_style is outline or filled. |
-| `color_scheme` | `standard-primary` (default), `standard-secondary`, `highlight-primary`, `highlight-secondary` | Standard uses the page background. Highlight inverts to the theme's contrast palette. Accent variants add a secondary background or border to each card for extra separation. |
-| `top_spacing` | `auto` (default), `small`, `none` | `small` reduces spacing for tighter rhythm; `none` removes it entirely for flush stacking |
-| `bottom_spacing` | `auto` (default), `small`, `none` | Same as above for the bottom edge |
+## When to use
 
----
+- The main services or features section of a home page, or the overview at the top of a `services` page, after the opener.
+- Good for: three to eight services, benefits, "how it works" steps, what is included. Bad for: items that need photos (use `services-grid` or `card-grid`), a one-line pictogram strip (use `icon-list`), a heading-plus-list argument (use `features-split`).
+- It can open a page: its title becomes the page heading when first. It cannot sit under a header with `transparent_on_hero`; only `banner`, `slideshow` and `video-popup` support the transparent header.
+- Natural neighbours: `banner` or `rich-text` above, `testimonials`, `key-figures` or `action-bar` below. Keep one card style per page when other grid sections are present.
+- Needs three to eight cards with a title and one or two sentences each. Three or six cards fill three columns; four or eight fill four.
+- Fits every service business: trades, clinics, agencies, salons, gyms, schools, consultancies.
 
-## Available Blocks
+## Pitfalls
 
-| Block Type | Key Settings | Notes |
-|------------|-------------|-------|
-| `card` | `icon` -- any theme icon name | The visual anchor of the card. Choose icons that are quickly recognisable at small sizes. |
-| | `subtitle` -- short text | Rendered as an eyebrow above the card title. Good for categories ("Design", "Support") or numbering ("Step 1"). |
-| | `title` -- short text | Card headline. Keep to 2--4 words for scannability. |
-| | `description` -- richtext | Body copy. Supports bold, links, and lists. Sanitised with DOMPurify. |
-| | `button_link` -- text, href, target | Optional CTA rendered as a secondary button. Only use when cards genuinely link to dedicated pages. Most small business presets should omit buttons entirely. |
+- New cards carry a placeholder subtitle and a "Learn More" button pointing nowhere. Clear `subtitle` unless it earns its place (a category or "Step 1"), and clear the `button_link` text unless the card has a real page to link to. Most small-business grids need no buttons at all.
+- A `featured_image` locks the grid to two columns and ignores `columns_desktop`; it suits exactly four or six cards. With `layout` set to `carousel` the featured image is not shown at all.
+- `card_layout` set to `flat` removes the card box and with it the per-scheme borders and fills, so on `standard-secondary` or a highlight scheme the cards read as a plain list on a coloured band. `box` on `standard-primary` gives cards with no border at all; use `standard-secondary` when the cards need an outline.
+- `columns_desktop` is also the number of visible slides in `carousel`. A carousel only earns its place above five or six cards; below that, a grid is easier to scan.
+- `alignment` set to `center` centres icon, text and button inside each card; it pairs with `box` and short copy. Left alignment reads better with longer descriptions and flat cards.
+- Icon weight comes from `icon_style` more than `icon_size`: a small `filled` icon draws more attention than a large `plain` one. Keep the same style, size and shape across all grid sections of a site.
+- Keep card titles to two to four words and descriptions to one or two sentences; uneven text lengths make boxed cards different heights in the same row.
+- Any scheme other than `standard-primary` pads the grid inside its own coloured band, so `top_spacing` and `bottom_spacing` set to `none` remove that inner padding; under a filled hero use `small`. Never place it on a highlight scheme directly next to another highlight section.
 
----
+## Recipes
 
-## Layout Recipes
+### Services overview
 
-### 1. Services Overview (the classic)
+The classic three-column "what we do" with filled icons in outlined cards. The user supplies three or six services with a sentence each.
 
-| Setting | Value |
-|---------|-------|
-| `columns_desktop` | 3 |
-| `card_layout` | box |
-| `alignment` | center |
-| `icon_style` | filled |
-| `icon_size` | lg |
-| `icon_shape` | circle |
-| `color_scheme` | standard-secondary |
-| Cards | 3 or 6 |
+```json
+{
+  "type": "icon-card-grid",
+  "settings": { "eyebrow": "Our Services", "title": "What We Do", "description": "Placeholder sentence summarising the offer.", "layout": "grid", "columns_desktop": 3, "card_layout": "box", "alignment": "center", "icon_style": "filled", "icon_size": "lg", "icon_shape": "circle", "color_scheme": "standard-secondary" },
+  "blocks": [
+    { "type": "card", "settings": { "icon": "home", "subtitle": "", "title": "Service One", "description": "<p>Placeholder sentence on this service.</p>", "button_link": { "text": "", "href": "" } } },
+    { "type": "card", "settings": { "icon": "sparkles", "subtitle": "", "title": "Service Two", "description": "<p>Placeholder sentence on this service.</p>", "button_link": { "text": "", "href": "" } } },
+    { "type": "card", "settings": { "icon": "leaf", "subtitle": "", "title": "Service Three", "description": "<p>Placeholder sentence on this service.</p>", "button_link": { "text": "", "href": "" } } }
+  ]
+}
+```
 
-**Good for:** The main "What We Do" section on a homepage.
+### Why choose us, flat
 
----
+A quieter differentiators section that does not compete with the main services grid. The user supplies four short reasons.
 
-### 2. Why Choose Us -- Flat & Minimal
+```json
+{
+  "type": "icon-card-grid",
+  "settings": { "eyebrow": "Why Us", "title": "What Sets Us Apart", "heading_alignment": "start", "layout": "grid", "columns_desktop": 4, "card_layout": "flat", "alignment": "start", "icon_style": "plain", "icon_size": "md", "color_scheme": "standard-primary" },
+  "blocks": [
+    { "type": "card", "settings": { "icon": "shield", "subtitle": "", "title": "Licensed and Insured", "description": "<p>Placeholder line.</p>", "button_link": { "text": "", "href": "" } } },
+    { "type": "card", "settings": { "icon": "clock", "subtitle": "", "title": "On Time", "description": "<p>Placeholder line.</p>", "button_link": { "text": "", "href": "" } } },
+    { "type": "card", "settings": { "icon": "certificate", "subtitle": "", "title": "Certified Team", "description": "<p>Placeholder line.</p>", "button_link": { "text": "", "href": "" } } },
+    { "type": "card", "settings": { "icon": "heart", "subtitle": "", "title": "Local and Independent", "description": "<p>Placeholder line.</p>", "button_link": { "text": "", "href": "" } } }
+  ]
+}
+```
 
-| Setting | Value |
-|---------|-------|
-| `columns_desktop` | 4 |
-| `card_layout` | flat |
-| `alignment` | start |
-| `icon_style` | plain |
-| `icon_size` | md |
-| `color_scheme` | standard-primary |
-| Cards | 4 |
+### Process steps
 
-**Good for:** A secondary differentiators section that should not compete visually with the hero or primary services grid.
+Four numbered steps using the subtitle for the step label, outlined icons on the alternate highlight surface. The user supplies the steps in order.
 
----
+```json
+{
+  "type": "icon-card-grid",
+  "settings": { "eyebrow": "How It Works", "title": "From First Call to Finished Job", "layout": "grid", "columns_desktop": 4, "card_layout": "flat", "alignment": "center", "icon_style": "outline", "icon_size": "xl", "icon_shape": "circle", "color_scheme": "highlight-secondary" },
+  "blocks": [
+    { "type": "card", "settings": { "icon": "phone", "subtitle": "Step 1", "title": "Get in Touch", "description": "<p>Placeholder line.</p>", "button_link": { "text": "", "href": "" } } },
+    { "type": "card", "settings": { "icon": "clipboard-list", "subtitle": "Step 2", "title": "Free Quote", "description": "<p>Placeholder line.</p>", "button_link": { "text": "", "href": "" } } },
+    { "type": "card", "settings": { "icon": "calendar", "subtitle": "Step 3", "title": "Book a Date", "description": "<p>Placeholder line.</p>", "button_link": { "text": "", "href": "" } } },
+    { "type": "card", "settings": { "icon": "checks", "subtitle": "Step 4", "title": "Done and Checked", "description": "<p>Placeholder line.</p>", "button_link": { "text": "", "href": "" } } }
+  ]
+}
+```
 
-### 3. Feature Carousel
+### Service cards with pages
 
-| Setting | Value |
-|---------|-------|
-| `layout` | carousel |
-| `columns_desktop` | 3 |
-| `card_layout` | box |
-| `alignment` | center |
-| `icon_style` | outline |
-| `icon_size` | lg |
-| `icon_shape` | rounded |
-| `color_scheme` | highlight-primary |
-| Cards | 6--8 |
+Boxed cards that each link to a dedicated service page; add one card per page. The user supplies the service names, a sentence each and the page links.
 
-**Good for:** Showcasing many features or services without overwhelming the page. The carousel invites interaction and keeps the section compact.
-
----
-
-### 4. Compact Benefits Strip
-
-| Setting | Value |
-|---------|-------|
-| `columns_desktop` | 4 |
-| `card_layout` | flat |
-| `alignment` | center |
-| `icon_style` | filled |
-| `icon_size` | sm |
-| `icon_shape` | rounded |
-| `color_scheme` | standard-primary |
-| Cards | 4 (icon + title only, no descriptions or buttons) |
-
-**Good for:** A tight "why us" strip with just icons and short labels — works well between a hero and a content section.
-
----
-
-### 5. Process Steps
-
-| Setting | Value |
-|---------|-------|
-| `columns_desktop` | 4 |
-| `card_layout` | flat |
-| `alignment` | center |
-| `icon_style` | outline |
-| `icon_size` | xl |
-| `icon_shape` | circle |
-| `color_scheme` | highlight-secondary |
-| Cards | 4 (use subtitle for "Step 1", "Step 2", etc.) |
-
-**Good for:** Visualising a numbered process such as "How It Works" or an onboarding flow.
-
----
-
-### 6. Narrow Two-Column Highlights
-
-| Setting | Value |
-|---------|-------|
-| `columns_desktop` | 2 |
-| `card_layout` | box |
-| `alignment` | start |
-| `icon_style` | filled |
-| `icon_size` | lg |
-| `icon_shape` | sharp |
-| `color_scheme` | standard-secondary |
-| Cards | 2 |
-
-**Good for:** A focused comparison or two primary offerings displayed side-by-side with generous whitespace.
-
----
-
-### 7. Dense Feature Matrix
-
-| Setting | Value |
-|---------|-------|
-| `columns_desktop` | 5 |
-| `card_layout` | flat |
-| `alignment` | center |
-| `icon_style` | plain |
-| `icon_size` | sm |
-| `color_scheme` | standard-primary |
-| Cards | 10 (no descriptions, icon + title only) |
-
-**Good for:** A compact "everything included" checklist. Strip descriptions and buttons so each card is just an icon and label.
-
----
-
-## Differentiation Tips
-
-- **Box vs. Flat is the biggest mood lever.** Box cards feel structured and corporate-friendly; flat cards feel editorial and modern. Pick one per page and stay consistent with other grid widgets.
-- **Icon style carries more weight than icon size.** A small filled icon on a coloured circle draws more attention than a large plain icon. Use filled or outline when icons need to anchor the card; use plain when the title is the star.
-- **Carousel is best above 5 cards.** Below that threshold, a standard grid is easier to scan. Carousel shines when you want to pack 8+ items without vertical scroll.
-- **Default to no buttons for small business presets.** Most small businesses use icon card grids to showcase services, features, or highlights — not to link to individual pages for each one. Only add `button_link` when the industry genuinely needs per-card destinations.
-- **Subtract before you add.** Leave subtitle blank if the title is self-explanatory. Remove button_link if there is no dedicated page to link to. Every empty field tightens the card and improves readability.
-- **Color scheme stacking matters.** If the section above uses `highlight-primary`, set this widget to `standard-primary` (or vice versa) so there is a clear visual break. Avoid placing two `highlight-primary` widgets back-to-back.
-- **Use `top_spacing: none` or `bottom_spacing: none`** to visually merge this widget with an adjacent section that shares the same color scheme, creating a seamless content flow.
+```json
+{
+  "type": "icon-card-grid",
+  "settings": { "eyebrow": "Services", "title": "Explore What We Offer", "layout": "grid", "columns_desktop": 3, "card_layout": "box", "alignment": "start", "icon_style": "outline", "icon_size": "lg", "icon_shape": "rounded", "color_scheme": "standard-secondary" },
+  "blocks": [
+    { "type": "card", "settings": { "icon": "star", "subtitle": "", "title": "Service One", "description": "<p>Placeholder sentence.</p>", "button_link": { "text": "Learn More", "href": "services.html" } } },
+    { "type": "card", "settings": { "icon": "users", "subtitle": "", "title": "Service Two", "description": "<p>Placeholder sentence.</p>", "button_link": { "text": "Learn More", "href": "services.html" } } },
+    { "type": "card", "settings": { "icon": "rocket", "subtitle": "", "title": "Service Three", "description": "<p>Placeholder sentence.</p>", "button_link": { "text": "Learn More", "href": "services.html" } } }
+  ]
+}
+```

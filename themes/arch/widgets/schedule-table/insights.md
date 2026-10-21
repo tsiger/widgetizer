@@ -1,90 +1,118 @@
-# Schedule Table Widget — Insights
+# schedule-table
 
-A two-column schedule widget that pairs a day/hours table with an optional sidebar for contact info and social links, with automatic "today" highlighting.
+## Purpose
 
----
+Opening hours as a clean day-by-day table, with an optional sidebar for contact details or social links and an automatic highlight on today's row. Use it wherever visitors ask "when are you open": the `contact` page, a visit page, or the foot of the home page.
 
-## Settings Levers
+Each `day` block is one row (day on the left, hours on the right); a row marked `closed` shows the closed label instead of hours. `info` and `social` blocks fill a narrower sidebar beside the table; without them the table runs full width. The optional `note` is a small line under the last row for caveats.
 
-| Setting | Values | Visual Effect |
-|---|---|---|
-| `eyebrow` | Any text (blank by default) | Small label above the headline; adds a category/context line |
-| `eyebrow_uppercase` | `true` / `false` (default) | Uppercases the eyebrow text for a more formal label treatment |
-| `title` | Any text (default "Opening Hours") | Main headline; renders as h1 when the widget is first on the page, h2 otherwise |
-| `description` | Any text (blank by default) | Paragraph beneath the headline for extra context |
-| `heading_alignment` | `start`, `center` (default) | Controls whether the eyebrow/title/description block is left-aligned or centered |
-| `note` | Any text (default "We are closed on public holidays") | Small muted footnote displayed below the last schedule row |
-| `sidebar_position` | `start`, `end` (default) | Places the info/social sidebar on the chosen side; uses CSS grid reordering |
-| `week_start_day` | `0` (Sunday), `1` (Monday, default) | Determines which day block maps to index 0 for the "is-today" highlight calculation |
-| `color_scheme` | `standard-primary`, `standard-secondary`, `highlight-primary`, `highlight-secondary` | Controls background and text theming; non-standard schemes add padded container and custom bg |
-| `top_spacing` | `auto` (default), `small`, `none` | `small` reduces spacing for tighter rhythm; `none` removes it entirely for flush stacking |
-| `bottom_spacing` | `auto` (default), `small`, `none` | `small` reduces spacing for tighter rhythm; `none` removes it entirely for flush stacking |
+## When to use
 
----
+- A utility section, not a persuasion one. It sits late on a page: after `contact-details` or `map` on `contact`, or just before the footer on `index`.
+- Good for shops, cafés, restaurants, clinics, salons, gyms, galleries, libraries, workshops: anyone with fixed weekly hours.
+- Bad for timetables with several sessions a day or several rooms; use `class-schedule` or `event-list` for those. Bad for seasonal programmes with dates.
+- It can open a page when it has a `title`, but only on a page whose whole subject is hours (a "visit" page). It never supports a transparent header; under `transparent_on_hero` open the page with `banner` or `rich-text` first.
+- Natural neighbours: `contact-details`, `map`, `social-icons`, a closing `action-bar`.
+- Needs five to seven `day` blocks and, ideally, one `info` block so the sidebar has something to say.
 
-## Available Blocks
+## Pitfalls
 
-| Block Type | Key Settings | Notes |
-|---|---|---|
-| `day` | `day` (text, e.g. "Monday"), `hours` (text, e.g. "9:00 AM - 5:00 PM"), `closed` (checkbox) | Core repeatable row. When `closed` is checked the hours text is replaced with a static "Closed" label and the row gets an `is-closed` class. Today's row is auto-highlighted with accent borders and semibold text via client-side JS. |
-| `info` | `title` (text), `text` (richtext) | Sidebar content block. Supports formatted HTML via richtext. Multiple info blocks stack vertically in the sidebar. If no info or social blocks exist the sidebar column is removed and the table goes full-width. |
-| `social` | (none -- pulls from theme-level social settings) | Renders the shared social-icons partial using `theme.social`. Appears in the sidebar alongside info blocks. |
+- The today highlight works by position, not by name: the first `day` block is treated as the first day of the week chosen in `week_start_day`, the second as the next day, and so on. List all seven days in order starting from that day, or the wrong row lights up. If you only list some days, turn `highlight_today` off.
+- `week_start_day` must match the first block: `1` when the list starts with Monday, `0` when it starts with Sunday.
+- Split shifts go in one row's `hours` text ("11:00–14:30 / 17:00–22:00"); duplicating a day as two blocks also breaks the highlight count.
+- `closed` replaces the hours text, so anything typed in `hours` for that row is ignored. Edit `closed_text` only if the word should be translated or softened.
+- `sidebar_position` has no effect without `info` or `social` blocks. On phones the sidebar drops below the table whichever side it is on.
+- `social` draws the icons from the site's social settings (`instagram_url`, `facebook_url` and friends); it shows nothing until those are filled in and it cannot differ from the footer's icons.
+- Keep `info` text to a title plus two or three short lines (address, phone, email, a booking link). Long paragraphs make the sidebar taller than the table.
+- Functional content rarely earns a highlight surface. `highlight-primary` here competes with the page's real call to action; prefer `standard-primary` or `standard-secondary`.
+- Filled schemes pad inside their own band, so `top_spacing` `none` on a filled table removes its inner padding rather than the gap to the section above. Use `none` only directly under an unfilled `rich-text` opener.
 
----
+## Recipes
 
-## Layout Recipes
+### Classic opening hours
 
-### 1. Classic Business Hours
+The default arrangement: seven rows, contact details on the right, today highlighted. No images needed.
 
-- **Blocks:** 7 day blocks (Mon-Sun), 1 info block ("Contact Us" with phone + email)
-- **Settings:** `heading_alignment: center`, `sidebar_position: end`, `color_scheme: standard-primary`, `week_start_day: 1`
-- **Good for:** The default setup. A clean, scannable hours table with contact details on the side.
+```json
+{
+  "type": "schedule-table",
+  "settings": {
+    "title": "Opening hours",
+    "heading_alignment": "center",
+    "note": "Closed on public holidays.",
+    "sidebar_position": "end",
+    "week_start_day": "1",
+    "highlight_today": true,
+    "color_scheme": "standard-primary"
+  },
+  "blocks": [
+    { "type": "day", "settings": { "day": "Monday", "hours": "9:00 – 18:00" } },
+    { "type": "day", "settings": { "day": "Tuesday", "hours": "9:00 – 18:00" } },
+    { "type": "day", "settings": { "day": "Wednesday", "hours": "9:00 – 18:00" } },
+    { "type": "day", "settings": { "day": "Thursday", "hours": "9:00 – 20:00" } },
+    { "type": "day", "settings": { "day": "Friday", "hours": "9:00 – 18:00" } },
+    { "type": "day", "settings": { "day": "Saturday", "hours": "10:00 – 14:00" } },
+    { "type": "day", "settings": { "day": "Sunday", "hours": "", "closed": true } },
+    { "type": "info", "settings": { "title": "Find us", "text": "<p>12 Example Street, Springfield</p><p>(555) 010-0100</p><p>hello@example.com</p>" } }
+  ]
+}
+```
 
-### 2. Restaurant Split-Shift Hours
+### Restaurant service hours
 
-- **Blocks:** 7 day blocks with split hours (e.g. "11:30 AM - 2:30 PM / 5:00 PM - 10:00 PM"), 1 info block ("Reservations" with phone number and a booking link in richtext)
-- **Settings:** `heading_alignment: start`, `sidebar_position: end`, `color_scheme: highlight-primary`, `note: "Kitchen closes 30 minutes before closing"`, `title: "Hours & Reservations"`
-- **Good for:** Restaurants that have lunch and dinner services with a gap in between.
+Lunch and dinner on one row each, a reservations box first so it is read before the hours, and a kitchen caveat in the note.
 
-### 3. Weekend-Focused Venue
+```json
+{
+  "type": "schedule-table",
+  "settings": {
+    "eyebrow": "Plan your visit",
+    "title": "Hours and reservations",
+    "heading_alignment": "start",
+    "note": "The kitchen closes thirty minutes before we do.",
+    "sidebar_position": "start",
+    "week_start_day": "1",
+    "color_scheme": "standard-secondary"
+  },
+  "blocks": [
+    { "type": "day", "settings": { "day": "Monday", "hours": "", "closed": true } },
+    { "type": "day", "settings": { "day": "Tuesday", "hours": "12:00 – 14:30 / 18:00 – 22:00" } },
+    { "type": "day", "settings": { "day": "Wednesday", "hours": "12:00 – 14:30 / 18:00 – 22:00" } },
+    { "type": "day", "settings": { "day": "Thursday", "hours": "12:00 – 14:30 / 18:00 – 22:00" } },
+    { "type": "day", "settings": { "day": "Friday", "hours": "12:00 – 14:30 / 18:00 – 23:00" } },
+    { "type": "day", "settings": { "day": "Saturday", "hours": "12:00 – 23:00" } },
+    { "type": "day", "settings": { "day": "Sunday", "hours": "12:00 – 16:00" } },
+    { "type": "info", "settings": { "title": "Reservations", "text": "<p>Call (555) 010-0100 or <a href=\"contact.html\">book a table online</a>.</p>" } }
+  ]
+}
+```
 
-- **Blocks:** 5 day blocks (Wed-Sun only; Mon-Tue omitted or marked closed), 1 info block ("Location" with address), 1 social block
-- **Settings:** `heading_alignment: center`, `sidebar_position: start`, `color_scheme: standard-secondary`, `week_start_day: 0`, `eyebrow: "Plan Your Visit"`, `title: "We're Open"`
-- **Good for:** Venues that only operate part of the week and want to emphasize open days rather than listing five closed ones.
+### Hours with social links
 
-### 4. Gym / Fitness Studio
+A compact block for a café or shop that lives on social media: the hours, one line of address, then the icon row from the site's social settings.
 
-- **Blocks:** 7 day blocks with early-open hours (e.g. "5:30 AM - 10:00 PM"), 1 info block ("Front Desk" with phone), 1 info block ("Class Schedule" with a richtext link to a PDF or separate page)
-- **Settings:** `heading_alignment: start`, `sidebar_position: end`, `color_scheme: highlight-secondary`, `title: "Gym Hours"`, `note: "Staffed hours may differ -- see front desk"`
-- **Good for:** Facilities where access hours differ from staffed hours, with sidebar used for secondary info links.
-
-### 5. Seasonal / Holiday-Aware Shop
-
-- **Blocks:** 7 day blocks, 1 info block ("Holiday Hours" with richtext listing upcoming exceptions like Christmas Eve, New Year)
-- **Settings:** `heading_alignment: center`, `sidebar_position: end`, `color_scheme: standard-primary`, `note: "Hours may change during public holidays -- see sidebar"`, `title: "Store Hours"`
-- **Good for:** Shops that need to communicate both regular and exception hours without cluttering the main table.
-
-### 6. Professional Services -- Appointment Only
-
-- **Blocks:** 5 day blocks (Mon-Fri), Saturday and Sunday marked closed, 1 info block ("Book an Appointment" with richtext containing a phone number, email, and a booking-link CTA)
-- **Settings:** `heading_alignment: start`, `sidebar_position: end`, `color_scheme: standard-secondary`, `title: "Office Hours"`, `eyebrow: "By Appointment"`, `note: "Walk-ins welcome Mon-Wed only"`
-- **Good for:** Services where availability and booking info matter more than a simple open/closed status.
-
-### 7. Cafe with Social Presence
-
-- **Blocks:** 7 day blocks, 1 info block ("Find Us" with address and a short richtext blurb), 1 social block
-- **Settings:** `heading_alignment: center`, `sidebar_position: start`, `color_scheme: highlight-primary`, `title: "When We're Brewing"`, `note: ""`
-- **Good for:** Small cafes that lean on social media for daily specials and want their social links prominent alongside hours.
-
----
-
-## Differentiation Tips
-
-- **Use the eyebrow to add context, not decoration.** "Visit Us", "By Appointment", or "Summer 2026 Hours" turns a generic hours table into something that communicates intent before the visitor even reads the title.
-- **The note field is underused.** It is ideal for caveats that prevent phone calls: "Kitchen closes 30 min early", "Last entry at 4:30 PM", "Closed for private events -- check our Instagram." Delete the default if it does not apply.
-- **Sidebar position matters for reading flow.** Put the sidebar on the left when the info block is the primary action (booking link, directions) and you want visitors to see it first. Keep it on the right when the hours themselves are the main content.
-- **Do not list days you are never open.** A five-row table for a Mon-Fri business is cleaner than seven rows with two saying "Closed." Fewer rows means faster scanning.
-- **Split hours go in the hours text field, not separate blocks.** "11 AM - 2 PM / 5 PM - 10 PM" on a single day row is more scannable than duplicating the day as two blocks.
-- **The today-highlight is automatic but depends on `week_start_day`.** If the day blocks start with Sunday, set `week_start_day` to 0. If they start with Monday, leave it at 1. A mismatch will highlight the wrong row.
-- **Stack multiple info blocks for distinct sidebar sections.** One for "Location", one for "Parking", one for "Reservations" keeps each piece of information under its own heading rather than cramming everything into one richtext blob.
-- **Color scheme accent variants pair well with adjacent neutral widgets.** Using `highlight-secondary` on the schedule table between two `standard-primary` widgets draws the eye to hours without repainting the whole page.
+```json
+{
+  "type": "schedule-table",
+  "settings": {
+    "title": "When we are open",
+    "description": "Pop in, or follow along for daily specials.",
+    "heading_alignment": "center",
+    "note": "",
+    "sidebar_position": "end",
+    "week_start_day": "1",
+    "color_scheme": "standard-primary"
+  },
+  "blocks": [
+    { "type": "day", "settings": { "day": "Monday", "hours": "7:30 – 16:00" } },
+    { "type": "day", "settings": { "day": "Tuesday", "hours": "7:30 – 16:00" } },
+    { "type": "day", "settings": { "day": "Wednesday", "hours": "7:30 – 16:00" } },
+    { "type": "day", "settings": { "day": "Thursday", "hours": "7:30 – 16:00" } },
+    { "type": "day", "settings": { "day": "Friday", "hours": "7:30 – 18:00" } },
+    { "type": "day", "settings": { "day": "Saturday", "hours": "8:30 – 18:00" } },
+    { "type": "day", "settings": { "day": "Sunday", "hours": "9:00 – 15:00" } },
+    { "type": "info", "settings": { "title": "Where", "text": "<p>Corner of Example Street and Sample Avenue.</p>" } },
+    { "type": "social", "settings": {} }
+  ]
+}
+```

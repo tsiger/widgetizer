@@ -13,6 +13,7 @@ import {
   resolveSchemaDefaults,
   readLabelLocale,
   readWidgetGuidance,
+  readThemeGuidance,
   readUploadBytes,
   getMediaFilesPage,
   getMediaFileById,
@@ -22,7 +23,9 @@ import {
   readCollectionItem,
   renderSavedPagePreview,
   renderCollectionItemPreview,
+  listThemes,
   listThemePresets,
+  readPresetDetails,
   sanitizeRichText,
 } from "@widgetizer/builder-server";
 
@@ -64,6 +67,7 @@ export function createAssistantSite({ adapters }) {
       widgetSchemas: async (scope, lang) => resolveSchemaDefaults(await readWidgetSchemas(storage, scope), storage, scope, lang),
       labelLocale: (scope) => readLabelLocale(storage, scope),
       widgetGuidance: (scope, schema) => readWidgetGuidance(storage, scope, schema),
+      themeGuidance: (scope) => readThemeGuidance(storage, scope),
       mediaPage: async (scope, options) => getMediaFilesPage(scope.projectId, options),
       mediaFile: async (scope, id) => getMediaFileById(scope.projectId, id),
       mediaIds: async (scope, paths) => getMediaIdsByPaths(scope.projectId, paths),
@@ -82,6 +86,9 @@ export function createAssistantSite({ adapters }) {
         return renderCollectionItemPreview({ storage, scope, project, collectionType, slug, savedItem: saved, lang });
       },
       presets: (themeId) => listThemePresets(themeId),
+      // Installed themes, read from the theme source (not a site's copy): for choosing a new site's start.
+      themes: () => listThemes(),
+      presetDetails: (themeId, presetId) => readPresetDetails(themeId, presetId),
       sanitizeRichText,
     },
   };

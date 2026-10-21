@@ -310,9 +310,9 @@ Knowledge is served **on demand, in small pieces**, through tool results, not du
 - Preset-generation restrictions move out of insights into the preset docs. `theme-preset-generator.md` (which requires reading schema + insights, and expects adjacency, content-burden and replacement advice) is updated alongside the restructuring so nothing it relies on is lost. No code parses the current tables.
 - **Include core widgets** in the migration, notably `packages/core/src/widgets/core-form/insights.md`, and keep its deployment limitation prominent: the form only receives submissions on Widgetizer Hosting, and on any other static host submissions fail. The assistant must say so whenever it adds a form.
 
-### Layer 4 — Preset guidance file (direction decided, format open)
+### Layer 4 — Preset guidance file (decided)
 
-Preset choice for "new site from a description" currently rests on a one-line niche label in `presets.json` (e.g. "Bakery") plus the preset's templates. That handles obvious matches but not near-misses or niches with no preset. **TODO:** define the file's format.
+Preset choice for "new site from a description" currently rests on a one-line niche label in `presets.json` (e.g. "Bakery") plus the preset's templates. That handles obvious matches but not near-misses or niches with no preset. The file is `presets/<id>/insights.md` with three sections, Suits, Look and Adapting; the format is in the theme skill's guidance reference.
 
 - **Where:** one guidance file per preset folder (`presets/<id>/…`), not entries in `presets.json`. It stays self-contained (copying or deleting a preset folder carries its guidance) and keeps `presets.json` small, since the editor's preset picker loads it. Prose is also easier for theme authors to write per preset. It is optional: presets without it still work.
 - **Hand-write intent, derive inventory.** The file holds only judgement: the rationale behind the preset, the kinds of business it suits (shop, service, appointments, portfolio, hospitality), look and mood, similar niches it adapts to, and how to adapt it. Pages, widgets, menus and seeded collections are read from the preset's actual files (including root template/menu fallbacks), never listed by hand, so they can't drift.
@@ -443,4 +443,4 @@ External facts below were checked against Anthropic's and OpenAI's documentation
 
 ## Next
 
-All eight design steps are decided. Still open: the preset guidance file format (step 6, layer 4) and the per-language blank alt decision (step 7). The relay runtime (step 8) is confirmed by the packaging spike in the first milestone of `future-mcp-plan.md`.
+All eight design steps are decided. Still open: the per-language blank alt decision (step 7). The relay runtime (step 8) is confirmed by the packaging spike in the first milestone of `future-mcp-plan.md`.

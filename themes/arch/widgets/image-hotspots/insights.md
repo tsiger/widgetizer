@@ -1,86 +1,77 @@
-# Image Hotspots Widget
+# image-hotspots
 
-An interactive image overlay that places clickable marker pins on a photo, each revealing a tooltip with a title, rich-text description, and optional call-to-action link.
+## Purpose
 
----
+One large photo with pulsing markers placed on it; each marker opens a small card with a title, a short description and an optional button. It explains the parts of a single picture: the features of a product, the areas of a room or floor plan, the dishes on a table.
 
-## Settings Levers
+Markers are positioned as percentages across and down the image. On desktop a card opens beside its marker; on phones the cards open beneath the image. Only one is open at a time, and the cards keep the theme's standard light surface whatever the section's `color_scheme`.
 
-| Setting | Values | Visual Effect |
-|---------|--------|---------------|
-| `eyebrow` | Any text / blank | Small label above the headline. Adds context or category framing ("Our Showroom", "How It Works"). Leave blank to hide. |
-| `eyebrow_uppercase` | `true` / `false` (default) | Uppercases the eyebrow text for a more formal label treatment |
-| `title` | Any text (default "Interactive Image") | Main headline rendered as `<h1>` on the first widget of a page, `<h2>` otherwise. Blank hides the entire header row if description and eyebrow are also empty. |
-| `description` | Any text / blank | Supporting paragraph beneath the headline. Good for a one-sentence setup ("Tap any pin to learn more"). |
-| `heading_alignment` | `start` / `center` (default) | Left-aligns the header block for editorial layouts; center keeps it balanced above the image. |
-| `image` | Image upload / blank | The base photo all hotspots sit on. Rendered at full container width with responsive srcset. Falls back to a landscape placeholder when empty. |
-| `image_alt` | Any text (default "Interactive image with hotspots") | Alt text for the base image. Important for accessibility and SEO. |
-| `color_scheme` | `standard-primary` / `standard-secondary` / `highlight-primary` / `highlight-secondary` | Controls the section background and overall palette. `standard-primary` has no extra padding; the other three add padded container treatment and override `--widget-bg-color`. |
-| `top_spacing` | `auto` (default), `small`, `none` | `small` reduces spacing for tighter rhythm; `none` removes it entirely for flush stacking |
-| `bottom_spacing` | `auto` (default), `small`, `none` | Same as above for the bottom edge |
+## When to use
 
----
+- Role: an interactive explainer in the middle of a page, after the visitor knows what the business is and before the call to action.
+- Good for: product and craft businesses (materials, finishes), venues and real estate (rooms, amenities), restaurants (a plated spread), renovation portfolios (what changed in the after photo), service overviews on an infographic-style image.
+- Bad for: several unrelated photos, long descriptions, or anything a visitor must read without clicking; the content is hidden until a marker is tapped.
+- Opening a page: avoid it. The page would start with an image that says nothing until touched, and the section does not support the header's transparent mode, which only `banner`, `slideshow` and `video-popup` support.
+- Natural neighbours: a `rich-text` or `split-content` introduction above, a `key-figures` strip or `accordion` below, an `action-bar` to close.
+- Content needed: one sharp, high-resolution landscape photo and three to six markers, each with a title of two to four words and one or two sentences.
 
-## Available Blocks
+## Pitfalls
 
-| Block Type | Key Settings | Notes |
-|------------|-------------|-------|
-| `hotspot` | `title` (text), `description` (richtext), `button_link` (link), `position_x` (range 0-100), `position_y` (range 0-100) | Each block is a single pin on the image. Position values are percentages from the top-left corner. Tooltip appears below the pin on desktop with smart edge-detection repositioning; on mobile (<750 px) the tooltip renders inline beneath the image instead. The close button and Escape key dismiss it. Defaults ship two blocks at (30,40) and (70,30). |
+- Marker positions are percentages of the image box, so swapping the photo for a different crop moves every marker onto the wrong spot. Re-place them after any image change.
+- Keep `position_x` and `position_y` between roughly 10 and 90, and markers at least 15 to 20 percent apart on both axes; edge markers get clipped cards and clustered markers overlap each other's cards.
+- Three to six markers is the range. Fewer looks underused; more turns the phone view into a long stack of cards under the photo.
+- The marker button appears only when `button_link` has both text and a target. Reserve it for the one or two markers that drive an action.
+- Descriptions are tooltips, not paragraphs: one or two sentences in `<p>`, no lists longer than three items.
+- Markers are drawn in the theme's accent colour; a photo dominated by that colour, or a very busy image, hides them. Let the `title` and `description` invite the interaction, for example "Tap a marker to see the details".
+- The image displays at full container width, so a portrait photo becomes very tall and pushes the lower markers off screen on laptops; use landscape.
+- A `color_scheme` other than `standard-primary` makes the section a filled band whose spacing is padding inside its colour. Functional explainers rarely justify a highlight surface; `standard-secondary` is enough. Under a filled hero use `small` top spacing, never `none`.
 
----
+## Recipes
 
-## Layout Recipes
+### Product feature callouts
 
-### 1. Showroom / Product Feature Callouts
+Marks the materials and details of one product or piece of work. Supply a clean landscape studio photo with the product filling most of the frame.
 
-- **Settings**: 4-6 hotspots on a product or workspace photo. `heading_alignment: start`, eyebrow "Product Details", `color_scheme: standard-primary`.
-- **Hotspot strategy**: Pin each key feature (material, finish, component) at its physical location. Short title + 1-sentence description + optional link to a detail page.
-- **Good for**: Highlighting craftsmanship details or product features on a single hero photo.
+```json
+{
+  "type": "image-hotspots",
+  "settings": { "eyebrow": "Product details", "title": "Every part, explained", "description": "Tap a marker to see what goes into it.", "heading_alignment": "start", "image_alt": "Close-up of the product with its main features marked", "color_scheme": "standard-primary" },
+  "blocks": [
+    { "type": "hotspot", "settings": { "title": "Solid frame", "description": "<p>One sentence on the material and why it matters.</p>", "position_x": 28, "position_y": 42 } },
+    { "type": "hotspot", "settings": { "title": "Hand finish", "description": "<p>One sentence on the finishing process.</p>", "position_x": 62, "position_y": 30 } },
+    { "type": "hotspot", "settings": { "title": "Adjustable fit", "description": "<p>One sentence on the adjustment and its range.</p>", "position_x": 74, "position_y": 72, "button_link": { "text": "See options", "href": "services.html" } } }
+  ]
+}
+```
 
-### 2. Floor Plan / Venue Tour
+### Space or floor-plan tour
 
-- **Settings**: 5-8 hotspots on an overhead floor-plan image or wide interior photo. `heading_alignment: center`, title "Explore Our Space", `color_scheme: highlight-primary`.
-- **Hotspot strategy**: Mark key areas (reception, lounge, kitchen, patio). Description includes capacity or amenities. Link each to a gallery or booking page.
-- **Good for**: Event venues, coworking spaces, real-estate listings.
+Lets visitors explore a venue, studio or property from one wide interior photo or an illustrated plan. Supply a landscape image where each area is clearly visible.
 
-### 3. Before/After Explainer
+```json
+{
+  "type": "image-hotspots",
+  "settings": { "title": "Explore the space", "description": "Select an area to see what it offers.", "heading_alignment": "center", "image_alt": "Overview of the venue with its main areas marked", "color_scheme": "standard-secondary" },
+  "blocks": [
+    { "type": "hotspot", "settings": { "title": "Reception", "description": "<p>Where guests arrive and check in.</p>", "position_x": 18, "position_y": 60 } },
+    { "type": "hotspot", "settings": { "title": "Main hall", "description": "<p>Seats a stated number of guests in several layouts.</p>", "position_x": 50, "position_y": 45 } },
+    { "type": "hotspot", "settings": { "title": "Terrace", "description": "<p>Outdoor area used in warm months.</p>", "position_x": 80, "position_y": 35, "button_link": { "text": "Ask about availability", "href": "contact.html" } } }
+  ]
+}
+```
 
-- **Settings**: 2-3 hotspots on a single "after" photo. `heading_alignment: start`, eyebrow "The Transformation", `color_scheme: standard-secondary`.
-- **Hotspot strategy**: Pinpoint specific changes (new countertop, replaced windows, landscaping). Description explains the upgrade and materials used.
-- **Good for**: Portfolio case studies, renovation showcases.
+### Dishes on the table
 
-### 4. Team / Office Culture Snapshot
+Tags each dish in a plated spread for a restaurant, caterer or bakery. Supply a landscape overhead photo with the dishes spaced apart. The `small` top spacing docks it under a filled hero above.
 
-- **Settings**: 3-5 hotspots on a team group photo or office panorama. `heading_alignment: center`, title "Meet the Team", `color_scheme: standard-primary`.
-- **Hotspot strategy**: Pin individuals or areas (treatment room, reception). Title is the person's name or area name; description is a fun fact or role summary. Link to a full bio page.
-- **Good for**: About pages where you want an interactive way to introduce the team or workspace.
-
-### 5. Menu / Dish Highlights
-
-- **Settings**: 4-6 hotspots on a beautifully plated spread or table scene. `heading_alignment: center`, eyebrow "Chef's Selection", `color_scheme: highlight-secondary`, `top_spacing: small` (to dock closely under a hero above — the hero's bottom spacing is internal padding, so `none` would press this section against its edge).
-- **Hotspot strategy**: Tag each dish. Description includes key ingredients and dietary info. Link to the full menu or online ordering.
-- **Good for**: Restaurant homepages, catering brochures, food-truck sites.
-
-### 6. Anatomy of a Service
-
-- **Settings**: 3-4 hotspots on an infographic-style image or process photo. `heading_alignment: start`, title "What's Included", `color_scheme: standard-secondary`.
-- **Hotspot strategy**: Each pin represents a phase or deliverable (consultation, design mockup, installation, follow-up). Descriptions set expectations and timelines.
-- **Good for**: Service overview pages, pricing sections.
-
-### 7. Property / Grounds Map
-
-- **Settings**: 6-8 hotspots on an aerial photo or illustrated site map. `heading_alignment: center`, title "Find Your Way", `color_scheme: highlight-primary`.
-- **Hotspot strategy**: Mark key areas (parking, entrance, garden, pool, barn). Descriptions include hours or quick directions. Links go to detail pages or booking.
-- **Good for**: Multi-area properties where visitors need to orient themselves before arriving.
-
----
-
-## Differentiation Tips
-
-- **Pair with a preceding hero or full-bleed image widget** using `top_spacing: small` so the hotspot image reads as a continuation of the hero. Because a filled hero spaces itself with internal padding, it leaves no external gap below — `small` supplies the breathing room, while `none` would slam the hotspot image against the hero's edge. Use `none` only when the widget above is unfilled (its own bottom margin provides the gap) or when the two sections share a color scheme and should fuse into one band.
-- **Keep hotspot count between 3 and 6.** Fewer than 3 and the widget looks underused; more than 6 and the pins start competing for attention, especially on mobile where tooltips stack vertically.
-- **Spread pins across quadrants.** Clustering pins in one corner makes the image feel lopsided and causes tooltip overlap on desktop. Aim for at least 20% separation on both axes between adjacent pins.
-- **Use the link sparingly.** Not every hotspot needs a button. Reserve links for the 1-2 pins that drive the strongest conversion action (book now, view product, get quote) so the call to action stands out.
-- **Write tooltip descriptions that complement, not repeat.** The title should name the feature; the description should answer "why should I care." Avoid restating the title in longer form.
-- **Choose the right color scheme for contrast.** If the base image is dark, `highlight-primary` or `highlight-secondary` schemes frame the section with a lighter surround, making the pin markers more visible at the edges. For light images, `standard-primary` keeps things clean.
-- **Test mobile behavior early.** On screens below 750 px, tooltips appear as stacked cards below the image rather than floating overlays. Make sure description text is concise enough to avoid excessive scrolling.
+```json
+{
+  "type": "image-hotspots",
+  "settings": { "eyebrow": "From the kitchen", "title": "What is on the table", "description": "Tap a dish to learn more.", "heading_alignment": "center", "image_alt": "Overhead view of several dishes on a table", "color_scheme": "standard-primary", "top_spacing": "small" },
+  "blocks": [
+    { "type": "hotspot", "settings": { "title": "Starter", "description": "<p>Main ingredients and a dietary note.</p>", "position_x": 22, "position_y": 38 } },
+    { "type": "hotspot", "settings": { "title": "Main course", "description": "<p>Main ingredients and a dietary note.</p>", "position_x": 55, "position_y": 55 } },
+    { "type": "hotspot", "settings": { "title": "Dessert", "description": "<p>Main ingredients and a dietary note.</p>", "position_x": 82, "position_y": 30, "button_link": { "text": "See the full menu", "href": "services.html" } } }
+  ]
+}
+```

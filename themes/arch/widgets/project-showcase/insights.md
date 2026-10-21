@@ -1,168 +1,112 @@
-# Project Showcase Widget
+# project-showcase
 
-Image-forward portfolio grid (or carousel) with hover-reveal text overlay, built for displaying completed work, case studies, and visual portfolios.
+## Purpose
 
----
+An image-led grid or carousel of hand-picked work: each tile is a photo with the project title and a one-line description laid over a dark gradient at the bottom, shown on hover or always. For portfolios, lookbooks and before-and-after galleries that do not need a detail page per item.
 
-## Settings Levers
+Each `project` block is one tile with its own `image`, `title`, `description` and optional `link`; with a link the whole tile is clickable. Tiles share one `aspect_ratio`, so the grid stays even whatever the source photos. Projects that live in the `projects` collection and need their own pages belong in `projects-grid` instead; this section is for curated tiles edited right here.
 
-| Setting | Values | Visual Effect |
-|---------|--------|---------------|
-| `heading_alignment` | `start`, `center` (default) | Controls whether the eyebrow/title/description block sits flush-left or centered above the grid |
-| `eyebrow_uppercase` | `true` / `false` (default) | Uppercases the eyebrow text for a more formal label treatment |
-| `layout` | `grid`, `carousel` | Grid shows all items at once in a responsive multi-column layout; carousel displays a swipeable strip with prev/next buttons |
-| `columns_desktop` | `2` -- `5` | Number of columns on desktop viewports; fewer columns = larger cards with more visual impact |
-| `aspect_ratio` | `auto`, `contain`, `1/1`, `4/3`, `3/2`, `3/4`, `16/9` | Determines image crop shape. `auto` uses the natural image ratio; `contain` fits the full image inside a fixed-height container; portrait (`3/4`) is unusual and attention-grabbing |
-| `text_display` | `hover`, `always` | `hover` keeps cards image-only until mouseover reveals the gradient overlay with title and description; `always` shows the overlay permanently |
-| `color_scheme` | `standard-primary`, `standard-secondary`, `highlight-primary`, `highlight-secondary` | Background treatment for the entire section. Standard uses the default page background; highlight and accent variants pull from theme color variables |
-| `top_spacing` | `auto` (default), `small`, `none` | `small` reduces spacing for tighter rhythm; `none` removes it entirely for flush stacking |
-| `bottom_spacing` | `auto` (default), `small`, `none` | `small` reduces spacing for tighter rhythm; `none` removes it entirely for flush stacking |
+## When to use
 
----
+- The proof section on `index` for a visual business, or the body of a `work`, `gallery` or `portfolio` page when there are no case-study pages.
+- Good for 4 to 12 strong photographs with a short caption each: finished rooms, buildings, haircuts, cakes, cars, events, logos.
+- Bad for text-heavy case studies (`projects-grid` or `card-grid`), for a loose photo wall without captions (`gallery`, `masonry-gallery`) and for one hero image (`image`, `banner`).
+- Can open a page when it has a `title`, but presets open with `rich-text` and give the showcase `top_spacing` `none`. It never supports a transparent header; only `banner`, `slideshow` and `video-popup` do.
+- Sits well after `rich-text` or `banner` and before `testimonials` or a call to action; photos followed by voices is the classic order.
+- Needs images in one orientation shot in a similar style. A multiple of `columns_desktop` fills every row.
+- Fits architects, interior designers, contractors, landscapers, photographers, salons, bakeries, tattoo studios, event venues.
 
-## Available Blocks
+## Pitfalls
 
-| Block Type | Key Settings | Notes |
-|------------|-------------|-------|
-| `project` | `image` (image picker), `title` (text), `description` (text), `link` (URL, target) | Each block is one portfolio card. The link wraps the entire card as a clickable overlay. `link.target` defaults to `_self`. If no image is set, a placeholder landscape graphic renders instead. |
+- `text_display` defaults to `hover`, and touch screens never hover: on phones the tiles are pictures with no titles. Choose `always` whenever the title matters; keep `hover` for purely visual grids where the picture speaks.
+- The overlay text is white over a dark gradient. Bright, light images at the bottom edge still carry it, but busy bottom edges fight the text; crop so the lower part of each image is calm.
+- `description` is a subtitle of six to ten words. Longer text crowds the tile and gets cut on narrow cards.
+- `aspect_ratio` `auto` keeps each image's natural shape and makes rows ragged. `contain` shows the whole image inside a fixed-height frame, leaving empty space around images of other shapes; use it only for logos or screenshots that must not be cropped. Fixed ratios crop to fit.
+- A tile without an `image` shows a grey placeholder. Add all images before publishing, or remove the tile.
+- `layout` `carousel` needs more tiles than `columns_desktop`, or the arrows sit disabled. Four or five columns in a carousel give a "peek" at the next tile that invites swiping.
+- Two columns signal a few flagship projects; four or five signal volume. Pick by what the business wants to say, not by how many photos exist.
+- Filled schemes draw the band behind the tiles; `highlight-primary` turns it into a dark gallery wall. `top_spacing` or `bottom_spacing` `none` on a filled showcase removes inner padding, not the gap to the neighbour; use `none` only directly under an unfilled `rich-text` opener.
 
----
+## Recipes
 
-## Layout Recipes
+### Flagship projects
 
-### 1. Architect / Interior Design Portfolio
+Two large cinematic tiles per row for a firm that wants to look selective, titles always visible. Four wide images in 3:2.
 
-| Setting | Value |
-|---------|-------|
-| `layout` | `grid` |
-| `columns_desktop` | `2` |
-| `aspect_ratio` | `3/2` |
-| `text_display` | `hover` |
-| `heading_alignment` | `start` |
-| `color_scheme` | `standard-primary` |
+```json
+{
+  "type": "project-showcase",
+  "settings": {
+    "eyebrow": "Selected work",
+    "title": "Four projects we are proud of",
+    "heading_alignment": "start",
+    "layout": "grid",
+    "columns_desktop": 2,
+    "aspect_ratio": "3 / 2",
+    "text_display": "always",
+    "color_scheme": "standard-primary"
+  },
+  "blocks": [
+    { "type": "project", "settings": { "title": "Hillside house", "description": "New build on a steep plot", "link": { "text": "Hillside house", "href": "work.html" } } },
+    { "type": "project", "settings": { "title": "Corner café", "description": "Fit-out of a former bank", "link": { "text": "Corner café", "href": "work.html" } } },
+    { "type": "project", "settings": { "title": "Garden studio", "description": "Timber workspace at the end of a garden", "link": { "text": "Garden studio", "href": "work.html" } } },
+    { "type": "project", "settings": { "title": "Loft apartment", "description": "Open plan with a mezzanine", "link": { "text": "Loft apartment", "href": "work.html" } } }
+  ]
+}
+```
 
-Large, cinematic cards that let the photography do the talking. Hover-reveal keeps the grid clean. Two columns give each project room to breathe.
+### Square gallery wall
 
-**Good for:** Architecture firms, interior designers, landscape architects, construction companies.
+Six square tiles on a dark highlight band, captions on hover, for photographers and makers whose images speak for themselves.
 
----
+```json
+{
+  "type": "project-showcase",
+  "settings": {
+    "eyebrow": "Portfolio",
+    "title": "Recent work",
+    "heading_alignment": "center",
+    "layout": "grid",
+    "columns_desktop": 3,
+    "aspect_ratio": "1 / 1",
+    "text_display": "hover",
+    "color_scheme": "highlight-primary"
+  },
+  "blocks": [
+    { "type": "project", "settings": { "title": "Spring wedding", "description": "Outdoor ceremony" } },
+    { "type": "project", "settings": { "title": "Studio portraits", "description": "Natural light series" } },
+    { "type": "project", "settings": { "title": "Harbour at dawn", "description": "Personal project" } },
+    { "type": "project", "settings": { "title": "Family session", "description": "At home" } },
+    { "type": "project", "settings": { "title": "Product launch", "description": "Event coverage" } },
+    { "type": "project", "settings": { "title": "Winter market", "description": "Editorial" } }
+  ]
+}
+```
 
-### 2. Photography / Visual Arts Mosaic
+### Lookbook carousel
 
-| Setting | Value |
-|---------|-------|
-| `layout` | `grid` |
-| `columns_desktop` | `3` |
-| `aspect_ratio` | `1/1` |
-| `text_display` | `hover` |
-| `heading_alignment` | `center` |
-| `color_scheme` | `highlight-primary` |
+Portrait tiles in a swipeable strip for salons, fashion and fitness; four visible, more to swipe. Eight or more portrait photos.
 
-Square thumbnails on a dark (highlight) background create an Instagram-style grid that feels familiar to visual audiences. Three columns balances density with detail.
-
-**Good for:** Photographers, videographers, tattoo artists, florists.
-
----
-
-### 3. Contractor Before/After Strip
-
-| Setting | Value |
-|---------|-------|
-| `layout` | `carousel` |
-| `columns_desktop` | `2` |
-| `aspect_ratio` | `16/9` |
-| `text_display` | `always` |
-| `heading_alignment` | `center` |
-| `color_scheme` | `standard-primary` |
-
-Wide cinematic ratio works well for before/after shots of renovations or landscaping jobs. Carousel lets you load many projects without overwhelming the page. Always-visible text ensures project names are readable without interaction.
-
-**Good for:** General contractors, landscapers, painters, flooring installers.
-
----
-
-### 4. Restaurant / Hospitality Highlights
-
-| Setting | Value |
-|---------|-------|
-| `layout` | `grid` |
-| `columns_desktop` | `3` |
-| `aspect_ratio` | `4/3` |
-| `text_display` | `always` |
-| `heading_alignment` | `center` |
-| `color_scheme` | `highlight-secondary` |
-
-The 4:3 ratio suits food photography and venue shots. Always-on overlay text labels each dish, event space, or catering package. The highlight-secondary scheme adds warmth against a rich background.
-
-**Good for:** Restaurants, caterers, event venues, hotels, bakeries.
-
----
-
-### 5. Contractor / Tradesperson Project Gallery
-
-| Setting | Value |
-|---------|-------|
-| `layout` | `grid` |
-| `columns_desktop` | `3` |
-| `aspect_ratio` | `4/3` |
-| `text_display` | `hover` |
-| `heading_alignment` | `start` |
-| `color_scheme` | `standard-primary` |
-
-Clean, professional grid with left-aligned heading that communicates reliability. Link each card to a dedicated project page. Hover-reveal keeps the interface minimal. Use the description field for short outcome lines like "Full bathroom remodel in 10 days."
-
-**Good for:** Electricians, plumbers, roofers, custom cabinet makers, pool installers.
-
----
-
-### 6. Salon / Beauty Lookbook Carousel
-
-| Setting | Value |
-|---------|-------|
-| `layout` | `carousel` |
-| `columns_desktop` | `4` |
-| `aspect_ratio` | `3/4` |
-| `text_display` | `hover` |
-| `heading_alignment` | `center` |
-| `color_scheme` | `standard-secondary` |
-
-Portrait ratio is perfect for hair, makeup, and fashion shots where the subject is vertical. Four visible columns create a dense lookbook feel that invites swiping. Hover-reveal keeps the focus on the imagery.
-
-**Good for:** Hair salons, barbershops, nail studios, makeup artists, fashion boutiques.
-
----
-
-### 7. Nonprofit / Community Impact Wall
-
-| Setting | Value |
-|---------|-------|
-| `layout` | `grid` |
-| `columns_desktop` | `4` |
-| `aspect_ratio` | `1/1` |
-| `text_display` | `always` |
-| `heading_alignment` | `center` |
-| `color_scheme` | `highlight-primary` |
-| `top_spacing` | `none` |
-| `bottom_spacing` | `none` |
-
-Dense four-column square grid creates an impactful wall of faces, events, and outcomes. Always-visible overlay makes every project title scannable without interaction, which matters for accessibility. Edge-to-edge spacing lets this section act as a bold visual divider.
-
-**Good for:** Nonprofits, schools, community organizations, churches, municipal departments.
-
----
-
-## Differentiation Tips
-
-- **Hover vs. always-on text is the single biggest mood lever.** Hover creates a gallery feel where images dominate. Always-on feels more informational and editorial. Default to hover for visual industries (design, photography, beauty) and always-on for service industries (contractors, nonprofits) where the project name matters more than the image alone.
-
-- **Two columns signals premium; four or five signals volume.** A roofing company with 50 completed jobs should use 4--5 columns to communicate experience. An architecture firm with six flagship projects should use 2 columns to communicate selectiveness.
-
-- **Portrait ratio (3/4) is underused and distinctive.** Most portfolio sections default to landscape. Switching to portrait immediately sets a page apart and works especially well for people-centric businesses (salons, fashion, fitness trainers).
-
-- **Pair carousel layout with higher column counts (4--5) for a peek effect.** The carousel naturally crops the last visible item, hinting that more content exists. This encourages interaction and works well when you have 8+ projects.
-
-- **Use the highlight color scheme when the section sits between two standard sections.** The background contrast creates a natural visual break and draws the eye to the portfolio, which is usually the most persuasive section on a small business site.
-
-- **Remove spacing (`none`) when stacking this widget directly below a full-width hero.** The seamless transition from hero image into project grid feels intentional and modern. Combine with `highlight-primary` to make the portfolio section feel like a continuation of the hero rather than a separate block.
-
-- **Keep descriptions short -- six to ten words max.** The overlay text area is compact by design. Long descriptions get clipped or crowd the card. Treat the description as a subtitle ("Complete kitchen renovation in Oak Park") rather than a paragraph.
+```json
+{
+  "type": "project-showcase",
+  "settings": {
+    "eyebrow": "Lookbook",
+    "title": "This season's work",
+    "heading_alignment": "center",
+    "layout": "carousel",
+    "columns_desktop": 4,
+    "aspect_ratio": "3 / 4",
+    "text_display": "always",
+    "color_scheme": "standard-secondary"
+  },
+  "blocks": [
+    { "type": "project", "settings": { "title": "Soft balayage", "description": "Low-maintenance colour" } },
+    { "type": "project", "settings": { "title": "Textured crop", "description": "Short and easy" } },
+    { "type": "project", "settings": { "title": "Bridal updo", "description": "Occasion styling" } },
+    { "type": "project", "settings": { "title": "Copper gloss", "description": "Single-process colour" } },
+    { "type": "project", "settings": { "title": "Curly cut", "description": "Shaped dry" } },
+    { "type": "project", "settings": { "title": "Platinum", "description": "Full lightening" } }
+  ]
+}
+```

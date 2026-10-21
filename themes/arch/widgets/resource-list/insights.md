@@ -1,79 +1,99 @@
-# Resource List Widget
+# resource-list
 
-A vertical list of downloadable files and documents, each with a title, description, and download button -- ideal for sharing PDFs, brochures, price lists, and forms.
+## Purpose
 
----
+A list of downloadable documents, each in its own boxed row with a title, a one-line description and a small button that opens the file in a new tab. For brochures, menus, price lists, forms, policies and class materials. An optional photo can sit beside the list.
 
-## Settings Levers
+Each `resource` block is one row; its `file` is the document the button opens and `button_label` is the button's wording. Without a file the row shows text only and no button. Without the section `image` the list sits in a centred reading column; with one, the page splits into two columns on desktop, the photo on the side chosen by `image_position` and staying in view while the list scrolls.
 
-| Setting | Values | Visual Effect |
-|---------|--------|---------------|
-| `eyebrow` | Any text (default "Resources") | Small label above the headline for framing like "Downloads" or "Helpful Documents" |
-| `eyebrow_uppercase` | `true` / `false` (default) | Uppercases the eyebrow text for a more formal label treatment |
-| `title` | Any text (default "Downloads & Documents") | Section headline; renders as `<h1>` when the widget is the first on the page, `<h2>` otherwise |
-| `description` | Any text (default "Browse our collection of useful resources and documents.") | Paragraph below the headline for context or instructions |
-| `heading_alignment` | `start`, `center` (default) | Left-aligns the header block for editorial layouts; center works for standalone sections |
-| `image` | Optional image | Adds a supporting image beside the resource list for visual context |
-| `image_position` | `start` (default), `end` | Places the image to the start or end of the resource list |
-| `color_scheme` | `standard-primary`, `standard-secondary`, `highlight-primary`, `highlight-secondary` | **standard-primary** -- clean, no background. **standard-secondary** -- adds secondary background + border to each resource row. **highlight-primary** -- tinted section background. **highlight-secondary** -- tinted section background + secondary row fill + border |
-| `top_spacing` | `auto` (default), `small`, `none` | `small` reduces spacing for tighter rhythm; `none` removes it entirely for flush stacking |
-| `bottom_spacing` | `auto` (default), `small`, `none` | Same as above for the bottom edge |
+## When to use
 
----
+- A `resources`, `menu` or `new-patients` page, or the end of a service page where visitors need the paperwork: intake forms, brochures, price sheets, handbooks, terms.
+- Good for three to six documents with a clear name each. Clinics and practices, schools and clubs, restaurants with PDF menus, agencies with capability decks, landlords and venues with floor plans.
+- Bad for a single download (a `rich-text` button is enough), for more than eight files (split into several sections by eyebrow, or move to a dedicated page) and for links to web pages rather than files (`icon-list`, `card-grid`).
+- Can open a page when it has a `title`, but it is better placed after a `rich-text` opener with `top_spacing` `none`. It never supports a transparent header; only `banner`, `slideshow` and `video-popup` do.
+- Sits well after explanatory `rich-text` or `accordion` and before `contact-details` or a call to action.
+- Needs the actual files uploaded; a row without one is a promise with no button.
 
-## Available Blocks
+## Pitfalls
 
-| Block Type | Key Settings | Notes |
-|------------|-------------|-------|
-| `resource` | `title` (text, default "Document Title"), `description` (text, brief summary of the resource), `file` (file upload for the downloadable document), `button_label` (text, default "Download") | Each block renders as one resource row. The button label can be customized per resource (e.g. "Download PDF", "View Menu", "Get Form"). Leave the file blank during design -- the client uploads their actual documents later. |
+- Button labels should say what the visitor gets: "Download menu (PDF)", "Open intake form". A list where every row says "Download" wastes the only interactive element.
+- Descriptions are plain text and read best as one sentence: what the document is and who needs it. Marketing copy belongs in the section `description`.
+- `image_position` has no effect without an `image`. With an image, use `heading_alignment` `start`; a centred heading over a two-column body looks off balance.
+- The photo should be a calm, relevant picture (the storefront, the team at work, the product), not a page of the document itself; it stays in view as the list scrolls, so a busy image is a distraction.
+- On `standard-secondary` and `highlight-secondary` the rows take a soft fill; on `standard-primary` and `highlight-primary` they are outlined boxes. All four work, but documents are utility content, so prefer `standard-primary` or `standard-secondary` and leave the page's highlight for persuasion.
+- Filled schemes pad inside their own band; `top_spacing` or `bottom_spacing` `none` on them removes inner padding, not the gap to the neighbour. Use `none` only directly under an unfilled `rich-text` opener.
+- Files open in a new tab; some browsers download them straight away. Say so in the description for large files.
 
----
+## Recipes
 
-## Layout Recipes
+### Downloads page
 
-### 1. General Downloads Section
-- **Settings**: title "Downloads", heading_alignment center, color_scheme standard-primary
-- **Blocks**: 3 resources -- e.g. "Service Brochure", "Price List", "New Client Form" with "Download PDF" buttons
-- **Good for**: A catch-all downloads area on any small business site where visitors grab key documents
+A centred list of the three documents most visitors ask for, no photo, under a `rich-text` opener. Upload one file per row.
 
-### 2. Menu & Price Sheets with Photo
-- **Settings**: eyebrow "Our Menu", title "Menus & Price Lists", image set to a food or storefront photo, image_position end, heading_alignment start, color_scheme standard-secondary
-- **Blocks**: 3-4 resources -- "Lunch Menu", "Dinner Menu", "Catering Packages", "Wine List" with "View PDF" buttons
-- **Good for**: Restaurants and food businesses that maintain downloadable menus alongside their website
+```json
+{
+  "type": "resource-list",
+  "settings": {
+    "eyebrow": "Downloads",
+    "title": "Documents and forms",
+    "description": "Everything you may need before your first visit.",
+    "heading_alignment": "center",
+    "color_scheme": "standard-primary",
+    "top_spacing": "none"
+  },
+  "blocks": [
+    { "type": "resource", "settings": { "title": "Service brochure", "description": "An overview of what we do and how we price it.", "button_label": "Download brochure (PDF)" } },
+    { "type": "resource", "settings": { "title": "New client form", "description": "Fill it in before your first appointment.", "button_label": "Open form (PDF)" } },
+    { "type": "resource", "settings": { "title": "Price list", "description": "Current prices for all services.", "button_label": "Download price list (PDF)" } }
+  ]
+}
+```
 
-### 3. Patient / Client Forms
-- **Settings**: eyebrow "Before Your Visit", title "Patient Forms", description "Please download and complete these forms before your first appointment.", heading_alignment center, color_scheme highlight-primary
-- **Blocks**: 3-5 resources -- "New Patient Registration", "Medical History", "Insurance Information", "HIPAA Consent", each with "Download Form" buttons
-- **Good for**: Practices that need patients or clients to fill out paperwork ahead of appointments
+### Menus beside a photo
 
-### 4. Highlighted Resources with Accent Rows
-- **Settings**: eyebrow "Resources", title "Helpful Guides", heading_alignment start, color_scheme highlight-secondary
-- **Blocks**: 4-6 resources -- e.g. "Homeowner Maintenance Checklist", "Seasonal HVAC Tips", "Warranty Information", "Emergency Procedures" with "Download" buttons
-- **Good for**: Service businesses that provide educational resources to build trust and demonstrate expertise
+Restaurant menus as PDFs with a photo of the dining room on the right; left-aligned heading, soft band. Supply one landscape photo and the menu files.
 
-### 5. Legal & Compliance Documents
-- **Settings**: title "Policies & Documents", heading_alignment start, color_scheme standard-primary
-- **Blocks**: 3-4 resources -- "Terms of Service", "Privacy Policy", "Refund Policy", "Licensing Information" with "View Document" buttons
-- **Good for**: Making required legal or regulatory documents easily accessible from a dedicated page
+```json
+{
+  "type": "resource-list",
+  "settings": {
+    "eyebrow": "Menus",
+    "title": "Download our menus",
+    "description": "Menus change with the season; the files are updated each week.",
+    "heading_alignment": "start",
+    "image_position": "end",
+    "color_scheme": "standard-secondary"
+  },
+  "blocks": [
+    { "type": "resource", "settings": { "title": "Lunch menu", "description": "Served every day until three.", "button_label": "Open lunch menu" } },
+    { "type": "resource", "settings": { "title": "Dinner menu", "description": "From six, with daily specials.", "button_label": "Open dinner menu" } },
+    { "type": "resource", "settings": { "title": "Drinks list", "description": "Wine, beer and soft drinks.", "button_label": "Open drinks list" } },
+    { "type": "resource", "settings": { "title": "Group bookings", "description": "Set menus for parties of eight or more.", "button_label": "Open group menu" } }
+  ]
+}
+```
 
-### 6. Class & Program Materials
-- **Settings**: eyebrow "Class Materials", title "Downloads for Students", image set to a classroom or studio photo, image_position start, heading_alignment start, color_scheme standard-secondary
-- **Blocks**: 4-5 resources -- "Class Schedule", "Beginner Handbook", "Practice Log", "Recital Information" with "Download PDF" buttons
-- **Good for**: Businesses that run classes or programs and need to distribute materials to participants
+### Patient forms
 
-### 7. Seasonal Specials & Promotions
-- **Settings**: eyebrow "Special Offers", title "Current Promotions", description "Download our latest deals and seasonal specials.", heading_alignment center, color_scheme highlight-primary, top_spacing none
-- **Blocks**: 2-3 resources -- "Spring Specials", "Loyalty Program Details", "Referral Rewards" with "Get Details" buttons
-- **Good for**: Distributing promotional flyers, coupon sheets, or seasonal offer summaries as downloadable files
+Intake paperwork for a clinic with a reassuring photo on the left; four forms with specific labels.
 
----
-
-## Differentiation Tips
-
-- **The download button is the whole point.** Unlike a card grid or icon list, every resource row ends with a clear call-to-action to grab a file. Keep button labels specific -- "Download PDF", "View Menu", "Get Form" -- so visitors know exactly what they are getting.
-- **Keep descriptions short and functional.** One sentence explaining what the document is and why someone would want it. This is not a place for marketing copy -- visitors scanning a resource list want to find the right file fast.
-- **The optional image adds warmth.** A resource list on its own can feel dry and utilitarian. Adding a relevant photo (storefront, team at work, product shot) alongside the list makes the section feel more inviting without cluttering the individual rows.
-- **Three to five resources is the sweet spot.** Fewer than three and the section feels underpopulated -- consider folding the downloads into another widget. More than six and the list starts to feel like a filing cabinet. Group large document libraries across multiple sections with different eyebrows.
-- **Pair with a highlight color scheme for visibility.** Resource lists are often buried at the bottom of pages. Using highlight-primary or highlight-secondary gives the section a distinct background that signals "stop and grab these" rather than blending into surrounding content.
-- **Button label variety prevents monotony.** If every row says "Download", the list feels repetitive. Mix in "View PDF", "Get Form", "Download Menu" to give each resource its own identity and set expectations about the file type.
-- **Use heading_alignment start when paired with an image.** Center-aligned headings with a side image create an awkward visual imbalance. Left-aligning the header block keeps everything anchored to the same edge as the content.
+```json
+{
+  "type": "resource-list",
+  "settings": {
+    "eyebrow": "Before your visit",
+    "title": "Patient forms",
+    "description": "Download, complete and bring these with you to save time at reception.",
+    "heading_alignment": "start",
+    "image_position": "start",
+    "color_scheme": "standard-primary"
+  },
+  "blocks": [
+    { "type": "resource", "settings": { "title": "Registration form", "description": "Your details and contact preferences.", "button_label": "Open registration form" } },
+    { "type": "resource", "settings": { "title": "Medical history", "description": "Conditions, medication and allergies.", "button_label": "Open history form" } },
+    { "type": "resource", "settings": { "title": "Insurance details", "description": "Only if you are claiming through an insurer.", "button_label": "Open insurance form" } },
+    { "type": "resource", "settings": { "title": "Privacy notice", "description": "How we store and use your information.", "button_label": "Read privacy notice" } }
+  ]
+}
+```

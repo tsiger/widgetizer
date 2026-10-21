@@ -1,79 +1,106 @@
-# Testimonial Hero Widget
+# testimonial-hero
 
-A full-width, split-layout social proof section that pairs a large author portrait with a quote, name, and optional company logo -- designed to anchor credibility at the top of a page or directly after a hero.
+## Purpose
 
----
+One customer's story told large: a two-column section that pairs a big portrait with a single quote, the author's name and role, and an optional company logo. It is the heavyweight social-proof section for one marquee client, not a wall of reviews.
 
-## Settings levers
+On desktop the text column and the portrait stand side by side at equal height, the logo at the top of the text column and the quote, name and role anchored to the bottom so they line up with the foot of the photo. On phones the text comes first and the portrait follows. Without a portrait a placeholder illustration keeps the two-column shape.
 
-| Setting | Values | Visual effect |
-|---|---|---|
-| `logo` | Image upload (or empty) | Displays a company/brand logo above the quote text. Omitting it produces a cleaner, personal-feeling testimonial. |
-| `author_image` | Image upload (or empty) | Large portrait shown in the end (or start) column. When empty a placeholder illustration renders instead. |
-| `image_position` | `start`, `end` (default) | Swaps the two-column order on desktop. `start` puts the portrait first, giving it more visual weight on LTR screens. |
-| `color_scheme` | `standard-primary` (default), `standard-secondary`, `highlight-primary`, `highlight-secondary` | `standard-primary` inherits the page background with no extra padding. Highlight variants activate a padded container with tinted or contrasting backgrounds. |
-| `top_spacing` | `auto` (default), `small`, `none` | `small` reduces spacing for tighter rhythm; `none` removes it entirely for flush stacking |
-| `bottom_spacing` | `auto` (default), `small`, `none` | `small` reduces spacing for tighter rhythm; `none` removes it entirely for flush stacking |
+## When to use
 
----
+- Mid-page proof after the section that makes the claim: a `services-grid`, `features-split` or `pricing` section followed by one strong client story, then the closing `action-bar`.
+- Good for one named, recognisable customer with a real photo and a quote worth reading slowly. Bad for collecting many short reviews; that is `testimonials` or `testimonial-slider`.
+- Rarely a page opener. When it is the first section its `heading` block becomes the page title, so the author's name would head the page.
+- Sits well between two standard-surface sections. On `highlight-primary` or `highlight-secondary` it is one of the page's one or two emphasis bands, so do not place it next to another highlight section.
+- Needs one quote of one to three sentences, a name, a role line and ideally a portrait; the `logo` is optional and adds credibility only when the brand is known to the visitor.
+- Fits agencies, consultants, B2B services, contractors and clinics, premium services and transformation stories.
 
-## Available blocks
+## Pitfalls
 
-| Block | Key settings | Notes |
-|---|---|---|
-| **heading** | `text` (plain text), `size` (lg default through 9xl) | Typically used for the author name. Renders as `<h1>` when the widget is the first on the page, `<h2>` otherwise. Can be repeated for a two-line attribution (name + company). |
-| **text** | `text` (richtext), `size` (sm / base / lg default), `uppercase` (false default), `muted` (false default) | The workhorse block. Use it for the quote body, job title, location, or any supplementary line. `muted` applies a lower-contrast color; `uppercase` adds letter-spaced caps for labels. |
+- Everything in the text column is a block: the quote is a `text` block, the name a `heading` block, the role a second `text` block with `muted` on. Keep that order; a name-first column reads as a profile, not a testimonial.
+- The `text` block at size `lg` is large type. A quote longer than about forty words towers over the portrait; cut to the strongest sentence or two.
+- The portrait shows at its own proportions and the text column stretches to match, so a tall portrait makes a tall section with a lot of empty space above the quote. Landscape or square photos balance better.
+- With no `author_image` the placeholder shows on the published site too, so either supply a photo or choose a text-only section instead.
+- `image_position` only matters on desktop; on phones the text always comes first.
+- The `logo` is shown at up to a fifth of the content width. Use a wordmark on a transparent background; a boxed logo looks like a sticker.
+- Filled schemes (`standard-secondary`, `highlight-primary`, `highlight-secondary`) pad inside their own band, so `top_spacing` and `bottom_spacing` set to `none` remove that inner padding rather than closing a gap to a neighbour; use `none` only to fuse with a same-scheme band next to it.
+- The `heading` block is a page heading. Heading sizes above `2xl` make a person's name shout; `lg` or `xl` is plenty.
 
-Default block order: quote text (lg) --> author name heading (lg) --> job title text (sm, muted).
+## Recipes
 
----
+### Flagship client spotlight
 
-## Layout recipes
+A homepage proof band on the strongest surface, right after the services section. The user supplies a landscape portrait of the client and, if the brand is known, the client's logo.
 
-**1. "Flagship Client Spotlight" (homepage hero zone)**
-- Settings: `image_position: end`, `color_scheme: highlight-secondary`, `top_spacing: none`, `logo: client-brand.svg`, `author_image: professional-headshot.jpg`
-- Blocks: text (lg) for a two-sentence quote, heading (2xl) for client name, text (sm, muted) for "VP of Marketing, Acme Corp"
-- Good for: Landing pages where you lead with proof instead of a traditional hero. The highlight-secondary background creates a bold color break.
+```json
+{
+  "type": "testimonial-hero",
+  "settings": {
+    "image_position": "end",
+    "color_scheme": "highlight-primary"
+  },
+  "blocks": [
+    { "type": "text", "settings": { "text": "<p>A short quote from a customer goes here. One or two sentences that name the result they got.</p>", "size": "lg" } },
+    { "type": "heading", "settings": { "text": "Customer name", "size": "xl" } },
+    { "type": "text", "settings": { "text": "<p>Role, company</p>", "size": "sm", "muted": true } }
+  ]
+}
+```
 
-**2. "Neighborhood Trust" (local services)**
-- Settings: `image_position: start`, `color_scheme: standard-primary`, `logo: (empty)`, `author_image: casual-customer-photo.jpg`
-- Blocks: text (lg) for a short, conversational quote, heading (lg) for first name + last initial, text (sm, muted, uppercase) for neighborhood or city name
-- Good for: Service pages for contractors, salons, or clinics where a friendly face matters more than a corporate logo.
+### Friendly local recommendation
 
-**3. "Partner Endorsement" (B2B credibility)**
-- Settings: `image_position: end`, `color_scheme: standard-secondary`, `logo: partner-logo.png`, `author_image: (empty -- use placeholder)`
-- Blocks: text (lg) for a results-oriented quote with a bold stat, heading (xl) for full name, text (sm, muted) for title + company, text (sm, muted, uppercase) for "Official Partner Since 2021"
-- Good for: Integration or partner pages where the logo carries more weight than the photo. The placeholder image keeps the layout balanced.
+Portrait first, plain page surface, no logo: a neighbour recommending a tradesperson, salon or clinic. The user supplies a casual photo of the customer.
 
-**4. "Before/After Storyteller" (transformation services)**
-- Settings: `image_position: start`, `color_scheme: highlight-primary`, `logo: (empty)`, `author_image: after-transformation.jpg`
-- Blocks: text (lg) for a narrative-style quote describing the journey, heading (lg) for client name, text (sm, muted) for context like "Lost 30 lbs in 4 months" or "Revenue doubled in Q3"
-- Good for: Placing just below a services overview to transition into social proof. The highlight scheme draws the eye after a standard-background section.
+```json
+{
+  "type": "testimonial-hero",
+  "settings": {
+    "image_position": "start",
+    "color_scheme": "standard-primary"
+  },
+  "blocks": [
+    { "type": "text", "settings": { "text": "<p>A short, conversational quote from a customer goes here.</p>", "size": "lg" } },
+    { "type": "heading", "settings": { "text": "Customer name", "size": "lg" } },
+    { "type": "text", "settings": { "text": "<p>Neighbourhood or town</p>", "size": "sm", "muted": true, "uppercase": true } }
+  ]
+}
+```
 
-**5. "Founder-to-Founder" (startup / indie brand)**
-- Settings: `image_position: end`, `color_scheme: standard-primary`, `top_spacing: none`, `bottom_spacing: none`, `logo: startup-logo.svg`, `author_image: candid-founder-photo.jpg`
-- Blocks: text (lg) for a punchy one-liner quote, heading (xl) for full name, text (base) for title, text (sm, muted) for a Twitter/X handle or website URL
-- Good for: About pages or pricing pages where peer validation from another founder seals the deal. Flush spacing lets it sit between two standard sections seamlessly.
+### Partner endorsement
 
-**6. "Event Keynote Pull-Quote" (conferences / education)**
-- Settings: `image_position: end`, `color_scheme: highlight-secondary`, `logo: event-logo.png`, `author_image: speaker-on-stage.jpg`
-- Blocks: text (lg) for a memorable one-sentence pull-quote, heading (3xl) for speaker name, text (sm, uppercase) for "Keynote Speaker", text (sm, muted) for event name and year
-- Good for: Event recap pages or post-conference landing pages. The oversized heading makes the speaker name a design element in itself.
+A B2B quote where the partner's logo carries the weight. The user supplies the partner logo and a portrait; the soft surface separates it from standard sections above and below.
 
-**7. "Quiet Authority" (luxury / premium positioning)**
-- Settings: `image_position: start`, `color_scheme: standard-secondary`, `logo: (empty)`, `author_image: editorial-portrait.jpg`
-- Blocks: text (base) for a restrained, single-sentence endorsement, heading (lg) for name, text (sm, muted, uppercase) for a short descriptor like "Private Client"
-- Good for: Premium service pages where saying less signals exclusivity. No logo, small text, and the accent background do the heavy lifting.
+```json
+{
+  "type": "testimonial-hero",
+  "settings": {
+    "image_position": "end",
+    "color_scheme": "standard-secondary"
+  },
+  "blocks": [
+    { "type": "text", "settings": { "text": "<p>A short quote from a partner goes here, ideally with one concrete figure.</p>", "size": "lg" } },
+    { "type": "heading", "settings": { "text": "Customer name", "size": "lg" } },
+    { "type": "text", "settings": { "text": "<p>Role, company</p>", "size": "sm", "muted": true } },
+    { "type": "text", "settings": { "text": "<p>Partner since 2021</p>", "size": "sm", "muted": true, "uppercase": true } }
+  ]
+}
+```
 
----
+### Quiet premium endorsement
 
-## Differentiation tips
+Restrained type for a luxury or private-client service: smaller quote, no logo, a short descriptor instead of a job title. The user supplies an editorial portrait.
 
-- **Lead with the quote, not the name.** The default block order already does this. Resist the urge to put the heading first -- a compelling sentence hooks visitors before they care who said it.
-- **Use the logo strategically.** A recognizable brand logo above the quote adds instant credibility. But if the logo is unknown to your audience, drop it entirely -- an unfamiliar logo adds clutter, not trust.
-- **Match image_position to reading flow.** For pages where the testimonial follows a text-heavy section, place the image at `start` so the eye lands on a visual break first. For pages that follow a gallery or image hero, put the image at `end` so the quote gets attention.
-- **Pair color_scheme with adjacent widgets.** Alternate between `standard-primary` and `highlight-primary` (or their secondary variants) to create a visual rhythm down the page. Two consecutive `standard-primary` sections blur together; a `highlight-primary` testimonial between them acts as a divider.
-- **Keep quotes to two sentences max.** The large text size at `lg` means long quotes dominate the viewport. Edit ruthlessly -- the best testimonials are one strong claim followed by one supporting detail.
-- **Stack multiple text blocks for layered attribution.** Name (heading) + Title (text, sm, muted) + Company (text, sm, uppercase, muted) reads as a structured byline and feels more credible than cramming everything into one line.
-- **Remove spacing to create section joins.** Setting both `top_spacing: none` and `bottom_spacing: none` on a `highlight-secondary` testimonial sandwiched between two `standard-primary` sections creates a bold color band effect that breaks up long pages without adding empty space.
-- **Use placeholder images intentionally.** If you genuinely lack a client photo, the placeholder keeps the two-column layout intact. A broken layout with one empty column is worse than an obvious placeholder.
+```json
+{
+  "type": "testimonial-hero",
+  "settings": {
+    "image_position": "start",
+    "color_scheme": "standard-primary"
+  },
+  "blocks": [
+    { "type": "text", "settings": { "text": "<p>A single restrained sentence from a customer goes here.</p>", "size": "base" } },
+    { "type": "heading", "settings": { "text": "Customer name", "size": "lg" } },
+    { "type": "text", "settings": { "text": "<p>Private client</p>", "size": "sm", "muted": true, "uppercase": true } }
+  ]
+}
+```

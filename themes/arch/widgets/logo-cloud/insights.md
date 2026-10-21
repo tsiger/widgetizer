@@ -1,154 +1,103 @@
-# Logo Cloud Widget — Insights
+# logo-cloud
 
-Displays a grid or carousel of partner/client logos with optional heading, building trust and social proof at a glance.
+## Purpose
 
----
+A grid or carousel of client, partner, press or certification logos under a short label. It is the lightest social-proof section in the theme: logos appear grey and faded, turning to full colour on hover, so the row stays calm until the visitor looks at it.
 
-## Settings Levers
+Each `logo` block is an image with a `name` used as its alternative text and an optional `link` that makes the whole tile clickable. `aspect_ratio` decides whether each logo keeps its own height or all tiles share one shape, and `card_layout` adds a bordered tile around each logo.
 
-| Setting | Values | Visual Effect |
-|---------|--------|---------------|
-| `eyebrow` | Any text (default: "Trusted By") | Small label above the headline; omit to remove |
-| `eyebrow_uppercase` | `true` / `false` (default) | Uppercases the eyebrow text for a more formal label treatment |
-| `title` | Any text | Main headline; renders as `<h1>` when the widget is first on the page, `<h2>` otherwise |
-| `description` | Any text (optional) | Supporting paragraph beneath the headline |
-| `heading_alignment` | `start`, `center` (default) | Centers or left-aligns the entire header block |
-| `card_layout` | `flat` (default), `box` | Flat removes card borders for a clean look; box adds a bordered card container around each logo |
-| `layout` | `grid` (default), `carousel` | Static equal-column grid vs. horizontally scrollable carousel with prev/next arrows |
-| `columns_desktop` | 2 -- 8 (default: 6) | Number of columns on desktop; in carousel mode this sets visible slides per view |
-| `aspect_ratio` | `auto` (default), `4 / 3`, `3 / 2`, `1 / 1` | Controls the aspect ratio of logo cards; auto lets each image determine its own height |
-| `color_scheme` | `standard-primary`, `standard-secondary`, `highlight-primary`, `highlight-secondary` | Controls background and border palette; non-standard schemes add padded container and override `--widget-bg-color` |
-| `top_spacing` | `auto` (default), `small`, `none` | `small` reduces spacing for tighter rhythm; `none` removes it entirely for flush stacking |
-| `bottom_spacing` | `auto` (default), `small`, `none` | `small` reduces spacing for tighter rhythm; `none` removes it entirely for flush stacking |
+## When to use
 
----
+- Role: a quiet credibility strip under the opener, a press bar, a "licensed and insured" badge row, or a partner list on an `about` or `services` page.
+- Good for: agencies and consultancies (clients), trades and clinics (certifications, associations), shops (brands carried), anyone featured in the press.
+- Bad for: a single badge (`image`), photos of people (`profile-grid`), or logos that need a sentence each (`card-grid`).
+- Opening a page: no. It has nothing to say on its own and does not support the header's transparent mode, which only `banner`, `slideshow` and `video-popup` support.
+- Natural neighbours: directly under `banner`, `split-hero` or `key-figures`; above or below `testimonials`, which it backs up.
+- Content needed: enough logos to fill whole rows, typically four to eight, each supplied as a crisp file on a transparent background.
 
-## Available Blocks
+## Pitfalls
 
-| Block Type | Key Settings | Notes |
-|------------|-------------|-------|
-| `logo` | `image` (image picker), `name` (text, default "Company"), `link` (URL, optional, target support) | Each block is one logo card. Images render grayscale at 60 % opacity and transition to full color on hover. When no image is uploaded a placeholder is shown. If a link is provided the entire card becomes an anchor. The `name` text is used as the image `alt` attribute for accessibility. |
+- Logos must be prepared, not just collected: transparent backgrounds, similar visual weight, trimmed of empty margins. One heavy dark logo among light ones dominates the row even in grey.
+- `auto` lets each logo set its own height, which gives a ragged row when the files differ in shape. `3 / 2` or `4 / 3` makes uniform tiles for wordmarks; `1 / 1` suits round badges and seals.
+- Fill complete rows: six logos for six columns, eight for four columns. A row with a gap at the end looks unfinished. Switch to `carousel` only when the logos exceed one row; `columns_desktop` is then how many show at once.
+- On a highlight scheme, dark logos sink into the band. Use light or white logo versions there, or keep the row on a standard surface.
+- The default `title` is a boast about hundreds of companies; replace it with a true statement or clear it and keep only the `eyebrow`.
+- Set `name` on every block; it is what screen readers and search engines read instead of the picture.
+- Linking every logo sends visitors away; link only the few with a reason, in a new tab.
+- A `color_scheme` other than `standard-primary` makes the section a filled band whose spacing is padding inside its colour. The strip is a natural `small` spacing candidate; under a filled hero use `small`, and `none` only under an unfilled opener.
+- Use only logos the business has permission to show; being a customer of a brand does not make its logo a partnership.
 
----
+## Recipes
 
-## Layout Recipes
+### Client wall under the hero
 
-### 1. "Client Wall" -- Full-Width Grid
+Six logos in one flat row with a short label, docked under a filled hero. Supply six logo files of similar weight on transparent backgrounds.
 
-| Setting | Value |
-|---------|-------|
-| layout | grid |
-| columns_desktop | 6 |
-| heading_alignment | center |
-| eyebrow | Trusted By |
-| title | Companies that rely on us |
-| color_scheme | standard-primary |
+```json
+{
+  "type": "logo-cloud",
+  "settings": { "eyebrow": "Trusted by", "title": "", "heading_alignment": "center", "card_layout": "flat", "layout": "grid", "columns_desktop": 6, "aspect_ratio": "3 / 2", "color_scheme": "standard-primary", "top_spacing": "small" },
+  "blocks": [
+    { "type": "logo", "settings": { "name": "Example Company" } },
+    { "type": "logo", "settings": { "name": "Sample Studio" } },
+    { "type": "logo", "settings": { "name": "Placeholder Partners" } },
+    { "type": "logo", "settings": { "name": "Demo Industries" } },
+    { "type": "logo", "settings": { "name": "Test Collective" } },
+    { "type": "logo", "settings": { "name": "Specimen Group" } }
+  ]
+}
+```
 
-**Good for:** Homepage social-proof section immediately below the hero.
+### Press strip
 
----
+Five publication wordmarks with no heading on a soft band. Supply five press logos; link each to the article in a new tab if the coverage is public.
 
-### 2. "Partner Carousel" -- Scrollable Strip
+```json
+{
+  "type": "logo-cloud",
+  "settings": { "eyebrow": "As seen in", "title": "", "heading_alignment": "center", "card_layout": "flat", "layout": "grid", "columns_desktop": 5, "aspect_ratio": "3 / 2", "color_scheme": "standard-secondary" },
+  "blocks": [
+    { "type": "logo", "settings": { "name": "Example Daily", "link": { "text": "Read the article", "href": "https://example.com/", "target": "_blank" } } },
+    { "type": "logo", "settings": { "name": "Sample Magazine" } },
+    { "type": "logo", "settings": { "name": "Placeholder Review" } },
+    { "type": "logo", "settings": { "name": "Demo Journal" } },
+    { "type": "logo", "settings": { "name": "Specimen Weekly" } }
+  ]
+}
+```
 
-| Setting | Value |
-|---------|-------|
-| layout | carousel |
-| columns_desktop | 4 |
-| heading_alignment | center |
-| eyebrow | Our Partners |
-| title | _(leave blank)_ |
-| color_scheme | standard-primary |
-| top_spacing | none |
-| bottom_spacing | none |
+### Certification badges
 
-**Good for:** Compact trust bar between two content-heavy sections; works well when you have 10+ logos and don't want to overwhelm the page.
+Three or four boxed square tiles for licences, memberships and awards. Supply square badge images; the border makes each badge read as a credential.
 
----
+```json
+{
+  "type": "logo-cloud",
+  "settings": { "eyebrow": "Credentials", "title": "Licensed, insured and accredited", "heading_alignment": "center", "card_layout": "box", "layout": "grid", "columns_desktop": 4, "aspect_ratio": "1 / 1", "color_scheme": "standard-primary" },
+  "blocks": [
+    { "type": "logo", "settings": { "name": "Example trade licence" } },
+    { "type": "logo", "settings": { "name": "Sample association member" } },
+    { "type": "logo", "settings": { "name": "Placeholder safety certificate" } },
+    { "type": "logo", "settings": { "name": "Demo industry award" } }
+  ]
+}
+```
 
-### 3. "Featured Certifications" -- Narrow Highlight Strip
+### Partner carousel
 
-| Setting | Value |
-|---------|-------|
-| layout | grid |
-| columns_desktop | 3 |
-| heading_alignment | center |
-| eyebrow | Certifications |
-| title | Licensed & Insured |
-| color_scheme | highlight-primary |
+Ten or more partner or brand logos shown five at a time with arrows and a short description. Supply the full set of logos in one consistent shape.
 
-**Good for:** Showing 3-4 certification or association badges (BBB, chamber of commerce, trade license) on a contrasting background to make them pop.
-
----
-
-### 4. "As Seen In" -- Press Logo Bar
-
-| Setting | Value |
-|---------|-------|
-| layout | grid |
-| columns_desktop | 5 |
-| heading_alignment | center |
-| eyebrow | As Seen In |
-| title | _(leave blank)_ |
-| description | _(leave blank)_ |
-| color_scheme | standard-secondary |
-| top_spacing | none |
-
-**Good for:** A slim press-mention strip placed right under a hero or testimonial section. Keeping title and description blank lets the logos speak for themselves.
-
----
-
-### 5. "Supplier Showcase" -- Left-Aligned with Description
-
-| Setting | Value |
-|---------|-------|
-| layout | grid |
-| columns_desktop | 4 |
-| heading_alignment | start |
-| eyebrow | Our Suppliers |
-| title | We work with the best brands |
-| description | All products are sourced from authorized distributors. |
-| color_scheme | standard-primary |
-
-**Good for:** Product or service pages where you want to explain the relationship with the brands you carry, not just flash logos.
-
----
-
-### 6. "Membership Badges" -- Two-Column Accent Grid
-
-| Setting | Value |
-|---------|-------|
-| layout | grid |
-| columns_desktop | 2 |
-| heading_alignment | center |
-| eyebrow | _(leave blank)_ |
-| title | Proud Member |
-| color_scheme | highlight-secondary |
-
-**Good for:** Displaying just 2 important association or membership logos at large size with high visual weight (e.g., on an About page).
-
----
-
-### 7. "Brand Partners" -- Wide Carousel with Copy
-
-| Setting | Value |
-|---------|-------|
-| layout | carousel |
-| columns_desktop | 5 |
-| heading_alignment | center |
-| eyebrow | Brands We Carry |
-| title | Products from names you trust |
-| description | We stock and service all major brands. |
-| color_scheme | standard-primary |
-
-**Good for:** A feature-rich integrations section on a product or pricing page where the logo count is large (12+) and you want to keep vertical space tight.
-
----
-
-## Differentiation Tips
-
-- **Grayscale-to-color hover effect is built in.** Every logo image starts desaturated and faded; it becomes full-color on hover. This keeps the section visually calm and draws the eye only on interaction -- no extra CSS needed.
-- **Grid vs. carousel is a content-volume decision.** Use grid when you have up to roughly 8 logos and want them all visible at once. Switch to carousel when the count exceeds one row's worth so the page doesn't stretch.
-- **Pair `highlight-primary` color schemes with minimal text.** The contrasting background already draws attention. A short eyebrow plus logos (no title, no description) is often more effective than adding a headline.
-- **Use the `link` setting sparingly.** Linking every logo to an external site can send visitors away from your page. Reserve links for strategic partners or required attribution; leave the rest unlinked.
-- **Collapse spacing to glue sections together.** Setting `top_spacing` or `bottom_spacing` to `none` lets you visually attach the logo cloud to an adjacent hero, CTA, or testimonial widget for a seamless flow.
-- **Column count signals importance.** Fewer columns (2-3) with large logos feel premium and exclusive. More columns (6-8) with smaller logos communicate broad adoption. Choose based on the story you want to tell.
+```json
+{
+  "type": "logo-cloud",
+  "settings": { "eyebrow": "Brands we carry", "title": "Products from names you know", "description": "We stock and service every brand shown here.", "heading_alignment": "center", "card_layout": "box", "layout": "carousel", "columns_desktop": 5, "aspect_ratio": "3 / 2", "color_scheme": "standard-primary" },
+  "blocks": [
+    { "type": "logo", "settings": { "name": "Example Brand" } },
+    { "type": "logo", "settings": { "name": "Sample Brand" } },
+    { "type": "logo", "settings": { "name": "Placeholder Brand" } },
+    { "type": "logo", "settings": { "name": "Demo Brand" } },
+    { "type": "logo", "settings": { "name": "Specimen Brand" } },
+    { "type": "logo", "settings": { "name": "Model Brand" } }
+  ]
+}
+```

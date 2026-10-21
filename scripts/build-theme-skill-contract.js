@@ -19,6 +19,12 @@ import { Liquid } from "liquidjs";
 import { createLiquidEngine, widgetizerLiquidTags } from "@widgetizer/render-engine";
 import { SUPPORTED_SETTING_TYPES } from "../packages/core/src/config/settingTypes.js";
 import { COLLECTION_STRUCTURED_DATA_RULES } from "../packages/core/src/structuredData/collectionTypes.js";
+import {
+  GUIDANCE_FILE,
+  PRESET_GUIDE_HEADINGS,
+  RECIPE_FENCE,
+  WIDGET_GUIDE_HEADINGS,
+} from "../packages/core/src/guidance/insightsFile.js";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 export const CONTRACT_PATH = path.join(ROOT, "skills", "widgetizer-theme", "references", "contract.json");
@@ -124,6 +130,13 @@ export function buildContract() {
     },
     // Font stack → the weights the font picker offers for it.
     fonts: Object.fromEntries([...fonts.system, ...fonts.google].map((font) => [font.stack, font.availableWeights])),
+    // Guidance files the assistant serves and the checker validates (references/guidance.md).
+    guidance: {
+      file: GUIDANCE_FILE,
+      widgetHeadings: [...WIDGET_GUIDE_HEADINGS],
+      presetHeadings: [...PRESET_GUIDE_HEADINGS],
+      recipeFence: RECIPE_FENCE,
+    },
   };
 }
 
