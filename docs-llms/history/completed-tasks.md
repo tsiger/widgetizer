@@ -573,6 +573,46 @@ Turning on "Split into pages" also made the page the collection's main page, too
 
 **Body at:** `59f3703a:docs-llms/TODO-agents.md`.
 
+### GH148 · The testimonial carousel shows part of the next card on phones
+
+**Won't fix · Unrated · OSS · 2026-10-22**
+
+A user on 0.9.9 reported that Arch's testimonial slider shows a slice of the next card on small screens.
+
+**Resolution:** owner's decision: the peek of the next card is the intended design, hinting that the slider scrolls. No change. [GitHub #148](https://github.com/tsiger/widgetizer/issues/148)
+
+**Body at:** `e92cda65:docs-llms/TODO-agents.md`.
+
+### BACKUP-ZIP-NAME · Backups download as `project-export.zip` in the dev setup
+
+**Done · Low · OSS · 2026-10-22**
+
+Across origins (dev editor on :3000, API on :3001) the editor could not read the backup's `Content-Disposition`, so downloads fell back to `project-export.zip`.
+
+**Resolution:** the API's CORS setup exposes `Content-Disposition` (`createApp.js`), so the editor names the download `<project>-export-<timestamp>.zip`; covered in `infrastructure.test.js`. Fix `9c58f46d`.
+
+**Body at:** `e92cda65:docs-llms/TODO-agents.md`.
+
+### PREVIEW-FORM-SUBMIT · Submitting a form in the preview shows a raw server error
+
+**Done · Low · OSS · 2026-10-22**
+
+The Core Form posts to an address only a publishing host answers, so a submit in the preview showed Express's "Cannot POST".
+
+**Resolution:** in preview render mode the Core Form stops the submit and shows "This is a preview, so nothing was sent." in its status line; the form doc says so, and `coreWidgetStrings.test.js` covers it. Fix `f5bd88c4`.
+
+**Body at:** `e92cda65:docs-llms/TODO-agents.md`.
+
+### GH159 · Links whose target is gone still publish as working links
+
+**Won't fix · Unrated · OSS · 2026-10-22**
+
+Deleting a page or removing a language keeps a pointing link's label and empties its address, so the published menu item or button links to nowhere.
+
+**Resolution:** owner's decision: keeping the label is right, and re-pointing the link is the site owner's job; the published output is unchanged. A future tool that lists broken and empty links is tracked as [GitHub #164](https://github.com/tsiger/widgetizer/issues/164). [GitHub #159](https://github.com/tsiger/widgetizer/issues/159)
+
+**Body at:** `e92cda65:docs-llms/TODO-agents.md`.
+
 ## Reconciliation decisions
 
 - GitHub #115, #122, #126, #133, #134 and #135 have implementation evidence. Their remaining local entries are review/documentation/integration work, not instructions to rebuild the features. GitHub statuses were left unchanged.
