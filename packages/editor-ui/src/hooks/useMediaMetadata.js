@@ -92,10 +92,12 @@ export default function useMediaMetadata({ activeProject, showToast, setFiles })
     }
   };
 
-  // Handler for file view - uses file ID for reliable access to both images and videos
+  // Opens a file in a new tab by its ID (works for any file type). Without an
+  // opener: an uploaded HTML or SVG file runs its own scripts, which must not be
+  // able to navigate the editor window.
   const handleFileView = (file) => {
     // Use the ID-based route which works for both images and videos
-    window.open(API_URL(`/api/media/projects/${activeProject.id}/media/${file.id}`), "_blank");
+    window.open(API_URL(`/api/media/projects/${activeProject.id}/media/${file.id}`), "_blank", "noopener,noreferrer");
   };
 
   return {

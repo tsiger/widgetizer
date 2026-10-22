@@ -1,5 +1,22 @@
-import { LANGUAGE_CODE_RE, normalizeLanguageCode } from "@widgetizer/core/languages";
+import { LANGUAGE_CODE_RE, nativeLanguageName, normalizeLanguageCode } from "@widgetizer/core/languages";
 import { languageFolder, resolveLanguage } from "@widgetizer/core/contentAddress";
+
+/**
+ * A language's English name for a server message — "Greek", not "el". Messages
+ * are English sentences, and a bare code is an internal detail nobody chose.
+ * Falls back to the native name, then to the code, so it never comes back empty.
+ */
+export function languageNameForMessage(code) {
+  if (!code) return "";
+  try {
+    const name = new Intl.DisplayNames(["en"], { type: "language" }).of(code);
+    // `of` echoes the input back when it knows no name for it.
+    if (name && name.toLowerCase() !== String(code).toLowerCase()) return name;
+  } catch {
+    // A code Intl refuses — fall through.
+  }
+  return nativeLanguageName(code) || code;
+}
 
 /** A row from before the languages setting existed reads as single-language. */
 export function projectLanguages(project) {
@@ -35,7 +52,9 @@ export function requestLanguage(req, res) {
   if (malformed || notEnabled) {
     res.status(400).json({
       error: "Unknown language",
-      message: `Language "${requested || language}" is not enabled for this project.`,
+      message: malformed
+        ? `Language "${requested}" is not enabled for this project.`
+        : `${languageNameForMessage(language)} is not enabled for this project.`,
       // A well-formed language the project does not have is, from an editor's point
       // of view, the same event as one removed mid-edit: this work cannot be saved
       // anywhere. It carries the same code so the editor reacts the same way —

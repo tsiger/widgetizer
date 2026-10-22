@@ -121,7 +121,7 @@ See [multilingual domain rules](domain/multilingual.md), [theme strings](domain/
 | `utils/mimeTypes.js` | Thin wrapper over `@widgetizer/core/mimeTypes` (`ALLOWED_MIME_TYPES`, `getContentType()`, `getMediaCategory()`) |
 | `utils/pathSecurity.js` | Thin wrapper over `@widgetizer/core/pathSecurity` (`isWithinDirectory()`), plus `isSafePathSegment()` for request/file-sourced folder names (slugs, theme and preset names) |
 | `utils/zipSafety.js` | Bounded ZIP reading/extraction (`openZip`, `extractZipSafely`, `readZipEntry`, `UnsafeZipError`): refuses ZIP bombs by compression ratio and unpack budget |
-| `utils/backupContentChecks.js` | Refuses restored content an app-made backup never holds (`mediaLibraryProblem`, `collectionItemsProblem`) |
+| `utils/backupContentChecks.js` | Validates restored content JSON, media paths and collection item slugs (`mediaLibraryProblem`, `contentFilesProblem`) |
 | `utils/uploadFileName.js` | `normalizeUploadName()` — keeps the words of an uploaded file name, capped at `MAX_UPLOAD_NAME_LENGTH` |
 | `utils/contentLanguage.js` | `requestLanguage(req, res)` (`?language=` / `body.language`), `projectLanguages()`, `projectLanguageContexts()`, `languageFoldersIn()` |
 | `utils/serializeByKey.js` | `createKeyedSerializer()` — in-process per-key async serialization (export, translation ops) |

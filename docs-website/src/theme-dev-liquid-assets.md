@@ -1,5 +1,5 @@
 ---
-description: Complete reference for Widgetizer theme Liquid tags and filters: assets, media, SEO, fonts, theme settings, custom code, richtext, URLs, dates, and collections.
+description: Complete reference for Widgetizer theme Liquid tags and filters: assets, media, SEO, fonts, theme settings, custom code, richtext, URLs, dates, translations, and collections.
 ---
 
 Widgetizer extends LiquidJS with theme-author tools for assets, media, SEO, fonts, theme settings, menus, snippets, and collections. Use this page as the contract for what each custom tag or filter expects, what it outputs, and where it belongs.
@@ -12,7 +12,7 @@ Most tags can technically render anywhere, but a theme is much easier to maintai
 
 ```liquid
 <!doctype html>
-<html lang="en">
+<html lang="{{ page.language | default: 'en' }}" dir="{{ page.dir | default: 'ltr' }}">
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -43,9 +43,9 @@ Most tags can technically render anywhere, but a theme is much easier to maintai
 
 | Tag or value | Recommended location | Why |
 | :-- | :-- | :-- |
-| `{% seo %}` | `<head>` before other metadata-heavy tags | Emits title, description, robots, canonical, Open Graph, and Twitter metadata |
+| `{% seo %}` | `<head>` before other metadata-heavy tags | Emits title, description, robots, canonical, language alternates, Open Graph, Twitter metadata, and structured data |
 | `{% fonts %}` | `<head>` before CSS | Emits font preconnect links and the font stylesheet before CSS uses those font families |
-| `{% render 'site-icons', site_icons: site_icons %}` | `<head>` near SEO/fonts | Emits favicon, Apple touch icon, and manifest links when the project has a favicon |
+| `{% render 'site-icons', site_icons: site_icons %}` | `<head>` near SEO/fonts | Emits favicon, search-result icon, Apple touch icon, and manifest links when the project has a favicon |
 | `{% theme_settings %}` | `<head>` before `base.css` | Emits CSS custom properties used by theme CSS |
 | `{% asset src: "base.css" %}` | `<head>` after `theme_settings` | Loads the theme's global stylesheet immediately |
 | `{% custom_css %}` | `<head>` after theme CSS | Lets the user override theme CSS |
@@ -83,6 +83,17 @@ Use the `raw` filter only when the value is already trusted HTML:
 > **Warning:** `richtext` is sanitized for you. `code` settings, `{% custom_css %}`, `{% custom_head_scripts %}`, and `{% custom_footer_scripts %}` are intentional raw-code sinks and are not sanitized.
 
 # Liquid Filters
+
+## `t`
+
+`t` returns a visitor-facing word from your theme's `site` dictionary (`locales/<lang>.json`), in the language of the page being rendered. Named arguments fill `{{ name }}` placeholders:
+
+```liquid
+<button aria-label="{{ 'site.common.next' | t }}">{{ 'site.common.next' | t }}</button>
+<span>{{ 'site.slideshow.go_to_slide' | t: number: forloop.index }}</span>
+```
+
+A word missing in the page's language falls back to English. A key nothing defines renders its last segment with underscores as spaces (`go to slide`). Theme keys override the app's built-in words (`site.breadcrumbs.*`, `site.core_form.*`). See [Localization](theme-dev-localization.html).
 
 ## `rte_text` and `rte_blank`
 
@@ -146,13 +157,25 @@ The home link is the case worth the filter: with Clean URLs on it is `./` at the
 string for a missing slug (or a missing prefix), and behave identically inside a
 `{% render %}`'d snippet.
 
+Both link **within the rendered page's language**: on a Greek page, `'index' | page_url` is the
+Greek homepage and `item.slug | item_url: 'news'` is a Greek item. Pass `lang:` for a deliberate
+cross-language link:
+
+```liquid
+<a href="{{ 'index' | page_url: lang: 'en' }}">English</a>
+<a href="{{ item.slug | item_url: 'news', lang: 'en' }}">Read in English</a>
+```
+
+Slugs are per language, so a hardcoded slug only works where that language's page uses the same
+one; the filter doesn't look for a renamed translation. See [Links in the Page's Language](theme-dev-localization.html#links-in-the-page-s-language).
+
 Use them only for links your theme invents. Menu items, `link` settings, and richtext links
 arrive already resolved to the right shape — emit those as-is — and a raw URL typed by the
 user goes through [`safe_url`](#safe-url) instead.
 
 ## `format_date`
 
-`format_date` formats a `YYYY-MM-DD` date value with the project's configured date format. You can pass a format string to override the project setting for one output.
+`format_date` formats a `YYYY-MM-DD` date value with the format chosen in the theme's `date_format` setting (found by id in any settings group; Arch keeps it in `general`). You can pass a format string to override it for one output. Month names are written in the language of the page being rendered; the format itself doesn't change.
 
 ```liquid
 <time datetime="{{ item.settings.date }}">
@@ -191,11 +214,11 @@ Handles are not guaranteed to be unique. If several blocks can share the same ti
 {% endif %}
 ```
 
-Typical properties are `alt`, `title` and `caption`, but the available keys depend on the media record stored by the project.
+Typical properties are `alt`, `title` and `caption`, but the available keys depend on the media record stored by the project. `alt`, `title` and `caption` come back in the language of the page being rendered: a field with no translation inherits the default language's text (the editor never saves an empty translation, so an emptied field inherits too). A file that isn't in the media library returns an empty string.
 
 ## `collection`
 
-`collection` loads items from a theme-defined collection type and returns an array of item objects. Each item exposes `settings`, `slug`, and usually `url` when the collection type has item pages enabled.
+`collection` loads items from a theme-defined collection type and returns an array of item objects. Each item exposes `settings`, `slug`, and usually `url` when the collection type has item pages enabled. Items come from the language of the page being rendered only; a language with no items returns an empty list, never another language's items.
 
 ```liquid
 {% assign posts = 'news' | collection: limit: 6, sort: 'date_desc' %}
@@ -239,9 +262,15 @@ Source resolution depends on where the tag is used:
 | `snippets/*.liquid` | `assets/` |
 | `widgets/{type}/widget.liquid` | `widgets/{type}/` |
 
-During preview, URLs point at preview API routes. During export, URLs are rewritten to static files, nested pages receive the correct `../` prefix, and CSS/JS assets can receive an export-version cache-busting query string.
+During preview, URLs point at preview API routes. During export, URLs are rewritten to static files and nested pages receive the correct `../` prefix.
 
-Use unique filenames across widgets. On export, widget CSS/JS files are flattened into the exported `assets/` folder, so `widgets/gallery/styles.css` and `widgets/hero/styles.css` would collide. Prefer names like `gallery.css`, `gallery.js`, `hero.css`, and `hero.js`.
+On export, every stylesheet and script URL the asset tags emit gets a cache-busting token, `?v=<export number>-<app version>-<timestamp>` (for example `?v=3-0.9.10-20260806T142530`), new for every export, so browsers never keep an old copy. A query string or `#fragment` you wrote yourself is kept and the token joins it. Preload links get the same token, so a preload and the request it warms use the identical URL. Images and other files aren't tokenized.
+
+Widget CSS/JS files follow three rules on export:
+
+- **Flat.** They're copied into the exported `assets/` folder next to the theme's own assets, by filename. Keep them directly in the widget folder; subfolders inside a widget aren't supported.
+- **Unique names.** `widgets/gallery/styles.css` and `widgets/hero/styles.css` would collide, and a widget file named like a theme asset replaces it. Prefer names like `gallery.css`, `gallery.js`, `hero.css`, and `hero.js`. The theme checker reports duplicate names.
+- **Only what's used.** A widget file is exported only when a rendered page enqueued it. Files you load some other way (a URL built in JavaScript, for example) aren't copied.
 
 # Asset Tags
 
@@ -285,7 +314,7 @@ Use `asset` for global theme files that should always load, such as `base.css`, 
 This is the preferred pattern for widget-specific CSS/JS:
 
 ```liquid
-{# widgets/testimonials/widget.liquid #}
+{% comment %} widgets/testimonials/widget.liquid {% endcomment %}
 {% enqueue_style src: "testimonials.css" %}
 {% enqueue_script src: "testimonials.js", defer: true %}
 
@@ -469,7 +498,7 @@ It expects these context objects, which Widgetizer provides during preview and e
 | `og_title` | Open Graph and Twitter title. Falls back to the page title |
 | `og_type` | Open Graph type. Defaults to `website` |
 | `og_image` | Absolute URL or uploaded media path for social image |
-| `twitter_card` | Twitter card type when an image exists. Defaults to `summary_large_image`; without an image the tag emits `summary` |
+| `twitter_card` | Ignored. The card is `summary_large_image` when a social image resolves and `summary` otherwise |
 
 Title behavior:
 
@@ -478,10 +507,15 @@ Title behavior:
 - When `project.siteTitle` exists, the final `<title>` becomes `Page title - Site title`.
 - On page 2 and later of a page split into pages, the number joins the title: `Page title - 2 - Site title`.
 
+Language alternates:
+
+- On a multilingual site, the tag adds `<link rel="alternate" hreflang>` for each language version of the page, plus `x-default` for the default language, built from [`page.translations`](theme-dev-localization.html#the-language-switcher). Don't emit your own.
+- Languages without a version of this page, and versions marked `noindex`, are left out. Nothing is emitted without a Website Address, on a `noindex` page, or on page 2 and later of a page split into pages.
+
 Canonical behavior:
 
 - `seo.canonical_url` wins when present.
-- Otherwise the tag uses `project.siteUrl` plus the page slug.
+- Otherwise the tag uses `project.siteUrl` plus the page's published address, including its language folder and the Clean URLs setting.
 - `index` and `home` slugs canonicalize to the site root.
 - If `project.siteUrl` is missing or invalid, no canonical tag is emitted.
 - On page 2 and later of a page split into pages, the canonical is that page's own address (`seo.canonical_url` applies to page 1 only), and `rel="prev"` / `rel="next"` links point at the neighbouring pages. Those need a site URL too.
@@ -493,6 +527,7 @@ Open Graph image behavior:
 - Raster images prefer the generated `large` variant when one exists.
 - SVG images use the original SVG filename.
 - If no absolute URL can be built, `og:image` and `twitter:image` are omitted.
+- On collection item pages, an empty social image falls back to the item's `usedAsImage` field (see [Collections](theme-dev-collections.html#item-fields)).
 
 All SEO text is escaped before output. Collection item pages use the same `page.seo` contract after Widgetizer shapes the collection item into a page-like render context.
 
@@ -514,7 +549,7 @@ Structured data behavior:
 </head>
 ```
 
-It reads theme settings from `settings.global.typography` and looks for settings with `type: "font_picker"`.
+It reads every setting with `type: "font_picker"`, in any group of `settings.global`. Arch keeps its two in `typography`:
 
 ```json
 {
@@ -562,7 +597,7 @@ Provider behavior:
 
 - Default output uses Google Fonts preconnects and a `fonts.googleapis.com/css2` stylesheet.
 - Bunny Fonts output uses `fonts.bunny.net`.
-- Current runtime compatibility for Bunny Fonts reads a global `privacy` group setting with id `use_bunny_fonts`. Arch exposes the user-facing toggle in its `advanced` group, so theme authors should keep the setting id stable and verify provider output when reorganizing settings.
+- Bunny Fonts is used when a checkbox setting with id `use_bunny_fonts` is on. The tag finds it by id in any group; Arch keeps it in `advanced`. See [Settings the App Reads by Id](theme-dev-manifest-settings.html#settings-the-app-reads-by-id).
 
 When no selected font needs an external stylesheet, `{% fonts %}` outputs nothing.
 
@@ -644,7 +679,7 @@ Values use the saved `value` when present and fall back to `default`. CSS values
 
 ## `{% custom_css %}`
 
-`custom_css` outputs the global `advanced.custom_css` setting inside a style tag.
+`custom_css` outputs the `custom_css` theme setting inside a style tag. Like the two script tags below, it finds the setting by id in any group (Arch uses `advanced`), using the saved value and then the default.
 
 ```liquid
 <head>
@@ -675,7 +710,7 @@ Place it after your theme stylesheet so user CSS can override theme defaults.
 
 ## `{% custom_head_scripts %}`
 
-`custom_head_scripts` outputs the global `advanced.custom_head_scripts` setting as raw HTML.
+`custom_head_scripts` outputs the `custom_head_scripts` theme setting as raw HTML.
 
 ```liquid
 <head>
@@ -698,7 +733,7 @@ Use it for analytics snippets, verification tags, consent-manager bootstraps, or
 
 ## `{% custom_footer_scripts %}`
 
-`custom_footer_scripts` outputs the global `advanced.custom_footer_scripts` setting as raw HTML.
+`custom_footer_scripts` outputs the `custom_footer_scripts` theme setting as raw HTML.
 
 ```liquid
 <body>
@@ -730,7 +765,7 @@ These values are available in `layout.liquid`.
 | `{{ main_content | raw }}` | Rendered page widget HTML |
 | `{{ footer | raw }}` | Rendered global footer widget HTML |
 | `{{ body_class }}` | Contextual CSS classes for the `<body>` |
-| `{{ site_icons }}` | Precomputed favicon, Apple touch icon, and manifest hrefs |
+| `{{ site_icons }}` | Precomputed favicon, search-result icon, Apple touch icon, and manifest hrefs |
 
 `header`, `main_content`, and `footer` are already-rendered HTML strings, so they must use `| raw`.
 
@@ -740,16 +775,25 @@ The `site_icons` object is usually rendered through a snippet:
 {% render 'site-icons', site_icons: site_icons %}
 ```
 
-The Arch snippet checks:
+The icon source is the theme's `favicon` image setting (found by id in any group). Each field is a blank string when there's nothing to link:
 
-- `site_icons.primaryIconHref`
-- `site_icons.primaryIconType`
-- `site_icons.primaryIconSizes`
-- `site_icons.legacyIconHref`
-- `site_icons.appleTouchIconHref`
-- `site_icons.manifestHref`
+| Field | What it is |
+| :-- | :-- |
+| `primaryIconHref`, `primaryIconType`, `primaryIconSizes` | The main icon: the SVG when the favicon is an SVG, otherwise a 32×32 PNG |
+| `legacyIconHref` | 32×32 PNG for browsers without SVG icon support |
+| `serpIconHref` | 192×192 PNG, the size search engines show in results. Export only |
+| `appleTouchIconHref` | 180×180 Apple touch icon |
+| `manifestHref` | Web app manifest. Export only |
 
-On export, Widgetizer generates the needed favicon files and rewrites nested-page paths automatically.
+Arch's snippet links each one that isn't blank:
+
+```liquid
+{% if site_icons.serpIconHref != blank %}
+  <link rel="icon" href="{{ site_icons.serpIconHref }}" type="image/png" sizes="192x192">
+{% endif %}
+```
+
+If you write your own `site-icons` snippet, include `serpIconHref`. On export, Widgetizer generates the icon files and rewrites nested-page paths automatically. It also writes a `favicon.ico` at the site root for browsers and crawlers that request it directly; don't link it, or browsers prefer it over the sharper icons. In the editor preview only the uploaded file itself is linked.
 
 # Snippets and Menus
 
@@ -768,13 +812,16 @@ it in the layout or inside your header widget, whichever suits the design.
 | `class_nav`, `class_list`, `class_item`, `class_link`, `class_current` | Classes for each element |
 | `separator` | Text between crumbs. Most themes draw one in CSS instead |
 | `home_label` | Replaces the first crumb's label |
-| `page_label` | Word before the number on page 2 and later of a page split into pages (default "Page") |
-| `aria_label` | Accessible name for the nav (default "Breadcrumb") |
+| `page_label` | Word before the number on page 2 and later of a page split into pages (default: the `site.breadcrumbs.page` word, "Page" in English) |
+| `aria_label` | Accessible name for the nav (default: the `site.breadcrumbs.label` word, "Breadcrumb" in English) |
 | `show_home` | Set `false` to drop the first crumb |
 
 It emits `<nav aria-label><ol><li>`, marks the last crumb with `aria-current="page"`,
 and renders **nothing at all** when the trail is empty — which is the case on the
 homepage (its page 2 and later show `Home › Page 2`), so you do not need to guard the call.
+The default words come from the built-in `site.breadcrumbs` dictionary, so they follow the page's
+language; override them in your own `site` block. Pass `home_label` only from translated text
+(a setting or a `t` word), never a literal.
 
 Prefer your own markup? Loop the array:
 
@@ -811,7 +858,16 @@ Use Liquid's `render` tag to include snippets from `snippets/`.
 {% render 'menu', menu: widget.settings.navigation, class_menu: 'nav' %}
 ```
 
-Pass every value the snippet needs explicitly. This keeps snippets reusable and easier to test.
+A rendered snippet is **isolated**: it sees only the arguments you pass and a small set of render globals, not the calling template's `page`, `widget`, `block`, `theme`, `project`, `item` or `filePath`. Pass every value the snippet needs explicitly:
+
+```liquid
+{% render 'language-switcher', translations: page.translations, label: widget.settings.language_switcher_label %}
+{% render 'social-icons', social: theme.social, identity: project.identity %}
+```
+
+These work inside a snippet with nothing extra passed, because what they need travels with the render: `{% image %}` and `media_meta` (with image text in the page's language), `page_url` / `item_url`, the `collection` filter, `format_date` and `t`. The built-in `breadcrumbs` snippet can be rendered from a snippet too, and the built-in `menu` snippet needs only its `menu` argument. `{% seo %}` reads `page` and `project`, so it belongs in the layout. Asset and enqueue tags work in a snippet but always load from the theme `assets/` folder.
+
+Avoid naming your own variables or snippet arguments `page`, `project`, `widget`, `globals`, `mediaFiles`, `imagePath` or `currentPageData` unless you pass the real value under its own name (`page: page` is fine). Core tags read those names, so `{% assign imagePath = block.settings.image %}` breaks every `{% image %}` after it.
 
 For menu structures and snippet conventions, see [Menus & Snippets](theme-dev-menus-snippets.html).
 
@@ -851,7 +907,8 @@ Fallback behavior:
 
 - If `src` is blank, the tag outputs nothing.
 - If media metadata is not found, the tag still returns a path based on the filename.
-- If media metadata is found, alt/title default to the media library metadata.
+- If media metadata is found, alt/title default to the media library metadata, in the language of the page being rendered. A field with no translation inherits the default language's text (the editor never saves an empty translation, so an emptied field inherits too).
+- A non-empty `alt` or `title` you pass wins in every language, so pass only translated text (a setting value or a `t` word).
 - Raster images use the requested generated size when available.
 - SVG images use the original file and do not receive width/height or `srcset`.
 
@@ -926,8 +983,9 @@ When the URL or ID is invalid, the tag outputs an HTML comment instead of a brok
 
 During export:
 
-- Theme assets are copied into `assets/`.
-- Widget `.css` and `.js` files are flattened into the exported `assets/` folder.
+- Theme assets are copied into `assets/` (except `icons.json`, which the icon snippet reads while rendering).
+- Widget `.css` and `.js` files that a rendered page enqueued are flattened into the exported `assets/` folder.
+- Stylesheet and script URLs get a per-export cache-busting token (see [Asset Sources](#asset-sources)).
 - Only media files that are actually used are copied.
 - Public generated image variants are copied into `assets/images/`.
 - `thumb` variants are skipped.

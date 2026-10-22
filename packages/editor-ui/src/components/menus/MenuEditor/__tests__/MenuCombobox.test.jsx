@@ -55,3 +55,37 @@ describe("MenuCombobox — grouped options", () => {
     expect(onChange).not.toHaveBeenCalled();
   });
 });
+
+describe("MenuCombobox — the closed field names the target's language", () => {
+  // Two "About" pages in two languages read the same once the list is closed.
+  const LANG_OPTIONS = [
+    { value: "en-about", label: "About", group: "Pages", language: "en" },
+    { value: "fr-about", label: "About", group: "Pages", language: "fr" },
+  ];
+  const renderClosed = (value) =>
+    render(
+      <MenuCombobox
+        options={LANG_OPTIONS}
+        value={value}
+        onChange={vi.fn()}
+        placeholder="Select…"
+        isOpen={false}
+        onOpenChange={vi.fn()}
+      />,
+    );
+
+  it("badges the selected page with its language on a multilingual site", async () => {
+    const { default: useProjectStore } = await import("../../../../stores/projectStore.js");
+    useProjectStore.setState({ activeProject: { id: "p1", defaultLanguage: "en", languages: ["fr"] } });
+    renderClosed("fr-about");
+    expect(screen.getByPlaceholderText("Select…").value).toBe("About");
+    expect(screen.getByTitle("Français").textContent).toBe("fr");
+  });
+
+  it("shows no badge on a single-language site", async () => {
+    const { default: useProjectStore } = await import("../../../../stores/projectStore.js");
+    useProjectStore.setState({ activeProject: { id: "p1", defaultLanguage: "en", languages: [] } });
+    renderClosed("en-about");
+    expect(screen.queryByTitle("English")).toBeNull();
+  });
+});

@@ -527,9 +527,11 @@ async function ensureBreadcrumbs(deps, sharedGlobals) {
   }
 
   // Not a page: a collection item, whose path carries its language folder ahead
-  // of the collection prefix. Item pages normally seed the trail themselves in
-  // renderCollectionItemPage; this resolves the preview's single-widget morph,
-  // which re-renders a header in isolation and knows only the path.
+  // of the collection prefix. Item pages seed the trail themselves in
+  // renderCollectionItemPage, so this serves a caller that renders a widget with
+  // only the path; the widget reads the trail as the `breadcrumbs` global. The
+  // editor's morph always sends its page, so it does not arrive here with an
+  // item path.
   const withoutExt = canonicalPath.endsWith(".html") ? canonicalPath.slice(0, -5) : canonicalPath;
   const [maybeLanguage, ...rest] = withoutExt.split("/");
   const itemLanguage = languages.includes(maybeLanguage) ? maybeLanguage : "";
@@ -539,7 +541,7 @@ async function ensureBreadcrumbs(deps, sharedGlobals) {
     return sharedGlobals.breadcrumbs;
   }
 
-  const resolved = await resolveItemFromPath(deps, target);
+  const resolved = await resolveItemFromPath(deps, target, itemLanguage);
   if (!sharedGlobals.listingPages) {
     sharedGlobals.listingPages = await loadListingIndex(deps, pagesByUuid);
   }
@@ -564,10 +566,11 @@ async function ensureBreadcrumbs(deps, sharedGlobals) {
  * through `resolveInside` before touching the filesystem.
  *
  * @param {RenderDeps} deps
- * @param {string} target - extension-stripped item path
+ * @param {string} target - extension-stripped item path, language folder removed
+ * @param {string} [language] - the item's language folder; "" for the default language
  * @returns {Promise<{collectionType: string, item: {slug: string, name: string, slugPrefix: string}}|null>}
  */
-async function resolveItemFromPath(deps, target) {
+async function resolveItemFromPath(deps, target, language = "") {
   const separator = target.indexOf("/");
   const slugPrefix = target.slice(0, separator);
   const slug = target.slice(separator + 1);
@@ -585,9 +588,13 @@ async function resolveItemFromPath(deps, target) {
       const schemaPath = await resolveInside(deps.projectDir, "collection-types", type, "schema.json");
       if (!schemaPath) continue;
       const schema = JSON.parse(await fs.readFile(schemaPath, "utf-8"));
-      if (schema?.slugPrefix !== slugPrefix) continue;
+      // An omitted slugPrefix defaults to the type, as it does when the schema is loaded.
+      if ((schema?.slugPrefix ?? schema?.type) !== slugPrefix) continue;
 
-      const itemPath = await resolveInside(deps.projectDir, "collections", type, `${slug}.json`);
+      // Another language's items live in their own folder under the type.
+      const itemPath = language
+        ? await resolveInside(deps.projectDir, "collections", type, language, `${slug}.json`)
+        : await resolveInside(deps.projectDir, "collections", type, `${slug}.json`);
       if (!itemPath) return null;
       const item = JSON.parse(await fs.readFile(itemPath, "utf-8"));
       const titleField = (schema.settings || []).find((setting) => setting.usedAsTitle);
@@ -632,7 +639,12 @@ async function planPagination(deps, widgets, widgetsOrder, { pageSlug, currentPa
     if (!collectionType || typeof perPageSetting !== "string" || !Array.isArray(schema.settings)) continue;
 
     const declared = schema.settings.find((setting) => setting?.id === perPageSetting);
-    const perPage = Number(widget.settings[perPageSetting] ?? declared?.default);
+    // Clamped like the rendered setting is, or the pager would count pages the list never shows.
+    const stored = widget.settings[perPageSetting] ?? declared?.default;
+    if (stored === "") continue;
+    let perPage = Number(stored);
+    if (typeof declared?.min === "number") perPage = Math.max(perPage, declared.min);
+    if (typeof declared?.max === "number") perPage = Math.min(perPage, declared.max);
     if (!Number.isInteger(perPage) || perPage < 1) continue;
 
     const totalItems = await deps.countCollectionItems(collectionType, language);

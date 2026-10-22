@@ -534,6 +534,135 @@ async function updateThemeSettingsViaStorage(storage, scope, handlers, failed) {
   }
 }
 
+/** A slug-format page href (`about.html`) — not an absolute URL or an anchor. */
+function pageSlugOfHref(href) {
+  if (typeof href !== "string" || !href.endsWith(".html") || href.includes("://") || href.startsWith("#")) return null;
+  return href.replace(".html", "");
+}
+
+/** Give a theme menu item the uuid of the page its slug link names, when there is one. */
+function stampMenuItemPage(item, pageSlugToUuid) {
+  const slug = pageSlugOfHref(item.link);
+  const uuid = slug && pageSlugToUuid.get(slug);
+  if (uuid) item.pageUuid = uuid;
+  return item;
+}
+
+/**
+ * The setting-value transform that turns a theme's slug references into stable
+ * ones: a link object gains the `pageUuid` of the page its href names, richtext
+ * anchors gain `data-page-uuid`, and a string naming a menu in `menuSlugToUuid`
+ * becomes that menu's uuid. Values that already carry a reference are kept.
+ */
+function createReferenceEnricher({ pageSlugToUuid, menuSlugToUuid = new Map() }) {
+  return (value) => {
+    if (isLinkObject(value)) {
+      if (value.pageUuid) return value;
+      const slug = pageSlugOfHref(value.href);
+      const uuid = slug && pageSlugToUuid.get(slug);
+      return uuid ? { ...value, pageUuid: uuid } : value;
+    }
+    if (typeof value === "string" && menuSlugToUuid.has(value)) {
+      return menuSlugToUuid.get(value);
+    }
+    // Richtext page-links: stamp data-page-uuid from the anchor's slug href. (Item-links
+    // in richtext are stamped post-seed, once collection items exist — see seedPresetCollections.)
+    if (typeof value === "string") {
+      return enrichRichtextLinkRefs(value, { pageSlugToUuid });
+    }
+    return value;
+  };
+}
+
+/**
+ * Give the pages and menus a theme update adds the page references a new
+ * project's get, so their links follow a page that is later renamed. Works on
+ * the update's prepared content in memory and writes nothing: the update writes
+ * it during its all-or-nothing swap.
+ *
+ * Slugs resolve against the project's pages plus the added ones, per language
+ * folder — `contact.html` in a page under `pages/el/` names the Greek Contact,
+ * as it would if left as a plain link. Menus and the theme's settings use the
+ * default language's pages. Menu selections stay as the theme wrote them: a menu
+ * slug resolves per language when the page renders, which a uuid would undo.
+ * The project's existing content is not touched, including links that already
+ * name a page the update adds.
+ *
+ * @param {object} params
+ * @param {string} params.pagesDir - The project's pages directory (read only)
+ * @param {Array<{rel: string, content: object}>} params.additions - Added files, paths relative to the
+ *   project; `pages/…` and `menus/…` entries are enriched in place
+ * @param {object} params.themeJson - The update's theme.json before it is merged with the project's,
+ *   so only values the theme supplies are enriched; mutated in place
+ */
+export async function enrichThemeUpdateAdditions({ pagesDir, additions, themeJson }) {
+  // `el/about.json` and `el/global/header.json` are Greek; `about.json` and
+  // `global/header.json` are the default language.
+  const folderOf = (relToPages) => {
+    const first = relToPages.split(path.sep)[0];
+    return LANGUAGE_CODE_RE.test(first) ? first : "";
+  };
+  const slugMaps = new Map();
+  const mapFor = (folder) => {
+    if (!slugMaps.has(folder)) slugMaps.set(folder, new Map());
+    return slugMaps.get(folder);
+  };
+
+  for (const dir of await withLanguageDirs(pagesDir)) {
+    const folder = dir === pagesDir ? "" : path.basename(dir);
+    for (const file of await fs.readdir(dir)) {
+      if (!file.endsWith(".json")) continue;
+      try {
+        const page = JSON.parse(await fs.readFile(path.join(dir, file), "utf8"));
+        if (page.slug && page.uuid) mapFor(folder).set(page.slug, page.uuid);
+      } catch {
+        // An unreadable page cannot be a link target; it does not block the update.
+      }
+    }
+  }
+
+  const addedPages = [];
+  const addedMenus = [];
+  for (const addition of additions) {
+    const [top, ...rest] = addition.rel.split(path.sep);
+    if (top === "pages") addedPages.push({ addition, relToPages: rest.join(path.sep) });
+    else if (top === "menus") addedMenus.push(addition);
+  }
+  for (const { addition, relToPages } of addedPages) {
+    const page = addition.content;
+    if (page.slug && page.uuid) mapFor(folderOf(relToPages)).set(page.slug, page.uuid);
+  }
+
+  for (const { addition, relToPages } of addedPages) {
+    const enrichValue = createReferenceEnricher({ pageSlugToUuid: mapFor(folderOf(relToPages)) });
+    const content = addition.content;
+    if (content.type === "header" || content.type === "footer") {
+      addition.content = transformWidgetSettings(content, enrichValue);
+    } else if (content.widgets && typeof content.widgets === "object") {
+      const widgets = {};
+      for (const [widgetId, widget] of Object.entries(content.widgets)) {
+        widgets[widgetId] = transformWidgetSettings(widget, enrichValue);
+      }
+      addition.content = { ...content, widgets };
+    }
+  }
+
+  const rootPages = mapFor("");
+  for (const addition of addedMenus) {
+    addition.content = {
+      ...addition.content,
+      items: processMenuItems(addition.content.items, (item) => stampMenuItemPage(item, rootPages)),
+    };
+  }
+
+  const enrichRootValue = createReferenceEnricher({ pageSlugToUuid: rootPages });
+  transformThemeSettings(themeJson, {
+    link: (value) => (isLinkObject(value) ? enrichRootValue(value) : value),
+    richtext: (value) =>
+      typeof value === "string" ? enrichRichtextLinkRefs(value, { pageSlugToUuid: rootPages }) : value,
+  });
+}
+
 /**
  * Enrich a newly created project's references.
  * - Adds pageUuid to menu items based on slug-to-UUID mapping
@@ -575,17 +704,7 @@ export async function enrichNewProjectReferences(pagesDir, menusDir) {
           const menu = JSON.parse(content);
           const menuSlug = path.parse(menuFile).name;
 
-          const enrichedItems = processMenuItems(menu.items, (item) => {
-            if (item.link && typeof item.link === "string") {
-              const link = item.link;
-              if (link.endsWith(".html") && !link.includes("://") && !link.startsWith("#")) {
-                const slug = link.replace(".html", "");
-                const uuid = pageSlugToUuid.get(slug);
-                if (uuid) item.pageUuid = uuid;
-              }
-            }
-            return item;
-          });
+          const enrichedItems = processMenuItems(menu.items, (item) => stampMenuItemPage(item, pageSlugToUuid));
 
           const enrichedMenu = {
             ...menu,
@@ -631,25 +750,7 @@ export async function enrichNewProjectReferences(pagesDir, menusDir) {
   }
 
   // Step 4: Enrich page and global widgets (links + menu references)
-  const enrichValue = (value) => {
-    if (isLinkObject(value)) {
-      if (value.pageUuid) return value;
-      const { href } = value;
-      if (!href || !href.endsWith(".html") || href.includes("://") || href.startsWith("#")) return value;
-      const slug = href.replace(".html", "");
-      const uuid = pageSlugToUuid.get(slug);
-      return uuid ? { ...value, pageUuid: uuid } : value;
-    }
-    if (typeof value === "string" && menuSlugToUuid.has(value)) {
-      return menuSlugToUuid.get(value);
-    }
-    // Richtext page-links: stamp data-page-uuid from the anchor's slug href. (Item-links
-    // in richtext are stamped post-seed, once collection items exist — see seedPresetCollections.)
-    if (typeof value === "string") {
-      return enrichRichtextLinkRefs(value, { pageSlugToUuid });
-    }
-    return value;
-  };
+  const enrichValue = createReferenceEnricher({ pageSlugToUuid, menuSlugToUuid });
 
   const widgetProcessor = (widget) => transformWidgetSettings(widget, enrichValue);
 

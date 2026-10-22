@@ -72,6 +72,8 @@ While you can't change themes, you have several layers of customization within y
 
 Theme settings apply across the whole site. In Arch, this includes things like colors, typography, spacing style, social links, animation behavior, favicon, date format, custom CSS, and optional scripts.
 
+You change them on the **Site settings** screen, or from the **Site settings** menu while editing a page. Both work on the same settings. See [Page Editor](page-editor.html#site-settings-screen) for how saving, **Reset** and discarding work.
+
 <figure class="doc-screenshot">
   <img src="assets/screenshots/theme-settings.png" alt="Widgetizer site settings screen showing the Colors tab with theme color swatches and hex value fields." loading="lazy">
   <figcaption>Theme settings expose the global controls the theme author has made customizable, such as colors and typography.</figcaption>
@@ -80,6 +82,13 @@ Theme settings apply across the whole site. In Arch, this includes things like c
 ### Widget Settings
 
 Each widget has its own controls. A gallery widget might control columns and image behavior; a banner widget might control heading text, layout, button links, color scheme, and spacing.
+
+### Header and Footer in Arch
+
+Arch's header and footer have a few settings worth knowing about:
+
+- **Show language switcher** (header, under **Languages**): lets visitors move between a page's languages. It's on by default and stays hidden on a site with one language. See [Languages](languages.html). Projects created before Arch 0.9.10 get it after you apply the theme update.
+- **Business Details** block (footer, and the **Contact Details** widget): shows the address, phone and email, and opening hours you entered in [Project details](projects.html#site-identity-and-business-details). Use **Show address**, **Show phone and email** and **Show opening hours** to choose what appears, and **Additional details** for anything else you want to add, such as parking or appointment notes.
 
 ### Content and Media
 
@@ -107,7 +116,7 @@ Widgetizer includes a theme update system that allows theme authors to release i
 
 When a theme author releases an update:
 
-1. **Notification**: The sidebar shows a badge indicating themes have updates available
+1. **Notification**: The **Manage** menu at the top right shows a badge when themes have updates available
 2. **Theme Page**: Visit the Themes page to see which themes have updates
 3. **Update**: Click **"Update"** on a theme card to install the latest version
 4. **Apply to Projects**: Projects using that theme will show an update indicator
@@ -121,9 +130,9 @@ your projects unexpectedly. The update is offered so you can take it when you're
 
 After a theme is updated:
 
-1. Go to the **Projects** page
-2. Look for the **update indicator** (arrow icon) next to projects using the updated theme
-3. Edit the project and click **"Apply Theme Update"**
+1. Go to the **Projects** screen and look for the **"Update available"** label next to projects using the updated theme
+2. Open the project (it becomes the active project)
+3. Choose **Manage › Project details** and click **"Apply Update"** in the **Theme Update Available** box
 4. The system updates your project's theme files while preserving your content
 
 ### What Gets Updated
@@ -153,7 +162,7 @@ When a theme update includes new settings:
 
 - **New settings** are added with their default values
 - **Your customized values** (colors, fonts, etc.) are preserved
-- **Removed settings** (deleted by theme author) are cleaned up
+- **Removed settings** (deleted by theme author) are cleaned up. If you had an unsaved change to one of them, Widgetizer tells you that change couldn't be saved.
 
 This means your design choices stay intact while you get access to new features.
 
@@ -167,7 +176,7 @@ You can remove a theme you no longer need from the Themes page:
 2. Choose **Delete**.
 3. Confirm in the dialog. Deletion cannot be undone.
 
-**Restriction:** You cannot delete a theme that is currently used by any project. If you try, Widgetizer shows an error explaining that the theme is in use. Remove or change the theme from those projects first (e.g. by deleting the projects or switching them to another theme), then delete the theme.
+**Restriction:** You cannot delete a theme that is currently used by any project. If you try, Widgetizer shows an error explaining that the theme is in use. Since a project's theme can't be changed, delete those projects first, then delete the theme.
 
 # Creating Your Own Theme
 

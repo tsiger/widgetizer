@@ -29,9 +29,27 @@ import {
   parsePresetGuide,
   parseWidgetGuide,
 } from "@widgetizer/core/guidance";
+import { isValidLanguageCode } from "@widgetizer/core/languages";
 import { validateCollectionSchema } from "../packages/builder-server/src/services/collectionService.js";
+import { isNewerVersion, sortVersions } from "../packages/builder-server/src/utils/semver.js";
 import { sanitizeVideoPath } from "../packages/builder-server/src/services/sanitizationService.js";
 import { buildContract } from "./build-theme-skill-contract.js";
+
+// Only a code a site can add can clash, so this starts from the app's own gate,
+// which refuses right-to-left languages and numeric regions (`ar`, `es-419`).
+// That gate accepts any `xx-anything`, but a real site adds a bare code (`it`)
+// or one with a real region or script (`pt-br`, `zh-hant`). Warning only on
+// those keeps prefixes like `my-work` quiet.
+const regionNames = new Intl.DisplayNames(["en"], { type: "region", fallback: "none" });
+const scriptNames = new Intl.DisplayNames(["en"], { type: "script", fallback: "none" });
+function looksLikeLanguageCode(prefix) {
+  if (!isValidLanguageCode(prefix)) return false;
+  const subtag = prefix.split("-")[1];
+  if (subtag === undefined) return true;
+  if (/^[a-z]{2}$/.test(subtag)) return regionNames.of(subtag.toUpperCase()) !== undefined;
+  if (/^[a-z]{4}$/.test(subtag)) return scriptNames.of(subtag[0].toUpperCase() + subtag.slice(1)) !== undefined;
+  return false;
+}
 
 export function validateTheme(dir) {
   const contract = buildContract();
@@ -126,6 +144,7 @@ export function validateTheme(dir) {
     "required",
     "usedAsTitle",
     "usedAsDate",
+    "usedAsImage",
     "options",
     "min",
     "max",
@@ -474,11 +493,11 @@ export function validateTheme(dir) {
     }
   }
 
-  function checkLabelKeys(file, json) {
+  function checkLabelKeys(file, json, locale = theme.locale) {
     walkStrings(json, (value) => {
       if (!value.startsWith("tTheme:")) return;
       const key = value.slice("tTheme:".length);
-      if (typeof valueAt(theme.locale, key) !== "string") {
+      if (typeof valueAt(locale, key) !== "string") {
         error(file, "unknown-label-key", `"${value}" has no matching string in locales/en.json (expected at ${key}).`);
       }
     });
@@ -1034,6 +1053,76 @@ export function validateTheme(dir) {
   // Collections
   // ---------------------------------------------------------------------------
 
+  /**
+   * The checks one collection's schema passes, wherever it comes from: the
+   * theme's own collection-types/ or an update layered over it. `prefixes` maps
+   * each item-page prefix already seen to its collection, so a repeat is
+   * reported; `locale` is the en.json its tTheme: labels resolve against, and
+   * `skipLabels` skips them when that file could not be read (its own finding says so).
+   * Returns the collection's fields.
+   */
+  function checkCollectionSchema(file, folder, schema, { hasTemplate, templateFile, prefixes, locale, skipLabels }) {
+    if (typeof schema.type !== "string" || !SLUG_RE.test(schema.type)) {
+      error(file, "collection-type", `"type" must match ${SLUG_RE}.`);
+    } else if (schema.type !== folder) {
+      error(file, "collection-type", `"type" is "${schema.type}" but the folder is "${folder}"; they must match.`);
+    }
+    if ("blocks" in schema)
+      error(
+        file,
+        "collection-schema",
+        "Collections have no blocks; items are flat records. Use a gallery or table field for repeated content.",
+      );
+
+    const fields = checkSettingDefinitions(file, schema.settings ?? [], "collection");
+    if (!Array.isArray(schema.settings)) error(file, "collection-schema", '"settings" must be an array of fields.');
+    for (const setting of Array.isArray(schema.settings) ? schema.settings : []) {
+      for (const key of ["multiple", "repeater", "blocks"]) {
+        if (isObject(setting) && key in setting)
+          error(file, "collection-schema", `field "${setting.id}": "${key}" is not supported.`);
+      }
+    }
+
+    const validation = validateCollectionSchema(schema, folder);
+    for (const message of validation.errors) error(file, "collection-schema", message);
+
+    if (schema.hasItemPages) {
+      const prefix = schema.slugPrefix ?? schema.type;
+      if (typeof prefix !== "string" || !SLUG_RE.test(prefix) || prefix === "assets") {
+        error(file, "collection-prefix", `slugPrefix "${prefix}" must match ${SLUG_RE} and cannot be "assets".`);
+      } else {
+        if (prefix === "page")
+          warn(
+            file,
+            "collection-prefix",
+            'slugPrefix "page" is where a homepage split into pages publishes its copies (page/2.html, page/3.html and so on). A site that splits its homepage cannot export while this collection exists. Use a different prefix.',
+          );
+        // A site's additional languages publish into folders named by their codes,
+        // and the theme cannot know which ones a site adds: a site using this code
+        // cannot add the language, and an update bringing this collection in is refused.
+        if (looksLikeLanguageCode(prefix))
+          warn(
+            file,
+            "collection-prefix",
+            `slugPrefix "${prefix}" has the shape of a language code. A site with a "${prefix}" language publishes its pages in the same ${prefix}/ folder, so it cannot add that language, and updates that bring this collection in are refused. Use a longer prefix.`,
+          );
+        if (prefixes.has(prefix))
+          error(
+            file,
+            "collection-prefix",
+            `slugPrefix "${prefix}" is also used by collection "${prefixes.get(prefix)}".`,
+          );
+        prefixes.set(prefix, schema.type);
+      }
+      if (!hasTemplate) {
+        error(templateFile, "required-file", '"hasItemPages" is true, so this collection needs a template.liquid.');
+      }
+    }
+
+    if (!skipLabels) checkLabelKeys(file, schema, locale);
+    return fields;
+  }
+
   function loadCollections() {
     const root = path.join(themeRoot, "collection-types");
     const prefixes = new Map();
@@ -1048,55 +1137,13 @@ export function validateTheme(dir) {
       const schema = readJson(file);
       if (!isObject(schema)) continue;
 
-      if (typeof schema.type !== "string" || !SLUG_RE.test(schema.type)) {
-        error(file, "collection-type", `"type" must match ${SLUG_RE}.`);
-      } else if (schema.type !== folder) {
-        error(file, "collection-type", `"type" is "${schema.type}" but the folder is "${folder}"; they must match.`);
-      }
-      if ("blocks" in schema)
-        error(
-          file,
-          "collection-schema",
-          "Collections have no blocks; items are flat records. Use a gallery or table field for repeated content.",
-        );
-
-      const fields = checkSettingDefinitions(file, schema.settings ?? [], "collection");
-      if (!Array.isArray(schema.settings)) error(file, "collection-schema", '"settings" must be an array of fields.');
-      for (const setting of Array.isArray(schema.settings) ? schema.settings : []) {
-        for (const key of ["multiple", "repeater", "blocks"]) {
-          if (isObject(setting) && key in setting)
-            error(file, "collection-schema", `field "${setting.id}": "${key}" is not supported.`);
-        }
-      }
-
-      const validation = validateCollectionSchema(schema, folder);
-      for (const message of validation.errors) error(file, "collection-schema", message);
-
-      if (schema.hasItemPages) {
-        const prefix = schema.slugPrefix ?? schema.type;
-        if (typeof prefix !== "string" || !SLUG_RE.test(prefix) || prefix === "assets") {
-          error(file, "collection-prefix", `slugPrefix "${prefix}" must match ${SLUG_RE} and cannot be "assets".`);
-        } else {
-          if (prefix === "page")
-            warn(file, "collection-prefix", 'slugPrefix "page" collides with pagination paths (page/2/...).');
-          if (prefixes.has(prefix))
-            error(
-              file,
-              "collection-prefix",
-              `slugPrefix "${prefix}" is also used by collection "${prefixes.get(prefix)}".`,
-            );
-          prefixes.set(prefix, schema.type);
-        }
-        if (!isFile(path.join(dir, "template.liquid"))) {
-          error(
-            path.join(dir, "template.liquid"),
-            "required-file",
-            '"hasItemPages" is true, so this collection needs a template.liquid.',
-          );
-        }
-      }
-
-      checkLabelKeys(file, schema);
+      const templateFile = path.join(dir, "template.liquid");
+      const fields = checkCollectionSchema(file, folder, schema, {
+        hasTemplate: isFile(templateFile),
+        templateFile,
+        prefixes,
+        locale: theme.locale,
+      });
       theme.collections.set(folder, { schema, fields, dir });
     }
   }
@@ -1899,6 +1946,219 @@ export function validateTheme(dir) {
     }
   }
 
+  /**
+   * The paths a version's deleted/ folder removes, as the app reads it: a file is
+   * a placeholder for that file, an empty folder removes that whole folder, and a
+   * folder with contents only holds deeper paths.
+   */
+  function deletedPaths(dir, relative = "") {
+    const paths = [];
+    const entries = readFolder(path.join(dir, relative));
+    for (const entry of entries ?? []) {
+      const entryPath = relative ? `${relative}/${entry.name}` : entry.name;
+      if (!entry.isDirectory()) {
+        paths.push(entryPath);
+        continue;
+      }
+      const children = readFolder(path.join(dir, entryPath));
+      if (children?.length === 0) paths.push(entryPath);
+      else if (children) paths.push(...deletedPaths(dir, entryPath));
+    }
+    return paths;
+  }
+
+  /** A folder's entries, or null (reported) when it cannot be read. */
+  function readFolder(folder) {
+    try {
+      return fs.readdirSync(folder, { withFileTypes: true });
+    } catch (cause) {
+      error(folder, "unreadable-file", `Cannot read folder: ${cause.message}`);
+      return null;
+    }
+  }
+
+  /**
+   * The collections and English strings a project gets once `versions` (ascending)
+   * are layered over the theme, as the app builds its latest snapshot: each
+   * version's files overwrite, then its deleted/ markers remove. A collection
+   * folder stays until its whole folder is deleted, keeping the schema and
+   * template files it ends up with (null when there is none), whether any version
+   * changed it, and the update path that last changed it or its template.
+   */
+  function layerCollections(versions) {
+    const collections = new Map();
+    for (const [folder, { dir }] of theme.collections) {
+      const template = path.join(dir, "template.liquid");
+      collections.set(folder, {
+        schema: path.join(dir, "schema.json"),
+        schemaFromUpdate: false,
+        template: isFile(template) ? template : null,
+        changedAt: dir,
+        templateChangedAt: null,
+        touched: false,
+      });
+    }
+    const english = path.join(themeRoot, "locales", "en.json");
+    const localeState = { file: isFile(english) ? english : null, changedAt: null };
+
+    for (const version of versions) {
+      const versionDir = path.join(themeRoot, "updates", version);
+      const typesDir = path.join(versionDir, "collection-types");
+      // The app copies an update over the theme file by file, and a file cannot
+      // replace a folder, so such an update fails to apply.
+      if (exists(typesDir) && !isDir(typesDir)) {
+        if (isDir(path.join(themeRoot, "collection-types")))
+          error(
+            typesDir,
+            "updates",
+            "This is a file where the theme has a collection-types/ folder; the update cannot apply.",
+          );
+        continue;
+      }
+      for (const entry of isDir(typesDir) ? fs.readdirSync(typesDir, { withFileTypes: true }) : []) {
+        const dir = path.join(typesDir, entry.name);
+        if (!entry.isDirectory()) {
+          if (collections.has(entry.name))
+            error(
+              dir,
+              "updates",
+              `This is a file where collection-types/${entry.name}/ is a folder; the update cannot apply.`,
+            );
+          continue;
+        }
+        const current = collections.get(entry.name) ?? { schema: null, template: null, templateChangedAt: null };
+        const schema = path.join(dir, "schema.json");
+        const template = path.join(dir, "template.liquid");
+        for (const [name, file] of [
+          ["schema.json", schema],
+          ["template.liquid", template],
+        ]) {
+          if (isDir(file))
+            error(
+              file,
+              "updates",
+              `This is a folder where collection-types/${entry.name}/${name} is a file; the update cannot apply.`,
+            );
+        }
+        collections.set(entry.name, {
+          schema: isFile(schema) ? schema : current.schema,
+          schemaFromUpdate: isFile(schema) || Boolean(current.schemaFromUpdate),
+          template: isFile(template) ? template : current.template,
+          changedAt: dir,
+          templateChangedAt: isFile(template) ? template : current.templateChangedAt,
+          touched: true,
+        });
+      }
+      const updatedEnglish = path.join(versionDir, "locales", "en.json");
+      if (isFile(updatedEnglish)) Object.assign(localeState, { file: updatedEnglish, changedAt: updatedEnglish });
+
+      const deletedDir = path.join(versionDir, "deleted");
+      for (const removed of isDir(deletedDir) ? deletedPaths(deletedDir) : []) {
+        const marker = path.join(deletedDir, removed);
+        const parts = removed.split("/");
+        if (removed === "locales" || removed === "locales/en.json")
+          Object.assign(localeState, { file: null, changedAt: marker });
+        if (parts[0] !== "collection-types") continue;
+        if (parts.length === 1) {
+          collections.clear();
+        } else if (parts.length === 2) {
+          collections.delete(parts[1]);
+        } else if (parts.length === 3 && collections.has(parts[1])) {
+          const current = collections.get(parts[1]);
+          if (parts[2] === "schema.json")
+            collections.set(parts[1], { ...current, schema: null, changedAt: marker, touched: true });
+          if (parts[2] === "template.liquid")
+            collections.set(parts[1], { ...current, template: null, templateChangedAt: marker, touched: true });
+        }
+      }
+    }
+    return { collections, localeState };
+  }
+
+  /**
+   * The collection checks, run on what the updates newer than the base leave
+   * behind, reported against the update that caused each problem. The theme's own
+   * collections are already checked, so an untouched one is only rechecked for
+   * labels that updated English strings no longer have; a folder at or below the
+   * base is never applied.
+   */
+  function checkUpdatedCollections() {
+    const base = theme.manifest?.version;
+    if (typeof base !== "string" || !VERSION_RE.test(base)) return;
+    const root = path.join(themeRoot, "updates");
+    const versions = sortVersions(
+      listDirs(root).filter(
+        (version) =>
+          VERSION_RE.test(version) && isFile(path.join(root, version, "theme.json")) && isNewerVersion(base, version),
+      ),
+    );
+    if (versions.length === 0) return;
+
+    const { collections, localeState } = layerCollections(versions);
+    // Only the English file the updates end with is read, so one a later version
+    // replaces is never reported. When it cannot be read, its own finding says so
+    // and labels are not checked against it.
+    let locale = theme.locale;
+    if (localeState.changedAt) locale = localeState.file ? readJson(localeState.file) : {};
+    const localeUnreadable = Boolean(localeState.changedAt) && locale === undefined;
+
+    // The prefixes of the theme's own collections that survive the updates, so an
+    // updated one that repeats them is reported against the update.
+    const prefixes = new Map();
+    for (const [folder, entry] of collections) {
+      const schema = theme.collections.get(folder)?.schema;
+      if (!entry.schemaFromUpdate && entry.schema && schema?.hasItemPages)
+        prefixes.set(schema.slugPrefix ?? schema.type, folder);
+    }
+
+    for (const [folder, entry] of collections) {
+      if (entry.template && entry.template === entry.templateChangedAt)
+        checkLiquid(entry.template, { kind: "item-template" });
+      if (!entry.schema) {
+        error(
+          entry.changedAt,
+          "required-file",
+          `Once the updates are applied, collection-types/${folder}/ has no schema.json.`,
+        );
+        continue;
+      }
+      if (!entry.schemaFromUpdate) {
+        // The theme's own schema, checked already: only what the updates changed
+        // around it can break it.
+        const schema = theme.collections.get(folder)?.schema;
+        if (entry.touched && schema?.hasItemPages && !entry.template)
+          error(
+            entry.templateChangedAt ?? entry.changedAt,
+            "required-file",
+            `Once the updates are applied, "${folder}" has item pages but no template.liquid.`,
+          );
+        if (localeState.changedAt && !localeUnreadable) {
+          walkStrings(schema, (value) => {
+            if (!value.startsWith("tTheme:")) return;
+            const key = value.slice("tTheme:".length);
+            if (typeof valueAt(theme.locale, key) === "string" && typeof valueAt(locale, key) !== "string")
+              error(
+                localeState.changedAt,
+                "unknown-label-key",
+                `Collection "${folder}" uses "${value}", which the updated locales/en.json no longer has.`,
+              );
+          });
+        }
+        continue;
+      }
+      if (!entry.touched) continue;
+      const schema = readJson(entry.schema);
+      if (!isObject(schema)) continue;
+      checkCollectionSchema(entry.schema, folder, schema, {
+        hasTemplate: Boolean(entry.template),
+        templateFile: entry.templateChangedAt ?? path.join(path.dirname(entry.schema), "template.liquid"),
+        prefixes,
+        locale,
+        skipLabels: localeUnreadable,
+      });
+    }
+  }
+
   function checkPackage() {
     for (const name of ["layout.liquid", "screenshot.png"]) {
       if (!isFile(path.join(themeRoot, name)))
@@ -1988,6 +2248,7 @@ export function validateTheme(dir) {
     checkWidgetGuides();
     checkThemeGuide();
     checkUpdates();
+    checkUpdatedCollections();
     checkPackage();
   }
 

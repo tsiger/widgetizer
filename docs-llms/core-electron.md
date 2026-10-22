@@ -280,9 +280,19 @@ The editor preview opens in a dedicated Electron `BrowserWindow` (`createPreview
 
 - Repeated preview opens **reuse the same preview window** if it already exists; if minimized it is restored, then shown and focused.
 - A new preview window is offset from the editor so it doesn't sit exactly on top when the editor isn't maximized.
-- The incoming `previewPath` arrives over IPC and is **untrusted**: it is validated by `isSafePreviewPath` (`electron/previewPath.js`) before being turned into a renderer URL. Unsafe paths are ignored. See that module for the rationale.
+- The incoming `previewPath` arrives over IPC and is **untrusted**: it is validated by `isSafePreviewPath` (`electron/previewPath.js`) before being turned into a renderer URL. It accepts exactly the standalone preview route shapes (`app/src/previewRoutes.jsx`): a page, a numbered copy, and a collection item, each with or without a language. Unsafe paths are ignored. See that module for the rationale.
 - The preview renderer's `will-prevent-unload` is overridden so a stuck `beforeunload` handler can't block closing.
 - In web builds, the editor uses a named browser tab for the same reuse behavior.
+
+## New Windows and Outside Links
+
+Every window (editor, preview, and the windows below) gets `applyWindowOpenPolicy`: a `window.open` or `target="_blank"` URL is classified by `windowOpenTarget` (`electron/windowOpenPolicy.js`) against the app server's origins (`127.0.0.1` and `localhost` on the reported port).
+
+- **App server pages** (an export, a media file such as a PDF or MP3) open in a plain `BrowserWindow` with no preload (`openContentWindow`), since they run site code.
+- **Other http(s) addresses** open in the system browser (`shell.openExternal`).
+- **Anything else** is refused.
+
+Inside a content window, `will-navigate` and `will-redirect` apply the same rule, so a link or redirect to another site goes to the browser instead of loading in the app. Redirects in iframes (`isMainFrame === false`) are left alone, so embedded maps and videos keep working. The Help menu's documentation link calls `shell.openExternal` directly; renderer links such as the changelog and live demos go through the preload's `openExternal` (http(s) only) or, as ordinary `_blank` links, through the window-open handler above.
 
 ## Error Handling
 

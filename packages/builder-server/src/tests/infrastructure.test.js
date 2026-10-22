@@ -304,6 +304,7 @@ describe("createEditorApp", () => {
         assert.equal(response.status, 200);
         assert.equal(response.headers.get("access-control-allow-origin"), origin);
         assert.equal(response.headers.get("access-control-allow-credentials"), null);
+        assert.match(response.headers.get("access-control-expose-headers") ?? "", /Content-Disposition/i);
       }
 
       const preflightOrigin = "http://localhost:3000";

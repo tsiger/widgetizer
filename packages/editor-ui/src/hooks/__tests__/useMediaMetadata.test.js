@@ -45,4 +45,15 @@ describe("useMediaMetadata", () => {
 
     expect(invalidateMediaCache).toHaveBeenCalledWith("proj-1");
   });
+
+  it("opens a file without a link back to the editor", () => {
+    window.open = vi.fn();
+    const { result } = renderHook(() =>
+      useMediaMetadata({ activeProject: ACTIVE_PROJECT, showToast: vi.fn(), setFiles: vi.fn() }),
+    );
+
+    result.current.handleFileView({ id: "file-1" });
+
+    expect(window.open).toHaveBeenCalledWith(expect.stringContaining("/media/file-1"), "_blank", "noopener,noreferrer");
+  });
 });

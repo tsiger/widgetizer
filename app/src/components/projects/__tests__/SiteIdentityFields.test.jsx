@@ -58,7 +58,13 @@ function Harness({
   );
 }
 
-const readiness = () => screen.getByRole("status").textContent;
+// The card lists every item; only a missing one has a button, named after it.
+const readiness = () =>
+  screen
+    .queryAllByRole("button")
+    .map((button) => button.getAttribute("aria-label") || "")
+    .filter((name) => name.includes("readinessItems"))
+    .join(" ");
 const logoFileInput = () => document.getElementById("identity-logo-file");
 
 beforeEach(() => {
@@ -138,15 +144,35 @@ describe("SiteIdentityFields — readiness", () => {
     await waitFor(() => expect(readiness()).toContain("forms.project.identity.readinessItems.logo"));
   });
 
-  it("shows nothing when nothing is missing", () => {
+  it("says the site is ready, with no progress or links, when nothing is missing", () => {
     render(<Harness identity={{ category: "person" }} siteUrl="https://ann.example" siteTitle="Ann" />);
-    expect(screen.queryByRole("status")).toBeNull();
+    expect(screen.getByRole("heading", { name: "forms.project.identity.readiness.allReady" })).toBeTruthy();
+    expect(screen.getByRole("status").textContent).toBe("forms.project.identity.readiness.allReady");
+    expect(readiness()).toBe("");
+  });
+
+  it("names the Site Title, or the Public Name with a note once one is set", async () => {
+    render(<Harness identity={{ category: "person" }} siteTitle="Ann" />);
+    const card = () => screen.getByRole("region", { name: "forms.project.identity.readiness.title" }).textContent;
+    expect(card()).toContain("forms.project.identity.readinessItems.name");
+    expect(card()).not.toContain("publicNameNote");
+
+    fireEvent.change(document.getElementById("identity-publicName"), { target: { value: "Ann's Studio" } });
+    await waitFor(() => expect(card()).toContain("forms.project.identity.readinessItems.publicName"));
+    expect(card()).toContain("forms.project.identity.readiness.publicNameNote");
+  });
+
+  it("lists what is already filled in alongside what is missing", () => {
+    render(<Harness identity={{ category: "person" }} siteTitle="Ann" />);
+    const card = screen.getByRole("region", { name: "forms.project.identity.readiness.title" });
+    expect(card.textContent).toContain("forms.project.identity.readinessItems.name");
+    expect(readiness()).toBe("forms.project.identity.readiness.add forms.project.identity.readinessItems.siteUrl");
   });
 
   it("hands a missing item to onGoTo", () => {
     const onGoTo = vi.fn();
     render(<Harness onGoTo={onGoTo} />);
-    fireEvent.click(screen.getByRole("button", { name: "forms.project.identity.readinessItems.name" }));
+    fireEvent.click(screen.getByRole("button", { name: /readinessItems.name$/ }));
     expect(onGoTo).toHaveBeenCalledWith("name");
   });
 });

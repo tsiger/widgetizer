@@ -10,9 +10,9 @@ The Media Library is your central hub for all the images used in your website. W
 
 1. Go to the **Media** page
 2. Drag files from your computer into the upload zone
-3. Or click **"Choose Files"** to browse
+3. Or click **"Select Files"** to browse
 
-You can upload multiple files at once. Widgetizer will process them in batches.
+You can upload multiple files at once. Widgetizer will process them in batches, and new uploads appear at the top of the library.
 
 ### Supported File Types
 
@@ -132,9 +132,10 @@ Each file can have metadata for accessibility and SEO:
 
 1. Click the **pencil icon** (Edit) on any file
 2. Add or update:
-   - **Alt Text**: Describes the image for screen readers and SEO
-   - **Title**: Optional title text
-3. Click **"Save"**
+   - **Alt Text**: Describes the image for screen readers and SEO (required)
+   - **Title**: Optional title text, often shown on hover
+   - **Caption**: Optional text shown under the image wherever the theme displays captions (images only)
+3. Click **"Save Changes"**
 
 <figure class="doc-screenshot">
   <img src="assets/screenshots/media-detail-drawer.png" alt="Widgetizer media metadata drawer showing an image preview, alt text field, title field, caption field, and Save Changes button." loading="lazy">
@@ -142,6 +143,22 @@ Each file can have metadata for accessibility and SEO:
 </figure>
 
 > **Tip:** Always add alt text to images for better accessibility and SEO.
+
+### Captions in Arch
+
+Arch shows an image's caption:
+
+- Under the **Image** widget
+- Under the featured image on News, Projects, and Services item pages
+- Under each image of a project or service gallery
+- In the **Gallery** widget, when an image block has no caption of its own
+- In the **Masonry Gallery** lightbox, when an image block has no title of its own
+
+Images inside rich text don't show captions. Existing projects get captions after applying the Arch 0.9.10 [theme update](themes.html).
+
+### Descriptions in Other Languages
+
+On a site with more than one [language](languages.html), the metadata drawer has a **Language** list at the top. The file itself is shared by every language; pick a language to give it its own alt text, title, and caption. A field you leave empty uses the main language's text, which is shown greyed out as a hint.
 
 ### Deleting Files
 
@@ -158,13 +175,17 @@ Each file can have metadata for accessibility and SEO:
 
 ### Delete Protection
 
-Widgetizer tracks which pages use which files. **You cannot delete a file that's currently being used** in:
+Widgetizer tracks where every file is used. **You cannot delete a file that's currently being used** in:
 
-- Page content (widgets)
-- Header widget
-- Footer widget
+- Page content (widgets, rich text, and the page's social media image)
+- Header and footer widgets
+- [Collection](collections.html) items, including their social media image
+- Theme settings, such as the site icon
+- The logo in your project's business details
 
-If you try to delete a file in use, you'll see an error message showing which pages are using it.
+This covers every language of your site. If you try to delete a file in use, you'll see an error message showing where it's used.
+
+Before deleting, Widgetizer checks your saved content again, so a file is protected even if its usage badge is out of date.
 
 # Usage Tracking
 
@@ -172,8 +193,8 @@ Widgetizer automatically tracks where your media files are being used. This help
 
 ### How It Works
 
-- When you save a page, Widgetizer scans its content for media files
-- Files are marked as "used in" specific pages
+- When you save a page, collection item, theme settings, or project details, Widgetizer scans the content for media files
+- Files are marked as "used in" those places, with the language named when it isn't the main one
 - The Media Library shows usage badges on each file
 
 ### Usage Badges
@@ -181,14 +202,14 @@ Widgetizer automatically tracks where your media files are being used. This help
 Files in both grid and list view display a badge when they're in use:
 
 - No badge: File isn't being used anywhere
-- "Used in N place(s)" badge: hover the badge to see exactly which pages or global widgets reference it
+- "Used in N place(s)" badge: hover the badge to see exactly which pages, collection items, or global widgets reference it
 
 ### Refreshing Usage
 
 If you think the usage tracking is out of sync, you can manually refresh it:
 
 1. Click the **"Refresh Usage"** button in the toolbar
-2. Widgetizer will rescan all pages and update the usage information
+2. Widgetizer will rescan all content and update the usage information
 
 # File Organization
 
@@ -196,19 +217,21 @@ If you think the usage tracking is out of sync, you can manually refresh it:
 
 When you upload a file, Widgetizer:
 
-1. Converts the filename to a URL-friendly format (lowercase, hyphens instead of spaces)
-2. Checks if that filename already exists
-3. If it exists, adds a number (e.g., `my-image-1.jpg`, `my-image-2.jpg`)
+1. Converts the filename to a URL-friendly format: lowercase, with spaces, underscores, and punctuation turned into hyphens so the words stay readable
+2. Converts accented letters and other alphabets to plain Latin letters (names that can't be converted become `image` or `file`)
+3. Shortens very long names to 60 characters, plus the extension
+4. Checks if that filename already exists (ignoring upper and lower case) and, if it does, adds a number (e.g., `my-image-1.jpg`, `my-image-2.jpg`)
 
-**Example:**
+**Examples:**
 
-- Upload: "My Awesome Photo.JPG"
-- Stored as: `my-awesome-photo.jpg`
+- "My Awesome Photo.JPG" is stored as `my-awesome-photo.jpg`
+- "logo (final)_v2.svg" is stored as `logo-final-v2.svg`
+- "Café déjà vu.png" is stored as `cafe-deja-vu.png`
 
 ### Storage Location
 
 - Images live at `/data/projects/your-project/uploads/images/`
-- Document files (PDFs) live at `/data/projects/your-project/uploads/files/`
+- Documents, audio, and video (PDF, MP3, MP4) live at `/data/projects/your-project/uploads/files/`
 
 Generated image sizes are stored with `-{size}` suffixes:
 
@@ -217,7 +240,7 @@ Generated image sizes are stored with `-{size}` suffixes:
 - `my-image-medium.jpg`
 - `my-image-large.jpg`
 
-PDFs are stored as-is without variants. During export, `/uploads/files/` paths are rewritten to `assets/files/` in the output.
+PDF, MP3, and MP4 files are stored as-is, without variants or conversion. During export, `/uploads/files/` paths are rewritten to `assets/files/` in the output.
 
 # Tips & Best Practices
 

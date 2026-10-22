@@ -345,6 +345,61 @@ describe("export — homepage copies clash with a collection published under pag
   });
 });
 
+// The main-language homepage is not split here, so only the per-language check
+// can catch it. As for the main language, a split homepage reserves its page/
+// folder against any collection prefixed "page", whether or not that collection
+// has items in the language yet: one added later would land on el/page/N.html.
+describe("export — a translated homepage's copies clash with a collection published under page/", () => {
+  const greekDir = () => path.join(getProjectPagesDir(PROJECT_FOLDER), "el");
+
+  before(async () => {
+    await storage.write(
+      scope,
+      "collection-types/archive/schema.json",
+      JSON.stringify({ ...NEWS_SCHEMA, type: "archive", displayName: "Archive", displayNamePlural: "Archive", slugPrefix: "page" }),
+    );
+    for (const [index, title] of GREEK_TITLES.entries()) {
+      const slug = title.toLowerCase();
+      const created = `2026-01-0${9 - index}T00:00:00.000Z`;
+      await storage.write(
+        scope,
+        `collections/news/el/${slug}.json`,
+        JSON.stringify({ id: slug, uuid: `u-el-${slug}`, slug, schemaVersion: 1, created, updated: created, settings: { title } }),
+      );
+    }
+    projectRepo.updateProject(PROJECT_ID, { languages: ["el"] }, { seeded: true });
+    await fs.outputFile(
+      path.join(greekDir(), "index.json"),
+      JSON.stringify({
+        name: "Arxiki",
+        slug: "index",
+        uuid: "p-el-home",
+        seo: { title: "Arxiki" },
+        widgets: grid({ limit: 2, paginate: true }),
+        widgetsOrder: ["w1"],
+      }),
+    );
+  });
+
+  after(async () => {
+    await fs.remove(greekDir());
+    await fs.remove(path.join(getProjectDir(PROJECT_FOLDER), "collections", "news", "el"));
+    await fs.remove(path.join(getProjectDir(PROJECT_FOLDER), "collection-types", "archive"));
+    projectRepo.updateProject(PROJECT_ID, { languages: [] }, { seeded: true });
+  });
+
+  it("refuses the export, naming the language folder and the collection", async () => {
+    await resetExports();
+    projectRepo.updateProject(PROJECT_ID, { cleanUrls: false });
+    const res = await runExport();
+    assert.equal(res._status, 400, JSON.stringify(res._json));
+    assert.equal(res._json.error, "Export failed: homepage pages clash with a collection");
+    assert.match(res._json.message, /"el" homepage/);
+    assert.match(res._json.message, /el\/page\/2\.html/);
+    assert.match(res._json.message, /Archive/);
+  });
+});
+
 describe("collection reads within one export", () => {
   it("slices every copy from the same read, even if the collection changes mid-export", async () => {
     const { buildCollectionRenderDeps } = await import("../services/renderingService.js");

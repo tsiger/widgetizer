@@ -36,7 +36,7 @@ The folder name is the type's machine id. Here's a complete `schema.json` (the A
     { "type": "text", "id": "title", "label": "Title", "required": true, "usedAsTitle": true },
     { "type": "date", "id": "date", "label": "Publication date", "usedAsDate": true },
     { "type": "textarea", "id": "excerpt", "label": "Excerpt" },
-    { "type": "image", "id": "featured_image", "label": "Featured image" },
+    { "type": "image", "id": "featured_image", "label": "Featured image", "usedAsImage": true },
     { "type": "richtext", "id": "body", "label": "Body", "allow_headings": true, "allow_images": true }
   ]
 }
@@ -50,7 +50,7 @@ The folder name is the type's machine id. Here's a complete `schema.json` (the A
 | `settings` | Yes | The item's fields (see below) |
 | `displayName` / `displayNamePlural` | No | Singular and plural labels shown in the editor |
 | `icon` | No | Icon id for the editor sidebar |
-| `slugPrefix` | No | URL/output prefix for item pages (defaults to `type`; `assets` is reserved) |
+| `slugPrefix` | No | URL/output prefix for item pages (defaults to `type`; must be unique; see [Item Addresses](#item-addresses)) |
 | `hasItemPages` | No | `true` → each item renders its own page (requires `template.liquid`) |
 | `defaultSort` | No | `manual`, `created_desc`, `created_asc`, `title_asc`, `title_desc`, `date_desc`, `date_asc` |
 | `schemaVersion` | No | Bookkeeping value carried onto items for future migrations |
@@ -64,6 +64,7 @@ A few flags are specific to collection fields:
 
 - **`usedAsTitle: true`:** exactly one `text` field. It supplies the item's title and its auto-generated slug.
 - **`usedAsDate: true`:** at most one `date` field. It becomes the sort key for `date_desc` / `date_asc` (items with a blank date sort last).
+- **`usedAsImage: true`:** at most one `image` field. Item pages use it as the social share image when the item has no SEO image of its own.
 - **`required: true`:** the item fails validation until the field has a value.
 
 # Listing Items: the `collection` filter
@@ -88,6 +89,8 @@ Each returned item has this shape:
 ```
 
 `url` is computed for the current page depth, so it's correct whether you link from the homepage or from another item page.
+
+The filter returns the items of the page's language only (see [Languages](#languages)).
 
 ### Example: a Card Grid
 
@@ -124,7 +127,7 @@ Each returned item has this shape:
 
 # Item Pages (template.liquid)
 
-When `hasItemPages: true`, add a `template.liquid` to the type folder. Each item renders as a standalone page at `slugPrefix/item-slug.html`.
+When `hasItemPages: true`, add a `template.liquid` to the type folder. Each item renders as a standalone page at `slugPrefix/item-slug.html` (`el/slugPrefix/item-slug.html` for another language).
 
 Item templates have access to two objects:
 
@@ -157,7 +160,7 @@ A few things happen automatically for item pages:
 
 - **They render inside your `layout.liquid`:** header, `main_content`, and footer wrap the template, just like a regular page.
 - **SEO is wired for you.** Title, description, Open Graph, and canonical tags come from the item; you don't add SEO markup in `template.liquid`.
-- **Links are depth-aware.** Item pages live one directory deep, so internal links and assets are prefixed with `../` during export. Use the `{% image %}` tag and `item.url` / menu links and it's handled; don't hand-build `/uploads/...` paths.
+- **Links are depth-aware.** Item pages live in a folder (`news/`, or `el/news/` for another language), so internal links and assets are prefixed with `../` or `../../` during export. Use the `{% image %}` tag, `item.url`, menu links and the `page_url` / `item_url` filters and it's handled; don't hand-build `/uploads/...` or relative paths.
 - **Richtext is escaped by default.** Render `richtext` fields with `| raw` (see [Autoescaping](theme-dev-liquid-assets.html#escaping-model)). Embedded images and internal links inside richtext resolve automatically.
 
 # Structured Data
@@ -199,28 +202,62 @@ Rules worth knowing:
 The theme ships the **schema and template**; the site owner's **item data** lives separately in the project:
 
 ```
-collection-types/{type}/schema.json      # from your theme
-collection-types/{type}/template.liquid  # from your theme
-collections/{type}/{slug}.json           # one file per item (authored by the user)
-collections/{type}/_order.json           # manual ordering (defaultSort: "manual")
+collection-types/{type}/schema.json       # from your theme
+collection-types/{type}/template.liquid   # from your theme
+collections/{type}/{slug}.json            # one file per item (authored by the user)
+collections/{type}/_order.json            # manual ordering (defaultSort: "manual")
+collections/{type}/{lang}/{slug}.json     # items in another site language
+collections/{type}/{lang}/_order.json     # that language's own manual order
 ```
 
-Theme updates can ship new/changed collection **types** (schema and template); the user's **items** under `collections/` are never touched.
+Theme updates can ship new/changed collection **types** (schema and template); the user's **items** under `collections/` are never touched. Seed demo items through a preset's `collections/` folder; they're added in the site's default language.
+
+# Languages
+
+On a multilingual site, one schema serves every language, but each language has its own items:
+
+- **Separate items.** An owner creates an item's version in another language from the original; from then on the two are edited independently, with their own fields, slug and SEO. Slugs are unique per language.
+- **Separate order.** Manual ordering is kept per language.
+- **No borrowing.** The `collection` filter returns the page's language only. A Greek listing with no Greek items is empty; it never shows English items. Plan an empty state for listings, ideally with a [`defaultKey`](theme-dev-localization.html#words-the-owner-can-edit-defaultkey) message.
+- **Per-language pagination.** A listing split into pages counts the current language's items, so languages can have different numbers of pages.
+- **Item pages.** `item.url`, `page.language` and `page.translations` are all set for the item's language, so the layout's language switcher links an item to its other versions.
+
+# Item Addresses
+
+Item pages publish into a folder named by the collection's effective `slugPrefix` (`slugPrefix`, or `type` when you leave it out). Pages and other languages publish into folders too, so a few names can collide:
+
+| Rule | What happens otherwise |
+| :-- | :-- |
+| `slugPrefix` is lowercase letters, numbers and hyphens, and not `assets` | The schema is invalid: the collection is left out and a theme upload containing it fails |
+| Every collection with item pages has its own prefix | Collections sharing a prefix are left out, and an upload or update that causes it fails |
+| Avoid `page` | A homepage split into pages publishes its copies at `page/2.html`, so a site with such a homepage can't export while this collection exists |
+| Avoid anything shaped like a language code (`de`, `fr`, `pt-br`) | Another language publishes into a folder named by its code, so a site can't add that language, an update bringing the collection in is refused, and export stops |
+
+Item slugs `index` and `page` are reserved, so owners can't create items with them.
+
+The theme checker reports the first two as errors and warns about `page` and language-code prefixes, both in the theme itself and in collections your update folders add:
+
+```bash
+npm run validate:theme -- themes/my-theme
+```
+
+A longer, descriptive prefix (`articles`, `our-work`) avoids every case. Changing a prefix later moves every item page's address, so choose it once.
 
 # Export Output
 
-When you export the site, each item page is written to `{slugPrefix}/{slug}.html` and included in `sitemap.xml`. With Markdown export enabled, a `.md` alternate is written too. Only collection types with `hasItemPages: true` and a `template.liquid` produce pages; types without item pages exist purely to feed widgets via the `collection` filter.
+When you export the site, each item page is written to `{slugPrefix}/{slug}.html`, or `{lang}/{slugPrefix}/{slug}.html` for another language, and included in `sitemap.xml`. With Markdown export enabled, a `.md` alternate is written too. Only collection types with `hasItemPages: true` and a `template.liquid` produce pages; types without item pages exist purely to feed widgets via the `collection` filter. Export stops before writing anything when an item fails validation or a collection with item pages has items but no `template.liquid`.
 
 # Authoring Checklist
 
 - [ ] `collection-types/{type}/schema.json` with a unique lowercase `type` matching the folder
-- [ ] Exactly one `usedAsTitle` text field; at most one `usedAsDate` date field
-- [ ] `slugPrefix` set (or rely on the default `type`)
+- [ ] Exactly one `usedAsTitle` text field; at most one `usedAsDate` date field; at most one `usedAsImage` image field
+- [ ] `slugPrefix` set (or rely on the default `type`), unique, and not `page` or a language code
 - [ ] If `hasItemPages: true`, a `template.liquid` that renders `item.settings.*`
 - [ ] Richtext fields rendered with `| raw`
 - [ ] For article-like types, a `structuredData` block that maps to visible fields
 - [ ] A widget (or page) that lists items via the `collection` filter
 - [ ] Seed demo items in a [preset](theme-dev-structure.html) so the type looks complete out of the box
+- [ ] Listings have an empty state, since a language may have no items
 
 # Related Pages
 

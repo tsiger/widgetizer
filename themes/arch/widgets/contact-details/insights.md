@@ -22,7 +22,7 @@ Each block is one column. With `first-featured` or `last-featured` the featured 
 - It is a utility section: it almost always belongs on `standard-primary` or `standard-secondary`. Highlight surfaces are for high-value content; a dark band around opening hours spends that emphasis for nothing.
 - A `menu_block` shows one level only; items nested under a parent are hidden. Give it a flat menu such as `footer-menu`, never the main navigation with dropdowns. Five to seven links read best.
 - `social_block` has no per-block settings: it shows the site's social profiles when any are set and nothing useful otherwise. Add the profiles first or leave the block out.
-- `business_details` renders nothing on the published site when the project details are empty; check the preview rather than assuming the column exists.
+- `business_details` shows nothing but its title on the published site when the project details are empty; check the preview rather than assuming the column has content. Its `text` (Additional details) is for the owner's own extra lines, such as parking or "by appointment", never a retyped address.
 - `first-featured` and `last-featured` widen one column by a full extra column; with two blocks that is a two-thirds/one-third split. Use `equal` when no block deserves the lead.
 - Any scheme other than `standard-primary` pads the content inside its own coloured band, so `top_spacing` and `bottom_spacing` set to `none` remove that inner padding rather than closing an outer gap. Under a filled section above, `small` gives the docked look.
 - Keep the `info` text to two or three short sentences; a long paragraph pushes the other columns far below their titles.

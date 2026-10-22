@@ -38,6 +38,11 @@
     },
     {
       "type": "page",
+      "title": "Page Editor",
+      "path": "page-editor.md"
+    },
+    {
+      "type": "page",
       "title": "Collections",
       "path": "collections.md"
     },
@@ -45,6 +50,11 @@
       "type": "page",
       "title": "Menus",
       "path": "menus.md"
+    },
+    {
+      "type": "page",
+      "title": "Languages",
+      "path": "languages.md"
     },
     {
       "type": "page",
@@ -124,6 +134,11 @@
       "type": "page",
       "title": "Menus & Snippets",
       "path": "theme-dev-menus-snippets.md"
+    },
+    {
+      "type": "page",
+      "title": "Localization",
+      "path": "theme-dev-localization.md"
     },
     {
       "type": "header",

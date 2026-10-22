@@ -388,7 +388,10 @@ describe("theme skill validator catches invented theme features", () => {
         manifest.settings.global = { ...rest, brand: typography, code: advanced };
       }),
     );
-    assert.deepEqual(moved.filter((f) => f.rule !== "group-name"), []);
+    assert.deepEqual(
+      moved.filter((f) => f.rule !== "group-name"),
+      [],
+    );
 
     const untagged = await findingsAfter("moved-reserved-untagged", async (dir) => {
       await editJson(path.join(dir, "theme.json"), (manifest) => {
@@ -409,7 +412,10 @@ describe("theme skill validator catches invented theme features", () => {
         manifest.settings.global.extra = [manifest.settings.global.advanced[0]];
       }),
     );
-    assert.ok(findings.some((f) => f.level === "warning" && f.rule === "duplicate-setting-id"), JSON.stringify(findings));
+    assert.ok(
+      findings.some((f) => f.level === "warning" && f.rule === "duplicate-setting-id"),
+      JSON.stringify(findings),
+    );
     assert.ok(!findings.some((f) => f.level === "error"), JSON.stringify(findings));
   });
 
@@ -582,6 +588,303 @@ echo local_title
       findings.some((finding) => finding.rule === "collection-schema" && finding.message.includes("usedAsTitle")),
       JSON.stringify(findings),
     );
+  });
+
+  it("warns about an item-page prefix shaped like a language code", async () => {
+    const schema = (type, extra) => ({
+      type,
+      hasItemPages: true,
+      settings: [{ id: "title", type: "text", label: "Title", usedAsTitle: true }],
+      ...extra,
+    });
+    const collection = async (dir, folder, json) => {
+      await fs.outputJson(path.join(dir, `collection-types/${folder}/schema.json`), json);
+      await fs.outputFile(path.join(dir, `collection-types/${folder}/template.liquid`), "{{ item.title }}");
+    };
+    const findings = await findingsAfter("language-prefix", async (dir) => {
+      await collection(dir, "services", schema("services", { slugPrefix: "it" }));
+      // The prefix defaults to the type, so a two-letter type is shaped like a code too.
+      await collection(dir, "me", schema("me"));
+      await collection(dir, "pt-br-work", schema("pt-br-work", { slugPrefix: "pt-br" }));
+      await collection(dir, "work", schema("work"));
+      await collection(dir, "zh-hant-work", schema("zh-hant-work", { slugPrefix: "zh-hant" }));
+      // Codes no site can add: a numeric region, and a right-to-left language.
+      await collection(dir, "es-419-work", schema("es-419-work", { slugPrefix: "es-419" }));
+      await collection(dir, "ar-work", schema("ar-work", { slugPrefix: "ar" }));
+      // Shaped like a code, but no real region or script follows the hyphen.
+      await collection(dir, "my-work", schema("my-work"));
+      await collection(dir, "ai-tools", schema("ai-tools"));
+      // A list-only collection writes no pages, so its prefix is never a folder.
+      await collection(dir, "de", { ...schema("de"), hasItemPages: false });
+    });
+    const flagged = findings
+      .filter((f) => f.level === "warning" && f.rule === "collection-prefix" && f.message.includes("language code"))
+      .map((f) => f.file)
+      .sort();
+    assert.deepEqual(
+      flagged,
+      ["me", "pt-br-work", "services", "zh-hant-work"].map((folder) => `collection-types/${folder}/schema.json`),
+      JSON.stringify(findings),
+    );
+  });
+
+  it("warns about an item-page prefix where a split homepage publishes its copies", async () => {
+    const findings = await findingsAfter("page-prefix", async (dir) => {
+      await fs.outputJson(path.join(dir, "collection-types/info/schema.json"), {
+        type: "info",
+        hasItemPages: true,
+        slugPrefix: "page",
+        settings: [{ id: "title", type: "text", label: "Title", usedAsTitle: true }],
+      });
+      await fs.outputFile(path.join(dir, "collection-types/info/template.liquid"), "{{ item.title }}");
+    });
+    assert.ok(
+      findings.some(
+        (f) =>
+          f.level === "warning" &&
+          f.file === "collection-types/info/schema.json" &&
+          f.rule === "collection-prefix" &&
+          f.message.includes("page/2.html"),
+      ),
+      JSON.stringify(findings),
+    );
+  });
+
+  it("still reports a collection's labels when the theme has no English strings", async () => {
+    const findings = await findingsAfter("no-english", async (dir) => {
+      await fs.remove(path.join(dir, "locales/en.json"));
+      await fs.outputJson(path.join(dir, "collection-types/work/schema.json"), {
+        type: "work",
+        displayName: "tTheme:collections.work",
+        settings: [{ id: "title", type: "text", label: "Title", usedAsTitle: true }],
+      });
+    });
+    assert.ok(
+      findings.some((f) => f.rule === "unknown-label-key" && f.file === "collection-types/work/schema.json"),
+      JSON.stringify(findings),
+    );
+  });
+
+  describe("collections an update brings in", () => {
+    const schema = (type, extra) => ({
+      type,
+      hasItemPages: true,
+      settings: [{ id: "title", type: "text", label: "Title", usedAsTitle: true }],
+      ...extra,
+    });
+    const collection = async (dir, folder, json, { template = true } = {}) => {
+      if (json) await fs.outputJson(path.join(dir, `collection-types/${folder}/schema.json`), json);
+      if (template)
+        await fs.outputFile(path.join(dir, `collection-types/${folder}/template.liquid`), "{{ item.title }}");
+    };
+    // An update folder over the starter's 1.0.0 base.
+    const update = async (dir, version, build) => {
+      const versionDir = path.join(dir, "updates", version);
+      const manifest = await fs.readJson(path.join(dir, "theme.json"));
+      await fs.outputJson(path.join(versionDir, "theme.json"), { ...manifest, version });
+      await build(versionDir);
+    };
+    const prefixFindings = (findings) =>
+      findings.filter(
+        (f) => f.rule === "collection-prefix" || f.rule === "required-file" || f.rule === "unknown-label-key",
+      );
+
+    it("checks an update's collection like the theme's own", async () => {
+      const findings = await findingsAfter("update-collection", async (dir) => {
+        await collection(dir, "work", schema("work"));
+        await update(dir, "1.1.0", async (versionDir) => {
+          await collection(versionDir, "services", schema("services", { slugPrefix: "it" }));
+          await collection(versionDir, "team", schema("team", { slugPrefix: "work" }));
+          await collection(versionDir, "blog", schema("blog"), { template: false });
+        });
+      });
+      const file = (folder, name = "schema.json") => `updates/1.1.0/collection-types/${folder}/${name}`;
+      const found = prefixFindings(findings).map((f) => [f.level, f.file, f.rule]);
+      assert.deepEqual(
+        found.sort(),
+        [
+          ["error", file("blog", "template.liquid"), "required-file"],
+          ["error", file("team"), "collection-prefix"],
+          ["warning", file("services"), "collection-prefix"],
+        ].sort(),
+        JSON.stringify(findings),
+      );
+    });
+
+    it("checks what the updates leave once layered: later versions win and deleted/ removes", async () => {
+      const findings = await findingsAfter("update-layering", async (dir) => {
+        await collection(dir, "work", schema("work"));
+        await update(dir, "1.1.0", async (versionDir) => {
+          await collection(versionDir, "services", schema("services", { slugPrefix: "it" }));
+          await collection(versionDir, "events", schema("events", { slugPrefix: "me" }));
+        });
+        await update(dir, "1.2.0", async (versionDir) => {
+          // Fixes 1.1.0's services prefix and drops its events collection.
+          await collection(versionDir, "services", schema("services", { slugPrefix: "services" }), { template: false });
+          await fs.ensureDir(path.join(versionDir, "deleted/collection-types/events"));
+          // Removes the theme's own work template while work keeps item pages.
+          await fs.outputFile(path.join(versionDir, "deleted/collection-types/work/template.liquid"), "");
+        });
+      });
+      assert.deepEqual(
+        prefixFindings(findings).map((f) => [f.level, f.file, f.rule]),
+        [["error", "updates/1.2.0/deleted/collection-types/work/template.liquid", "required-file"]],
+        JSON.stringify(findings),
+      );
+    });
+
+    it("needs a schema in every collection folder that survives the updates", async () => {
+      const findings = await findingsAfter("update-empty-folders", async (dir) => {
+        await collection(dir, "work", schema("work"));
+        await update(dir, "1.1.0", async (versionDir) => {
+          await fs.ensureDir(path.join(versionDir, "collection-types/empty"));
+          // Each file removed on its own: the folder itself stays.
+          await fs.outputFile(path.join(versionDir, "deleted/collection-types/work/schema.json"), "");
+          await fs.outputFile(path.join(versionDir, "deleted/collection-types/work/template.liquid"), "");
+        });
+      });
+      assert.deepEqual(
+        prefixFindings(findings)
+          .map((f) => [f.file, f.rule])
+          .sort(),
+        [
+          ["updates/1.1.0/collection-types/empty", "required-file"],
+          ["updates/1.1.0/deleted/collection-types/work/schema.json", "required-file"],
+        ],
+        JSON.stringify(findings),
+      );
+    });
+
+    it("refuses an update file where the theme has a folder, which the app cannot apply", async () => {
+      const findings = await findingsAfter("update-file-over-folder", async (dir) => {
+        await collection(dir, "work", schema("work"));
+        await update(dir, "1.1.0", (versionDir) => fs.outputFile(path.join(versionDir, "collection-types/work"), ""));
+        await update(dir, "1.2.0", (versionDir) => fs.outputFile(path.join(versionDir, "collection-types"), ""));
+      });
+      assert.deepEqual(
+        findings
+          .filter((f) => f.rule === "updates")
+          .map((f) => f.file)
+          .sort(),
+        ["updates/1.1.0/collection-types/work", "updates/1.2.0/collection-types"],
+        JSON.stringify(findings),
+      );
+    });
+
+    it("reads deeper deletion markers as removing only that deeper path", async () => {
+      const findings = await findingsAfter("update-deep-marker", async (dir) => {
+        await collection(dir, "work", schema("work"));
+        await update(dir, "1.1.0", (versionDir) =>
+          fs.outputFile(path.join(versionDir, "deleted/collection-types/work/template.liquid/child"), ""),
+        );
+      });
+      assert.deepEqual(prefixFindings(findings), [], JSON.stringify(findings));
+    });
+
+    it("rechecks the theme's own labels against English strings an update replaces", async () => {
+      const findings = await findingsAfter("update-locale-only", async (dir) => {
+        const english = await fs.readJson(path.join(dir, "locales/en.json"));
+        await fs.outputJson(path.join(dir, "locales/en.json"), { ...english, collections: { work: "Work" } });
+        await collection(dir, "work", schema("work", { displayName: "tTheme:collections.work" }));
+        await update(dir, "1.1.0", (versionDir) =>
+          // Not valid JSON, but 1.2.0 replaces it, so it is never what a project gets.
+          fs.outputFile(path.join(versionDir, "locales/en.json"), "{ broken"),
+        );
+        await update(dir, "1.2.0", (versionDir) => fs.outputJson(path.join(versionDir, "locales/en.json"), english));
+      });
+      assert.deepEqual(
+        findings.filter((f) => f.level === "error").map((f) => [f.file, f.rule]),
+        [["updates/1.2.0/locales/en.json", "unknown-label-key"]],
+        JSON.stringify(findings),
+      );
+    });
+
+    // Permission bits only lock a folder for an ordinary user on a POSIX system:
+    // Windows ignores them and root reads through them, so the test would prove nothing there.
+    const cannotLockFolders = process.platform === "win32" || process.getuid?.() === 0;
+    it("reports a deletion folder it cannot read and checks the rest", { skip: cannotLockFolders }, async () => {
+      const locked = path.join(TEST_ROOT, "mutations", "update-unreadable", "updates/1.1.0/deleted/assets/locked");
+      try {
+        const findings = await findingsAfter("update-unreadable", async (dir) => {
+          await update(dir, "1.1.0", async (versionDir) => {
+            await fs.outputFile(path.join(versionDir, "deleted/assets/locked/old.css"), "");
+            await fs.chmod(path.join(versionDir, "deleted/assets/locked"), 0o000);
+            await collection(versionDir, "services", schema("services", { slugPrefix: "it" }));
+          });
+        });
+        assert.deepEqual(
+          findings.filter((f) => f.rule === "unreadable-file").map((f) => f.file),
+          ["updates/1.1.0/deleted/assets/locked"],
+          JSON.stringify(findings),
+        );
+        assert.ok(
+          findings.some((f) => f.rule === "collection-prefix" && f.file.endsWith("services/schema.json")),
+          JSON.stringify(findings),
+        );
+      } finally {
+        // Unlocked, or the suite's cleanup cannot remove it.
+        await fs.chmod(locked, 0o755).catch(() => {});
+      }
+    });
+
+    it("checks the Liquid of a template an update brings in", async () => {
+      const findings = await findingsAfter("update-template-liquid", async (dir) => {
+        await collection(dir, "work", schema("work"));
+        await update(dir, "1.1.0", (versionDir) =>
+          // Only the template changes; the schema stays the theme's own.
+          fs.outputFile(path.join(versionDir, "collection-types/work/template.liquid"), "{% if item.title %}unclosed"),
+        );
+      });
+      assert.ok(
+        findings.some((f) => f.level === "error" && f.file === "updates/1.1.0/collection-types/work/template.liquid"),
+        JSON.stringify(findings),
+      );
+    });
+
+    it("refuses an update folder where a collection's schema or template is a file", async () => {
+      const findings = await findingsAfter("update-folder-over-file", async (dir) => {
+        await collection(dir, "work", schema("work"));
+        await update(dir, "1.1.0", (versionDir) =>
+          fs.outputFile(path.join(versionDir, "collection-types/work/schema.json/child"), ""),
+        );
+      });
+      assert.deepEqual(
+        findings.filter((f) => f.rule === "updates").map((f) => f.file),
+        ["updates/1.1.0/collection-types/work/schema.json"],
+        JSON.stringify(findings),
+      );
+    });
+
+    it("skips update folders at or below the base, which the app never applies", async () => {
+      const findings = await findingsAfter("update-at-base", async (dir) => {
+        await update(dir, "1.0.0", (versionDir) =>
+          collection(versionDir, "services", schema("services", { slugPrefix: "it" })),
+        );
+        await update(dir, "0.9.0", (versionDir) =>
+          collection(versionDir, "events", schema("events", { slugPrefix: "me" })),
+        );
+      });
+      assert.deepEqual(prefixFindings(findings), [], JSON.stringify(findings));
+    });
+
+    it("resolves an updated collection's labels against the updated English strings", async () => {
+      const findings = await findingsAfter("update-labels", async (dir) => {
+        await update(dir, "1.1.0", async (versionDir) => {
+          await collection(versionDir, "services", schema("services", { displayName: "tTheme:collections.services" }));
+          const english = await fs.readJson(path.join(dir, "locales/en.json"));
+          await fs.outputJson(path.join(versionDir, "locales/en.json"), {
+            ...english,
+            collections: { services: "Services" },
+          });
+          await collection(versionDir, "events", schema("events", { displayName: "tTheme:collections.events" }));
+        });
+      });
+      assert.deepEqual(
+        prefixFindings(findings).map((f) => [f.file, f.rule]),
+        [["updates/1.1.0/collection-types/events/schema.json", "unknown-label-key"]],
+        JSON.stringify(findings),
+      );
+    });
   });
 
   it("rejects duplicate order entries", async () => {

@@ -57,12 +57,20 @@ const REGION_SCRIPTS = new Map([
 
 /** Selectable languages, in their own names, ordered by English name. */
 export const SUPPORTED_LANGUAGES = [
+  { code: "af", name: "Afrikaans" },
   { code: "sq", name: "Shqip" },
+  { code: "am", name: "አማርኛ" },
   { code: "hy", name: "Հայերեն" },
+  { code: "az", name: "Azərbaycan" },
+  { code: "bn", name: "বাংলা" },
+  { code: "eu", name: "Euskara" },
+  { code: "be", name: "Беларуская" },
   { code: "bs", name: "Bosanski" },
   { code: "bg", name: "Български" },
+  { code: "my", name: "မြန်မာ" },
   { code: "ca", name: "Català" },
   { code: "zh", name: "中文" },
+  { code: "zh-hant", name: "中文（繁體）" },
   { code: "hr", name: "Hrvatski" },
   { code: "cs", name: "Čeština" },
   { code: "da", name: "Dansk" },
@@ -71,9 +79,11 @@ export const SUPPORTED_LANGUAGES = [
   { code: "et", name: "Eesti" },
   { code: "fi", name: "Suomi" },
   { code: "fr", name: "Français" },
+  { code: "gl", name: "Galego" },
   { code: "ka", name: "ქართული" },
   { code: "de", name: "Deutsch" },
   { code: "el", name: "Ελληνικά" },
+  { code: "gu", name: "ગુજરાતી" },
   { code: "hi", name: "हिन्दी" },
   { code: "hu", name: "Magyar" },
   { code: "is", name: "Íslenska" },
@@ -81,26 +91,43 @@ export const SUPPORTED_LANGUAGES = [
   { code: "ga", name: "Gaeilge" },
   { code: "it", name: "Italiano" },
   { code: "ja", name: "日本語" },
+  { code: "kk", name: "Қазақ" },
+  { code: "km", name: "ខ្មែរ" },
   { code: "ko", name: "한국어" },
+  { code: "lo", name: "ລາວ" },
   { code: "lv", name: "Latviešu" },
   { code: "lt", name: "Lietuvių" },
+  { code: "lb", name: "Lëtzebuergesch" },
   { code: "mk", name: "Македонски" },
   { code: "ms", name: "Bahasa Melayu" },
   { code: "mt", name: "Malti" },
+  { code: "mr", name: "मराठी" },
+  { code: "mn", name: "Монгол" },
+  { code: "ne", name: "नेपाली" },
   { code: "no", name: "Norsk" },
   { code: "pl", name: "Polski" },
   { code: "pt", name: "Português" },
+  { code: "pt-br", name: "Português (Brasil)" },
+  { code: "pa", name: "ਪੰਜਾਬੀ" },
   { code: "ro", name: "Română" },
   { code: "ru", name: "Русский" },
   { code: "sr", name: "Српски" },
+  { code: "si", name: "සිංහල" },
   { code: "sk", name: "Slovenčina" },
   { code: "sl", name: "Slovenščina" },
   { code: "es", name: "Español" },
+  { code: "sw", name: "Kiswahili" },
   { code: "sv", name: "Svenska" },
+  { code: "tl", name: "Tagalog" },
+  { code: "ta", name: "தமிழ்" },
+  { code: "te", name: "తెలుగు" },
   { code: "th", name: "ไทย" },
   { code: "tr", name: "Türkçe" },
   { code: "uk", name: "Українська" },
+  { code: "uz", name: "Oʻzbek" },
   { code: "vi", name: "Tiếng Việt" },
+  { code: "cy", name: "Cymraeg" },
+  { code: "zu", name: "isiZulu" },
 ];
 
 const NATIVE_NAMES = new Map(SUPPORTED_LANGUAGES.map(({ code, name }) => [code, name]));
@@ -180,8 +207,9 @@ export function hreflangCase(value) {
 export function nativeLanguageName(value) {
   const code = normalizeLanguageCode(value);
   if (!code) return "";
+  if (NATIVE_NAMES.has(code)) return NATIVE_NAMES.get(code);
   const base = code.split("-")[0];
-  const name = NATIVE_NAMES.get(code) ?? NATIVE_NAMES.get(base);
+  const name = NATIVE_NAMES.get(base);
   if (!name) return hreflangCase(code);
   return code === base ? name : `${name} (${hreflangCase(code).split("-").slice(1).join("-")})`;
 }

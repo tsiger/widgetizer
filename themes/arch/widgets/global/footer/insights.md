@@ -22,7 +22,7 @@ By default it is a dark `highlight-primary` band that ends the page firmly; on a
 - Blocks are laid out in their order, left to right. On phones they stack in the same order, so the most useful column (contact or menu) should not be last.
 - `menu_block` shows a flat list; submenus of the chosen menu are hidden. Point it at a shallow menu such as `footer-menu`, not at the nested `main-menu`.
 - `social_block` shows the profiles entered in Project details, or failing that the theme's social settings, with no per-block choice. With none set the column is just its title, so remove the block or fill in the profiles.
-- `business_details` and `social_block` render nothing from an empty Project details, which looks fine in the editor but leaves a bare title on the published site.
+- `business_details` and `social_block` show nothing from an empty Project details, which looks fine in the editor but leaves a bare title on the published site. Use the `text` (Additional details) of `business_details` for extra lines of the owner's own, not to retype the address.
 - `copyright` left blank removes the line and its divider, and the footer closes with even padding; a line with only spaces still counts as blank.
 - `logo_width` sizes the footer logo separately from the header's. A small mark reads well at 80 to 120; a wide wordmark may need 200 or more. Supply a light logo version when the footer is on a highlight scheme.
 - `badges_block` images are capped by `max_height`; mixed badge shapes line up by height, so wide badges look larger than square ones. A `badge_1_link` and its siblings are optional; link only to pages that verify the badge.

@@ -52,33 +52,40 @@ export function mediaLibraryProblem(mediaData, languages) {
 }
 
 /**
- * Every collection item's stored slug, which names its published page.
+ * Stored content must be readable before import can claim to restore it.
+ * Collection item slugs also name their published pages.
  * @param {string} dir - the unpacked backup
  * @returns {Promise<string|null>}
  */
-export async function collectionItemsProblem(dir) {
-  const collectionsDir = path.join(dir, "collections");
-  if (!(await fs.pathExists(collectionsDir))) return null;
+export async function contentFilesProblem(dir) {
   const files = [];
   const walk = async (folder) => {
     for (const entry of await fs.readdir(folder, { withFileTypes: true })) {
       const full = path.join(folder, entry.name);
       if (entry.isDirectory()) await walk(full);
-      else if (entry.isFile() && entry.name.endsWith(".json") && entry.name !== "_order.json") files.push(full);
+      else if (entry.isFile() && entry.name.endsWith(".json")) files.push(full);
     }
   };
-  await walk(collectionsDir);
+  for (const name of ["pages", "menus", "collections"]) {
+    const folder = path.join(dir, name);
+    if (await fs.pathExists(folder)) await walk(folder);
+  }
+  const themeFile = path.join(dir, "theme.json");
+  if (await fs.pathExists(themeFile)) files.push(themeFile);
 
   for (const file of files) {
+    const where = path.relative(dir, file).split(path.sep).join("/");
     let item;
     try {
-      item = await fs.readJson(file);
-    } catch {
-      continue; // an unreadable item is skipped when the collection is read, as it always was
+      // Not fs.readJson: it strips a byte-order mark that the app's own parse rejects.
+      item = JSON.parse((await fs.readFile(file)).toString("utf8"));
+    } catch (error) {
+      if (!(error instanceof SyntaxError)) throw error;
+      return `the content file ${where} is not valid JSON.`;
     }
+    if (!where.startsWith("collections/") || path.basename(file) === "_order.json") continue;
     const slug = item?.slug ?? item?.id;
     if (typeof slug !== "string" || !ITEM_SLUG.test(slug)) {
-      const where = path.relative(dir, file).split(path.sep).join("/");
       return `the collection item ${where} has the address ${JSON.stringify(slug ?? null)}, which is not a valid item address.`;
     }
   }

@@ -61,7 +61,7 @@ Header and footer are language-specific project singletons. Media files, menu ob
 
 ## Listing and pagination
 
-A collection-aware widget may mark this page as its collection's listing anchor, which also decides where that collection's items sit in [breadcrumbs](#breadcrumbs). Saving that claim clears competing anchors in the same language. Pagination implies the listing-anchor flag; only one widget per page may paginate, with a positive integer page size. Duplicating a page clears these flags; creating another-language version keeps them because it belongs to another language partition.
+A collection-aware widget may mark this page as its collection's listing anchor, which also decides where that collection's items sit in [breadcrumbs](#breadcrumbs). Saving that claim clears competing anchors in the same language. Pagination is independent of the anchor; only one widget per page may paginate, with a positive integer page size. Duplicating a page clears the anchor and keeps pagination; creating another-language version keeps them because it belongs to another language partition.
 
 The listing and its valid-item count use this page's language. Pager links, generated copies and their sitemap addresses stay in that language; an English count cannot determine a Greek page's number of copies. Live widget preview updates receive the page language too. Copy *N* is published at `<slug>/page/N.html` (homepage: `page/N.html`, under `<language>/` for another language) and its title gets a ` - N` suffix; see [addresses](../multilingual.md#addresses-and-identity). See [collection behavior](collection.md#listings-and-multilingual-output) and [export eligibility](../operations/output.md#which-languages-are-included).
 

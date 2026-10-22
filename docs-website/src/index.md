@@ -33,9 +33,17 @@ The [Media Library](media.html) is where your images live. Widgetizer resizes ea
 
 Build your site's [navigation menus](menus.html) with drag-and-drop. Create sub-menus and link each item to your pages.
 
+### Languages
+
+A site can be published in more than one [language](languages.html). Each language gets its own pages, menus, header and footer, written by you, while images and design settings are shared.
+
 ### Collections
 
 Some themes include [Collections](collections.html): repeatable content types like News, Projects, or Services. Each collection holds many items of the same shape, and the theme decides how they look. It's a lightweight CMS built right into the theme.
+
+# Desktop or Server
+
+Install **Widgetizer Desktop** on macOS or Windows, or run Widgetizer on your own server. See [Getting Started](getting-started.html).
 
 # Your Files, Your Site
 

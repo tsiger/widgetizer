@@ -129,7 +129,7 @@
   {% unless email_href contains 'mailto:' %}
     {% assign email_href = 'mailto:' | append: email_href %}
   {% endunless %}
-  <a href="{{ email_href | safe_url }}" class="social-link" aria-label="Email">
+  <a href="{{ email_href | safe_url }}" class="social-link" aria-label="{{ 'site.common.email' | t }}">
     {% render 'icon', icon: 'mail' %}
   </a>
 {% endif %}

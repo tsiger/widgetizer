@@ -63,7 +63,7 @@ All single-document operations resolve the requested language, defaulting to the
 | Edit details | Preserve UUID, creation date, group; sanitize SEO; optional rename | Preserve widgets when omitted; validate slug conflict; a self-referencing parent is dropped and the save succeeds |
 | Save editor content | Persist widget map/order/settings and page metadata | Enforce widget count and pagination; update usage; may move another page's listing anchor |
 | Rename | Write new filename, preserve stable identity, then remove old file | UUID-backed links follow current slug; old-file removal is best effort |
-| Duplicate | New UUID/group and unique copy name/slug; copy content | Clear listing/pagination flags; retain referenced shared media and add usage |
+| Duplicate | New UUID/group and unique copy name/slug; copy content | Clear the listing anchor, keep pagination; retain referenced shared media and add usage |
 | Delete | Remove this version | Clear usage and attempt reference cleanup; leave siblings/assets intact |
 | Bulk delete | Process IDs in selected language and collect outcomes | Supports partial success; inspect actual successful deletions and cleanup behavior |
 | Claim listing/pagination | Validate widget schema/page size; save claim | Clear competing anchors/pagination within the same language; report moved anchors |

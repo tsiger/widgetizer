@@ -1,8 +1,9 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useState } from "react";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 import { isStandalonePreviewNavigationUrl } from "@widgetizer/editor-ui/utils/previewLinkUtils";
+import { detachPreviewFromOpener } from "@widgetizer/editor-ui/lib/openSitePreview";
 import PreviewModeToggle from "@widgetizer/editor-ui/components/preview/PreviewModeToggle.jsx";
 import PreviewStage, { STANDALONE_SANDBOX } from "@widgetizer/editor-ui/components/preview/PreviewStage.jsx";
 import DebugStatePanel from "../components/dev/DebugStatePanel";
@@ -30,6 +31,10 @@ export default function SitePreviewLayout() {
     setResolvedPath(location.pathname);
     setPreview({ src: null, loading: true, notFound: false });
   }
+
+  // Before the site frame loads (a layout effect runs ahead of the children's
+  // effects that set its src), so the site's scripts cannot reach the editor.
+  useLayoutEffect(() => detachPreviewFromOpener(), []);
 
   // Follow links clicked inside the preview iframe (page<->page, page<->item).
   useEffect(() => {

@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { MemoryRouter, Route, Routes } from "react-router-dom";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { MemoryRouter, Route, Routes, RouterProvider, createMemoryRouter } from "react-router-dom";
 
 const getAllProjects = vi.fn();
 const updateProject = vi.fn();
@@ -39,9 +39,10 @@ vi.mock("@widgetizer/editor-ui/components/layout/PageLayout.jsx", () => ({
   default: ({ children }) => <div>{children}</div>,
 }));
 vi.mock("../../components/projects/ProjectForm.jsx", () => ({
-  default: ({ onSubmit }) => (
+  default: ({ onSubmit, initialData }) => (
     <>
       <p>project form</p>
+      <p>theme: {initialData?.themeName || initialData?.theme}</p>
       <button type="button" onClick={() => onSubmit({ name: "Bakery", folderName: "bakery-new" })}>
         submit form
       </button>
@@ -154,5 +155,133 @@ describe("ProjectsEdit — folder rename", () => {
     const { showToast } = useToastStore.getState();
     await waitFor(() => expect(showToast).toHaveBeenCalled());
     expect(showToast).toHaveBeenCalledWith(expect.any(String), "success");
+  });
+});
+
+describe("ProjectsEdit — saving details", () => {
+  beforeEach(() => {
+    storeState = { activeProject: { id: "p1" }, loading: false, setActiveProject: vi.fn() };
+    getAllProjects.mockResolvedValue([
+      { id: "p1", name: "Bakery", folderName: "bakery", theme: "arch", themeName: "Arch" },
+    ]);
+    getActiveProject
+      .mockReset()
+      .mockResolvedValue({ id: "p1", name: "Bakery", folderName: "bakery-new", theme: "arch" });
+    useToastStore.getState().showToast.mockReset();
+  });
+
+  it("keeps the theme's display name after a save, though the reply has only its id", async () => {
+    updateProject.mockReset().mockResolvedValue({ id: "p1", name: "Bakery", folderName: "bakery-new", theme: "arch" });
+    openDetails("p1");
+    expect(await screen.findByText("theme: Arch")).toBeTruthy();
+
+    fireEvent.click(screen.getByText("submit form"));
+    await waitFor(() => expect(useToastStore.getState().showToast).toHaveBeenCalled());
+    expect(screen.getByText("theme: Arch")).toBeTruthy();
+  });
+});
+
+// Whether an update is offered depends on "Receive Theme Updates", which this
+// screen saves; the banner follows the saved setting without a reload.
+describe("ProjectsEdit — the update banner after a save", () => {
+  beforeEach(() => {
+    storeState = { activeProject: { id: "p1" }, loading: false, setActiveProject: vi.fn() };
+    getAllProjects.mockResolvedValue([{ id: "p1", name: "Bakery", folderName: "bakery" }]);
+    getActiveProject.mockReset().mockResolvedValue({ id: "p1", name: "Bakery", folderName: "bakery-new" });
+    updateProject.mockReset().mockResolvedValue({ id: "p1", name: "Bakery", folderName: "bakery-new" });
+  });
+
+  it("appears when the save turns updates on", async () => {
+    checkThemeUpdates
+      .mockResolvedValueOnce({ hasUpdate: false })
+      .mockResolvedValueOnce({ hasUpdate: true, currentVersion: "1.0.0", latestVersion: "1.1.0" });
+    openDetails("p1");
+    fireEvent.click(await screen.findByText("submit form"));
+
+    expect(await screen.findByRole("button", { name: /apply update/i })).toBeInTheDocument();
+  });
+
+  it("follows the latest check when an earlier one answers late", async () => {
+    let answerFirstSave;
+    checkThemeUpdates
+      .mockResolvedValueOnce({ hasUpdate: false })
+      .mockImplementationOnce(
+        () =>
+          new Promise((resolve) => {
+            answerFirstSave = resolve;
+          }),
+      )
+      .mockResolvedValueOnce({ hasUpdate: false });
+    openDetails("p1");
+    fireEvent.click(await screen.findByText("submit form"));
+    await waitFor(() => expect(checkThemeUpdates).toHaveBeenCalledTimes(2));
+    fireEvent.click(screen.getByText("submit form"));
+    await waitFor(() => expect(checkThemeUpdates).toHaveBeenCalledTimes(3));
+
+    answerFirstSave({ hasUpdate: true, currentVersion: "1.0.0", latestVersion: "1.1.0" });
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(screen.queryByRole("button", { name: /apply update/i })).toBeNull();
+  });
+
+  it("still checks when reloading the active project after the save fails", async () => {
+    getActiveProject.mockReset().mockRejectedValue(new Error("offline"));
+    checkThemeUpdates
+      .mockResolvedValueOnce({ hasUpdate: false })
+      .mockResolvedValueOnce({ hasUpdate: true, currentVersion: "1.0.0", latestVersion: "1.1.0" });
+    openDetails("p1");
+    fireEvent.click(await screen.findByText("submit form"));
+
+    expect(await screen.findByRole("button", { name: /apply update/i })).toBeInTheDocument();
+  });
+
+  it("ignores a project the page has since left", async () => {
+    // An Apply Update on p1 finishes after the page has moved to p2; its
+    // reload must not put p1's details or banner on p2's page.
+    let finishApply;
+    getAllProjects.mockResolvedValue([
+      { id: "p1", name: "Bakery" },
+      { id: "p2", name: "Café" },
+    ]);
+    checkThemeUpdates.mockImplementation((projectId) =>
+      Promise.resolve(
+        projectId === "p1"
+          ? { hasUpdate: true, currentVersion: "1.0.0", latestVersion: "1.1.0" }
+          : { hasUpdate: false },
+      ),
+    );
+    applyThemeUpdate.mockImplementation(
+      () =>
+        new Promise((resolve) => {
+          finishApply = resolve;
+        }),
+    );
+    const router = createMemoryRouter(
+      [
+        { path: "/projects/edit/:id", element: <ProjectsEdit /> },
+        { path: "/projects", element: <p>projects list</p> },
+      ],
+      { initialEntries: ["/projects/edit/p1"] },
+    );
+    render(<RouterProvider router={router} />);
+    fireEvent.click(await screen.findByRole("button", { name: /apply update/i }));
+
+    storeState = { ...storeState, activeProject: { id: "p2" } };
+    await act(() => router.navigate("/projects/edit/p2"));
+    await waitFor(() => expect(screen.queryByRole("button", { name: /apply update/i })).toBeNull());
+
+    await act(async () => finishApply({ success: true, previousVersion: "1.0.0", newVersion: "1.1.0" }));
+    await act(async () => {});
+    expect(screen.queryByRole("button", { name: /apply update/i })).toBeNull();
+  });
+
+  it("goes away when the save turns updates off", async () => {
+    checkThemeUpdates
+      .mockResolvedValueOnce({ hasUpdate: true, currentVersion: "1.0.0", latestVersion: "1.1.0" })
+      .mockResolvedValueOnce({ hasUpdate: false });
+    openDetails("p1");
+    await screen.findByRole("button", { name: /apply update/i });
+    fireEvent.click(screen.getByText("submit form"));
+
+    await waitFor(() => expect(screen.queryByRole("button", { name: /apply update/i })).toBeNull());
   });
 });

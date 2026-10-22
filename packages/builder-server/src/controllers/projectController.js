@@ -1,7 +1,7 @@
 import fs from "fs-extra";
 import { isSafePathSegment } from "../utils/pathSecurity.js";
 import { extractZipSafely, openZip, readZipEntry, UnsafeZipError } from "../utils/zipSafety.js";
-import { mediaLibraryProblem, collectionItemsProblem } from "../utils/backupContentChecks.js";
+import { mediaLibraryProblem, contentFilesProblem } from "../utils/backupContentChecks.js";
 import path from "path";
 import * as themeController from "./themeController.js";
 import archiver from "archiver";
@@ -1078,7 +1078,7 @@ export async function exportProject(req, res) {
 
     // Create export manifest
     const manifest = {
-      formatVersion: "1.1",
+      formatVersion: BACKUP_FORMAT_VERSION,
       exportedAt: new Date().toISOString(),
       widgetizerVersion: appVersion,
       project: {
@@ -1261,6 +1261,27 @@ class BackupRefusedError extends Error {
   }
 }
 
+const BACKUP_FORMAT_VERSION = "1.1";
+
+/**
+ * Why this version cannot read a backup's format, or null. A newer format is
+ * refused even for a minor step: what it added would be dropped without a word.
+ * Backups from before the field existed carry none and import as always.
+ * @returns {string|null} the whole user-facing error
+ */
+function backupFormatProblem(manifest) {
+  const version = manifest?.formatVersion;
+  if (version === undefined) return null;
+  const match = typeof version === "string" ? /^(\d+)\.(\d+)$/.exec(version) : null;
+  if (!match) return refusedBackupMessage(`its format version ${JSON.stringify(version)} is not a version number.`);
+  const [major, minor] = BACKUP_FORMAT_VERSION.split(".").map(Number);
+  const [theirMajor, theirMinor] = [Number(match[1]), Number(match[2])];
+  if (theirMajor < major || (theirMajor === major && theirMinor <= minor)) return null;
+  const maker = manifest.widgetizerVersion;
+  const madeBy = typeof maker === "string" && /^\d+\.\d+\.\d+$/.test(maker) ? ` (${maker})` : "";
+  return `This backup was made by a newer version of Widgetizer${madeBy} and uses a backup format this version cannot read. The project was not imported, so nothing has changed and your backup file is untouched. Update Widgetizer to import it.`;
+}
+
 function refusedBackupMessage(problem) {
   return `This backup cannot be imported: ${problem} A backup made by Widgetizer never contains this, so the file may have been changed. The project was not imported.`;
 }
@@ -1300,7 +1321,7 @@ function importManifestProblem(project) {
 
 /**
  * Why an unpacked backup's content cannot be imported, or null: its media
- * library's paths and translation languages, and its collection item slugs.
+ * library's paths and translation languages, readable content JSON, and item slugs.
  * @param {string} dir - the unpacked backup
  * @param {string[]} languages - the project's languages other than the default
  */
@@ -1316,7 +1337,7 @@ async function backupContentProblem(dir, languages) {
     const problem = mediaLibraryProblem(mediaData, languages);
     if (problem) return problem;
   }
-  return collectionItemsProblem(dir);
+  return contentFilesProblem(dir);
 }
 
 /**
@@ -1392,6 +1413,9 @@ export async function importProject(req, res) {
       if (error instanceof UnsafeZipError) return res.status(400).json({ error: error.message });
       return res.status(400).json({ error: "Invalid project export: corrupted manifest file" });
     }
+
+    const formatProblem = backupFormatProblem(manifest);
+    if (formatProblem) return res.status(400).json({ error: formatProblem });
 
     // Validate manifest structure
     if (!manifest.project || !manifest.project.name || !manifest.project.theme) {
@@ -1684,6 +1708,9 @@ export async function applyProjectThemeUpdate(req, res) {
   } catch (error) {
     rethrowIfLocked(error);
     console.error("Error applying theme update:", error);
+    if (error.statusCode) {
+      return res.status(error.statusCode).json({ error: error.message });
+    }
     if (error.message.includes("not found")) {
       return res.status(404).json({ error: error.message });
     }

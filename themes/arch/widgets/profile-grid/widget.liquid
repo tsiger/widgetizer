@@ -195,7 +195,7 @@
                       </a>
                     {% endif %}
                     {% if block.settings.email != blank %}
-                      <a href="mailto:{{ block.settings.email }}" class="profile-social-link" aria-label="Email" data-setting="email">
+                      <a href="mailto:{{ block.settings.email }}" class="profile-social-link" aria-label="{{ 'site.common.email' | t }}" data-setting="email">
                         {% render 'icon', icon: 'mail' %}
                       </a>
                     {% endif %}
@@ -324,7 +324,7 @@
                     </a>
                   {% endif %}
                   {% if block.settings.email != blank %}
-                    <a href="mailto:{{ block.settings.email }}" class="profile-social-link" aria-label="Email" data-setting="email">
+                    <a href="mailto:{{ block.settings.email }}" class="profile-social-link" aria-label="{{ 'site.common.email' | t }}" data-setting="email">
                       {% render 'icon', icon: 'mail' %}
                     </a>
                   {% endif %}

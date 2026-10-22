@@ -72,7 +72,7 @@ async function assertCodeIsFree(storage, scope, code) {
   const clash = schemas.find((schema) => schema.hasItemPages && schema.slugPrefix === code);
   if (clash) {
     throw new LanguageError(
-      `"${code}" is already the URL prefix of the "${clash.displayName || clash.type}" collection. Change that prefix before adding the language.`,
+      `"${code}" pages would be published in the ${code}/ folder, where the "${clash.displayNamePlural || clash.type}" collection publishes its items, so they could overwrite each other. Your theme sets that folder name, so this language can't be added with the current theme version.`,
     );
   }
 }

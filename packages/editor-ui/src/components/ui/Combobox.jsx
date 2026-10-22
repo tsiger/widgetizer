@@ -1,12 +1,19 @@
 import { useState, useRef, useEffect } from "react";
 import { ChevronDown } from "lucide-react";
 import ComboboxOptionList from "./ComboboxOptionList.jsx";
+import ComboboxLanguageBadge from "./ComboboxLanguageBadge.jsx";
+import { useIsMultilang } from "../../stores/projectStore";
 
 export default function Combobox({ options, value, onChange, placeholder }) {
   const [isOpen, setIsOpen] = useState(false);
   const [displayValue, setDisplayValue] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const containerRef = useRef(null);
+  const isMultilang = useIsMultilang();
+  // Only while the field shows the selected target, not text being typed over it.
+  const selectedOption = options.find((option) => option.value === value);
+  const badgeLanguage =
+    isMultilang && selectedOption && displayValue === selectedOption.label ? selectedOption.language : undefined;
 
   useEffect(() => {
     const selectedOption = options.find((option) => option.value === value);
@@ -75,8 +82,9 @@ export default function Combobox({ options, value, onChange, placeholder }) {
             setSearchTerm("");
           }}
           placeholder={placeholder}
-          className="form-input w-full pr-10"
+          className={`form-input w-full ${badgeLanguage ? "pr-20" : "pr-10"}`}
         />
+        {badgeLanguage && <ComboboxLanguageBadge language={badgeLanguage} />}
         <button
           type="button"
           onClick={toggleDropdown}

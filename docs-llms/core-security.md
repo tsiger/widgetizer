@@ -33,6 +33,7 @@ All incoming data is validated and sanitized before reaching controllers.
 - **`date`** — `sanitizeDateValue`: coerces to a valid `YYYY-MM-DD` calendar date or `""` (rejects impossible dates like `2026-02-30`).
 - **`code`** — intentionally not sanitized or transformed (embeds, custom CSS/JS). Normal `{{ value }}` Liquid output still autoescapes; code only becomes executable/markup when a template emits it through an explicit raw sink such as `| raw` or the custom CSS/head/footer script tags.
 - Theme-setting scalars (`color`, `number`/`range`, `checkbox`, `select`/`radio`, `font_picker`) are type-validated and fall back to the schema default when invalid.
+- **`number` / `range`** in widget, block and collection-item settings are clamped to the schema's `min`/`max` before render, so a value stored out of range renders inside it; `""` (a cleared number) and non-numeric values are left as they are. The editor's number input clamps on blur too, and `planPagination` clamps the per-page value the same way so the pager counts the pages the list renders.
 
 The image-path allowlists are strict allowlists (not blocklists) because the value can reach an unescaped `<img src>` sink — see §12.
 
@@ -51,7 +52,7 @@ The image-path allowlists are strict allowlists (not blocklists) because the val
 
 ### 4. Cross-Origin Resource Sharing (CORS)
 
-- Local origins only (`applySharedMiddleware` in `createApp.js`): `cors` is given an origin predicate that allows `http:`/`https:` origins on `localhost`, `127.0.0.1` and `[::1]` (any port), plus requests with no `Origin` header. That keeps the dev split-origin flow (Vite :3000 → API :3001) working; same-origin consumers (Electron, the packaged web build serving the SPA) need no CORS at all. Any other origin gets no `Access-Control-Allow-Origin` header, so a foreign website open in the same browser cannot read the unauthenticated local API cross-origin. A configurable, environment-specific allowlist for embedding hosts is still [pending](#cors--csp-hardening).
+- Local origins only (`applySharedMiddleware` in `createApp.js`): `cors` is given an origin predicate that allows `http:`/`https:` origins on `localhost`, `127.0.0.1` and `[::1]` (any port), plus requests with no `Origin` header. That keeps the dev split-origin flow (Vite :3000 → API :3001) working; same-origin consumers (Electron, the packaged web build serving the SPA) need no CORS at all. Allowed origins may also read `Content-Disposition` (`exposedHeaders`), so the dev editor saves a backup under the server's timestamped file name. Any other origin gets no `Access-Control-Allow-Origin` header, so a foreign website open in the same browser cannot read the unauthenticated local API cross-origin. A configurable, environment-specific allowlist for embedding hosts is still [pending](#cors--csp-hardening).
 
 ### 5. Multi-layered SVG Sanitization
 

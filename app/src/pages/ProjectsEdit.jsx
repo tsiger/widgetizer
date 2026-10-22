@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { ChevronLeft, RefreshCw } from "lucide-react";
@@ -21,7 +21,15 @@ import useProjectStore from "@widgetizer/editor-ui/stores/projectStore";
 import useThemeStore from "@widgetizer/editor-ui/stores/themeStore";
 import useGuardedFormPage from "@widgetizer/editor-ui/hooks/useGuardedFormPage";
 
+// One page per project: moving to another project's details starts a fresh
+// page, so a load, save or update still running for the previous project can
+// only touch the page it started on.
 export default function ProjectsEdit() {
+  const { id } = useParams();
+  return <ProjectDetails key={id} />;
+}
+
+function ProjectDetails() {
   const { t } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
@@ -50,6 +58,20 @@ export default function ProjectsEdit() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, isActiveProject]);
 
+  // Whether to offer a theme update; the answer also depends on the project's
+  // "Receive Theme Updates" setting, so a save asks again. Only the latest
+  // check is used: an earlier one answering late would bring back a stale banner.
+  const updateCheck = useRef(0);
+  const refreshUpdateStatus = async () => {
+    const check = ++updateCheck.current;
+    try {
+      const status = await checkThemeUpdates(id);
+      if (check === updateCheck.current) setUpdateStatus(status);
+    } catch (updateErr) {
+      console.warn("Could not check for theme updates:", updateErr);
+    }
+  };
+
   const loadProject = async () => {
     try {
       const projects = await getAllProjects();
@@ -59,14 +81,7 @@ export default function ProjectsEdit() {
         return;
       }
       setProject(project);
-
-      // Check for theme updates
-      try {
-        const status = await checkThemeUpdates(id);
-        setUpdateStatus(status);
-      } catch (updateErr) {
-        console.warn("Could not check for theme updates:", updateErr);
-      }
+      await refreshUpdateStatus();
     } catch (err) {
       showToast(err.message || t("projectsEdit.toasts.loadError"), "error");
     } finally {
@@ -110,7 +125,10 @@ export default function ProjectsEdit() {
         ...formData,
         theme: project.theme,
       });
-      setProject(updatedProject);
+      // The reply is the bare project; only the list adds the theme's display
+      // name. This form cannot change the theme, so the loaded name still holds.
+      setProject({ ...updatedProject, themeName: project.themeName });
+      refreshUpdateStatus();
 
       // Check if the project folderName changed
       if (updatedProject.folderName !== project.folderName) {

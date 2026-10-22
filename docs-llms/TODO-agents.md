@@ -17,85 +17,29 @@
 Snapshot: 2026-09-20, source revision `f10e20ce`. Linked-issue assignees are preserved from GitHub; local-only tasks have no assigned owner. Historical reports are evidence, not fresh reproductions.
 Original local details: `git show f10e20ce:docs-llms/TODO.md` (original numbered sections).
 Original review reasoning: `git show f10e20ce:docs-llms/domain/review-status.md` and `git show f10e20ce:docs-llms/domain/review-questions.md`.
-Public board: [OSS Roadmap](https://github.com/users/tsiger/projects/7); current milestone [OSS - 0.9.10](https://github.com/tsiger/widgetizer/milestone/2). Milestone section reconciled with GitHub on 2026-10-14.
+Public board: [OSS Roadmap](https://github.com/users/tsiger/projects/7); current milestone [OSS - 0.9.10](https://github.com/tsiger/widgetizer/milestone/2). Milestone section reconciled with GitHub on 2026-10-19.
 
 ## OSS 0.9.10 milestone (mirrors GitHub)
 
-Open issues in the milestone, with their GitHub board status. Closed in this milestone: #118, #120, #121, #127, #129, #130, #132, #135, #136, #137, #139, #142, #143, #144, #145 (see the milestone's Closed tab).
+Open issues in the milestone, with their GitHub board status. Closed in this milestone: #118, #120, #121, #122, #127, #129, #130, #132, #133, #134, #135, #136, #137, #139, #142, #143, #144, #145, #155, #156, #126, #117, #157, #158, #153, #160 (see the milestone's Closed tab).
 
 #### GH115 · Multilingual support
 
 **GitHub: To Be Reviewed · anastis, tsiger**
 
-Steps 0–24 and R1–R8 are built and both real-project walkthroughs passed. The 2026-10-14 docs-llms pass reconciled the multilingual rules, theme switcher, architecture/package maps and domain model with the code, and added the checklist's Multilingual section (LANG-001 to LANG-042) — docs `202e9dfa`. The leftover English on translated pages is THEME-STRINGS (#156). Awaiting the partner's review.
+Steps 0–24 and R1–R8 are built and both real-project walkthroughs passed. The 2026-10-14 docs-llms pass reconciled the multilingual rules, theme switcher, architecture/package maps and domain model with the code, and added the checklist's Multilingual section (LANG-001 to LANG-042) — docs `202e9dfa`. The leftover English on translated pages was fixed under #156. A 2026-10-18 Fable/Codex gap review extended §18 to LANG-074 (refusals, cross-language links and menus, removal cleanup, editor guards, export combinations, preview paths, shared settings) and found the desktop app refusing language preview paths, fixed in `electron/previewPath.js`. Awaiting the partner's review.
 
 **Start:** [Multilingual rules](domain/multilingual.md), [user checklist](user-test-checklist.md). [GitHub #115](https://github.com/tsiger/widgetizer/issues/115)
 
-#### GH122 · Review automatic search-engine information
-
-**GitHub: To Be Reviewed · anastis**
-
-Structured-data commits e3ae2f424/e48731228 and docs d065e7ae9 exist. Review the current contract and recorded evidence; do not build a second SEO pipeline.
-
-**Done when:** Existing implementation satisfies the agreed feature, or concrete gaps get separate tasks.
-
-**Start:** [Structured data](core-export.md#structured-data-json-ld), [site identity](core-projects.md#6-site-identity-and-business-details) and [collection mappings](core-collections.md#5c-structured-data-structureddata-block). **Source:** GitHub #122. [GitHub #122](https://github.com/tsiger/widgetizer/issues/122)
-
-#### GH126 · window.confirm bug in Electron
-
-**GitHub: To Be Reviewed · anastis**
-
-`window.confirm()` left the Windows Electron window unable to take keyboard focus after the dialog closed. Both navigation guards use the in-app confirm (`useConfirm`, with Escape, focus trap and focus return); no native `confirm`/`alert`/`prompt` remains in editor-ui or the app shell. The owner verified it in the Windows desktop app on 2026-10-12. Router-level tests remain T71. Fix `5defb8fe`, hardening `48eef6f4`.
-
-**Start:** [ConfirmProvider.jsx](../packages/editor-ui/src/components/ui/ConfirmProvider.jsx). [GitHub #126](https://github.com/tsiger/widgetizer/issues/126)
-
-#### GH133 · Review form limits for embedding apps
-
-**GitHub: To Be Reviewed · anastis**
-
-MAX_FORMS_PER_SITE is read by export and LocalLimitsAdapter returns Infinity. Preserve fallback semantics. Host must answer the key; decide language-stream counting and item physical/group counts without documenting private tiers.
-
-**Done when:** Integration answers the key and tests its chosen limits, including translations.
-
-**Start:** [core-packages.md](core-packages.md). **Source:** GitHub #133. [GitHub #133](https://github.com/tsiger/widgetizer/issues/133)
-
-#### GH134 · Autosave and Undo
+#### GH162 · Links that open a new window go to the browser in the desktop app
 
 **GitHub: To Be Reviewed · tsiger**
 
-Undo history survives saves (undoing past a save makes the page dirty again), quick edits to one setting within 500 ms are one step, the limit is 150, and server theme corrections go through the history. No autosave toggle was added. Fix `e4379a50`. The "Split into pages" multi-step undo found in review is PAGINATE-UNDO.
+Was DESKTOP-WINDOW-OPEN. `electron/main.js` set no `setWindowOpenHandler`, so any `window.open` or `target="_blank"` from a page (preview, exported site, theme script, pasted embed) created a new `BrowserWindow` that loaded whatever it was given. Fixed by porting the `mcp` branch's policy: `windowOpenTarget` (`electron/windowOpenPolicy.js`) sends the app server's own pages (exports, media files) to a plain sandboxed window without the preload, other `http(s)` addresses to `shell.openExternal`, and denies the rest (`file:`, `data:`, `javascript:`, `about:blank`); the handler is on the main, preview and every content window. Unit test of the decisions in `windowOpenPolicy.test.js`.
 
-**Start:** [pageStore.js](../packages/editor-ui/src/stores/pageStore.js). [GitHub #134](https://github.com/tsiger/widgetizer/issues/134)
+**Done when:** in the desktop app, View site, the issues report and Media's file view open in an app window, an outside link in the preview opens the system browser, and nothing else opens a window.
 
-#### THEME-LOCALE-STALE · Theme labels stay untranslated after a theme update
-
-**GitHub: To Be Reviewed · anastis**
-
-After applying a theme update, a setting the update added (e.g. `show_breadcrumbs`) showed its raw key (`global.general.settings.show_breadcrumbs.label`) in Site settings and the editor until the page reloaded: `useThemeLocale` kept a module-level cache per project and language for 5 minutes with no invalidation. Fixed on `0.9.10`: `invalidateThemeLocale(projectId)` marks every language of that project stale and refetches where mounted (old labels stay until the new arrive), with a per-project generation so a refresh never cancels another project's load; `projectManager.applyThemeUpdate` calls it on success; a non-OK locale reply no longer replaces cached labels. An embedding app that applies updates through its own request must call `invalidateThemeLocale` itself.
-
-**Done when:** Applying a theme update shows the new settings' labels in Site settings and the editor without a reload, confirmed in the app.
-
-**Start:** [useThemeLocale.js](../packages/editor-ui/src/hooks/useThemeLocale.js), [projectManager.js](../packages/editor-ui/src/queries/projectManager.js), [useThemeLocaleInvalidate.test.jsx](../packages/editor-ui/src/hooks/__tests__/useThemeLocaleInvalidate.test.jsx). **Source:** 2026-10-07 browser regression pass on `theme-save-concurrency`; fixed 2026-10-14. [GitHub #155](https://github.com/tsiger/widgetizer/issues/155)
-
-#### THEME-STRINGS · Translate the remaining built-in breadcrumb and business-details text
-
-**GitHub: To Be Reviewed · anastis**
-
-Translated pages showed English: the core breadcrumbs snippet defaulted `aria_label` to "Breadcrumb" and `page_label` to "Page", `breadcrumbNode.js` named numbered crumbs `Page N`, and Arch's `business-details.liquid` sliced English day ids ("Mon"–"Sun") and printed a literal "Closed". Fixed on `0.9.10` in `ce862cce`: core `site.breadcrumbs.{label,page}` (en/el) as the snippet defaults, the seo tag passes the page word into the BreadcrumbList, Arch `site.business_details.{closed,days.*}` (en/el) with each name escaped once, the same Arch files in `updates/0.9.10/`, the engine falls back to the core English dictionary when no `loadSiteStrings` is supplied, and the locale checker counts core snippets as users of core keys.
-
-**Done when:** Confirmed in the app: a Greek page-2 trail ends "Σελίδα 2", Greek opening hours read "Δευ–Παρ" / "Κλειστά", English is unchanged.
-
-**Start:** [breadcrumbs.liquid](../packages/core/src/snippets/breadcrumbs.liquid), [business-details.liquid](../themes/arch/snippets/business-details.liquid), [SeoTag.js](../packages/core/src/tags/SeoTag.js). **Source:** 2026-10-05 code review of `48eef6f4..9e98dad7`; fixed 2026-10-14. [GitHub #156](https://github.com/tsiger/widgetizer/issues/156)
-
-#### GH117 · Featured image as the fallback social image
-
-**GitHub: Todo · tsiger**
-
-Issue is title-only: should a page or item with no `og_image` use its featured image? Today `{% seo %}` emits `og:image` only from `seo.og_image` (`SeoTag.js`), and a Site URL is required for any absolute image (an owner decision). Decide the rule (collection items only, or pages too; which field counts as "featured") before building.
-
-**Done when:** The agreed fallback ships with a test, or the issue moves out of the milestone.
-
-**Start:** [SeoTag.js](../packages/core/src/tags/SeoTag.js), [publishedUrls.js](../packages/core/src/utils/publishedUrls.js). [GitHub #117](https://github.com/tsiger/widgetizer/issues/117)
+**Start:** [main.js](../electron/main.js), [windowOpenPolicy.js](../electron/windowOpenPolicy.js). [GitHub #162](https://github.com/tsiger/widgetizer/issues/162)
 
 ## Findings (not scheduled)
 
@@ -122,17 +66,6 @@ Treat a reply of the wrong shape as a load failure, and show it: the existing lo
 
 **Start:** [Pages.jsx](../packages/editor-ui/src/pages/Pages.jsx), [useTranslationVersions.js](../packages/editor-ui/src/hooks/useTranslationVersions.js), [widgetStore.js](../packages/editor-ui/src/stores/widgetStore.js), [Media.jsx](../packages/editor-ui/src/pages/Media.jsx), [mediaUsageDisplay.js](../packages/editor-ui/src/utils/mediaUsageDisplay.js), [themeUpdateStore.js](../packages/editor-ui/src/stores/themeUpdateStore.js), [apiFetch.js](../packages/editor-ui/src/lib/apiFetch.js). **Source:** 2026-10-02 upgrade walkthrough.
 
-#### EXPORT-CLASH-LANG · Catch output-path clashes inside language folders
-
-**Open · Low · Shared**
-
-- A theme update can add a collection whose `slugPrefix` equals an enabled language code: `isReservedSlugPrefix(slugPrefix)` is called without `languages` (`collectionService.js` ~214) and theme updates do no check, while adding a language does (`assertCodeIsFree`). Items then publish over that language's pages (`it/foo.html`).
-- The paginated-homepage vs `page`-prefix clash check uses `rootPages` only (`exportController.js` ~457): a Greek paginated homepage writes `el/page/2.html`, which a Greek item slugged `2` silently overwrites.
-
-**Done when:** Export (and ideally theme update) refuses both clashes in every language with a clear message, with tests.
-
-**Start:** [exportController.js](../packages/builder-server/src/controllers/exportController.js), [collectionService.js](../packages/builder-server/src/services/collectionService.js), [contentAddress.js](../packages/core/src/utils/contentAddress.js). **Source:** 2026-10-05 code review of `48eef6f4..9e98dad7`.
-
 #### SKIPPED-ITEM-NOTICE · Say when a collection item is skipped for a bad slug
 
 **Open · Low · Shared**
@@ -142,16 +75,6 @@ Since `0fd5005a`, `readCollectionItems` (`collectionService.js`) skips an item w
 **Done when:** A skipped item is visible to the user (or repaired), with a test.
 
 **Start:** [collectionService.js](../packages/builder-server/src/services/collectionService.js), [CollectionItems.jsx](../packages/editor-ui/src/pages/CollectionItems.jsx). **Source:** 2026-10-06 review of the containment fix.
-
-#### TRANSLATION-CREATE-NAV · A translation created just before leaving a list pulls the user back
-
-**Open · Low · Shared**
-
-`useTranslationVersions.createIn` awaits the create request, then calls `setCreated`, shows a toast and calls the screen's `onCreated`, which navigates to the new version's editor (`CollectionItems.jsx` `navigate(itemEditPath(created))`, built from the type of the render that started it; `Pages.jsx` `navigate(pageEditorPath(created))`). Nothing checks that the user is still on that screen: start creating a missing translation, switch to another collection or section before the request returns, and the user is pulled into the created item's (or page's) editor. The version is created correctly; only the navigation is unwanted. Found by reading the code in the 2026-10-06 review of `87e96448`.
-
-**Done when:** A creation that finishes after its screen has gone still creates the version but neither navigates nor updates the departed screen (a toast may remain), with a test for both callers.
-
-**Start:** [useTranslationVersions.js](../packages/editor-ui/src/hooks/useTranslationVersions.js), [CollectionItems.jsx](../packages/editor-ui/src/pages/CollectionItems.jsx), [Pages.jsx](../packages/editor-ui/src/pages/Pages.jsx). **Source:** 2026-10-06 review of the collection list fix.
 
 #### THEME-UPLOAD-CLEANUP · A failed theme update upload can leave its new versions installed
 
@@ -175,15 +98,39 @@ Recommended: on server start, check each project for a leftover `.theme-update-b
 
 **Start:** [themeUpdateService.js](../packages/builder-server/src/services/themeUpdateService.js), [server-common.js](../app/server-common.js). **Source:** 2026-10-05 code review of `48eef6f4..9e98dad7`; narrowed 2026-10-06.
 
-#### MEDIA-USAGE-LABELS · Show readable "Used in" labels for other-language content
+#### THEME-UPDATE-REMOVED-FOLDER · A theme version that drops a whole updatable folder leaves it in projects
+
+**Open · Medium · Shared**
+
+`applyThemeUpdateToDir` stages each of `UPDATABLE_PATHS` only when the theme source has it (`themeUpdateService.js` ~386, `continue; // not in this theme`), so a path absent from the source is never swapped: the project keeps its old copy. An update that empties a folder with a `deleted/` marker (`layerThemeSnapshot`, `themeController.js` ~399, drops it from `latest/`) therefore leaves e.g. the old `collection-types/` (or `assets/`, `widgets/`, `snippets/`, `locales/`) in every project while the version advances. That contradicts [theme-updates.md](theme-updates.md)'s "Entire folder replaced", and a kept collection is invisible to the update's language-folder check, which reads only the staged copy. Pre-existing; found by reading the code, not reproduced.
+
+Suggested: record a path absent from the source as a planned removal: move the project's copy into the backup during the swap (so rollback and recovery put it back) without placing a replacement. Check what a theme with no `collection-types/` at all means first (never had one vs. removed it); both look the same to the apply.
+
+**Done when:** An update whose snapshot lacks an updatable path removes the project's copy, rolls back with the rest, and is tested (project has a collection, source has no `collection-types/`).
+
+**Start:** [themeUpdateService.js](../packages/builder-server/src/services/themeUpdateService.js), [themeController.js](../packages/builder-server/src/controllers/themeController.js). **Source:** 2026-10-18 Codex review of `29289f67..6344ab5c`.
+
+#### THEME-UPDATE-STAGE-CLEANUP · A staging folder that fails to delete is reused by the next update
 
 **Open · Low · Shared**
 
-`resolveUsageTitle` (`mediaUsageDisplay.js` ~79) strips only `global:` / `global:root:`, so `global:el:header` shows "El:header (Global)". `Media.jsx` (~121-123) fetches only the default language's collection items, so other-language items show raw `collection:<uuid>`. Distinct from UI-LIST-REPLY (null replies).
+Every removal of `.theme-update-stage/` swallows its error (`themeUpdateService.js` ~263 in `recoverInterruptedUpdate`, ~436/~442 in the prepare failure and the language-folder refusal, ~491/~502 after the swap). If one fails, the next run's `ensureDir` reuses the folder and `fs.copy` merges into it, so leftover staged files (an old collection folder, a stale asset) can be swapped into the project or cause a false refusal; the refusal also returns its 409 as if the stage were gone. Pre-existing pattern; found by reading the code, not reproduced.
 
-**Done when:** Every language's globals, pages and items show a readable, language-tagged label, with a test.
+Suggested: at the start of a run, remove the stage without swallowing the error and refuse with the usual "could not be prepared" message if it is still there; on the refusal path, report a cleanup failure instead of the clean 409.
 
-**Start:** [mediaUsageDisplay.js](../packages/editor-ui/src/utils/mediaUsageDisplay.js), [Media.jsx](../packages/editor-ui/src/pages/Media.jsx). **Source:** 2026-10-05 code review of `48eef6f4..9e98dad7`.
+**Done when:** A run never prepares into a stage it did not create, with a test that makes the stage removal fail.
+
+**Start:** [themeUpdateService.js](../packages/builder-server/src/services/themeUpdateService.js). **Source:** 2026-10-18 Codex review of `29289f67..6344ab5c`.
+
+#### THEME-UPDATE-PREPARE-DIRS · Preparing a theme update creates folders in the live project
+
+**Open · Low · Shared**
+
+`applyThemeUpdateToDir` documents its prepare phase as touching nothing the project uses, but it walks the theme's templates with `processTemplatesRecursive` (`templateHelpers.js`), which calls `fs.ensureDir` on each target under the project's `pages/` (including subfolders such as `pages/el/`). A prepare that then fails leaves those empty folders behind, and the update plan does not name them. Found by Codex while reviewing GH153; not reproduced.
+
+**Done when:** Preparing an update computes the target paths without creating live folders, with a test that a failed prepare leaves `pages/` as it was.
+
+**Start:** [templateHelpers.js](../packages/builder-server/src/utils/templateHelpers.js), [themeUpdateService.js](../packages/builder-server/src/services/themeUpdateService.js).
 
 #### PREVIEW-SCRIPT-URL · A malformed theme script address stops a widget's live preview
 
@@ -194,38 +141,6 @@ Recommended: on server start, check each project for a leftover `.theme-update-b
 **Done when:** An address that can't be resolved is skipped (or left to the browser) and the rest of the morph still applies, with a runtime test.
 
 **Start:** [previewRuntime.js](../packages/core/src/runtime/previewRuntime.js), [previewRuntimeMedia.test.js](../packages/core/src/runtime/__tests__/previewRuntimeMedia.test.js). **Source:** 2026-10-07 review of `b9c9fc13`.
-
-#### THEME-WARNING-LABEL · Name the corrected setting in theme-save warnings
-
-**Open · Low · Shared**
-
-A theme save whose value the server corrects warns `"tTheme:global.colors.settings.standard_border_color.label" contained an invalid value and was reset.` The label is the raw theme key: the server builds the warning from `item.label` (`mergeThemeSettingChanges`, and `sanitizeThemeSettings` ~455 for the whole-file POST), and Settings' `describeWarning` (`Settings.jsx` ~15-24) shows it untranslated. Seen 2026-10-07 in the browser; the same text appeared before `theme-save-concurrency`.
-
-**Done when:** The warning names the setting in the user's language (resolve the label through the theme locale on the client), with a test.
-
-**Start:** [Settings.jsx](../packages/editor-ui/src/pages/Settings.jsx), [useThemeLocale.js](../packages/editor-ui/src/hooks/useThemeLocale.js). **Source:** 2026-10-07 browser regression pass on `theme-save-concurrency`.
-
-#### UNDO-CLEAN · Undoing back to the saved state leaves Save enabled
-
-**Open · Low · Shared**
-
-In the page editor, undoing a theme edit or a structural change (delete, reorder) back to exactly the saved state leaves Save enabled. `reconcileModifiedWidgets` (`saveStore.js` ~136-180) re-derives per-widget dirtiness but never clears `themeSettingsModified` or `structureModified`, and `hasUnsavedChanges` reads both flags. Saving then sends nothing for the theme (empty change list) and clears the flags.
-
-**Done when:** After undo returns page, globals and theme to their saved state, Save is disabled and no unsaved marker shows, with a test.
-
-**Start:** [saveStore.js](../packages/editor-ui/src/stores/saveStore.js), [EditorTopBar.jsx](../packages/editor-ui/src/components/pageEditor/EditorTopBar.jsx). **Source:** 2026-10-07 browser regression pass on `theme-save-concurrency`.
-
-#### PAGINATE-UNDO · Turning on "Split into pages" takes three undos and changes a setting out of view
-
-**Open · Low · Shared**
-
-Turning `paginate` on in `SettingsPanel.handleSettingChange` (`SettingsPanel.jsx` ~87-104) makes up to three `updateWidgetSettings` calls: `listing_anchor` true, the schema's `collection.perPageSetting` (12 when unset or below 1), then `paginate`. Each is a different setting, so `pageStore`'s undo grouping (one changed path within 500 ms) keeps them as three history steps; one Ctrl+Z turns paginate off and leaves the anchor and the count. Turning `listing_anchor` off while paginated is two steps. The partial states are valid, so nothing is corrupted. Found 2026-10-05.
-
-Layout makes it worse: `paginate` and `listing_anchor` are injected after all the widget's own settings (`allSettings`, ~170-179), while the per-page setting is a theme field much higher up (Arch `news-grid`: `limit` is 10th of 24). Turning on pagination can change the item count where the user can't see it. Consider placing the two injected settings directly after the `perPageSetting` field, so the linked settings sit together.
-
-**Done when:** each linked change is one undo step (both directions) with a test, and the injected settings appear next to the per-page setting, or the placement is decided against.
-
-**Start:** [SettingsPanel.jsx](../packages/editor-ui/src/components/pageEditor/SettingsPanel.jsx), [widgetStore.js](../packages/editor-ui/src/stores/widgetStore.js), [pageStore.js](../packages/editor-ui/src/stores/pageStore.js). **Source:** found 2026-10-05 reviewing GitHub #134; split out when GH134 closed 2026-10-12.
 
 #### EDITOR-THEME-USAGE-NOTICE · The editor's image-tracking notice says "this page" for theme saves
 
@@ -273,6 +188,18 @@ Choosing a library image in a theme setting and saving after that image was dele
 
 **Start:** [validate-theme.js](../scripts/validate-theme.js), [build-theme-skill-contract.js](../scripts/build-theme-skill-contract.js), [themeSkill.test.js](../packages/builder-server/src/tests/themeSkill.test.js). **Source:** 2026-10-05 code review of `9e98dad7..e2f61b21`.
 
+#### LANG-PREFIX-WARNING · The theme checker's language-code prefix warning is a heuristic
+
+**Open · Low · OSS**
+
+`looksLikeLanguageCode` (`scripts/validate-theme.js` ~35) warns on an item-page prefix that `isValidLanguageCode` accepts and that is a bare code or carries a two-letter region or four-letter script `Intl.DisplayNames` names. The app accepts more: `de-1996` (a variant) and even `my-work` pass `isValidLanguageCode` and could be added as a language, yet the checker stays quiet (adding the language, theme updates and export still refuse the actual clash, so only the author's early warning is missed). `Intl.DisplayNames` is also not a registry: `zz` ("Unknown Region"), `zzzz` and retired regions (`bu`, `an`, `su`) have names, so `en-zz` warns. [core-collections.md](core-collections.md) and the skill's `templates-collections-and-presets.md` say "real region or script", which overclaims.
+
+Options: keep the heuristic and reword the two docs ("a region or script code Node recognises", named as a heuristic); or warn on everything `isValidLanguageCode` accepts (brings back warnings on `my-work`, `hr-jobs`); or ship a region/script/variant registry.
+
+**Done when:** The docs describe what the checker actually does, and the chosen rule is tested with `de-1996`, `en-zz` and a retired region.
+
+**Start:** [validate-theme.js](../scripts/validate-theme.js), [themeSkill.test.js](../packages/builder-server/src/tests/themeSkill.test.js), [languages.js](../packages/core/src/utils/languages.js). **Source:** 2026-10-18 Codex review of `29289f67..6344ab5c`.
+
 #### GH148 · The testimonial carousel shows part of the next card on phones
 
 **Open · Unrated · OSS**
@@ -282,16 +209,6 @@ User report on 0.9.9: on small screens Arch's testimonial slider shows a slice o
 **Done when:** One card shows fully at phone widths, checked in preview and export.
 
 **Start:** [testimonial-slider](../themes/arch/widgets/testimonial-slider). [GitHub #148](https://github.com/tsiger/widgetizer/issues/148)
-
-#### GH153 · Pages and menus added by a theme update are not linked like a new project's
-
-**Open · Low · Shared**
-
-Creation runs `enrichNewProjectReferences` over starter pages and menus; `applyThemeUpdateToDir` does not, so a page an update adds has no `uuid` until saved, its menu items keep plain links with no `pageUuid`, and a menu setting keeps the menu id. Renders fine, but those links do not follow renames. Only affects updates that ship brand-new pages or menus. Found by reading the code.
-
-**Done when:** Added pages get a uuid and the linking runs over just the added files inside the update's swap, with a test.
-
-**Start:** [themeUpdateService.js](../packages/builder-server/src/services/themeUpdateService.js). [GitHub #153](https://github.com/tsiger/widgetizer/issues/153)
 
 #### GH154 · Linux desktop "View site" fails under ~/.config
 
@@ -303,7 +220,77 @@ The export viewer (`routes/export.js`) calls `res.sendFile` with an absolute pat
 
 **Start:** [export.js](../packages/builder-server/src/routes/export.js), [core-electron.md](core-electron.md). [GitHub #154](https://github.com/tsiger/widgetizer/issues/154)
 
+#### GH159 · Links whose target is gone still publish as working links
+
+**Open · Unrated · OSS · For: tsiger**
+
+Deleting a page or removing a language keeps a pointing link's label and empties its address (`clearDeletedReferencesInSection` in `linkEnrichment.js` ~907 returns `{ ...rest, href: "" }`; menus clear `link` in `menuResolver.js`). The label stays on purpose so the editor shows what to re-point, but the published site writes it as a link: the core menu snippet emits `<a href="">Greek About</a>`, and Arch's button templates show a button whenever its text is set (e.g. `image-text` `link.text != blank`), emitting `<a href="" class="widget-button">View services</a>`. An empty `href` reloads the current page. Seen in the 2026-10-18 #115 export review after removing Greek (LANG-043 says "no destination"). The behaviour is not decided; tsiger owns it, since most of the work is in Arch's button templates. The issue proposes: a menu item with no address renders as plain text (keeping its sub-items); a button with no address is left out; the editor keeps showing both.
+
+**Done when:** The behaviour is decided, and preview and export then write no `href=""` for cleared menu items or buttons, the editor still lists them, with tests for the menu snippet and at least one Arch button template.
+
+**Start:** [menu.liquid](../packages/core/src/snippets/menu.liquid), [linkEnrichment.js](../packages/builder-server/src/utils/linkEnrichment.js), [image-text](../themes/arch/widgets/image-text/widget.liquid). [GitHub #159](https://github.com/tsiger/widgetizer/issues/159)
+
 ### Improvements
+
+#### PROJECT-DETAILS-STALE · An old Project details save can reset the active project or toast on another project
+
+**Open · Low · OSS**
+
+`ProjectsEdit.jsx` starts a fresh page per project (`key={id}`), so a load, save or Apply Update still running for a project the user has left only touches its own, unmounted page. Two writes still reach outside it. A save's follow-up `getActiveProject()` → `setActiveProject(...)` (the folder-rename and the plain branch of `handleSubmit`) writes the shared project store: save p1, activate p2 and open its details before that request returns, and p1 becomes active again, so p2's page redirects to the Projects list. And toasts from the old page (a failed load, a save or update finishing) still show on the new one. Needs the user to leave, activate another project and reopen details within the save's round trip. Pre-existing; found by Codex reviewing the update-banner refresh, 2026-10-19; not reproduced.
+
+**Done when:** a save whose page has unmounted no longer writes the active project (a mounted ref, or a store write that checks the active id is still the saved project's), and its toasts are skipped or name the project, with a test that moves to p2 while a p1 save is pending.
+
+**Start:** [ProjectsEdit.jsx](../app/src/pages/ProjectsEdit.jsx), [projectStore.js](../packages/editor-ui/src/stores/projectStore.js).
+
+#### BACKUP-ZIP-NAME · Backups download as `project-export.zip` in the dev setup
+
+**Open · Low · OSS**
+
+`exportProject` in `projectController.js` (~1260) sends `Content-Disposition: attachment; filename="<project>-export-<timestamp>.zip"`, but `projectManager.js` (~240) can only read that header if the response exposes it; across origins (dev: editor on :3000, API on :3001, including the dev Electron app) it can't, so it falls back to `project-export.zip` and repeat backups become `project-export (3).zip`. Same-origin builds (packaged app, built web app) should get the real name — unconfirmed. Seen 2026-10-18 in the browser and the dev desktop app.
+
+**Done when:** The downloaded backup carries the project name in dev and packaged/same-origin setups (e.g. expose `Content-Disposition`, or let the server name it via a plain navigation), checked in both.
+
+**Start:** [projectController.js](../packages/builder-server/src/controllers/projectController.js), [projectManager.js](../packages/editor-ui/src/queries/projectManager.js).
+
+#### PREVIEW-FORM-SUBMIT · Submitting a form in the preview shows a raw server error
+
+**Open · Low · OSS**
+
+The Core Form posts to `/__widgetizer/forms/<key>`, which only a publishing host provides; OSS has no such route by design (`docs-llms/domain/entities/form.md`). In the editor preview and the desktop preview window a submit therefore navigates the frame to Express's "Cannot POST /__widgetizer/forms/el:contact". Seen 2026-10-18 (LANG-059, web and desktop).
+
+**Done when:** A submit in the preview stays on the page and says forms work once the site is published, with a test.
+
+**Start:** [core-form widget](../packages/core/src/widgets/core-form/widget.liquid), [previewRuntime.js](../packages/core/src/runtime/previewRuntime.js).
+
+#### MULTILANG-ONLY-SETTINGS · Hide language-only settings on single-language sites
+
+**Open · Low · OSS**
+
+Arch's header shows "Languages", "Show language switcher" and "Language switcher name" (`languages_header`, `show_language_switcher`, `language_switcher_label`) even when the site has one language, where they do nothing. Schemas have no conditional-visibility property and the platform doesn't know these ids (only Arch and `archLanguageSwitcher.test.js` reference them). Proposed design: a generic setting property `"multilingualOnly": true` the editor honours by hiding the row when `useIsMultilang()` is false; Arch flags its three rows (base and `updates/<version>/`). It is a theme-contract addition: document it with the setting types, add it to the theme skill reference and regenerate the catalog (`scripts/build-theme-skill-contract.js`), and let `validate-theme.js` accept it. Seen 2026-10-18 (#115 review, LANG-074).
+
+**Done when:** Flagged settings are hidden on single-language sites and shown once a second language is added, with editor tests, docs and the skill catalog updated.
+
+**Start:** [header schema](../themes/arch/widgets/global/header/schema.json), [SettingsPanel.jsx](../packages/editor-ui/src/components/pageEditor/SettingsPanel.jsx), [validate-theme.js](../scripts/validate-theme.js).
+
+#### LANG-NAME-IN-SENTENCES · Name languages in the interface language inside messages
+
+**Open · Low · Shared**
+
+`languageLabel.js` documents the rule: inside an English sentence a language is named in the interface language ("Greek"), while pickers, tabs and the public switcher use its own name ("Ελληνικά"). Server errors follow it (`languageNameForMessage` in `contentLanguage.js`) and so does the removed-language banner, but several editor messages put the native name in an English sentence: "Ελληνικά added." / "… removed." (`nameOf` in `app/src/components/projects/LanguagesSection.jsx` ~42), "Ελληνικά version created." (`useTranslationVersions.js` ~81), the export's "Français has no homepage…" (`ExportCreator.jsx`, skipped languages), and the Media "Used in" tags "About (Ελληνικά)" / "Header (Global, Ελληνικά)" (`mediaUsageDisplay.js` ~74, ~110 — a list, so possibly fine). Owner, 2026-10-19: "we probably shouldn't mix languages like 'Ελληνικά added.'" — revisit later.
+
+**Done when:** Every sentence-style message uses `languageLabel`, the labelled lists are decided either way, and tests assert the names.
+
+**Start:** [languageLabel.js](../packages/editor-ui/src/lib/languageLabel.js), [LanguagesSection.jsx](../app/src/components/projects/LanguagesSection.jsx), [useTranslationVersions.js](../packages/editor-ui/src/hooks/useTranslationVersions.js).
+
+#### ITEM-COPY-NUMBERING · Number duplicated collection items like pages and menus
+
+**Open · Low · OSS**
+
+`duplicateItem` in `collectionService.js` (~1063) appends a fixed " (Copy)" to the title field, so duplicating a copy gives "X (Copy) (Copy)"; pages, menus and projects use `generateCopyName` (`utils/namingHelpers.js`) for "X (Copy)", "X (Copy 2)", …, checked against the existing names. Items need the existing titles of the same collection and language to do the same. The slug already numbers itself (`x-copy`, `x-copy-1` via `generateUniqueSlug`). Noted 2026-10-19 while fixing the copy casing.
+
+**Done when:** Duplicating an item, then its copy, gives "X (Copy)" and "X (Copy 2)" per language, with a test.
+
+**Start:** [collectionService.js](../packages/builder-server/src/services/collectionService.js), [namingHelpers.js](../packages/builder-server/src/utils/namingHelpers.js).
 
 #### T66 · Explain form errors beside the right field
 
@@ -347,6 +334,29 @@ Keep SeoTag and renderEngine buildPageTitle aligned, including pagination; escap
 
 **Start:** [SeoTag.js](../packages/core/src/tags/SeoTag.js). **Source:** Original §73.
 
+#### SEO-DATA-EXTRAS · Optional structured-data properties Google recommends
+
+**Open · Low · Shared**
+
+Possible future improvements found reviewing #122 with Google's Rich Results Test (2026-10-17); every item validated, these were optional warnings or omissions:
+- **Article author.** `BlogPosting` has no `author` (Google: "Missing field author (optional)"); `ARTICLE_PROPERTIES` in `articleNode.js` maps only headline, datePublished, description, image and articleBody. A cheap default is the identity node (`#identity`) as author; a mapped author field could come later.
+- **Publication date without time.** A `date` field yields `datePublished: "2026-05-30"`, valid schema.org but flagged twice by Google (invalid datetime, missing timezone). `dateModified` (a full timestamp) passes. Decide whether to emit a full datetime, and with which timezone.
+- **Language.** No node carries `inLanguage`; pages state it only through `<html lang>` and hreflang. Adding the rendering language to `WebPage`/`BlogPosting` makes translated pages explicit.
+
+**Done when:** Each item is either emitted (with tests) or deliberately declined in the structured-data docs.
+
+**Start:** [articleNode.js](../packages/core/src/structuredData/articleNode.js), [siteNodes.js](../packages/core/src/structuredData/siteNodes.js), [Structured data](core-export.md#structured-data-json-ld). **Source:** 2026-10-17 browser review of #122.
+
+#### MEDIA-USAGE-TITLES · Let the server name the Media screen's "Used in" sources
+
+**Open · Low · Shared**
+
+To label its "Used in" lists, `Media.jsx` (`loadUsageTitles`) fetches every page, the collection schemas, and each collection's items once per language: 2 + schemas × languages requests on every visit, all concurrent, and a fetch that fails just leaves raw ids. Fine for current themes; on a large site with many collections and languages it grows. The server already resolves these ids (`mediaUsageService.js`, `usageId` in `contentAddress.js`), so one endpoint returning `{ usageId: { kind, title, language } }` for the project's media would replace the fan-out, and the client would keep only the formatting (`mediaUsageDisplay.js`).
+
+**Done when:** The Media screen labels its usage from one request, with the same labels as today, or the task is closed as not needed.
+
+**Start:** [Media.jsx](../packages/editor-ui/src/pages/Media.jsx), [mediaUsageDisplay.js](../packages/editor-ui/src/utils/mediaUsageDisplay.js), [mediaUsageService.js](../packages/builder-server/src/services/mediaUsageService.js). **Source:** 2026-10-18 Codex review of the media usage label fix.
+
 ### Decisions
 
 Agree what we want before building it.
@@ -370,6 +380,36 @@ The data model treats `""` in `media_file_translations` as "deliberately blank" 
 **Done when:** UI, server and multilingual docs describe and implement the same rule, with a test.
 
 **Start:** [MediaDrawer.jsx](../packages/editor-ui/src/components/media/MediaDrawer.jsx), [mediaController.js](../packages/builder-server/src/controllers/mediaController.js), [mediaRepository.js](../packages/builder-server/src/db/repositories/mediaRepository.js). **Source:** 2026-10-05 code review of `48eef6f4..9e98dad7`.
+
+#### MENU-LANG-FALLBACK · Decide whether a translated header falls back to the default language's menu
+
+**Decision needed · Unrated · OSS**
+
+A header `menu` setting holds either a menu uuid (picked in the dropdown) or a slug (the theme default, e.g. `main-menu`, until someone picks). `resolveMenuSettings` (`menuResolver.js` ~185-200) resolves a slug in the rendering language's folder and, failing that, in the default language's — documented in `core-menus.md`. So deleting the Greek Main menu makes a Greek header still on the default show the **English** main menu (English labels, English targets), while a header whose Greek menu was picked shows no menu. The editor's dropdown then reads "Main menu (en)", but nothing else says so, and the Delete Menu dialog doesn't mention the header uses it. Seen in the 2026-10-18 #115 review (LANG-057). Options: (A) no slug fallback for non-default languages — a missing language menu shows no menu, as with a picked one; (B) keep the fallback and reword LANG-057, optionally warning in the delete dialog; (C) keep it but block or warn on deleting a menu a header uses. Proposed: A plus a "used by the Greek header" warning when deleting.
+
+**Done when:** The chosen rule is implemented in `menuResolver.js` with tests, `core-menus.md` and LANG-057 describe it, and the delete dialog warning (if chosen) names where the menu is used.
+
+**Start:** [menuResolver.js](../packages/render-engine/src/menuResolver.js), [core-menus.md](core-menus.md), [Menus.jsx](../packages/editor-ui/src/pages/Menus.jsx).
+
+#### ARCH-DEFAULT-WORDS · Decide whether Arch's editable defaults follow the page language
+
+**Decision needed · Unrated · OSS**
+
+Arch text settings start from literal English `default`s and template fallbacks (`| default: '…'`), so an untouched translated page shows English: header skip link "Skip to main content", "Primary", "Menu", "Close menu"; News/Projects/Services Grid "Read more" / "View project" / "View service" / "View all"; widget headings ("Latest News", …); fallbacks such as "Learn More", "Download", "Before"/"After", "Play video", "Features". Settings with `defaultKey` (Core Form, `services_grid.empty`, …) already follow the page language, and every non-editable theme and core word is translated (Arch `site.*` 59/59 in `el`, core 15/15). Seen in the 2026-10-18 #115 review (LANG-034; LANG-044 makes the same claim). Options: (A) give Arch's editable defaults `defaultKey`s with locale entries in every language Arch ships; (B) only the always-present chrome (skip link, nav label, menu title/close, "Read more", "View all"), leaving headings; (C) leave it and reword LANG-034 to mean non-editable words only. Proposed: B now, A over time.
+
+**Done when:** The chosen set resolves per page language in preview and export (new Arch version under `updates/<version>/`), or LANG-034 and LANG-044 say defaults are the owner's to translate.
+
+**Start:** [header widget](../themes/arch/widgets/global/header/widget.liquid), [news-grid](../themes/arch/widgets/news-grid/widget.liquid), [Arch locales](../themes/arch/locales/), `settingDefault` in [renderEngine.js](../packages/render-engine/src/renderEngine.js).
+
+#### DATE-ORDER-LANG · Decide whether date order follows the page language
+
+**Decision needed · Low · Shared**
+
+The site has one `date_format` theme setting; `formatDateOnly` (`packages/core/src/utils/dateFormat.js`) localizes month names via `Intl` but keeps the chosen order, so with the default "December 31, 2026" a Greek page reads "Μαρτίου 15, 2026" where Greek usage is "15 Μαρτίου 2026". Options: a per-language date format, a "follow the language's usual order" format, or leave it to the owner's choice. Seen 2026-10-18 (#115 review, LANG-034).
+
+**Done when:** The chosen rule is implemented with tests, or documented as the owner's choice.
+
+**Start:** [dateFormat.js](../packages/core/src/utils/dateFormat.js), [dateFilter.js](../packages/core/src/filters/dateFilter.js).
 
 #### GH138 · Edit project details directly from the project list
 
@@ -435,14 +475,13 @@ The containment checks that keep file-sourced paths inside their folder compare 
 
 Confirm the problem first; not confirmed bugs.
 
-#### RENDER-LANG · Make site-wide links and single-widget re-renders follow the page language
+#### RENDER-LANG · Make site-wide links in theme settings follow the page language
 
 **Investigate · Low · Shared**
 
-- `resolveThemeSettingReferences` (`renderEngine.js` ~760-860): a theme-setting `link` resolves to the target's own language and a uuid menu to that exact menu; `theme.json` is one file for all languages, so Greek pages show English targets (the leak d0442659 fixed for `page_url`). On item pages theme settings resolve before `currentPageData` is set, so a slug menu resolves to the root-language menu. Arch declares no such settings, so third-party themes only.
-- `resolveItemFromPath` (`renderEngine.js` ~561-598) strips the language folder but reads `collections/<type>/<slug>.json` without it, so a header re-rendered alone for a Greek item page shows an empty or English breadcrumb. Preview only; reachability unconfirmed.
+`resolveThemeSettingReferences` (`renderEngine.js` ~760-860): a theme-setting `link` resolves to the target's own language and a uuid menu to that exact menu; `theme.json` is one file for all languages, so Greek pages show English targets (the leak d0442659 fixed for `page_url`). On item pages theme settings resolve before `currentPageData` is set, so a slug menu resolves to the root-language menu. Arch declares no such settings, so third-party themes only. (The single-widget item lookup this entry also covered reads the language folder since `bcb7fab6`.)
 
-**Done when:** Theme-setting references resolve per rendering language (or the limitation is documented in the theme contract), and the single-widget item lookup uses the language folder.
+**Done when:** Theme-setting references resolve per rendering language, or the limitation is documented in the theme contract.
 
 **Start:** [renderEngine.js](../packages/render-engine/src/renderEngine.js). **Source:** 2026-10-05 code review of `48eef6f4..9e98dad7`.
 

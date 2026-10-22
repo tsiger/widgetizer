@@ -10,50 +10,53 @@ Two lists: what is in the current GitHub milestone, and what we have found but n
 | Issue | What | GitHub status | Who |
 | --- | --- | --- | --- |
 | [#115](https://github.com/tsiger/widgetizer/issues/115) | Multilingual sites | To Be Reviewed | anastis, tsiger |
-| [#122](https://github.com/tsiger/widgetizer/issues/122) | Search-engine information (structured data) | To Be Reviewed | anastis |
-| [#126](https://github.com/tsiger/widgetizer/issues/126) | Leave-page prompt froze typing on Windows | To Be Reviewed | anastis |
-| [#133](https://github.com/tsiger/widgetizer/issues/133) | Form limits for embedding apps | To Be Reviewed | anastis |
-| [#134](https://github.com/tsiger/widgetizer/issues/134) | Undo keeps working after autosave | To Be Reviewed | tsiger |
-| [#155](https://github.com/tsiger/widgetizer/issues/155) | Theme labels refresh after a theme update | To Be Reviewed | anastis |
-| [#156](https://github.com/tsiger/widgetizer/issues/156) | No English left on translated pages | To Be Reviewed | anastis |
-| [#117](https://github.com/tsiger/widgetizer/issues/117) | Featured image as the fallback social image | Todo | tsiger |
+| [#162](https://github.com/tsiger/widgetizer/issues/162) | Desktop app: links that open a new window go to the browser | To Be Reviewed | tsiger |
 
-Closed in this milestone: 15 issues (the milestone's Closed tab).
+Closed in this milestone: 26 issues (the milestone's Closed tab).
 
 ## Findings, not scheduled
 
 ### Bugs
 
 - **UI-LIST-REPLY** — a bad reply from the server crashes the Pages screen or empties editor screens. Show a clear "couldn't load" instead.
-- **EXPORT-CLASH-LANG** — in a translated language, a collection can silently overwrite pages on export. Refuse the export with a clear message.
 - **GH148** — the testimonial carousel shows part of the next card on phones (reported on 0.9.9).
 - **GH154** — on the Linux desktop app, "View site" fails.
-- **GH153** — pages and menus a theme update adds aren't linked like a new project's, so their links don't follow renames.
 - **SKIPPED-ITEM-NOTICE** — a collection item with a broken address disappears with nothing on screen to say so.
-- **TRANSLATION-CREATE-NAV** — creating a translation and leaving the list before it finishes pulls you into its editor anyway.
 - **THEME-UPLOAD-CLEANUP** — a theme update upload that fails near the end can leave its new versions installed.
 - **THEME-UPDATE-RESUME** — after a crash mid theme update the site looks broken until the update is pressed again.
-- **MEDIA-USAGE-LABELS** — "Used in" shows codes like "El:header (Global)" for translated content.
+- **THEME-UPDATE-REMOVED-FOLDER** — when a theme version drops a whole folder (for example all its collection types), sites that update keep the old one.
+- **THEME-UPDATE-STAGE-CLEANUP** — if a theme update can't delete its temporary folder, the next update can pick up stale files from it.
+- **THEME-UPDATE-PREPARE-DIRS** — getting a theme update ready creates empty page folders in the site, which stay behind if the update then fails.
 - **PREVIEW-SCRIPT-URL** — a badly written theme script address stops a widget's live preview.
-- **THEME-WARNING-LABEL** — a theme-save warning names the setting by an internal code.
-- **UNDO-CLEAN** — undoing back to the saved state leaves Save enabled.
-- **PAGINATE-UNDO** — turning on "Split into pages" takes three undos and changes the item count out of view.
 - **EDITOR-THEME-USAGE-NOTICE** — a site-settings save in the editor says "this page" in its image notice.
 - **SETTINGS-LOAD-RETRY** — Site settings doesn't retry after a failed load.
 - **MISSING-IMAGE-MESSAGE** — a theme save with a deleted image just says "Please try again".
 - **THEME-CHECKER** — the theme checker passes a few things that break on export and crashes on one valid tag.
+- **LANG-PREFIX-WARNING** — the theme checker's "this prefix looks like a language code" warning is a best guess: it misses a few codes a site could add and the docs describe it as more exact than it is.
+- **GH159** — when a link's target page is deleted or its language removed, the menu item or button keeps its label but publishes as a link to nowhere that just reloads the page. For tsiger: what to publish instead isn't decided. The issue proposes showing the menu item as plain text and leaving the button out, while the editor keeps showing them so they can be re-pointed.
+- **PROJECT-DETAILS-STALE** — if you save Project details and switch to another project's details within a second, the old save can make the first project active again (sending you back to the Projects list) or show its messages on the new page.
+- **BACKUP-ZIP-NAME** — backups download as `project-export.zip` instead of the project's name (seen in the dev setup; the packaged app may be fine).
+- **PREVIEW-FORM-SUBMIT** — submitting a form in the preview shows a raw "Cannot POST" error; say forms work once published instead.
 
 ### Improvements
 
+- **LANG-NAME-IN-SENTENCES** — some messages mix languages, like "Ελληνικά added." or "Ελληνικά version created."; inside an English sentence the language should read "Greek". Revisit later.
+- **ITEM-COPY-NUMBERING** — duplicating a copied item gives "X (Copy) (Copy)"; number it "X (Copy 2)" like pages and menus.
+- **MULTILANG-ONLY-SETTINGS** — the header's language switcher settings show on single-language sites, where they do nothing. Let themes mark settings as "only with several languages" so the editor hides them.
 - **T66** — form errors should say which field to fix and how.
 - **T53** — make the three-dot menus easier to use with a keyboard.
 - **VIDEO-EMBED-FILTER** — read YouTube/Vimeo links properly in one shared filter (Shorts, unlisted links, bad IDs).
 - **T73** — let themes choose "|" instead of "-" between page and site titles.
+- **SEO-DATA-EXTRAS** — optional extras Google suggests for the search-engine information: an author on news articles, a full time on publication dates, and the page's language.
+- **MEDIA-USAGE-TITLES** — the Media screen makes many requests to name where each file is used; on big multilingual sites one request from the server would be better.
 
 ### Decisions
 
 - **T76** — can a site's main language change once it has translations?
 - **MEDIA-BLANK-ALT** — allow deliberately blank alt text in one language, or drop the idea.
+- **MENU-LANG-FALLBACK** — when a language's menu is deleted, that language's pages show the main language's menu, unless the header's menu was picked by hand (then they show none). Decide: never fall back (proposed, plus a warning when deleting a menu a header uses), or keep the fallback and say so.
+- **ARCH-DEFAULT-WORDS** — Arch's editable starting texts ("Skip to main content", "Menu", "Read more", "View all", headings like "Latest News") stay English on translated pages until the owner edits them. Decide: translate them per language (proposed first for the header and "Read more"/"View all"), or leave them as the owner's to change.
+- **DATE-ORDER-LANG** — dates keep the site's one date order in every language, so Greek shows "Μαρτίου 15, 2026" instead of "15 Μαρτίου 2026". Decide whether each language gets its own order.
 - **GH138** — edit a project's details from the project list?
 - **GH128** — which extra image-optimisation tools to add.
 - **T54** — which accessibility standard to aim for.

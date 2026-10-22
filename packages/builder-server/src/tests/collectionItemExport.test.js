@@ -55,6 +55,7 @@ const NEWS_SCHEMA = {
   settings: [
     { type: "text", id: "title", label: "Title", required: true, usedAsTitle: true },
     { type: "richtext", id: "body", label: "Body" },
+    { type: "image", id: "cover", label: "Cover", usedAsImage: true },
   ],
 };
 
@@ -92,7 +93,9 @@ describe("collection item-page export — happy path", () => {
     await fs.remove(path.join(getProjectDir(PROJECT_FOLDER), "collection-types"));
     await storage.write(scope, "collection-types/news/schema.json", JSON.stringify(NEWS_SCHEMA, null, 2));
     await storage.write(scope, "collection-types/news/template.liquid", NEWS_TEMPLATE);
-    await storage.write(scope, "collections/news/alpha.json", JSON.stringify(newsItem("alpha", "Alpha", "2026-01-02T00:00:00.000Z")));
+    const alpha = newsItem("alpha", "Alpha", "2026-01-02T00:00:00.000Z");
+    alpha.settings.cover = "/uploads/images/cover.jpg";
+    await storage.write(scope, "collections/news/alpha.json", JSON.stringify(alpha));
     await storage.write(scope, "collections/news/bravo.json", JSON.stringify(newsItem("bravo", "Bravo", "2026-01-03T00:00:00.000Z")));
     const res = await runExport();
     assert.equal(res._status, 200, `export failed: ${JSON.stringify(res._json)}`);
@@ -134,6 +137,14 @@ describe("collection item-page export — happy path", () => {
     assert.ok(html.includes("Made with Widgetizer"), "item HTML should carry the easter egg");
     // {% seo %} emits the item's title (itemPageData.name) with the site title appended.
     assert.ok(html.includes("<title>Alpha - Coll Export Site</title>"), html);
+  });
+
+  it("uses the usedAsImage field as the share image when the item has none", async () => {
+    const dir = latestExportDir();
+    const alpha = await fs.readFile(path.join(dir, "news", "alpha.html"), "utf8");
+    assert.ok(alpha.includes(`property="og:image" content="${SITE_URL}/assets/images/cover.jpg"`), alpha);
+    const bravo = await fs.readFile(path.join(dir, "news", "bravo.html"), "utf8");
+    assert.ok(!bravo.includes("og:image"), bravo);
   });
 
   it("adds collection item URLs to sitemap.xml (grouped after pages)", async () => {
@@ -179,6 +190,17 @@ describe("collection item-page export — fail-fast validation", () => {
     const res = await runExport();
     assert.equal(res._status, 400, JSON.stringify(res._json));
     assert.ok(/collection item/i.test(res._json.error), res._json.error);
+    // The reply names the item, its language and the field, so the screen can link to it.
+    assert.deepEqual(res._json.invalidItems, [
+      {
+        collection: "news",
+        collectionName: "News",
+        slug: "broken",
+        title: "broken",
+        language: "en",
+        errors: [{ fieldId: "title", reason: "required field is empty", fieldLabel: "Title" }],
+      },
+    ]);
     // No output directory should have been created (validation precedes disk writes).
     assert.ok(!(await fs.pathExists(path.join(PUBLISH_DIR, `${PROJECT_FOLDER}-v1`))), "no partial export dir on a blocked export");
   });

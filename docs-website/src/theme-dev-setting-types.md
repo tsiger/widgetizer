@@ -12,6 +12,7 @@ All setting types share these properties:
 - `label` (string, required): Human-readable label shown in the UI.
 - `description` (string, optional): Help text below the field.
 - `default` (any, optional): Default value used when no value is provided.
+- `defaultKey` (string, optional, widget and block settings): A `site` dictionary key whose word is the default, in the language of the page. See [Localization](theme-dev-localization.html#words-the-owner-can-edit-defaultkey).
 - `outputAsCssVar` (boolean, optional): When `true`, outputs a CSS variable via `{% theme_settings %}`.
 
 For how settings map into templates and CSS variables, see [Theme Manifest & Settings](theme-dev-manifest-settings.html).
@@ -39,7 +40,7 @@ For how settings map into templates and CSS variables, see [Theme Manifest & Set
 }
 ```
 
-**`number`:** Single-line input restricted to numeric values.
+**`number`:** Single-line input restricted to numeric values. Optional `min`, `max` and `step`: a value typed outside `min`/`max` snaps to the nearest limit when the owner leaves the field, and a stored value outside them renders at the limit. A cleared field stores `""`.
 
 ```json
 {
@@ -75,7 +76,7 @@ For how settings map into templates and CSS variables, see [Theme Manifest & Set
 Features:
 
 - **Formatting toolbar** with Bold, Italic, Link, Bullet List, and Numbered List buttons
-- **Link editor** with URL input (auto-prefixes `https://` if missing)
+- **Link editor** with URL input (auto-prefixes `https://` if missing), plus a picker for internal pages and collection items. Picked links are stored as references, so they follow renames and are cleared when the target is deleted; this works in widget, block, collection item and global theme settings alike
 - **Link to file** button (paperclip) links the selected text to a file from the Media Library (a PDF, an audio file, or an image), with a type filter in the picker
 - **Expand button** opens a larger modal for comfortable editing
 - Active formatting is highlighted in the toolbar based on cursor position
@@ -206,6 +207,8 @@ In [collection](theme-dev-collections.html) schemas, a `date` field can be marke
 }
 ```
 
+The value is the upload path. Alt text, title and caption live on the media library record, and owners can translate them per language; `{% image %}` and `media_meta` return them in the page's language. See [`{% image %}`](theme-dev-liquid-assets.html#image).
+
 **`youtube`:** YouTube embed with URL/ID input and embed options.
 
 ```json
@@ -264,7 +267,7 @@ The picker only uploads and selects MP4 files. Resolve the URL from `filePath` a
 
 Playback depends on the visitor's browser decoding the file; H.264/AAC is the safe choice.
 
-**`gallery`:** Ordered set of images managed through the media library (add, remove, drag-reorder). The value is an **array of upload-path strings** (e.g. `["/uploads/images/a.jpg", "/uploads/images/b.jpg"]`); an empty gallery is `[]`. Image alt/title/caption live on the media record, not in the gallery value.
+**`gallery`:** Ordered set of images managed through the media library (add, remove, drag-reorder). The value is an **array of upload-path strings** (e.g. `["/uploads/images/a.jpg", "/uploads/images/b.jpg"]`); an empty gallery is `[]`. Image alt/title/caption live on the media record (per language), not in the gallery value.
 
 ```json
 {
@@ -332,7 +335,7 @@ Render sanitization rebuilds each row from the declared columns only (dropping u
 }
 ```
 
-**`menu`:** Dropdown populated with theme menus.
+**`menu`:** Dropdown populated with the project's menus.
 
 ```json
 {
@@ -341,6 +344,8 @@ Render sanitization rebuilds each row from the declared columns only (dropping u
   "label": "Header Navigation"
 }
 ```
+
+A menu the owner picks in the editor is stored by its identity and stays that exact menu on every page. A menu named by slug, such as a schema default or starter content, resolves to the current language's menu of that name, falling back to the default language's. See [Menus & Snippets](theme-dev-menus-snippets.html).
 
 **`link`:** Structured link object with `href`, `text`, and `target`.
 
@@ -356,6 +361,10 @@ Render sanitization rebuilds each row from the declared columns only (dropping u
   }
 }
 ```
+
+A page or collection item picked in the editor is stored as a stable reference. In the template, `href` is already resolved for the page's depth, the Clean URLs setting and the target's language; a picked English page stays English when the link sits on a Greek page. A typed URL is passed through as written. `link` settings in `theme.json` behave the same way.
+
+A slug in a `default` like the one above (`"contact.html"`) is never connected to a page, whether the default is used at render time or copied into a widget the owner adds. Ship real starter links in templates or presets; see [Starter Links and Updates](theme-dev-distribution.html#starter-links-and-updates).
 
 Optional properties:
 
@@ -382,9 +391,9 @@ Optional properties:
 
 # Where Settings Are Used
 
-- **Theme settings** live in `theme.json` and render via `{% theme_settings %}`.
+- **Theme settings** live in `theme.json`, are read as `theme.{group}.{id}` and can output CSS variables via `{% theme_settings %}`. They're shared by every language of a site.
 - **Widget settings** live in `widgets/*/schema.json` and are accessed via `widget.settings.*`.
 - **Block settings** live in the widget schema's `blocks` array and are accessed via `block.settings.*`.
-- **Collection fields** live in `collection-types/*/schema.json` and are accessed via `item.settings.*`. They use these same types, plus a few collection-only flags (`usedAsTitle`, `usedAsDate`, `required`); see [Collections](theme-dev-collections.html).
+- **Collection fields** live in `collection-types/*/schema.json` and are accessed via `item.settings.*`. They use these same types, plus a few collection-only flags (`usedAsTitle`, `usedAsDate`, `usedAsImage`, `required`); see [Collections](theme-dev-collections.html).
 
 See [Widgets & Blocks](theme-dev-widgets-blocks.html) for widget schema patterns, and [Liquid Tags & Filters](theme-dev-liquid-assets.html) for rendering tips.

@@ -101,7 +101,7 @@ This table is the complete list. There is no `toggle`, `boolean`, `url`, `html`,
 | `header` | None | `label`, optional `description`; use a unique ID by convention. |
 | `text` | String | Plain text, autoescaped. |
 | `textarea` | String | Multiline plain text; line breaks do not automatically become HTML breaks. |
-| `number` | Number, or `""` when cleared | Optional numeric `min`, `max`, `step`. Guard empty values before arithmetic. |
+| `number` | Number, or `""` when cleared | Optional numeric `min`, `max`, `step`; values outside `min`/`max` are clamped in the editor and at render. Guard empty values before arithmetic. |
 | `range` | Number | Set meaningful `min`, `max`, `step`, and `default`; optional `unit`. Widgets must append a desired unit themselves in markup/CSS; automatic CSS variable units apply to global settings. |
 | `checkbox` | Boolean | Use `true`/`false`, not strings. `toggle` is not a registered setting type. |
 | `select` | Selected option value | Supply `options: [{ "value": "wide", "label": "Wide" }]`; make defaults belong to the options. Prefer strings for portable enum values. |
@@ -142,7 +142,7 @@ Example table field and value:
 ]
 ```
 
-`required` is enforced for collection item data through its validation path; do not assume setting the flag gives all widget inputs server-side required validation. Collection-only `usedAsTitle`/`usedAsDate` rules are in the content reference. `outputAsCssVar` is for global theme settings, not automatic per-widget styling.
+`required` is enforced for collection item data through its validation path; do not assume setting the flag gives all widget inputs server-side required validation. Collection-only `usedAsTitle`/`usedAsDate`/`usedAsImage` rules are in the content reference. `outputAsCssVar` is for global theme settings, not automatic per-widget styling.
 
 ## Defaults and links
 

@@ -74,6 +74,7 @@ Collections are optional. Put schemas in `collection-types/<type>/schema.json`; 
 - `type` matches `^[a-z0-9-]+$` and the folder name; `settings` is an array of supported fields with IDs.
 - Exactly one non-header field has `usedAsTitle: true`, and it is `text`.
 - At most one non-header field has `usedAsDate: true`, and it is `date`.
+- At most one non-header field has `usedAsImage: true`, and it is `image`. Item pages use it as the share image when the item's SEO image is empty.
 - Schema-level blocks and setting keys `multiple`, `repeater`, and `blocks` are unsupported. Items are flat records; use `gallery` or `table` fields for supported repeated content.
 - `defaultSort`, if supplied, is `manual`, `created_desc`, `created_asc`, `title_asc`, `title_desc`, `date_desc`, or `date_asc`. Date sorting requires the date field.
 - Item-page `slugPrefix` matches the slug pattern and is not `assets`; omitted prefix defaults to `type`. Effective prefixes must be unique across collections on theme import, including after applying updates.
@@ -81,7 +82,7 @@ Collections are optional. Put schemas in `collection-types/<type>/schema.json`; 
 - A supplied `structuredData` mapping must match the supported type/field rules below.
 - Presets must not contain `collection-types/`.
 
-**Contract:** provide the item template when advertising item pages; the schema validator is not a complete template-existence/render check. Keep setting IDs unique and define all values your templates use. `schemaVersion` is bookkeeping, not an automatic migration script. Avoid collisions with generated page paths; `page` is reserved as a page/item slug, and a collection prefix `page` can conflict with homepage pagination during export.
+**Contract:** provide the item template when advertising item pages; the schema validator is not a complete template-existence/render check. Keep setting IDs unique and define all values your templates use. `schemaVersion` is bookkeeping, not an automatic migration script. Avoid collisions with generated page paths; `page` is reserved as a page/item slug, and a collection prefix `page` can conflict with homepage pagination during export. Don't use an item-page prefix shaped like a language code (two letters, optionally followed by a real region or script, such as `pt-br` or `zh-hant`): a site's additional languages publish into folders named by their codes, so a site with that language can't add it, and an update that brings the collection in is refused. The validator warns about both.
 
 An item-page template reads `item.settings`, `collection`, `page`, and `theme`. It produces the item's main content; the engine surrounds it with header/footer and the theme layout. Do not embed another complete HTML document inside it.
 
@@ -120,7 +121,7 @@ This is a fragment to merge into a full widget schema. The editor injects the `l
 
 Define the visitor string used here. `entry.url` is absent/null for a list-only collection. Results contain prepared settings and stable record identity. The theme is responsible for a useful empty state.
 
-**Enforced on page save:** at most one paginating widget per page; positive whole-number items per page; valid collection/perPageSetting configuration. Pagination makes that widget an anchor. Anchor coordination clears competing anchors/pagination for the collection on other pages.
+**Enforced on page save:** at most one paginating widget per page; positive whole-number items per page; valid collection/perPageSetting configuration. Pagination and the anchor are independent. Anchor coordination clears competing anchors for the collection on other pages and leaves their pagination alone.
 
 The engine supplies `pagination.current`, `.total`, `.perPage`, `.totalItems`, `.prevHref`, `.nextHref`, and `.pages` entries (`number`, `href`, `current`). Pagination can be absent when all items fit on one page. The filter's slice is applied to the active listing widget only. Use supplied hrefs; do not calculate nested page URLs yourself.
 

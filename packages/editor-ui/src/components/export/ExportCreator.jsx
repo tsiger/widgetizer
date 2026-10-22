@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import Button from "../ui/Button";
 import { exportProjectAPI } from "../../queries/exportManager";
@@ -7,6 +8,14 @@ import useToastStore from "../../stores/toastStore";
 import { Loader2, Package } from "lucide-react";
 import { summarizeStructuredData } from "../../utils/structuredDataSummary";
 import { nativeLanguageName } from "@widgetizer/core/languages";
+import { useIsMultilang } from "../../stores/projectStore";
+import { useThemeLocale } from "../../hooks/useThemeLocale";
+import { useEditorPath } from "../../lib/routeBase.jsx";
+import { itemEditHref } from "../../lib/contentRoutes";
+import { languageLabel } from "../../lib/languageLabel.js";
+
+// Items named under a refused export; the rest are counted.
+const INVALID_ITEMS_SHOWN = 5;
 
 export default function ExportCreator({
   activeProject,
@@ -32,6 +41,11 @@ export default function ExportCreator({
   const [localSkipped, setLocalSkipped] = useState([]);
   const skippedLanguages = setSkippedFromParent ? skippedFromParent || [] : localSkipped;
   const setSkippedLanguages = setSkippedFromParent || setLocalSkipped;
+  // Items whose missing fields stopped the last export, so each can be opened and fixed.
+  const [invalidItems, setInvalidItems] = useState([]);
+  const isMultilang = useIsMultilang();
+  const { tTheme } = useThemeLocale();
+  const editorPath = useEditorPath();
   const showToast = useToastStore((state) => state.showToast);
   const isEmptyState = variant === "empty";
 
@@ -55,6 +69,7 @@ export default function ExportCreator({
     setLastExport(null);
     setStructuredDataSummary(null);
     setSkippedLanguages([]);
+    setInvalidItems([]);
 
     try {
       const result = await exportProjectAPI(projectIdAtStart, { exportMarkdown });
@@ -76,6 +91,7 @@ export default function ExportCreator({
       if (useProjectStore.getState().activeProject?.id !== projectIdAtStart) return;
       console.error("Exporting failed:", err);
       showToast(err.message || t("exportSite.toasts.unknownError"), "error");
+      setInvalidItems(Array.isArray(err.data?.invalidItems) ? err.data.invalidItems : []);
     } finally {
       setIsExporting(false);
     }
@@ -122,6 +138,37 @@ export default function ExportCreator({
           <p className="mt-1 text-sm text-green-700">
             {t("exportSite.creator.successCreated", { date: formatDate(lastExport.timestamp) })}
           </p>
+        </div>
+      )}
+
+      {invalidItems.length > 0 && (
+        <div
+          className={`mt-4 rounded-sm border border-red-200 bg-red-50 p-4 ${isEmptyState ? "w-full max-w-md text-left" : ""}`}
+          role="alert"
+        >
+          <p className="text-sm font-medium text-red-900">{t("exportSite.invalidItems.title")}</p>
+          <ul className="mt-2 space-y-1 text-sm text-red-800">
+            {invalidItems.slice(0, INVALID_ITEMS_SHOWN).map((item) => (
+              <li key={`${item.collection}/${item.language}/${item.slug}`}>
+                <Link
+                  to={editorPath(itemEditHref(item.collection, item, isMultilang))}
+                  className="font-medium underline hover:text-red-950"
+                >
+                  {tTheme(item.collectionName)}: {item.title || item.slug}
+                </Link>
+                {isMultilang && ` (${languageLabel(item.language)})`}
+                {" — "}
+                {(item.errors || [])
+                  .map((error) => t("exportSite.invalidItems.field", { field: tTheme(error.fieldLabel) }))
+                  .join(", ")}
+              </li>
+            ))}
+          </ul>
+          {invalidItems.length > INVALID_ITEMS_SHOWN && (
+            <p className="mt-1 text-sm text-red-800">
+              {t("exportSite.invalidItems.more", { count: invalidItems.length - INVALID_ITEMS_SHOWN })}
+            </p>
+          )}
         </div>
       )}
 

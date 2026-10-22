@@ -34,6 +34,21 @@ vi.mock("../../hooks/useGuardedFormPage", () => ({
     return { getDirtyTitle: (title) => title };
   },
 }));
+// Labels come from the theme; the corrected-value sentence from the editor's own text.
+vi.mock("../../hooks/useThemeLocale", () => ({
+  // Like the real resolver: a key it cannot find comes back without its prefix.
+  useThemeLocale: () => ({
+    tTheme: (str) =>
+      str === "tTheme:global.colors.settings.accent.label"
+        ? "Accent color"
+        : str.startsWith("tTheme:")
+          ? str.slice("tTheme:".length)
+          : str,
+  }),
+}));
+vi.mock("react-i18next", () => ({
+  useTranslation: () => ({ t: (key, options) => (options?.label ? `${key}(${options.label})` : key) }),
+}));
 vi.mock("../../components/layout/PageLayout", () => ({
   default: ({ children }) => <div>{children}</div>,
 }));
@@ -89,7 +104,10 @@ describe("Site settings save", () => {
   it("shows each warning as text", async () => {
     saveThemeSettingChanges.mockResolvedValueOnce({
       theme: saved("#0000ff"),
-      warnings: [{ code: "MEDIA_USAGE_STALE", path: "theme.json" }, { code: "SETTING_REMOVED", id: "old" }],
+      warnings: [
+        { code: "MEDIA_USAGE_STALE", path: "theme.json" },
+        { code: "SETTING_REMOVED", id: "old" },
+      ],
     });
     fireEvent.click(await openAndEdit());
 
@@ -101,9 +119,48 @@ describe("Site settings save", () => {
     expect(message).toContain("themeSettings.toasts.settingRemoved");
   });
 
+  it("names a corrected setting by its translated label, in the editor's own words", async () => {
+    saveThemeSettingChanges.mockResolvedValueOnce({
+      theme: saved("#ff0000"),
+      warnings: [
+        { code: "VALUE_CORRECTED", id: "accent", label: "tTheme:global.colors.settings.accent.label" },
+        { code: "VALUE_CORRECTED", message: '"Old" contained an invalid value and was reset.' },
+      ],
+    });
+    fireEvent.click(await openAndEdit());
+
+    await waitFor(() => expect(showToast).toHaveBeenCalled());
+    const [message] = showToast.mock.calls[0];
+    expect(message).toContain("themeSettings.toasts.valueCorrected(Accent color)");
+    expect(message).not.toContain("tTheme:");
+    // A correction that names no setting (the older whole-file save) keeps the server's sentence.
+    expect(message).toContain('"Old" contained an invalid value and was reset.');
+  });
+
+  it("leaves a corrected setting unnamed while its label is not translated yet, and keeps other warnings' own text", async () => {
+    saveThemeSettingChanges.mockResolvedValueOnce({
+      theme: saved("#ff0000"),
+      warnings: [
+        { code: "VALUE_CORRECTED", id: "border", label: "tTheme:global.colors.settings.border.label" },
+        { code: "SOMETHING_NEW", id: "accent", message: "Something new happened." },
+      ],
+    });
+    fireEvent.click(await openAndEdit());
+
+    await waitFor(() => expect(showToast).toHaveBeenCalled());
+    const [message] = showToast.mock.calls[0];
+    expect(message).toContain("themeSettings.toasts.valueCorrectedUnnamed");
+    expect(message).not.toContain("global.colors.settings.border.label");
+    expect(message).toContain("Something new happened.");
+  });
+
   it("says the settings changed elsewhere and keeps the edit unsaved", async () => {
     saveThemeSettingChanges.mockRejectedValueOnce(
-      Object.assign(new Error("changed"), { status: 409, code: "THEME_SETTINGS_CHANGED", data: { conflicts: ["accent"] } }),
+      Object.assign(new Error("changed"), {
+        status: 409,
+        code: "THEME_SETTINGS_CHANGED",
+        data: { conflicts: ["accent"] },
+      }),
     );
     getThemeSettings.mockResolvedValueOnce(JSON.parse(JSON.stringify(THEME))).mockResolvedValueOnce(saved("#00ff00"));
     fireEvent.click(await openAndEdit());

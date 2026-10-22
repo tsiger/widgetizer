@@ -259,12 +259,20 @@
       "receiveThemeUpdatesHelp": "Get notified when a new version of the theme is available.",
       "identity": {
         "help": "Who is behind this site. Search engines read these details, and your theme can show them on the site.",
-        "readinessLabel": "Search engines can't see these details yet:",
+        "readiness": {
+          "title": "Search Engines",
+          "progress": "{{done}} of {{total}} ready",
+          "allReady": "Ready for search engines",
+          "help": "Search engines read who is behind your site from these details once they are filled in.",
+          "add": "Add",
+          "publicNameNote": "Used instead of the Site Title"
+        },
         "readinessItems": {
-          "siteUrl": "site address",
-          "name": "name",
-          "logo": "logo",
-          "address": "address"
+          "siteUrl": "Site Address",
+          "name": "Site Title",
+          "publicName": "Public Name",
+          "logo": "Logo",
+          "address": "Address"
         },
         "categoryLabel": "What best describes you?",
         "categoryHelp": "Pick the closest match. A local business gets a Business Details tab for its address and opening hours.",
@@ -697,13 +705,14 @@
     "noWidgetsFound": "No widgets found",
     "paginate": {
       "label": "Split into pages",
-      "description": "Shows this many items per page, with page links below the list. Makes this the main page for the collection.",
+      "description": "Shows this many items per page, with page links below the list.",
       "onlyOne": "Only one list per page can be split into pages, and \"{{widget}}\" already is."
     },
     "listingAnchor": {
+      "header": "Collection",
       "label": "Main {{collection}} page",
       "description": "Marks this page as the home of this collection. Its items show it in their breadcrumbs, e.g. Home › Blog › A post. Only one page per collection.",
-      "moved": "This is now the main page for that collection — moved from {{pages}}. If that page was split into pages, it no longer is."
+      "moved": "This is now the main page for that collection — moved from {{pages}}."
     },
     "themeConflict": "Site settings were changed elsewhere since this editor opened. Your theme changes are kept on top of the current settings and will be saved.",
     "mediaUsage": {
@@ -922,6 +931,12 @@
       "exportError": "Exporting failed with an unknown issue.",
       "unknownError": "An unknown error occurred during exporting."
     },
+    "invalidItems": {
+      "title": "These items need fixing before the site can be exported",
+      "field": "{{field}} is empty",
+      "more_one": "and {{count}} more item",
+      "more_other": "and {{count}} more items"
+    },
     "languages": {
       "skippedTitle": "Some languages were not exported",
       "skipped_one": "{{languages}} has no homepage, so it was left out — and links pointing into it were removed from the exported pages. Create a page with the slug 'index' in it and export again.",
@@ -952,6 +967,7 @@
       "conflict": "Some of these settings were changed elsewhere since this page opened. Your changes are kept on top of the current settings; review them and save again.",
       "settingRemoved": "A setting you changed no longer exists in this theme, so that change was not saved.",
       "valueCorrected": "\"{{label}}\" contained an invalid value and was reset.",
+      "valueCorrectedUnnamed": "A setting contained an invalid value and was reset.",
       "mediaUsageStale": "Your settings are saved. Widgetizer could not update its record of which images they use, so the media library may show one as unused until you press Refresh usage there."
     }
   },

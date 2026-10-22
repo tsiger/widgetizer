@@ -12,19 +12,19 @@ The layout and templates system defines how pages are assembled. `layout.liquid`
 
 ```liquid
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ page.language | default: project.defaultLanguage | default: 'en' }}" dir="{{ page.dir | default: 'ltr' }}">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  {% seo %}                     {# title, description, Open Graph, canonical #}
-  {% fonts %}                   {# font preconnect + stylesheet #}
+  {% seo %}
+  {% fonts %}
   {% render 'site-icons', site_icons: site_icons %}
-  {% theme_settings %}          {# CSS variables from global settings #}
-  {% asset src: "base.css" %}   {# theme base styles (after theme_settings) #}
-  {% custom_css %}              {# optional: user custom CSS #}
-  {% custom_head_scripts %}     {# optional: analytics, etc. #}
-  {% header_assets %}           {# enqueued header styles/scripts #}
+  {% theme_settings %}
+  {% asset src: "base.css" %}
+  {% custom_css %}
+  {% custom_head_scripts %}
+  {% header_assets %}
 </head>
 <body class="{{ body_class }}">
   {{ header | raw }}
@@ -36,22 +36,24 @@ The layout and templates system defines how pages are assembled. `layout.liquid`
   {{ footer | raw }}
 
   {% asset src: "scripts.js", defer: true %}
-  {% footer_assets %}           {# enqueued footer styles/scripts #}
-  {% custom_footer_scripts %}   {# optional: pre-</body> scripts #}
+  {% footer_assets %}
+  {% custom_footer_scripts %}
 </body>
 </html>
 ```
 
 `themes/arch/layout.liquid` is a complete, production-ready version you can reference. For the full tag reference and ordering rules, see [Liquid Tags & Filters](theme-dev-liquid-assets.html).
 
+`page.language` and `page.dir` give the document the language and direction of the page being rendered, so a site that publishes in several languages gets the right `lang` on every page. Don't hardcode `lang="en"`. See [Localization](theme-dev-localization.html#the-document-language).
+
 ### Recommended Head Order
 
 Keep global head tags in this order unless your theme has a specific reason to move them:
 
 1. Native document metadata: charset, viewport, format detection, and other static `<meta>` tags.
-2. `{% seo %}` so page SEO, canonical, Open Graph, and Twitter tags are present on every page.
+2. `{% seo %}` so page SEO, canonical, language alternates, Open Graph, Twitter tags and structured data are present on every page.
 3. `{% fonts %}` so web font preconnects and stylesheets load before CSS uses those families.
-4. `{% render 'site-icons', site_icons: site_icons %}` so favicon, Apple touch icon, and manifest links are emitted when configured.
+4. `{% render 'site-icons', site_icons: site_icons %}` so favicon, search-result icon, Apple touch icon, and manifest links are emitted when configured.
 5. `{% theme_settings %}` before your CSS so generated CSS variables exist.
 6. Global CSS with `{% asset src: "base.css" %}`.
 7. `{% custom_css %}` after theme CSS so user CSS can override it.
@@ -75,13 +77,13 @@ Your layout must render the three content placeholders. They contain **pre-rende
 
 ### Site Icons
 
-If your theme exposes a favicon image setting (Arch uses `theme.general.favicon`), render the provided `site_icons` object through a snippet:
+If your theme exposes an image setting with id `favicon` (in any group; Arch keeps it in `general`), render the provided `site_icons` object through a snippet:
 
 ```liquid
 {% render 'site-icons', site_icons: site_icons %}
 ```
 
-The object contains precomputed favicon, Apple touch icon, and manifest paths. Export rewrites those paths for nested pages, so theme authors should render the provided values instead of hardcoding favicon filenames.
+`site-icons` is a theme snippet, not a built-in one, so ship your own in `snippets/` (Arch's `snippets/site-icons.liquid` is a good copy). The object contains precomputed favicon, search-result icon (`serpIconHref`), Apple touch icon, and manifest paths. Export generates those files, plus an unlinked `favicon.ico` at the site root, and rewrites the paths for nested pages, so render the provided values instead of hardcoding favicon filenames. See [Layout Values](theme-dev-liquid-assets.html#layout-values) for every field.
 
 # Page Templates (templates/\*.json)
 
@@ -115,6 +117,12 @@ Blocks live inside a widget definition:
 
 - `blocks`: object keyed by block ID
 - `blocksOrder`: array of block IDs in order
+
+### Starter Content Becomes the Owner's
+
+When a project is created, each template becomes an ordinary page the owner edits, in the site's default language. Templates are never re-applied: a theme update adds templates that are new, as new pages, and leaves existing pages alone. If the owner adds another language later, they create those pages themselves (the menus, header and footer are copied for them).
+
+Links in templates can name pages by slug (`"href": "contact.html"`). Widgetizer connects them to the matching page when the project is created, so they keep working after a rename and on pages inside folders. A link that comes only from a `schema.json` default is never connected to a page: put starter links in the template or preset instead. See [Starter Links and Updates](theme-dev-distribution.html#starter-links-and-updates).
 
 # Global Templates (templates/global/\*.json)
 

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { X } from "lucide-react";
+import { Circle, CircleCheck, X } from "lucide-react";
 import { SITE_IDENTITY_CATEGORIES, PROFILE_NETWORKS, identityReadiness } from "@widgetizer/core/siteIdentity";
 import { readThemeSetting } from "@widgetizer/core/themeSettingChanges";
 import { IconButton } from "@widgetizer/editor-ui/components/ui/Button.jsx";
@@ -128,27 +128,60 @@ export default function SiteIdentityFields({
 
 function Readiness({ values, logoFile, siteUrl, siteTitle, onGoTo }) {
   const { t } = useTranslation();
-  const missing = identityReadiness(formToIdentity(values).value, { siteUrl, siteTitle }).filter(
-    (entry) => !entry.ok && !(entry.item === "logo" && logoFile),
+  const items = identityReadiness(formToIdentity(values).value, { siteUrl, siteTitle }).map((entry) =>
+    entry.item === "logo" && logoFile ? { ...entry, ok: true } : entry,
   );
-  if (!missing.length) return null;
+  const usesPublicName = !!values?.publicName?.trim();
+  const done = items.filter((entry) => entry.ok).length;
+  const allReady = done === items.length;
 
   return (
-    <p className="rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700" role="status">
-      {t("forms.project.identity.readinessLabel")}{" "}
-      {missing.map((entry, index) => (
-        <span key={entry.item}>
-          {index > 0 && ", "}
-          <button
-            type="button"
-            onClick={() => onGoTo(entry.item)}
-            className="font-medium text-pink-600 underline hover:text-pink-700"
-          >
-            {t(`forms.project.identity.readinessItems.${entry.item}`)}
-          </button>
-        </span>
-      ))}
-    </p>
+    <section
+      aria-labelledby="identity-readiness-title"
+      className="rounded-sm border border-yellow-200 bg-yellow-100 p-5 text-sm shadow-md lg:rotate-1"
+    >
+      <h3 id="identity-readiness-title" className={`text-base font-semibold ${allReady ? "text-green-700" : "text-slate-900"}`}>
+        {allReady ? t("forms.project.identity.readiness.allReady") : t("forms.project.identity.readiness.title")}
+      </h3>
+      {/* Stays mounted so finishing the last item is announced too; the heading already shows it. */}
+      <p className={allReady ? "sr-only" : "mt-0.5 text-slate-700"} role="status">
+        {allReady
+          ? t("forms.project.identity.readiness.allReady")
+          : t("forms.project.identity.readiness.progress", { done, total: items.length })}
+      </p>
+      <ul className="mt-3 space-y-2">
+        {items.map((entry) => {
+          const nameFromPublicName = entry.item === "name" && usesPublicName;
+          const label = t(`forms.project.identity.readinessItems.${nameFromPublicName ? "publicName" : entry.item}`);
+          return (
+            <li key={entry.item} className="flex items-start gap-2">
+              {entry.ok ? (
+                <CircleCheck size={18} className="mt-px shrink-0 text-green-700" aria-hidden="true" />
+              ) : (
+                <Circle size={18} className="mt-px shrink-0 text-yellow-700/60" aria-hidden="true" />
+              )}
+              <span className="text-slate-800">
+                {label}
+                {nameFromPublicName && (
+                  <span className="block text-slate-600">{t("forms.project.identity.readiness.publicNameNote")}</span>
+                )}
+              </span>
+              {!entry.ok && (
+                <button
+                  type="button"
+                  onClick={() => onGoTo(entry.item)}
+                  aria-label={`${t("forms.project.identity.readiness.add")} ${label}`}
+                  className="ml-auto font-medium text-pink-600 underline hover:text-pink-700"
+                >
+                  {t("forms.project.identity.readiness.add")}
+                </button>
+              )}
+            </li>
+          );
+        })}
+      </ul>
+      {!allReady && <p className="mt-4 text-sm text-slate-700">{t("forms.project.identity.readiness.help")}</p>}
+    </section>
   );
 }
 

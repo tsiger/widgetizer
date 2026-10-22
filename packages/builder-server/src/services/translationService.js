@@ -14,7 +14,7 @@
  */
 import { normalizeLanguageCode } from "@widgetizer/core/languages";
 import { itemsDir, itemKey, pageKey, pagesDir, translationGroupIdOf } from "@widgetizer/core/contentAddress";
-import { projectLanguages, projectLanguageContexts } from "../utils/contentLanguage.js";
+import { languageNameForMessage, projectLanguages, projectLanguageContexts } from "../utils/contentLanguage.js";
 import { createKeyedSerializer } from "../utils/serializeByKey.js";
 
 // Checking whether a language already holds a member, allocating the slug and
@@ -145,5 +145,5 @@ export async function findGroupMembers({ storage, scope, project, groupId }) {
  */
 export function assertLanguageFree(existing, language, what) {
   if (!existing) return;
-  throw new TranslationError(`A ${what} in "${language}" already exists for this translation group.`, 409);
+  throw new TranslationError(`A ${what} in ${languageNameForMessage(language)} already exists for this translation group.`, 409);
 }

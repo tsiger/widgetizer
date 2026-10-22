@@ -29,6 +29,7 @@ A collection type is defined by `collection-types/{type}/schema.json` in the the
 - **Allowed field types** are the standard editor setting types — validated via `isSupportedSettingType` against `SUPPORTED_SETTING_TYPES` (`packages/core/src/config/settingTypes.js`), the single source of truth shared with the editor's `SettingsRenderer`. An item is a **flat record**, so the repeater-style keys `multiple`, `repeater`, and `blocks` are **disallowed** (use a `table` or `gallery` for repetition within a field). For the per-type authoring shapes — including the `richtext` toolbar options — see [Setting Types](theming-setting-types.md).
 - **`usedAsTitle: true`** — exactly one field, which must be `text`. It supplies the item's title and the auto-generated slug.
 - **`usedAsDate: true`** — at most one field, which must be `date`. It becomes the sort key for `date_desc` / `date_asc` (items with a blank date sort last).
+- **`usedAsImage: true`** — at most one field, which must be `image`. On item pages it is the share image (`og:image` / `twitter:image`) when the item's own SEO image is empty.
 - **`required: true`** — the item fails validation until the field has a non-empty value.
 - **`table`** columns are `text`-only in v1; each column id must match `^[a-zA-Z][a-zA-Z0-9_]*$` and must not be `__proto__` / `constructor` / `prototype`.
 
@@ -161,12 +162,12 @@ ticked: the editor holds the change until save, so clearing another page earlier
 would strip its anchor for an edit the user might discard. The save response
 carries `listingAnchorMovedFrom` with the names of the pages it cleared, which
 the editor announces. A duplicated page starts unclaimed — it is written directly
-and the sweep never sees it (duplicating or pasting a widget in the editor clears the flag too). A duplicated *project* keeps its anchors, since the
+and the sweep never sees it (duplicating or pasting a widget in the editor clears the flag too, and `paginate` with it, since one page cannot hold two paginators). A duplicated page keeps `paginate`. A duplicated *project* keeps its anchors, since the
 whole hierarchy is copied and stays internally consistent. If data ever holds two
 anchors anyway, the first page by slug wins so every render agrees.
 
-Pagination leans on the anchor: a paginating widget always holds it, and when the
-sweep takes the anchor from a page it also turns that page's `paginate` off (§5b).
+Pagination is independent of the anchor: a paginating widget need not hold it, and
+the sweep leaves `paginate` alone on the pages it takes the anchor from (§5b).
 
 ---
 
@@ -180,9 +181,9 @@ A listing widget can split its page into numbered copies. The schema names the s
 "collection": { "type": "news", "perPageSetting": "limit" }
 ```
 
-`SettingsPanel.jsx` then injects a **"Split into pages"** checkbox (`paginate`) beside the anchor checkbox. Turning it on also ticks the anchor, sets items per page to 12 when it was below 1, and refuses (a toast naming the holder) when another widget on the page already paginates. While it is on, items per page cannot drop below 1, and unticking the anchor turns it off.
+`SettingsPanel.jsx` then injects a **"Split into pages"** checkbox (`paginate`) just before that setting (at the end when the schema has no such setting); the anchor checkbox sits apart, in its own **Collection** section after the theme's settings. Turning it on sets items per page to 12 when it was below 1, in the same undo step (`updateWidgetSettingValues`), and refuses (a toast naming the holder) when another widget on the page already paginates. While it is on, items per page cannot drop below 1. It does not touch the anchor.
 
-**Server rules** — `enforcePaginationRules` in `pageController.js`, run by `savePageContent` and by `updatePage` whenever widgets are sent. Items per page (the widget's value, else the schema default) must be a whole number ≥ 1, else `422`. A widget whose schema lacks `collection.type`, a string `perPageSetting` or an array `settings` has `paginate` switched off. Two paginating widgets on one page → `422`. A paginating widget gets `listing_anchor: true`; the anchor sweep then clears the anchor and `paginate` on other pages.
+**Server rules** — `enforcePaginationRules` in `pageController.js`, run by `savePageContent` and by `updatePage` whenever widgets are sent. Items per page (the widget's value, else the schema default) must be a whole number ≥ 1, else `422`. A widget whose schema lacks `collection.type`, a string `perPageSetting` or an array `settings` has `paginate` switched off. Two paginating widgets on one page → `422`. `paginate` never sets or needs `listing_anchor`.
 
 **Planning** — `planPagination(deps, widgets, widgetsOrder, { pageSlug, currentPage })` in `render-engine` picks the first widget that can paginate, counts valid items through `deps.countCollectionItems`, and returns `{ widgetId, collectionType, perPage, totalItems, total, current, pageSlug }` — or `null` when nothing paginates or everything fits on one page, in which case output is unchanged. Callers put the plan on `sharedGlobals.paginationPlan`. Never name it `sharedGlobals.pagination`: render globals are visible to Liquid, so that name would hand a pager object to every widget.
 
@@ -199,7 +200,7 @@ A listing widget can split its page into numbered copies. The schema names the s
 
 The widget keeps calling `'news' | collection: limit: …`; the engine sets `globals.collectionSlice` around that one widget's render, and the filter applies the offset and limit (§5).
 
-**Addresses** — `packages/core/src/utils/contentAddress.js`. Page 1 is the page itself; copies are `<slug>/page/<n>.html`, or `page/<n>.html` for the homepage (`pageOutputPath`), linked with `pagedHref`. `page` is a reserved page and item slug (`isReservedPageSlug`, `isReservedItemSlug`). A collection `slugPrefix` of `page` stays allowed, but export refuses when the homepage paginates and a collection with item pages (`hasItemPages: true`) uses that prefix; a list-only collection never writes there.
+**Addresses** — `packages/core/src/utils/contentAddress.js`. Page 1 is the page itself; copies are `<slug>/page/<n>.html`, or `page/<n>.html` for the homepage (`pageOutputPath`), linked with `pagedHref`. `page` is a reserved page and item slug (`isReservedPageSlug`, `isReservedItemSlug`). A collection `slugPrefix` of `page` stays allowed, but export refuses when the homepage of any exported language paginates and a collection with item pages (`hasItemPages: true`) uses that prefix; a list-only collection never writes there. A `slugPrefix` equal to an enabled language code is refused when the language is added, by a theme update that would bring it in, and by an export that writes that language — the collection's main-language items and the language's pages would share a folder. A theme cannot know which languages a site adds, so `validate:theme` warns about an item-page prefix that reads as a language code a site can add — one `isValidLanguageCode` accepts that is a bare two-letter code or carries a real region or script (`pt-br`, `zh-hant`); `my-work` passes that check but stays quiet — as it does about `page` — in the theme's own collections and in those its updates newer than the base bring in.
 
 **SEO** — `SeoTag.js` gives page 2+ a `Blog - 2 - Site` title, its own absolute canonical (a custom `canonical_url` applies to page 1 only) and `rel="prev"` / `rel="next"` when a Site URL is set. Page 2+ publishes no `hreflang` alternates: its translations point at the base pages, which would leave the copy out of its own set, and another language may have a different number of copies. The sitemap omits them on copies for the same reason; the visitor language switcher still links each language's base page. Copies join the sitemap, and robots.txt when the page is noindex. Breadcrumbs on page 2+ end with a numbered crumb (`pageNumber`).
 

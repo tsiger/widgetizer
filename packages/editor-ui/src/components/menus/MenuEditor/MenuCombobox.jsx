@@ -1,17 +1,19 @@
 import { useState, useEffect, useRef, useMemo, memo } from "react";
 import { ChevronDown } from "lucide-react";
 import ComboboxOptionList from "../../ui/ComboboxOptionList.jsx";
+import ComboboxLanguageBadge from "../../ui/ComboboxLanguageBadge.jsx";
+import { useIsMultilang } from "../../../stores/projectStore";
 
 // Custom Combobox for menu editor with higher z-index and external control
 const MenuCombobox = memo(function MenuCombobox({ options, value, onChange, placeholder, isOpen, onOpenChange }) {
   const [searchTerm, setSearchTerm] = useState("");
   const containerRef = useRef(null);
 
+  const isMultilang = useIsMultilang();
+  const selectedOption = useMemo(() => options.find((option) => option.value === value), [value, options]);
   // Use value directly, no separate displayValue state
-  const displayValue = useMemo(() => {
-    const selectedOption = options.find((option) => option.value === value);
-    return selectedOption ? selectedOption.label : value || "";
-  }, [value, options]);
+  const displayValue = selectedOption ? selectedOption.label : value || "";
+  const badgeLanguage = isMultilang ? selectedOption?.language : undefined;
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -62,8 +64,9 @@ const MenuCombobox = memo(function MenuCombobox({ options, value, onChange, plac
             setSearchTerm("");
           }}
           placeholder={placeholder}
-          className="form-input w-full pr-10"
+          className={`form-input w-full ${badgeLanguage ? "pr-20" : "pr-10"}`}
         />
+        {badgeLanguage && <ComboboxLanguageBadge language={badgeLanguage} />}
         <button
           type="button"
           onClick={toggleDropdown}

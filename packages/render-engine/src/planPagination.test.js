@@ -64,6 +64,18 @@ describe("planPagination", () => {
     expect((await planPagination(deps(), { w1: paginating() }, ["w1"], { pageSlug: "blog" })).perPage).toBe(3);
   });
 
+  it("pages by the per-page value the list renders, kept inside the schema's limits", async () => {
+    writeSchema("news-grid", {
+      collection: { type: "news", perPageSetting: "limit" },
+      settings: [{ id: "limit", type: "number", default: 3, min: 2, max: 3 }],
+    });
+    const plan = await planPagination(deps(), { w1: paginating({ limit: 99 }) }, ["w1"], { pageSlug: "blog" });
+    expect(plan.perPage).toBe(3);
+    expect(plan.total).toBe(3);
+    expect((await planPagination(deps(), { w1: paginating({ limit: 1 }) }, ["w1"], { pageSlug: "blog" })).perPage).toBe(2);
+    expect(await planPagination(deps(), { w1: paginating({ limit: "" }) }, ["w1"], { pageSlug: "blog" })).toBeNull();
+  });
+
   it("skips widgets that cannot paginate and uses the next one that can", async () => {
     const widgets = {
       missing: paginating({ limit: 2 }, "ghost-grid"),

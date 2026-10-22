@@ -17,6 +17,8 @@ They cover the small, structural pieces that nearly every site needs, so themes 
 
 A contact or inquiry form you build visually from field blocks. It has its own guide: see [Forms](forms.html).
 
+On a [multilingual site](languages.html), new fields and the texts you haven't changed (such as the submit button) follow the page's language. Fields copied with a page keep their original wording until you translate them.
+
 ### Divider
 
 A horizontal line for separating sections. You can set its **color**, **thickness** (1-10px), **width** (10-100% of the container), and the **padding** above and below it.

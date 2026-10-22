@@ -1,12 +1,12 @@
 ---
-description: Download Widgetizer for macOS or Windows, run it on a server with Docker, or start it from source with Node.js.
+description: Download Widgetizer Desktop for macOS or Windows, run it on a server with Docker, or start it from source with Node.js.
 ---
 
-Widgetizer runs as a native desktop app for macOS and Windows: download it, install it, and start building. Want it on a server instead? Run it with Docker. And if you prefer your own development environment, you can start it from source with Node.js.
+Widgetizer runs as a native desktop app, **Widgetizer Desktop**, for macOS and Windows: download it, install it, and start building. Want it on a server instead? Run it with Docker. And if you prefer your own development environment, you can start it from source with Node.js.
 
 # Download the Desktop App
 
-The desktop app is the easiest way to use Widgetizer. It is a normal installer with no setup, and it updates itself automatically, so you are always on the latest version.
+Widgetizer Desktop is the easiest way to use Widgetizer. It is a normal installer with no setup, and it updates itself automatically, so you are always on the latest version.
 
 <div class="download-grid">
   <a id="dl-mac-arm" class="download-card" href="https://github.com/tsiger/widgetizer/releases/latest">
@@ -168,7 +168,7 @@ npm run start:prod
 
 Once you see "Server is running on http://127.0.0.1:3001", open your browser and go to **http://127.0.0.1:3001**
 
-> **Note:** The standalone desktop apps already include the built frontend, so you don't need to run these build steps when using those.
+> **Note:** Widgetizer Desktop already includes the built frontend, so you don't need to run these build steps when using it.
 
 # Next Steps
 

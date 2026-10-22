@@ -6,22 +6,21 @@ In Widgetizer, a **Project** is a container for your entire website. Each projec
 
 # Understanding the Active Project
 
-At any given time, one project is marked as **active**. This is the project you're currently working on. When you open the page editor or media library, you'll be working within the active project.
+At any given time, one project is marked as **active**. This is the project you're currently working on. When you open the page editor or media library, you'll be working within the active project. Its name is shown at the top of the screen, under **Current project**.
 
-> **Important:** Your first project is automatically set as active when you create it.
+> **Important:** A new project becomes the active project as soon as you create it.
 
 # Creating a New Project
 
-1. Click the **"New Project"** button
-2. Fill in the project details:
-   - **Title** (required): The display name for your project
+1. Open the **Projects** screen and click **"New project"**
+2. On the **General** tab, fill in:
+   - **Project Title** (required): The display name for your project
    - **Theme** (required): Choose a design theme for your project
-   - **Preset** (if available): Some themes offer preset variants: different color schemes, typography, or demo content. When you select a theme that has presets, a visual card grid appears below the theme dropdown. Pick the preset that best matches your needs, or keep the default.
-3. Expand **"More settings"** to configure additional options:
-   - **Folder Name** (required): Auto-generated from the title, but you can customize it
-   - **Notes** (optional): Personal notes about the project for your own reference
-   - **Website Address** (optional): The URL where your site will be hosted
+   - **Style Preset** (if available): Some themes offer preset variants: different color schemes, typography, or demo content. When you select a theme that has presets, a visual card grid appears below the theme dropdown. Pick the preset that best matches your needs, or keep the default.
+3. Fill in the other tabs now or later. They are all optional (see [The Project Form](#the-project-form) below).
 4. Click **"Create Project"**
+
+Widgetizer opens the new project straight away, ready to edit.
 
 <figure class="doc-screenshot">
   <img src="assets/screenshots/project-create-presets.png" alt="Widgetizer new project form showing title, theme selector, and visual style preset cards." loading="lazy">
@@ -38,61 +37,99 @@ Think of project creation as: **Theme -> Preset -> Project**.
 
 For the built-in library, many starter cards are presets of the default **Arch** theme. They may look like separate theme choices because they can include complete demo sites, but they share the same underlying theme and widget system. See [Themes](themes.html) for the full explanation.
 
-### Understanding the Fields
+# The Project Form
 
-- **Title**: The display name shown throughout Widgetizer.
-- **[Theme](themes.html)**: Defines the look and feel, available widgets, templates, settings, and theme-owned content types for your site. **Note:** You cannot change the theme after creating a project, so choose carefully!
-- **Preset**: A starting point inside the chosen theme, with different colors, fonts, and/or demo content. Presets are only applied at project creation. Once created, your project is independent and fully customizable.
-- **Folder Name**: The folder where your project files are stored and exported. This is automatically generated from the title as a URL-friendly slug (e.g., "My Site" becomes `my-site`).
+**New project** and **Project details** use the same form, split into tabs. One **Save** covers every tab. If something needs fixing, Widgetizer opens the tab with the problem, and a tab with an error shows a small dot.
+
+You don't choose a folder name. Widgetizer picks one from the title and keeps it the same afterwards, even if you rename the project.
+
+### General
+
+- **Project Title**: The display name shown throughout Widgetizer.
+- **[Theme](themes.html)**: Defines the look and feel, available widgets, templates, settings, and theme-owned content types for your site. **Note:** You cannot change the theme after creating a project, so choose carefully! In Project details the theme is shown with its version, but can't be changed.
+- **Style Preset**: A starting point inside the chosen theme, with different colors, fonts, and/or demo content. Presets are only applied at project creation. Once created, your project is independent and fully customizable.
 - **Notes**: Personal notes for your own reference. Useful for remembering what each project is for.
-- **Website Address**: The base URL where your site will be hosted (e.g., `https://example.com`). This is used for:
-  - Generating absolute URLs in social media tags and SEO
-  - **Automatically creating `sitemap.xml`** when you export your site
-  - **Automatically creating `robots.txt`** with sitemap location when you export
-  - If you're not sure yet, you can leave this empty and add it later.
+- **Receive Theme Updates**: Get notified when a new version of the theme is available.
 
-# Editing a Project
+### Site
 
-1. Go to the **Projects** page
-2. Find your project in the list
-3. Click the **pencil icon** (Edit)
-4. Update the fields you want to change
-5. Click **"Save Changes"**
+- **Site Title**: Used in your site's browser tab titles, such as "Page Name - Site Title". It is separate from the project title, which only you see.
+- **Site Address**: The address where your live site will be hosted (see [Site Address](#site-address) below).
+- **Clean URLs**: Leave this off unless your host serves pages without `.html` (see [Clean URLs](#clean-urls) below).
+- **Default Language**: The language your site is written in.
+- **Other Languages**: Add more languages for a multilingual site. This list appears in Project details once the project exists. See [Languages](languages.html).
 
-### What You Can Edit
+### Identity and Business Details
 
-- **Title**: The display name shown throughout Widgetizer
-- **Folder Name**: The folder where your project files are stored (can be changed independently of the title)
-- **Notes**: Personal notes about your project
-- **Website Address**: The base URL for your site
-- **Site identity** and **Business details**: Who is behind the site and where to find you (see below)
-- **Theme**: Cannot be changed after creation
+These describe who is behind the site. See [Site Identity and Business Details](#site-identity-and-business-details) below.
+
+# Site Address
+
+The **Site Address** is the full address of your live site, such as `https://example.com`. If your site lives in a folder of a larger website, include the folder: `https://example.com/site`. Widgetizer keeps that folder in every address it builds, so links in search results and social shares point to the right place.
+
+The Site Address is used for:
+
+- Full addresses in social media tags and SEO
+- **Automatically creating `sitemap.xml`** when you export your site
+- **Automatically creating `robots.txt`** with the sitemap location when you export
+- The details search engines read about you (see below)
+
+Enter only the address itself. A `?` or `#` part isn't accepted. If you're not sure yet, leave it empty and add it later. Without a Site Address, the export simply leaves out the items that need one.
+
+# Clean URLs
+
+Some hosts, such as Netlify or Cloudflare Pages, serve a page at `/about` instead of `/about.html`. Turn on **Clean URLs** on the **Site** tab if yours does.
+
+When it's on:
+
+- Links Widgetizer builds for you drop the `.html`: menus, links you pick in widget settings and rich text, and collection lists. Links to the homepage leave out `index.html`.
+- The canonical address of each page, `sitemap.xml` and `robots.txt` drop the `.html` too.
+- Exported files are still named `about.html`. Your host must serve them at `/about`.
+- Links you typed by hand stay exactly as you typed them.
+
+Not sure? Leave it off. Your site works on any host with the setting off.
+
+# Opening a Project and Project Details
+
+Click a project's name on the **Projects** screen to open it. If it isn't the active project yet, it becomes the active one.
+
+To change a project's settings, open it first, then choose **Manage › Project details** at the top right. Project details always shows the active project.
+
+1. Choose **Manage › Project details**
+2. Update the fields you want to change, on any tab
+3. Click **"Save Changes"**
+
+> **Note:** Adding or removing a language takes effect straight away, not when you save. See [Languages](languages.html).
 
 # Site Identity and Business Details
 
-When you edit a project, two more sections describe who is behind the site. Search engines like Google read these details, and your theme can show them on the site, for example in the footer. They only appear when editing a project, not when creating one.
+The **Identity** and **Business Details** tabs describe who is behind the site. Search engines like Google read these details, and your theme can show them on the site, for example in the footer. You can fill them in when you create a project or later in Project details.
 
-### What Google Can Read
+### What Search Engines Can See
 
-At the top of **Site identity**, a line shows which details Google can already read, such as *"Google can read your details: website address ✓, name ✓, logo missing"*. Click a missing item to jump to the field that fixes it. Search engines need your **Website Address** before they can read any of it.
+A yellow note beside the form shows what search engines can read: each detail gets a check once it's filled in, and **Add** next to a missing one takes you to the field. When a **Public Name** is set, the note shows it instead of the Site Title, since that's the name used. Search engines need your **Site Address** before they can read any of it.
 
-### Site Identity
+### Identity
 
-- **What best describes you?**: Choose Organization, Person, or the closest kind of local business (restaurant, hotel, dental practice, and so on). A local business also gets the **Business details** section.
-- **Public name**: The name people know you by. Leave it empty to use the Site Title.
-- **Logo**: A logo for search engines and your theme, separate from the Site Icon. If a Site Icon is set, **Use the Site Icon** fills it in for you. You can only choose or upload a logo while this project is the active project. For other projects the field shows the current logo and a **Remove logo** button.
-- **Email** and **Short description**: One or two sentences about what you do.
-- **Social profiles**: The full address of each profile, such as `https://instagram.com/yourname`.
+- **What best describes you?**: Choose Organization, Person, or the closest kind of local business (restaurant, hotel, dental practice, and so on). A local business also gets the **Business Details** tab.
+- **Public Name**: The name people know you by. Leave it empty to use the Site Title.
+- **Logo**: A logo for search engines and your theme, separate from the Site Icon. In Project details, choose it from your media library. If a Site Icon is set and no logo is, **Use the Site Icon** fills it in for you. When creating a project, choose an image file from your computer; it's added to the new project's media library. If the logo can't be added, the project is still created and you can add the logo later in Project details.
+- **Email** and **Short Description**: One or two sentences about what you do.
+- **Social Profiles**: Pick a network from **Add a profile…** and enter the full address, such as `https://instagram.com/yourname`.
 
 ### Business Details
 
-- **Phone** and **Price range** (optional, e.g. `€€` or `$10–30`)
-- **Location name**: Only if this location goes by a different name than the public name
-- **Street address**, **City**, **Region or state**, **Postal code**
-- **Country code**: Two letters, e.g. `GR`, `US` or `DE`
-- **Opening hours**: Set each day to **Open**, **Closed**, or **Not stated**. Use **Add hours** for a split shift, such as 09:00–13:00 and 17:00–21:00.
+- **Phone** and **Price Range** (optional, e.g. `€€` or `$10–30`)
+- **Location Name**: Only if this location goes by a different name than the public name
+- **Street Address**, **City**, **Region or State**, **Postal Code**
+- **Country Code**: Two letters, e.g. `GR`, `US` or `DE`
+- **Opening Hours**: Set each day to **Open**, **Closed**, or **Not stated**. Use **Add hours** for a split shift, such as 09:00–13:00 and 17:00–21:00.
 
 If a value can't be used (an email without `@`, a profile address without `https://`), Widgetizer marks the field and doesn't save until you fix it.
+
+### Showing Them on Your Site
+
+In the Arch theme, add a **Business Details** block to the footer or to a **Contact Details** widget. It shows your address, phone and email, and opening hours, each of which you can switch off. Use its **Additional details** field for anything else, such as parking or appointment notes; it appears below the details. Day names and words like "Closed" follow the language of the page. A block with nothing to show keeps its title on the site, and in the preview it reminds you to add details.
 
 > **Tip:** Social profiles you add here replace the social links in your theme settings wherever the Arch theme shows social icons. If you add none, the theme settings are used as before.
 
@@ -100,44 +137,48 @@ Duplicating, backing up and importing a project keeps these details, logo includ
 
 # Setting the Active Project
 
-To switch which project you're working on:
+To switch which project you're working on, click its name on the **Projects** screen, or:
 
-1. Go to the **Projects** page
-2. Find the project you want to work on
-3. Click the **star icon** next to the project name
+1. Open the project's **actions menu** (⋮)
+2. Choose **"Set as active project"**
 
-The active project will have a pink "Active" badge and a filled star icon.
+The active project has an "Active" badge.
 
 > **Note:** You can only have one active project at a time. Setting a new project as active automatically deactivates the previous one.
 
 # Deleting a Project
 
-1. Go to the **Projects** page
-2. Find the project you want to delete
-3. Click the **trash icon** (Delete)
+1. Go to the **Projects** screen
+2. Open the project's **actions menu** (⋮)
+3. Choose **"Delete project"**
 4. Confirm the deletion in the popup
 
 ### Important Notes
 
-- **You cannot delete the active project**. If you want to delete it, first set another project as active.
-- **Deletion is permanent**. All pages, media, and settings for that project will be removed.
-- Consider exporting your project as a backup before deleting it.
+- **You cannot delete the active project**. Its menu shows "Cannot delete active project". Set another project as active first.
+- **Deletion is permanent**. All pages, media, exported versions, and settings for that project will be removed.
+- Consider downloading a backup before deleting it.
+- If another program is holding one of the project's files (common on Windows), the project is still deleted, but a warning names the folder that couldn't be fully removed. Delete that folder yourself once the program lets go of it. Widgetizer never reuses that folder for a new project.
 
 # Other Project Actions
 
+These are all in each project's **actions menu** (⋮) on the Projects screen.
+
 ### Duplicating a Project
 
-Want to create a copy of a project? Click the **copy icon** next to any project. This creates an exact duplicate with all pages, settings, and media.
+Choose **"Duplicate project"** to make a copy with all pages, settings, and media. The copy is named after the original with "(Copy)" added.
 
-### Exporting a Project
+### Downloading a Backup
 
-You can export any project as a ZIP file for backup or to transfer to another Widgetizer installation. Click the **export icon** to download a copy of your project.
+Choose **"Download backup"** to save the project as a ZIP file, for safekeeping or to move it to another Widgetizer installation.
 
-> **Note:** This is different from site exporting. Project export creates a backup ZIP, while [site export](export.html) generates deployable HTML files.
+> **Note:** This is different from site exporting. A backup is something Widgetizer can open again, while [site export](export.html) generates deployable HTML files.
 
-### Importing a Project
+### Importing a Backup
 
-To import a previously exported project, click **"Import Project"** and select the ZIP file. The imported project will appear in your projects list with a new name to avoid conflicts.
+Click **"Import Backup"** at the top of the Projects screen and select a backup ZIP file. The imported project opens straight away as the active project.
+
+A backup is checked before anything is created. One whose files are damaged is refused with a message naming the problem, and one that uses a newer backup format asks you to update Widgetizer first. Either way, no project is created and your backup file is untouched.
 
 # Theme Updates for Projects
 
@@ -145,16 +186,15 @@ When a theme author releases an update, projects using that theme can receive th
 
 ### Identifying Projects with Available Updates
 
-- Projects with available theme updates show an **arrow icon** in the project list
-- The project card indicates the current version and the available version
+- On the Projects screen, the theme column shows an **"Update available"** label next to the theme's version
+- The **Manage** menu shows a badge when updates are waiting
 
 ### Applying a Theme Update
 
-1. Go to the **Projects** page
-2. Find the project with the update indicator
-3. Click **Edit** to open the project settings
-4. Click **"Apply Theme Update"**
-5. The system updates your theme files while preserving your content
+1. Open the project (it becomes the active project)
+2. Choose **Manage › Project details**
+3. In the **Theme Update Available** box, which shows the current and new version, click **"Apply Update"**
+4. The system updates your theme files while preserving your content
 
 ### What's Updated vs. Protected
 

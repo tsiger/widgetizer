@@ -195,7 +195,7 @@ describe("create a page's version in another language", () => {
 
     const again = await createPageVersion("about", { targetLanguage: "el" });
     assert.equal(again._status, 409);
-    assert.match(again._json.message, /already exists/);
+    assert.equal(again._json.message, "A page in Greek already exists for this translation group.");
   });
 
   it("creates from a translation as readily as from the source, joining the same group", async () => {

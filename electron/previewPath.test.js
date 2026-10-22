@@ -21,6 +21,26 @@ describe("isSafePreviewPath", () => {
     expect(isSafePreviewPath("/preview/http://evil.com")).toBe(false);
   });
 
+  // A translated page or item names its language under its own namespace, and a
+  // split page has numbered copies; the Preview button opens all of them.
+  it("accepts language and numbered-copy preview paths", () => {
+    expect(isSafePreviewPath("/preview/page/el/about")).toBe(true);
+    expect(isSafePreviewPath("/preview/page/pt-br/about")).toBe(true);
+    expect(isSafePreviewPath("/preview/page/el/news/page/2")).toBe(true);
+    expect(isSafePreviewPath("/preview/paged/news/2")).toBe(true);
+    expect(isSafePreviewPath("/preview/collection/el/news/story")).toBe(true);
+  });
+
+  it("rejects malformed language and numbered-copy paths", () => {
+    expect(isSafePreviewPath("/preview/page/EL/about")).toBe(false); // uppercase code
+    expect(isSafePreviewPath("/preview/page/el")).toBe(false); // missing page
+    expect(isSafePreviewPath("/preview/page/el/../x")).toBe(false);
+    expect(isSafePreviewPath("/preview/page/el/news/page/0")).toBe(false);
+    expect(isSafePreviewPath("/preview/paged/news/x")).toBe(false);
+    expect(isSafePreviewPath("/preview/collection/el/news/story/extra")).toBe(false);
+    expect(isSafePreviewPath("/preview/page/el//evil.com")).toBe(false);
+  });
+
   it("rejects path traversal and stray slashes in a page id", () => {
     expect(isSafePreviewPath("/preview/../secret")).toBe(false);
     expect(isSafePreviewPath("/preview/a/b")).toBe(false);

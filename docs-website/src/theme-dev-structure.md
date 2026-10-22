@@ -55,19 +55,22 @@ themes/my-theme/
 │   └── news/
 │       ├── schema.json
 │       └── template.liquid
-├── locales/              # Translation files for i18n
+├── locales/              # Editor labels + visitor-facing words
 │   ├── en.json
-│   ├── fr.json
+│   ├── el.json           # visitor words only (the "site" block)
 │   └── ...
 ├── presets/              # Optional preset variants (color schemes + demo content)
+│   ├── presets.json      # registry: default preset + list of presets
 │   ├── default/
 │   │   ├── preset.json
-│   │   ├── screenshot.png
+│   │   ├── screenshot.png  # 1024×1024
 │   │   ├── menus/
 │   │   └── templates/
 │   └── alt-preset/
 │       ├── preset.json
 │       ├── screenshot.png
+│       ├── collections/  # starter collection items
+│       ├── media/        # starter images + manifest.json
 │       ├── menus/
 │       └── templates/
 ├── updates/              # Version update folders (for distributing updates)
@@ -115,13 +118,13 @@ A folder for theme-wide CSS, JavaScript, and shared assets (for example, `base.c
 
 Menu and snippet structures are covered in [Menus & Snippets](theme-dev-menus-snippets.html).
 
-**`locales/`** (optional)
+**`locales/`** (optional, recommended)
 
-A folder containing translation JSON files for theme localization. Each file is named by language code (e.g., `en.json`, `fr.json`). When present, labels in `theme.json` and widget schemas can use translation keys instead of hardcoded strings. See [Theme Manifest & Settings](theme-dev-manifest-settings.html#theme-localization-i18n) for details.
+JSON files named by language code (`en.json`, `el.json`). Each has two halves. Keys outside `site` are editor labels that `theme.json` and widget schemas reference with `tTheme:` keys; the editor is English, so only `en.json` needs them, including a `global.<group>.name` for each settings group. The `site` block holds the words visitors read, resolved in the language of the page being rendered, so each language you support gets a file with its own `site` block. See [Localization](theme-dev-localization.html) and [Theme Manifest & Settings](theme-dev-manifest-settings.html#theme-locales).
 
 **`presets/`** (optional)
 
-A folder containing preset variants of the theme. Each subfolder is one preset and contains its own `preset.json` (manifest with name, description, and overridden theme settings), `screenshot.png` (preview shown during project creation), and optionally `menus/` and `templates/` to ship preset-specific demo content. Presets are picked at project creation time; see [Themes](themes.html#theme-presets) for the user flow.
+A folder containing preset variants of the theme, listed in `presets/presets.json`. Each subfolder is one preset and contains its own `preset.json` (overridden theme settings), a square 1024×1024 `screenshot.png` (preview card shown during project creation; the theme's own screenshot is 1280×720), and optionally `menus/`, `templates/`, `collections/` and `media/` to ship preset-specific demo content. Presets are picked at project creation time; see [Themes](themes.html#theme-presets) for the user flow.
 
 # What Widgetizer Loads
 
@@ -135,7 +138,7 @@ When a theme is selected for a project, the system loads:
 - `menus/` for navigation menus
 - `snippets/` for reusable Liquid partials
 - `collection-types/*/` for collection schemas and item-page templates (when present)
-- `locales/` for translation strings (when present)
+- `locales/` for editor labels and visitor-facing words (when present)
 - `presets/*/preset.json` for preset variants (when present)
 
 # Arch Theme Example
@@ -158,7 +161,7 @@ If you want to understand a real theme, open these files in order:
 6. `themes/arch/presets/`: starter sites built from the same theme. A preset can override settings, templates, menus, collection items, and starter media. For your own theme, ship a preset's starter images inside the preset folder (`presets/<id>/media/` with `images/` and a `manifest.json`). Arch itself keeps its images in a theme-root `preset-media/<id>/` pool instead — same inner layout, used for themes with many media-heavy presets so the images stay out of theme updates. If you use the pool: never rename or delete a file in a later version, only add.
 7. `themes/arch/collection-types/`: theme-owned CMS types such as News, Projects, Services, and development/demo types.
 8. `themes/arch/snippets/` and `themes/arch/assets/icons.json`: shared Liquid helpers and icon data.
-9. `themes/arch/locales/`: translatable labels for theme settings, widget schemas, and editor UI text.
+9. `themes/arch/locales/`: `en.json` holds the editor labels for theme settings and widget schemas plus the English visitor words; `el.json` holds the Greek visitor words only.
 
 ### What Arch Demonstrates
 
@@ -168,7 +171,7 @@ If you want to understand a real theme, open these files in order:
 - Full presets for different business types
 - Collection types with optional item pages
 - Global widgets for header and footer
-- Localized labels using `tTheme:` keys
+- Editor labels using `tTheme:` keys, and visitor words in English and Greek with a header language switcher (see [Localization](theme-dev-localization.html))
 
 ### What Arch Is Not
 
@@ -176,13 +179,14 @@ Arch is not a separate theme for every preset. Brewline, Brightside, Shearline, 
 
 # Theme Copying in Projects
 
-When a new project is created, the selected theme is copied into the project's data directory so it can be customized per project without modifying the original theme:
+When a new project is created, the newest installed version of the theme (its `latest/` snapshot when there is one, otherwise the base) is copied into the project so it can be customized per project without modifying the original theme:
 
-- Destination: `data/projects/<folderName>/`
-- Copied items: every theme file (`theme.json`, `layout.liquid`, `widgets/`, `assets/`, `snippets/`, `menus/`, `locales/`, `screenshot.png`, …) **except** `updates/`, `latest/`, and `presets/`
-- `templates/` are resolved separately: from the chosen preset's `templates/` folder if a preset is selected, otherwise from the theme's root `templates/`
+- Destination: the project's own folder (`data/projects/<folderName>/` in a source install)
+- Copied items: every theme file (`theme.json`, `layout.liquid`, `widgets/`, `assets/`, `snippets/`, `menus/`, `locales/`, `collection-types/`, `screenshot.png`, …) **except** `updates/`, `latest/`, `presets/` and `preset-media/`
+- `templates/` aren't copied as files: each template becomes a page, from the chosen preset's `templates/` when it has them, otherwise from the theme's root `templates/`. Menus follow the same rule.
+- Starter images come only from the chosen preset and are added to the project's media library; the rest of a `preset-media/` pool stays behind.
 
-This ensures each project has its own theme files and can evolve independently.
+This ensures each project has its own theme files and can evolve independently. Changing the installed theme later affects new projects only; existing projects change when their owner applies a [theme update](theme-dev-distribution.html).
 
 # Distributing & Updating Themes
 

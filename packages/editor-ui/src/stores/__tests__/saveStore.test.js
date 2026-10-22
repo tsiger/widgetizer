@@ -683,6 +683,39 @@ describe("saveStore (useAutoSave)", () => {
       expect(useAutoSave.getState().autoSaveInterval).not.toBeNull();
     });
 
+    it("clears the structure flag when undo returns the page to its saved state", () => {
+      seedPageStore();
+      useAutoSave.getState().setStructureModified(true); // a delete or reorder, since undone
+      useAutoSave.getState().reconcileModifiedWidgets();
+      expect(useAutoSave.getState().structureModified).toBe(false);
+      expect(useAutoSave.getState().hasUnsavedChanges()).toBe(false);
+    });
+
+    it("keeps the structure flag while the page still differs from its saved state", () => {
+      const page = seedPageStore();
+      useAutoSave.getState().setStructureModified(true);
+      usePageStore.setState({ page: { ...page, widgets: {}, widgetsOrder: [] } }); // the widget is still deleted
+      useAutoSave.getState().reconcileModifiedWidgets();
+      expect(useAutoSave.getState().structureModified).toBe(true);
+    });
+
+    it("clears the theme flag when undo returns the theme settings to their saved state", () => {
+      seedPageStore();
+      useAutoSave.getState().setThemeSettingsModified(true);
+      mockThemeStoreState.hasUnsavedThemeChanges.mockReturnValue(false);
+      useAutoSave.getState().reconcileModifiedWidgets();
+      expect(useAutoSave.getState().themeSettingsModified).toBe(false);
+      expect(useAutoSave.getState().hasUnsavedChanges()).toBe(false);
+    });
+
+    it("keeps the theme flag while the theme settings still differ", () => {
+      seedPageStore();
+      useAutoSave.getState().setThemeSettingsModified(true);
+      mockThemeStoreState.hasUnsavedThemeChanges.mockReturnValue(true);
+      useAutoSave.getState().reconcileModifiedWidgets();
+      expect(useAutoSave.getState().themeSettingsModified).toBe(true);
+    });
+
     it("leaves a widget clean, and the timer unarmed, when it differs only by a key holding undefined", () => {
       const page = seedPageStore();
       usePageStore.setState({
@@ -1906,6 +1939,33 @@ describe("saveStore (useAutoSave)", () => {
   // --------------------------------------------------------------------------
 
   describe("undo/redo racing an in-flight save", () => {
+    it("keeps a structural change unsaved while the save writing it is in flight and the undo reverts it", async () => {
+      const page = seedPageStore();
+      usePageStore.setState({ page: { ...page, widgets: {}, widgetsOrder: [] } }); // delete w-1
+      useAutoSave.getState().setStructureModified(true);
+
+      let resolveSave;
+      savePageContent.mockImplementationOnce(
+        () =>
+          new Promise((resolve) => {
+            resolveSave = resolve;
+          }),
+      );
+      const savePromise = useAutoSave.getState().save(false);
+
+      // Undo back to the old baseline before the save lands: the save is still
+      // writing the delete, so the page is not "saved" yet.
+      usePageStore.setState({ page: JSON.parse(JSON.stringify(page)) });
+      useAutoSave.getState().reconcileModifiedWidgets();
+      expect(useAutoSave.getState().structureModified).toBe(true);
+      expect(useAutoSave.getState().hasUnsavedChanges()).toBe(true);
+
+      resolveSave({});
+      await savePromise;
+      // The server now holds the delete; the restored widget is the unsaved change.
+      expect(useAutoSave.getState().hasUnsavedChanges()).toBe(true);
+    });
+
     it("rebaselines originalPage to the entry-time (pre-undo) snapshot actually sent, so an undo mid-flight correctly leaves the page dirty against the server's new state", async () => {
       const page = seedPageStore(); // page.widgets["w-1"].settings.text === "Hi"; originalPage matches
       const editedPage = {

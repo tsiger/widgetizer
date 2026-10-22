@@ -10,22 +10,39 @@ import useToastStore from "../stores/toastStore";
 import useThemeStore from "../stores/themeStore";
 import useProjectStore from "../stores/projectStore";
 import useGuardedFormPage from "../hooks/useGuardedFormPage";
+import { useThemeLocale } from "../hooks/useThemeLocale";
 
-/** A save warning as text: each carries a `code`, and a correction may carry the server's own message. */
-function describeWarning(warning, t) {
+/**
+ * A save warning as text, in the editor's own words: each carries a `code`. A
+ * corrected value names its setting the way the field is labelled (the theme's
+ * label, translated); while the theme's words are not loaded yet the setting
+ * goes unnamed rather than showing its key. A correction that names no
+ * setting, as the older whole-file save reports them, keeps the server's sentence.
+ */
+function describeWarning(warning, t, tTheme) {
   switch (warning.code) {
     case "MEDIA_USAGE_STALE":
       return t("themeSettings.toasts.mediaUsageStale");
     case "SETTING_REMOVED":
     case "SETTING_AMBIGUOUS":
       return t("themeSettings.toasts.settingRemoved");
+    case "VALUE_CORRECTED": {
+      const label = warning.label || warning.id;
+      if (!label) return warning.message || t("themeSettings.toasts.valueCorrectedUnnamed");
+      const name = tTheme(label);
+      if (label.startsWith("tTheme:") && name === label.slice("tTheme:".length)) {
+        return t("themeSettings.toasts.valueCorrectedUnnamed");
+      }
+      return t("themeSettings.toasts.valueCorrected", { label: name });
+    }
     default:
-      return warning.message || t("themeSettings.toasts.valueCorrected", { label: warning.label || warning.id || "" });
+      return warning.message || t("themeSettings.toasts.valueCorrectedUnnamed");
   }
 }
 
 export default function Settings() {
   const { t } = useTranslation();
+  const { tTheme } = useThemeLocale();
 
   const settings = useThemeStore((s) => s.settings);
   const loading = useThemeStore((s) => s.loading);
@@ -98,11 +115,11 @@ export default function Settings() {
       if (result.conflict) {
         // The edits are kept on top of the current settings, still unsaved —
         // except any for a setting the theme no longer has, which the warnings name.
-        const extra = (result.warnings ?? []).map((warning) => describeWarning(warning, t));
+        const extra = (result.warnings ?? []).map((warning) => describeWarning(warning, t, tTheme));
         showToast([t("themeSettings.toasts.conflict"), ...extra].join(" "), "warning");
         clearConflict();
       } else if (result.warnings?.length) {
-        showToast(result.warnings.map((warning) => describeWarning(warning, t)).join(" "), "warning");
+        showToast(result.warnings.map((warning) => describeWarning(warning, t, tTheme)).join(" "), "warning");
       } else {
         showToast(t("themeSettings.toasts.saveSuccess"), "success");
       }

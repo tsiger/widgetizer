@@ -136,3 +136,83 @@ describe("buildUsageTitleMap", () => {
     });
   });
 });
+
+// Every language's content is listed together, and a page often keeps the same
+// name in each, so content outside the default language names its language.
+describe("usage labels on a site with more than one language", () => {
+  it("names another language's header and footer", () => {
+    expect(resolveUsageTitle("global:el:header", {})).toBe("Header (Global, Ελληνικά)");
+    expect(resolveUsageTitle("global:el:footer")).toBe("Footer (Global, Ελληνικά)");
+    expect(resolveUsageTitle("global:root:header")).toBe("Header (Global)");
+  });
+
+  it("tags pages and items outside the default language", () => {
+    const map = buildUsageTitleMap({
+      defaultLanguage: "en",
+      pages: [
+        { uuid: "p-en", id: "about", slug: "about", name: "About", language: "en" },
+        { uuid: "p-el", id: "about", slug: "about", name: "About", language: "el" },
+      ],
+      collections: [
+        {
+          schema: { type: "news", displayName: "Article" },
+          items: [
+            { uuid: "i-en", slug: "story", title: "Story", language: "en" },
+            { uuid: "i-el", slug: "story", title: "Istoria", language: "el" },
+          ],
+        },
+      ],
+    });
+    expect(map["page:p-en"]).toBe("About");
+    expect(map["page:p-el"]).toBe("About (Ελληνικά)");
+    expect(map["collection:i-en"]).toBe("Article: Story");
+    expect(map["collection:i-el"]).toBe("Article: Istoria (Ελληνικά)");
+  });
+
+  // A slug repeats across languages; the pre-uuid rows it identifies belong to the default one.
+  it("keeps the slug fallbacks for the default language", () => {
+    const map = buildUsageTitleMap({
+      defaultLanguage: "en",
+      pages: [
+        { uuid: "p-en", id: "about", slug: "about", name: "About", language: "en" },
+        { uuid: "p-el", id: "about", slug: "about", name: "Sxetika", language: "el" },
+      ],
+      collections: [
+        {
+          schema: { type: "news", displayName: "Article" },
+          items: [
+            { uuid: "i-en", slug: "story", title: "Story", language: "en" },
+            { uuid: "i-el", slug: "story", title: "Istoria", language: "el" },
+          ],
+        },
+      ],
+    });
+    expect(map["page:about"]).toBe("About");
+    expect(map["collection:story"]).toBe("Article: Story");
+  });
+
+  // Content that could not take a uuid (a read-only working folder) is recorded
+  // by its language folder and slug, in every language.
+  it("names rows recorded by language folder and slug", () => {
+    const map = buildUsageTitleMap({
+      defaultLanguage: "en",
+      pages: [
+        { slug: "about", name: "About", language: "en" },
+        { slug: "sxetika", name: "Sxetika", language: "el" },
+      ],
+      collections: [
+        {
+          schema: { type: "news", displayName: "Article" },
+          items: [
+            { slug: "story", title: "Story", language: "en" },
+            { slug: "story", title: "Istoria", language: "el" },
+          ],
+        },
+      ],
+    });
+    expect(resolveUsageTitle("page:slug:about", map)).toBe("About");
+    expect(resolveUsageTitle("page:slug:el/sxetika", map)).toBe("Sxetika (Ελληνικά)");
+    expect(resolveUsageTitle("collection:slug:news/story", map)).toBe("Article: Story");
+    expect(resolveUsageTitle("collection:slug:news/el/story", map)).toBe("Article: Istoria (Ελληνικά)");
+  });
+});

@@ -57,6 +57,8 @@ A numeric input field.
 - **`min`** (number, optional): The minimum allowed value.
 - **`max`** (number, optional): The maximum allowed value.
 
+A value outside `min`/`max` snaps to the nearest limit when the owner leaves the field, and a stored widget, block or collection-item value outside them renders at the limit (the stored file is not rewritten). A cleared field stores `""`, which is left as it is.
+
 ```json
 {
   "id": "max_items",

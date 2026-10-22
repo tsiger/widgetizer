@@ -1,6 +1,6 @@
 {% comment %}
-  Business details from Project details: address, phone, email and opening hours.
-  Usage: {% render 'business-details', identity: project.identity, show_address: true, show_contact: true, show_hours: true %}
+  Business details from Project details (address, phone, email, opening hours) plus the block's own Additional details.
+  Usage: {% render 'business-details', identity: project.identity, show_address: true, show_contact: true, show_hours: true, text: block.settings.text %}
 {% endcomment %}
 
 {%- assign has_address = false -%}
@@ -20,7 +20,13 @@
   {%- assign has_hours = true -%}
 {%- endif -%}
 
-{%- if has_address or has_contact or has_hours -%}
+{%- assign has_text = true -%}
+{%- assign text_is_blank = text | rte_blank -%}
+{%- if text_is_blank -%}
+  {%- assign has_text = false -%}
+{%- endif -%}
+
+{%- if has_address or has_contact or has_hours or has_text -%}
   <div class="business-details w-body t-sm">
     {%- if has_address -%}
       {%- assign address = identity.address -%}
@@ -85,7 +91,11 @@
         {%- endfor -%}
       </dl>
     {%- endif -%}
+
+    {%- if has_text -%}
+      <div class="business-details-text w-rte" data-setting="text">{{ text | raw }}</div>
+    {%- endif -%}
   </div>
 {%- elsif renderMode == 'preview' -%}
-  <p class="business-details-empty-hint w-meta t-sm t-muted">Add your business details in Project details</p>
+  <p class="business-details-empty-hint w-meta t-sm t-muted">Add your business details in Project details or in Additional details</p>
 {%- endif -%}

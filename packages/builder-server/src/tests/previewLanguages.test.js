@@ -35,6 +35,7 @@ const { createCollectionPreviewToken, createPreviewToken, renderSingleWidget } =
   "../controllers/previewController.js"
 );
 const { getToken } = await import("../services/previewTokenStore.js");
+const { renderWidget } = await import("../services/renderingService.js");
 const { closeDb } = await import("../db/index.js");
 const { LocalStorageAdapter } = await import("@widgetizer/adapters-local");
 
@@ -136,6 +137,20 @@ async function seed() {
     path.join(projectDir, "widgets", "crumbs", "schema.json"),
     JSON.stringify({ name: "crumbs", settings: [] }),
   );
+  await fs.outputFile(path.join(projectDir, "widgets", "position", "widget.liquid"), `<p>[{{ widget.index }}]</p>`);
+  // Reads the trail as the `breadcrumbs` global, which a render given only a path still has.
+  await fs.outputFile(
+    path.join(projectDir, "widgets", "trail", "widget.liquid"),
+    `<nav class="trail">{% for crumb in breadcrumbs %}<span>{{ crumb.label }}</span>{% endfor %}</nav>`,
+  );
+  await fs.outputFile(
+    path.join(projectDir, "widgets", "trail", "schema.json"),
+    JSON.stringify({ name: "trail", settings: [] }),
+  );
+  await fs.outputFile(
+    path.join(projectDir, "widgets", "position", "schema.json"),
+    JSON.stringify({ name: "position", settings: [] }),
+  );
 
   // A home page and a listing page, so there is a trail to lose.
   await storage.write(
@@ -208,6 +223,15 @@ async function seed() {
 
   await storage.write(scope, "collection-types/news/schema.json", JSON.stringify(NEWS_SCHEMA, null, 2));
   await storage.write(scope, "collection-types/news/template.liquid", NEWS_TEMPLATE);
+  // No slugPrefix: its items publish under the type, "events/".
+  const { slugPrefix: _omitted, ...eventsSchema } = { ...NEWS_SCHEMA, type: "events", displayNamePlural: "Events" };
+  await storage.write(scope, "collection-types/events/schema.json", JSON.stringify(eventsSchema, null, 2));
+  await storage.write(scope, "collection-types/events/template.liquid", NEWS_TEMPLATE);
+  await storage.write(
+    scope,
+    "collections/events/launch.json",
+    JSON.stringify({ id: "launch", uuid: "u-launch", slug: "launch", settings: { title: "Launch" } }),
+  );
 }
 
 function mockReq(body, query = {}) {
@@ -452,6 +476,25 @@ describe("a collection item's own switcher", () => {
     assert.match(html, /<a href="el\/index.html" data-lang="el" data-fallback="true"/);
     assert.doesNotMatch(html, /hreflang="el"/);
   });
+
+  it("keeps the saved item's own SEO", async () => {
+    await storage.write(
+      scope,
+      "collections/news/shared.json",
+      JSON.stringify({
+        id: "shared",
+        uuid: "u-shared",
+        slug: "shared",
+        created: "2026-01-01T00:00:00.000Z",
+        updated: "2026-01-01T00:00:00.000Z",
+        settings: { title: "Shared" },
+        seo: { description: "Saved description", og_image: "https://cdn.example.com/social.jpg" },
+      }),
+    );
+    const html = await itemHtml({}, "shared");
+    assert.match(html, /name="description" content="Saved description"/);
+    assert.match(html, /property="og:image" content="https:\/\/cdn.example.com\/social.jpg"/);
+  });
 });
 
 // A morph re-renders one widget with no page around it. The editor sends the
@@ -499,6 +542,35 @@ describe("a morphed widget on a translated page", () => {
     const about = JSON.parse(await storage.read(scope, "pages/about.json"));
     const html = await morph({ ...about, language: "en" }, "about.html");
     assert.deepEqual(labels(html), ["Home", "About"]);
+  });
+
+  // A widget rendered with only an item's path names the item from that path;
+  // its language folder decides which file holds the title.
+  const trailOfPath = async (currentCanonicalPath) => {
+    const sharedGlobals = {
+      renderMode: "preview",
+      enqueuedStyles: new Map(),
+      enqueuedScripts: new Map(),
+      currentCanonicalPath,
+    };
+    const html = await renderWidget(
+      PROJECT_ID,
+      "trail",
+      { type: "trail", settings: {} },
+      RAW_THEME_SETTINGS,
+      "preview",
+      sharedGlobals,
+    );
+    return labels(html);
+  };
+
+  it("reads an item named only by its path from that path's language folder", async () => {
+    assert.equal((await trailOfPath("el/news/istoria.html")).at(-1), "Istoria");
+    assert.equal((await trailOfPath("news/story.html")).at(-1), "Story");
+  });
+
+  it("finds an item whose collection leaves slugPrefix to default to its type", async () => {
+    assert.equal((await trailOfPath("events/launch.html")).at(-1), "Launch");
   });
 });
 
@@ -561,5 +633,81 @@ describe("a built-in widget on the canvas", () => {
 
     assert.ok(html.includes("Πάμε"));
     assert.ok(!html.includes("Αποστολή μηνύματος"));
+  });
+});
+
+// A morph re-renders one widget, but themes branch on its place on the page
+// (`widget.index == 1` picks the h1), so it must get the number the full render
+// gives it, or the first widget's heading drops to h2 after every edit.
+describe("a morphed widget's place on the page", () => {
+  const morph = async (widgetId, page, type = "position") => {
+    let html = "";
+    const res = {
+      send(body) {
+        html = body;
+        return res;
+      },
+      status() {
+        return res;
+      },
+      json(body) {
+        html = JSON.stringify(body);
+        return res;
+      },
+    };
+    await renderSingleWidget(
+      mockReq({
+        widgetId,
+        widget: { type, settings: {} },
+        themeSettings: RAW_THEME_SETTINGS,
+        currentCanonicalPath: `${page.slug}.html`,
+        page,
+      }),
+      res,
+    );
+    return html;
+  };
+
+  const page = {
+    slug: "about",
+    language: "en",
+    widgets: { first: { type: "position" }, second: { type: "position" } },
+    // An id with no data takes no number, as in the full render; an entry that is
+    // not a string id, or names an inherited property, is skipped too.
+    widgetsOrder: ["gone", { toString: null }, "constructor", "first", "second"],
+  };
+
+  it("numbers the widget as the full render does", async () => {
+    assert.match(await morph("first", page), /\[1\]/);
+    assert.match(await morph("second", page), /\[2\]/);
+  });
+
+  it("leaves a widget outside the page order unnumbered", async () => {
+    assert.match(await morph("header", page), /\[\]/);
+  });
+
+  it("numbers by the widgets' own order when the page has none", async () => {
+    const unordered = { slug: "about", language: "en", widgets: page.widgets };
+    assert.match(await morph("second", unordered), /\[2\]/);
+  });
+
+  // A page widget may be called "footer"; the global footer is still unnumbered.
+  it("leaves the global footer unnumbered when a page widget shares its id", async () => {
+    const footerTemplate = path.join(getProjectDir(PROJECT_FOLDER), "widgets", "global", "footer", "widget.liquid");
+    const original = await fs.readFile(footerTemplate, "utf8");
+    await fs.writeFile(footerTemplate, "<footer>[{{ widget.index }}]</footer>");
+    try {
+      const sharing = {
+        slug: "about",
+        language: "en",
+        widgets: { footer: { type: "position" }, first: { type: "position" } },
+        widgetsOrder: ["footer", "first"],
+      };
+      assert.match(await morph("footer", sharing, "footer"), /<footer>\[\]<\/footer>/);
+      assert.match(await morph("footer", sharing), /\[1\]/);
+      assert.match(await morph("first", sharing), /\[2\]/);
+    } finally {
+      await fs.writeFile(footerTemplate, original);
+    }
   });
 });

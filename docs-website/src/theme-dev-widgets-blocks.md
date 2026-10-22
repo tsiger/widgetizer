@@ -64,27 +64,41 @@ Widgetizer know which of the site's pages list what.
 
 It does two things. Breadcrumbs on a collection item find the item's parent page by
 looking for the page that carries a widget listing that collection. And the editor adds a
-**"Main {collection} page"** checkbox to your widget's settings, so a site owner with more
-than one listing page can say which is the collection's home; only one page per collection
-can hold it.
+**"Main {collection} page"** checkbox in a **Collection** section after your widget's
+settings, so a site owner with more than one listing page can say which is the collection's
+home; only one page per collection can hold it.
 
 Nothing to add for a widget that does not list a collection.
 
 ## Splitting a List into Pages
 
 Name the setting that controls how many items your widget shows, and site owners get a
-**"Split into pages"** checkbox:
+**"Split into pages"** checkbox, placed just before that setting:
 
 ```json
 {
   "type": "news-grid",
-  "collection": { "type": "news", "perPageSetting": "limit" }
+  "collection": { "type": "news", "perPageSetting": "limit" },
+  "settings": [
+    { "type": "number", "id": "limit", "label": "Items per page", "default": 6 }
+  ]
 }
 ```
 
 When it is on, that setting becomes items per page, and export publishes the whole page
 once per page of items: `news.html`, `news/page/2.html`, `news/page/3.html` (or
 `page/2.html` for the homepage). If everything fits on one page, nothing extra is written.
+The owner-side view is in [Collections](collections.html).
+
+The rules Widgetizer enforces:
+
+- **`perPageSetting` must name a `number` or `range` setting** in the widget's own `settings`, ideally with a default. Without `collection.type` and a `perPageSetting`, pagination stays off; with a name that matches no setting, a split page can't be saved. The theme checker reports both.
+- **Don't declare `paginate` or `listing_anchor` yourself.** The editor adds those two checkboxes to every listing widget.
+- **Items per page is a whole number of at least 1.** Turning the checkbox on raises a value below 1 to 12, and a page whose paginating widget has any other count can't be saved.
+- **One paginator per page.** The editor refuses to switch on a second paginating widget on the same page.
+- **Independent of the main page.** Splitting a list doesn't mark it as the collection's main page, and the main page needn't be split. They're separate choices.
+- **Copies.** A duplicated page keeps its split list. A duplicated or pasted widget starts with both "Split into pages" and "Main page" off, since one page can't hold two paginators.
+- **Per language.** Each language counts its own items, so a Greek list can have a different number of pages from the English one.
 
 Your template keeps asking for items the same way — Widgetizer applies the right offset
 and limit to the splitting widget's `collection` call. All you add is the page links,
@@ -92,8 +106,8 @@ drawn from the `pagination` object, which only the splitting widget receives:
 
 ```liquid
 {% if pagination %}
-  <nav aria-label="Pagination">
-    {% if pagination.prevHref %}<a href="{{ pagination.prevHref }}" rel="prev">Previous</a>{% endif %}
+  <nav aria-label="{{ 'site.pagination.label' | t }}">
+    {% if pagination.prevHref %}<a href="{{ pagination.prevHref }}" rel="prev">{{ 'site.common.previous' | t }}</a>{% endif %}
     {% for entry in pagination.pages %}
       {% if entry.current %}
         <span aria-current="page">{{ entry.number }}</span>
@@ -101,13 +115,13 @@ drawn from the `pagination` object, which only the splitting widget receives:
         <a href="{{ entry.href }}">{{ entry.number }}</a>
       {% endif %}
     {% endfor %}
-    {% if pagination.nextHref %}<a href="{{ pagination.nextHref }}" rel="next">Next</a>{% endif %}
+    {% if pagination.nextHref %}<a href="{{ pagination.nextHref }}" rel="next">{{ 'site.common.next' | t }}</a>{% endif %}
   </nav>
 {% endif %}
 ```
 
-Every link is already correct for the page's depth and the Clean URLs setting. See
-[Pagination Object](theme-dev-objects-context.html) for all fields. Widgetizer takes care
+The words come from your theme's `site` dictionary (see [Localization](theme-dev-localization.html)). Every link is already correct for the page's depth and the Clean URLs setting. See
+[Pagination Object](theme-dev-objects-context.html#pagination-object) for all fields. Widgetizer takes care
 of the rest: numbered titles, canonical and prev/next links, sitemap entries, and a
 `Home › News › Page 2` breadcrumb.
 
@@ -152,6 +166,21 @@ Widget settings appear in the editor sidebar when the widget is selected. Use th
 ```
 
 Use `header` settings to group related fields visually. For all available setting types, see [Setting Types](theme-dev-setting-types.html).
+
+### Words That Follow the Page's Language
+
+A setting holding words visitors read (a button label, an empty-list message) can take its default from your theme's `site` dictionary with `defaultKey`, so it starts out in the language of each page instead of in English:
+
+```json
+{
+  "type": "text",
+  "id": "empty_text",
+  "label": "Empty message",
+  "defaultKey": "site.news_grid.empty"
+}
+```
+
+The owner can still type their own words, which are then stored like any other value. Add a literal `default` next to `defaultKey` only when the resolved word must be stored with the widget. See [Localization](theme-dev-localization.html#words-the-owner-can-edit-defaultkey) for the details, including how an emptied field behaves.
 
 ## Adding Blocks
 
@@ -230,7 +259,7 @@ Each block type definition has:
 }
 ```
 
-`defaultBlocks` pre-populates the widget with content when first added. Always include defaults so the widget looks complete out of the box.
+`defaultBlocks` pre-populates the widget with content when first added. Always include defaults so the widget looks complete out of the box. Starter block settings are stored with the widget, so give a block its words in the editing language with a `defaultKeys` map (`{ "label": "site.core_form.name_field" }`); the literal setting is the fallback. See [Localization](theme-dev-localization.html#defaultkey-together-with-default).
 
 ## Limiting the Number of Blocks (maxBlocks)
 

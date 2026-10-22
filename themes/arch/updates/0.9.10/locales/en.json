@@ -31,7 +31,8 @@
     },
     "common": {
       "next": "Next",
-      "previous": "Previous"
+      "previous": "Previous",
+      "email": "Email"
     },
     "comparison_slider": {
       "drag": "Drag to compare before and after images"
@@ -812,6 +813,10 @@
             },
             "show_hours": {
               "label": "Show opening hours"
+            },
+            "text": {
+              "label": "Additional details",
+              "description": "Shown under the details from Project details."
             }
           }
         },

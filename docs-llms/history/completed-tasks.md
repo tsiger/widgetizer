@@ -373,6 +373,206 @@ A files widget with columns and icons was proposed. The issue was closed on GitH
 
 **Body at:** `10b894d3:docs-llms/TODO-agents.md`.
 
+### GH122 · Review automatic search-engine information
+
+**Done · Unrated · OSS · 2026-10-17**
+
+Structured data (JSON-LD) had been built behind `{% seo %}`: site, identity and page nodes, the breadcrumb list from the visible trail, and BlogPosting from mapped News fields, with export readiness notes.
+
+**Resolution:** Reviewed in the browser on English and Greek exports, with Clean URLs on and with no Site URL, and checked with Google's Rich Results Test: local business, organization, article and breadcrumbs all valid, no errors. The optional extras Google suggests (article author, a full publication datetime, `inLanguage`) are logged as SEO-DATA-EXTRAS. Built in `e3ae2f42`…`163cc588`. [GitHub #122](https://github.com/tsiger/widgetizer/issues/122)
+
+**Body at:** `105e7593:docs-llms/TODO-agents.md`.
+
+### GH133 · Review form limits for embedding apps
+
+**Done · Unrated · OSS · 2026-10-17**
+
+The five-forms-per-site limit was a hard-coded constant applied on every export, the standalone app included. It became the limit key `MAX_FORMS_PER_SITE`: the local adapter answers Infinity, and with no usable answer the export falls back to the default of 5.
+
+**Resolution:** Reviewed on the basis that the hosting side will not cap forms per site (it limits monthly submissions), which makes translated-form counting moot for it. A standalone export with six distinct forms succeeds in the browser. Export tests now cover the wiring from the limits adapter to the forms manifest, the fallback for missing or unusable answers, an adapter that throws, and translated copies under a finite ceiling (`105e7593`). Built in `a3f5fa18`. [GitHub #133](https://github.com/tsiger/widgetizer/issues/133)
+
+**Body at:** `105e7593:docs-llms/TODO-agents.md`.
+
+### GH134 · Autosave and Undo
+
+**Done · Unrated · OSS · 2026-10-17**
+
+Saves, autosave included, cleared the undo history, so a minute of editing took away Undo. The answer was no autosave setting: Undo keeps working across saves.
+
+**Resolution:** Reviewed in the browser against EDIT-045 to EDIT-045D: undo back to the original, quick typing as one step, undo after a save (the reverted value saves; Redo restores it), and undo of a theme setting changed from the editor. All pass. UNDO-CLEAN reproduced (already logged) and PREVIEW-WIDGET-INDEX was found and logged. Fix `e4379a50`. [GitHub #134](https://github.com/tsiger/widgetizer/issues/134)
+
+**Body at:** `105e7593:docs-llms/TODO-agents.md`.
+
+### THEME-LOCALE-STALE · Theme labels stay untranslated after a theme update
+
+**Done · Unrated · Shared · 2026-10-17**
+
+After a theme update, a setting the update added showed its raw locale key in Site settings and the editor until the page reloaded.
+
+**Resolution:** `invalidateThemeLocale(projectId)` refreshes the project's theme labels and `applyThemeUpdate` calls it on success. Reviewed in the browser through a real 0.9.9 → 0.9.10 Arch update: "Show breadcrumbs" shows its label without a reload in both places. An embedding app that applies updates through its own request must call `invalidateThemeLocale` itself. Fix `3b20007c`. [GitHub #155](https://github.com/tsiger/widgetizer/issues/155)
+
+**Body at:** `105e7593:docs-llms/TODO-agents.md`.
+
+### THEME-STRINGS · Translate the remaining built-in breadcrumb and business-details text
+
+**Done · Unrated · Shared · 2026-10-17**
+
+Translated pages showed English in the breadcrumb label, numbered crumbs and the BreadcrumbList, and in Arch's opening-hours day names and "Closed".
+
+**Resolution:** Core `site.breadcrumbs.*` and Arch `site.business_details.*` words (en/el), with the same Arch files in `updates/0.9.10/`. Reviewed in the browser on a Greek export: the page-2 trail ends "Σελίδα 2" in the page and its breadcrumb data, opening hours read "Δευ–Παρ" / "Σάβ–Κυρ Κλειστά", and English is unchanged. Fix `ce862cce`. [GitHub #156](https://github.com/tsiger/widgetizer/issues/156)
+
+**Body at:** `105e7593:docs-llms/TODO-agents.md`.
+
+### EXPORT-CLASH-LANG · Catch output-path clashes inside language folders
+
+**Done · Low · Shared · 2026-10-18**
+
+A collection whose `slugPrefix` equals a language code published its main-language items over that language's pages, and a theme update could bring such a collection in unchecked. The split-homepage check against a `page`-prefixed collection covered the main language only.
+
+**Resolution:** Export refuses both clashes in every exported language before writing. A theme update is refused with a 409 when its staged collection types would publish into a language folder; an interrupted run is undone first. The add-language refusal and every message say the theme sets the folder name. The split-homepage policy stays strict: any split homepage plus a `page`-prefixed collection with item pages is refused. `validate:theme` warns about language-code-like and `page` prefixes, in the theme and in the collections its updates bring in. Reproduced and checked in the browser through a theme update. Fix `29289f67`, `6344ab5c`.
+
+**Body at:** `6344ab5c:docs-llms/TODO-agents.md`.
+
+### PREVIEW-WIDGET-INDEX · A re-rendered widget in the editor preview loses its page position
+
+**Done · Low · Shared · 2026-10-18**
+
+After an edit or undo, the editor re-rendered only the changed widget without `widget.index`, so Arch's first widget showed its heading as `h2` until the page reloaded.
+
+**Resolution:** `renderSingleWidget` numbers the widget as the full render does: its place in the page's `widgetsOrder` (or the widgets' own order when there is none), counting only ids with data; the header and footer, told apart by type, stay unnumbered. Reproduced and checked in the browser on Arch's About page: the heading stays `h1` after an edit and after its undo. Fix `bcb7fab6`.
+
+**Body at:** `bcb7fab6:docs-llms/TODO-agents.md`.
+
+### RENDER-LANG (part) · A widget rendered with only an item's path reads the item's language
+
+**Done · Low · Shared · 2026-10-18**
+
+`resolveItemFromPath` stripped the language folder but read the item from the main-language folder, so a widget rendered with only a translated item's path showed an empty or main-language trail. It also matched only an explicit `slugPrefix`, missing a collection that leaves it to default to its type. The editor's own morph always sends its page and never takes this path.
+
+**Resolution:** The lookup reads `collections/<type>/<language>/<slug>.json` for another language and matches the effective prefix. The theme-setting half of RENDER-LANG stays open. Fix `bcb7fab6`.
+
+**Body at:** `bcb7fab6:docs-llms/TODO-agents.md`.
+
+### MEDIA-USAGE-LABELS · Show readable "Used in" labels for other-language content
+
+**Done · Low · Shared · 2026-10-18**
+
+The Media screen's "Used in" list showed "El:header (Global)" for another language's header, and raw `collection:<uuid>` for other-language items, which it never fetched; same-named pages read "About, About".
+
+**Resolution:** `Media.jsx` fetches every language's collection items; `buildUsageTitleMap` and `resolveUsageTitle` name other-language content with its language ("Header (Global, Ελληνικά)", "About (Ελληνικά)", "Article: … (Ελληνικά)"), resolve rows recorded by language folder and slug, and leave the pre-uuid slug fallbacks to the default language. Reproduced and checked in the browser on a translated site. The request fan-out this adds is logged as MEDIA-USAGE-TITLES. Fix `efc941d0`.
+
+**Body at:** `efc941d0:docs-llms/TODO-agents.md`.
+
+### TRANSLATION-CREATE-NAV · A translation created just before leaving a list pulls the user back
+
+**Done · Low · Shared · 2026-10-18**
+
+Creating a missing translation and leaving before the request returned took the user into the new version's editor anyway.
+
+**Resolution:** `useTranslationVersions` records, refreshes and toasts the created version wherever the user is now (`afterCreate`), and calls `onCreated` (the navigation) only if the screen is still mounted and nothing has navigated since the click — a language tab included, since the collection list and the page editor keep the same screen across addresses. Covers the pages and collection lists, the page editor's language menu and the item form; tested on the hook. Reproduced and checked in the browser on a slowed connection: leaving for Media, for another collection, or for the other language tab all stay put, and the list shows the new version. Fix `efc941d0`.
+
+**Body at:** `efc941d0:docs-llms/TODO-agents.md`.
+
+### GH126 · window.confirm bug in Electron
+
+**Done · Unrated · OSS · 2026-10-17**
+
+`window.confirm()` left the Windows Electron window unable to take keyboard focus after the dialog closed.
+
+**Resolution:** Both navigation guards use the in-app confirm (`useConfirm`, with Escape, focus trap and focus return); no native `confirm`/`alert`/`prompt` remains in editor-ui or the app shell. The owner verified it in the Windows desktop app on 2026-10-12, and the issue was closed on GitHub. Router-level tests remain T71. Fix `5defb8fe`, hardening `48eef6f4`. [GitHub #126](https://github.com/tsiger/widgetizer/issues/126)
+
+**Body at:** `8768d405:docs-llms/TODO-agents.md`.
+
+### GH153 · Pages and menus added by a theme update are not linked like a new project's
+
+**Done · Low · Shared · 2026-10-19**
+
+A theme update wrote the pages and menus it adds without page references, so their slug links (`contact.html`) did not follow a page the owner later renamed. Reproduced in the browser: after an update added a Team page and Contact was renamed, Team's button still published `contact.html`.
+
+**Resolution:** `applyThemeUpdateToDir` gives added pages their uuid while preparing the update, and `enrichThemeUpdateAdditions` (sharing its transforms with project creation) stamps `pageUuid` on links and richtext in added pages and on added menus' items, per language folder, and on link/richtext settings the update's `theme.json` brings, before the merge so owner values stay as they are. Menu selections stay slugs (they resolve per language); existing content is not touched. Reviewed by Codex and Fable; checked in the browser by updating a project, renaming Contact and exporting. The prepare phase's live-folder creation is logged as THEME-UPDATE-PREPARE-DIRS. Fix `aa1f17df`. Added to the OSS 0.9.10 milestone and closed on GitHub on 2026-10-19. [GitHub #153](https://github.com/tsiger/widgetizer/issues/153)
+
+**Body at:** `aa1f17df:docs-llms/TODO-agents.md`.
+
+### UNDO-CLEAN · Undoing back to the saved state leaves Save enabled
+
+**Done · Low · Shared · 2026-10-19**
+
+Undoing a theme-setting edit or a structural change (delete, add, reorder) back to exactly the saved state left Save enabled, the page's unsaved dot on and the leave-page prompt armed: `reconcileModifiedWidgets` never cleared `structureModified` or `themeSettingsModified`.
+
+**Resolution:** after undo/redo, `reconcileModifiedWidgets` keeps each flag only while the page or the theme still differs from what is saved, and keeps both while a save is in flight (that save is writing the edit the undo reverses; Codex review). Reproduced and checked in the browser: a theme toggle and a widget delete, each undone, leave Save disabled with no unsaved dot or leave-page prompt, and redo marks the page changed again. Tests in `saveStore.test.js`. Fix `de8961a2`.
+
+**Body at:** `aa1f17df:docs-llms/TODO-agents.md`.
+
+### PROJECT-THEME-NAME · Project details shows the theme id after a save
+
+**Done · Low · OSS · 2026-10-19**
+
+After saving Project details the Theme field read the theme's id ("arch") instead of its name ("Arch") until the page was reopened: `ProjectsEdit.jsx` replaced its project with the update reply, which has no `themeName` (only `getAllProjects` adds it).
+
+**Resolution:** the page keeps the `themeName` it loaded when it takes the update reply; the form cannot change the theme, so the name still holds. Chosen over adding `themeName` to every project reply, which nothing else needs (Fable review). Checked in the browser and reviewed by Codex; test in `ProjectsEdit.test.jsx`. Fix `b1795090`.
+
+**Body at:** `de8961a2:docs-llms/TODO-agents.md`.
+
+### THEME-WARNING-LABEL · Name the corrected setting in theme-save warnings
+
+**Done · Low · Shared · 2026-10-19**
+
+A Site settings save whose value the server reset showed the server's English sentence around the theme's raw label key: `"tTheme:global.colors.settings.standard_border_color.label" contained an invalid value and was reset.`
+
+**Resolution:** `describeWarning` (`Settings.jsx`) builds a `VALUE_CORRECTED` warning from the editor's own `themeSettings.toasts.valueCorrected`, naming the setting through the theme locale as its field is labelled. While the theme's words are not loaded it uses `valueCorrectedUnnamed` instead of the key; a correction naming no setting (the older whole-file save) keeps the server's sentence; an unknown code shows its own message (Codex review). Reproduced and checked in the browser: "Border Color" contained an invalid value and was reset. Tests in `Settings.test.jsx`. Fix `0ad5c505`.
+
+**Body at:** `53cc80f3:docs-llms/TODO-agents.md`.
+
+### VIEWER-OPENER · The export viewer window keeps `window.opener`
+
+**Done · Low · OSS · 2026-10-19**
+
+View site and the issues report (`ExportHistoryTable.jsx`) and Media's file view opened with plain `window.open(url, "_blank")`, so an exported site or an uploaded HTML/SVG file kept `window.opener` and its scripts could navigate the editor (reverse tabnabbing), in the browser and as a new desktop-app window.
+
+**Resolution:** those openings pass `noopener,noreferrer`; Media uses the single opener in `useMediaMetadata`. Codex found the standalone site preview had the same exposure; it is opened by name for reuse, which rules out `noopener`, so `SitePreviewLayout` calls `detachPreviewFromOpener()` (`lib/openSitePreview.js`) before the site frame loads (embedding apps with their own preview page call it too). Checked in Chrome and the dev desktop app: the viewer and the preview have no opener, and Preview still reuses its window. The desktop app's unrestricted window creation is logged as DESKTOP-WINDOW-OPEN. Fix `ca9ee2b1`.
+
+**Body at:** `ca9ee2b1:docs-llms/TODO-agents.md`.
+
+### GH117 · Featured image as the fallback social image
+
+**Done · Unrated · OSS · 2026-10-19**
+
+A collection item with no SEO image of its own published no og:image, even when it had a featured image.
+
+**Resolution:** Collection items only (pages have no featured image). A collection-type field flagged `usedAsImage: true` (at most one, `image`) fills the item page's `seo.og_image` when it is empty, in `buildCollectionItemPageData`; an explicit SEO image still wins, and the Site URL rule is unchanged. Arch marks `featured_image` on news, projects and services, also in `updates/0.9.10/`. Item preview now carries the saved item's SEO, which it had been dropping. Checked by the owner in preview and export on Bedrock. Fix `c91fc86b`. [GitHub #117](https://github.com/tsiger/widgetizer/issues/117)
+
+**Body at:** `c91fc86b:docs-llms/TODO-agents.md`.
+
+### GH157 · Desktop shortcut from the installer
+
+**Done · Unrated · OSS · 2026-10-19**
+
+The installed desktop app should put a shortcut on the desktop.
+
+**Resolution:** A first Windows install already created one (electron-builder's default, confirmed by a fresh install of the 0.9.9 release). A reinstall kept shortcuts as the user left them, so a deleted one never came back. `nsis.createDesktopShortcut: "always"` now recreates it on a manual reinstall; in-app updates still leave a removed shortcut alone, by the owner's choice. Mac and Linux unchanged. Checked by the owner with a test installer. Fix `de115fb6`. [GitHub #157](https://github.com/tsiger/widgetizer/issues/157)
+
+**Body at:** `de115fb6:docs-llms/TODO-agents.md`.
+
+### GH158 · Arch's default header button breaks on pages inside a folder
+
+**Done · Unrated · OSS · 2026-10-19**
+
+On a project from the Arch preset, the header's "Get in touch" button linked to a missing `contact.html` from language-folder and collection-item pages.
+
+**Resolution:** Only the Arch preset left `ctaButtonLink` unset, so the header used the schema default, a typed `contact.html` that creation-time enrichment never stamps with a `pageUuid`. The preset's header (base and `updates/0.9.10/`) now stores the button, so creation stamps it like every other preset. The schema default and render engine are unchanged; projects already created keep their button, and translated pages link to the default-language Contact, as picked links do. Resolving page-naming schema defaults (also the Action Bar's `contact.html` defaults) in the app was left for a later version, by the owner's choice. Fix `be8c8ddb`. [GitHub #158](https://github.com/tsiger/widgetizer/issues/158)
+
+**Body at:** `be8c8ddb:docs-llms/TODO-agents.md`.
+
+### GH160 · Decide whether "Split into pages" needs "Main page", then fix its undo
+
+**Done · Unrated · OSS · 2026-10-19**
+
+Turning on "Split into pages" also made the page the collection's main page, took up to three undos, and saving it switched off both settings on the page that had them, beyond undo's reach.
+
+**Resolution:** Owner's decision: untie them. `enforcePaginationRules` no longer sets `listing_anchor`; `clearListingAnchorsElsewhere` clears only the anchor on other pages; `duplicatePage` keeps `paginate` and clears the anchor. In the editor, turning on `paginate` no longer ticks the anchor, unticking the anchor leaves `paginate`, and the item-count fill goes through one `updateWidgetSettingValues` call, so it is one undo step. "Split into pages" sits just before the widget's `perPageSetting`; "Main page" has its own Collection section. Losing the main page to another page still can't be undone, which the owner accepted. Reviewed by Codex; checked by the owner in the editor. Fix `59f3703a`. Added to the OSS 0.9.10 milestone and closed on GitHub on 2026-10-19. [GitHub #160](https://github.com/tsiger/widgetizer/issues/160)
+
+**Body at:** `59f3703a:docs-llms/TODO-agents.md`.
+
 ## Reconciliation decisions
 
 - GitHub #115, #122, #126, #133, #134 and #135 have implementation evidence. Their remaining local entries are review/documentation/integration work, not instructions to rebuild the features. GitHub statuses were left unchanged.

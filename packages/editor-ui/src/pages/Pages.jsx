@@ -106,6 +106,9 @@ export default function Pages() {
     defaultLanguage,
     createVersion: (page, targetLanguage) =>
       createPageLanguageVersion(page.id, { targetLanguage, sourceLanguage: page.language }),
+    // The list changes wherever the user is now, a language tab included; only a
+    // user still here is taken to the new version.
+    afterCreate: () => loadPages(),
     onCreated: (created) => navigate(pageEditorPath(created)),
   });
 

@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { MemoryRouter } from "react-router-dom";
 
 const exportProjectAPI = vi.fn();
 const getExportHistory = vi.fn();
@@ -9,8 +10,11 @@ let projectState;
 vi.mock("../../stores/projectStore", () => {
   const hook = (selector) => (selector ? selector(projectState) : projectState);
   hook.getState = () => projectState;
-  return { default: hook };
+  return { default: hook, useIsMultilang: () => (projectState.activeProject?.languages || []).length > 0 };
 });
+vi.mock("../../hooks/useThemeLocale", () => ({
+  useThemeLocale: () => ({ tTheme: (str) => (str?.startsWith("tTheme:") ? str.slice(7) : str) }),
+}));
 vi.mock("../../stores/toastStore", () => {
   const state = { showToast: () => {} };
   const hook = (selector) => (selector ? selector(state) : state);
@@ -87,5 +91,57 @@ describe("ExportSite — search-engine note", () => {
 
     await waitFor(() => expect(screen.getByTestId("export-history")).toBeInTheDocument());
     expect(screen.queryByText("exportSite.structuredData.title")).toBeNull();
+  });
+});
+
+describe("ExportSite — items that stop an export", () => {
+  const refusal = (invalidItems) =>
+    Object.assign(new Error("Export blocked: collection item(s) have validation errors."), {
+      data: { error: "Export failed: invalid collection items", invalidItems },
+    });
+  const item = (slug, language = "el") => ({
+    collection: "news",
+    collectionName: "News",
+    slug,
+    title: slug === "nea" ? "Νέα ανακοίνωση" : slug,
+    language,
+    errors: [{ fieldId: "title", reason: "required field is empty", fieldLabel: "tTheme:news.title" }],
+  });
+
+  it("lists each item with its language and field, linked to its editor", async () => {
+    projectState = { activeProject: { id: "project-1", name: "Crumbly", languages: ["el"] } };
+    getExportHistory.mockResolvedValue({ exports: [] });
+    exportProjectAPI.mockRejectedValue(refusal([item("nea")]));
+
+    render(
+      <MemoryRouter>
+        <ExportSite />
+      </MemoryRouter>,
+    );
+    fireEvent.click(await screen.findByRole("button", { name: "exportSite.creator.exportButton" }));
+
+    const link = await screen.findByRole("link", { name: "News: Νέα ανακοίνωση" });
+    expect(link.getAttribute("href")).toBe("/collections/news/nea/edit?language=el");
+    expect(screen.getByText("exportSite.invalidItems.title")).toBeInTheDocument();
+    expect(link.closest("li").textContent).toContain("(Greek)");
+    expect(link.closest("li").textContent).toContain("exportSite.invalidItems.field");
+  });
+
+  it("names the first five and counts the rest", async () => {
+    getExportHistory.mockResolvedValue({ exports: [] });
+    exportProjectAPI.mockRejectedValue(refusal(["a", "b", "c", "d", "e", "f", "g"].map((slug) => item(slug, "en"))));
+
+    render(
+      <MemoryRouter>
+        <ExportSite />
+      </MemoryRouter>,
+    );
+    fireEvent.click(await screen.findByRole("button", { name: "exportSite.creator.exportButton" }));
+
+    await screen.findByText("exportSite.invalidItems.title");
+    expect(screen.getAllByRole("listitem")).toHaveLength(5);
+    expect(screen.getByText("exportSite.invalidItems.more")).toBeInTheDocument();
+    // A single-language site does not name the language.
+    expect(screen.getAllByRole("listitem")[0].textContent).not.toContain("(");
   });
 });

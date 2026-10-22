@@ -31,6 +31,8 @@ function applySharedMiddleware(app) {
   app.use(
     cors({
       origin: (origin, callback) => callback(null, isLocalOrigin(origin)),
+      // Lets the dev editor (another port) read a download's filename, e.g. the timestamped backup name.
+      exposedHeaders: ["Content-Disposition"],
     }),
   );
 

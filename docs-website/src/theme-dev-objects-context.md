@@ -119,9 +119,11 @@ Available in `layout.liquid`, widget templates and collection item templates:
 - `page.seo.og_title`
 - `page.seo.og_image`
 - `page.seo.og_type`
-- `page.seo.twitter_card`
 - `page.seo.robots`
 - `page.seo.canonical_url`
+- `page.language` — the language code of the content being rendered (`en`, `el`). Use it for `<html lang>`
+- `page.dir` — `ltr` or `rtl`, for `<html dir>`
+- `page.translations` — one entry per published language (the current one included) with a link to this page's version in it, for a language switcher; empty on a single-language site. See [The Language Switcher](theme-dev-localization.html#the-language-switcher)
 - `page.breadcrumbs` — the trail for this page, Home first and this page last;
   empty on the homepage, except on its page 2 and later (`Home › Page 2`). Also on `globals.breadcrumbs` inside every widget, so a
   header can draw it. Each entry has `label`, `href` (already depth- and
@@ -132,7 +134,9 @@ Available in `layout.liquid`, widget templates and collection item templates:
 - `page.pagination` — on a page split into pages, the same object the splitting
   widget gets. See [Pagination Object](#pagination-object).
 
-> **Note:** A collection item page exposes a `page` object too, built from the item (`page.slug` is `"{slugPrefix}/{slug}"`, `page.name` is the item title). This lets item pages flow through the same layout and SEO as regular pages. See [Collections](theme-dev-collections.html).
+`page.seo.twitter_card` may exist on stored pages, but nothing reads it: `{% seo %}` picks the Twitter card from whether a social image resolves.
+
+> **Note:** A collection item page exposes a `page` object too, built from the item (`page.slug` is `"{slugPrefix}/{slug}"`, `page.name` is the item title, `page.language` is the item's language). This lets item pages flow through the same layout and SEO as regular pages. See [Collections](theme-dev-collections.html).
 
 # Project Object
 
@@ -142,6 +146,8 @@ Available in `layout.liquid`, widget templates and collection item templates:
 - `project.name`
 - `project.siteTitle`
 - `project.description`
+- `project.defaultLanguage` — the site's default language code
+- `project.languages` — the site's additional language codes (empty on a single-language site)
 - `project.theme`
 - `project.siteUrl`
 - `project.cleanUrls`
@@ -175,12 +181,16 @@ Every field is always present, and empty values are blank strings.
 {% endif %}
 
 {% for run in project.identity.openingHours %}
+  {% assign first_key = 'site.business_details.days.' | append: run.firstDay %}
+  {% assign last_key = 'site.business_details.days.' | append: run.lastDay %}
   <p>
-    {{ run.firstDay | capitalize }}{% if run.lastDay != run.firstDay %}–{{ run.lastDay | capitalize }}{% endif %}:
-    {% if run.closed %}Closed{% else %}{% for range in run.ranges %}{{ range.opens }}–{{ range.closes }}{% unless forloop.last %}, {% endunless %}{% endfor %}{% endif %}
+    {{ first_key | t }}{% if run.lastDay != run.firstDay %}–{{ last_key | t }}{% endif %}:
+    {% if run.closed %}{{ 'site.business_details.closed' | t }}{% else %}{% for range in run.ranges %}{{ range.opens }}–{{ range.closes }}{% unless forloop.last %}, {% endunless %}{% endfor %}{% endif %}
   </p>
 {% endfor %}
 ```
+
+The details are shared by every language, but the words around them aren't: day names and "Closed" come from your `site` dictionary (here `site.business_details.*`, as in Arch), so they follow the page's language. The theme checker can't verify keys built at runtime like `first_key`, so make sure all seven day keys exist in `en.json`.
 
 Widgetizer also publishes these details to search engines on its own, so a theme only uses `project.identity` to show them to visitors. When your theme has its own social link settings, prefer `project.identity.profiles` when `hasProfiles` is true and fall back to your settings otherwise.
 
@@ -193,7 +203,7 @@ Available only inside a collection type's `template.liquid` (item pages). Full d
 - `item.id`
 - `item.uuid`
 - `item.slug`
-- `item.url` (relative URL to the item page, depth-aware)
+- `item.url` (relative URL to the item page, depth-aware, including the language folder for a non-default language)
 - `item.created`
 - `item.updated`
 - `item.settings.*` (the item's fields, per the collection schema)
@@ -214,16 +224,27 @@ The layout has access to rendered content placeholders. The three content placeh
 - `{{ main_content | raw }}`
 - `{{ footer | raw }}`
 - `{{ body_class }}` (page slugs are prefixed with `page-`, e.g., `page-about`)
-- `{{ site_icons }}`: precomputed favicon / apple-touch-icon paths, typically consumed by a `site-icons` snippet
+- `{{ site_icons }}`: precomputed favicon, search-result icon, Apple touch icon and manifest paths, typically consumed by a `site-icons` snippet (see [Layout Values](theme-dev-liquid-assets.html#layout-values))
 
 These are not available inside widget templates.
 
-### Global Variables (Available Everywhere)
+### Values in Every Template
 
-The following globals are available in all templates, including inside `{% render %}` snippets:
+Layout, widget and collection item templates also get:
 
-- `currentCanonicalPath`: The un-prefixed path of the page being rendered (e.g., `about.html`, or `portfolio/project-alpha.html` for a collection item page). The core `menu.liquid` snippet compares it against each menu item's `canonicalPath` to mark active items with the `is-active` class, matching on the canonical path (rather than the displayed `href`) so active state still works when item links are depth-prefixed with `../`.
-- `filePath`: Base path for resolving file assets (PDFs, audio and video uploaded via the `file` and `video` setting types). Use it as `{{ filePath | append: '/' | append: filename }}` so links work in both preview and exported output. See [Setting Types](theme-dev-setting-types.html#media-types) for the `file` and `video` settings and their template usage.
+- `filePath`: Base path for resolving file assets (PDFs, audio and video uploaded via the `file` and `video` setting types). Use it as `{{ filePath | append: '/' | append: filename }}` so links work in both preview and exported output. See [Setting Types](theme-dev-setting-types.html#media-types). It isn't visible inside a `{% render %}`'d snippet, so pass it in (`filePath: filePath`) or build the URL before rendering.
+
+### Render Globals (Also Inside Snippets)
+
+A `{% render %}`'d snippet only sees its arguments plus these globals, readable by name anywhere:
+
+- `breadcrumbs`: the current page's breadcrumb trail
+- `cleanUrls`: the project's Clean URLs setting
+- `outputPathPrefix`: the current page's depth, `""` at the root, `../` one level deep
+- `renderMode`: `"preview"` in the editor, `"publish"` on export
+- `icons`: the theme's icon set by name (used by Arch's `icon` snippet)
+
+The built-in `menu` snippet also reads `currentCanonicalPath`, the un-prefixed path of the page being rendered (`about.html`, `el/about.html`, `portfolio/project-alpha.html`), and compares it with each menu item's `canonicalPath` to mark the active item. Other values on the globals are internal and can change without notice. Everything else a snippet needs, pass as an argument (see [Snippets](theme-dev-liquid-assets.html#render-snippet-name)).
 
 # Practical Guidance
 

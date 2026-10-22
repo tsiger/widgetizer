@@ -115,13 +115,18 @@ The library is read before the response starts streaming: once the ZIP is being 
 1. Validate upload size, ZIP safety, nonempty archive, one media-metadata entry, manifest shape, restorable languages, and installed theme availability.
 2. Allocate a new project name/folder/UUID and extract into a temporary directory.
 3. Recover theme version from the manifest or copied theme metadata.
-4. Copy source files into the destination, excluding the export manifest; insert the project row after successful copying.
-5. Restore media metadata into SQLite with new media file IDs, then remove the intermediate media JSON.
-6. Refresh usage and remove the temporary extraction directory.
+4. Validate content JSON, media paths and translations, and collection item slugs before creating the destination directory.
+5. Copy source files into the destination, excluding the export manifest; insert the project row after successful copying.
+6. Restore media metadata into SQLite with new media file IDs, then remove the intermediate media JSON.
+7. Refresh usage and remove the temporary extraction directory.
 
 **ZIP safety.** Import and theme upload unpack through [zipSafety](../../../packages/builder-server/src/utils/zipSafety.js): each entry is streamed to disk and the archive is refused (400) once the bytes it actually produces pass 100 times its size, whatever sizes it records; entry names must be plain paths, no file may appear twice (case-insensitively), and entry length/CRC must match. The manifest is read through the same budget, capped at 16 MB. A file that is not a readable ZIP is a 400. Top-level dot entries (a theme update's working folders) are left out of the import.
 
 **Content a backup made by the app never holds** refuses the whole backup with a 400 naming the problem: a media path that is not one file directly in an upload folder, media text for the default language or one the project lacks, a collection item slug that is not a plain slug, a theme or preset that is not a single folder name, or a project detail of the wrong kind. Markup is stripped from the name, title and notes as on the create form. Legacy `audios`/`videos` upload folders and an older unchecked Site Address are still accepted ([backupContentChecks](../../../packages/builder-server/src/utils/backupContentChecks.js)).
+
+**A newer backup format** refuses the import before anything else in the manifest is read: `backupFormatProblem` compares the manifest's `formatVersion` with `BACKUP_FORMAT_VERSION` in `projectController.js`, the same constant export writes. Newer, including a minor step, is refused with "made by a newer version of Widgetizer … Update Widgetizer to import it"; a value that is not a `major.minor` string (an explicit `null` included) is refused as a changed backup; an absent field, as in older exports, is accepted.
+
+**Unreadable content JSON** refuses the whole backup with a 400 naming the damaged file, before creating a project directory or database row. `contentFilesProblem` checks every JSON file under `pages/` (including global widgets), `menus/` and `collections/` (including ordering files), across all language folders, plus root `theme.json`. It uses `JSON.parse` on UTF-8 text, as the app's content readers do: unlike `fs.readJson`, it does not strip a byte-order mark and accept a file that would fail when opened later. Only syntax errors become this refusal; operational I/O errors propagate through the import failure handler. Existing projects, media and the active-project selection stay unchanged on refusal. This is syntax validation, not a complete content-schema or reference check; it does not scan uploaded JSON assets or unrelated theme implementation files.
 
 Unlike project duplication, this path does **not** run the content-UUID remapper: page/item/menu identities in the backup remain project-scoped. Both paths regenerate media database IDs. Both preserve translation membership and translated metadata.
 

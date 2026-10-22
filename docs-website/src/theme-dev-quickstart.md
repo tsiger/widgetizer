@@ -8,6 +8,14 @@ By the end you'll have a minimal theme with a layout, one widget, and a homepage
 
 > **Tip:** Keep the [Arch theme](https://github.com/tsiger/widgetizer/tree/master/themes/arch) open in another window. It's a complete, production-ready theme and the best reference while you build.
 
+### Optional Shortcuts
+
+You don't need any of these to follow the quickstart, but they can save time once you build a real theme:
+
+- **Starter theme.** `skills/widgetizer-theme/assets/starter-theme/` in the Widgetizer repository is a minimal theme that already passes the checker: layout, header with menu and language switcher, footer, two sample widgets, a home page, a menu and an English locale file. Copy it as a starting point and replace the design.
+- **Authoring skills.** `skills/widgetizer-theme/` is an Agent Skill that teaches an AI coding agent the theme rules, with one reference file per topic and a generated catalog (`references/contract.json`) of the tags, filters, setting types and fonts the app supports. `skills/widgetizer-theme-design/` covers the design side: the brief, visual previews and the editing model. Both are useful to read even without an agent.
+- **Theme checker.** `npm run validate:theme` checks a theme folder against what the app supports (see [Step 7](#step-7-check-your-theme)).
+
 # What You'll Build
 
 ```
@@ -17,6 +25,8 @@ themes/hello-theme/
 ├── screenshot.png        # 1280×720 preview for the theme picker
 ├── assets/
 │   └── base.css          # theme styles
+├── locales/
+│   └── en.json           # editor group names (and, later, visitor words)
 ├── widgets/
 │   └── hello/
 │       ├── schema.json   # the widget's editable settings
@@ -55,7 +65,7 @@ Create the `themes/hello-theme/` folder, then add the files below.
 
 ```liquid
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ page.language | default: 'en' }}" dir="{{ page.dir | default: 'ltr' }}">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -80,7 +90,7 @@ Create the `themes/hello-theme/` folder, then add the files below.
 </html>
 ```
 
-`{{ header }}` and `{{ footer }}` render your global header/footer widgets. We're skipping those for now, so they'll simply be empty; the page still renders. See [Layout & Templates](theme-dev-layout-templates.html) and [Liquid Tags & Filters](theme-dev-liquid-assets.html).
+`{{ header }}` and `{{ footer }}` render your global header/footer widgets. We're skipping those for now, so they'll simply be empty; the page still renders. `page.language` and `page.dir` give the document the language of the page being rendered, which matters once a site publishes in more than one language (see [Localization](theme-dev-localization.html)). See [Layout & Templates](theme-dev-layout-templates.html) and [Liquid Tags & Filters](theme-dev-liquid-assets.html).
 
 # Step 3: A Widget
 
@@ -171,16 +181,50 @@ body {
 h1, h2 { color: var(--colors-accent); }
 ```
 
+**`locales/en.json`:** the editor titles each settings group from this file:
+
+```json
+{
+  "global": {
+    "colors": { "name": "Colors" }
+  }
+}
+```
+
+The same file later holds your visitor-facing words; see [Localization](theme-dev-localization.html).
+
 Finally, add a **`screenshot.png`** (1280×720); it's required and shows in the theme picker.
 
 # Step 6: Load Your Theme
 
 1. Zip the `hello-theme/` folder.
-2. In Widgetizer, go to the **Themes** page and upload the zip (or, if running from source, drop the folder into `themes/` and run `npm run theme:sync`).
+2. In Widgetizer, go to the **Themes** page and upload the zip. If you run Widgetizer from source, you can instead keep the folder in `themes/` and copy it into the app's theme library with `npm run theme:sync -- --theme hello-theme`.
 3. Create a new [project](projects.html) and choose **Hello Theme**.
 4. Open the page editor, and your homepage renders with the `hello` widget. Edit the heading and watch it update live.
 
 That's a complete theme. From here, grow it.
+
+### Seeing Changes While You Work
+
+A project keeps its own copy of the theme, so editing `themes/hello-theme/` doesn't change a project you already created. From source, keep a test project in sync while you edit:
+
+```bash
+npm run theme:sync -- --theme hello-theme --project <project-folder>
+```
+
+`<project-folder>` is the project's folder under `data/projects/`. The command copies the theme into the library and the project, then watches for changes. It never copies `templates/` or `menus/`, so the project's pages and menus stay as they are, but it **does** copy `theme.json` over the project's, which resets that project's saved Site settings to your defaults. Use a throwaway project. To see how a real site receives a new version, ship it as a [theme update](theme-dev-distribution.html) instead.
+
+# Step 7: Check Your Theme
+
+From a Widgetizer source checkout, run the app's theme checker on your folder:
+
+```bash
+npm run validate:theme -- themes/hello-theme
+```
+
+It parses every template with the same Liquid engine the app uses and checks the theme against what the app supports: required files, screenshot sizes, setting types and defaults, unknown tags and filters, editor attributes, starter pages and menus, locale keys, asset names, collections, presets and update folders. It needs no running app and changes nothing. Add `--strict` to fail on warnings too, or `--json` for machine-readable output.
+
+A clean run is a static check only. It doesn't render, open the editor or export, so still try the theme in the editor, preview it, and inspect an export.
 
 # Where to Go Next
 
@@ -189,5 +233,6 @@ That's a complete theme. From here, grow it.
 - [Liquid Tags & Filters](theme-dev-liquid-assets.html): media, assets, SEO, and the filter reference
 - [Widgets & Blocks](theme-dev-widgets-blocks.html): repeatable blocks, multiple block types, editor events
 - [Collections](theme-dev-collections.html): theme-defined content types with their own pages
+- [Localization](theme-dev-localization.html): visitor-facing words in every language a site publishes
 - [Theme Contract](theme-dev-contract.html): the required files, placeholders, and attributes on one page
 - [Distributing & Updating Themes](theme-dev-distribution.html): versioned updates and presets

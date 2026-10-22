@@ -32,7 +32,7 @@ An additional-language form has a separate exported identity, even when its name
 
 Display defaults such as the heading, submit button, required-fields note and choice placeholder follow the page's language until edited. The app supplies English and Greek words even when the theme supplies none; a theme can override them. This shipped in `22a93fa5`. Clearing the required-fields note removes its entire line, including the asterisk; clearing a choice placeholder leaves its first option empty. A cleared submit-button label deliberately falls back to translated text so the button retains a name.
 
-Save and export prepare the form and its definition. A deployed site needs a compatible handler for the form's submission address. This editor/backend does not provide a submission inbox, delivery service, submission deletion or retention settings. Previewing a form is not an end-to-end submission test.
+Save and export prepare the form and its definition. A deployed site needs a compatible handler for the form's submission address. This editor/backend does not provide a submission inbox, delivery service, submission deletion or retention settings. Previewing a form is not an end-to-end submission test: in preview (`renderMode == "preview"`) the form's script stops the submit and writes "This is a preview, so nothing was sent." into its status line, instead of posting to an address the preview server does not serve.
 
 ## Technical details
 

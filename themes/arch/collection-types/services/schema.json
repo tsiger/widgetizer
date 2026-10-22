@@ -24,7 +24,7 @@
       "label": "Summary",
       "description": "Short teaser shown in listings and at the top of the service."
     },
-    { "type": "image", "id": "featured_image", "label": "Featured image" },
+    { "type": "image", "id": "featured_image", "label": "Featured image", "usedAsImage": true },
     { "type": "gallery", "id": "gallery", "label": "Gallery" },
     { "type": "richtext", "id": "description", "label": "Description", "allow_headings": true, "allow_images": true },
     { "type": "header", "id": "details_header", "label": "Details" },

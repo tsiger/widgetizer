@@ -4,6 +4,14 @@ description: The Widgetizer theme contract at a glance. Required files, layout p
 
 This page is a one-stop reference for the **contract** every theme must satisfy: the files Widgetizer expects, the placeholders your layout must render, and the attributes the editor needs on your markup. Keep it open while you build. Each item links to the page with the full explanation.
 
+Most of these rules are checked for you. From a Widgetizer source checkout, run:
+
+```bash
+npm run validate:theme -- themes/my-theme
+```
+
+The checker reports errors (the theme breaks or the app rejects it) and warnings (review them). It is a static check: it doesn't render pages, run the editor or export, so test those in the app too. See [Step 7 of the quickstart](theme-dev-quickstart.html#step-7-check-your-theme).
+
 # Required Files
 
 A theme must include these to be recognized and functional:
@@ -17,7 +25,7 @@ A theme must include these to be recognized and functional:
 | `templates/` | At least one page template (e.g. `index.json`) |
 | `assets/` | Theme CSS/JS (e.g. `base.css`) |
 
-Optional but recommended: `locales/`, ship at least `en.json` (required if your schemas use `tTheme:` keys, since projects copy and expect a `locales/` directory). Also optional: `snippets/`, `menus/`, `collection-types/`, `presets/`, `updates/`. See [Theme Structure](theme-dev-structure.html).
+Optional but recommended: `locales/`, with at least `en.json`. It holds `tTheme:` editor labels and the name of each settings group, and its `site` block holds the words visitors read (see [Localization](theme-dev-localization.html)). Also optional: `snippets/`, `menus/`, `collection-types/`, `presets/`, `updates/`. See [Theme Structure](theme-dev-structure.html).
 
 # Required Layout Placeholders
 
@@ -29,7 +37,7 @@ Your `layout.liquid` must render the three content placeholders. They are **pre-
 {{ footer | raw }}
 ```
 
-Apply `{{ body_class }}` to the `<body>` element. See [Layout & Templates](theme-dev-layout-templates.html).
+Apply `{{ body_class }}` to the `<body>` element, and give `<html>` the page's language and direction (`lang="{{ page.language }}" dir="{{ page.dir }}"`). See [Layout & Templates](theme-dev-layout-templates.html).
 
 ### Recommended `<head>` Tags
 
@@ -39,10 +47,10 @@ Not strictly required, but expected for a complete theme:
 | :-- | :-- |
 | `{% seo %}` | Title, description, Open Graph, canonical |
 | `{% fonts %}` | Font preconnect + stylesheet |
-| `{% render 'site-icons', site_icons: site_icons %}` | Favicon, Apple touch icon, and manifest links |
+| `{% render 'site-icons', site_icons: site_icons %}` | Favicon, search-result icon, Apple touch icon, and manifest links |
 | `{% theme_settings %}` | CSS variables from global settings (place before `base.css`) |
 | `{% asset src: "base.css" %}` | Global theme stylesheet |
-| `{% custom_css %}` | User custom CSS from `advanced.custom_css` |
+| `{% custom_css %}` | User custom CSS from the `custom_css` setting |
 | `{% custom_head_scripts %}` / `{% custom_footer_scripts %}` | User-provided script/code sinks |
 | `{% header_assets %}` / `{% footer_assets %}` | Output enqueued widget assets |
 
@@ -87,7 +95,10 @@ See [Widgets & Blocks](theme-dev-widgets-blocks.html).
 
 - **Widget type = folder name.** `widgets/hero/` defines the `hero` type, and `schema.json`'s `type` must match.
 - **Collection type = folder name.** Same rule for `collection-types/{type}/`.
-- **Unique asset filenames.** Widget `.css`/`.js` files are flattened into one `assets/` folder on export; name them uniquely (e.g. `slideshow.css`, not `styles.css`) to avoid collisions. See [Export](export.html).
+- **Unique asset filenames.** Widget `.css`/`.js` files are flattened into one `assets/` folder on export, next to the theme's own assets; name them uniquely across all widgets and `assets/` (e.g. `slideshow.css`, not `styles.css`). Keep them directly in the widget folder, not in subfolders. Only files a rendered page enqueues are exported. See [Asset Sources](theme-dev-liquid-assets.html#asset-sources).
+- **Settings the app reads by id.** `favicon`, `date_format`, `use_bunny_fonts`, `custom_css`, `custom_head_scripts` and `custom_footer_scripts` are found by id in whichever settings group you put them. Declare each id only once across `settings.global`. See [Theme Manifest & Settings](theme-dev-manifest-settings.html#settings-the-app-reads-by-id).
+- **Collection addresses.** Each collection with item pages needs its own `slugPrefix`; `assets` is reserved. Avoid `page` and anything shaped like a language code (`de`, `pt-br`). See [Collections](theme-dev-collections.html#item-addresses).
+- **No hardcoded visitor words.** Use the `site` dictionary and the `t` filter. See [Localization](theme-dev-localization.html).
 - **Scope widget CSS** with `.widget-{{ widget.id }}` so styles don't leak between instances.
 - **Use the asset tags instead of hardcoded paths.** They handle preview routes, exported static paths, nested page prefixes, and cache-busting for you.
 

@@ -42,6 +42,22 @@ function openResolvedPreview(previewPath) {
 }
 
 /**
+ * Cut the preview window's link back to the editor that opened it. The preview
+ * runs the site's own scripts (theme code, pasted embeds) in a frame that shares
+ * this origin, so through `window.opener` they could navigate the editor window.
+ * The window is opened by name so it can be reused, which `noopener` would
+ * prevent; the page it shows calls this as it mounts instead, before the site
+ * frame loads. Reuse by name does not need the opener.
+ */
+export function detachPreviewFromOpener() {
+  try {
+    window.opener = null;
+  } catch {
+    // Nothing to detach.
+  }
+}
+
+/**
  * Open the navigable standalone preview for a PAGE. Resolves the configured page
  * preview path (the OSS default `/preview/:pageId`, or an embedding host's override
  * via setStandalonePreviewPath) and dispatches it. The user lands on that page and can

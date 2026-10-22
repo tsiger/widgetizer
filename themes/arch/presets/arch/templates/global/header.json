@@ -2,6 +2,11 @@
   "type": "header",
   "settings": {
     "logoImage": "/uploads/images/arch-logo.svg",
-    "logoMaxWidth": 90
+    "logoMaxWidth": 90,
+    "ctaButtonLink": {
+      "href": "contact.html",
+      "text": "Get in touch",
+      "target": "_self"
+    }
   }
 }

@@ -99,7 +99,7 @@ Global settings are defined in `settings.global`. Each key is a group that becom
 
 Arch defines:
 
-- `general` (favicon, reveal animations, date format)
+- `general` (favicon, reveal animations, date format, breadcrumbs)
 - `colors` (standard and highlight color sets)
 - `typography` (heading and body font pickers)
 - `style` (corner style, spacing density, button shape)
@@ -161,7 +161,7 @@ Example:
 
 For body fonts, a `--{group}-body_font_bold-weight` variable is also generated to avoid faux bold rendering.
 
-The `{% fonts %}` tag also reads `font_picker` settings from the `typography` group. It loads external stylesheets only for Widgetizer's known web fonts; system font stacks intentionally produce no external request. Use `heading_font` and `body_font` ids when you want the same behavior Arch uses, including automatic bold-weight loading for `body_font`.
+The `{% fonts %}` tag also reads every `font_picker` setting, in whichever group it sits. It loads external stylesheets only for Widgetizer's known web fonts; system font stacks intentionally produce no external request. Use the id `body_font` when you want the automatic bold-weight loading Arch uses.
 
 # Accessing Theme Settings in Liquid
 
@@ -177,9 +177,24 @@ All settings are available in templates through the `theme` object using the sam
 {% endif %}
 ```
 
+# Settings the App Reads by Id
+
+A few settings mean something to Widgetizer itself. The app finds them **by id, in whichever group you put them**, using the saved value and then the schema default. Arch's placement is shown, but any group works:
+
+| Setting id | Suggested type | Used by | Arch group |
+| :-- | :-- | :-- | :-- |
+| `favicon` | `image` | Site icons (`site_icons`) | `general` |
+| `date_format` | `select` | The `format_date` filter | `general` |
+| `use_bunny_fonts` | `checkbox` | `{% fonts %}`: load from Bunny Fonts instead of Google Fonts | `advanced` |
+| `custom_css` | `code` with `language: "css"` | `{% custom_css %}` | `advanced` |
+| `custom_head_scripts` | `code` with `language: "html"` | `{% custom_head_scripts %}` | `advanced` |
+| `custom_footer_scripts` | `code` with `language: "html"` | `{% custom_footer_scripts %}` | `advanced` |
+
+Declare each of these ids only once across `settings.global`. If the same id appears in two groups other than the one the app looks in first, the app can't tell which one you meant and ignores it; the theme checker flags duplicates.
+
 # Advanced Settings (Custom Code)
 
-If you include the `advanced` group, users can inject:
+With the three custom-code settings above, users can inject:
 
 - Custom CSS via `{% custom_css %}`
 - Custom scripts in `<head>` via `{% custom_head_scripts %}`
@@ -187,40 +202,39 @@ If you include the `advanced` group, users can inject:
 
 These tags must be present in `layout.liquid` for the settings to take effect. See [Layout & Templates](theme-dev-layout-templates.html) for required placeholders and tag placement.
 
-Use these exact setting ids if you want the built-in tags to pick them up:
-
-| Setting id | Suggested type | Consumed by |
-| :-- | :-- | :-- |
-| `custom_css` | `code` with `language: "css"` | `{% custom_css %}` |
-| `custom_head_scripts` | `code` with `language: "html"` | `{% custom_head_scripts %}` |
-| `custom_footer_scripts` | `code` with `language: "html"` | `{% custom_footer_scripts %}` |
-| `use_bunny_fonts` | `checkbox` | `{% fonts %}` provider selection compatibility |
-
 Custom CSS and scripts are deliberate raw output surfaces. They should be presented as advanced controls and documented for trusted site administrators, not casual content editors. For the detailed output contract, see [Liquid Tags & Filters](theme-dev-liquid-assets.html#seo-fonts-and-theme-settings).
 
-# Theme Localization (i18n)
+# Links, Menus and Rich Text in Theme Settings
 
-Themes can provide translated labels for all settings and widget fields. This allows the Theme Settings panel and widget editor to display in the user's chosen language.
+`link`, `menu` and `richtext` settings in `theme.json` behave exactly like the same settings in a widget. A page or item picked in a site-wide setting is stored as a stable reference: it follows renames, is cleared when its target is deleted, carries over when a project is duplicated, and resolves for the page being rendered (its depth, the Clean URLs setting, and the target's language). The rich text editor's internal-link picker works there too. Read the resolved value as usual:
 
-### Locale Files
-
-Create a `locales/` folder in your theme root with one JSON file per language:
-
-```
-themes/my-theme/
-├── locales/
-│   ├── en.json
-│   ├── fr.json
-│   ├── de.json
-│   └── es.json
+```liquid
+{% assign cta = theme.footer.cta_link %}
+{% if cta.href != blank %}
+  <a href="{{ cta.href }}"{% if cta.target == '_blank' %} target="_blank" rel="noopener"{% endif %}>{{ cta.text }}</a>
+{% endif %}
 ```
 
-Each file contains nested keys matching your settings structure:
+A slug link you ship as a `theme.json` default (`"href": "contact.html"`) is connected to the matching page when a project is created. See [Starter Links and Updates](theme-dev-distribution.html#starter-links-and-updates).
+
+Theme settings are shared by every language of a site, so don't use them for words visitors read. Put those in the `site` dictionary or in a header/footer setting, which is stored per language.
+
+# Theme Locales
+
+A theme's `locales/` folder serves two audiences:
+
+- **Editor labels** (keys outside `site`) name settings, widgets and options in the editor. The editor interface is English, so these live in `locales/en.json` only.
+- **Visitor words** (the `site` block) are what the published site says. They resolve in the language of each rendered page and work today, in every language a site publishes. They're covered on the [Localization](theme-dev-localization.html) page.
+
+### Editor Label Keys
+
+Each locale file contains nested keys matching your settings structure:
 
 ```json
 {
   "global": {
     "colors": {
+      "name": "Colors",
       "settings": {
         "standard_bg_primary": {
           "label": "Primary Background"
@@ -239,6 +253,8 @@ Each file contains nested keys matching your settings structure:
 }
 ```
 
+`global.<group>.name` titles each settings group in the editor, so include one for every group even if your labels are plain strings.
+
 ### Using Translation Keys
 
 In `theme.json` and widget `schema.json` files, use the `tTheme:` prefix followed by a dot-notation path instead of a hardcoded string:
@@ -252,7 +268,7 @@ In `theme.json` and widget `schema.json` files, use the `tTheme:` prefix followe
 }
 ```
 
-The system resolves `tTheme:global.colors.settings.standard_bg_primary.label` by looking up `global.colors.settings.standard_bg_primary.label` in the active locale file. If the key is not found or no locale file exists for the current language, the raw key string is displayed as a fallback.
+The system resolves `tTheme:global.colors.settings.standard_bg_primary.label` by looking up `global.colors.settings.standard_bg_primary.label` in `en.json`. If the key is not found, the raw key string is displayed, which makes a missing label easy to spot. Values without the `tTheme:` prefix are shown as written, so a small theme can use plain strings.
 
 ### Widget Schema Localization
 
@@ -275,9 +291,11 @@ Widget `displayName` and setting `label` fields support the same `tTheme:` prefi
 }
 ```
 
-### Supported Languages
+### Checking Your Locales
 
-Widgetizer's admin interface currently ships with English; additional languages will be added in future releases. Your theme can provide a locale file for any language code you intend to support; the active locale matches the user's language setting in [App Settings](settings.html), and locale files for languages that aren't yet selectable in the UI sit dormant until they are.
+`npm run validate:theme -- themes/my-theme` checks that every `tTheme:` key, group name, `t` key and `defaultKey` your theme uses exists in `en.json`. For themes in the `themes/` folder, `npm run validate:theme-locales` also reports unused keys and compares each language's `site` block with English. See [Checking and Shipping Translations](theme-dev-localization.html#checking-and-shipping-translations).
+
+Locale files are part of each project's copy of the theme. Changes reach existing projects only through a [theme update](theme-dev-distribution.html).
 
 # Practical Guidance
 

@@ -163,7 +163,21 @@ const useAutoSave = create((set, get) => ({
       }
     }
 
-    set({ modifiedWidgets: next });
+    // The structure and theme flags are only ever raised by an edit; after an
+    // undo or redo they hold only while the page or the theme still differs
+    // from what is saved, so undoing back to the saved state leaves nothing to
+    // save. (Header/footer structure is covered by `next` above.) While a save
+    // is in flight they stay: it is writing the edit this undo reverses, so
+    // matching the old baseline is not "saved", and clearing would let the
+    // leave-page guard pass before that save lands.
+    const pageDiffers = Boolean(savedFormPage && originalPage && !isEqual(savedFormPage, originalPage));
+    const themeDiffers = useThemeStore.getState().hasUnsavedThemeChanges();
+    const saving = Boolean(get().runningSave);
+    set({
+      modifiedWidgets: next,
+      structureModified: get().structureModified && (pageDiffers || saving),
+      themeSettingsModified: get().themeSettingsModified && (themeDiffers || saving),
+    });
 
     // Arm the autosave timer once, for ANY dirtiness this reconcile can see —
     // not just the per-widget ledger. Differences that live outside any
@@ -174,8 +188,7 @@ const useAutoSave = create((set, get) => ({
     // through syncThemeStoreFromSnapshot). Without those, an undone/redone
     // reorder or theme edit sits unsaved until the next content edit happens
     // to re-arm the timer — save() persists both (hasPageDiff / hasThemeDrift).
-    const hasPageDiff = savedFormPage && originalPage && !isEqual(savedFormPage, originalPage);
-    if (next.size > 0 || hasPageDiff || useThemeStore.getState().hasUnsavedThemeChanges()) {
+    if (next.size > 0 || pageDiffers || themeDiffers) {
       set({ autoSaveFailureCount: 0 });
       get().resetAutoSaveTimer();
     }

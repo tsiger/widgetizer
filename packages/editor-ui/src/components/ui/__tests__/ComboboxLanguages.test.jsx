@@ -111,3 +111,29 @@ describe("link picker on a single-language site", () => {
     expect(screen.getByText("Anything")).toBeTruthy();
   });
 });
+
+describe("the closed link field names the selected target's language", () => {
+  const renderClosed = (value) =>
+    render(
+      <EditingLanguageProvider language="en">
+        <Combobox options={OPTIONS} value={value} onChange={vi.fn()} placeholder="Select…" />
+      </EditingLanguageProvider>,
+    );
+
+  it("badges a selected page with its language", () => {
+    renderClosed("p2");
+    expect(screen.getByPlaceholderText("Select…").value).toBe("Sxetika");
+    expect(screen.getByTitle("Ελληνικά").textContent).toBe("el");
+  });
+
+  it("shows no badge on a single-language site", () => {
+    setSiteLanguages([]);
+    renderClosed("p1");
+    expect(screen.queryByTitle("English")).toBeNull();
+  });
+
+  it("shows no badge for a typed link", () => {
+    renderClosed("https://example.com");
+    expect(screen.queryByTitle(/English|Ελληνικά/)).toBeNull();
+  });
+});

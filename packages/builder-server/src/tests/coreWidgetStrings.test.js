@@ -225,3 +225,22 @@ describe("the page and the manifest", () => {
     assert.deepEqual(keys, ["contact", "el:contact"]);
   });
 });
+
+// Only a publishing host answers the form's address, so a submit in the preview
+// would otherwise land on the preview server's raw "Cannot POST" page.
+describe("a form submitted in the preview", () => {
+  it("stays on the page and says nothing was sent, while the published form posts as usual", async () => {
+    const { renderWidget } = await import("../services/renderingService.js");
+    const preview = await renderWidget(PROJECT_ID, "form", formWidget(), {}, "preview", {
+      projectId: PROJECT_ID,
+      renderMode: "preview",
+      enqueuedStyles: new Map(),
+      enqueuedScripts: new Map(),
+    });
+    assert.ok(preview.includes("nothing was sent"), preview.slice(-1500));
+
+    const published = await read(await exportSite(), "index.html");
+    assert.ok(!published.includes("nothing was sent"));
+    assert.ok(published.includes('action="/__widgetizer/forms/contact"'));
+  });
+});

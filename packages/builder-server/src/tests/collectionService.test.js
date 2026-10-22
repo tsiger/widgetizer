@@ -113,6 +113,19 @@ describe("validateCollectionSchema (pure)", () => {
     assert.ok(errors.some((e) => e.includes("usedAsTitle")));
   });
 
+  it("allows at most one usedAsImage, on an image setting", () => {
+    const withImage = (settings) => ({ ...NEWS_SCHEMA, settings: [{ id: "title", type: "text", usedAsTitle: true }, ...settings] });
+    assert.equal(svc.validateCollectionSchema(withImage([{ id: "hero", type: "image", usedAsImage: true }]), "news").valid, true);
+    for (const settings of [
+      [{ id: "body", type: "richtext", usedAsImage: true }],
+      [{ id: "a", type: "image", usedAsImage: true }, { id: "b", type: "image", usedAsImage: true }],
+    ]) {
+      const { valid, errors } = svc.validateCollectionSchema(withImage(settings), "news");
+      assert.equal(valid, false);
+      assert.ok(errors.some((e) => e.includes("usedAsImage")));
+    }
+  });
+
   it("rejects v1-disallowed setting keys (repeater/blocks/multiple)", () => {
     const bad = {
       ...NEWS_SCHEMA,
@@ -532,6 +545,31 @@ describe("normalize + render helpers (pure)", () => {
     for (const siteUrl of ["", "not-a-url", "https://example.com/?utm=x", "https://example.com/#top"]) {
       assert.equal(svc.buildCollectionItemPageData(NEWS_SCHEMA, item, siteUrl).seo.canonical_url, "");
     }
+  });
+
+  const IMAGE_SCHEMA = {
+    ...NEWS_SCHEMA,
+    settings: NEWS_SCHEMA.settings.map((s) => (s.id === "hero" ? { ...s, usedAsImage: true } : s)),
+  };
+  const withHero = { ...item, settings: { title: "Hello", hero: "/uploads/images/hero.jpg" } };
+
+  it("buildCollectionItemPageData falls back to the usedAsImage field for og_image", () => {
+    const page = svc.buildCollectionItemPageData(IMAGE_SCHEMA, withHero, "https://example.com");
+    assert.equal(page.seo.og_image, "/uploads/images/hero.jpg");
+  });
+
+  it("buildCollectionItemPageData keeps the item's own og_image over the usedAsImage field", () => {
+    const page = svc.buildCollectionItemPageData(
+      IMAGE_SCHEMA,
+      { ...withHero, seo: { og_image: "/uploads/images/social.jpg" } },
+      "https://example.com",
+    );
+    assert.equal(page.seo.og_image, "/uploads/images/social.jpg");
+  });
+
+  it("buildCollectionItemPageData leaves og_image empty without a usedAsImage field", () => {
+    assert.equal(svc.buildCollectionItemPageData(NEWS_SCHEMA, withHero, "https://example.com").seo.og_image, "");
+    assert.equal(svc.buildCollectionItemPageData(IMAGE_SCHEMA, item, "https://example.com").seo.og_image, "");
   });
 
   it("buildCollectionItemPageData lets an explicit item canonical win", () => {

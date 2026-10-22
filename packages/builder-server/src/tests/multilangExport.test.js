@@ -270,6 +270,42 @@ describe("forms", () => {
   });
 });
 
+// A collection's main-language items publish into a folder named by its
+// slugPrefix, and a language's pages into a folder named by its code. When the
+// two match, one can overwrite the other.
+describe("a collection whose slugPrefix is a language code", () => {
+  const writeSchema = (type, slugPrefix) =>
+    storage.write(
+      scope,
+      `collection-types/${type}/schema.json`,
+      JSON.stringify({ ...NEWS_SCHEMA, type, displayName: "Products", displayNamePlural: "Products", slugPrefix }),
+    );
+  const removeSchema = (type) => fs.remove(path.join(getProjectDir(PROJECT_FOLDER), "collection-types", type));
+
+  it("refuses the export when that language is published", async () => {
+    await writeSchema("products", "el");
+    try {
+      await resetExports();
+      const res = await runExport();
+      assert.equal(res._status, 400, JSON.stringify(res._json));
+      assert.equal(res._json.error, "Export failed: a collection clashes with a language");
+      assert.match(res._json.message, /"Products" collection publishes its items in the el\/ folder/);
+    } finally {
+      await removeSchema("products");
+    }
+  });
+
+  // German has no homepage, so the export leaves it out and its folder is never written.
+  it("lets the export through when that language is left out of it", async () => {
+    await writeSchema("products", "de");
+    try {
+      await exportSite();
+    } finally {
+      await removeSchema("products");
+    }
+  });
+});
+
 // The export writes every language, so it must validate every language. An item
 // broken only in its translation would otherwise be dropped in silence.
 describe("an item that is invalid only in a translation", () => {

@@ -19,7 +19,7 @@ const SHOW_FOLDER_NAME = false;
 
 const READINESS_TARGETS = {
   siteUrl: { tab: "site", fieldId: "siteUrl" },
-  name: { tab: "identity", fieldId: "identity-publicName" },
+  name: { tab: "site", fieldId: "siteTitle" },
   logo: { tab: "identity", fieldId: "identity-logo" },
   address: { tab: "business", fieldId: "identity-streetAddress" },
 };
@@ -212,6 +212,8 @@ export default function ProjectForm({
     identityErrors.some(isBusinessIdentityError);
   const tabs = ["general", "site", "identity", ...(showBusinessTab ? ["business"] : [])];
   const currentTab = tabs.includes(activeTab) ? activeTab : "identity";
+  // New Project's General tab needs the full width for the preset grid.
+  const showReadiness = !(isNew && currentTab === "general");
   const tabHasErrors = {
     general: !!(errors.name || errors.theme || errors.folderName),
     site: !!errors.siteUrl,
@@ -225,6 +227,14 @@ export default function ProjectForm({
       const field = document.getElementById(fieldId);
       field?.scrollIntoView({ behavior: "smooth", block: "center" });
       field?.focus();
+      const highlighted = field?.closest(".form-field") || field;
+      const reduceMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+      highlighted?.animate?.(
+        reduceMotion
+          ? [{ boxShadow: "0 0 0 3px rgba(236, 72, 153, 0.6)" }, { boxShadow: "0 0 0 3px rgba(236, 72, 153, 0.6)" }]
+          : [{ boxShadow: "0 0 0 0 rgba(236, 72, 153, 0.6)" }, { boxShadow: "0 0 0 10px rgba(236, 72, 153, 0)" }],
+        { duration: reduceMotion ? 2000 : 900, iterations: reduceMotion ? 1 : 3 },
+      );
     });
   };
 
@@ -486,173 +496,181 @@ export default function ProjectForm({
         ))}
       </div>
 
-      <div
-        role="tabpanel"
-        id="project-panel-general"
-        aria-labelledby="project-tab-general"
-        hidden={currentTab !== "general"}
-        className="form-section"
-      >
-        <div className="max-w-xl space-y-4">
-          {nameField}
+      <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:gap-10">
+        {showReadiness && (
+          <aside className="lg:sticky lg:top-6 lg:order-last lg:w-72 lg:shrink-0">
+            <SiteIdentityFields section="readiness" {...identityProps} />
+          </aside>
+        )}
+        <div className={`min-w-0 flex-1${showReadiness ? " lg:max-w-xl" : ""}`}>
+          <div
+            role="tabpanel"
+            id="project-panel-general"
+            aria-labelledby="project-tab-general"
+            hidden={currentTab !== "general"}
+            className="form-section"
+          >
+            <div className="max-w-xl space-y-4">
+              {nameField}
 
-          {!isNew && themeInfo}
+              {!isNew && themeInfo}
 
-          {isNew && (
-            <div className="form-field">
-              <label htmlFor="theme" className="form-label">
-                {t("forms.project.themeLabel")} <span className="text-pink-500">*</span>
-              </label>
-              <select
-                id="theme"
-                {...register("theme", {
-                  required: t("forms.project.themeRequired"),
-                })}
-                className="form-select"
-              >
-                <option value="">{t("forms.project.selectTheme")}</option>
-                {themes.map((theme) => (
-                  <option key={theme.id} value={theme.id}>
-                    {theme.name} {theme.version && `(v${theme.version})`}
-                  </option>
-                ))}
-              </select>
-              {errors.theme && <p className="form-error">{errors.theme.message}</p>}
-              <p className="form-description">{t("forms.project.themeHelp")}</p>
+              {isNew && (
+                <div className="form-field">
+                  <label htmlFor="theme" className="form-label">
+                    {t("forms.project.themeLabel")} <span className="text-pink-500">*</span>
+                  </label>
+                  <select
+                    id="theme"
+                    {...register("theme", {
+                      required: t("forms.project.themeRequired"),
+                    })}
+                    className="form-select"
+                  >
+                    <option value="">{t("forms.project.selectTheme")}</option>
+                    {themes.map((theme) => (
+                      <option key={theme.id} value={theme.id}>
+                        {theme.name} {theme.version && `(v${theme.version})`}
+                      </option>
+                    ))}
+                  </select>
+                  {errors.theme && <p className="form-error">{errors.theme.message}</p>}
+                  <p className="form-description">{t("forms.project.themeHelp")}</p>
+                </div>
+              )}
             </div>
-          )}
-        </div>
 
-        {isNew && presets.presets.length > 0 && (
-          <div className="form-field">
-            <label className="form-label">{t("forms.project.presetLabel")}</label>
-            {presetsLoading ? (
-              <p className="text-sm text-gray-500">{t("forms.project.loadingPresets")}</p>
-            ) : (
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5">
-                {presets.presets.map((preset) => (
-                  <div key={preset.id} className="min-w-0">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const nextPresetId = selectedPreset === preset.id ? null : preset.id;
-                        setSelectedPreset(nextPresetId);
-                        setValue("preset", nextPresetId || "", { shouldDirty: true });
-                      }}
-                      className={`group relative w-full rounded-lg overflow-hidden text-left transition-all ${
-                        selectedPreset === preset.id
-                          ? "border-[3px] border-pink-500 ring-2 ring-pink-500/20"
-                          : "border-2 border-gray-200 dark:border-gray-700 hover:border-pink-300 dark:hover:border-pink-400"
-                      }`}
-                    >
-                      <img
-                        src={getPresetScreenshotUrl(selectedTheme, preset.id, preset.hasScreenshot)}
-                        alt={preset.name}
-                        className="w-full aspect-square object-cover"
-                      />
-                      {selectedPreset === preset.id ? (
-                        <div className="absolute top-2 right-2 w-6 h-6 bg-pink-500 rounded-full flex items-center justify-center shadow">
-                          <Check size={14} className="text-white" />
-                        </div>
-                      ) : (
-                        <>
-                          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/25 transition-colors pointer-events-none" />
-                          <span className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity text-white text-sm font-semibold bg-black/50 px-2.5 py-1 rounded pointer-events-none">
-                            Select
-                          </span>
-                        </>
-                      )}
-                    </button>
-                    {preset.description && (
-                      <p className="mt-2 text-center text-sm font-semibold leading-tight">{preset.description}</p>
-                    )}
-                    <p className={`text-center text-xs text-slate-500 ${preset.description ? "" : "mt-2"}`}>
-                      {preset.name}
-                    </p>
-                    {preset.liveDemo && (
-                      <a
-                        href={preset.liveDemo}
-                        target="_blank"
-                        rel="noreferrer"
-                        onClick={(e) => {
-                          if (window.electronUpdater?.openExternal) {
-                            e.preventDefault();
-                            window.electronUpdater.openExternal(preset.liveDemo);
-                          }
-                        }}
-                        className="mt-1 flex items-center justify-center gap-1 text-sm text-pink-600 hover:text-pink-700 hover:underline"
-                      >
-                        Live demo
-                        <ExternalLink size={14} />
-                      </a>
-                    )}
+            {isNew && presets.presets.length > 0 && (
+              <div className="form-field">
+                <label className="form-label">{t("forms.project.presetLabel")}</label>
+                {presetsLoading ? (
+                  <p className="text-sm text-gray-500">{t("forms.project.loadingPresets")}</p>
+                ) : (
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5">
+                    {presets.presets.map((preset) => (
+                      <div key={preset.id} className="min-w-0">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const nextPresetId = selectedPreset === preset.id ? null : preset.id;
+                            setSelectedPreset(nextPresetId);
+                            setValue("preset", nextPresetId || "", { shouldDirty: true });
+                          }}
+                          className={`group relative w-full rounded-lg overflow-hidden text-left transition-all ${
+                            selectedPreset === preset.id
+                              ? "border-[3px] border-pink-500 ring-2 ring-pink-500/20"
+                              : "border-2 border-gray-200 dark:border-gray-700 hover:border-pink-300 dark:hover:border-pink-400"
+                          }`}
+                        >
+                          <img
+                            src={getPresetScreenshotUrl(selectedTheme, preset.id, preset.hasScreenshot)}
+                            alt={preset.name}
+                            className="w-full aspect-square object-cover"
+                          />
+                          {selectedPreset === preset.id ? (
+                            <div className="absolute top-2 right-2 w-6 h-6 bg-pink-500 rounded-full flex items-center justify-center shadow">
+                              <Check size={14} className="text-white" />
+                            </div>
+                          ) : (
+                            <>
+                              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/25 transition-colors pointer-events-none" />
+                              <span className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity text-white text-sm font-semibold bg-black/50 px-2.5 py-1 rounded pointer-events-none">
+                                Select
+                              </span>
+                            </>
+                          )}
+                        </button>
+                        {preset.description && (
+                          <p className="mt-2 text-center text-sm font-semibold leading-tight">{preset.description}</p>
+                        )}
+                        <p className={`text-center text-xs text-slate-500 ${preset.description ? "" : "mt-2"}`}>
+                          {preset.name}
+                        </p>
+                        {preset.liveDemo && (
+                          <a
+                            href={preset.liveDemo}
+                            target="_blank"
+                            rel="noreferrer"
+                            onClick={(e) => {
+                              if (window.electronUpdater?.openExternal) {
+                                e.preventDefault();
+                                window.electronUpdater.openExternal(preset.liveDemo);
+                              }
+                            }}
+                            className="mt-1 flex items-center justify-center gap-1 text-sm text-pink-600 hover:text-pink-700 hover:underline"
+                          >
+                            Live demo
+                            <ExternalLink size={14} />
+                          </a>
+                        )}
+                      </div>
+                    ))}
                   </div>
-                ))}
+                )}
               </div>
             )}
+
+            <div className="max-w-xl space-y-4">
+              {SHOW_FOLDER_NAME && folderNameField()}
+              {notesField()}
+              {checkboxField(
+                "receiveThemeUpdates",
+                "forms.project.receiveThemeUpdatesLabel",
+                "forms.project.receiveThemeUpdatesHelp",
+              )}
+            </div>
           </div>
-        )}
 
-        <div className="max-w-xl space-y-4">
-          {SHOW_FOLDER_NAME && folderNameField()}
-          {notesField()}
-          {checkboxField(
-            "receiveThemeUpdates",
-            "forms.project.receiveThemeUpdatesLabel",
-            "forms.project.receiveThemeUpdatesHelp",
-          )}
-        </div>
-      </div>
+          <div
+            role="tabpanel"
+            id="project-panel-site"
+            aria-labelledby="project-tab-site"
+            hidden={currentTab !== "site"}
+            className="max-w-xl form-section"
+          >
+            {siteTitleField()}
+            {siteUrlField()}
+            {checkboxField("cleanUrls", "forms.project.cleanUrlsLabel", "forms.project.cleanUrlsHelp")}
 
-      <div
-        role="tabpanel"
-        id="project-panel-site"
-        aria-labelledby="project-tab-site"
-        hidden={currentTab !== "site"}
-        className="max-w-xl form-section"
-      >
-        {siteTitleField()}
-        {siteUrlField()}
-        {checkboxField("cleanUrls", "forms.project.cleanUrlsLabel", "forms.project.cleanUrlsHelp")}
-
-        <div className="border-t border-gray-200 pt-6 dark:border-gray-700">
-          {defaultLanguageField()}
-          {/* A project has to exist before content can be copied into a new
+            <div className="border-t border-gray-200 pt-6 dark:border-gray-700">
+              {defaultLanguageField()}
+              {/* A project has to exist before content can be copied into a new
               language, so the list only appears once it does. */}
-          {!isNew && (
-            <LanguagesSection
-              defaultLanguage={savedDefaultLanguage}
-              languages={languages}
-              onChange={setLanguages}
-              // Adding a language locks the default on the SERVER, which still
-              // holds the saved one: acting now would lock a value the form is
-              // not showing and make the next Save fail.
-              blocked={watch("defaultLanguage") !== savedDefaultLanguage}
-              onBusyChange={setLanguageBusy}
-            />
-          )}
+              {!isNew && (
+                <LanguagesSection
+                  defaultLanguage={savedDefaultLanguage}
+                  languages={languages}
+                  onChange={setLanguages}
+                  // Adding a language locks the default on the SERVER, which still
+                  // holds the saved one: acting now would lock a value the form is
+                  // not showing and make the next Save fail.
+                  blocked={watch("defaultLanguage") !== savedDefaultLanguage}
+                  onBusyChange={setLanguageBusy}
+                />
+              )}
+            </div>
+          </div>
+
+          <div
+            role="tabpanel"
+            id="project-panel-identity"
+            aria-labelledby="project-tab-identity"
+            hidden={currentTab !== "identity"}
+            className="max-w-xl form-section"
+          >
+            <SiteIdentityFields section="identity" {...identityProps} />
+          </div>
+
+          <div
+            role="tabpanel"
+            id="project-panel-business"
+            aria-labelledby="project-tab-business"
+            hidden={currentTab !== "business"}
+            className="max-w-xl form-section"
+          >
+            <SiteIdentityFields section="business" {...identityProps} />
+          </div>
         </div>
-      </div>
-
-      <div
-        role="tabpanel"
-        id="project-panel-identity"
-        aria-labelledby="project-tab-identity"
-        hidden={currentTab !== "identity"}
-        className="max-w-xl form-section"
-      >
-        <SiteIdentityFields section="readiness" {...identityProps} />
-        <SiteIdentityFields section="identity" {...identityProps} />
-      </div>
-
-      <div
-        role="tabpanel"
-        id="project-panel-business"
-        aria-labelledby="project-tab-business"
-        hidden={currentTab !== "business"}
-        className="max-w-xl form-section"
-      >
-        <SiteIdentityFields section="business" {...identityProps} />
       </div>
 
       {stickyBar}

@@ -87,6 +87,9 @@ export default {
     owner: "tsiger",
     repo: "widgetizer",
   },
+  nsis: {
+    createDesktopShortcut: "always",
+  },
   win: {
     artifactName: "Widgetizer-Setup-${version}.${ext}",
     target: [

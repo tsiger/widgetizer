@@ -253,10 +253,10 @@ function CollectionItemsScreen({ activeLanguage, setActiveLanguage }) {
     defaultLanguage,
     createVersion: (item, targetLanguage) =>
       createItemLanguageVersion(type, item.slug, { targetLanguage, sourceLanguage: item.language }),
-    onCreated: (created) => {
-      afterMutation();
-      navigate(itemEditPath(created));
-    },
+    // The list and caches change wherever the user is now; only a user still
+    // here is taken to the new version.
+    afterCreate: afterMutation,
+    onCreated: (created) => navigate(itemEditPath(created)),
   });
 
   const loading = schemasLoading || itemsLoading;

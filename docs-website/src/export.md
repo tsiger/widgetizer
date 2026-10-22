@@ -9,8 +9,8 @@ Exporting generates a complete, static HTML version of your website that can be 
 When you export a project, Widgetizer:
 
 1. Renders all pages to static HTML files
-2. Copies all required assets (CSS, JS, images, PDFs)
-3. Generates SEO files (sitemap.xml, robots.txt)
+2. Copies all required assets (CSS, JS, images, PDFs, audio, and video)
+3. Generates SEO files (sitemap.xml, robots.txt) and site icons
 4. Packages everything into a deployable folder
 
 The exported site is completely self-contained and requires no server-side processing.
@@ -21,13 +21,27 @@ The exported site is completely self-contained and requires no server-side proce
 
 Every page in your project becomes an HTML file:
 
-- The homepage (`index` slug) becomes `index.html`
+- The homepage (the page with the slug `index` or `home`) becomes `index.html`
 - Other pages use their slug as the filename (e.g., `about.html`, `contact.html`)
 - All HTML is formatted with Prettier for clean, readable output
+
+### Clean URLs
+
+If **Clean URLs** is turned on in [Project details](projects.html#clean-urls), the links Widgetizer generates (menus, link settings, rich-text links, collection listings), canonical addresses, `sitemap.xml`, and `robots.txt` leave out `.html` (`/about` instead of `/about.html`). The files themselves are still named `about.html`, so your host must serve `about.html` when a visitor asks for `/about`. Links you typed by hand are left as you wrote them.
+
+### Multilingual Sites
+
+On a site with more than one [language](languages.html#exporting-a-multilingual-site), the main language is exported at the root of the folder and every other language goes in a folder named by its code (for example `el/index.html`, `el/about.html`). Each language uses its own header, footer, and menus.
+
+A language without a homepage is left out of the export, and the Export page names it in a **"Some languages were not exported"** note. Links you picked from the page picker that point into a language that was left out are removed from that export; your content is not changed. Links you typed by hand stay as they are, so check them yourself.
+
+When a Site Address is set, pages that exist in several languages tell search engines about each other (hreflang links), and `sitemap.xml` lists those alternates too. Pages set to not be indexed, and pages 2 and later of a list split into pages, are left out of these links.
 
 ### Collection Item Pages
 
 If your theme defines [collections](collections.html) with item pages, each item is exported to its own HTML file under the collection's prefix (for example `news/summer-sale.html`) and included in `sitemap.xml`. List-only items (those without an item page) are rendered wherever the theme's widgets display them.
+
+A listing that is split into pages is exported once per page: `news.html`, then `news/page/2.html`, `news/page/3.html`, and so on (`page/2.html` for the homepage).
 
 ### Assets
 
@@ -38,6 +52,7 @@ The export includes all assets your site needs:
 | `assets/`     | `assets/`                              | Theme CSS, JS, icons                |
 | `widgets/*/`  | `assets/`                              | Widget CSS and JS files (flattened) |
 | Media library | `assets/images/` and `assets/files/`   | Only media files actually in use    |
+| Site icon     | Export root                            | `favicon.ico` and app icons         |
 | Core assets   | `assets/`                              | Placeholder images                  |
 
 > **Note:** Widget `.css` and `.js` files are flattened into a single `assets/` folder during export. Use unique, widget-prefixed filenames like `slideshow.css` or `testimonial-slider.js` to avoid collisions.
@@ -46,13 +61,21 @@ The export includes all assets your site needs:
 
 Widgetizer tracks which media files are actually used on your pages (see [Media Library](media.html)). During export:
 
-- Only images and PDFs referenced in your content are copied
+- Only images, PDFs, audio (MP3), and video (MP4) referenced in your content are copied
 - For images, public generated variants are copied to `assets/images/`
 - `thumb` variants are skipped because they are only used by the media library UI
 - Raster originals are copied only when no public `large` variant exists
 - SVG originals are always copied as-is
-- PDFs are copied to `assets/files/` and any `/uploads/files/` paths in your HTML are rewritten to point there
+- PDF, MP3, and MP4 files are copied to `assets/files/` as-is, and any `/uploads/files/` paths in your HTML are rewritten to point there
 - Unused media is skipped, reducing export size
+
+### Site Icons
+
+When your theme's **Site Icon** is set, the export writes the browser and app icons at the root of the folder, including a `favicon.ico` for browsers and tools that look for one there.
+
+### Fresh CSS and JavaScript
+
+Every export stamps its CSS and JavaScript addresses with a version of its own, so visitors' browsers load the new files after you publish an update instead of an old cached copy.
 
 ### Optional Markdown Files
 
@@ -60,16 +83,26 @@ If you enable **"Also export pages as Markdown (.md)"** when creating an export,
 
 ### SEO Files
 
-If your project has a Site URL configured, Widgetizer generates:
+If your project has a [Site Address](projects.html#site-address) configured, Widgetizer generates:
 
 - `sitemap.xml`: Lists all indexed pages for search engines
 - `robots.txt`: Search engine instructions, including pages marked as `noindex`
 
+If your site lives in a subfolder, include it in the Site Address (for example `https://example.com/site`). Every generated address, from the sitemap to canonical and social links, keeps that subfolder.
+
 ### Details for Search Engines
 
-When a Website Address is set, every exported page also describes itself to search engines in a way they can read directly: your site's name, logo, address and opening hours on the homepage (from [Site identity and Business details](projects.html#site-identity-and-business-details)), the path from the homepage to each page, and for news articles the headline, date, image and text. Nothing needs to be turned on, and nothing changes in how your pages look.
+When a Site Address is set, every exported page also describes itself to search engines in a way they can read directly: your site's name, logo, address and opening hours on the homepage (from [Site identity and Business details](projects.html#site-identity-and-business-details)), the path from the homepage to each page, and for news articles the headline, date, image and text. Nothing needs to be turned on, and nothing changes in how your pages look.
 
-Without a Website Address, these details are left out. Exports also tell you when details search engines look for are missing, such as your logo or address.
+Without a Site Address, these details are left out.
+
+After a successful export, the Export page shows a note when details search engines look for are missing:
+
+- **Project details**, such as your site address, name, logo, or address: add them in [Project details](projects.html#site-identity-and-business-details)
+- **Article pages missing some of their details**, such as a News item with an empty field: fill in the item's fields
+- **Collection pages not listed on any page, or listed on several**: their breadcrumbs go straight to Home. Add the collection's listing widget to a page, or tick **Main News page** (or the matching collection) on the page that should be its home
+
+These notes never stop an export. They are separate from the Developer Mode report below, which also lists them.
 
 # Export Versioning
 
@@ -101,7 +134,7 @@ From the Export page, you can:
 
 # HTML Validation (Developer Mode)
 
-When [Developer Mode](settings.html#developer-settings) is enabled in App Settings, Widgetizer validates all exported HTML and generates a detailed issues report.
+When [Developer Mode](settings.html#developer-tools) is enabled in App Settings, Widgetizer validates all exported HTML and generates a detailed issues report.
 
 ### What Gets Validated
 
@@ -128,8 +161,18 @@ If validation finds any issues, an `__export__issues.html` file is created in th
 
 For a successful export:
 
-- Your project must have at least one page with the slug `index` (the homepage). See [Pages](pages.html).
-- All widgets and assets must be properly configured
+- Your project must have a homepage: a page with the slug `index` or `home` (not both) in the main language. See [Pages](pages.html).
+- Every collection item must have its required fields filled in, in every language being exported
+
+### When an Export Is Refused
+
+Widgetizer checks your project before it writes anything. If something would break the site, the export stops and no version number is used up:
+
+- **Items that need fixing:** the Export page lists the collection items with missing required fields, each linking to its editor so you can fix it
+- **No homepage, or two homepages** (`index` and `home`) in the same language
+- **Pages that would overwrite each other**, such as a collection whose prefix matches a language code, or a homepage split into pages while a collection uses the `page` prefix
+
+Fix the problem and export again.
 
 # Deploying Your Export
 

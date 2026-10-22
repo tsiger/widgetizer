@@ -349,6 +349,7 @@ export async function renderCollectionItemPreview({
     created: now,
     updated: now,
     settings: settings || {},
+    ...(saved?.seo ? { seo: saved.seo } : {}),
   };
 
   // Preview is served at a single URL (root), so no depth prefixing: assets
@@ -601,7 +602,35 @@ export async function renderSingleWidget(req, res) {
       if (pagination) sharedGlobals.paginationPlan = pagination;
     }
 
-    const renderedWidget = await renderWidget(activeProjectId, widgetId, widget, rawThemeSettings || {}, "preview", sharedGlobals, null, renderDeps);
+    // The full render numbers the page's widgets 1, 2, … in widgetsOrder (or the
+    // widgets' own order when there is none), skipping ids with no data, and themes
+    // branch on it (`widget.index == 1` picks the h1). The header and footer keep
+    // null, as in the full render; they are told apart by type, as the engine does,
+    // since a page widget may share their id. So does a widget not in the order.
+    let widgetIndex = null;
+    const isGlobal = widget?.type === "header" || widget?.type === "footer";
+    if (currentPage && !isGlobal) {
+      const pageWidgets = isPlainObject(currentPage.widgets) ? currentPage.widgets : {};
+      const order = Array.isArray(currentPage.widgetsOrder) ? currentPage.widgetsOrder : Object.keys(pageWidgets);
+      // The order comes from the request body, so an entry that is not a string id
+      // is skipped, where the full render's direct lookup could throw or miscount.
+      const present = order.filter(
+        (id) => typeof id === "string" && (id === widgetId || (Object.hasOwn(pageWidgets, id) && pageWidgets[id])),
+      );
+      const position = present.indexOf(widgetId);
+      if (position !== -1) widgetIndex = position + 1;
+    }
+
+    const renderedWidget = await renderWidget(
+      activeProjectId,
+      widgetId,
+      widget,
+      rawThemeSettings || {},
+      "preview",
+      sharedGlobals,
+      widgetIndex,
+      renderDeps,
+    );
 
     // Append enqueued asset tags so the preview runtime can load them on morph
     const assetTags = renderEnqueuedAssetTags(sharedGlobals);

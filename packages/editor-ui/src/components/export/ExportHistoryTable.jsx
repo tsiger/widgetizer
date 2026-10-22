@@ -69,13 +69,13 @@ export default function ExportHistoryTable({
       const entryFile = result.entryFile || "index.html";
 
       const viewUrl = getExportViewUrl(exportPath, entryFile);
-      window.open(viewUrl, "_blank");
+      window.open(viewUrl, "_blank", "noopener,noreferrer");
     } catch (error) {
       console.error("Error getting entry file:", error);
       // Fallback to index.html - handle both Windows and Unix paths
       const exportPath = exportRecord.outputDir.split(/[/\\]/).pop();
       const viewUrl = getExportViewUrl(exportPath, "index.html");
-      window.open(viewUrl, "_blank");
+      window.open(viewUrl, "_blank", "noopener,noreferrer");
     }
   };
 
@@ -83,7 +83,7 @@ export default function ExportHistoryTable({
     // The report is served from the export dir via the existing view route.
     const exportPath = exportRecord.outputDir.split(/[/\\]/).pop();
     const reportUrl = getExportViewUrl(exportPath, "__export__issues.html");
-    window.open(reportUrl, "_blank");
+    window.open(reportUrl, "_blank", "noopener,noreferrer");
   };
 
   const handleDownloadExport = (exportRecord) => {

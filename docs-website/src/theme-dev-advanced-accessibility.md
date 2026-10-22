@@ -24,6 +24,29 @@ Key points:
 - Always scope queries to `widget`
 - Guard against double initialization
 - Never use global `document.querySelector()` inside widgets
+- Never hardcode words a visitor reads or hears (button text, `aria-label`s)
+
+## Words for Scripts
+
+A script that builds controls in the browser can't use the `t` filter, so render the words into the markup and read them from there:
+
+```liquid
+<section
+  id="{{ widget.id }}"
+  class="widget widget-gallery widget-{{ widget.id }}"
+  data-widget-id="{{ widget.id }}"
+  data-widget-type="gallery"
+  data-t-next="{{ 'site.common.next' | t }}"
+  data-t-previous="{{ 'site.common.previous' | t }}"
+>
+```
+
+```javascript
+const nextLabel = widget.dataset.tNext || "Next";
+nextButton.setAttribute("aria-label", nextLabel);
+```
+
+Words several widgets share can go on `<body>` in `layout.liquid`, as Arch does for its lightbox. Insert them with `textContent` or `setAttribute`, never as HTML. See [Localization](theme-dev-localization.html#words-a-script-builds).
 
 ## External Scripts and Partial Updates
 
@@ -78,7 +101,7 @@ Arch includes a reveal system controlled by `theme.general.enable_reveal_animati
 ### Required Pieces
 
 - Add `.reveal` classes in templates
-- Conditionally enqueue `reveal.js` in `layout.liquid`
+- Conditionally load `reveal.js` in `layout.liquid`
 - Use a CSS override when animations are disabled
 
 ### Example (Arch)
@@ -88,7 +111,7 @@ Arch includes a reveal system controlled by `theme.general.enable_reveal_animati
   <style>.reveal { opacity: 1 !important; transform: none !important; }</style>
 {% endunless %}
 {% if theme.general.enable_reveal_animations %}
-  {% enqueue_script src: "reveal.js", priority: 50 %}
+  {% asset src: "reveal.js", defer: true %}
 {% endif %}
 ```
 
@@ -96,11 +119,12 @@ Arch includes a reveal system controlled by `theme.general.enable_reveal_animati
 
 During export:
 
-- Theme assets in `/assets/` are copied
-- Widget `.css` and `.js` files are flattened into `/assets/`
-- Duplicate filenames will collide
+- Theme assets in `assets/` are copied
+- Widget `.css` and `.js` files that a rendered page enqueued are flattened into `assets/`, next to the theme's own files. Files in subfolders of a widget aren't supported
+- Duplicate filenames collide, across widgets and theme assets alike
+- Stylesheet and script URLs get a fresh cache-busting `?v=` token on every export
 
-Use unique, widget-prefixed filenames to avoid collisions.
+Use unique, widget-prefixed filenames, keep widget files directly in the widget folder, and load them with the enqueue tags. The theme checker reports duplicate names. See [Asset Sources](theme-dev-liquid-assets.html#asset-sources).
 
 # Accessibility
 
@@ -112,8 +136,9 @@ Themes must follow the heading hierarchy rules:
 
 Other requirements:
 
-- Use `alt` text on images
-- Use `aria-*` for interactive controls
+- Use `alt` text on images (`{% image %}` fills it from the media library, in the page's language)
+- Use `aria-*` for interactive controls, with labels from the `site` dictionary or a setting, never literals
+- Set `<html lang>` from `page.language` so screen readers pronounce each language correctly
 - Ensure keyboard navigation (Tab, Enter/Space, Escape, Arrow keys)
 
 # Reduced Motion

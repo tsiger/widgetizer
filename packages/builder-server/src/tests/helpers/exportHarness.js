@@ -64,12 +64,12 @@ export async function createExportHarness({
   const storage = new LocalStorageAdapter({ dataRoot: TEST_DATA_DIR });
   const scope = { actor: { id: "default", kind: "local" }, projectId, folderName: projectFolder };
 
-  function mockReq({ params = {}, body = {}, storage: storageOverride = storage } = {}) {
+  function mockReq({ params = {}, body = {}, storage: storageOverride = storage, limits } = {}) {
     return {
       params,
       body,
       scope: { projectId: params.projectId, folderName: projectFolder, actor: scope.actor },
-      adapters: { storage: storageOverride },
+      adapters: limits ? { storage: storageOverride, limits } : { storage: storageOverride },
       app: { locals: {} },
       [Symbol.for("express-validator#contexts")]: [],
     };
@@ -89,9 +89,11 @@ export async function createExportHarness({
 
   // `storage` lets a test hand the controller a wrapped adapter (e.g. one that
   // mutates the project row mid-export); default is the harness's own.
-  async function runExport(body = {}, { storage: storageOverride } = {}) {
+  // `limits` wires a limits adapter, as the OSS and hosted shells do; without
+  // it the export runs with no adapter and export-time ceilings use their defaults.
+  async function runExport(body = {}, { storage: storageOverride, limits } = {}) {
     const res = mockRes();
-    await exportProject(mockReq({ params: { projectId }, body, storage: storageOverride }), res);
+    await exportProject(mockReq({ params: { projectId }, body, storage: storageOverride, limits }), res);
     return res;
   }
 

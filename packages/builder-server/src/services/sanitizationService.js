@@ -274,6 +274,10 @@ function sanitizeSettingValue(value, setting) {
       });
     case "link":
       return sanitizeLink(value);
+    case "number":
+    case "range":
+      if (value === "") return value;
+      return validateNumber(value, setting) ?? value;
     default:
       return value;
   }

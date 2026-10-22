@@ -108,7 +108,7 @@ Project creation excludes templates from the general copy and instantiates them 
 
 ## Distributed updates
 
-**Enforced:** each `updates/<version>/` has an accepted numeric version and a parseable `theme.json` whose `version` exactly matches the folder. Re-uploading an installed theme imports new update versions; its base version must match the installed base. Merely changing the base files is not an update delivery mechanism.
+**Enforced:** each `updates/<version>/` has an accepted numeric version and a parseable `theme.json` whose `version` exactly matches the folder. The validator also layers the update folders newer than the base over it, as the app does, and checks each collection an update adds, changes or removes with the same collection rules as the theme's own. Re-uploading an installed theme imports new update versions; its base version must match the installed base. Merely changing the base files is not an update delivery mechanism.
 
 **Contract:** preserve the released base for ZIP updates. Add a new delta folder with the changed files and the new manifest. Include the full intended manifest/settings schema; do not assume a manifest containing only `version` is a usable replacement. Generate/rebuild `latest/` through the application mechanism.
 

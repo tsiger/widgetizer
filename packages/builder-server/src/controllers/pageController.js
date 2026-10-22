@@ -86,7 +86,6 @@ export async function enforcePaginationRules({ scope, storage, widgets }) {
     paginators.push(widget);
   }
   if (paginators.length > 1) return "Only one widget per page can split the page into pages.";
-  for (const widget of paginators) widget.settings.listing_anchor = true;
   return null;
 }
 
@@ -899,7 +898,7 @@ export async function savePageContent(req, res) {
 }
 
 /**
- * Clear `listing_anchor` (and `paginate`, which needs it) on every OTHER page for the collections the just-saved
+ * Clear `listing_anchor` on every OTHER page for the collections the just-saved
  * page claims, so a collection has exactly one anchor. Returns the names of the
  * pages it cleared, for the editor to report.
  *
@@ -940,11 +939,10 @@ export async function clearListingAnchorsElsewhere({ scope, storage, keepPageId,
 
     let modified = false;
     for (const widget of Object.values(page.widgets || {})) {
-      if (!(widget?.settings?.listing_anchor || widget?.settings?.paginate) || !widget.type) continue;
+      if (!widget?.settings?.listing_anchor || !widget.type) continue;
       const collectionType = await collectionOf(widget.type);
       if (!collectionType || !claimedCollections.has(collectionType)) continue;
       widget.settings.listing_anchor = false;
-      widget.settings.paginate = false;
       modified = true;
     }
 
@@ -1008,8 +1006,8 @@ export async function duplicatePage(req, res) {
     const duplicatedWidgets = {};
     for (const [widgetId, widget] of Object.entries(originalPageData.widgets || {})) {
       duplicatedWidgets[widgetId] =
-        widget?.settings?.listing_anchor === true || widget?.settings?.paginate === true
-          ? { ...widget, settings: { ...widget.settings, listing_anchor: false, paginate: false } }
+        widget?.settings?.listing_anchor === true
+          ? { ...widget, settings: { ...widget.settings, listing_anchor: false } }
           : widget;
     }
 

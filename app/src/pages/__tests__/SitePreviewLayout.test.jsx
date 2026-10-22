@@ -45,6 +45,12 @@ beforeEach(() => {
 });
 
 describe("SitePreviewLayout", () => {
+  it("cuts the window's link back to the editor before the site frame loads", () => {
+    window.opener = { location: "editor" };
+    renderAt("/preview/home");
+    expect(window.opener).toBeNull();
+  });
+
   it("renders the iframe with the src its child reports via setPreview", () => {
     const { container } = renderAt("/preview/home");
     const iframe = container.querySelector("iframe");

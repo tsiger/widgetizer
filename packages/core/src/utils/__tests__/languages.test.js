@@ -150,7 +150,16 @@ describe("nativeLanguageName", () => {
   });
 
   it("falls back to the base language, keeping the region visible", () => {
-    expect(nativeLanguageName("pt-br")).toBe("Português (BR)");
+    expect(nativeLanguageName("es-mx")).toBe("Español (MX)");
+  });
+
+  it("uses a listed regional language's own name as it is", () => {
+    expect(nativeLanguageName("pt-br")).toBe("Português (Brasil)");
+    expect(nativeLanguageName("zh-hant")).toBe("中文（繁體）");
+  });
+
+  it("keeps an unlisted Chinese variant script-neutral", () => {
+    expect(nativeLanguageName("zh-tw")).toBe("中文 (TW)");
   });
 
   it("falls back to the code itself when the language is unknown", () => {

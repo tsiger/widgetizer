@@ -46,12 +46,14 @@ describe("EditorTopBar undo/redo dirty-tracking", () => {
     expect(reconcileModifiedWidgets).toHaveBeenCalled();
   });
 
-  it("reconciles modifiedWidgets after Ctrl+Shift+Z (redo)", () => {
+  // Holding Shift makes the browser report a capital "Z".
+  it("redoes on Ctrl+Shift+Z and reconciles modifiedWidgets", () => {
     const reconcileModifiedWidgets = vi.fn();
     useAutoSave.setState({ reconcileModifiedWidgets });
     usePageStore.temporal.setState({ pastStates: [], futureStates: [{ page: { id: "home", widgets: {} } }] });
     renderTopBar();
-    fireEvent.keyDown(window, { key: "z", ctrlKey: true, shiftKey: true });
+    fireEvent.keyDown(window, { key: "Z", ctrlKey: true, shiftKey: true });
+    expect(usePageStore.temporal.getState().futureStates).toHaveLength(0);
     expect(reconcileModifiedWidgets).toHaveBeenCalled();
   });
 });
@@ -81,6 +83,14 @@ describe("EditorTopBar manual-save failure handling", () => {
     fireEvent.keyDown(window, { key: "s", ctrlKey: true });
     await vi.waitFor(() => expect(consoleErrorSpy).toHaveBeenCalledWith("Failed to save:", error));
     consoleErrorSpy.mockRestore();
+  });
+
+  it("saves on Ctrl+S with Caps Lock on", async () => {
+    const save = vi.fn().mockResolvedValue({ status: "success" });
+    useAutoSave.setState({ save, hasUnsavedChanges: () => true, isSaving: false });
+    renderTopBar();
+    fireEvent.keyDown(window, { key: "S", ctrlKey: true });
+    await vi.waitFor(() => expect(save).toHaveBeenCalled());
   });
 });
 

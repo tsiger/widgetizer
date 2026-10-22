@@ -597,31 +597,6 @@ function answerAssistantPrompt(action) {
   serverRpc.call(call[0], call[1]).catch((error) => log(`Answering the assistant prompt failed: ${error.message}`));
 }
 
-function contentOrigins() {
-  return serverPort ? [`http://127.0.0.1:${serverPort}`, `http://localhost:${serverPort}`] : [];
-}
-
-function applyWindowOpenPolicy(window) {
-  window.webContents.setWindowOpenHandler(({ url }) => {
-    const target = windowOpenTarget(url, contentOrigins());
-    if (target === "content") openContentWindow(url);
-    else if (target === "external") shell.openExternal(url);
-    return { action: "deny" };
-  });
-}
-
-// Exports and media files run site code, so they get a window without the preload bridge.
-function openContentWindow(url) {
-  const window = new BrowserWindow({
-    width: 1280,
-    height: 800,
-    backgroundColor: "#ffffff",
-    webPreferences: { contextIsolation: true, nodeIntegration: false, sandbox: true },
-  });
-  applyWindowOpenPolicy(window);
-  window.loadURL(url).catch((err) => log(`Failed to open ${url}: ${err.message}`));
-}
-
 async function askToEnableAssistant() {
   if (!mainWindow || mainWindow.isDestroyed()) return false;
   const { response } = await dialog.showMessageBox(mainWindow, {
@@ -935,6 +910,45 @@ function createAppMenu() {
 
   const menu = Menu.buildFromTemplate(template);
   Menu.setApplicationMenu(menu);
+}
+
+function contentOrigins() {
+  return serverPort ? [`http://127.0.0.1:${serverPort}`, `http://localhost:${serverPort}`] : [];
+}
+
+// Pages shown in the app (the preview, an exported site, a theme's script) can call
+// window.open or use target="_blank". Without a handler each would become a new app
+// window that loads whatever it was given.
+function applyWindowOpenPolicy(window) {
+  window.webContents.setWindowOpenHandler(({ url }) => {
+    const target = windowOpenTarget(url, contentOrigins());
+    if (target === "content") openContentWindow(url);
+    else if (target === "external") shell.openExternal(url);
+    return { action: "deny" };
+  });
+}
+
+// Exports and media files run site code, so they get a window without the preload bridge.
+function openContentWindow(url) {
+  const window = new BrowserWindow({
+    width: 1280,
+    height: 800,
+    backgroundColor: "#ffffff",
+    webPreferences: { contextIsolation: true, nodeIntegration: false, sandbox: true },
+  });
+  applyWindowOpenPolicy(window);
+  // The open handler only sees new windows; a link or redirect inside this one gets the same rule.
+  const keepToAppContent = (event, legacyUrl, _isInPlace, legacyIsMainFrame) => {
+    // will-redirect also fires inside iframes; an embedded map or video must keep its own redirects.
+    if ((event.isMainFrame ?? legacyIsMainFrame) === false) return;
+    const target = windowOpenTarget(event.url ?? legacyUrl, contentOrigins());
+    if (target === "content") return;
+    event.preventDefault();
+    if (target === "external") shell.openExternal(event.url ?? legacyUrl);
+  };
+  window.webContents.on("will-navigate", keepToAppContent);
+  window.webContents.on("will-redirect", keepToAppContent);
+  window.loadURL(url).catch((err) => log(`Failed to open ${url}: ${err.message}`));
 }
 
 function setupIpcHandlers() {

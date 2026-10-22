@@ -648,6 +648,46 @@ describe("sanitizeWidgetData — block settings", () => {
 });
 
 // ============================================================================
+// sanitizeWidgetData — number limits
+// ============================================================================
+
+describe("sanitizeWidgetData — number limits", () => {
+  const schema = {
+    settings: [
+      { id: "count", type: "number", min: 0, max: 10 },
+      { id: "free", type: "number" },
+      { id: "size", type: "range", min: 1, max: 5 },
+    ],
+    blocks: [{ type: "stat", settings: [{ id: "value", type: "number", min: 0, max: 10 }] }],
+  };
+
+  it("keeps a stored value inside the schema's min and max", () => {
+    const data = {
+      settings: { count: 99, free: 99, size: -3 },
+      blocks: { b1: { type: "stat", settings: { value: -5 } } },
+    };
+    sanitizeWidgetData(data, schema);
+    assert.equal(data.settings.count, 10);
+    assert.equal(data.settings.free, 99);
+    assert.equal(data.settings.size, 1);
+    assert.equal(data.blocks.b1.settings.value, 0);
+  });
+
+  it("leaves an emptied field and a value within limits alone", () => {
+    const data = { settings: { count: "", size: 3 } };
+    sanitizeWidgetData(data, schema);
+    assert.equal(data.settings.count, "");
+    assert.equal(data.settings.size, 3);
+  });
+
+  it("applies to collection items too", () => {
+    const item = { settings: { count: 42 } };
+    sanitizeCollectionItemData(item, { settings: [{ id: "count", type: "number", min: 0, max: 10 }] });
+    assert.equal(item.settings.count, 10);
+  });
+});
+
+// ============================================================================
 // sanitizeWidgetData — schema edge cases
 // ============================================================================
 

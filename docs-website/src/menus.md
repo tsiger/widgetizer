@@ -33,6 +33,8 @@ Links to one of your website pages. If your theme defines [collections](collecti
 
 > **Note:** Internal links are stored as stable references. If you later rename the page or item's filename, the menu link follows the change automatically instead of breaking.
 
+On a [multilingual site](languages.html), the picker opens on the menu's language, with buttons to show another language or **"All"**. Each page and item is labelled with its language code (such as `en` or `el`), so you can tell two pages with the same name apart. A link keeps the exact page you chose: an English page picked in a Greek menu stays an English link.
+
 #### Custom URL
 
 Links to any URL, internal or external.
@@ -120,6 +122,12 @@ The duplicate will be named "[Original Name] (Copy)", and "(Copy 2)", "(Copy 3)"
 3. Confirm the deletion
 
 > **Warning:** Deletion is permanent. All menu items and structure will be removed.
+
+# Menus in Other Languages
+
+On a [multilingual site](languages.html), each language has its own menus. The **Menus** screen shows a tab for each language; open a language's tab to see and edit its menus, and a new menu is created in the language whose tab is open.
+
+When you add a language, Widgetizer copies all your menus into it. The copies keep your original labels and still link to your original pages, so translate the labels and pick the translated pages for each item.
 
 # Using Menus in Your Theme
 

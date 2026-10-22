@@ -350,7 +350,7 @@ describe("addLanguage — refusals", () => {
         settings: [{ id: "title", type: "text", usedAsTitle: true }],
       }),
     );
-    await rejects("el", /URL prefix/);
+    await rejects("el", /"nea" collection publishes its items/);
   });
 });
 

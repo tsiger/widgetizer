@@ -6,6 +6,115 @@ description: Release notes and version history for Widgetizer. See what's new in
 
 All notable changes to Widgetizer are documented here.
 
+## 0.9.10 - Unreleased
+
+### Multilingual Sites
+
+A site can now be written in several languages. Each language has its own pages, collection items, menus, header, and footer, while media, theme, and business details are shared. Nothing is translated automatically. See [Languages](languages.html).
+
+- Over 70 site languages to choose from, including Brazilian Portuguese and Traditional Chinese
+- Add and remove a site's languages in Project details; a new language starts with copies of the menus, header, and footer to translate
+- Create a page's or item's version in another language from the editor, with language tabs and translation chips in the Pages and collection lists
+- Link pickers reach every language and show the target's language
+- Image alt text, title, and caption per language, chosen from a **Language** list in the media drawer
+- Each language exports to its own folder (main language at the root), with hreflang links and sitemap alternates; a language without a homepage is left out and named
+- Arch adds a header **language switcher**, and its own words, dates, breadcrumbs, opening hours, and the built-in form read in the page's language
+
+### Breadcrumbs and Pagination
+
+- **Breadcrumbs:** give a page a parent page and Arch draws the trail above its content (turn on **Show breadcrumbs** in the theme settings). Collection items show the page that lists them, set with the new **Main page** checkbox on a listing widget
+- **Split into pages:** a News, Projects, or Services grid can show a set number of items per page, with page links below. Each page is exported as a numbered copy (`news/page/2.html`) and added to the sitemap. Splitting into pages and marking the main page are independent
+
+### Search Engines and Site Identity
+
+- **Site identity and Business details:** tell search engines who runs the site (organization, person, or local business), with logo, contact details, social profiles, address, and opening hours
+- **Structured data:** every page describes itself to search engines automatically, with site and business details on the homepage, breadcrumb trails, and article details for News items
+- **Search engine checklist:** a note beside the Project details form shows which details search engines can read, with a check for each one and **Add** to jump to a missing field
+- **Export notes:** after an export, the Export page says which details search engines look for are still missing
+- **Business details on the site:** Arch adds a Business details block to the footer and Contact Details, with an Additional details field for your own text, and social icons use the project's profiles when set
+- **Clean URLs:** a project setting for hosts that serve pages without `.html`; generated links, canonicals, and the sitemap drop the extension while the files stay `.html`
+- **Site Address in a subfolder:** a Site Address such as `https://example.com/site` now keeps its subfolder in every generated address
+- **Featured image as share image:** Arch News, Projects, and Services items use their featured image for social sharing when no social media image is set
+- **favicon.ico:** exports include a `favicon.ico` and a 192px icon for search results
+
+### Projects
+
+- **Tabbed project form:** New project and Project details share one form with General, Site, Identity, and Business Details tabs, and you can pick a logo while creating a project
+- **Simpler folder names:** the project folder name is generated for you and no longer shown
+- **Project details for the active project:** open a project to edit its details; other actions are in each row's menu in the projects list
+- **Safer deletion:** if a locked file stops a project folder from being removed, the app tells you where it is and never reuses it
+
+### Editor
+
+- **Undo survives saves:** undo history is kept after saving and autosaving, quick edits to one field are grouped into a single step, and history holds up to 150 steps
+- **Undo back to saved:** undoing back to exactly what was saved leaves nothing to save
+- **Shortcut hints:** the widget menu shows the Delete shortcut
+- **Icon search:** the icon picker finds icons by synonyms (search "photo" to find camera) and ranks the best matches first
+- **Number limits:** number settings keep to the minimum and maximum the theme sets
+- **Safer Site settings:** theme settings save only what you changed, one save at a time, and never overwrite a theme update made in another tab; **Discard changes** discards the theme draft too
+
+### Media
+
+- **MP4 video:** upload MP4 files and play them in Arch's Video widget; used videos are included in exports
+- **Captions in Arch:** the media library caption appears under the Image widget, item featured images, and project and service galleries, and fills in for Gallery blocks without their own and in the Masonry Gallery lightbox when a block has no title
+- **Readable file names:** uploaded file names keep their words (`logo (final)_v2.svg` becomes `logo-final-v2.svg`), and accented letters and other alphabets are converted to plain letters
+- **New uploads first:** freshly uploaded files appear at the top of the library
+- **Wider delete protection:** files used in collection items, social images, theme settings, the business logo, or any language can't be deleted, and deletion re-checks saved content first
+
+### Desktop App
+
+- **Widgetizer Desktop:** the desktop app is now called Widgetizer Desktop
+- **Desktop shortcut:** reinstalling on Windows brings back a deleted desktop shortcut
+- **Links open in your browser:** links that open a new window, and outside links inside an export or media window, open in your browser; exports and media files open in their own window
+- **Confirm dialogs:** on Windows, text fields accept typing again right after a confirmation dialog closes
+
+### Added
+
+- **New fonts:** Instrument Sans and STIX Two Text
+- **No limit on forms:** a site can now have more than five different forms
+- **Button text for grids:** the News, Projects, and Services grids let you change the card button label
+- **Theme update links:** pages and menus added by a theme update are linked the same way as in a new project, and the Arch header button links to Contact from every page
+
+### For Theme Authors
+
+- **`validate:theme`:** `npm run validate:theme -- themes/my-theme` checks a theme's schemas, Liquid, assets, and locales before you ship it
+- **Visitor-facing translations:** a `site` locale dictionary and the `t` filter let a theme speak each page's language; `page.language`, `page.dir`, and `page.translations` (for language switchers) are available in templates
+- **`page_url` and `item_url` filters:** link to a page or item in the current language, following Clean URLs
+- **Pagination:** declare `perPageSetting` on a collection listing and render the shared pagination snippet
+- **Breadcrumbs:** a core breadcrumb trail and snippet; declare a widget's `collection` so items find their listing page
+- **Structured data and identity:** collection types can map fields to article data, and `project.identity` exposes the business details
+- **Share-image fallback:** mark one collection image field `usedAsImage` to use it as the item's social image
+- **`video` setting type:** pick an uploaded MP4
+- **Localized dates:** `format_date` writes month names in the page's language
+- **Snippets:** `{% image %}`, `media_meta`, and the `collection` filter work inside rendered snippets
+- **Theme settings from any group:** fonts, Bunny Fonts, custom CSS and scripts, and the site icon are found by setting id in any group
+
+### Security
+
+- Project backups and theme ZIPs are checked for ZIP bombs and for contents a real backup never holds
+- Exported sites, media files, and the site preview can no longer control the editor window
+- Video embeds build the player address from the video ID only
+- Request slugs, theme names, and file paths are kept inside their project folders
+
+### Fixed
+
+- Bunny Fonts now serves every font weight, not just regular
+- Translated pages no longer show English in breadcrumbs and opening hours
+- Theme labels no longer show internal codes after a theme update
+- Choosing a page in a link field no longer leaves the page "unsaved"
+- Saving the project or page form no longer drops a field (such as a page's parent)
+- Deleting content clears the links that pointed at it the same way, whether you delete one page or a whole language
+- Deleting a parent page moves its children to a surviving translation of that parent when there is one
+- An edited widget keeps its heading level in the preview
+- Arch heroes make room for the breadcrumb trail under a transparent header
+- Project backup downloads no longer arrive as `.zip_` on Windows
+- A backup with damaged content, or one in a newer backup format, is refused instead of creating a half-imported project
+- **Ctrl+Shift+Z** (Cmd+Shift+Z) redoes in the page editor, and shortcuts work with Caps Lock on
+- **Cancel** in a menu's structure asks before discarding a change made just before it, and a quick **Save** keeps the latest text
+- Submitting a form in the preview no longer shows a server error page
+- The code editor's line numbers stay inside the box
+- Renaming a project folder can no longer lose the only complete copy
+
 ## 0.9.9 - 2026-07-16
 
 ### Collections

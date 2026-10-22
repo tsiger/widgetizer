@@ -1,10 +1,125 @@
 # Electron Auto-Update And Theme Update Test
 
-This is a human-run playbook for testing real Windows Electron auto-updates and bundled theme-update deltas between any two releases.
+This is a playbook for testing real Windows and macOS Electron auto-updates and bundled theme-update deltas between any two releases.
 
 Use it for `0.9.8 -> 0.9.9`, `0.9.9 -> 0.9.10`, or future version pairs. The important rule is that the base app must be built from the real previous release tag, not by editing or emulating the app version.
 
 Do not ask an agent to run these commands unless you explicitly want it to execute the test.
+
+## Rehearsal Recipes (Start Here)
+
+These are the short, proven paths. The long sections further down are the original detailed playbook and troubleshooting reference.
+
+Rules that apply to both platforms:
+
+- **Back up the real user data, don't just wipe it.** The developer's own Widgetizer projects live in the user-data folder. Copy it aside before the test and restore it afterwards.
+- **Both sides must be signed the same way.** A signed app refuses an unsigned update. On Windows, a signed build stores the publisher name in `resources/app-update.yml` and the updater checks the new installer against it. So either test unsigned → unsigned (both built from source), or signed → signed.
+- **Do not regenerate the theme delta** when `themes/arch/updates/<targetVersion>/` is already committed. `theme-update-delta.js --force` overwrites hand-made fixes in that folder. Build the target from its branch as it is.
+- **Build each version in its own worktree** under a separate test folder, so the developer's normal checkout is untouched. Remove the worktrees afterwards with `git worktree remove --force <path>`.
+- **The updater override** is `ELECTRON_UPDATER_URL` (or `--updater-url=`). It exists from `0.9.8` onwards and only applies when the app is started with it. An app started from a shortcut, the Dock or Finder checks GitHub instead.
+- **An expected harmless error:** `Cannot download differentially, fallback to full download ... blockmap ... 404`. The local feed doesn't hold the old version's blockmap, so it downloads the full file. On GitHub the old release has its blockmap, so real users get the smaller download.
+
+### Windows (verified 2026-10-19, 0.9.9 → 0.9.10)
+
+Unsigned → unsigned. The official 0.9.9 release is signed, so it would refuse an unsigned 0.9.10. Build both from source.
+
+```powershell
+$repo = "C:\Users\g_tsi\Projects\widgetizer-saas\widgetizer"
+$test = "C:\Users\g_tsi\Projects\widgetizer-upgrade-test"
+cd $repo
+git fetch origin
+
+# 1. Back up the real data, then wipe the install (Widgetizer must be closed)
+robocopy "$env:APPDATA\widgetizer" "$test\backup-appdata-widgetizer" /E /COPY:DAT
+foreach ($p in "$env:LOCALAPPDATA\Programs\widgetizer","$env:APPDATA\widgetizer","$env:LOCALAPPDATA\widgetizer","$env:LOCALAPPDATA\widgetizer-updater") {
+  if (Test-Path -LiteralPath $p) { Remove-Item -LiteralPath $p -Recurse -Force }
+}
+
+# 2. Build the base and target, each in a worktree (one at a time; each takes a few minutes)
+foreach ($v in @(@{ dir = "widgetizer-0.9.9"; ref = "0.9.9" }, @{ dir = "widgetizer-0.9.10"; ref = "0.9.10" })) {
+  git worktree add --detach "$test\$($v.dir)" $v.ref
+  Push-Location "$test\$($v.dir)"
+  Set-Content -LiteralPath .env -Value "VITE_API_URL=http://localhost:3001"
+  Set-Content -LiteralPath .env.production -Value "VITE_API_URL="
+  npm ci
+  npm run electron:build:win:unsigned
+  Pop-Location
+}
+
+# 3. Serve the target as the update feed (leave running)
+cd "$test\widgetizer-0.9.10\dist-electron"
+npx --yes http-server . -p 8384 -a 127.0.0.1 -c-1
+```
+
+For the target, use the release branch (`0.9.10`) after `git fetch`, and check that it matches `origin/0.9.10`.
+
+The human then:
+
+1. Installs `$test\widgetizer-0.9.9\dist-electron\Widgetizer-Setup-0.9.9.exe`.
+2. Creates two Arch projects, one with theme updates on and one off, then closes Widgetizer completely (check Task Manager).
+3. Opens a new PowerShell window from the Start menu and runs:
+   ```powershell
+   $env:ELECTRON_UPDATER_URL = "http://127.0.0.1:8384"
+   & "$env:LOCALAPPDATA\Programs\widgetizer\Widgetizer.exe"
+   ```
+4. Clicks Update, then Restart Now, and checks the version in About.
+5. Updates Arch on the Themes screen. Only the opted-in project offers the theme update; applies it and checks the project.
+
+Restore afterwards (Widgetizer closed): stop the feed, delete the four install/data folders again, copy the backup back with `robocopy "$test\backup-appdata-widgetizer" "$env:APPDATA\widgetizer" /E /COPY:DAT`, and reinstall the official signed release (`gh release download <fromVersion> --repo tsiger/widgetizer --pattern "Widgetizer-Setup-*.exe"`, then run it with `/S`). Keep the backup until the developer confirms their projects look right.
+
+### Mac (verified 2026-10-19, Apple silicon, 0.9.9 → 0.9.10)
+
+The installed signed 0.9.9 app detected the local feed, downloaded the signed and notarized arm64 ZIP, and installed/relaunched as 0.9.10 through **Update → Restart Now**. The installed signature verified, SQLite integrity passed, and all 442 existing project files were unchanged by the app upgrade. Arch then updated to 0.9.10; the opted-in project accepted its theme update, while the opted-out project remained on 0.9.8 with its files unchanged. These were existing blank-preset test projects, so this run does not establish populated-site rendering/export coverage. The original app and data were restored afterward. Intel and differential downloads were not tested; this run used a full download.
+
+Notarization initially returned HTTP 403 about a missing or expired agreement. The account showed the updated agreement accepted, but retries still failed. After replacing the app-specific password in `.env.mac`, the next submission succeeded. This sequence does not establish whether credential replacement or agreement propagation resolved the error. Keep credentials out of logs and chat; no signing certificate replacement was needed.
+
+macOS only installs updates that are code-signed by the same Developer ID as the running app. **An unsigned → unsigned test does not work on Mac.** Use the official signed release as the base and a signed (and notarized) build of the target.
+
+Data folder: `~/Library/Application Support/widgetizer`. Updater caches: `~/Library/Caches/widgetizer-updater` and `~/Library/Caches/com.widgetizer.app.ShipIt`.
+
+```bash
+repo=~/Projects/widgetizer-saas/widgetizer   # adjust to the Mac checkout
+test=~/widgetizer-upgrade-test
+cd "$repo" && git fetch origin
+
+# 1. Back up the real data, then remove the app and data (Widgetizer must be quit: Cmd+Q)
+mkdir -p "$test"
+ditto ~/Library/Application\ Support/widgetizer "$test/backup-appsupport-widgetizer"
+rm -rf /Applications/Widgetizer.app ~/Library/Application\ Support/widgetizer \
+  ~/Library/Caches/widgetizer-updater ~/Library/Caches/com.widgetizer.app.ShipIt
+
+# 2. Download the official signed base release (pick the DMG for this Mac: -arm64 for Apple silicon)
+gh release download 0.9.9 --repo tsiger/widgetizer --pattern "Widgetizer-0.9.9-arm64.dmg" --dir "$test"
+
+# 3. Build the signed + notarized target in a worktree
+git worktree add --detach "$test/widgetizer-0.9.10" 0.9.10
+cp "$repo/.env.mac" "$test/widgetizer-0.9.10/"
+cd "$test/widgetizer-0.9.10"
+printf 'VITE_API_URL=http://localhost:3001\n' > .env
+printf 'VITE_API_URL=\n' > .env.production
+npm ci
+export $(cat .env.mac | xargs) && npm run electron:build:mac
+
+# 4. Serve the target as the update feed (leave running in its own Terminal tab)
+cd "$test/widgetizer-0.9.10/dist-electron"
+npx --yes http-server . -p 8384 -a 127.0.0.1 -c-1
+```
+
+The feed folder must contain `latest-mac.yml` and the `.zip` files; macOS updates come from the zip, not the DMG.
+
+The human then:
+
+1. Opens the 0.9.9 DMG and drags Widgetizer to Applications, then opens it once from Applications.
+2. Creates two Arch projects, one with theme updates on and one off, then quits with Cmd+Q.
+3. Opens a new Terminal window and runs (all one line):
+   ```bash
+   ELECTRON_UPDATER_URL=http://127.0.0.1:8384 /Applications/Widgetizer.app/Contents/MacOS/Widgetizer
+   ```
+   Do not use `open -a Widgetizer`, because `open` does not pass the variable through. Leave the Terminal window open; the app's log prints there.
+4. Clicks Update, then Restart Now, and checks the version in About.
+5. Updates Arch on the Themes screen. Only the opted-in project offers the theme update; applies it and checks the project.
+
+Restore afterwards (Widgetizer quit): stop the feed, remove the app, data and caches as in step 1, copy the backup back with `ditto "$test/backup-appsupport-widgetizer" ~/Library/Application\ Support/widgetizer`, and reinstall the official release from its DMG. Remove the worktree with `git worktree remove --force "$test/widgetizer-0.9.10"`. Keep the backup until the developer confirms their projects look right.
 
 ## Non-Negotiables
 
@@ -38,7 +153,7 @@ $targetBranch = "master"
 Common paths:
 
 ```powershell
-$repo = "C:\Users\g_tsi\Projects\widgetizer"
+$repo = "C:\Users\g_tsi\Projects\widgetizer-saas\widgetizer"
 $testRoot = "C:\Users\g_tsi\Projects\widgetizer-upgrade-test"
 $baseWt = "$testRoot\widgetizer-$fromVersion"
 $installedExe = "$env:LOCALAPPDATA\Programs\widgetizer\Widgetizer.exe"
@@ -68,7 +183,7 @@ Use this section when the `0.9.8` installer and the target `dist-electron` feed 
 For the current `0.9.8 -> 0.9.9` test, the expected files are:
 
 - Base installer: `C:\Users\g_tsi\Projects\widgetizer-upgrade-test\widgetizer-0.9.8\dist-electron\Widgetizer-Setup-0.9.8.exe`
-- Target feed directory: `C:\Users\g_tsi\Projects\widgetizer\dist-electron`
+- Target feed directory: `C:\Users\g_tsi\Projects\widgetizer-saas\widgetizer\dist-electron`
 - Target feed URL: `http://127.0.0.1:8384`
 
 ### PowerShell Window 1: Clean And Install `0.9.8`
@@ -138,7 +253,7 @@ Open a **second PowerShell window or tab**. This second window is only for the f
 Run this in **PowerShell Window 2**:
 
 ```powershell
-cd "C:\Users\g_tsi\Projects\widgetizer\dist-electron"
+cd "C:\Users\g_tsi\Projects\widgetizer-saas\widgetizer\dist-electron"
 npx http-server . -p 8384 -a 127.0.0.1
 ```
 
@@ -361,6 +476,8 @@ Ensure the target worktree also has production same-origin API config before bui
 Set-Content -LiteralPath .env.production -Value "VITE_API_URL="
 ```
 
+Skip this step when `themes/arch/updates/$targetVersion/` is already committed: `--force` overwrites hand-made fixes in that folder.
+
 Generate the Arch update delta from the real base tag:
 
 ```powershell
@@ -382,7 +499,7 @@ npm run electron:build:win:unsigned
 Expected output under:
 
 ```text
-C:\Users\g_tsi\Projects\widgetizer\dist-electron
+C:\Users\g_tsi\Projects\widgetizer-saas\widgetizer\dist-electron
 ```
 
 The generic feed folder must contain at least:
@@ -403,7 +520,7 @@ npx http-server . -p $feedPort -a 127.0.0.1
 If this is a new PowerShell window and the variables are not set, use literal values:
 
 ```powershell
-cd "C:\Users\g_tsi\Projects\widgetizer\dist-electron"
+cd "C:\Users\g_tsi\Projects\widgetizer-saas\widgetizer\dist-electron"
 npx http-server . -p 8384 -a 127.0.0.1
 ```
 

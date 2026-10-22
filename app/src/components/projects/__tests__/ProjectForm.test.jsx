@@ -86,11 +86,12 @@ beforeEach(() => {
 });
 
 describe("ProjectForm — edit page tabs", () => {
-  it("shows four tabs with General open and the readiness line inside Identity", async () => {
+  it("shows four tabs with General open and the readiness card beside every tab", async () => {
     renderForm();
     await screen.findByRole("tablist");
 
-    expect(panel("identity").querySelector("[role=status]")).not.toBeNull();
+    const card = screen.getByRole("region", { name: "forms.project.identity.readiness.title" });
+    expect(card.closest("[role=tabpanel]")).toBeNull();
     expect(screen.getAllByRole("tab").map((element) => element.id)).toEqual([
       "project-tab-general",
       "project-tab-site",
@@ -144,7 +145,7 @@ describe("ProjectForm — edit page tabs", () => {
     await screen.findByRole("tablist");
 
     fireEvent.click(tab("identity"));
-    fireEvent.click(screen.getByRole("button", { name: "forms.project.identity.readinessItems.siteUrl" }));
+    fireEvent.click(screen.getByRole("button", { name: "forms.project.identity.readiness.add forms.project.identity.readinessItems.siteUrl" }));
     await waitFor(() => expect(panel("site")).toBeVisible());
     await waitFor(() => expect(document.activeElement?.id).toBe("siteUrl"));
   });

@@ -25,7 +25,7 @@ export default function SettingsPanel({
   const { schemas: collectionSchemas } = useCollections();
   const { tTheme } = useThemeLocale();
   const { page, globalWidgets, updateThemeSetting } = usePageStore();
-  const { updateWidgetSettings, updateGlobalWidgetSettings, updateBlockSettings } = useWidgetStore();
+  const { updateWidgetSettingValues, updateGlobalWidgetSettings, updateBlockSettings } = useWidgetStore();
   const { markWidgetModified, setThemeSettingsModified } = useAutoSave();
   const showToast = useToastStore((state) => state.showToast);
 
@@ -84,6 +84,7 @@ export default function SettingsPanel({
       markWidgetModified(selectedWidgetId);
     } else {
       const perPageSetting = currentWidgetSchema?.collection?.perPageSetting;
+      const values = { [settingId]: value };
       if (settingId === "paginate" && value === true) {
         const holder = Object.entries(page?.widgets || {}).find(
           ([id, widget]) => id !== selectedWidgetId && widget?.settings?.paginate === true,
@@ -93,19 +94,16 @@ export default function SettingsPanel({
           showToast(t("pageEditor.paginate.onlyOne", { widget: holderName }), "error");
           return;
         }
-        updateWidgetSettings(selectedWidgetId, "listing_anchor", true);
         const perPageDefault = Array.isArray(currentWidgetSchema?.settings)
           ? currentWidgetSchema.settings.find((setting) => setting?.id === perPageSetting)?.default
           : undefined;
         if (perPageSetting && !(Number(currentValues?.[perPageSetting] ?? perPageDefault) >= 1)) {
-          updateWidgetSettings(selectedWidgetId, perPageSetting, DEFAULT_ITEMS_PER_PAGE);
+          values[perPageSetting] = DEFAULT_ITEMS_PER_PAGE;
         }
-      } else if (settingId === "listing_anchor" && value === false && currentValues?.paginate) {
-        updateWidgetSettings(selectedWidgetId, "paginate", false);
       } else if (settingId === perPageSetting && currentValues?.paginate && !(Number(value) >= 1)) {
-        value = 1;
+        values[settingId] = 1;
       }
-      updateWidgetSettings(selectedWidgetId, settingId, value);
+      updateWidgetSettingValues(selectedWidgetId, values);
       markWidgetModified(selectedWidgetId);
     }
   };
@@ -143,17 +141,20 @@ export default function SettingsPanel({
   // lists, and no theme should have to repeat it.
   const listedCollectionType = currentWidgetSchema?.collection?.type;
   const listedCollection = (collectionSchemas || []).find((schema) => schema.type === listedCollectionType);
-  const anchorSetting = listedCollectionType
-    ? {
-        id: "listing_anchor",
-        type: "checkbox",
-        label: t("pageEditor.listingAnchor.label", {
-          collection: listedCollection?.displayNamePlural || listedCollection?.displayName || listedCollectionType,
-        }),
-        description: t("pageEditor.listingAnchor.description"),
-        default: false,
-      }
-    : null;
+  const anchorSettings = listedCollectionType
+    ? [
+        { id: "listing_anchor_header", type: "header", label: t("pageEditor.listingAnchor.header") },
+        {
+          id: "listing_anchor",
+          type: "checkbox",
+          label: t("pageEditor.listingAnchor.label", {
+            collection: listedCollection?.displayNamePlural || listedCollection?.displayName || listedCollectionType,
+          }),
+          description: t("pageEditor.listingAnchor.description"),
+          default: false,
+        },
+      ]
+    : [];
 
   const paginateSetting =
     listedCollectionType && currentWidgetSchema?.collection?.perPageSetting
@@ -166,16 +167,20 @@ export default function SettingsPanel({
         }
       : null;
 
+  const perPageIndex = paginateSetting
+    ? (settings || []).findIndex((setting) => setting?.id === currentWidgetSchema.collection.perPageSetting)
+    : -1;
+  const withPaginate =
+    !paginateSetting || !settings
+      ? settings
+      : perPageIndex === -1
+        ? [...settings, paginateSetting]
+        : [...settings.slice(0, perPageIndex), paginateSetting, ...settings.slice(perPageIndex)];
+
   // Combine settings with name setting at the end for widgets (not global widgets, blocks, or theme settings)
   const allSettings =
     !isThemeSettings && !selectedBlockId && !isGlobalWidget && settings
-      ? [
-          ...settings,
-          ...(paginateSetting ? [paginateSetting] : []),
-          ...(anchorSetting ? [anchorSetting] : []),
-          widgetNameHeader,
-          widgetNameSetting,
-        ]
+      ? [...withPaginate, ...anchorSettings, widgetNameHeader, widgetNameSetting]
       : settings;
 
   return (

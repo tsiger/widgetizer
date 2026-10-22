@@ -293,7 +293,9 @@ const useWidgetStore = create((set, get) => ({
     }
   },
 
-  updateWidgetSettings: (widgetId, settingId, value) => {
+  updateWidgetSettings: (widgetId, settingId, value) => get().updateWidgetSettingValues(widgetId, { [settingId]: value }),
+
+  updateWidgetSettingValues: (widgetId, values) => {
     const pageStore = usePageStore.getState();
     const { page } = pageStore;
     if (!page || !widgetId || !page.widgets?.[widgetId]) return;
@@ -306,7 +308,7 @@ const useWidgetStore = create((set, get) => ({
           ...page.widgets[widgetId],
           settings: {
             ...(page.widgets[widgetId].settings || {}),
-            [settingId]: value,
+            ...values,
           },
         },
       },

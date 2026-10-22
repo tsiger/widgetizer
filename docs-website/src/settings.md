@@ -2,13 +2,15 @@
 description: Configure Widgetizer app settings including language, image optimization, upload limits, and export preferences.
 ---
 
-App Settings control global preferences that apply across all your projects in Widgetizer. These settings affect how the application behaves, how files are processed, and how exports are managed. You can access App Settings from the main navigation menu.
+App Settings control global preferences that apply across all your projects in Widgetizer. These settings affect how the application behaves, how files are processed, and how exports are managed. Open them from **Manage › General settings** at the top right. The screen has four tabs: **General**, **Media & Upload**, **Export & Versioning** and **Developer Tools**.
 
 # General Settings
 
 ### Language
 
 Sets the language for the Widgetizer admin interface. This affects all menus, buttons, labels, and messages you see while using the application.
+
+It has nothing to do with the language of your website. A site's languages are set per project, in **Project details › Site**. See [Languages](languages.html).
 
 **Available languages:**
 
@@ -49,7 +51,7 @@ Choose the format that matches your region or preference. The format you select 
 
 These settings control the maximum file size allowed for uploads across all projects. If a file exceeds these limits, it will be rejected with an error message.
 
-#### Maximum Image Upload Size
+#### Max Upload Size
 
 Sets the maximum size for an individual uploaded file (images, PDFs, MP3 audio, and MP4 video).
 
@@ -147,7 +149,7 @@ Sets the maximum file size allowed when importing a project ZIP file.
 
 When importing a project, if the ZIP file exceeds this limit, the import will be rejected with an error message.
 
-# Developer Settings
+# Developer Tools
 
 Settings for advanced users and theme developers.
 

@@ -1163,7 +1163,7 @@ describe("listing anchor (one page per collection)", () => {
     assert.equal(holderRead._json.widgets.w1.settings.listing_anchor, true);
   });
 
-  it("makes a paginating widget its collection's anchor", async () => {
+  it("splits a list into pages without making it the collection's anchor", async () => {
     const holder = await createTestPage("Old Blog");
     await saveWith(holder.slug, holder.name, gridWidget(true));
 
@@ -1172,10 +1172,13 @@ describe("listing anchor (one page per collection)", () => {
       w1: { type: "news-grid", settings: { paginate: true, listing_anchor: false } },
     });
     assert.equal(res._status, 200);
-    assert.deepEqual(res._json.listingAnchorMovedFrom, ["Old Blog"]);
+    assert.equal(res._json.listingAnchorMovedFrom, undefined);
 
     const read = await callController(getPage, { params: { id: page.slug } });
-    assert.equal(read._json.widgets.w1.settings.listing_anchor, true);
+    assert.equal(read._json.widgets.w1.settings.paginate, true);
+    assert.equal(read._json.widgets.w1.settings.listing_anchor, false);
+    const holderRead = await callController(getPage, { params: { id: holder.slug } });
+    assert.equal(holderRead._json.widgets.w1.settings.listing_anchor, true);
   });
 
   it("refuses a second paginating widget on the same page", async () => {
@@ -1189,13 +1192,15 @@ describe("listing anchor (one page per collection)", () => {
     assert.deepEqual(read._json.widgets, {});
   });
 
-  it("does not carry pagination onto a duplicated page", async () => {
+  it("keeps pagination on a duplicated page, but not the anchor", async () => {
     const original = await createTestPage("Paged Original");
-    await saveWith(original.slug, original.name, { w1: { type: "news-grid", settings: { paginate: true } } });
+    await saveWith(original.slug, original.name, {
+      w1: { type: "news-grid", settings: { paginate: true, listing_anchor: true } },
+    });
 
     const dup = await callController(duplicatePage, { params: { id: original.slug } });
     const copy = await callController(getPage, { params: { id: dup._json.slug } });
-    assert.equal(copy._json.widgets.w1.settings.paginate, false);
+    assert.equal(copy._json.widgets.w1.settings.paginate, true);
     assert.equal(copy._json.widgets.w1.settings.listing_anchor, false);
   });
 
@@ -1227,14 +1232,19 @@ describe("listing anchor (one page per collection)", () => {
     assert.notEqual(read._json.widgets.w1.settings.listing_anchor, true);
   });
 
-  it("turns pagination off on the page that loses the anchor", async () => {
+  it("keeps pagination on the page that loses the anchor", async () => {
     const first = await createTestPage("Paged First");
     const second = await createTestPage("Paged Second");
-    await saveWith(first.slug, first.name, { w1: { type: "news-grid", settings: { paginate: true } } });
-    await saveWith(second.slug, second.name, { w1: { type: "news-grid", settings: { paginate: true } } });
+    await saveWith(first.slug, first.name, {
+      w1: { type: "news-grid", settings: { paginate: true, listing_anchor: true } },
+    });
+    const res = await saveWith(second.slug, second.name, {
+      w1: { type: "news-grid", settings: { paginate: true, listing_anchor: true } },
+    });
+    assert.deepEqual(res._json.listingAnchorMovedFrom, ["Paged First"]);
 
     const firstRead = await callController(getPage, { params: { id: first.slug } });
-    assert.equal(firstRead._json.widgets.w1.settings.paginate, false);
+    assert.equal(firstRead._json.widgets.w1.settings.paginate, true);
     assert.equal(firstRead._json.widgets.w1.settings.listing_anchor, false);
     const secondRead = await callController(getPage, { params: { id: second.slug } });
     assert.equal(secondRead._json.widgets.w1.settings.paginate, true);
@@ -1253,15 +1263,12 @@ describe("listing anchor (one page per collection)", () => {
     });
     assert.equal(refused._status, 422);
 
-    const holder = await createTestPage("Details Holder");
-    await saveWith(holder.slug, holder.name, { w1: { type: "news-grid", settings: { paginate: true } } });
     const accepted = await callController(updatePage, {
       params: { id: page.slug },
       body: { name: page.name, slug: page.slug, widgets: { w1: { type: "news-grid", settings: { paginate: true } } } },
     });
     assert.equal(accepted._status, 200);
-    assert.equal(accepted._json.data.widgets.w1.settings.listing_anchor, true);
-    assert.deepEqual(accepted._json.listingAnchorMovedFrom, ["Details Holder"]);
+    assert.equal(accepted._json.data.widgets.w1.settings.paginate, true);
   });
 
   it("does not fail on a malformed widget schema, and a later paginator still works", async () => {
@@ -1279,7 +1286,6 @@ describe("listing anchor (one page per collection)", () => {
     const read = await callController(getPage, { params: { id: page.slug } });
     assert.equal(read._json.widgets.w1.settings.paginate, false);
     assert.equal(read._json.widgets.w2.settings.paginate, true);
-    assert.equal(read._json.widgets.w2.settings.listing_anchor, true);
   });
 });
 
@@ -1367,7 +1373,7 @@ describe("pages in another language", () => {
   it("refuses a language the project has not enabled", async () => {
     const created = await callController(createPage, { body: { name: "Bonjour", language: "fr" } });
     assert.equal(created._status, 400);
-    assert.match(created._json.message, /"fr"/);
+    assert.equal(created._json.message, "French is not enabled for this project.");
     const read = await callController(getPage, { params: { id: "anything" }, query: { language: "fr" } });
     assert.equal(read._status, 400);
     const malformed = await callController(createPage, { body: { name: "Odd", language: "not-a-language" } });

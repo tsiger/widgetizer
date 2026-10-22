@@ -235,6 +235,8 @@ describe("item mutations", () => {
     });
     assert.equal(dup._status, 201);
     assert.equal(dup._json.slug, "src-copy");
+    // Same suffix as a duplicated page, menu or project.
+    assert.equal(dup._json.settings.title, "Src (Copy)");
 
     const reorder = await call(collectionController.reorderItems, {
       params: { collectionType: "news" },
@@ -386,6 +388,14 @@ describe("items in another language (API)", () => {
   it("refuses a language the project has not enabled", async () => {
     const res = await createNews({ settings: { title: "Bonjour" }, language: "fr" });
     assert.equal(res._status, 400);
+    // Named in English for the sentence, not by its bare code.
+    assert.equal(res._json.message, "French is not enabled for this project.");
+  });
+
+  it("quotes a malformed language as given, since it has no name", async () => {
+    const res = await createNews({ settings: { title: "Bonjour" }, language: "not-a-language" });
+    assert.equal(res._status, 400);
+    assert.equal(res._json.message, 'Language "not-a-language" is not enabled for this project.');
   });
 
   it("counts the item cap across every language of the collection", async () => {

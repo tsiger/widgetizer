@@ -1110,6 +1110,9 @@ describe("exportProject validation", () => {
       res._json.error.toLowerCase().includes("homepage"),
       `Expected homepage error, got: ${res._json.error}`,
     );
+    // A refusal is not an export: no history row, so the next export keeps version 1.
+    assert.deepEqual(exportRepo.getExports(tempProjectId), []);
+    assert.equal(exportRepo.getNextVersion(tempProjectId), 1);
 
     // Cleanup
     await fs.remove(projDir);

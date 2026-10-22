@@ -10,7 +10,7 @@ import {
 } from "@dnd-kit/core";
 import { sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 import { Plus } from "lucide-react";
-import { debounce, isEqual } from "lodash";
+import { isEqual } from "lodash";
 
 import Button from "../../ui/Button";
 import SortableList from "./SortableList";
@@ -91,26 +91,16 @@ function MenuEditor({ initialItems = [], onChange, onDeleteItem }) {
     }
   }, [initialItems, items]);
 
-  // Create a debounced version of onChange
-  const debouncedOnChange = useMemo(
-    () =>
-      debounce((newItems) => {
-        // Don't call onChange if we're in the middle of a drag operation
-        if (!activeId) {
-          onChange(newItems);
-        }
-      }, 300),
-    [onChange, activeId],
-  );
-
-  // Only call onChange when items actually change
+  // Reported at once, not debounced: the page decides from it whether Cancel
+  // must ask and what Save sends, so a pending edit would be silently lost.
+  const onChangeRef = useRef(onChange);
   useEffect(() => {
-    // Don't trigger onChange during drag operations
-    if (!activeId) {
-      debouncedOnChange(items);
-    }
-    return () => debouncedOnChange.cancel();
-  }, [items, debouncedOnChange, activeId]);
+    onChangeRef.current = onChange;
+  });
+
+  useEffect(() => {
+    if (!activeId) onChangeRef.current(items);
+  }, [items, activeId]);
 
   // Clear cache when items change
   useEffect(() => {
@@ -303,8 +293,6 @@ function MenuEditor({ initialItems = [], onChange, onDeleteItem }) {
     (item) => {
       // If onDeleteItem prop is provided, call it with the item
       if (onDeleteItem && typeof onDeleteItem === "function") {
-        // Cancel any pending debounced onChange calls
-        debouncedOnChange.cancel();
         onDeleteItem(item);
         return;
       }
@@ -340,7 +328,7 @@ function MenuEditor({ initialItems = [], onChange, onDeleteItem }) {
       // Also remove from expanded items if it was expanded
       setExpandedItems((prev) => prev.filter((itemId) => itemId !== id));
     },
-    [findItemByIdCached, onDeleteItem, debouncedOnChange],
+    [findItemByIdCached, onDeleteItem],
   );
 
   // Edit an item by ID
