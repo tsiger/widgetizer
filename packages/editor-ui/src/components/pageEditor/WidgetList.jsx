@@ -23,8 +23,19 @@ import FixedWidgetItem from "./widgets/FixedWidgetItem";
 import WidgetItem from "./widgets/WidgetItem";
 import WidgetSection from "./widgets/WidgetSection";
 import usePageStore from "../../stores/pageStore";
-import useWidgetStore, { hasReachedMaxBlocks } from "../../stores/widgetStore";
+import useWidgetStore, {
+  hasReachedMaxBlocks,
+  findWidgetOwner,
+  areaModifiedKey,
+  isAreaUnsupportedType,
+} from "../../stores/widgetStore";
 import useAutoSave from "../../stores/saveStore";
+import useProjectStore from "../../stores/projectStore";
+import useToastStore from "../../stores/toastStore";
+import { AREA_UNSUPPORTED_WIDGET_TYPES } from "@widgetizer/core/sharedAreas";
+import { nativeLanguageName } from "@widgetizer/core/languages";
+import { useThemeLocale } from "../../hooks/useThemeLocale";
+import SharedAreaSection from "./SharedAreaSection";
 import { scrollElementIntoView } from "../../queries/previewManager";
 import WidgetSelector from "./WidgetSelector";
 import WidgetContextMenu from "./WidgetContextMenu";
@@ -44,12 +55,15 @@ export default function WidgetList({
   previewIframeRef, // Need this for scroll coordination
 }) {
   const { t } = useTranslation();
+  const { tTheme } = useThemeLocale();
   const [activeId, setActiveId] = useState(null);
   const [collapsedWidgets, setCollapsedWidgets] = useState({});
 
   // WidgetSelector modal state
   const [isWidgetSelectorOpen, setIsWidgetSelectorOpen] = useState(false);
   const [insertPosition, setInsertPosition] = useState(0);
+  // The shared area the selector adds to, or null for the page.
+  const [insertAreaId, setInsertAreaId] = useState(null);
   const [widgetTriggerRef, setWidgetTriggerRef] = useState(null);
   const [activeWidgetTriggerPosition, setActiveWidgetTriggerPosition] = useState(null);
 
@@ -63,7 +77,10 @@ export default function WidgetList({
   // Widget context menu state: { widgetId, x, y } | null
   const [contextMenu, setContextMenu] = useState(null);
 
-  const { globalWidgets } = usePageStore();
+  const { globalWidgets, declaredAreas, retainedAreas, sharedAreas, sharedAreasError } = usePageStore();
+  const projectLanguageCount = useProjectStore((state) => state.activeProject?.languages?.length || 0);
+  // Name the language only on a site with more than one: "shared" is enough otherwise.
+  const areaLanguageName = projectLanguageCount > 0 && page?.language ? nativeLanguageName(page.language) : null;
   const {
     deleteWidget,
     duplicateWidget,
@@ -128,17 +145,32 @@ export default function WidgetList({
     }
   };
 
+  // A change to a page widget is the page's; one to an area widget is that area's.
+  const markChanged = (widgetId) => {
+    const owner = findWidgetOwner(widgetId);
+    if (owner?.type === "area") markWidgetModified(areaModifiedKey(owner.areaId));
+    else if (owner?.type === "global") markWidgetModified(widgetId);
+    else setStructureModified(true);
+  };
+
+  const areaWidget = (widgetId) => {
+    const owner = findWidgetOwner(widgetId);
+    return owner?.type === "area" ? sharedAreas[owner.areaId]?.widgets?.[widgetId] : null;
+  };
+
   // Handle widget deletion
   const handleDeleteWidget = (widgetId) => {
-    if (!page || !page.widgets[widgetId]) return;
+    const owner = findWidgetOwner(widgetId);
+    if (!owner || owner.type === "global") return;
     deleteWidget(widgetId);
-    setStructureModified(true);
+    if (owner.type === "page") setStructureModified(true);
   };
 
   // Handle widget duplication
   const handleDuplicateWidget = (widgetId) => {
+    const owner = findWidgetOwner(widgetId);
     duplicateWidget(widgetId);
-    setStructureModified(true);
+    if (owner?.type === "page") setStructureModified(true);
   };
 
   // Handle widget copy (stores a deep clone in the in-memory clipboard)
@@ -146,19 +178,28 @@ export default function WidgetList({
     copyWidget(widgetId);
   };
 
-  // Handle widget paste (inserts the clipboard widget at the given position)
-  const handlePasteWidget = (position) => {
-    pasteWidget(position);
-    setStructureModified(true);
+  // Paste into the page or an area. An area cannot hold a form, so pasting one
+  // there is refused with a notice rather than silently doing nothing.
+  const pasteInto = (position, areaId) => {
+    const pasted = pasteWidget(position, areaId);
+    if (pasted && !areaId) setStructureModified(true);
+    if (!pasted && areaId && isAreaUnsupportedType(widgetClipboard?.type)) {
+      useToastStore.getState().showToast(t("pageEditor.sharedAreas.formNotAllowed"), "warning");
+    }
   };
 
-  // Paste from the context menu: insert immediately after the target widget.
-  // Reads live order from the store to avoid a stale-closure position.
+  // Handle widget paste (inserts the clipboard widget at the given position)
+  const handlePasteWidget = (position) => pasteInto(position, insertAreaId);
+
+  // Paste from the context menu: insert immediately after the target widget, in
+  // the same list. Reads live order from the store to avoid a stale-closure position.
   const handlePasteAfter = (widgetId) => {
-    const order = usePageStore.getState().page?.widgetsOrder || [];
+    const owner = findWidgetOwner(widgetId);
+    const state = usePageStore.getState();
+    const areaId = owner?.type === "area" ? owner.areaId : null;
+    const order = (areaId ? state.sharedAreas[areaId]?.widgetsOrder : state.page?.widgetsOrder) || [];
     const idx = order.indexOf(widgetId);
-    pasteWidget(idx === -1 ? order.length : idx + 1);
-    setStructureModified(true);
+    pasteInto(idx === -1 ? order.length : idx + 1, areaId);
   };
 
   // Widget context menu open/close
@@ -175,8 +216,9 @@ export default function WidgetList({
     updateWidgetSettings(widgetId, "name", newName);
   };
 
-  // Handle opening widget selector
-  const handleAddWidgetClick = (position, triggerRef) => {
+  // Handle opening widget selector; `areaId` targets a shared area instead of the page.
+  const handleAddWidgetClick = (position, triggerRef, areaId = null) => {
+    setInsertAreaId(areaId);
     setInsertPosition(position);
     setWidgetTriggerRef(triggerRef);
     setActiveWidgetTriggerPosition(position);
@@ -185,7 +227,7 @@ export default function WidgetList({
 
   // Handle opening block selector
   const handleAddBlockClick = (widgetId, triggerRef, position = null) => {
-    const widget = widgets[widgetId] || page?.widgets?.[widgetId] || globalWidgets[widgetId];
+    const widget = widgets[widgetId] || page?.widgets?.[widgetId] || globalWidgets[widgetId] || areaWidget(widgetId);
     const schema = widget && widgetSchemas[widget.type];
 
     if (hasReachedMaxBlocks(widget, schema)) return;
@@ -198,13 +240,9 @@ export default function WidgetList({
       const { addBlock, setSelectedWidgetId, setSelectedGlobalWidgetId, setSelectedBlockId } =
         useWidgetStore.getState();
       const newBlockId = addBlock(widgetId, blockType, position);
-      if (widgetId === "header" || widgetId === "footer") {
-        markWidgetModified(widgetId);
-        setSelectedGlobalWidgetId(widgetId);
-      } else {
-        setStructureModified(true);
-        setSelectedWidgetId(widgetId);
-      }
+      markChanged(widgetId);
+      if (widgetId === "header" || widgetId === "footer") setSelectedGlobalWidgetId(widgetId);
+      else setSelectedWidgetId(widgetId);
       setSelectedBlockId(newBlockId);
       return;
     }
@@ -300,7 +338,7 @@ export default function WidgetList({
                     position={0}
                     onAddClick={handleAddWidgetClick}
                     isWidgetSelectorOpen={isWidgetSelectorOpen}
-                    activeWidgetTriggerPosition={activeWidgetTriggerPosition}
+                    activeWidgetTriggerPosition={insertAreaId ? null : activeWidgetTriggerPosition}
                   />
 
                   {sortableWidgets.map((widget, index) => {
@@ -346,7 +384,7 @@ export default function WidgetList({
                             position={index + 1}
                             onAddClick={handleAddWidgetClick}
                             isWidgetSelectorOpen={isWidgetSelectorOpen}
-                            activeWidgetTriggerPosition={activeWidgetTriggerPosition}
+                            activeWidgetTriggerPosition={insertAreaId ? null : activeWidgetTriggerPosition}
                           />
                         )}
                       </div>
@@ -406,6 +444,49 @@ export default function WidgetList({
           </div>
         )}
 
+        {(declaredAreas.length > 0 || retainedAreas.length > 0 || sharedAreasError) && (
+          <div className="mt-4">
+            {sharedAreasError && (
+              <p className="text-[11px] text-amber-700 mb-2">{t("pageEditor.sharedAreas.loadFailed")}</p>
+            )}
+            {declaredAreas.map((area) => (
+              <SharedAreaSection
+                key={area.id}
+                areaId={area.id}
+                label={tTheme(area.label) || area.id}
+                languageName={areaLanguageName}
+                content={sharedAreas[area.id]}
+                widgetSchemas={widgetSchemas}
+                isModified={modifiedWidgets.has(areaModifiedKey(area.id))}
+                selectedWidgetId={selectedWidgetId}
+                selectedBlockId={selectedBlockId}
+                onWidgetSelect={onWidgetSelect}
+                onBlockSelect={onBlockSelect}
+                onReorder={(newOrder) => reorderWidgets(newOrder, area.id)}
+                onAddWidgetClick={(position, triggerRef) => handleAddWidgetClick(position, triggerRef, area.id)}
+                isWidgetSelectorOpen={isWidgetSelectorOpen}
+                activeWidgetTriggerPosition={insertAreaId === area.id ? activeWidgetTriggerPosition : null}
+                onOpenContextMenu={openWidgetContextMenu}
+                onBlocksReorder={reorderBlocks}
+                onAddBlockClick={handleAddBlockClick}
+                isBlockSelectorOpen={isBlockSelectorOpen}
+                activeWidgetId={activeWidgetId}
+                activeBlockTriggerKey={activeBlockTriggerKey}
+                onHover={handleHover}
+                onRenameWidget={(widgetId, newName) => {
+                  handleRenameWidget(widgetId, newName);
+                  markChanged(widgetId);
+                }}
+              />
+            ))}
+            {retainedAreas.map((area) => (
+              <p key={area.id} className="text-[11px] text-slate-500 mb-2 px-1">
+                {t("pageEditor.sharedAreas.notShown", { area: area.id, count: area.widgetCount })}
+              </p>
+            ))}
+          </div>
+        )}
+
         {footerWidget && <div className="my-4 border-t border-slate-200" />}
 
         {footerWidget && (
@@ -440,10 +521,11 @@ export default function WidgetList({
           setActiveWidgetTriggerPosition(null);
         }}
         widgetSchemas={widgetSchemas}
+        excludeTypes={insertAreaId ? [...AREA_UNSUPPORTED_WIDGET_TYPES] : []}
         onSelectWidget={(type, position) => {
           const { addWidget } = useWidgetStore.getState();
-          addWidget(type, position);
-          setStructureModified(true);
+          addWidget(type, position, insertAreaId);
+          if (!insertAreaId) setStructureModified(true);
         }}
         hasClipboard={!!widgetClipboard}
         onPasteWidget={handlePasteWidget}
@@ -462,7 +544,11 @@ export default function WidgetList({
         }}
         widgetSchema={
           activeWidgetId
-            ? widgetSchemas[page?.widgets?.[activeWidgetId]?.type || globalWidgets[activeWidgetId]?.type]
+            ? widgetSchemas[
+                page?.widgets?.[activeWidgetId]?.type ||
+                  globalWidgets[activeWidgetId]?.type ||
+                  areaWidget(activeWidgetId)?.type
+              ]
             : null
         }
         onSelectBlock={(blockType) => {
@@ -472,13 +558,9 @@ export default function WidgetList({
             const newBlockId = addBlock(activeWidgetId, blockType, blockInsertPosition);
 
             // Keep the widget selected and select the new block
-            if (activeWidgetId === "header" || activeWidgetId === "footer") {
-              markWidgetModified(activeWidgetId);
-              setSelectedGlobalWidgetId(activeWidgetId);
-            } else {
-              setStructureModified(true);
-              setSelectedWidgetId(activeWidgetId);
-            }
+            markChanged(activeWidgetId);
+            if (activeWidgetId === "header" || activeWidgetId === "footer") setSelectedGlobalWidgetId(activeWidgetId);
+            else setSelectedWidgetId(activeWidgetId);
             setSelectedBlockId(newBlockId);
           }
           setIsBlockSelectorOpen(false);

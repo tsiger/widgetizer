@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { isEqual } from "lodash";
 import { savePageContent } from "../queries/pageManager";
 import { saveGlobalWidget } from "../queries/previewManager";
+import { saveSharedArea } from "../queries/sharedAreaManager";
 import { invalidateMediaCache } from "../queries/mediaManager";
 import usePageStore from "./pageStore";
 import useThemeStore from "./themeStore";
@@ -27,6 +28,14 @@ function autosaveDelay(failureCount) {
 // otherwise count it as a difference that no save can ever clear.
 const asSaved = (value) => (value === undefined ? undefined : JSON.parse(JSON.stringify(value)));
 const matchesSaved = (current, saved) => isEqual(asSaved(current), saved);
+
+/** Ids of the shared areas whose content differs from their saved copy. */
+function changedAreaIds({ sharedAreas, originalSharedAreas }) {
+  return Object.keys(sharedAreas || {}).filter((id) => !matchesSaved(sharedAreas[id], originalSharedAreas?.[id]));
+}
+
+/** A modified-widgets entry that names a shared area rather than a page widget. */
+const isAreaKey = (id) => id.startsWith("area:");
 
 const useAutoSave = create((set, get) => ({
   // State
@@ -100,7 +109,8 @@ const useAutoSave = create((set, get) => ({
       return true;
     }
 
-    return false;
+    // Shared areas are saved with the page they are edited on.
+    return changedAreaIds(pageStore).length > 0;
   },
 
   // Anything unsaved at all: what the Save button, auto-save and the
@@ -134,7 +144,8 @@ const useAutoSave = create((set, get) => ({
   // Unlike markWidgetModified, this can also CLEAR a widget's dirty flag
   // (when undo reverts it back to exactly its saved state).
   reconcileModifiedWidgets: () => {
-    const { page, originalPage, globalWidgets, originalGlobalWidgets } = usePageStore.getState();
+    const pageState = usePageStore.getState();
+    const { page, originalPage, globalWidgets, originalGlobalWidgets } = pageState;
 
     // Built as one pass into a single Set + one set() call (rather than
     // per-id markWidgetModified/markWidgetUnmodified round-trips, each of
@@ -161,6 +172,12 @@ const useAutoSave = create((set, get) => ({
       }
     }
 
+    const changedAreas = new Set(changedAreaIds(pageState));
+    for (const areaId of Object.keys(pageState.sharedAreas || {})) {
+      if (changedAreas.has(areaId)) next.add(`area:${areaId}`);
+      else next.delete(`area:${areaId}`);
+    }
+
     // The structure and theme flags are only ever raised by an edit; after an
     // undo or redo they hold only while the page or the theme still differs
     // from what is saved, so undoing back to the saved state leaves nothing to
@@ -168,7 +185,8 @@ const useAutoSave = create((set, get) => ({
     // is in flight they stay: it is writing the edit this undo reverses, so
     // matching the old baseline is not "saved", and clearing would let the
     // leave-page guard pass before that save lands.
-    const pageDiffers = Boolean(savedFormPage && originalPage && !isEqual(savedFormPage, originalPage));
+    const pageDiffers =
+      Boolean(savedFormPage && originalPage && !isEqual(savedFormPage, originalPage)) || changedAreas.size > 0;
     const themeDiffers = useThemeStore.getState().hasUnsavedThemeChanges();
     const saving = Boolean(get().runningSave);
     set({
@@ -264,7 +282,7 @@ const useAutoSave = create((set, get) => ({
     const run = (async () => {
       const { modifiedWidgets, structureModified, themeSettingsModified } = get();
       const pageStore = usePageStore.getState();
-      const { page, globalWidgets } = pageStore;
+      const { page, globalWidgets, sharedAreas } = pageStore;
       const themeStore = useThemeStore.getState();
       const themeSettings = themeStore.settings;
 
@@ -312,7 +330,31 @@ const useAutoSave = create((set, get) => ({
           guardedPromises.push(footerSave);
         }
 
-        const hasPageWidgetChanges = [...modifiedWidgets].some((id) => id !== "header" && id !== "footer");
+        // Each changed shared area is saved on its own, and takes its saved copy as
+        // soon as its own request succeeds: a failure elsewhere in this save must
+        // not leave a saved area looking unsaved, nor a failed one looking saved.
+        for (const areaId of changedAreaIds(pageStore)) {
+          const sent = sharedAreas[areaId];
+          const areaSave = saveSharedArea(areaId, sent, page?.language).then((result) => {
+            if (get().saveGeneration !== myGeneration) return result;
+            usePageStore.getState().setOriginalSharedArea(areaId, sent);
+            // Its changed marker goes now too, unless it was edited again meanwhile.
+            if (matchesSaved(usePageStore.getState().sharedAreas[areaId], asSaved(sent))) {
+              set((state) => {
+                const remaining = new Set(state.modifiedWidgets);
+                remaining.delete(`area:${areaId}`);
+                return { modifiedWidgets: remaining };
+              });
+            }
+            return result;
+          });
+          globalSaves.push(areaSave);
+          guardedPromises.push(areaSave);
+        }
+
+        const hasPageWidgetChanges = [...modifiedWidgets].some(
+          (id) => id !== "header" && id !== "footer" && !isAreaKey(id),
+        );
         const hasPageDiff = page && pageStore.originalPage ? !matchesSaved(page, pageStore.originalPage) : false;
         // Kept separately from the fan-out so its response can be read: the
         // server reports which page it took a listing anchor from, if any.
@@ -407,8 +449,8 @@ const useAutoSave = create((set, get) => ({
             listingAnchorMoved: pageSaveResult?.listingAnchorMovedFrom?.length
               ? { pages: pageSaveResult.listingAnchorMovedFrom }
               : state.listingAnchorMoved,
-            // Any of the three can carry it: a header-only save reports it on the
-            // global response, and theme settings on theirs.
+            // Any of them can carry it: a header-only or area-only save reports it
+            // on its own response, and theme settings on theirs.
             mediaUsageStale: [pageSaveResult, ...globalSaveResults].some((result) =>
               result?.warnings?.some((w) => w?.code === "MEDIA_USAGE_STALE"),
             ) || themeUsageStale

@@ -1,8 +1,7 @@
 import { GripVertical, CopyPlus, Trash2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useThemeLocale } from "../../../hooks/useThemeLocale";
-import useWidgetStore from "../../../stores/widgetStore";
-import useAutoSave from "../../../stores/saveStore";
+import useWidgetStore, { markWidgetChanged } from "../../../stores/widgetStore";
 
 export default function BlockItem({
   widgetId,
@@ -21,13 +20,12 @@ export default function BlockItem({
   const blockName = tTheme(blockSchema?.displayName) || block.type || "Block";
   const duplicateBlock = useWidgetStore((state) => state.duplicateBlock);
   const deleteBlock = useWidgetStore((state) => state.deleteBlock);
-  const markWidgetModified = useAutoSave((state) => state.markWidgetModified);
 
   const handleDuplicate = (e) => {
     e.stopPropagation();
     if (widgetId && blockId) {
       duplicateBlock(widgetId, blockId);
-      markWidgetModified(widgetId);
+      markWidgetChanged(widgetId);
     }
   };
 
@@ -35,7 +33,7 @@ export default function BlockItem({
     e.stopPropagation();
     if (widgetId && blockId) {
       deleteBlock(widgetId, blockId);
-      markWidgetModified(widgetId);
+      markWidgetChanged(widgetId);
     }
   };
 

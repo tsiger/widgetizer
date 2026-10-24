@@ -26,6 +26,8 @@ Every `widgetsOrder` key must identify an actual widget instance. Each instance 
 
 `templates/global/header.json` and `footer.json` contain a **single widget instance** (`type`, `settings`, optional `blocks`/`blocksOrder`), not a page's `widgets` map. Their schemas/templates reside at `widgets/global/<type>/`.
 
+`templates/global/areas/<id>.json` is optional starting content for a shared area the theme declares: `{ "widgets": { … }, "widgetsOrder": [ … ] }`, the same shape as a page's widgets, with no `core-form` and no `listing_anchor`/`paginate`. A preset can supply its own under its `templates/global/areas/`. It is copied when a site is created; a site's existing area content, including an area the owner emptied, is never replaced.
+
 **Convention:** use readable stable widget/block keys; snake_case versus kebab-case is not an engine restriction. Omit project UUIDs, creation timestamps, and project-specific references from starter content. Let scaffolding generate identities. Omit demo SEO by default so a fictional business's metadata does not become a user's authored SEO; this is an authoring convention, not a JSON parser restriction.
 
 ## Menus and links

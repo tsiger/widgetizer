@@ -10,6 +10,8 @@ import {
   pageKey,
   globalsDir,
   globalKey,
+  areasDir,
+  areaKey,
   menusDir,
   menuKey,
   itemsDir,
@@ -117,6 +119,8 @@ describe("storage keys", () => {
     expect(pageKey("about", EL)).toBe("pages/el/about.json");
     expect(globalsDir(EL)).toBe("pages/el/global");
     expect(globalKey("footer", EL)).toBe("pages/el/global/footer.json");
+    expect(areasDir(EL)).toBe("pages/el/global/areas");
+    expect(areaKey("before_footer", EL)).toBe("pages/el/global/areas/before_footer.json");
     expect(menusDir(EL)).toBe("menus/el");
     expect(menuKey("main", EL)).toBe("menus/el/main.json");
     expect(itemsDir("news", EL)).toBe("collections/news/el");
@@ -128,6 +132,7 @@ describe("storage keys", () => {
       const folder = languageFolder(lang);
       expect(parseContentKey(pageKey("about", lang))).toEqual({ kind: "page", language: folder, slug: "about" });
       expect(parseContentKey(globalKey("header", lang))).toEqual({ kind: "global", language: folder, type: "header" });
+      expect(parseContentKey(areaKey("before_footer", lang))).toEqual({ kind: "area", language: folder, id: "before_footer" });
       expect(parseContentKey(menuKey("main", lang))).toEqual({ kind: "menu", language: folder, id: "main" });
       expect(parseContentKey(itemKey("news", "story", lang))).toEqual({
         kind: "item",
@@ -147,6 +152,7 @@ describe("storage keys", () => {
     expect(parseContentKey("pages/drafts/about.json")).toBeNull();
     expect(parseContentKey("collections/news/deep/el/story.json")).toBeNull();
     expect(parseContentKey("pages/about.txt")).toBeNull();
+    expect(parseContentKey("pages/global/areas/deep/x.json")).toBeNull();
     expect(parseContentKey("theme/settings.json")).toBeNull();
     expect(languageFromKey(undefined)).toBeNull();
   });
@@ -301,6 +307,8 @@ describe("usage ids", () => {
     for (const { lang } of DEFAULTS) expect(usageId.global("header", lang)).toBe("global:root:header");
     expect(usageId.global("header", EL)).toBe("global:el:header");
     expect(usageId.global("footer", { language: "en", defaultLanguage: "el" })).toBe("global:en:footer");
+    expect(usageId.area("before_footer")).toBe("area:root:before_footer");
+    expect(usageId.area("before_footer", EL)).toBe("area:el:before_footer");
   });
 });
 

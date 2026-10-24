@@ -83,7 +83,7 @@ export async function fetchPreview(pageData, themeSettings, previewMode = "edito
  * @returns {Promise<string>} Rendered widget HTML string
  * @throws {Error} If widget rendering fails
  */
-export async function fetchRenderedWidget(widgetId, widget, themeSettings, currentCanonicalPath = "", page = null) {
+export async function fetchRenderedWidget(widgetId, widget, themeSettings, currentCanonicalPath = "", page = null, area = null) {
   try {
     const response = await editorFetch("/preview/widget", {
       method: "POST",
@@ -96,6 +96,7 @@ export async function fetchRenderedWidget(widgetId, widget, themeSettings, curre
         themeSettings,
         currentCanonicalPath,
         page,
+        ...(area ? { area } : {}),
       }),
     });
 
@@ -181,12 +182,23 @@ export async function updatePreview(iframe, newState, oldState) {
     }
   }
 
+  // A widget of a shared area renders knowing its area, as in the full render.
+  const areaOf = (widgetId) =>
+    Object.keys(newState.sharedAreas || {}).find((areaId) => newState.sharedAreas[areaId]?.widgets?.[widgetId]) || null;
+
   // Morph changed widgets
   for (const widgetId of changedWidgetIds) {
     const widgetData = newWidgets[widgetId];
     if (widgetData) {
       try {
-        const renderedHtml = await fetchRenderedWidget(widgetId, widgetData, newThemeSettings, currentCanonicalPath, newState.page);
+        const renderedHtml = await fetchRenderedWidget(
+          widgetId,
+          widgetData,
+          newThemeSettings,
+          currentCanonicalPath,
+          newState.page,
+          areaOf(widgetId),
+        );
         iframe.contentWindow.postMessage({ type: "MORPH_WIDGET", payload: { widgetId, html: renderedHtml } }, getPreviewTargetOrigin());
       } catch (error) {
         console.error(`Error updating widget ${widgetId}:`, error);

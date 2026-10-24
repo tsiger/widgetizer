@@ -35,6 +35,12 @@ With nothing selected, the settings panel says *"Select a widget to edit its set
 
 The header and footer are shared by every page in the same language. A change you make to them here shows up on all those pages. They always stay at the top and bottom, but you can add, reorder and remove their blocks like any other widget's.
 
+### Shared Areas
+
+Some themes add shared areas: places in the layout, such as **Before footer** in Arch, that you fill with ordinary widgets. They're listed below the page's widgets, marked as shared, and what you put in them shows on every page in the same language. You add, arrange and edit widgets there just as on a page, and copy and paste works between the page and an area.
+
+A form can't go in a shared area yet, and a list of items placed there can't be a collection's main page or be split into pages.
+
 ### The Widget Menu
 
 Right-click a widget in the widget list, or click its **Widget actions** button (⋮), to open its menu:
@@ -72,7 +78,7 @@ If you try to leave the editor with unsaved changes, Widgetizer asks first. **Ke
 
 Click **Undo** or **Redo** in the top bar, or use the keyboard shortcuts below.
 
-- **What it covers:** widgets and blocks on this page, the header and footer, and Site settings you change in the editor.
+- **What it covers:** widgets and blocks on this page, the header and footer, shared areas, and Site settings you change in the editor.
 - **Saving doesn't clear it.** You can still undo after a save or an autosave. Undoing a saved change makes the page unsaved again, and the next save stores the undone version.
 - **Back to where you were.** If you undo everything back to the last saved version, there's nothing to save, and the **Save** button turns grey again.
 - **Typing is one step.** Quick changes to the same value, like typing a heading or dragging a color, count as one step, so one undo takes back the whole word.

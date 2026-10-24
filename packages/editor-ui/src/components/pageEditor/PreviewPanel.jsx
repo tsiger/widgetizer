@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, forwardRef } from "react";
+import { useState, useEffect, useRef, useMemo, forwardRef } from "react";
 import { useTranslation } from "react-i18next";
 import { useThemeLocale } from "../../hooks/useThemeLocale";
 import { fetchPreviewToken, scrollElementIntoView, updatePreview } from "../../queries/previewManager";
@@ -27,8 +27,12 @@ function detectChangeType(newState, oldState) {
   const removedWidgets = [...oldWidgetIds].filter((id) => !newWidgetIds.has(id));
   // Check for reordering
   const orderChanged = JSON.stringify(newState.page?.widgetsOrder) !== JSON.stringify(oldState.page?.widgetsOrder);
+  // A shared area's widgets render in its own order, so reordering one is structural too.
+  const areaOrders = (state) =>
+    Object.fromEntries(Object.entries(state.sharedAreas || {}).map(([id, area]) => [id, area?.widgetsOrder || []]));
+  const areaOrderChanged = JSON.stringify(areaOrders(newState)) !== JSON.stringify(areaOrders(oldState));
 
-  const isStructural = addedWidgets.length > 0 || removedWidgets.length > 0 || orderChanged;
+  const isStructural = addedWidgets.length > 0 || removedWidgets.length > 0 || orderChanged || areaOrderChanged;
 
   // Find widgets with content changes (settings, blocks)
   const changedWidgetIds = [];
@@ -140,7 +144,7 @@ const PreviewPanel = forwardRef(function PreviewPanel(
     selectedWidgetId,
     selectedBlockId,
     selectedGlobalWidgetId,
-    widgets,
+    widgets: pageWidgets,
     themeSettings,
     previewMode = "desktop",
     runtimeMode = "editor",
@@ -170,7 +174,16 @@ const PreviewPanel = forwardRef(function PreviewPanel(
   // Store pending scroll info for after PREVIEW_READY
   const pendingScrollRef = useRef(null);
 
-  const { globalWidgets } = usePageStore();
+  const { globalWidgets, sharedAreas } = usePageStore();
+  // The page's widgets and its shared areas' widgets together: ids never clash, and
+  // both are on the previewed page, so selection, labels and live settings updates
+  // treat them alike. Which list a widget is in only matters to the full render,
+  // which is sent the areas themselves.
+  const widgets = useMemo(() => {
+    const merged = { ...(pageWidgets || {}) };
+    for (const area of Object.values(sharedAreas || {})) Object.assign(merged, area?.widgets || {});
+    return merged;
+  }, [pageWidgets, sharedAreas]);
   const loadedProjectId = usePageStore((state) => state.loadedProjectId);
   const activeProject = useProjectStore((state) => state.activeProject);
   const schemas = useWidgetStore((state) => state.schemas);
@@ -193,10 +206,11 @@ const PreviewPanel = forwardRef(function PreviewPanel(
       JSON.stringify(page) !== JSON.stringify(prev?.page) ||
       JSON.stringify(widgets) !== JSON.stringify(prev?.widgets) ||
       JSON.stringify(globalWidgets) !== JSON.stringify(prev?.globalWidgets) ||
+      JSON.stringify(sharedAreas) !== JSON.stringify(prev?.sharedAreas) ||
       JSON.stringify(themeSettings) !== JSON.stringify(prev?.themeSettings);
 
     if (contentChanged) {
-      const newState = { page, widgets, globalWidgets, themeSettings };
+      const newState = { page, widgets, globalWidgets, sharedAreas, themeSettings };
       const { isStructural } = detectChangeType(newState, prev);
       if (isStructural && !structuralReloadRef.current) {
         structuralReloadRef.current = true;
@@ -263,14 +277,14 @@ const PreviewPanel = forwardRef(function PreviewPanel(
   useEffect(() => {
     if (!iframeRef.current?.contentWindow || !initialLoadComplete) return;
 
-    const metadata = buildWidgetMetadata(page, globalWidgets, schemas, tTheme);
+    const metadata = buildWidgetMetadata({ ...page, widgets }, globalWidgets, schemas, tTheme);
     const widgetOrder = page?.widgetsOrder || [];
 
     iframeRef.current.contentWindow.postMessage(
       { type: "SET_WIDGET_METADATA", payload: { metadata, widgetOrder } },
       getPreviewTargetOrigin(),
     );
-  }, [page, globalWidgets, schemas, tTheme, initialLoadComplete, previewReadyKey]);
+  }, [page, widgets, globalWidgets, schemas, tTheme, initialLoadComplete, previewReadyKey]);
 
   // Initial page load effect
   useEffect(() => {
@@ -283,7 +297,7 @@ const PreviewPanel = forwardRef(function PreviewPanel(
         setLoading(true);
         setError(null);
 
-        const enhancedPageData = { ...page, globalWidgets };
+        const enhancedPageData = { ...page, globalWidgets, sharedAreas };
         const { token } = await fetchPreviewToken(enhancedPageData, themeSettings, runtimeMode);
         setPreviewSrc(buildPreviewUrl(token));
 
@@ -292,6 +306,7 @@ const PreviewPanel = forwardRef(function PreviewPanel(
           page,
           widgets,
           globalWidgets,
+          sharedAreas,
           themeSettings,
           selectedWidgetId,
           selectedBlockId,
@@ -313,6 +328,7 @@ const PreviewPanel = forwardRef(function PreviewPanel(
     activeProject?.id,
     loadedProjectId,
     globalWidgets,
+    sharedAreas,
     themeSettings,
     widgets,
     selectedWidgetId,
@@ -332,6 +348,7 @@ const PreviewPanel = forwardRef(function PreviewPanel(
       JSON.stringify(page) !== JSON.stringify(previousState?.page) ||
       JSON.stringify(widgets) !== JSON.stringify(previousState?.widgets) ||
       JSON.stringify(globalWidgets) !== JSON.stringify(previousState?.globalWidgets) ||
+      JSON.stringify(sharedAreas) !== JSON.stringify(previousState?.sharedAreas) ||
       JSON.stringify(themeSettings) !== JSON.stringify(previousState?.themeSettings);
 
     if (!contentChanged) {
@@ -339,6 +356,7 @@ const PreviewPanel = forwardRef(function PreviewPanel(
         page,
         widgets,
         globalWidgets,
+        sharedAreas,
         themeSettings,
         selectedWidgetId,
         selectedBlockId,
@@ -347,7 +365,7 @@ const PreviewPanel = forwardRef(function PreviewPanel(
       return;
     }
 
-    const newState = { page, widgets, globalWidgets, themeSettings };
+    const newState = { page, widgets, globalWidgets, sharedAreas, themeSettings };
     const { isStructural } = detectChangeType(newState, previousState);
 
     // Immediate visual feedback for simple setting changes (text/images)
@@ -478,7 +496,7 @@ const PreviewPanel = forwardRef(function PreviewPanel(
           // STRUCTURAL CHANGE: Full page reload
           console.log("[Preview] FULL PAGE RELOAD (structural change)");
 
-          const enhancedPageData = { ...page, globalWidgets };
+          const enhancedPageData = { ...page, globalWidgets, sharedAreas };
           const { token } = await fetchPreviewToken(enhancedPageData, themeSettings, runtimeMode);
           setPreviewSrc(buildPreviewUrl(token));
           // PREVIEW_READY handler will restore scroll + ungate SelectionOverlay
@@ -497,6 +515,7 @@ const PreviewPanel = forwardRef(function PreviewPanel(
           const updateState = {
             widgets,
             globalWidgets,
+            sharedAreas,
             themeSettings,
             selectedWidgetId,
             selectedGlobalWidgetId,
@@ -517,7 +536,7 @@ const PreviewPanel = forwardRef(function PreviewPanel(
         console.error("Preview update error:", err);
         // Fallback to full reload on any error
         try {
-          const enhancedPageData = { ...page, globalWidgets };
+          const enhancedPageData = { ...page, globalWidgets, sharedAreas };
           const { token } = await fetchPreviewToken(enhancedPageData, themeSettings, runtimeMode);
           setPreviewSrc(buildPreviewUrl(token));
         } catch (fallbackErr) {
@@ -529,6 +548,7 @@ const PreviewPanel = forwardRef(function PreviewPanel(
         page,
         widgets,
         globalWidgets,
+        sharedAreas,
         themeSettings,
         selectedWidgetId,
         selectedBlockId,
@@ -542,6 +562,7 @@ const PreviewPanel = forwardRef(function PreviewPanel(
     page,
     widgets,
     globalWidgets,
+    sharedAreas,
     themeSettings,
     schemas,
     selectedWidgetId,

@@ -39,6 +39,7 @@
     <main id="main-content" class="main-content">
       {{ main_content | raw }}
     </main>
+    {{ shared_areas.before_footer | raw }}
     {{ footer | raw }}
     
     {% asset src: "scripts.js", defer: true %}

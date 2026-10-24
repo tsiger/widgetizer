@@ -1,6 +1,6 @@
 # Shared widget areas — build plan for the first version
 
-**Status: plan, not built.** Scope agreed on 2026-10-22 (owner, Claude, Codex). The idea and its open questions are in [future-shared-widget-areas.md](future-shared-widget-areas.md). GitHub: [#163](https://github.com/tsiger/widgetizer/issues/163), milestone OSS - 1.0.0.
+**Status: built on the 1.0.0 branch (all eight steps), not yet released.** Scope agreed on 2026-10-22 (owner, Claude, Codex). The idea and its open questions are in [future-shared-widget-areas.md](future-shared-widget-areas.md). GitHub: [#163](https://github.com/tsiger/widgetizer/issues/163), milestone OSS - 1.0.0.
 
 ## What the first version is
 
@@ -37,8 +37,8 @@ Each step ends with its tests passing and is reviewable on its own. Codex review
 - `builder-server/src/services/sharedAreaService.js` (new), scope-first through the storage adapter: `readArea(storage, scope, id, lang)` (missing → empty, unreadable → throws), `listAreas(storage, scope, lang)` (declared areas with their content, plus retained ones).
 - `projectContentFs.js`: `readAreasFromDir(projectDir, lang)` for render and export, alongside `readGlobalWidgetFromDir`.
 - Routes (new `routes/sharedAreas.js`, registered in `setupBuilderServer.js`): `GET /api/shared-areas?language=` returns `{ declared: [{ id, label, shown: true }], retained: [{ id }], areas: { <id>: { widgets, widgetsOrder } } }`; `PUT /api/shared-areas/:id` saves one area.
-- The save mirrors `persistPageInSection`: inside `withContentWriteLock`, `assertLanguageStillEnabled`, `assertIntroducedMediaExists` against the previous file, the widget ceiling, refusal of `listing_anchor`/`paginate`, `storage.write(areaKey(...))`, then media usage (a usage failure is a warning, as for pages). Saving an undeclared, never-saved id is refused, and so is a `core-form` widget.
-- `mediaUsageService.js`: `extractMediaPathsFromArea`, `updateAreaMediaUsage`, `removeAreaFromMediaUsage`, and areas in `refreshAllMediaUsageFromDir`. `editor-ui/src/utils/mediaUsageDisplay.js`: `area:<lang>:<id>` reads as "Before footer — Greek".
+- The save mirrors `persistPageInSection`: inside `withContentWriteLock`, `assertLanguageStillEnabled`, `assertIntroducedMediaExists` against the previous file, the widget ceiling, refusal of `listing_anchor`/`paginate`, `storage.write(areaKey(...))`, then media usage (a usage failure is a warning, as for pages). Only an area the theme declares can be saved (a retained one stays as it is until the theme shows it again), and a `core-form` widget is refused.
+- `mediaUsageService.js`: `extractMediaPathsFromArea`, `updateAreaMediaUsage`, `removeAreaFromMediaUsage`, and areas in `refreshAllMediaUsageFromDir`. `editor-ui/src/utils/mediaUsageDisplay.js`: `area:<root|lang>:<id>` reads as "Before footer (Shared area, Ελληνικά)", like the header's "(Global, Ελληνικά)".
 - Tests (`sharedAreas.test.js`): round-trip, missing vs unreadable, refused roles and forms, ceiling, removed language, introduced missing media, retained area listed, an image used only in an area counts as in use and survives a usage refresh.
 
 ### 3. Rendering

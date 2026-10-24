@@ -20,6 +20,7 @@ import { Hash, TokenKind, toValueSync } from "liquidjs";
 import { createLiquidEngine } from "@widgetizer/render-engine";
 import { splitAssetRef } from "@widgetizer/core/assetUrl";
 import { isValidLanguageCode } from "@widgetizer/core/languages";
+import { readAreaDeclarations, areaWidgetProblem } from "@widgetizer/core/sharedAreas";
 import { validateCollectionSchema } from "../packages/builder-server/src/services/collectionService.js";
 import { isNewerVersion, sortVersions } from "../packages/builder-server/src/utils/semver.js";
 import { sanitizeVideoPath } from "../packages/builder-server/src/services/sanitizationService.js";
@@ -308,6 +309,7 @@ export function validateTheme(dir) {
     collections: new Map(), // type → { schema, fields: Map(id → setting) }
     imageSizes: new Set(contract.imageSizes),
     usesEnqueue: false,
+    areas: new Set(), // shared area ids declared in theme.json
   };
 
   // ---------------------------------------------------------------------------
@@ -985,7 +987,8 @@ export function validateTheme(dir) {
       ["escape", "escape_once", "strip_html", "rte_text", "url_encode", "handleize"].includes(filter),
     );
 
-    if (context.kind === "layout" && ["header", "main_content", "footer"].includes(base) && !isRaw) {
+    const isArea = /^shared_areas\.\w+$/.test(base);
+    if (context.kind === "layout" && (["header", "main_content", "footer"].includes(base) || isArea) && !isRaw) {
       error(file, "layout-raw", `${at(output.line)}{{ ${base} }} is rendered HTML; print it with {{ ${base} | raw }}.`);
     }
 
@@ -1085,6 +1088,9 @@ export function validateTheme(dir) {
     if (isObject(settings?.imageSizes)) {
       theme.imageSizes = new Set(["thumb", ...Object.keys(settings.imageSizes)]);
     }
+    const declarations = readAreaDeclarations(manifest);
+    for (const problem of declarations.problems) error(file, "shared-areas", problem);
+    theme.areas = new Set(declarations.areas.map((area) => area.id));
     checkLabelKeys(file, manifest);
   }
 
@@ -1680,6 +1686,42 @@ export function validateTheme(dir) {
         error(file, "unknown-widget-type", `There is no widgets/global/${type}/ to render this.`);
       else checkWidgetInstance(file, type, instance, pageSlugs, menuIds, { global: true });
     }
+
+    // Starting content for shared areas: one ordered widget list per area.
+    const areasDir = path.join(dir, "global", "areas");
+    for (const name of listFiles(areasDir, ".json")) {
+      const file = path.join(areasDir, name);
+      const id = name.replace(/\.json$/, "");
+      if (!theme.areas.has(id))
+        warn(
+          file,
+          "shared-areas",
+          `theme.json declares no shared area "${id}", so this starting content is never used.${didYouMean(id, theme.areas)}`,
+        );
+      const area = readJson(file);
+      if (!isObject(area)) continue;
+      const widgets = area.widgets ?? {};
+      const order = area.widgetsOrder ?? [];
+      if (!isObject(widgets) || !Array.isArray(order)) {
+        error(
+          file,
+          "template-shape",
+          'A shared area holds "widgets" (an object keyed by widget id) and "widgetsOrder" (an array of those ids).',
+        );
+        continue;
+      }
+      for (const widgetId of order) {
+        if (!Object.hasOwn(widgets, widgetId))
+          error(file, "template-shape", `widgetsOrder lists "${widgetId}", which is not in "widgets".`);
+      }
+      for (const [widgetId, instance] of Object.entries(widgets)) {
+        if (!order.includes(widgetId))
+          warn(file, "template-shape", `Widget "${widgetId}" is not in widgetsOrder, so it will not render.`);
+        const problem = areaWidgetProblem(instance);
+        if (problem) error(file, "shared-areas", `widget "${widgetId}": ${problem}`);
+        else checkWidgetInstance(file, widgetId, instance, pageSlugs, menuIds);
+      }
+    }
     return pageSlugs;
   }
 
@@ -1707,6 +1749,27 @@ export function validateTheme(dir) {
     }
     if (!prints("body_class"))
       warn(file, "layout", 'Add class="{{ body_class }}" to <body>; the app uses it for page and state classes.');
+    const printedAreas = new Set(
+      outputs
+        .map((output) => maskStrings(output.body).split("|")[0].trim().match(/^shared_areas\.(\w+)$/)?.[1])
+        .filter(Boolean),
+    );
+    for (const id of theme.areas) {
+      if (!printedAreas.has(id))
+        warn(
+          file,
+          "shared-areas",
+          `theme.json declares the shared area "${id}" but the layout never prints {{ shared_areas.${id} | raw }}, so its content never shows.`,
+        );
+    }
+    for (const id of printedAreas) {
+      if (!theme.areas.has(id))
+        warn(
+          file,
+          "shared-areas",
+          `The layout prints shared_areas.${id}, but theme.json declares no such area, so it is always empty.${didYouMean(id, theme.areas)}`,
+        );
+    }
     if (!hasTag("seo"))
       warn(file, "layout", "Add {% seo %} in <head>; it prints the title, meta, canonical and structured data.");
     if (!hasTag("header_assets") || !hasTag("footer_assets")) {

@@ -854,3 +854,58 @@ echo local_title
     assert.deepEqual(validateTheme(STARTER_DIR).findings, []);
   });
 });
+
+describe("shared areas in a theme", () => {
+  const declare = (dir, areas = [{ id: "before_footer", label: "Before footer" }]) =>
+    editJson(path.join(dir, "theme.json"), (json) => {
+      json.sharedAreas = areas;
+    });
+  const place = (dir, output = "{{ shared_areas.before_footer | raw }}") =>
+    edit(path.join(dir, "layout.liquid"), (text) => text.replace("{{ footer | raw }}", `${output}\n    {{ footer | raw }}`));
+  const startWith = (dir, area) => fs.outputJson(path.join(dir, "templates/global/areas/before_footer.json"), area);
+  const rulesOf = (findings) => findings.map((finding) => `${finding.level}:${finding.rule}`);
+
+  it("accepts a declared, placed area with valid starting content", async () => {
+    const findings = await findingsAfter("area-valid", async (dir) => {
+      await declare(dir);
+      await place(dir);
+      await startWith(dir, { widgets: { w1: { type: "hero", settings: {} } }, widgetsOrder: ["w1"] });
+    });
+    assert.deepEqual(findings, []);
+  });
+
+  it("refuses a bad declaration", async () => {
+    const findings = await findingsAfter("area-bad-id", (dir) => declare(dir, [{ id: "Before-Footer", label: "x" }]));
+    assert.ok(hasError(findings, "shared-areas"), JSON.stringify(findings));
+  });
+
+  it("warns when a declared area is never placed, or the layout places an undeclared one", async () => {
+    const unplaced = await findingsAfter("area-unplaced", (dir) => declare(dir));
+    assert.deepEqual(rulesOf(unplaced), ["warning:shared-areas"]);
+    const undeclared = await findingsAfter("area-undeclared", (dir) => place(dir));
+    assert.deepEqual(rulesOf(undeclared), ["warning:shared-areas"]);
+  });
+
+  it("requires | raw when the layout prints an area", async () => {
+    const findings = await findingsAfter("area-not-raw", async (dir) => {
+      await declare(dir);
+      await place(dir, "{{ shared_areas.before_footer }}");
+    });
+    assert.ok(hasError(findings, "layout-raw"), JSON.stringify(findings));
+  });
+
+  it("refuses a form or a page-only listing role in starting content, and checks widgets like a page's", async () => {
+    for (const [name, widget, rule] of [
+      ["area-form", { type: "core-form", settings: {} }, "shared-areas"],
+      ["area-role", { type: "hero", settings: { paginate: true } }, "shared-areas"],
+      ["area-unknown", { type: "invented", settings: {} }, "unknown-widget-type"],
+    ]) {
+      const findings = await findingsAfter(name, async (dir) => {
+        await declare(dir);
+        await place(dir);
+        await startWith(dir, { widgets: { w1: widget }, widgetsOrder: ["w1"] });
+      });
+      assert.ok(hasError(findings, rule), `${name}: ${JSON.stringify(findings)}`);
+    }
+  });
+});

@@ -6,6 +6,7 @@ import pagesRoutes from "./routes/pages.js";
 import menusRoutes from "./routes/menus.js";
 import mediaRoutes from "./routes/media.js";
 import previewRoutes from "./routes/preview.js";
+import sharedAreasRoutes from "./routes/sharedAreas.js";
 import exportRoutes from "./routes/export.js";
 import widgetsRoutes from "./routes/widgets.js";
 import iconsRoutes from "./routes/icons.js";
@@ -86,6 +87,7 @@ export function setupBuilderServer({ adapters, plugins = [] } = {}) {
   projectScopedRouter.use("/menus", menusRoutes);
   projectScopedRouter.use("/media", mediaRoutes);
   projectScopedRouter.use("/preview", previewRoutes);
+  projectScopedRouter.use("/shared-areas", sharedAreasRoutes);
   projectScopedRouter.use("/export", exportRoutes);
   projectScopedRouter.use("/widgets", widgetsRoutes);
   projectScopedRouter.use("/icons", iconsRoutes);

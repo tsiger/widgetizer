@@ -386,6 +386,7 @@ The `layout.liquid` template has access to additional objects that individual wi
 - `{{ header }}`: Rendered header content
 - `{{ main_content }}`: Rendered main page content
 - `{{ footer }}`: Rendered footer content
+- `{{ shared_areas.<id> }}`: Rendered content of a shared area the theme declares (see [Shared Areas](#shared-areas)); empty when the area is
 - `{{ body_class }}`: Dynamic CSS classes for the body element (page slugs are prefixed with `page-`, e.g., `page-about`)
 
 The layout also gets these, which every widget (header and footer included) and every collection item template see too:
@@ -1351,6 +1352,29 @@ Global widgets are special widgets that appear on every page of the website. Cur
 - Paired with `templates/global/footer.json` for default configuration
 
 **Important:** Header and footer are the only supported global widget types. Each global widget requires both a schema + template in `widgets/global/{name}/` and a corresponding JSON configuration in `templates/global/`. Global widgets support the full blocks system — block types, `maxBlocks`, `defaultBlocks`, and `blocksOrder`/`blocks` data — identical to page widgets.
+
+### Shared Areas
+
+A shared area is a named place in the layout that the site owner fills with ordinary widgets, shared by every page of one language. Declare areas in `theme.json` and print each in `layout.liquid`:
+
+```json
+"sharedAreas": [{ "id": "before_footer", "label": "tTheme:areas.before_footer" }]
+```
+
+```liquid
+</main>
+{{ shared_areas.before_footer | raw }}
+{{ footer | raw }}
+```
+
+- The `id` (`^[a-z][a-z0-9_]*$`) is the area's lasting identity: content is saved under it. The `label` (a `tTheme:` key or plain text) can change freely. The list order is the editor's order.
+- An empty area prints nothing, so any spacing or decoration must come from the widgets in it, not from markup around the output.
+- Widgets in an area render with `widget.index` null (an area widget is never the page's first section, so it never takes the page's main heading) and `widget.area` set to the area id. They see the current page's `page`, menus and links like any widget.
+- Areas cannot hold `core-form`, and a listing widget there cannot be the collection's main listing or split into pages.
+- Optional starting content goes in `templates/global/areas/<id>.json` as `{ "widgets": {…}, "widgetsOrder": […] }`; a preset can supply its own. It is copied when a site is created, and a theme update adds it only where a site has no content for that area yet, so an area the owner emptied stays empty.
+- Removing an area from a theme stops showing it; sites keep its content, and it reappears if the same id is declared again.
+
+Arch declares `before_footer`, placed between the page content and the footer, with no starting content. See [Shared areas](domain/entities/shared-area.md) for the full behavior.
 
 ## 7. Widget Blocks System
 

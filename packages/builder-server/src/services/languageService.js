@@ -1,6 +1,8 @@
 import { randomUUID } from "crypto";
 import { isValidLanguageCode, normalizeLanguageCode } from "@widgetizer/core/languages";
 import {
+  areaKey,
+  areasDir,
   globalKey,
   globalsDir,
   itemKey,
@@ -17,6 +19,8 @@ import { listCollectionSchemas } from "./collectionService.js";
 import {
   updateGlobalWidgetMediaUsage,
   removeGlobalWidgetFromMediaUsage,
+  updateAreaMediaUsage,
+  removeAreaFromMediaUsage,
   removePageFromMediaUsage,
   removeCollectionItemFromMediaUsage,
   syncPageMediaUsageOnWrite,
@@ -24,6 +28,7 @@ import {
 } from "./mediaUsageService.js";
 import { deleteMediaTranslationsForLanguage } from "../db/repositories/mediaRepository.js";
 import { clearDeletedReferencesInSection } from "../utils/linkEnrichment.js";
+import { readDeclaredAreas } from "./sharedAreaService.js";
 
 const GLOBAL_TYPES = ["header", "footer"];
 
@@ -113,7 +118,11 @@ async function readSeedSource(storage, scope, key, what) {
  * Checking as it goes would let a corrupt English header stop a run that had
  * already created the Greek menus: a half-seeded language nobody asked for.
  */
-async function assertSeedIsSafe(storage, scope, lang, menuIds) {
+async function assertSeedIsSafe(storage, scope, lang, menuIds, areaIds) {
+  for (const id of areaIds) {
+    await readSeedTarget(storage, scope, areaKey(id, lang));
+    await readSeedSource(storage, scope, areaKey(id), `The site's "${id}" shared area`);
+  }
   for (const id of menuIds) {
     await readSeedSource(storage, scope, menuKey(id), "A menu this language would be given");
     await readSeedTarget(storage, scope, menuKey(id, lang));
@@ -196,6 +205,24 @@ function menuSettingIds(schema) {
 
 const remapped = (value, menuRefs) => (typeof value === "string" && menuRefs.has(value) ? menuRefs.get(value) : value);
 
+/** A widget whose menu selections, top level and in blocks, point at the new language's copies. */
+function withRemappedMenus(widget, schema, menuRefs) {
+  const menuIds = menuSettingIds(schema);
+  const settings = { ...(widget.settings || {}) };
+  for (const id of menuIds.settings) {
+    if (id in settings) settings[id] = remapped(settings[id], menuRefs);
+  }
+  const blocks = {};
+  for (const [blockId, block] of Object.entries(widget.blocks || {})) {
+    const blockSettings = { ...(block?.settings || {}) };
+    for (const id of menuIds.blocks.get(block?.type) || []) {
+      if (id in blockSettings) blockSettings[id] = remapped(blockSettings[id], menuRefs);
+    }
+    blocks[blockId] = { ...block, settings: blockSettings };
+  }
+  return { ...widget, settings, blocks };
+}
+
 /**
  * Give the new language a header and footer, pointed at the menus above. This
  * writes scaffolding we generate, not the author's links: the page references
@@ -219,27 +246,43 @@ async function seedGlobals(storage, scope, lang, menuRefs) {
     // Preflight has already proven this readable, so a parse error here would
     // be a real surprise rather than a missing file.
     const schema = await readJson(storage, scope, `widgets/global/${widget.type || type}/schema.json`);
-    const menuIds = menuSettingIds(schema);
-
-    const settings = { ...(widget.settings || {}) };
-    for (const id of menuIds.settings) {
-      if (id in settings) settings[id] = remapped(settings[id], menuRefs);
-    }
-
-    const blocks = {};
-    for (const [blockId, block] of Object.entries(widget.blocks || {})) {
-      const blockSettings = { ...(block?.settings || {}) };
-      for (const id of menuIds.blocks.get(block?.type) || []) {
-        if (id in blockSettings) blockSettings[id] = remapped(blockSettings[id], menuRefs);
-      }
-      blocks[blockId] = { ...block, settings: blockSettings };
-    }
-
-    const copy = { ...widget, settings, blocks };
+    const copy = withRemappedMenus(widget, schema, menuRefs);
     await storage.write(scope, globalKey(type, lang), JSON.stringify(copy, null, 2));
     // The copy holds the same images as its source; without its own usage rows
     // clearing the source's would mark them unused while this one still shows them.
     await updateGlobalWidgetMediaUsage(scope.projectId, type, copy, lang);
+  }
+}
+
+/**
+ * Give the new language its shared areas: a copy of each declared area's default
+ * language content, menus pointed at the copies above, as for the header. An area
+ * never filled in the default language stays empty. An existing one is kept, as
+ * the globals are, with its media usage refreshed.
+ */
+async function seedAreas(storage, scope, lang, menuRefs, areaIds) {
+  for (const id of areaIds) {
+    const existing = await readSeedTarget(storage, scope, areaKey(id, lang));
+    if (existing) {
+      await updateAreaMediaUsage(scope.projectId, id, existing, lang);
+      continue;
+    }
+    const area = await readJson(storage, scope, areaKey(id));
+    if (!area?.widgets) continue;
+
+    const widgets = {};
+    for (const [widgetId, widget] of Object.entries(area.widgets)) {
+      // Each widget's own schema says which settings name a menu. Core widgets
+      // select no menus, and a widget whose schema cannot be read keeps its own.
+      let schema = null;
+      if (typeof widget?.type === "string" && !widget.type.startsWith("core-")) {
+        schema = await readJson(storage, scope, `widgets/${widget.type}/schema.json`).catch(() => null);
+      }
+      widgets[widgetId] = schema ? withRemappedMenus(widget, schema, menuRefs) : widget;
+    }
+    const copy = { ...area, widgets };
+    await storage.write(scope, areaKey(id, lang), JSON.stringify(copy, null, 2));
+    await updateAreaMediaUsage(scope.projectId, id, copy, lang);
   }
 }
 
@@ -274,10 +317,12 @@ export async function addLanguage({ storage, scope, project, code }) {
   const menuIds = (await storage.list(scope, menusDir()))
     .filter((name) => name.endsWith(".json"))
     .map((name) => name.replace(/\.json$/, ""));
+  const areaIds = (await readDeclaredAreas(storage, scope)).map((area) => area.id);
   // Read everything the seed could touch before it touches any of it.
-  await assertSeedIsSafe(storage, scope, lang, menuIds);
+  await assertSeedIsSafe(storage, scope, lang, menuIds, areaIds);
   const menuRefs = await seedMenus(storage, scope, lang, menuIds);
   await seedGlobals(storage, scope, lang, menuRefs);
+  await seedAreas(storage, scope, lang, menuRefs, areaIds);
 
   return { languages: [...languages, language] };
 }
@@ -342,7 +387,7 @@ export async function countLanguageContent({ storage, scope, project, code }) {
  * left to account for. A file that is gone is skipped, and a failure to rebuild
  * one row is logged rather than replacing the error that brought us here.
  */
-async function restoreUsageOfSurvivors(storage, scope, lang, { items, pages, globalTypes }) {
+async function restoreUsageOfSurvivors(storage, scope, lang, { items, pages, globalTypes, areaIds }) {
   const restore = async (key, sync) => {
     try {
       const content = await readJson(storage, scope, key);
@@ -362,6 +407,9 @@ async function restoreUsageOfSurvivors(storage, scope, lang, { items, pages, glo
     await restore(globalKey(type, lang), (widget) =>
       updateGlobalWidgetMediaUsage(scope.projectId, type, widget, lang),
     );
+  }
+  for (const id of areaIds) {
+    await restore(areaKey(id, lang), (area) => updateAreaMediaUsage(scope.projectId, id, area, lang));
   }
 }
 
@@ -402,6 +450,9 @@ export async function removeLanguage({ storage, scope, project, code }) {
   const globalTypes = (await jsonNames(storage, scope, globalsDir(lang))).map((name) =>
     name.replace(/\.json$/, ""),
   );
+  // Every saved area, including ones the theme no longer shows: they are this
+  // language's content too.
+  const areaIds = (await jsonNames(storage, scope, areasDir(lang))).map((name) => name.replace(/\.json$/, ""));
   // Menus need their uuids read up front too: a widget selects a menu BY uuid, so
   // clearing those selections afterwards needs an identity the deleted file no
   // longer has.
@@ -475,6 +526,11 @@ export async function removeLanguage({ storage, scope, project, code }) {
       await storage.delete(scope, globalKey(type, lang));
     }
 
+    for (const id of areaIds) {
+      await removeAreaFromMediaUsage(scope.projectId, id, lang);
+      await storage.delete(scope, areaKey(id, lang));
+    }
+
     for (const { key, uuid } of menus) {
       await storage.delete(scope, key);
       if (uuid) deletedMenuUuids.push(uuid);
@@ -489,7 +545,7 @@ export async function removeLanguage({ storage, scope, project, code }) {
     // for good either way — and leave every other reference alone for the retry.
     // Before the usage rebuild, so it reads the content as it will finally be.
     await clearReferences();
-    await restoreUsageOfSurvivors(storage, scope, lang, { items, pages, globalTypes });
+    await restoreUsageOfSurvivors(storage, scope, lang, { items, pages, globalTypes, areaIds });
     throw error;
   }
 

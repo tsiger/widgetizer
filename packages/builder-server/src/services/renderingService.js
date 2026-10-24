@@ -20,6 +20,7 @@
 import {
   renderWidget as engineRenderWidget,
   renderPageLayout as engineRenderPageLayout,
+  renderSharedAreas as engineRenderSharedAreas,
   renderCollectionItemPage as engineRenderCollectionItemPage,
   renderEnqueuedAssetTags,
   widgetSupportsTransparentHeader as engineWidgetSupportsTransparentHeader,
@@ -247,9 +248,23 @@ async function renderWidget(
   sharedGlobals = null,
   index = null,
   collectionDeps = null,
+  placement = {},
 ) {
   const deps = await buildRenderDeps(projectId, collectionDeps);
-  return engineRenderWidget(deps, widgetId, widgetData, rawThemeSettings, renderMode, sharedGlobals, index);
+  return engineRenderWidget(deps, widgetId, widgetData, rawThemeSettings, renderMode, sharedGlobals, index, placement);
+}
+
+/** Render a page's shared areas for its layout; see the engine's renderSharedAreas. */
+async function renderSharedAreas(
+  projectId,
+  areasById,
+  rawThemeSettings,
+  renderMode = "preview",
+  sharedGlobals = null,
+  collectionDeps = null,
+) {
+  const deps = await buildRenderDeps(projectId, collectionDeps);
+  return engineRenderSharedAreas(deps, areasById, rawThemeSettings, renderMode, sharedGlobals);
 }
 
 async function renderPageLayout(
@@ -288,7 +303,7 @@ async function widgetSupportsTransparentHeader(projectId, widgetType) {
  * resolution/page-shaping helpers so the engine stays free of backend imports.
  * @param {string} projectId
  * @param {object} args - schema/item/template/rawThemeSettings/renderMode/
- *   sharedGlobals/headerData/footerData/projectData/siteUrl
+ *   sharedGlobals/headerData/footerData/areasData/projectData/siteUrl
  * @param {{ storage: object, scope: object }|null} collectionDeps
  */
 async function renderCollectionItemPage(projectId, args, collectionDeps = null) {
@@ -317,6 +332,7 @@ function renderCollectionItemPageWithDeps(deps, args) {
 export {
   renderWidget,
   renderPageLayout,
+  renderSharedAreas,
   renderCollectionItemPage,
   renderCollectionItemPageWithDeps,
   renderEnqueuedAssetTags,

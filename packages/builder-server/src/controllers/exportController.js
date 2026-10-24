@@ -9,6 +9,7 @@ import { handleProjectResolutionError } from "../utils/projectErrors.js";
 import {
   renderWidget,
   renderPageLayout,
+  renderSharedAreas,
   renderCollectionItemPage,
   widgetSupportsTransparentHeader,
   planPagination,
@@ -19,7 +20,12 @@ import {
   loadCollectionTemplate,
   loadCollectionItemsByUuid,
 } from "../services/collectionService.js";
-import { listPagesFromDir, readGlobalWidgetFromDir, readThemeDataFromDir } from "../utils/projectContentFs.js";
+import {
+  listPagesFromDir,
+  readAreasFromDir,
+  readGlobalWidgetFromDir,
+  readThemeDataFromDir,
+} from "../utils/projectContentFs.js";
 import * as projectRepo from "../db/repositories/projectRepository.js";
 import { formatHtml, validateHtml, generateIssuesReport } from "../utils/htmlProcessor.js";
 import { buildSitemap, buildRobotsTxt } from "../services/seoArtifacts.js";
@@ -600,10 +606,14 @@ export async function exportProjectToDir(projectId, options = {}, collectionDeps
       globalsByLanguage.set(language, {
         header: await readGlobalWidgetFromDir(projectDir, "header", lang),
         footer: await readGlobalWidgetFromDir(projectDir, "footer", lang),
+        // Read once per language, like the header: every page of the export shows
+        // the same saved areas even if one is edited meanwhile. Rendered per page,
+        // since active menu items and relative links depend on the page.
+        areas: await readAreasFromDir(projectDir, lang),
       });
     }
     const globalsFor = (language) =>
-      globalsByLanguage.get(resolveLanguage(language, defaultLanguage)) || { header: null, footer: null };
+      globalsByLanguage.get(resolveLanguage(language, defaultLanguage)) || { header: null, footer: null, areas: {} };
 
     // Handle case where no pages are found (except for theme files etc)
     if (pagesDataArray.length === 0) {
@@ -641,7 +651,7 @@ export async function exportProjectToDir(projectId, options = {}, collectionDeps
 
     for (const { pageData, plan, pageNumber } of pageRenders) {
       const outputFilename = pageOutputPath(pageData.id, pageNumber, pageLang(pageData));
-      const { header: pageHeaderData, footer: pageFooterData } = globalsFor(pageData.language);
+      const { header: pageHeaderData, footer: pageFooterData, areas: pageAreasData } = globalsFor(pageData.language);
       // Per page, not per export: a language with no header of its own must
       // render none, not the last page's — whose links were built for that
       // page's depth and language.
@@ -709,6 +719,15 @@ export async function exportProjectToDir(projectId, options = {}, collectionDeps
         footerHtml = await renderWidget(projectId, "footer", pageFooterData, rawThemeSettings, "publish", sharedGlobals, null, renderCollectionDeps);
       }
 
+      const sharedAreas = await renderSharedAreas(
+        projectId,
+        pageAreasData,
+        rawThemeSettings,
+        "publish",
+        sharedGlobals,
+        renderCollectionDeps,
+      );
+
       // Determine if transparent header should be active for this page
       let extraBodyClasses = "";
       if (pageHeaderData?.settings?.transparent_on_hero) {
@@ -727,6 +746,7 @@ export async function exportProjectToDir(projectId, options = {}, collectionDeps
           headerContent: headerHtml,
           mainContent: pageWidgetsHtml,
           footerContent: footerHtml,
+          sharedAreas,
           extraBodyClasses,
         },
         pageData,
@@ -869,7 +889,7 @@ Per aspera ad astra
         // language's item pages wear that language's header and footer.
         for (const language of exportLanguages) {
           const lang = { language, defaultLanguage };
-          const { header: itemHeaderData, footer: itemFooterData } = globalsFor(language);
+          const { header: itemHeaderData, footer: itemFooterData, areas: itemAreasData } = globalsFor(language);
           const validItems = itemsByLanguage.get(language) || [];
           if (validItems.length === 0) continue;
 
@@ -914,6 +934,7 @@ Per aspera ad astra
                 sharedGlobals,
                 headerData: itemHeaderData,
                 footerData: itemFooterData,
+                areasData: itemAreasData,
                 projectData,
                 siteUrl,
               },

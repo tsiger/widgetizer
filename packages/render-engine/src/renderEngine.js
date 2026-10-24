@@ -1119,6 +1119,7 @@ async function createBaseRenderContext(deps, rawThemeSettings, renderMode = "pre
  * @param {string} [renderMode='preview'] - Render mode: 'preview' for dev server URLs, 'publish' for relative paths
  * @param {object} [sharedGlobals=null] - Optional shared globals to preserve enqueued assets across widgets
  * @param {number} [index=null] - Optional 1-based index of the widget in the page
+ * @param {{ area?: string }} [placement] - The shared area the widget belongs to, if any
  * @returns {Promise<string>} Rendered HTML string, or error HTML if rendering fails
  */
 async function renderWidget(
@@ -1129,6 +1130,7 @@ async function renderWidget(
   renderMode = "preview",
   sharedGlobals = null,
   index = null,
+  { area = null } = {},
 ) {
   try {
     const { type, settings = {}, blocks = {}, blocksOrder = [] } = widgetData;
@@ -1378,6 +1380,9 @@ async function renderWidget(
       blocks: resolvedWidgetData.blocks,
       blocksOrder: blocksOrder || [],
       index: index, // 1-based index of widget in page (null for global widgets or when not provided)
+      // The shared area holding this widget, else null. Area widgets have no index:
+      // themes use `index == 1` for the page's main heading, which an area never is.
+      area,
     };
 
     // Merge with widget-specific context
@@ -1507,6 +1512,8 @@ async function renderPageLayout(
       header: contentSections.headerContent || "",
       main_content: contentSections.mainContent || "",
       footer: contentSections.footerContent || "",
+      // `{{ shared_areas.<id> | raw }}`; an area this page has none of renders nothing.
+      shared_areas: contentSections.sharedAreas || {},
       page: pageContextFor(
         pageData,
         breadcrumbs,
@@ -1567,6 +1574,38 @@ async function renderPageLayout(
  * @param {Function} args.buildItemPageData - collectionService.buildCollectionItemPageData
  * @returns {Promise<{ html: string, mainContentHtml: string, itemPageData: object, resolvedItem: object }>}
  */
+/**
+ * Renders a page's shared areas, each an ordered list of ordinary widgets, for the
+ * layout's `shared_areas`. Call after the page context is in `sharedGlobals`, so area
+ * widgets see the page they are on (menus, breadcrumbs, translations, links), and
+ * before the layout, so their enqueued assets are emitted with the page's.
+ * @param {RenderDeps} deps
+ * @param {Record<string, { widgets?: object, widgetsOrder?: string[] }>|null} areasById
+ * @returns {Promise<Record<string, string>>} Rendered HTML per area id
+ */
+async function renderSharedAreas(deps, areasById, rawThemeSettings, renderMode = "preview", sharedGlobals = null) {
+  const rendered = {};
+  for (const [areaId, area] of Object.entries(areasById || {})) {
+    const widgets = area?.widgets || {};
+    const order = Array.isArray(area?.widgetsOrder) ? area.widgetsOrder : Object.keys(widgets);
+    let html = "";
+    for (const widgetId of order) {
+      const widget = widgets[widgetId];
+      if (!widget?.type) continue;
+      html += await renderWidget(deps, widgetId, widget, rawThemeSettings, renderMode, sharedGlobals, null, {
+        area: areaId,
+      });
+    }
+    // The editor's preview finds an area, empty or not, by this wrapper, and
+    // `display: contents` keeps it out of the theme's layout. Area ids are plain
+    // (`^[a-z][a-z0-9_]*$`), so one is safe in an attribute. Published pages get
+    // the widgets alone, and an empty area nothing at all.
+    rendered[areaId] =
+      renderMode === "preview" ? `<div data-shared-area="${areaId}" style="display: contents">${html}</div>` : html;
+  }
+  return rendered;
+}
+
 async function renderCollectionItemPage(
   deps,
   {
@@ -1578,6 +1617,7 @@ async function renderCollectionItemPage(
     sharedGlobals,
     headerData,
     footerData,
+    areasData,
     projectData,
     siteUrl,
     prepareItem,
@@ -1668,6 +1708,7 @@ async function renderCollectionItemPage(
   if (footerData) {
     footerContent = await renderWidget(deps, "footer", footerData, rawThemeSettings, renderMode, sharedGlobals, null);
   }
+  const sharedAreas = await renderSharedAreas(deps, areasData, rawThemeSettings, renderMode, sharedGlobals);
 
   // Render the collection type's template.liquid against the item context.
   const themeSnippetsDir = path.join(deps.projectDir, "snippets");
@@ -1690,6 +1731,7 @@ async function renderCollectionItemPage(
       headerContent,
       mainContent: mainContentHtml,
       footerContent,
+      sharedAreas,
       bodyClass: `collection-${schema.type} item-${resolvedItem.slug}`,
     },
     itemPageData,
@@ -1774,6 +1816,7 @@ async function widgetSupportsTransparentHeader(deps, widgetType) {
 export {
   renderWidget,
   renderPageLayout,
+  renderSharedAreas,
   renderCollectionItemPage,
   renderEnqueuedAssetTags,
   widgetSupportsTransparentHeader,

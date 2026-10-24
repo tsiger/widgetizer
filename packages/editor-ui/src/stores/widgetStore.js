@@ -5,6 +5,7 @@ import { getActiveProjectId } from "../lib/activeProjectId";
 import usePageStore from "./pageStore";
 import useAutoSave from "./saveStore";
 import { hasReachedMaxBlocks } from "@widgetizer/core/blockLimits";
+import { AREA_UNSUPPORTED_WIDGET_TYPES } from "@widgetizer/core/sharedAreas";
 import {
   insertIdAtPosition,
   insertIdAfter,
@@ -31,51 +32,91 @@ function isGlobalWidgetId(widgetId) {
 }
 
 /**
- * Get widget data regardless of whether it's a page widget or global widget.
+ * Where a widget lives: the header or footer, the page, or a shared area. Widget
+ * ids are unique across the page and its areas, so the id alone says which.
+ * @returns {{ type: "global" } | { type: "page" } | { type: "area", areaId: string } | null}
  */
-function getWidgetData(widgetId) {
-  const pageStore = usePageStore.getState();
-  if (isGlobalWidgetId(widgetId)) {
-    return { widget: pageStore.globalWidgets[widgetId] || null, isGlobal: true };
+export function findWidgetOwner(widgetId) {
+  if (isGlobalWidgetId(widgetId)) return { type: "global" };
+  const { page, sharedAreas } = usePageStore.getState();
+  if (page?.widgets?.[widgetId]) return { type: "page" };
+  for (const [areaId, area] of Object.entries(sharedAreas || {})) {
+    if (area?.widgets?.[widgetId]) return { type: "area", areaId };
   }
-  const { page } = pageStore;
-  return { widget: page?.widgets?.[widgetId] || null, isGlobal: false };
+  return null;
+}
+
+/** The owner a list action works on: the page, or the named shared area. */
+const listOwner = (areaId) => (areaId ? { type: "area", areaId } : { type: "page" });
+
+/** The ordered widget list of the page or of an area. */
+function readList(owner) {
+  const { page, sharedAreas } = usePageStore.getState();
+  const holder = owner?.type === "area" ? sharedAreas?.[owner.areaId] : page;
+  if (!holder) return null;
+  return { widgets: holder.widgets || {}, widgetsOrder: holder.widgetsOrder || Object.keys(holder.widgets || {}) };
+}
+
+function writeList(owner, { widgets, widgetsOrder }) {
+  const pageStore = usePageStore.getState();
+  if (owner.type === "area") pageStore.setSharedArea(owner.areaId, { widgets, widgetsOrder });
+  else pageStore.setPage({ ...pageStore.page, widgets, widgetsOrder });
 }
 
 /**
- * Persist an updated widget back to the correct store location.
+ * Get widget data wherever it lives: header/footer, page, or a shared area.
  */
-function setWidgetData(widgetId, updatedWidget, isGlobal) {
-  const pageStore = usePageStore.getState();
-  if (isGlobal) {
-    pageStore.updateGlobalWidget(widgetId, updatedWidget);
-  } else {
-    const { page } = pageStore;
-    pageStore.setPage({
-      ...page,
-      widgets: {
-        ...page.widgets,
-        [widgetId]: updatedWidget,
-      },
-    });
+function getWidgetData(widgetId) {
+  const owner = findWidgetOwner(widgetId);
+  if (!owner) return { widget: null, owner: null };
+  if (owner.type === "global") return { widget: usePageStore.getState().globalWidgets[widgetId] || null, owner };
+  return { widget: readList(owner)?.widgets?.[widgetId] || null, owner };
+}
+
+/**
+ * Persist an updated widget back to where it lives.
+ */
+function setWidgetData(widgetId, updatedWidget, owner) {
+  if (owner.type === "global") {
+    usePageStore.getState().updateGlobalWidget(widgetId, updatedWidget);
+    return;
   }
+  const list = readList(owner);
+  writeList(owner, { ...list, widgets: { ...list.widgets, [widgetId]: updatedWidget } });
 }
 
 // ---------------------------------------------------------------------------
 // Autosave signaling
 // ---------------------------------------------------------------------------
 
-function markStructureChanged() {
-  useAutoSave.getState().setStructureModified(true);
+/** The modified-widgets key an area's edits are recorded under. */
+export const areaModifiedKey = (areaId) => `area:${areaId}`;
+
+function markStructureChanged(owner = { type: "page" }) {
+  if (owner.type === "area") useAutoSave.getState().markWidgetModified(areaModifiedKey(owner.areaId));
+  else useAutoSave.getState().setStructureModified(true);
 }
 
-function markWidgetContentChanged(widgetId, isGlobal) {
-  if (isGlobal) {
+function markWidgetContentChanged(widgetId, owner) {
+  if (owner.type === "global") {
     useAutoSave.getState().markWidgetModified(widgetId);
   } else {
-    useAutoSave.getState().setStructureModified(true);
+    markStructureChanged(owner);
   }
 }
+
+/**
+ * Record a content edit to a widget (its settings or blocks) against its owner: a
+ * shared area's widget dirties that area, any other widget is tracked by its id.
+ */
+export function markWidgetChanged(widgetId) {
+  const owner = findWidgetOwner(widgetId);
+  if (owner?.type === "area") useAutoSave.getState().markWidgetModified(areaModifiedKey(owner.areaId));
+  else useAutoSave.getState().markWidgetModified(widgetId);
+}
+
+/** A widget type a shared area cannot hold (a form, for now). */
+export const isAreaUnsupportedType = (type) => AREA_UNSUPPORTED_WIDGET_TYPES.has(type);
 
 // ---------------------------------------------------------------------------
 // Selection state helpers
@@ -190,105 +231,92 @@ const useWidgetStore = create((set, get) => ({
 
   // --- Widget CRUD ---
 
-  addWidget: (widgetType, position) => {
+  // `areaId` adds to that shared area instead of the page.
+  addWidget: (widgetType, position, areaId = null) => {
     const { schemas } = get();
-    const pageStore = usePageStore.getState();
-    const { page } = pageStore;
+    const owner = listOwner(areaId);
+    const list = readList(owner);
 
-    if (!page || !schemas[widgetType]) return null;
+    if (!list || !schemas[widgetType]) return null;
+    if (areaId && isAreaUnsupportedType(widgetType)) return null;
 
     const newWidgetId = get().generateWidgetId();
     const newWidget = buildDefaultWidget(schemas[widgetType], widgetType, () => get().generateBlockId());
-    const currentOrder = page.widgetsOrder || Object.keys(page.widgets);
 
-    pageStore.setPage({
-      ...page,
-      widgets: { ...page.widgets, [newWidgetId]: newWidget },
-      widgetsOrder: insertIdAtPosition(currentOrder, newWidgetId, position),
+    writeList(owner, {
+      widgets: { ...list.widgets, [newWidgetId]: newWidget },
+      widgetsOrder: insertIdAtPosition(list.widgetsOrder, newWidgetId, position),
     });
 
     set(getWidgetSelectionState(newWidgetId));
-    markStructureChanged();
+    markStructureChanged(owner);
     return newWidgetId;
   },
 
   duplicateWidget: (widgetId) => {
-    const pageStore = usePageStore.getState();
-    const { page } = pageStore;
-
-    if (!page || !page.widgets[widgetId]) return null;
+    const { widget, owner } = getWidgetData(widgetId);
+    if (!widget || owner.type === "global") return null;
+    const list = readList(owner);
 
     const newWidgetId = get().generateWidgetId();
-    const newWidget = withoutListingFlags(
-      cloneWidgetWithNewBlockIds(page.widgets[widgetId], () => get().generateBlockId()),
-    );
-    const currentOrder = page.widgetsOrder || Object.keys(page.widgets);
+    const newWidget = withoutListingFlags(cloneWidgetWithNewBlockIds(widget, () => get().generateBlockId()));
 
-    pageStore.setPage({
-      ...page,
-      widgets: { ...page.widgets, [newWidgetId]: newWidget },
-      widgetsOrder: insertIdAfter(currentOrder, widgetId, newWidgetId),
+    writeList(owner, {
+      widgets: { ...list.widgets, [newWidgetId]: newWidget },
+      widgetsOrder: insertIdAfter(list.widgetsOrder, widgetId, newWidgetId),
     });
 
     set({ ...getWidgetSelectionState(newWidgetId), ...getClearedHoverState() });
-    markStructureChanged();
+    markStructureChanged(owner);
     return newWidgetId;
   },
 
   copyWidget: (widgetId) => {
-    const { page } = usePageStore.getState();
-    // Page widgets only — global widgets (header/footer) are singletons and live
-    // outside page.widgets, so they're naturally excluded.
-    if (!page || !page.widgets[widgetId]) return false;
+    // Page and area widgets — the header and footer are singletons, not copyable.
+    const { widget, owner } = getWidgetData(widgetId);
+    if (!widget || owner.type === "global") return false;
 
-    set({ widgetClipboard: JSON.parse(JSON.stringify(page.widgets[widgetId])) });
+    set({ widgetClipboard: JSON.parse(JSON.stringify(widget)) });
     return true;
   },
 
-  pasteWidget: (position) => {
+  // `areaId` pastes into that shared area. The copy never takes a page-only listing
+  // role, and an area refuses a widget it cannot hold (returns null).
+  pasteWidget: (position, areaId = null) => {
     const { widgetClipboard } = get();
     if (!widgetClipboard) return null;
 
-    const pageStore = usePageStore.getState();
-    const { page } = pageStore;
-    if (!page) return null;
+    const owner = listOwner(areaId);
+    const list = readList(owner);
+    if (!list) return null;
+    if (areaId && isAreaUnsupportedType(widgetClipboard.type)) return null;
 
     const newWidgetId = get().generateWidgetId();
     const newWidget = withoutListingFlags(cloneWidgetWithNewBlockIds(widgetClipboard, () => get().generateBlockId()));
-    const currentOrder = page.widgetsOrder || Object.keys(page.widgets);
 
-    pageStore.setPage({
-      ...page,
-      widgets: { ...page.widgets, [newWidgetId]: newWidget },
-      widgetsOrder: insertIdAtPosition(currentOrder, newWidgetId, position),
+    writeList(owner, {
+      widgets: { ...list.widgets, [newWidgetId]: newWidget },
+      widgetsOrder: insertIdAtPosition(list.widgetsOrder, newWidgetId, position),
     });
 
     set({ ...getWidgetSelectionState(newWidgetId), ...getClearedHoverState() });
-    markStructureChanged();
+    markStructureChanged(owner);
     return newWidgetId;
   },
 
   deleteWidget: (widgetId) => {
-    const pageStore = usePageStore.getState();
-    const { page } = pageStore;
     const { selectedWidgetId } = get();
+    const owner = widgetId ? findWidgetOwner(widgetId) : null;
+    if (!owner || owner.type === "global") return;
+    const list = readList(owner);
 
-    if (!page || !widgetId) return;
+    const { [widgetId]: _, ...remainingWidgets } = list.widgets;
+    writeList(owner, { widgets: remainingWidgets, widgetsOrder: removeIdFromOrder(list.widgetsOrder, widgetId) });
 
-    const { [widgetId]: _, ...remainingWidgets } = page.widgets;
-    const currentOrder = page.widgetsOrder || Object.keys(page.widgets);
-    const newOrder = removeIdFromOrder(currentOrder, widgetId);
-
-    pageStore.setPage({
-      ...page,
-      widgets: remainingWidgets,
-      widgetsOrder: newOrder,
-    });
-
-    markStructureChanged();
+    markStructureChanged(owner);
 
     if (selectedWidgetId === widgetId) {
-      const nextId = getNextSelectedId(currentOrder, widgetId);
+      const nextId = getNextSelectedId(list.widgetsOrder, widgetId);
       set({ selectedWidgetId: nextId, selectedBlockId: null, ...getClearedHoverState() });
     }
   },
@@ -296,23 +324,11 @@ const useWidgetStore = create((set, get) => ({
   updateWidgetSettings: (widgetId, settingId, value) => get().updateWidgetSettingValues(widgetId, { [settingId]: value }),
 
   updateWidgetSettingValues: (widgetId, values) => {
-    const pageStore = usePageStore.getState();
-    const { page } = pageStore;
-    if (!page || !widgetId || !page.widgets?.[widgetId]) return;
+    if (!widgetId) return;
+    const { widget, owner } = getWidgetData(widgetId);
+    if (!widget || owner.type === "global") return;
 
-    pageStore.setPage({
-      ...page,
-      widgets: {
-        ...page.widgets,
-        [widgetId]: {
-          ...page.widgets[widgetId],
-          settings: {
-            ...(page.widgets[widgetId].settings || {}),
-            ...values,
-          },
-        },
-      },
-    });
+    setWidgetData(widgetId, { ...widget, settings: { ...(widget.settings || {}), ...values } }, owner);
   },
 
   updateGlobalWidgetSettings: (widgetType, settingId, value) => {
@@ -327,27 +343,28 @@ const useWidgetStore = create((set, get) => ({
     });
   },
 
-  reorderWidgets: (newOrder) => {
-    const pageStore = usePageStore.getState();
-    const { page } = pageStore;
-    if (!page) return;
+  // `areaId` reorders that shared area; a widget never moves between owners here.
+  reorderWidgets: (newOrder, areaId = null) => {
+    const owner = listOwner(areaId);
+    const list = readList(owner);
+    if (!list) return;
 
     const reorderedWidgets = {};
     newOrder.forEach((widgetId) => {
-      if (page.widgets[widgetId]) {
-        reorderedWidgets[widgetId] = page.widgets[widgetId];
+      if (list.widgets[widgetId]) {
+        reorderedWidgets[widgetId] = list.widgets[widgetId];
       }
     });
 
-    pageStore.setPage({ ...page, widgets: reorderedWidgets, widgetsOrder: newOrder });
-    markStructureChanged();
+    writeList(owner, { widgets: reorderedWidgets, widgetsOrder: newOrder });
+    markStructureChanged(owner);
   },
 
   // --- Block CRUD ---
 
   addBlock: (widgetId, blockType, position = null) => {
     const { schemas } = get();
-    const { widget, isGlobal } = getWidgetData(widgetId);
+    const { widget, owner } = getWidgetData(widgetId);
     if (!widget) return null;
 
     const widgetSchema = schemas[widget.type];
@@ -372,14 +389,14 @@ const useWidgetStore = create((set, get) => ({
         blocks: { ...(widget.blocks || {}), [blockId]: newBlock },
         blocksOrder: newOrder,
       },
-      isGlobal,
+      owner,
     );
 
     return blockId;
   },
 
   duplicateBlock: (widgetId, blockId) => {
-    const { widget, isGlobal } = getWidgetData(widgetId);
+    const { widget, owner } = getWidgetData(widgetId);
     if (!widget || !widget.blocks?.[blockId]) return null;
 
     const { schemas } = get();
@@ -395,7 +412,7 @@ const useWidgetStore = create((set, get) => ({
         blocks: { ...widget.blocks, [newBlockId]: newBlock },
         blocksOrder: insertIdAfter(widget.blocksOrder || [], blockId, newBlockId),
       },
-      isGlobal,
+      owner,
     );
 
     return newBlockId;
@@ -403,7 +420,7 @@ const useWidgetStore = create((set, get) => ({
 
   deleteBlock: (widgetId, blockId) => {
     const { selectedBlockId } = get();
-    const { widget, isGlobal } = getWidgetData(widgetId);
+    const { widget, owner } = getWidgetData(widgetId);
     if (!widget) return;
 
     const currentOrder = widget.blocksOrder || [];
@@ -416,7 +433,7 @@ const useWidgetStore = create((set, get) => ({
         blocks: remainingBlocks,
         blocksOrder: removeIdFromOrder(currentOrder, blockId),
       },
-      isGlobal,
+      owner,
     );
 
     if (selectedBlockId === blockId) {
@@ -426,15 +443,15 @@ const useWidgetStore = create((set, get) => ({
   },
 
   reorderBlocks: (widgetId, newOrder) => {
-    const { widget, isGlobal } = getWidgetData(widgetId);
+    const { widget, owner } = getWidgetData(widgetId);
     if (!widget) return;
 
-    setWidgetData(widgetId, { ...widget, blocksOrder: newOrder }, isGlobal);
-    markWidgetContentChanged(widgetId, isGlobal);
+    setWidgetData(widgetId, { ...widget, blocksOrder: newOrder }, owner);
+    markWidgetContentChanged(widgetId, owner);
   },
 
   updateBlockSettings: (widgetId, blockId, settingId, value) => {
-    const { widget, isGlobal } = getWidgetData(widgetId);
+    const { widget, owner } = getWidgetData(widgetId);
     if (!widget || !widget.blocks?.[blockId]) return;
 
     setWidgetData(
@@ -452,7 +469,7 @@ const useWidgetStore = create((set, get) => ({
           },
         },
       },
-      isGlobal,
+      owner,
     );
   },
 }));

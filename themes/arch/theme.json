@@ -1,8 +1,9 @@
 {
   "name": "Arch",
-  "version": "0.9.10",
+  "version": "1.0.0",
   "description": "The default Widgetizer theme",
   "author": "Widgetizer",
+  "sharedAreas": [{ "id": "before_footer", "label": "tTheme:areas.before_footer" }],
   "settings": {
     "global": {
       "general": [

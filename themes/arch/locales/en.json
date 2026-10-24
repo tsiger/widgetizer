@@ -863,6 +863,9 @@
       }
     }
   },
+  "areas": {
+    "before_footer": "Before footer"
+  },
   "audio_player": {
     "name": "Audio Player",
     "settings": {

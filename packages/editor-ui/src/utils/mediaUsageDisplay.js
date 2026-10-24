@@ -110,6 +110,16 @@ export function resolveUsageTitle(usageEntry, usageTitleMap = {}) {
     return language ? `${name} (Global, ${nativeLanguageName(language)})` : `${name} (Global)`;
   }
 
+  if (usageEntry.startsWith("area:")) {
+    // `area:root:before_footer` or `area:el:before_footer`, named from the area's id.
+    const [folder, id = ""] = usageEntry.slice("area:".length).split(":");
+    const words = id.replace(/_/g, " ");
+    const name = words.charAt(0).toUpperCase() + words.slice(1);
+    return folder && folder !== "root"
+      ? `${name} (Shared area, ${nativeLanguageName(folder)})`
+      : `${name} (Shared area)`;
+  }
+
   // Unresolved page / collection / unknown source — fall back to the raw string.
   return usageEntry;
 }

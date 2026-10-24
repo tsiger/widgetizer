@@ -8,7 +8,7 @@ Use normal LiquidJS control flow, assignments, captures, loops, and `render` for
 
 | Context | Author-facing values |
 | --- | --- |
-| Layout | `header`, `main_content`, `footer` (already rendered HTML); `body_class`, `page_title`; `page`, `project`, `theme`, `site_icons`, `imagePath`, `filePath` |
+| Layout | `header`, `main_content`, `footer`, `shared_areas.<id>` (already rendered HTML); `body_class`, `page_title`; `page`, `project`, `theme`, `site_icons`, `imagePath`, `filePath` |
 | Widget | `widget.id`, `.type`, `.settings`, `.blocks`, `.blocksOrder`, `.index`; `theme`, `site_icons`, `imagePath`, `filePath`; `page` and `project` on page-aware renders |
 | Collection item template | `item` (prepared record), `collection` (definition), `page` (page-shaped item context), `project`, `theme`, media paths/icons |
 | Paginating widget | `pagination` only for the widget driving pagination; page-aware contexts also expose `page.pagination` |

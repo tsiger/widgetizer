@@ -14,7 +14,8 @@
 import fs from "fs-extra";
 import path from "path";
 import { LANGUAGE_CODE_RE } from "@widgetizer/core/languages";
-import { globalKey, resolveLanguage } from "@widgetizer/core/contentAddress";
+import { areaKey, globalKey, resolveLanguage } from "@widgetizer/core/contentAddress";
+import { readAreaDeclarations } from "@widgetizer/core/sharedAreas";
 
 /**
  * Lists and parses every publishable page in `<projectDir>/pages`: the root
@@ -98,6 +99,40 @@ export async function readGlobalWidgetFromDir(projectDir, widgetType, lang) {
     console.error(`Error reading global widget data (${widgetType}) in ${projectDir}:`, error);
     return null;
   }
+}
+
+/**
+ * The content of every shared area the project's theme declares, for one language,
+ * as the layout renders it. A declared area never saved is empty. One that cannot be
+ * read is left out of the render (and logged), like an unreadable header: rendering
+ * shows nothing for it, and only the save path refuses to overwrite it.
+ * @param {string} projectDir - Absolute path to the project working directory.
+ * @param {{ language?: string, defaultLanguage?: string }} [lang]
+ * @returns {Promise<Record<string, { widgets: object, widgetsOrder: string[] }>>}
+ */
+export async function readAreasFromDir(projectDir, lang) {
+  let themeJson;
+  try {
+    themeJson = await fs.readJson(path.join(projectDir, "theme.json"));
+  } catch {
+    return {};
+  }
+  const areas = {};
+  for (const { id } of readAreaDeclarations(themeJson).areas) {
+    const file = path.join(projectDir, ...areaKey(id, lang).split("/"));
+    try {
+      if (!(await fs.pathExists(file))) {
+        areas[id] = { widgets: {}, widgetsOrder: [] };
+        continue;
+      }
+      const data = await fs.readJson(file);
+      const widgets = data?.widgets && typeof data.widgets === "object" ? data.widgets : {};
+      areas[id] = { widgets, widgetsOrder: Array.isArray(data?.widgetsOrder) ? data.widgetsOrder : Object.keys(widgets) };
+    } catch (error) {
+      console.error(`Error reading shared area ${id} in ${projectDir}:`, error.message);
+    }
+  }
+  return areas;
 }
 
 /**

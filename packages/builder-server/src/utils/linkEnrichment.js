@@ -8,6 +8,8 @@ import {
   pagesDir,
   pageKey,
   globalKey,
+  areaKey,
+  areasDir,
   menusDir,
   menuKey,
   itemsDir,
@@ -106,14 +108,35 @@ async function updatePageWidgets(pagesDir, widgetProcessor) {
   }
 }
 
+/** A shared area with widgetProcessor applied to each of its widgets. */
+function processAreaWidgets(area, widgetProcessor) {
+  if (!area?.widgets || typeof area.widgets !== "object") return area;
+  const widgets = {};
+  for (const [id, widget] of Object.entries(area.widgets)) widgets[id] = widgetProcessor(widget);
+  return { ...area, widgets };
+}
+
 /**
- * Apply widgetProcessor to global widgets (header.json, footer.json), in the
- * root and in every language folder.
+ * Apply widgetProcessor to global widgets (header.json, footer.json) and to every
+ * widget of every shared area, in the root and in every language folder. Areas the
+ * theme no longer shows are included: their content is kept, so their links must
+ * stay right for when it comes back.
  */
 async function updateGlobalWidgets(pagesDir, widgetProcessor) {
   for (const dir of await withLanguageDirs(pagesDir)) {
     const globalDir = path.join(dir, "global");
     if (!(await fs.pathExists(globalDir))) continue;
+
+    const areaDir = path.join(globalDir, "areas");
+    const areaFiles = (await fs.pathExists(areaDir)) ? (await fs.readdir(areaDir)).filter((n) => n.endsWith(".json")) : [];
+    for (const name of areaFiles) {
+      const areaPath = path.join(areaDir, name);
+      const area = JSON.parse(await fs.readFile(areaPath, "utf8"));
+      const processed = processAreaWidgets(area, widgetProcessor);
+      if (JSON.stringify(processed) !== JSON.stringify(area)) {
+        await fs.outputFile(areaPath, JSON.stringify(processed, null, 2));
+      }
+    }
 
     for (const widgetType of ["header", "footer"]) {
       const widgetPath = path.join(globalDir, `${widgetType}.json`);
@@ -359,6 +382,27 @@ async function updatePagesViaStorage(
 
 async function updateGlobalWidgetsViaStorage(storage, scope, widgetProcessor, defaultLanguage, failed) {
   for (const language of ["", ...(await languageFoldersIn(storage, scope, "pages"))]) {
+    const lang = { language, defaultLanguage };
+    let areaNames = [];
+    try {
+      areaNames = (await storage.list(scope, areasDir(lang))).filter((name) => name.endsWith(".json"));
+    } catch (error) {
+      if (failed) failed.push({ key: areasDir(lang), reason: error.message });
+    }
+    for (const name of areaNames) {
+      const key = areaKey(name.slice(0, -".json".length), lang);
+      try {
+        const buf = await storage.read(scope, key);
+        if (buf == null) continue;
+        const area = JSON.parse(buf.toString("utf8"));
+        const processed = processAreaWidgets(area, widgetProcessor);
+        if (JSON.stringify(processed) !== JSON.stringify(area)) {
+          await storage.write(scope, key, JSON.stringify(processed, null, 2));
+        }
+      } catch (error) {
+        if (failed) failed.push({ key, reason: error.message });
+      }
+    }
     for (const widgetType of ["header", "footer"]) {
       const key = globalKey(widgetType, { language, defaultLanguage });
       try {

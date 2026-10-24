@@ -1,7 +1,7 @@
 import { ArrowLeft } from "lucide-react";
 import { SettingsRenderer } from "../settings";
 import usePageStore from "../../stores/pageStore";
-import useWidgetStore from "../../stores/widgetStore";
+import useWidgetStore, { areaModifiedKey } from "../../stores/widgetStore";
 import useAutoSave from "../../stores/saveStore";
 import { useTranslation } from "react-i18next";
 import { useThemeLocale } from "../../hooks/useThemeLocale";
@@ -20,6 +20,8 @@ export default function SettingsPanel({
   themeSettings,
   widgetSchemas,
   onBackToWidget,
+  // The shared area holding the selected widget, if it is in one.
+  selectedArea = null,
 }) {
   const { t } = useTranslation();
   const { schemas: collectionSchemas } = useCollections();
@@ -69,6 +71,9 @@ export default function SettingsPanel({
     );
   }
 
+  // An area widget's edit is the area's change, saved with the area, not the page.
+  const modifiedKey = selectedArea ? areaModifiedKey(selectedArea.id) : selectedWidgetId;
+
   const handleSettingChange = (settingId, value) => {
     if (isThemeSettings) {
       updateThemeSetting(selectedThemeGroup, settingId, value);
@@ -81,7 +86,7 @@ export default function SettingsPanel({
       markWidgetModified(selectedGlobalWidgetId);
     } else if (selectedBlockId) {
       updateBlockSettings(selectedWidgetId, selectedBlockId, settingId, value);
-      markWidgetModified(selectedWidgetId);
+      markWidgetModified(modifiedKey);
     } else {
       const perPageSetting = currentWidgetSchema?.collection?.perPageSetting;
       const values = { [settingId]: value };
@@ -104,7 +109,7 @@ export default function SettingsPanel({
         values[settingId] = 1;
       }
       updateWidgetSettingValues(selectedWidgetId, values);
-      markWidgetModified(selectedWidgetId);
+      markWidgetModified(modifiedKey);
     }
   };
 
@@ -139,7 +144,8 @@ export default function SettingsPanel({
   // breadcrumbs hang that collection's items under. Injected here rather than
   // declared per widget: it applies to any widget whose schema says what it
   // lists, and no theme should have to repeat it.
-  const listedCollectionType = currentWidgetSchema?.collection?.type;
+  // Both listing roles belong to one page, so a widget in a shared area gets neither.
+  const listedCollectionType = selectedArea ? null : currentWidgetSchema?.collection?.type;
   const listedCollection = (collectionSchemas || []).find((schema) => schema.type === listedCollectionType);
   const anchorSettings = listedCollectionType
     ? [
@@ -195,6 +201,11 @@ export default function SettingsPanel({
           </div>
         ) : (
           <span>{displayName}</span>
+        )}
+        {selectedArea && !selectedBlockId && (
+          <p className="mt-1 text-xs font-normal text-slate-500">
+            {t("pageEditor.sharedAreas.settingsNote", { area: selectedArea.label })}
+          </p>
         )}
       </div>
       <div className="px-3 pb-4 flex-1 overflow-y-auto">

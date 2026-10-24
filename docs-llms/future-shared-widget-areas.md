@@ -1,6 +1,14 @@
 # Shared widget areas — early concept
 
-**Notes started 21 September 2026. Brainstorming only: not implemented, scheduled, or a finished design.** Expand this document as the idea develops. Requirements below describe intended behaviour, not capabilities the app already has.
+**Notes started 21 September 2026.** The first version is built for 1.0.0 ([GitHub #163](https://github.com/tsiger/widgetizer/issues/163)): Arch's Before footer area, with editing, saving, undo, preview, export, links, media, languages, project copies, backups and theme updates. Its behaviour is documented in [Shared areas](domain/entities/shared-area.md) and its build plan in [the plan](future-shared-widget-areas-plan.md). What remains open is listed under [Still open after the first version](#still-open-after-the-first-version); the rest of this document is the original brainstorm, kept for its checklist.
+
+## Where we left off (24 October 2026)
+
+- **Branch:** `1.0.0` (created from master). The first version is committed and pushed there; it is not merged into master yet.
+- **Tests:** backend and frontend suites pass, apart from the Windows-only failures master has too (structural failure recovery, latest-snapshot atomicity, one atomic-write test: chmod and rename locks behave differently on Windows). Codex reviewed coverage and judged it enough; selecting an area widget by clicking in the preview has no automated test yet.
+- **Arch** is at 1.0.0 with the Before footer area (`themes/arch/updates/1.0.0/`). On a new computer, run `npm run theme:sync` so the runtime copy matches, then update an existing project to the new Arch version from the app.
+- **Next:** a quick manual test showed the editor needs **visual polish** (how the area section reads in the widget list next to the page's own widgets) and **more testing**. The notes and testing steps are in [GitHub #163](https://github.com/tsiger/widgetizer/issues/163); the manual checklist is section 20 (AREA-001 to AREA-021) of [the user test checklist](user-test-checklist.md).
+- **Related idea, not started:** a YouTube link alone on its line in a richtext field (for example a news item's body) rendered as a video player at render time, opt-in per field. It would build on the video address parsing in GitHub #184.
 
 ## The idea
 
@@ -195,3 +203,13 @@ Two windows can edit the same area while displaying different pages. Agree how c
 - [Widget authoring](theming-widgets.md)
 - [Theme lifecycle](domain/operations/themes.md)
 - [Project lifecycle](domain/operations/projects.md)
+
+## Still open after the first version
+
+- **After header**, and how it interacts with the transparent header.
+- **Moving** a widget between page content and an area (copy and paste covers it for now).
+- **Recovery controls** for content of an area a theme removed (today: kept, listed as not shown, reconnected when the id returns).
+- **Two windows** editing the same shared content: last save wins, as for the header and footer; a conflict warning would cover all of them.
+- **Forms in areas**: blocked until export's forms list reads areas.
+- An export report line when an area's file cannot be read (today the server log says so and the area is left out).
+- Live preview of an area's **reorder** reloads the preview rather than morphing it.

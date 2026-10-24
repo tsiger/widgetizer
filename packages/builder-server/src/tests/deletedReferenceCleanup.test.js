@@ -677,3 +677,50 @@ describe("what a delete reports when the sweep could not finish", () => {
     assert.ok(warning.count > 0);
   });
 });
+
+describe("shared areas", () => {
+  const areaFile = (id, language = "") =>
+    path.join(getProjectPagesDir(PROJECT_FOLDER), language, "global", "areas", `${id}.json`);
+  const linkingArea = (nav) => ({
+    widgets: {
+      a1: {
+        type: "hero",
+        settings: {
+          cta: { href: "el/about.html", text: "Read in Greek", target: "_self", pageUuid: EL_ABOUT },
+          body: `<p>See <a href="el/about.html" data-page-uuid="${EL_ABOUT}">the Greek page</a></p>`,
+          nav,
+        },
+      },
+    },
+    widgetsOrder: ["a1"],
+  });
+
+  it("lose a removed language's references, retained areas included", async () => {
+    await fs.outputJson(areaFile("before_footer"), linkingArea(EL_MENU));
+    // Saved content of an area the theme no longer declares: kept, so cleaned too.
+    await fs.outputJson(areaFile("old_banner"), linkingArea(EL_MENU));
+
+    const removed = await call(deleteLanguage, { params: { code: "el" } });
+    assert.equal(removed._status, 200);
+
+    for (const id of ["before_footer", "old_banner"]) {
+      const settings = (await fs.readJson(areaFile(id))).widgets.a1.settings;
+      assert.equal("pageUuid" in settings.cta, false, `${id}: the link's reference`);
+      assert.equal(settings.cta.href, "", `${id}: and its destination`);
+      assert.equal(settings.cta.text, "Read in Greek", `${id}: the label stays`);
+      assert.equal(settings.body.includes(EL_ABOUT), false, `${id}: the richtext reference`);
+      assert.equal(settings.nav, "", `${id}: the menu selection`);
+    }
+  });
+
+  it("lose a deleted menu's selection in every language", async () => {
+    await fs.outputJson(areaFile("before_footer"), linkingArea("m-en-main"));
+    await fs.outputJson(areaFile("before_footer", "el"), linkingArea("m-en-main"));
+
+    const res = await call(deleteMenu, { params: { id: "main-menu" } });
+    assert.equal(res._status, 200);
+
+    assert.equal((await fs.readJson(areaFile("before_footer"))).widgets.a1.settings.nav, "");
+    assert.equal((await fs.readJson(areaFile("before_footer", "el"))).widgets.a1.settings.nav, "");
+  });
+});

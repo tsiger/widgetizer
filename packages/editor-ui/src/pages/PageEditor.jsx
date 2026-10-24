@@ -18,9 +18,11 @@ import useToastStore from "../stores/toastStore";
 import useNavigationGuard from "../hooks/useNavigationGuard";
 import { EditingLanguageProvider } from "../lib/editingLanguage.jsx";
 import useDeleteKeyShortcut from "../hooks/useDeleteKeyShortcut";
+import { useThemeLocale } from "../hooks/useThemeLocale";
 
 export default function PageEditor() {
   const { t } = useTranslation();
+  const { tTheme } = useThemeLocale();
   const [searchParams] = useSearchParams();
   const [previewMode, setPreviewMode] = useState(() => {
     return localStorage.getItem("editorPreviewMode") || "desktop";
@@ -28,7 +30,7 @@ export default function PageEditor() {
   const previewIframeRef = useRef(null);
   const activeProject = useProjectStore((state) => state.activeProject);
 
-  const { page, loading, error } = usePageStore();
+  const { page, loading, error, sharedAreas, declaredAreas } = usePageStore();
   const themeSettings = useThemeStore((s) => s.settings);
   const {
     schemas: widgetSchemas,
@@ -117,9 +119,20 @@ export default function PageEditor() {
     setSelectedGlobalWidgetId(widgetType);
   };
 
-  // Get the selected widget and its schema (needed by SettingsPanel)
-  const selectedWidget = selectedWidgetId && page?.widgets[selectedWidgetId];
+  // Get the selected widget and its schema (needed by SettingsPanel). Widget ids are
+  // unique across the page and its shared areas, so the id finds it in either.
+  const selectedAreaId =
+    selectedWidgetId && !page?.widgets?.[selectedWidgetId]
+      ? Object.keys(sharedAreas || {}).find((areaId) => sharedAreas[areaId]?.widgets?.[selectedWidgetId])
+      : null;
+  const selectedWidget =
+    selectedWidgetId &&
+    (selectedAreaId ? sharedAreas[selectedAreaId].widgets[selectedWidgetId] : page?.widgets?.[selectedWidgetId]);
   const selectedWidgetSchema = selectedWidget ? widgetSchemas[selectedWidget.type] || {} : {};
+  const selectedAreaDeclaration = selectedAreaId ? (declaredAreas || []).find((area) => area.id === selectedAreaId) : null;
+  const selectedArea = selectedAreaId
+    ? { id: selectedAreaId, label: tTheme(selectedAreaDeclaration?.label) || selectedAreaId }
+    : null;
 
   if (loading) {
     return (
@@ -192,6 +205,7 @@ export default function PageEditor() {
           themeSettings={themeSettings}
           widgetSchemas={widgetSchemas}
           onBackToWidget={() => setSelectedBlockId(null)}
+          selectedArea={selectedArea}
         />
       </div>
     </div>

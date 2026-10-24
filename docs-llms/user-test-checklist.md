@@ -2163,6 +2163,85 @@ Run the web-app sections above in the desktop app too. This section covers only 
 
 ---
 
+## 20. Shared Areas
+
+Arch's **Before footer** area sits between the page content and the footer, on every page. Use a populated Arch project, and a copy of it with Greek added for the language tasks.
+
+### Editing
+
+- [ ] AREA-001 - Open any page in the editor and look below the page's widgets.
+  Expected: A "Before footer" section marked as shared, empty, with an Add widget button and a line saying it shows on every page.
+
+- [ ] AREA-002 - Add a Rich text widget to Before footer, type a heading, and watch the preview.
+  Expected: The section appears just above the footer while you type; the page's own widgets are unchanged.
+
+- [ ] AREA-003 - Click the new section in the preview.
+  Expected: It is selected in the Before footer list and its settings open, with a note that it is shared by every page in this language.
+
+- [ ] AREA-004 - Save, then open a different page.
+  Expected: The same section shows above that page's footer, in its Before footer list.
+
+- [ ] AREA-005 - Add a second widget to the area, drag it above the first, duplicate one, delete one, and add and edit a block.
+  Expected: Each action works as on a page, only inside the area; nothing moves into the page's list.
+
+- [ ] AREA-006 - Copy a page widget and paste it into Before footer, then copy an area widget and paste it into the page.
+  Expected: Independent copies in both directions: editing one never changes the other.
+
+- [ ] AREA-007 - Try to add a Form to Before footer, and try to paste a copied form into it.
+  Expected: Form is not offered in the area's widget list; pasting one shows a message that a form can't go in a shared area.
+
+- [ ] AREA-008 - Add a News grid (or another list of items) to Before footer and look at its settings.
+  Expected: No "Main page" and no "Split into pages" options; the list shows its items on every page.
+
+### Saving and undo
+
+- [ ] AREA-009 - Change only the area, then try to leave the editor.
+  Expected: The page is marked unsaved and leaving asks first; Save stores the area.
+
+- [ ] AREA-010 - Change the area and wait for autosave.
+  Expected: The change is saved without pressing Save.
+
+- [ ] AREA-011 - Change the area, save, then press Undo.
+  Expected: The change is undone and shows as unsaved again; saving stores the undone version.
+
+### Links, images and languages
+
+- [ ] AREA-012 - In the area, add a button that links to the About page and an image. Save. Rename About's address.
+  Expected: The button still goes to About on every page; the image shows.
+
+- [ ] AREA-013 - Open the image in Media.
+  Expected: "Used in" lists "Before footer (Shared area)", and deleting the image is refused while it is used.
+
+- [ ] AREA-014 - Delete the About page.
+  Expected: The area's button keeps its label but no longer links anywhere, in every language.
+
+- [ ] AREA-015 - On the Greek copy, add Greek with content already in the English area.
+  Expected: The Greek editor shows its own Before footer, starting as a copy of the English one; editing it does not change English.
+
+- [ ] AREA-016 - Remove Greek.
+  Expected: English keeps its area; nothing Greek remains.
+
+### Output
+
+- [ ] AREA-017 - Export the site and open it: the homepage, another page, a news article and page 2 of a split list.
+  Expected: The area shows above the footer on all of them; its links and images work from each.
+
+- [ ] AREA-018 - Export the Greek copy.
+  Expected: Greek pages show the Greek area, English pages the English one.
+
+- [ ] AREA-019 - Empty the area completely, save and export.
+  Expected: Nothing at all is printed above the footer: no gap, no empty box.
+
+### Projects and theme updates
+
+- [ ] AREA-020 - Duplicate the project, then download a backup and import it.
+  Expected: Both copies have the area with its content; editing the duplicate's area does not change the original.
+
+- [ ] AREA-021 - Update an older (0.9.10) Arch project to Arch 1.0.0.
+  Expected: The update succeeds; the project's pages, header and footer are unchanged, and the empty Before footer area appears in the editor.
+
+---
+
 ## Problem Report Template
 
 | Field             | What to write                                                                   |

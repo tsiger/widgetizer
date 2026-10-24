@@ -8,6 +8,7 @@ import * as projectRepo from "../db/repositories/projectRepository.js";
 import {
   renderWidget,
   renderPageLayout,
+  renderSharedAreas,
   renderCollectionItemPage,
   renderEnqueuedAssetTags,
   widgetSupportsTransparentHeader,
@@ -20,7 +21,12 @@ import {
   loadCollectionItemsByUuid,
   readCollectionItem,
 } from "../services/collectionService.js";
-import { listPagesFromDir, readGlobalWidgetFromDir, readThemeDataFromDir } from "../utils/projectContentFs.js";
+import {
+  listPagesFromDir,
+  readAreasFromDir,
+  readGlobalWidgetFromDir,
+  readThemeDataFromDir,
+} from "../utils/projectContentFs.js";
 import { globalKey, pageOutputPath, itemOutputPath } from "@widgetizer/core/contentAddress";
 import { requestLanguage, withoutLanguage, projectLanguageContexts, projectLanguages } from "../utils/contentLanguage.js";
 import { getProjectFolderName } from "../utils/projectHelpers.js";
@@ -33,6 +39,7 @@ import {
 import { isProjectResolutionError } from "../utils/projectErrors.js";
 import { generateToken, getToken } from "../services/previewTokenStore.js";
 import { LANGUAGE_CODE_RE, DEFAULT_LANGUAGE } from "@widgetizer/core/languages";
+import { AREA_ID_RE } from "@widgetizer/core/sharedAreas";
 
 // Inject the runtime script and base tag into rendered HTML. The site's
 // languages travel with it: a preview renders at the root, so a link reads as
@@ -243,6 +250,25 @@ async function generatePreviewHtml(pageData, rawThemeSettings, previewMode, coll
     }
   }
 
+  // The editor sends its unsaved areas with the page; anything else previews the
+  // saved ones. Only areas the theme declares are rendered either way.
+  const savedAreas = await readAreasFromDir(getProjectDir(project.folderName), {
+    language: pageData.language,
+    defaultLanguage,
+  });
+  const sentAreas = pageData.sharedAreas && typeof pageData.sharedAreas === "object" ? pageData.sharedAreas : {};
+  const areasData = Object.fromEntries(
+    Object.keys(savedAreas).map((id) => [id, Object.hasOwn(sentAreas, id) ? sentAreas[id] : savedAreas[id]]),
+  );
+  const sharedAreas = await renderSharedAreas(
+    activeProjectId,
+    areasData,
+    rawThemeSettings,
+    "preview",
+    sharedGlobals,
+    collectionDeps,
+  );
+
   // Determine if transparent header should be active for this page
   let extraBodyClasses = "";
   const headerSettings = pageData.globalWidgets?.header?.settings;
@@ -257,7 +283,7 @@ async function generatePreviewHtml(pageData, rawThemeSettings, previewMode, coll
 
   let renderedHtml = await renderPageLayout(
     activeProjectId,
-    { headerContent, mainContent, footerContent, extraBodyClasses },
+    { headerContent, mainContent, footerContent, sharedAreas, extraBodyClasses },
     pageData,
     rawThemeSettings,
     "preview",
@@ -402,6 +428,7 @@ export async function createCollectionPreviewToken(req, res) {
     const rawThemeSettings = await readThemeDataFromDir(projectDir);
     const headerData = await readGlobalWidgetFromDir(projectDir, "header", lang);
     const footerData = await readGlobalWidgetFromDir(projectDir, "footer", lang);
+    const areasData = await readAreasFromDir(projectDir, lang);
 
     // uuid -> page map so pageUuid links inside the item resolve to slugs.
     // listPagesFromDir reads <projectDir>/pages — projectDir is the working dir
@@ -477,6 +504,7 @@ export async function createCollectionPreviewToken(req, res) {
         sharedGlobals,
         headerData,
         footerData,
+        areasData,
         projectData,
         siteUrl: "",
       },
@@ -505,7 +533,7 @@ export async function createCollectionPreviewToken(req, res) {
  */
 export async function renderSingleWidget(req, res) {
   try {
-    const { widgetId, widget, themeSettings: rawThemeSettings, currentCanonicalPath, page } = req.body; // Expect themeSettings too
+    const { widgetId, widget, themeSettings: rawThemeSettings, currentCanonicalPath, page, area } = req.body; // Expect themeSettings too
     const activeProjectId = req.activeProject.id;
     const isPlainObject = (value) => !!value && typeof value === "object" && !Array.isArray(value);
     const currentPage = isPlainObject(page) ? page : null;
@@ -577,8 +605,10 @@ export async function renderSingleWidget(req, res) {
       rawThemeSettings || {},
       "preview",
       sharedGlobals,
+      // A widget of a shared area is not in the page's order, so it keeps a null index.
       widgetIndex,
       renderDeps,
+      typeof area === "string" && AREA_ID_RE.test(area) ? { area } : {},
     );
 
     // Append enqueued asset tags so the preview runtime can load them on morph

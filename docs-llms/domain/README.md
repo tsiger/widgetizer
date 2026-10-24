@@ -8,7 +8,7 @@ Updated 2026-09-20 against the completed R1–R8 review and real-project checks 
 
 ## A reading route through the app
 
-Start with a [project](entities/project.md), then look inside one [page](entities/page.md), one [widget](entities/widget.md) and one [block](entities/block.md), then the [built-in widgets](entities/core-widget.md) and [form rules](entities/form.md). Next, read about the [shared header/footer](entities/global-widget.md), [menus](entities/menu.md), [collections](entities/collection.md) and [media library](entities/media.md). Finish with [languages](multilingual.md) and the [operation walkthroughs](operations/README.md).
+Start with a [project](entities/project.md), then look inside one [page](entities/page.md), one [widget](entities/widget.md) and one [block](entities/block.md), then the [built-in widgets](entities/core-widget.md) and [form rules](entities/form.md). Next, read about the [shared header/footer](entities/global-widget.md), [shared areas](entities/shared-area.md), [menus](entities/menu.md), [collections](entities/collection.md) and [media library](entities/media.md). Finish with [languages](multilingual.md) and the [operation walkthroughs](operations/README.md).
 
 For a quick distinction that applies throughout: **editing changes your working view; saving keeps the work; exporting makes website files; deploying those files changes the website visitors see.** Some actions, such as uploading a file or deleting a page, save their result immediately when that operation succeeds.
 
@@ -76,6 +76,7 @@ This is an orientation diagram, not every possible edge. Media can also be refer
 | [Form and field](entities/form.md) | A form widget, its input blocks and generated submission definition | Additional-language forms have separate exported identities |
 | [Block](entities/block.md) | A piece inside a widget, such as one testimonial | Belongs to the section you are editing |
 | [Header and footer](entities/global-widget.md) | Shared top and bottom sections | Shared by pages in that language |
+| [Shared areas](entities/shared-area.md) | Theme-placed lists of ordinary widgets, such as Before footer | Shared by pages in that language |
 | [Setting and reference](entities/settings.md) | An editable value, or a selection such as a photograph or destination page | Depends on what contains the setting |
 | [Menu and menu item](entities/menu.md) | A navigation list and the choices inside it | Each language has its own navigation choices |
 | [Collection type and item](entities/collection.md) | A group such as News, and one entry such as an article | Shared field definitions; independent translated entries |

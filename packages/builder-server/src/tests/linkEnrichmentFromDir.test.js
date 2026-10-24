@@ -217,3 +217,36 @@ describe("cleanupDeletedCollectionItemReferences", () => {
     assert.equal(storage._files.get("pages/about.json"), JSON.stringify({ title: "About", widgets: {} }));
   });
 });
+
+describe("shared areas", () => {
+  it("are enriched with the pages, from the supplied projectDir", async () => {
+    await writePage("about", "page-about");
+    await fs.outputJSON(path.join(PROJECT_DIR, "pages", "global", "areas", "before_footer.json"), {
+      widgets: { a1: { type: "text", settings: { body: '<p><a href="about.html">About</a></p>' } } },
+      widgetsOrder: ["a1"],
+    });
+
+    await enrichSeededRichtextLinksFromDir({ projectDir: PROJECT_DIR });
+
+    const area = await fs.readJSON(path.join(PROJECT_DIR, "pages", "global", "areas", "before_footer.json"));
+    assert.ok(area.widgets.a1.settings.body.includes('data-page-uuid="page-about"'), area.widgets.a1.settings.body);
+  });
+
+  it("lose a deleted page's links through the storage adapter only, in every language", async () => {
+    const area = JSON.stringify({
+      widgets: { a1: { settings: { link: { pageUuid: "dead-uuid", href: "/x", text: "X" } } } },
+      widgetsOrder: ["a1"],
+    });
+    const storage = makeMemoryStorage({
+      "pages/global/areas/before_footer.json": area,
+      "pages/el/global/areas/before_footer.json": area,
+      "pages/el/about.json": JSON.stringify({ title: "About", widgets: {} }),
+    });
+
+    await cleanupDeletedPageReferences(storage, SCOPE, { deletedPageUuid: "dead-uuid" });
+
+    for (const key of ["pages/global/areas/before_footer.json", "pages/el/global/areas/before_footer.json"]) {
+      assert.deepEqual(JSON.parse(storage._files.get(key)).widgets.a1.settings.link, { href: "", text: "X" }, key);
+    }
+  });
+});

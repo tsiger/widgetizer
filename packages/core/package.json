@@ -28,6 +28,7 @@
     "./publishedUrls": "./src/utils/publishedUrls.js",
     "./breadcrumbs": "./src/utils/breadcrumbs.js",
     "./contentAddress": "./src/utils/contentAddress.js",
+    "./sharedAreas": "./src/utils/sharedAreas.js",
     "./siteIdentity": "./src/utils/siteIdentity.js",
     "./languages": "./src/utils/languages.js",
     "./mediaMetadata": "./src/utils/mediaMetadata.js",

@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { temporal } from "zundo";
 import { getPage } from "../queries/pageManager";
 import { getGlobalWidgets } from "../queries/previewManager";
+import { getSharedAreas } from "../queries/sharedAreaManager";
 import { getActiveProjectId } from "../lib/activeProjectId";
 import useThemeStore from "./themeStore";
 
@@ -18,6 +19,7 @@ import useThemeStore from "./themeStore";
 const selectTemporalState = (state) => ({
   page: state.page,
   globalWidgets: state.globalWidgets,
+  sharedAreas: state.sharedAreas,
   themeSettingsSnapshot: state.themeSettingsSnapshot,
 });
 
@@ -72,6 +74,36 @@ async function readGlobalWidgets(language) {
   }
 }
 
+const NO_AREAS = { declaredAreas: [], retainedAreas: [], sharedAreas: {}, originalSharedAreas: {}, sharedAreasError: null };
+
+/**
+ * Read a language's shared areas. A failed read leaves the page editable with no
+ * areas and records the error: nothing is shown as an empty area, so nothing can
+ * be saved over the real one.
+ */
+async function readSharedAreas(language) {
+  try {
+    const data = await getSharedAreas(language);
+    const declaredAreas = Array.isArray(data?.declared) ? data.declared : [];
+    const sharedAreas = {};
+    for (const { id } of declaredAreas) {
+      const area = data.areas?.[id];
+      sharedAreas[id] = {
+        widgets: area?.widgets || {},
+        widgetsOrder: Array.isArray(area?.widgetsOrder) ? area.widgetsOrder : Object.keys(area?.widgets || {}),
+      };
+    }
+    const retainedAreas = (Array.isArray(data?.retained) ? data.retained : []).map(({ id }) => ({
+      id,
+      widgetCount: Object.keys(data.areas?.[id]?.widgets || {}).length,
+    }));
+    return { declaredAreas, retainedAreas, sharedAreas, sharedAreasError: null };
+  } catch (err) {
+    console.error("Failed to load shared areas:", err);
+    return { declaredAreas: [], retainedAreas: [], sharedAreas: {}, sharedAreasError: err.message || "error" };
+  }
+}
+
 const usePageStore = create(
   temporal(
     (set, get) => ({
@@ -86,6 +118,12 @@ const usePageStore = create(
       // save's in-flight window", since re-adding an id already present is a
       // no-op).
       originalGlobalWidgets: { header: null, footer: null },
+
+      // Shared areas of the page's language: each an ordered widget list shared
+      // by every page. Only declared areas are editable; retained ones (saved
+      // content the theme no longer shows) are listed with their widget counts.
+      // originalSharedAreas is the last-saved copy, per area, like the globals'.
+      ...NO_AREAS,
 
       // Thin proxy snapshot — NOT the canonical copy. themeStore owns the truth.
       themeSettingsSnapshot: null,
@@ -109,6 +147,7 @@ const usePageStore = create(
             originalPage: null,
             globalWidgets: { header: null, footer: null },
             originalGlobalWidgets: { header: null, footer: null },
+            ...NO_AREAS,
             themeSettingsSnapshot: null,
             loadedProjectId: projectId,
           });
@@ -123,6 +162,7 @@ const usePageStore = create(
           originalPage: null,
           globalWidgets: { header: null, footer: null },
           originalGlobalWidgets: { header: null, footer: null },
+          ...NO_AREAS,
           themeSettingsSnapshot: null,
         });
 
@@ -146,7 +186,10 @@ const usePageStore = create(
           // In the language the page came back in — a default-language load passes
           // no argument but still has a folder. Held until the guard below, so a
           // superseded load cannot drop its header/footer on a newer page.
-          const globalWidgets = await readGlobalWidgets(pageData.language);
+          const [globalWidgets, areas] = await Promise.all([
+            readGlobalWidgets(pageData.language),
+            readSharedAreas(pageData.language),
+          ]);
 
           // Load theme settings into themeStore (canonical owner).
           // Skip refetch only if themeStore already holds *valid* data for this
@@ -170,6 +213,8 @@ const usePageStore = create(
             originalPage: JSON.parse(JSON.stringify(cleanPageData)),
             globalWidgets,
             originalGlobalWidgets: JSON.parse(JSON.stringify(globalWidgets)),
+            ...areas,
+            originalSharedAreas: JSON.parse(JSON.stringify(areas.sharedAreas)),
             themeSettingsSnapshot: themeSnapshot ? JSON.parse(JSON.stringify(themeSnapshot)) : null,
             loading: false,
             error: null,
@@ -189,6 +234,7 @@ const usePageStore = create(
             originalPage: null,
             globalWidgets: { header: null, footer: null },
             originalGlobalWidgets: { header: null, footer: null },
+            ...NO_AREAS,
             themeSettingsSnapshot: null,
             loadedProjectId: projectId,
           });
@@ -243,6 +289,13 @@ const usePageStore = create(
         set({ globalWidgets: updatedGlobalWidgets });
       },
 
+      /** Replace one declared area's content (an edit; recorded in the undo history). */
+      setSharedArea: (areaId, area) => {
+        const { sharedAreas } = get();
+        if (!Object.hasOwn(sharedAreas, areaId)) return;
+        set({ sharedAreas: { ...sharedAreas, [areaId]: area } });
+      },
+
       resetPage: () => {
         const { originalPage } = get();
         if (originalPage) {
@@ -256,6 +309,7 @@ const usePageStore = create(
           originalPage: null,
           globalWidgets: { header: null, footer: null },
           originalGlobalWidgets: { header: null, footer: null },
+          ...NO_AREAS,
           themeSettingsSnapshot: null,
           loadedProjectId: null,
           loading: false,
@@ -274,6 +328,13 @@ const usePageStore = create(
       // diff against this baseline.
       setOriginalGlobalWidgets: (globalWidgets) => {
         set({ originalGlobalWidgets: JSON.parse(JSON.stringify(globalWidgets)) });
+      },
+
+      // One area's saved copy, set when that area's own save succeeds, from the
+      // snapshot the save sent: a failed area stays dirty, and an edit made while
+      // the save was in flight still differs from this.
+      setOriginalSharedArea: (areaId, area) => {
+        set({ originalSharedAreas: { ...get().originalSharedAreas, [areaId]: JSON.parse(JSON.stringify(area)) } });
       },
 
       /**

@@ -2,9 +2,10 @@ import fs from "fs-extra";
 import path from "path";
 import { randomUUID } from "crypto";
 import * as themeController from "../controllers/themeController.js";
-import { processTemplatesRecursive } from "./templateHelpers.js";
+import { copyMissingAreaTemplates, processTemplatesRecursive } from "./templateHelpers.js";
 import { isSafePathSegment } from "./pathSecurity.js";
 import { enrichNewProjectReferences } from "./linkEnrichment.js";
+import { AREA_TEMPLATES_DIR, areaFromTemplate } from "@widgetizer/core/sharedAreas";
 
 /**
  * Scaffold a new project's on-disk content into an explicit directory.
@@ -88,7 +89,12 @@ export async function scaffoldProjectContent({ projectDir, theme, preset }) {
 
   // Initialize pages from theme/preset templates, then enrich link references
   try {
-    await processTemplatesRecursive(templatesDir, pagesDir, async (template, slug, targetPath) => {
+    await processTemplatesRecursive(templatesDir, pagesDir, async (template, slug, targetPath, { relativeDir }) => {
+      // A shared area's starting content is a widget list, not a page.
+      if (relativeDir === AREA_TEMPLATES_DIR) {
+        await fs.outputFile(targetPath, JSON.stringify(areaFromTemplate(template), null, 2));
+        return;
+      }
       const initializedPage = {
         ...template,
         ...(template.type !== "header" && template.type !== "footer"
@@ -103,6 +109,11 @@ export async function scaffoldProjectContent({ projectDir, theme, preset }) {
       };
       await fs.outputFile(targetPath, JSON.stringify(initializedPage, null, 2));
     });
+    // Before enrichment, so a theme area's links are stamped like the rest.
+    const themeTemplatesDir = path.join(await themeController.getThemeSourceDir(theme), "templates");
+    if (path.resolve(templatesDir) !== path.resolve(themeTemplatesDir)) {
+      await copyMissingAreaTemplates(themeTemplatesDir, pagesDir, areaFromTemplate);
+    }
 
     await enrichNewProjectReferences(pagesDir, menusDir);
   } catch (error) {

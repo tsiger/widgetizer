@@ -8,6 +8,7 @@
 export {
   renderWidget,
   renderPageLayout,
+  renderSharedAreas,
   renderCollectionItemPage,
   renderEnqueuedAssetTags,
   widgetSupportsTransparentHeader,

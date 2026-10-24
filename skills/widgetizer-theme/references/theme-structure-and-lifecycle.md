@@ -39,6 +39,8 @@ my-theme/
     global/                 when providing global starter instances
       header.json
       footer.json
+      areas/                optional starting content for shared areas
+        before_footer.json
   locales/
     en.json
   snippets/                 optional reusable Liquid partials
@@ -95,6 +97,22 @@ These special ids are feature contracts: the app finds them in any group, so gro
 Core currently supplies `core-spacer`, `core-divider`, and `core-form`. They are included unless `useCoreWidgets` is explicitly `false`. `core-` is a reserved resolution path, not a theme override mechanism. If opting out, implement whatever replacements the theme actually needs; copying a core filename into the theme does not override core rendering.
 
 The types `header` and `footer` resolve under `widgets/global/<type>/`. Their starter instances belong under `templates/global/`. They are not ordinary page widget directories. A theme can omit global content, but if it supplies it, the layout must emit it. What settings and blocks a header or footer offers is the theme's choice; the starter's are a minimal example.
+
+## Shared areas
+
+A shared area is a named place in the layout that the site owner fills with ordinary widgets, shared by every page of one language (each language has its own content). Declare areas in `theme.json` and place each one in `layout.liquid`:
+
+```json
+"sharedAreas": [{ "id": "before_footer", "label": "tTheme:areas.before_footer" }]
+```
+
+```liquid
+</main>
+{{ shared_areas.before_footer | raw }}
+{{ footer | raw }}
+```
+
+**Contract:** the `id` (`^[a-z][a-z0-9_]*$`) is the area's lasting identity: saved content is filed under it, so changing it disconnects existing content, while the `label` can change freely. The list order is the editor's order. An empty area prints nothing, so any spacing or decoration around it must come from the widgets inside it, not from wrapper markup in the layout. Area widgets get `widget.index` null (never the page's first section) and `widget.area` set to the area id. A form (`core-form`) cannot be placed in an area yet, and listing widgets there cannot be the collection's main listing or split into pages. Removing an area from a theme stops showing it; the site keeps its content.
 
 ## Three copies and the authoring loop
 

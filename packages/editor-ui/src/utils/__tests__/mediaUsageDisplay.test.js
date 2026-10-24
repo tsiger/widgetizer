@@ -146,6 +146,11 @@ describe("usage labels on a site with more than one language", () => {
     expect(resolveUsageTitle("global:root:header")).toBe("Header (Global)");
   });
 
+  it("names a shared area and its language", () => {
+    expect(resolveUsageTitle("area:root:before_footer")).toBe("Before footer (Shared area)");
+    expect(resolveUsageTitle("area:el:before_footer")).toBe("Before footer (Shared area, Ελληνικά)");
+  });
+
   it("tags pages and items outside the default language", () => {
     const map = buildUsageTitleMap({
       defaultLanguage: "en",

@@ -14,6 +14,8 @@ export default function WidgetSelector({
   onPasteWidget,
   position,
   triggerRef,
+  // Widget types the target cannot hold (a shared area cannot hold a form).
+  excludeTypes = [],
 }) {
   const { t } = useTranslation();
   const { tTheme } = useThemeLocale();
@@ -32,7 +34,7 @@ export default function WidgetSelector({
   }, []);
 
   const availableWidgets = Object.values(widgetSchemas)
-    .filter((schema) => schema.type !== "header" && schema.type !== "footer")
+    .filter((schema) => schema.type !== "header" && schema.type !== "footer" && !excludeTypes.includes(schema.type))
     .sort((a, b) => (tTheme(a.displayName) || a.type).localeCompare(tTheme(b.displayName) || b.type));
 
   const filteredWidgets = availableWidgets.filter((schema) => {

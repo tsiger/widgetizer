@@ -16,7 +16,7 @@ You can select the header or footer, change its available content and appearance
 
 Arch's header also offers a language switcher and editable navigation/accessibility labels. These controls belong to that language's header; the switcher uses related pages or language homepages and hides when fewer than two destinations exist. Its logo link returns to the homepage in the language being read. See [theme behavior](theme.md#visitor-strings-and-arch).
 
-These shared sections are not ordinary page widgets that you duplicate to make another header on the same page.
+These shared sections are not ordinary page widgets that you duplicate to make another header on the same page. A theme can also offer [shared areas](shared-area.md): places such as Before footer that hold ordinary widgets shared by every page.
 
 ### How far do changes reach?
 

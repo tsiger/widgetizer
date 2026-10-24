@@ -71,6 +71,15 @@ export function globalKey(type, lang) {
   return `${globalsDir(lang)}/${type}.json`;
 }
 
+/** A shared area's content lives beside the header and footer: one file per area, per language. */
+export function areasDir(lang) {
+  return `${globalsDir(lang)}/areas`;
+}
+
+export function areaKey(id, lang) {
+  return `${areasDir(lang)}/${id}.json`;
+}
+
 export function menusDir(lang) {
   return join("menus", languageFolder(lang));
 }
@@ -88,6 +97,7 @@ export function itemKey(type, slug, lang) {
 }
 
 const KEY_SHAPES = [
+  ["area", /^pages\/(?:(?<lang>[^/]+)\/)?global\/areas\/(?<id>[^/]+)\.json$/],
   ["global", /^pages\/(?:(?<lang>[^/]+)\/)?global\/(?<type>[^/]+)\.json$/],
   ["page", /^pages\/(?:(?<lang>[^/]+)\/)?(?<slug>[^/]+)\.json$/],
   ["menu", /^menus\/(?:(?<lang>[^/]+)\/)?(?<id>[^/]+)\.json$/],
@@ -164,6 +174,7 @@ export const usageId = {
   page: (uuid) => `page:${uuid}`,
   item: (uuid) => `collection:${uuid}`,
   global: (type, lang) => `global:${languageFolder(lang) || "root"}:${type}`,
+  area: (id, lang) => `area:${languageFolder(lang) || "root"}:${id}`,
 };
 
 // Always namespaced and always a resolved language: `/preview/el/contact` could be a language or a collection prefix.

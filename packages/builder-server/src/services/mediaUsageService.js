@@ -33,6 +33,7 @@ export const usageSource = {
   page: usageId.page,
   item: usageId.item,
   global: (type, lang) => usageId.global(String(type).replace(/^global:(root:)?/, ""), lang),
+  area: usageId.area,
   // Used only when a uuid could not be written to the file (read-only working dir).
   // The `slug:` marker keeps it distinguishable, so the migration can be retried and
   // the row retired once the content does get a uuid.
@@ -76,6 +77,7 @@ function isLegacyUsageSource(source) {
   if (source.startsWith("page:slug:") || source.startsWith("collection:slug:")) return true;
   if (source.startsWith("page:")) return false;
   if (source.startsWith("collection:")) return source.includes("/");
+  if (source.startsWith("area:")) return false;
   // `global:root:header` or `global:el:header`; the old form had no position.
   return !/^global:[a-z0-9-]+:/.test(source);
 }
@@ -181,6 +183,15 @@ export function extractMediaPathsFromPage(pageData) {
   });
 
   return Array.from(mediaPaths);
+}
+
+/**
+ * Extract all media paths from a shared area: its widgets, like a page's, with no SEO.
+ * @param {{ widgets?: object }} area
+ * @returns {string[]}
+ */
+export function extractMediaPathsFromArea(area) {
+  return extractMediaPathsFromPage({ widgets: area?.widgets });
 }
 
 /**
@@ -357,6 +368,26 @@ export async function updateGlobalWidgetMediaUsage(projectId, globalId, widgetDa
     console.error("Error stack:", error.stack);
     throw error;
   }
+}
+
+/**
+ * Record what a shared area uses, under `area:<root|lang>:<id>`.
+ * @param {string} projectId
+ * @param {string} areaId
+ * @param {{ widgets?: object }} area
+ * @param {{ language?: string, defaultLanguage?: string }} [lang]
+ */
+export async function updateAreaMediaUsage(projectId, areaId, area, lang) {
+  const mediaData = await readMediaFile(projectId);
+  const matchedFileIds = findFileIdsByPaths(mediaData.files, extractMediaPathsFromArea(area));
+  mediaRepo.updateMediaUsageForSource(projectId, usageSource.area(areaId, lang), matchedFileIds);
+  return { success: true };
+}
+
+/** Drop a shared area's usage rows entirely — the language it belonged to is gone. */
+export async function removeAreaFromMediaUsage(projectId, areaId, lang) {
+  mediaRepo.updateMediaUsageForSource(projectId, usageSource.area(areaId, lang), []);
+  return { success: true };
 }
 
 /**
@@ -642,6 +673,27 @@ export async function refreshAllMediaUsageFromDir({ projectId, projectDir }) {
             console.warn(`Error processing global widget ${fileName} for media usage:`, error.message);
             skipped.push({ source: `global:${language || "root"}:${fileName}`, reason: error.message });
           }
+        }
+      }
+    }
+
+    // Shared areas, per language folder. Areas a theme no longer shows are scanned
+    // too: their content is kept so it can come back, and so must its images.
+    for (const language of ["", ...languageFolders]) {
+      const lang = { language, defaultLanguage };
+      const areaDir = path.join(pagesDir, language, "global", "areas");
+      if (!(await fs.pathExists(areaDir))) continue;
+      const areaFiles = (await fs.readdir(areaDir, { withFileTypes: true })).filter(
+        (entry) => entry.isFile() && entry.name.endsWith(".json"),
+      );
+      for (const fileEntry of areaFiles) {
+        const areaId = fileEntry.name.replace(/\.json$/, "");
+        try {
+          const areaData = JSON.parse(await fs.readFile(path.join(areaDir, fileEntry.name), "utf8"));
+          addUsageForPaths(extractMediaPathsFromArea(areaData), usageSource.area(areaId, lang));
+        } catch (error) {
+          console.warn(`Error processing shared area ${areaId} for media usage:`, error.message);
+          skipped.push({ source: usageSource.area(areaId, lang), reason: error.message });
         }
       }
     }

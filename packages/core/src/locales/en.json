@@ -708,6 +708,16 @@
       "description": "Shows this many items per page, with page links below the list.",
       "onlyOne": "Only one list per page can be split into pages, and \"{{widget}}\" already is."
     },
+    "sharedAreas": {
+      "shared": "Shared",
+      "sharedIn": "Shared · {{language}}",
+      "emptyHint": "Shown on every page in this language.",
+      "settingsNote": "In {{area}}: shared by every page in this language.",
+      "notShown_one": "{{area}}: not shown by this theme. Its {{count}} widget is kept.",
+      "notShown_other": "{{area}}: not shown by this theme. Its {{count}} widgets are kept.",
+      "formNotAllowed": "A form can't be placed in a shared area yet.",
+      "loadFailed": "Shared areas could not be loaded, so they can't be edited right now."
+    },
     "listingAnchor": {
       "header": "Collection",
       "label": "Main {{collection}} page",

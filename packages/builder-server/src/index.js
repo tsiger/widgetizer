@@ -47,6 +47,9 @@ export {
   buildCollectionRenderDeps,
   renderCollectionItemPageWithDeps,
 } from "./services/renderingService.js";
+// Shared areas, read per language through the storage adapter, for an embedding
+// app's own render loop (the engine's renderSharedAreas renders them).
+export { listAreas, readArea } from "./services/sharedAreaService.js";
 export {
   listCollectionSchemas,
   listCollectionItems,

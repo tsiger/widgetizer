@@ -3,8 +3,12 @@ import fs from "fs-extra";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { v4 as uuidv4 } from "uuid";
-import { processTemplatesRecursive } from "../packages/builder-server/src/utils/templateHelpers.js";
+import {
+  copyMissingAreaTemplates,
+  processTemplatesRecursive,
+} from "../packages/builder-server/src/utils/templateHelpers.js";
 import { enrichNewProjectReferences } from "../packages/builder-server/src/utils/linkEnrichment.js";
+import { AREA_TEMPLATES_DIR, areaFromTemplate } from "@widgetizer/core/sharedAreas";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 export const ROOT = path.resolve(__dirname, "..");
@@ -191,15 +195,22 @@ async function collectExistingMenuMetadata(projectMenusDir) {
   return metadata;
 }
 
-export async function syncTemplatesToProject(templatesSourceDir, projectPagesDir) {
+// `themeTemplatesDir`: when the templates are a preset's, the theme's own, so an
+// area the preset does not supply still gets the theme's starting content.
+export async function syncTemplatesToProject(templatesSourceDir, projectPagesDir, themeTemplatesDir = null) {
   const now = new Date().toISOString();
   const existingMetadata = await collectExistingPageMetadata(projectPagesDir);
   const desiredRelativePaths = new Set();
 
   if (await pathExists(templatesSourceDir)) {
-    await processTemplatesRecursive(templatesSourceDir, projectPagesDir, async (template, slug, targetPath) => {
+    await processTemplatesRecursive(templatesSourceDir, projectPagesDir, async (template, slug, targetPath, { relativeDir }) => {
       const rel = normalizeRelPath(path.relative(projectPagesDir, targetPath));
       desiredRelativePaths.add(rel);
+
+      if (relativeDir === AREA_TEMPLATES_DIR) {
+        await fs.outputFile(targetPath, JSON.stringify(areaFromTemplate(template), null, 2));
+        return;
+      }
 
       if (template.type === "header" || template.type === "footer") {
         await fs.outputFile(targetPath, JSON.stringify(template, null, 2));
@@ -218,6 +229,11 @@ export async function syncTemplatesToProject(templatesSourceDir, projectPagesDir
 
       await fs.outputFile(targetPath, JSON.stringify(initializedPage, null, 2));
     });
+  }
+  if (themeTemplatesDir) {
+    for (const rel of await copyMissingAreaTemplates(themeTemplatesDir, projectPagesDir, areaFromTemplate)) {
+      desiredRelativePaths.add(normalizeRelPath(rel));
+    }
   }
 
   await removeExtraJsonFiles(projectPagesDir, desiredRelativePaths);
@@ -305,7 +321,11 @@ export async function syncPresetProject({ srcDir, projectDest, presetId }) {
   const presetSources = await resolvePresetSources(srcDir, presetId);
 
   await syncProjectThemeJson(srcDir, projectDest, presetSources.settingsOverrides);
-  await syncTemplatesToProject(presetSources.templatesSourceDir, path.join(projectDest, "pages"));
+  await syncTemplatesToProject(
+    presetSources.templatesSourceDir,
+    path.join(projectDest, "pages"),
+    presetSources.usesPresetTemplates ? path.join(srcDir, "templates") : null,
+  );
   await syncMenusToProject(presetSources.menusSourceDir, path.join(projectDest, "menus"));
   await enrichNewProjectReferences(path.join(projectDest, "pages"), path.join(projectDest, "menus"));
 }

@@ -17,6 +17,7 @@ import { withContentWriteLock } from "./contentCoordination.js";
 import { getUpdateStatus } from "../utils/updateStatus.js";
 import { processTemplatesRecursive } from "../utils/templateHelpers.js";
 import { enrichThemeUpdateAdditions } from "../utils/linkEnrichment.js";
+import { AREA_TEMPLATES_DIR, areaFromTemplate } from "@widgetizer/core/sharedAreas";
 import { findThemeSetting } from "@widgetizer/core/themeSettingChanges";
 import { projectLanguages } from "../utils/contentLanguage.js";
 import { loadableCollectionSchemas } from "./collectionService.js";
@@ -413,7 +414,20 @@ export async function applyThemeUpdateToDir({ themeSourceDir, projectDir, langua
     await processTemplatesRecursive(
       path.join(themeSourceDir, "templates"),
       path.join(projectDir, "pages"),
-      async (template, slug, targetPath) => {
+      async (template, slug, targetPath, { relativeDir }) => {
+        if (relativeDir === AREA_TEMPLATES_DIR) {
+          // A shared area gets the theme's starting content in each language the
+          // site has (as a new language does) where that language has none yet.
+          // An area a language already has, emptied or not, is the owner's.
+          const area = areaFromTemplate(template);
+          const name = path.basename(targetPath);
+          for (const language of ["", ...languages]) {
+            const rel = path.join("pages", language, "global", "areas", name);
+            if (await fs.pathExists(path.join(projectDir, rel))) continue;
+            additions.push({ rel, content: structuredClone(area) });
+          }
+          return;
+        }
         if (await fs.pathExists(targetPath)) return; // the author's page
         const now = new Date().toISOString();
         // A page gets its uuid here, as in a new project, so links to it can be

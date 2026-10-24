@@ -217,6 +217,15 @@ async function createSource(name = "Complete Site") {
 
   await fs.outputJson(path.join(pages, "global", "header.json"), { type: "header", ...referenceWidget(UU.menuEn).w1 });
   await fs.outputJson(path.join(pages, "el", "global", "header.json"), { type: "header", ...referenceWidget(UU.menuEl).w1 });
+  // Shared areas, one per language, holding the same kinds of reference.
+  await fs.outputJson(path.join(pages, "global", "areas", "before_footer.json"), {
+    widgets: referenceWidget(UU.menuEn),
+    widgetsOrder: ["w1"],
+  });
+  await fs.outputJson(path.join(pages, "el", "global", "areas", "before_footer.json"), {
+    widgets: referenceWidget(UU.menuEl),
+    widgetsOrder: ["w1"],
+  });
 
   await fs.outputJson(path.join(dir, "menus", "main.json"), {
     id: "main", uuid: UU.menuEn, name: "Main",
@@ -295,6 +304,8 @@ async function assertCompleteProject(row, { identities }) {
     deUeber: await readIf(p("pages", "de", "ueber-uns.json")),
     header: await readIf(p("pages", "global", "header.json")),
     elHeader: await readIf(p("pages", "el", "global", "header.json")),
+    area: await readIf(p("pages", "global", "areas", "before_footer.json")),
+    elArea: await readIf(p("pages", "el", "global", "areas", "before_footer.json")),
   };
   for (const [key, value] of Object.entries(pages)) assert.ok(value, `page missing: ${key}`);
 
@@ -347,6 +358,8 @@ async function assertCompleteProject(row, { identities }) {
     ["el page", pages.elSxetika.widgets.w1],
     ["header", pages.header],
     ["el header", pages.elHeader],
+    ["area", pages.area.widgets.w1],
+    ["el area", pages.elArea.widgets.w1],
   ]) {
     const s = holder.settings;
     assert.equal(s.cta.pageUuid, about, `${label}: widget link`);

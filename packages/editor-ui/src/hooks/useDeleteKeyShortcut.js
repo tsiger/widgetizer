@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import useWidgetStore from "../stores/widgetStore";
+import useWidgetStore, { findWidgetOwner, areaModifiedKey } from "../stores/widgetStore";
 import useAutoSave from "../stores/saveStore";
 
 const GLOBAL_WIDGET_IDS = new Set(["header", "footer"]);
@@ -62,10 +62,13 @@ export default function useDeleteKeyShortcut() {
 
       if (target.type === "block") {
         const { markWidgetModified, setStructureModified } = useAutoSave.getState();
+        const owner = findWidgetOwner(target.widgetId);
         deleteBlock(target.widgetId, target.blockId);
-        // Globals persist via modifiedWidgets; page widgets via the structure flag.
+        // Globals and shared areas persist via modifiedWidgets; page widgets via the structure flag.
         if (target.isGlobal) {
           markWidgetModified(target.widgetId);
+        } else if (owner?.type === "area") {
+          markWidgetModified(areaModifiedKey(owner.areaId));
         } else {
           setStructureModified(true);
         }
