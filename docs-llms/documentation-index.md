@@ -482,12 +482,6 @@ The [Widgetizer Theme skill](../skills/widgetizer-theme/SKILL.md) provides a tas
 
 ---
 
-### **[future_draft_collection_item_editor.md](future_draft_collection_item_editor.md)** - Future: Editable Collection Type Templates
-
-**Purpose**: Placeholder for discussing how collection-type templates could become editable in the editor. No content yet.
-
----
-
 ### **[future-skills-theme.md](future-skills-theme.md)** - Future: Widgetizer Theme Skill
 
 **Purpose**: Build notes for the tool-neutral theme Agent Skill: the repository skill and app-owned validator exist; the desktop-user flow, distribution and packaging remain proposals **When to use**:
@@ -513,7 +507,6 @@ The [Widgetizer Theme skill](../skills/widgetizer-theme/SKILL.md) provides a tas
 
 ## 🧭 Plans & Reference Lists
 
-- **[plan-preset-media.md](plan-preset-media.md)** — Plan for the theme-root `preset-media/<id>/` folder that keeps Arch's preset images out of update deltas and runtime copies. Shipped in 0.9.9; the durable rules live in theme-preset-file-format.md.
 - **[release-microsoft-store.md](release-microsoft-store.md)** — Step-by-step guide for a future Microsoft Store (MSIX/AppX) submission at 1.0.0, including the repo changes to reapply (appx config block, a Store-build flag that disables the auto-updater).
 - **[preset-plans/bedrock.md](preset-plans/bedrock.md)** — Working plan for the Bedrock preset (strategy brief and page plan), with its [image prompts](preset-plans/bedrock-images.json) and [image usage map](preset-plans/bedrock-images-usage.md).
 - **[arch-fonts-list.csv](arch-fonts-list.csv)** / **[arch-icons-list.txt](arch-icons-list.txt)** — Reference lists of available font stacks/weights and Arch's Tabler icon names, for preset and widget authoring.
