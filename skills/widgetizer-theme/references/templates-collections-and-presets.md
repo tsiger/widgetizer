@@ -159,7 +159,7 @@ Register variants in `presets/presets.json`:
 
 `liveDemo` is optional. A root-backed/default entry can fall through without its own folder. An absent preset directory falls back silently; verify IDs deliberately so a typo does not masquerade as a working preset.
 
-`presets/<id>/preset.json` contains `{"settings": {"background": "#f6f3ed"}}`: a flat setting-ID map overriding matching global **defaults**. It does not redefine the setting schema. Unknown IDs do not add settings.
+`presets/<id>/preset.json` contains `{"settings": {"background": "#f6f3ed"}}`: a flat setting-ID map overriding matching global **defaults**. It does not redefine the setting schema. Unknown IDs do not add settings. These overrides are applied at creation and again on every theme update, so changing them in an update changes existing projects made from that preset (owner-set values still win).
 
 | Dimension | Resolution |
 | --- | --- |

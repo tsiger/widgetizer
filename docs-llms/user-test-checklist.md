@@ -238,7 +238,7 @@ The Folder Name field is currently hidden. Mark PROJ-012, PROJ-013, PROJ-015 and
   Expected: A progress state appears, then a success message confirms the update.
 
 - [ ] PROJ-041 - After applying a theme update, check pages, collections, menus, media, and settings.
-  Expected: Project content is intact.
+  Expected: Project content is intact. A project made from a preset still has that preset's fonts and colours, and any setting you changed yourself keeps your choice.
 
 - [ ] PROJ-042 - Duplicate a project.
   Expected: A new row appears named like the original with "(Copy)".

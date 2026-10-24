@@ -6,7 +6,7 @@ description: Release notes and version history for Widgetizer. See what's new in
 
 All notable changes to Widgetizer are documented here.
 
-## 0.9.10 - Unreleased
+## 0.9.10 - 2026-10-22
 
 ### Multilingual Sites
 

@@ -11,7 +11,8 @@ import { getProjectFolderName } from "../utils/projectHelpers.js";
 import * as projectRepo from "../db/repositories/projectRepository.js";
 import { getThemeSourceDir, readThemeSourceMetadata } from "../controllers/themeController.js";
 import { createKeyedSerializer } from "../utils/serializeByKey.js";
-import { isWithinDirectory } from "../utils/pathSecurity.js";
+import { isSafePathSegment, isWithinDirectory } from "../utils/pathSecurity.js";
+import { applyPresetSettings, readPresetSettings } from "../utils/presetSettings.js";
 import { refreshMediaUsageAfterStructuralChange } from "./mediaUsageService.js";
 import { withContentWriteLock } from "./contentCoordination.js";
 import { getUpdateStatus } from "../utils/updateStatus.js";
@@ -342,6 +343,22 @@ async function findLanguageFolderCollection(themeDir, languages) {
 }
 
 /**
+ * The preset's settings, read from the theme being applied as project creation
+ * reads them. A preset that theme does not ship gives none, as it would to a
+ * new project. The name comes from the project's row, which a backup import can
+ * carry, so one that is not a plain folder name is not read at all.
+ * @param {string} themeSourceDir - The theme source the update applies
+ * @param {string|null} preset - The preset the project was created from
+ * @returns {Promise<object|null>} Setting values keyed by setting id
+ */
+async function readUpdatePresetSettings(themeSourceDir, preset) {
+  if (!preset || !isSafePathSegment(preset)) return null;
+  const presetDir = path.join(themeSourceDir, "presets", preset);
+  if (!(await fs.pathExists(presetDir))) return null;
+  return readPresetSettings(presetDir, preset);
+}
+
+/**
  * Apply a theme update to a project directory — the file-level core of an update.
  *
  * All of it, or none of it. The update is built off to the side first, and only
@@ -363,10 +380,12 @@ async function findLanguageFolderCollection(themeDir, languages) {
  * @param {string} params.projectDir - The project's content directory
  * @param {string[]} [params.languages] - The project's additional language codes; an update whose
  *   collections would publish into one of their folders is refused before the swap
+ * @param {string|null} [params.preset] - The preset the project was created from. Its settings
+ *   are applied again from the theme source; without it a preset project loses the preset's look
  * @returns {Promise<{newVersion: string|null}>} The version from the theme source's theme.json, or null if unreadable
  * @throws {Error} When the update could not be applied; the project is unchanged
  */
-export async function applyThemeUpdateToDir({ themeSourceDir, projectDir, languages = [] }) {
+export async function applyThemeUpdateToDir({ themeSourceDir, projectDir, languages = [], preset = null }) {
   const stageDir = path.join(projectDir, STAGE_DIR);
   const backupDir = path.join(projectDir, BACKUP_DIR);
 
@@ -450,6 +469,7 @@ export async function applyThemeUpdateToDir({ themeSourceDir, projectDir, langua
     // Enriched before the merge, so only values the theme supplies are touched:
     // an owner's value carried over by the merge keeps whatever it holds.
     const newThemeJson = await fs.readJson(newThemeJsonPath);
+    applyPresetSettings(newThemeJson, await readUpdatePresetSettings(themeSourceDir, preset));
     await enrichThemeUpdateAdditions({ pagesDir: path.join(projectDir, "pages"), additions, themeJson: newThemeJson });
 
     mergedThemeJson = mergeThemeSettings(await fs.readJson(path.join(projectDir, "theme.json")), newThemeJson);
@@ -612,7 +632,12 @@ async function applyThemeUpdateExclusively(projectId) {
   // wholesale from the theme either way. Rolling the files back for it would
   // mean holding the backup across a database write, which is more machinery
   // than the outcome warrants.
-  await applyThemeUpdateToDir({ themeSourceDir, projectDir, languages: projectLanguages(project).languages });
+  await applyThemeUpdateToDir({
+    themeSourceDir,
+    projectDir,
+    languages: projectLanguages(project).languages,
+    preset: project.preset,
+  });
 
   // 4. Update project metadata
   projectRepo.updateProject(projectId, {

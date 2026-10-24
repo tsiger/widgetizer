@@ -502,6 +502,39 @@ describe("applyThemeUpdate", () => {
     assert.equal(accent.value, "#00ff00");
   });
 
+  it("keeps the look of the preset the project was created from", async () => {
+    const globalSettings = (accent) => ({
+      global: {
+        colors: [
+          { id: "accent_color", label: "Accent", type: "color", default: accent },
+          { id: "text_color", label: "Text", type: "color", default: "#111111" },
+        ],
+      },
+    });
+    await createTheme("1.0.0", {
+      updates: [
+        {
+          version: "1.1.0",
+          settings: globalSettings("#00ff00"),
+          files: { "presets/warm/preset.json": { settings: { accent_color: "#ff6600" } } },
+        },
+      ],
+    });
+    await buildLatestSnapshot(THEME_NAME);
+    await createProject("1.0.0");
+    projectRepo.updateProject(PROJECT_ID, { preset: "warm" });
+    // As creation leaves it: the preset's colour is the default, and the owner set the text colour.
+    const created = globalSettings("#ff6600");
+    created.global.colors[1].value = "#222222";
+    await fs.writeJson(getProjectThemeJsonPath(PROJECT_FOLDER), { version: "1.0.0", settings: created });
+
+    await applyThemeUpdate(PROJECT_ID);
+
+    const colors = (await fs.readJson(getProjectThemeJsonPath(PROJECT_FOLDER))).settings.global.colors;
+    assert.equal(colors.find((s) => s.id === "accent_color").default, "#ff6600", "the preset's colour is kept");
+    assert.equal(colors.find((s) => s.id === "text_color").value, "#222222", "the owner's colour is kept");
+  });
+
   it("keeps old project locales until apply and then replaces them", async () => {
     await createTheme("1.0.0", {
       updates: [

@@ -307,3 +307,101 @@ test("applyThemeUpdateToDir: added globals and slug-less templates, moved and th
   assert.equal(shipped.value.pageUuid, faq.uuid, "a value the theme supplies is enriched");
   assert.equal(shipped.default.pageUuid, faq.uuid);
 });
+
+/**
+ * A theme source and a project made from its "warm" preset: the project holds
+ * the preset's look as defaults, and the owner has chosen one colour of their own.
+ */
+async function makePresetFixture() {
+  const { src, proj } = await makeFixture();
+  const themeSettings = (accent) => ({
+    version: "1.3.0",
+    settings: {
+      global: {
+        colors: [
+          { id: "primary", type: "color", default: "#00f" },
+          { id: "accent", type: "color", default: accent },
+          { id: "background", type: "color", default: "#fff" },
+        ],
+        typography: [{ id: "heading_font", type: "font_picker", default: { stack: "Inter", weight: 600 } }],
+      },
+    },
+  });
+  await fs.outputJson(path.join(src, "theme.json"), themeSettings("#0f0"));
+  await fs.outputJson(path.join(src, "presets", "warm", "preset.json"), {
+    settings: { accent: "#f60", background: "#fdf6ec", heading_font: { stack: "Fraunces", weight: 600 } },
+  });
+  await fs.outputJson(path.join(proj, "theme.json"), {
+    version: "1.0.0",
+    settings: {
+      global: {
+        colors: [
+          { id: "primary", type: "color", default: "#00f" },
+          { id: "accent", type: "color", default: "#f60" },
+          { id: "background", type: "color", default: "#fdf6ec", value: "#000" },
+        ],
+        typography: [{ id: "heading_font", type: "font_picker", default: { stack: "Fraunces", weight: 600 } }],
+      },
+    },
+  });
+  return { src, proj };
+}
+
+const settingOf = (themeJson, id) =>
+  Object.values(themeJson.settings.global)
+    .flat()
+    .find((item) => item.id === id);
+
+test("applyThemeUpdateToDir: a preset project keeps the preset's look, and the owner's choices win", async () => {
+  const { src, proj } = await makePresetFixture();
+
+  await applyThemeUpdateToDir({ themeSourceDir: src, projectDir: proj, preset: "warm" });
+
+  const theme = await fs.readJson(path.join(proj, "theme.json"));
+  assert.equal(settingOf(theme, "accent").default, "#f60", "the preset's colour is kept");
+  assert.deepEqual(settingOf(theme, "heading_font").default, { stack: "Fraunces", weight: 600 });
+  assert.equal(settingOf(theme, "primary").default, "#00f", "a setting the preset leaves alone follows the theme");
+  assert.equal(settingOf(theme, "background").value, "#000", "the owner's own choice is kept");
+  assert.equal(settingOf(theme, "background").default, "#fdf6ec");
+});
+
+test("applyThemeUpdateToDir: a preset changed by the update reaches the project", async () => {
+  const { src, proj } = await makePresetFixture();
+  await fs.outputJson(path.join(src, "presets", "warm", "preset.json"), {
+    settings: { accent: "#e50", background: "#fdf6ec", heading_font: { stack: "Fraunces", weight: 700 } },
+  });
+
+  await applyThemeUpdateToDir({ themeSourceDir: src, projectDir: proj, preset: "warm" });
+
+  const theme = await fs.readJson(path.join(proj, "theme.json"));
+  assert.equal(settingOf(theme, "accent").default, "#e50");
+  assert.deepEqual(settingOf(theme, "heading_font").default, { stack: "Fraunces", weight: 700 });
+});
+
+test("applyThemeUpdateToDir: no preset, or one the theme does not ship, takes the theme's defaults", async () => {
+  for (const preset of [null, "blank", "../warm"]) {
+    const { src, proj } = await makePresetFixture();
+    // A preset.json where `presets/../warm` leads, which that name must not reach.
+    await fs.outputJson(path.join(src, "warm", "preset.json"), { settings: { accent: "#bad" } });
+
+    await applyThemeUpdateToDir({ themeSourceDir: src, projectDir: proj, preset });
+
+    const theme = await fs.readJson(path.join(proj, "theme.json"));
+    assert.equal(settingOf(theme, "accent").default, "#0f0", `preset ${JSON.stringify(preset)}`);
+    assert.deepEqual(settingOf(theme, "heading_font").default, { stack: "Inter", weight: 600 });
+  }
+});
+
+test("applyThemeUpdateToDir: an unreadable preset settings file refuses the update and changes nothing", async () => {
+  const { src, proj } = await makePresetFixture();
+  await fs.outputFile(path.join(src, "presets", "warm", "preset.json"), "{ not json");
+  const before = await fs.readJson(path.join(proj, "theme.json"));
+
+  await assert.rejects(
+    applyThemeUpdateToDir({ themeSourceDir: src, projectDir: proj, preset: "warm" }),
+    /could not be prepared/,
+  );
+
+  assert.deepEqual(await fs.readJson(path.join(proj, "theme.json")), before);
+  assert.equal(await fs.readFile(path.join(proj, "assets", "old.css"), "utf8"), "stale");
+});

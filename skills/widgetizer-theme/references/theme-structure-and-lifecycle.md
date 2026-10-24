@@ -46,7 +46,7 @@ my-theme/
   snippets/                 optional reusable Liquid partials
   menus/                    optional starter menus
   collection-types/         optional theme-owned content definitions
-  presets/                  optional creation-time variants
+  presets/                  optional variants: content at creation, settings at creation and on every update
   updates/                  optional released deltas
 ```
 
@@ -122,7 +122,7 @@ A shared area is a named place in the layout that the site owner fills with ordi
 
 Editing one copy does not automatically update the others. Locate the actual target from the current task/environment; do not hardcode a desktop profile directory. Create or use a disposable project for verification. Theme/preset synchronization helpers can mutate projects: inspect their scope and use them only for an intended test target.
 
-Project creation excludes templates from the general copy and instantiates them into pages separately. `updates/`, `latest/`, `presets/`, and `preset-media/` are excluded from the project copy. Presets are consumed once; subsequent preset edits do not restyle existing projects.
+Project creation excludes templates from the general copy and instantiates them into pages separately. `updates/`, `latest/`, `presets/`, and `preset-media/` are excluded from the project copy. A preset's templates, menus, collection items and media are used once, at creation. Its `preset.json` settings are different: the project records its preset, and every theme update writes that preset's settings, as the new version has them, into the defaults again — so a preset edit shipped in an update restyles existing projects wherever the owner has not set that setting.
 
 ## Distributed updates
 
@@ -133,7 +133,7 @@ Project creation excludes templates from the general copy and instantiates them 
 At project update:
 
 - Theme infrastructure (`layout.liquid`, `assets`, `widgets`, `snippets`, `locales`, `screenshot.png`, `collection-types`) is refreshed.
-- Matching customized settings are preserved; new settings get defaults; removed definitions are dropped. Moving a setting between groups is not a transparent rename.
+- Defaults come from the new manifest, with the project's preset settings (from the new version of that preset) applied over them; then matching customized settings are preserved; new settings get defaults; removed definitions are dropped. A delta only needs the preset files it changes: a preset left out of a delta still comes through from the earlier versions. Deleting a preset from the theme (a deletion marker, so it is gone from the assembled theme) leaves its projects on the theme's defaults; owner-set values still survive. Moving a setting between groups keeps a unique setting ID's owner value and gives it the preset's default in its new group, but it is not a transparent rename: Liquid references and CSS variables that name the old group must be updated.
 - Existing pages, uploaded media, and collection item data are protected. Missing starter pages/menus can be added; existing content is preserved.
 - Changes to collection definitions can leave archived or newly required fields. A theme update does not automatically migrate arbitrary item schemas or translate content.
 

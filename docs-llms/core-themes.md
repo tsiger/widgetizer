@@ -15,7 +15,7 @@ The seed directory defaults to `themes/` (or `THEMES_ROOT` if set) but an embedd
 
 ### Theme Directory Structure
 
-A theme directory carries its authored content plus two system-managed areas — `updates/` (per-version partial update folders) and `latest/` (a materialized snapshot composed from the base version plus all updates in semver order). An optional `presets/` directory holds named theme variants used only at project creation:
+A theme directory carries its authored content plus two system-managed areas — `updates/` (per-version partial update folders) and `latest/` (a materialized snapshot composed from the base version plus all updates in semver order). An optional `presets/` directory holds named theme variants. A preset's content is used at project creation; its settings are applied at creation and again on every theme update:
 
 ```
 themes/
@@ -36,7 +36,7 @@ themes/
 ```
 
 - **Versioning (`updates/` + `latest/`):** the `latest/` folder is built by composing the base version with all `updates/<version>/` folders in semver order. The full validation and composition rules live in [Theme Updates](theme-updates.md).
-- **Presets (`presets/`):** optional; provides named variants that can override settings, templates, menus, collections, and preset media. Presets are applied only at project creation time. See [Theme Presets](theme-presets.md) for the registry format and resolution rules.
+- **Presets (`presets/`):** optional; provides named variants that can override settings, templates, menus, collections, and preset media. A preset's templates, menus, collections and media are applied only at project creation; its `preset.json` settings are applied at creation and again whenever the project takes a theme update (see [Theme Settings Merge](theme-updates.md#theme-settings-merge)). See [Theme Presets](theme-presets.md) for the registry format and resolution rules.
 
 ## 2. Frontend Implementation (`app/src/pages/Themes.jsx`)
 

@@ -16,7 +16,7 @@ A `default` field (which preset is pre-selected in the UI) plus a `presets` arra
 
 ### Per-preset overrides — `preset.json`
 
-A flat `setting_id → value` map under a `settings` key. At creation time these values overwrite the `default` field of matching settings in the project's copied `theme.json`; the schema itself stays in the base `theme.json`. Overrides cover both visual tokens (colors, fonts) and style toggles (corner style, spacing density) that drive body classes through the CSS design system — see [arch-design-system.md](arch-design-system.md).
+A flat `setting_id → value` map under a `settings` key. At creation time these values overwrite the `default` field of matching settings in the project's copied `theme.json`; the schema itself stays in the base `theme.json`. They go into `default`, not `value`, so they stay apart from the owner's own choices — and because a theme update rebuilds every `default` from the new theme, the update applies them again (see [Lifecycle notes](#lifecycle-notes)). Overrides cover both visual tokens (colors, fonts) and style toggles (corner style, spacing density) that drive body classes through the CSS design system — see [arch-design-system.md](arch-design-system.md).
 
 ### Fallback chain
 
@@ -33,6 +33,7 @@ Themes with no `presets/` directory behave exactly as before — presets are ful
 
 ## Where it lives in code
 
+- **Preset settings**: `readPresetSettings` / `applyPresetSettings` in `packages/builder-server/src/utils/presetSettings.js` read a `preset.json` and write its settings into a `theme.json`'s defaults; project creation and theme updates both use them.
 - **Resolution + registry**: `resolvePresetPaths(themeId, presetId)` and `listThemePresets` / `getThemePresets` in `packages/builder-server/src/controllers/themeController.js`. Preset path helpers (`getThemePresetsDir`, `getThemePresetDir`) are in `packages/builder-server/src/config.js`. Resolution reads from the theme **source** dir (`latest/` if present, root otherwise) so presets delivered via theme updates are visible.
 - **Route**: `GET /:id/presets` in `packages/builder-server/src/routes/themes.js`; `getAllThemes` includes a `presets` count per theme.
 - **Creation flow**: `scaffoldProjectContent` in `packages/builder-server/src/utils/projectScaffold.js` applies preset menus, template-derived pages, and the settings overrides; `seedPresetCollections` / `seedPresetMedia` in `packages/builder-server/src/controllers/projectController.js` seed collection item data and starter media. See [core-projects.md](core-projects.md) for the full sequence.
@@ -40,6 +41,7 @@ Themes with no `presets/` directory behave exactly as before — presets are ful
 
 ## Lifecycle notes
 
-- **Creation-time only**: presets are consumed once, at project creation. Afterward the project is independent — preset edits don't propagate. The `copyThemeToProject` flow excludes `presets/` and `preset-media/` (alongside `updates/` and `latest/`) so preset data never lands in a project.
+- **Content is creation-time only**: a preset's templates, menus, collection items and media are used once, at project creation. Afterward the project's pages, menus, collections and uploads are its own, and later preset edits never reach them. The `copyThemeToProject` flow excludes `presets/` and `preset-media/` (alongside `updates/` and `latest/`) so preset files never land in a project.
+- **Settings come back on every theme update**: the project row keeps the preset id (`preset`), and when the project applies a theme update its preset's `preset.json` settings are read from the new theme version and written into the defaults again, before the owner's values are merged in. So a preset project keeps its look through updates, a preset changed in an update reaches existing projects wherever the owner has not set that setting themselves, and the owner's own choices always win. A preset the new theme no longer ships gives no settings, and the project takes the theme's defaults. Details and every case: [Theme Settings Merge](theme-updates.md#theme-settings-merge).
 - **Screenshots**: served from the themes directory via `/themes/*`, so `presets/<id>/screenshot.png` resolves automatically.
 - **Theme updates**: handled by the version system, which refreshes shared infrastructure and merges `theme.json` without clobbering project content — see [theme-updates.md](theme-updates.md).

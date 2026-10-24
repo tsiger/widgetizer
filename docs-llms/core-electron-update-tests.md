@@ -12,6 +12,7 @@ These are the short, proven paths. The long sections further down are the origin
 
 Rules that apply to both platforms:
 
+- **Use a preset with content, not Blank, for the test projects** — see [Test Projects From A Preset](#test-projects-from-a-preset). A preset's fonts and colours live in the settings' defaults, which every theme update rebuilds, and its pages, collections and images are what a real site holds; a Blank project has neither, so it cannot show whether the update kept them.
 - **Back up the real user data, don't just wipe it.** The developer's own Widgetizer projects live in the user-data folder. Copy it aside before the test and restore it afterwards.
 - **Both sides must be signed the same way.** A signed app refuses an unsigned update. On Windows, a signed build stores the publisher name in `resources/app-update.yml` and the updater checks the new installer against it. So either test unsigned → unsigned (both built from source), or signed → signed.
 - **Do not regenerate the theme delta** when `themes/arch/updates/<targetVersion>/` is already committed. `theme-update-delta.js --force` overwrites hand-made fixes in that folder. Build the target from its branch as it is.
@@ -56,14 +57,14 @@ For the target, use the release branch (`0.9.10`) after `git fetch`, and check t
 The human then:
 
 1. Installs `$test\widgetizer-0.9.9\dist-electron\Widgetizer-Setup-0.9.9.exe`.
-2. Creates two Arch projects, one with theme updates on and one off, then closes Widgetizer completely (check Task Manager).
+2. Creates the two test projects from the **Arch** preset as described in [Test Projects From A Preset](#test-projects-from-a-preset), closes Widgetizer completely (check Task Manager), and takes the "before" snapshot from that section.
 3. Opens a new PowerShell window from the Start menu and runs:
    ```powershell
    $env:ELECTRON_UPDATER_URL = "http://127.0.0.1:8384"
    & "$env:LOCALAPPDATA\Programs\widgetizer\Widgetizer.exe"
    ```
 4. Clicks Update, then Restart Now, and checks the version in About.
-5. Updates Arch on the Themes screen. Only the opted-in project offers the theme update; applies it and checks the project.
+5. Runs the "after the app update" check from [Test Projects From A Preset](#test-projects-from-a-preset). Then updates Arch on the Themes screen; only the opted-in project offers the theme update. Applies it, then runs the "after the theme update" checks and looks at the project's preview.
 
 Restore afterwards (Widgetizer closed): stop the feed, delete the four install/data folders again, copy the backup back with `robocopy "$test\backup-appdata-widgetizer" "$env:APPDATA\widgetizer" /E /COPY:DAT`, and reinstall the official signed release (`gh release download <fromVersion> --repo tsiger/widgetizer --pattern "Widgetizer-Setup-*.exe"`, then run it with `/S`). Keep the backup until the developer confirms their projects look right.
 
@@ -110,16 +111,130 @@ The feed folder must contain `latest-mac.yml` and the `.zip` files; macOS update
 The human then:
 
 1. Opens the 0.9.9 DMG and drags Widgetizer to Applications, then opens it once from Applications.
-2. Creates two Arch projects, one with theme updates on and one off, then quits with Cmd+Q.
+2. Creates the two test projects from the **Arch** preset as described in [Test Projects From A Preset](#test-projects-from-a-preset), quits with Cmd+Q, and takes the "before" snapshot from that section.
 3. Opens a new Terminal window and runs (all one line):
    ```bash
    ELECTRON_UPDATER_URL=http://127.0.0.1:8384 /Applications/Widgetizer.app/Contents/MacOS/Widgetizer
    ```
    Do not use `open -a Widgetizer`, because `open` does not pass the variable through. Leave the Terminal window open; the app's log prints there.
 4. Clicks Update, then Restart Now, and checks the version in About.
-5. Updates Arch on the Themes screen. Only the opted-in project offers the theme update; applies it and checks the project.
+5. Runs the "after the app update" check from [Test Projects From A Preset](#test-projects-from-a-preset). Then updates Arch on the Themes screen; only the opted-in project offers the theme update. Applies it, then runs the "after the theme update" checks and looks at the project's preview.
 
 Restore afterwards (Widgetizer quit): stop the feed, remove the app, data and caches as in step 1, copy the backup back with `ditto "$test/backup-appsupport-widgetizer" ~/Library/Application\ Support/widgetizer`, and reinstall the official release from its DMG. Remove the worktree with `git worktree remove --force "$test/widgetizer-0.9.10"`. Keep the backup until the developer confirms their projects look right.
+
+## Test Projects From A Preset
+
+Every rehearsal uses two projects made from the **Arch** preset card on New Project. It ships a full demo site — pages, menus, the News, Projects and Services collections, starter images — and its own look (Fraunces headings, pink `#DE1877` accent). Name them exactly as below, so the folder names in the commands match:
+
+| Project name | Receive theme updates | Folder |
+|---|---|---|
+| `Preset test - updates ON` | on | `preset-test-updates-on` |
+| `Preset test - updates OFF` | off | `preset-test-updates-off` |
+
+The commands use the packaged app's data folder: `~/Library/Application Support/widgetizer/data` on Mac, `$env:APPDATA\widgetizer\data` on Windows. Set the test folder first (`test=~/widgetizer-upgrade-test` on Mac; `$test` from the Windows recipe).
+
+### Before the app update
+
+With the base version's projects created and Widgetizer closed, record every file in both projects.
+
+Mac:
+
+```bash
+cd ~/Library/Application\ Support/widgetizer/data/projects
+find preset-test-updates-on preset-test-updates-off -type f | sort | xargs -I{} shasum -a 256 "{}" > "$test/projects-before.sha"
+```
+
+Windows:
+
+```powershell
+$projects = "$env:APPDATA\widgetizer\data\projects"
+Get-ChildItem "$projects\preset-test-updates-on", "$projects\preset-test-updates-off" -Recurse -File |
+  Get-FileHash | Select-Object Path, Hash | Export-Csv "$test\projects-before.csv" -NoTypeInformation
+```
+
+### After the app update
+
+Once the app has restarted as the target version, and before touching the Themes screen, the app update must have changed no project file. Both commands print nothing when that holds.
+
+Mac:
+
+```bash
+cd ~/Library/Application\ Support/widgetizer/data/projects
+shasum -a 256 -c --quiet "$test/projects-before.sha"
+```
+
+Windows:
+
+```powershell
+$projects = "$env:APPDATA\widgetizer\data\projects"
+Import-Csv "$test\projects-before.csv" |
+  Where-Object { -not (Test-Path -LiteralPath $_.Path) -or (Get-FileHash -LiteralPath $_.Path).Hash -ne $_.Hash } |
+  Select-Object -ExpandProperty Path
+```
+
+### After the theme update
+
+After updating Arch on the Themes screen and applying the update to `Preset test - updates ON`:
+
+1. **Content and the opted-out project are untouched.** Only the opted-in project's theme files (`theme.json`, `assets`, `widgets`, `snippets`, `locales`, `layout.liquid`, `collection-types`) may have changed. Both commands print nothing when that holds.
+
+   Mac:
+
+   ```bash
+   cd ~/Library/Application\ Support/widgetizer/data/projects
+   grep -E 'preset-test-updates-off/|/(pages|menus|collections|uploads)/' "$test/projects-before.sha" | shasum -a 256 -c --quiet
+   ```
+
+   Windows:
+
+   ```powershell
+   $projects = "$env:APPDATA\widgetizer\data\projects"
+   Import-Csv "$test\projects-before.csv" |
+     Where-Object { $_.Path -match '\\preset-test-updates-off\\|\\(pages|menus|collections|uploads)\\' } |
+     Where-Object { -not (Test-Path -LiteralPath $_.Path) -or (Get-FileHash -LiteralPath $_.Path).Hash -ne $_.Hash } |
+     Select-Object -ExpandProperty Path
+   ```
+
+2. **The preset's look survived and every new setting arrived.** Each of the preset's settings must still be in effect, read from the updated Arch's own `presets/arch/preset.json`, and every setting in the updated Arch `theme.json` must be in the project. Both commands print only the `checked …` line when that holds; any `NOT THE PRESET'S` or `MISSING SETTING` line is a failure.
+
+   Mac:
+
+   ```bash
+   python3 - <<'EOF'
+   import json, os
+   data = os.path.expanduser("~/Library/Application Support/widgetizer/data")
+   ids = lambda t: {i["id"]: i for g in t["settings"]["global"].values() if isinstance(g, list) for i in g if isinstance(i, dict) and i.get("id")}
+   project = ids(json.load(open(f"{data}/projects/preset-test-updates-on/theme.json")))
+   preset = json.load(open(f"{data}/themes/arch/latest/presets/arch/preset.json"))["settings"]
+   for key, want in preset.items():
+       item = project.get(key, {})
+       if (item["value"] if item.get("value") is not None else item.get("default")) != want:
+           print("NOT THE PRESET'S:", key)
+   for key in ids(json.load(open(f"{data}/themes/arch/latest/theme.json"))):
+       if key not in project:
+           print("MISSING SETTING:", key)
+   print(f"checked {len(preset)} preset settings")
+   EOF
+   ```
+
+   Windows:
+
+   ```powershell
+   $data = "$env:APPDATA\widgetizer\data"
+   $settingsOf = { param($t) foreach ($g in $t.settings.global.PSObject.Properties) { $g.Value | Where-Object { $_.id } } }
+   $project = & $settingsOf (Get-Content "$data\projects\preset-test-updates-on\theme.json" -Raw | ConvertFrom-Json)
+   $preset = (Get-Content "$data\themes\arch\latest\presets\arch\preset.json" -Raw | ConvertFrom-Json).settings
+   foreach ($p in $preset.PSObject.Properties) {
+     $item = $project | Where-Object { $_.id -eq $p.Name } | Select-Object -First 1
+     $actual = if ($null -ne $item.value) { $item.value } else { $item.default }
+     if (($actual | ConvertTo-Json -Compress -Depth 5) -ne ($p.Value | ConvertTo-Json -Compress -Depth 5)) { "NOT THE PRESET'S: $($p.Name)" }
+   }
+   $latest = & $settingsOf (Get-Content "$data\themes\arch\latest\theme.json" -Raw | ConvertFrom-Json)
+   $latest.id | Where-Object { $_ -notin $project.id } | ForEach-Object { "MISSING SETTING: $_" }
+   "checked $(@($preset.PSObject.Properties).Count) preset settings"
+   ```
+
+3. **It looks right.** Open `Preset test - updates ON` and look over the preview: home page, a News item, a Projects item, the header menu and footer. Headings are in Fraunces, accents are pink, and the demo images show. Then open `Preset test - updates OFF`: it is still on the base version and looks the same.
 
 ## Non-Negotiables
 
@@ -221,10 +336,7 @@ foreach ($p in $paths) {
 
 After the installer finishes, open Widgetizer if it did not auto-open.
 
-Create the base-version test projects in the `0.9.8` app:
-
-- one Arch project with theme updates enabled
-- one Arch project with theme updates disabled
+Create the two test projects in the `0.9.8` app from the **Arch** preset, as described in [Test Projects From A Preset](#test-projects-from-a-preset): `Preset test - updates ON` with theme updates enabled and `Preset test - updates OFF` with them disabled.
 
 Still in **PowerShell Window 1**, verify the clean `0.9.8` state while Widgetizer is running:
 
@@ -238,13 +350,15 @@ Expected before starting the update:
 - `/api/themes` shows Arch `version: "0.9.8"`.
 - The opted-in project has `receiveThemeUpdates: true`.
 - The opted-out project has `receiveThemeUpdates: false`.
-- Both projects have `themeVersion: "0.9.8"`.
+- Both projects have `themeVersion: "0.9.8"` and `preset: "arch"`.
 
 Close Widgetizer before launching it against the update feed:
 
 ```powershell
 Get-Process Widgetizer -ErrorAction SilentlyContinue | Stop-Process -Force
 ```
+
+Then take the "before" snapshot from [Test Projects From A Preset](#test-projects-from-a-preset).
 
 ### PowerShell Window 2: Start The `0.9.9` Feed Server
 
@@ -325,6 +439,7 @@ Expected final state:
 - Arch reports `version: "0.9.9"` after the Arch update is applied.
 - The opted-in project moves to `themeVersion: "0.9.9"` after applying its project theme update.
 - The opted-out project remains on `themeVersion: "0.9.8"`.
+- The "after the app update" and "after the theme update" checks in [Test Projects From A Preset](#test-projects-from-a-preset) pass.
 
 ## Updater Override Requirement
 
@@ -435,10 +550,7 @@ $baseWt\dist-electron\win-unpacked\Widgetizer.exe
 
 That is useful for debugging, but the upgrade rehearsal needs the installed NSIS app because `electron-updater` updates the installed app.
 
-In the base app, create at least two Arch projects:
-
-- One project with theme updates enabled.
-- One project with theme updates disabled.
+In the base app, create the two test projects from the **Arch** preset, as described in [Test Projects From A Preset](#test-projects-from-a-preset): `Preset test - updates ON` with theme updates enabled and `Preset test - updates OFF` with them disabled. Close Widgetizer and take the "before" snapshot from that section before launching against the update feed.
 
 Optional API sanity checks while the base app is running:
 
@@ -450,7 +562,7 @@ Invoke-RestMethod http://127.0.0.1:3001/api/projects | ConvertTo-Json -Depth 10
 Expected before upgrade:
 
 - `/api/themes` shows Arch version `$fromVersion`.
-- Projects have `themeVersion: "$fromVersion"`.
+- Projects have `themeVersion: "$fromVersion"` and `preset: "arch"`.
 - The opted-in project has `receiveThemeUpdates: true`.
 - The opted-out project has `receiveThemeUpdates: false`.
 
@@ -686,6 +798,8 @@ Expected:
 - The project no longer reports `hasThemeUpdate: true`.
 
 The opted-out project should remain on `themeVersion: "$fromVersion"` until its update preference is enabled and the project update is applied.
+
+Then run the "after the theme update" checks in [Test Projects From A Preset](#test-projects-from-a-preset): content and the opted-out project untouched, the preset's look and every new setting present, and the preview looks right.
 
 ## Troubleshooting
 

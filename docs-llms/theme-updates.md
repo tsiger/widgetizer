@@ -191,64 +191,90 @@ Existing content is left as it is: a hand-typed link that already names a page t
 
 ## Theme Settings Merge
 
-When updating `theme.json`, the system uses intelligent merging (`mergeThemeSettings` in `themeUpdateService.js`):
+Each setting in a project's `theme.json` has two slots, and the merge treats them differently:
 
-### Rules
+- **`value`** — what the owner chose in the editor. Kept through every update.
+- **`default`** — the project's starting look: the theme's default, or, for a project made from a preset, the preset's value written there at creation (see [theme-presets.md](theme-presets.md)). Rebuilt from the new theme on every update.
 
-1. **New settings** from the theme are **added** to the project
-2. **Existing user values** are **preserved** (not overwritten)
-3. **Removed settings** (deleted by theme author) are **removed** from the project
+The update builds the new `theme.json` in three steps while it is prepared (`applyThemeUpdateToDir` in `themeUpdateService.js`):
+
+1. **Read the new theme's `theme.json`.** Its schema and defaults are the starting point.
+2. **Apply the project's preset again.** The project row records the preset it was created from (`preset`). Its `preset.json` settings are read from the theme being applied (`presets/<preset>/` in the theme source, so `latest/` when one exists) and written into the matching settings' `default`, exactly as creation does it (`applyPresetSettings` in `utils/presetSettings.js`, matched by setting id across all groups). Without this step the merge would hand a preset project the plain theme defaults and the preset's look would be lost.
+3. **Merge in the owner's values** (`mergeThemeSettings`):
+   - a setting in both keeps the owner's `value`; everything else comes from the new item
+   - a setting the update **moved** to another group keeps the owner's `value` too (`carryMovedSettingValues`)
+   - a **new** setting keeps the new definition as it is, including its preset-adjusted default and any `value` the theme itself supplies
+   - a setting the theme **removed** is dropped, with its `value`
+
+Link defaults and values the new `theme.json` brings, the preset's included, are enriched with page references between steps 2 and 3, so an owner's carried-over value is left exactly as it was.
+
+The preset step, case by case:
+
+| Project's `preset` | Result |
+|---|---|
+| none, or a preset with no folder (such as `blank`) | no preset settings; the theme's defaults |
+| a preset folder with no `preset.json` | no preset settings; the theme's defaults, and the update goes ahead |
+| a preset the new theme ships | that preset's settings **as the new version has them** — a preset changed in the update reaches the project, except where the owner set a `value` |
+| a preset the new theme no longer ships — deleted from the effective theme source (`latest/`, or the root when there is none), not merely left out of a delta | no preset settings; the project takes the theme's defaults and loses that look, though the owner's values stay (known limit) |
+| a name that is not a single safe folder name (only possible through an imported backup) | not read; the theme's defaults |
+| a preset whose `preset.json` cannot be read | the update is refused while it is prepared, and the project is unchanged |
+
+`applyThemeUpdateToDir` takes the preset as its `preset` argument. The packaged update passes the project's; an embedding app that calls it directly must pass it too, or preset projects lose their look.
 
 ### Example
 
-**Theme's new `theme.json`:**
+A project made from a preset that sets `accent` to `#ff6600`. The owner later changed `text` in the editor.
+
+**The project's `theme.json` before the update:**
 
 ```json
 {
   "settings": {
     "global": {
       "colors": [
-        { "id": "primary", "default": "#0000ff" },
-        { "id": "secondary", "default": "#ff0000" },
-        { "id": "accent", "default": "#00ff00" } // NEW setting
+        { "id": "accent", "default": "#ff6600" },
+        { "id": "text", "default": "#111111", "value": "#222222" },
+        { "id": "old_color", "default": "#999999" }
       ]
     }
   }
 }
 ```
 
-**User's current `theme.json`:**
+**The new theme's `theme.json`** (`old_color` removed, `link` added, `accent`'s default changed):
 
 ```json
 {
   "settings": {
     "global": {
       "colors": [
-        { "id": "primary", "default": "#123456" }, // User changed this
-        { "id": "secondary", "default": "#ff0000" },
-        { "id": "old_color", "default": "#999999" } // Removed by theme author
+        { "id": "accent", "default": "#00ff00" },
+        { "id": "text", "default": "#111111" },
+        { "id": "link", "default": "#0000ff" }
       ]
     }
   }
 }
 ```
 
-**Result after merge:**
+**After the update** (the new version of the preset still sets `accent` to `#ff6600`):
 
 ```json
 {
   "settings": {
     "global": {
       "colors": [
-        { "id": "primary", "default": "#123456" }, // User value preserved
-        { "id": "secondary", "default": "#ff0000" },
-        { "id": "accent", "default": "#00ff00" } // New setting added
-        // old_color removed (not in new theme)
+        { "id": "accent", "default": "#ff6600" }, // the preset's, applied again
+        { "id": "text", "default": "#111111", "value": "#222222" }, // the owner's value kept
+        { "id": "link", "default": "#0000ff" } // new setting, theme default
+        // old_color dropped: the new theme removed it
       ]
     }
   }
 }
 ```
+
+A project with no preset gets `accent` `#00ff00`, the new theme default.
 
 ## User Workflow
 
@@ -338,7 +364,7 @@ After the theme is updated:
 1. Projects page shows update indicator (arrow icon) next to affected projects
 2. User edits the project
 3. User clicks "Apply Theme Update" (or similar action)
-4. System copies updated files, merges settings
+4. System copies updated files, applies the project's preset settings again, and merges the owner's settings (see [Theme Settings Merge](#theme-settings-merge))
 5. Project's `themeVersion` is updated — only after the files are in place, so a failed update stays available to retry. This write is outside the file rollback: if it fails, the new files stay with the old recorded version, and the next update re-applies them
 6. Frontend invalidates the cached projects list so refreshed project reads immediately show the new version and cleared update badge
 
@@ -403,6 +429,7 @@ Projects track theme update information:
 
 - `packages/builder-server/src/controllers/themeController.js` — Theme CRUD, `latest/` snapshot building (`buildLatestSnapshot`), source resolution, and the 5s source cache
 - `packages/builder-server/src/services/themeUpdateService.js` — Project update logic, `UPDATABLE_PATHS`, and `mergeThemeSettings`
+- `packages/builder-server/src/utils/presetSettings.js` — `readPresetSettings` / `applyPresetSettings`, shared by project creation and theme updates
 - `packages/builder-server/src/utils/semver.js` — Version parsing and comparison
 - `packages/builder-server/src/utils/updateStatus.js` — Shared update-status shaping on top of semver comparison
 - `packages/builder-server/src/routes/themes.js`, `packages/builder-server/src/routes/projects.js` — REST routes listed above
