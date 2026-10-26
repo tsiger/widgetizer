@@ -4,6 +4,7 @@ import useWidgetStore from "../stores/widgetStore";
 import fontDefinitions from "@widgetizer/core/config/fonts.json" with { type: "json" };
 import { getPreviewTargetOrigin } from "../lib/previewBase";
 import { readThemeSetting, themeSettingsOfType } from "@widgetizer/core/themeSettingChanges";
+import { changedThemeSettingPaths, readsDependOn } from "@widgetizer/core/themeReads";
 import { collectThemeFonts, themeFontsStylesheetUrl } from "@widgetizer/core/themeFonts";
 
 const ALL_FONTS_LIST = [...fontDefinitions.system, ...fontDefinitions.google];
@@ -111,25 +112,110 @@ export async function fetchRenderedWidget(widgetId, widget, themeSettings, curre
   }
 }
 
+// The site settings each widget and the layout read in the iframe's current
+// document, kept per iframe: from PREVIEW_READY after a full render, then from
+// each widget re-render.
+const previewThemeReads = new WeakMap();
+
+// Each call of updatePreview takes the next number; an update that finishes after
+// a newer one started applies nothing, so an older render never lands on a newer one.
+const previewGenerations = new WeakMap();
+
+const RENDER_CONCURRENCY = 4;
+
+/**
+ * Record the reads a full render reported (the PREVIEW_READY payload).
+ * @param {HTMLIFrameElement} iframe
+ * @param {{ widgets?: Object<string, string[]>, layout?: string[] } | null} themeReads
+ */
+export function setPreviewThemeReads(iframe, themeReads) {
+  if (!iframe) return;
+  // A new document: an update still rendering for the old one must not morph into it,
+  // and it already carries the custom code it was rendered with.
+  previewGenerations.set(iframe, (previewGenerations.get(iframe) || 0) + 1);
+  lastCustomCode.delete(iframe);
+  previewThemeReads.set(iframe, {
+    widgets: { ...(themeReads?.widgets || {}) },
+    layout: Array.isArray(themeReads?.layout) ? themeReads.layout : null,
+  });
+}
+
+/**
+ * Make any update still rendering apply nothing, e.g. when an edit is undone
+ * before it finished.
+ * @param {HTMLIFrameElement} iframe
+ */
+export function invalidatePreviewUpdates(iframe) {
+  if (iframe) previewGenerations.set(iframe, (previewGenerations.get(iframe) || 0) + 1);
+}
+
+async function mapWithConcurrency(items, limit, task) {
+  const results = new Array(items.length);
+  let next = 0;
+  const worker = async () => {
+    while (next < items.length) {
+      const index = next++;
+      results[index] = await task(items[index]);
+    }
+  };
+  await Promise.all(Array.from({ length: Math.min(limit, items.length) }, worker));
+  return results;
+}
+
+/**
+ * Fetch a single rendered widget together with the site settings it read.
+ * @returns {Promise<{ html: string, themeReads: string[] | null }>}
+ */
+export async function fetchRenderedWidgetWithReads(widgetId, widget, themeSettings, currentCanonicalPath = "", page = null, area = null) {
+  const response = await editorFetch("/preview/widget", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      widgetId,
+      widget,
+      themeSettings,
+      currentCanonicalPath,
+      page,
+      withThemeReads: true,
+      ...(area ? { area } : {}),
+    }),
+  });
+
+  if (!response.ok) {
+    await throwApiError(response, "Failed to render widget");
+  }
+
+  const { html, themeReads } = await response.json();
+  return { html, themeReads: Array.isArray(themeReads) ? themeReads : null };
+}
+
 /**
  * Update preview for CONTENT CHANGES ONLY (settings, blocks).
  * This function should NOT be called for structural changes (add/remove/reorder widgets).
  * Structural changes should trigger a full page reload instead.
  *
  * Flow:
- * 1. Find widgets whose content changed
- * 2. Morph those widgets via MORPH_WIDGET message
- * 3. Update theme CSS variables if changed
+ * 1. Apply changed site settings the runtime handles (CSS variables, fonts, classes) at once
+ * 2. Find widgets whose content changed, plus those that read a changed site setting
+ * 3. Render them in parallel and morph them in page order via MORPH_WIDGET
  *
  * @param {HTMLIFrameElement} iframe - Preview iframe element
  * @param {Object} newState - New page state with widgets, globalWidgets, themeSettings
  * @param {Object} [oldState] - Previous page state for comparison
- * @returns {Promise<void>}
+ * @returns {Promise<{ stale?: boolean, needsReload?: boolean }>} `stale` when a newer
+ *   update started meanwhile (nothing was applied); `needsReload` when the page
+ *   layout reads a changed site setting, so only a full render shows it.
  */
 export async function updatePreview(iframe, newState, oldState) {
   if (!iframe?.contentWindow || !newState) {
-    return;
+    return {};
   }
+
+  const generation = (previewGenerations.get(iframe) || 0) + 1;
+  previewGenerations.set(iframe, generation);
+  const isCurrent = () => previewGenerations.get(iframe) === generation;
 
   const safeOldState = oldState || {};
   const { widgets: newWidgets = {}, globalWidgets: newGlobalWidgets = {}, themeSettings: newThemeSettings } = newState;
@@ -144,80 +230,83 @@ export async function updatePreview(iframe, newState, oldState) {
     themeSettings: oldThemeSettings,
   } = safeOldState;
 
+  const themeSettingsChanged = JSON.stringify(newThemeSettings) !== JSON.stringify(oldThemeSettings);
+  if (themeSettingsChanged) {
+    updateThemeSettings(iframe, newThemeSettings);
+  }
+
+  // The site settings whose rendered value changed; null when there is nothing to
+  // compare with, which counts as every setting.
+  const settingChanges = themeSettingsChanged && oldThemeSettings ? changedThemeSettingPaths(oldThemeSettings, newThemeSettings) : null;
+  const reads = previewThemeReads.get(iframe) || { widgets: {}, layout: null };
+  const readsChangedSetting = (widgetReads) =>
+    themeSettingsChanged && (!settingChanges || readsDependOn(widgetReads, settingChanges));
+
+  // The layout printed what it read into the document, so only a full render
+  // updates it — even for a setting the runtime also applies as a variable.
+  if (themeSettingsChanged && reads.layout && (!settingChanges || readsDependOn(reads.layout, settingChanges))) {
+    return { needsReload: true };
+  }
+
   // Find widgets whose content changed (settings, blocks, block order)
   const changedWidgetIds = [];
-  const newWidgetIds = new Set(Object.keys(newWidgets));
-  const oldWidgetIds = new Set(Object.keys(oldWidgets));
-
-  for (const id of newWidgetIds) {
-    if (oldWidgetIds.has(id)) {
-      const oldWidget = oldWidgets[id];
-      const newWidget = newWidgets[id];
-      if (oldWidget && newWidget) {
-        const settingsChanged = JSON.stringify(oldWidget.settings) !== JSON.stringify(newWidget.settings);
-        const blocksChanged = JSON.stringify(oldWidget.blocks) !== JSON.stringify(newWidget.blocks);
-        const blockOrderChanged = JSON.stringify(oldWidget.blocksOrder) !== JSON.stringify(newWidget.blocksOrder);
-        if (settingsChanged || blocksChanged || blockOrderChanged) {
-          changedWidgetIds.push(id);
-        }
-      }
+  for (const id of Object.keys(newWidgets)) {
+    const oldWidget = oldWidgets[id];
+    const newWidget = newWidgets[id];
+    if (!oldWidget || !newWidget) continue;
+    const settingsChanged = JSON.stringify(oldWidget.settings) !== JSON.stringify(newWidget.settings);
+    const blocksChanged = JSON.stringify(oldWidget.blocks) !== JSON.stringify(newWidget.blocks);
+    const blockOrderChanged = JSON.stringify(oldWidget.blocksOrder) !== JSON.stringify(newWidget.blocksOrder);
+    if (settingsChanged || blocksChanged || blockOrderChanged || readsChangedSetting(reads.widgets[id])) {
+      changedWidgetIds.push(id);
     }
   }
 
-  // Check global widgets
   const headerChanged =
     newGlobalWidgets?.header && JSON.stringify(newGlobalWidgets.header) !== JSON.stringify(oldGlobalWidgets?.header);
   const footerChanged =
     newGlobalWidgets?.footer && JSON.stringify(newGlobalWidgets.footer) !== JSON.stringify(oldGlobalWidgets?.footer);
 
-  const themeSettingsChanged = JSON.stringify(newThemeSettings) !== JSON.stringify(oldThemeSettings);
-
-  // When theme settings change, re-render all widgets since any setting
-  // could be referenced in templates via {{ theme.* }}
-  if (themeSettingsChanged) {
-    for (const id of Object.keys(newWidgets)) {
-      if (!changedWidgetIds.includes(id)) {
-        changedWidgetIds.push(id);
-      }
-    }
-  }
-
   // A widget of a shared area renders knowing its area, as in the full render.
   const areaOf = (widgetId) =>
     Object.keys(newState.sharedAreas || {}).find((areaId) => newState.sharedAreas[areaId]?.widgets?.[widgetId]) || null;
 
-  // Morph changed widgets
-  for (const widgetId of changedWidgetIds) {
-    const widgetData = newWidgets[widgetId];
-    if (widgetData) {
-      try {
-        const renderedHtml = await fetchRenderedWidget(
-          widgetId,
-          widgetData,
-          newThemeSettings,
-          currentCanonicalPath,
-          newState.page,
-          areaOf(widgetId),
-        );
-        iframe.contentWindow.postMessage({ type: "MORPH_WIDGET", payload: { widgetId, html: renderedHtml } }, getPreviewTargetOrigin());
-      } catch (error) {
-        console.error(`Error updating widget ${widgetId}:`, error);
-      }
-    }
+  const jobs = changedWidgetIds.map((widgetId) => ({ widgetId, data: newWidgets[widgetId], area: areaOf(widgetId) }));
+  if (newGlobalWidgets.header && (headerChanged || readsChangedSetting(reads.widgets.header))) {
+    jobs.push({ widgetId: "header", data: newGlobalWidgets.header, area: null });
+  }
+  if (newGlobalWidgets.footer && (footerChanged || readsChangedSetting(reads.widgets.footer))) {
+    jobs.push({ widgetId: "footer", data: newGlobalWidgets.footer, area: null });
   }
 
-  // Update global widgets if changed
-  if ((headerChanged || themeSettingsChanged) && newGlobalWidgets.header) {
+  const results = await mapWithConcurrency(jobs, RENDER_CONCURRENCY, async (job) => {
     try {
-      const renderedHtml = await fetchRenderedWidget("header", newGlobalWidgets.header, newThemeSettings, currentCanonicalPath, newState.page);
-      iframe.contentWindow.postMessage(
-        { type: "MORPH_WIDGET", payload: { widgetId: "header", html: renderedHtml } },
-        getPreviewTargetOrigin(),
+      return await fetchRenderedWidgetWithReads(
+        job.widgetId,
+        job.data,
+        newThemeSettings,
+        currentCanonicalPath,
+        newState.page,
+        job.area,
       );
     } catch (error) {
-      console.error("Error updating header:", error);
+      console.error(`Error updating widget ${job.widgetId}:`, error);
+      return null;
     }
-  }
+  });
+
+  if (!isCurrent()) return { stale: true };
+
+  jobs.forEach((job, index) => {
+    const result = results[index];
+    if (!result) return;
+    iframe.contentWindow.postMessage(
+      { type: "MORPH_WIDGET", payload: { widgetId: job.widgetId, html: result.html } },
+      getPreviewTargetOrigin(),
+    );
+    reads.widgets[job.widgetId] = result.themeReads;
+  });
+  previewThemeReads.set(iframe, reads);
 
   // Sync transparent-header body class when header settings change
   if (headerChanged) {
@@ -239,22 +328,8 @@ export async function updatePreview(iframe, newState, oldState) {
       getPreviewTargetOrigin(),
     );
   }
-  if ((footerChanged || themeSettingsChanged) && newGlobalWidgets.footer) {
-    try {
-      const renderedHtml = await fetchRenderedWidget("footer", newGlobalWidgets.footer, newThemeSettings, currentCanonicalPath, newState.page);
-      iframe.contentWindow.postMessage(
-        { type: "MORPH_WIDGET", payload: { widgetId: "footer", html: renderedHtml } },
-        getPreviewTargetOrigin(),
-      );
-    } catch (error) {
-      console.error("Error updating footer:", error);
-    }
-  }
 
-  // Update theme CSS variables if changed
-  if (themeSettingsChanged) {
-    updateThemeSettings(iframe, newThemeSettings);
-  }
+  return {};
 }
 
 /**
@@ -320,11 +395,41 @@ function settingsToCssVariables(settings) {
  * @param {HTMLIFrameElement} iframe - Preview iframe element
  * @param {Object} settings - Theme settings to apply
  */
-function updateThemeSettings(iframe, settings) {
+export function updateThemeSettings(iframe, settings) {
   if (!iframe?.contentWindow) {
     console.warn("Preview Manager: No iframe window available");
     return;
   }
+
+  applyRuntimeThemeSettings(iframe, settings);
+
+  // Debounce custom code (CSS / scripts) to avoid excessive re-execution; scripts
+  // run again on every message, so unchanged code is not sent again.
+  clearTimeout(customCodeTimer);
+  customCodeTimer = setTimeout(() => {
+    const { css, scripts } = extractCustomCode(settings);
+    const sent = lastCustomCode.get(iframe) || {};
+    const cssJson = JSON.stringify(css);
+    const scriptsJson = JSON.stringify(scripts);
+    if (cssJson !== sent.css) {
+      iframe.contentWindow?.postMessage({ type: "UPDATE_CUSTOM_CSS", payload: css }, getPreviewTargetOrigin());
+    }
+    if (scriptsJson !== sent.scripts) {
+      iframe.contentWindow?.postMessage({ type: "UPDATE_CUSTOM_SCRIPTS", payload: scripts }, getPreviewTargetOrigin());
+    }
+    lastCustomCode.set(iframe, { css: cssJson, scripts: scriptsJson });
+  }, 300);
+}
+
+/**
+ * Apply the site settings the preview runtime handles itself — CSS variables,
+ * fonts and style classes — with no render. Custom code is left to
+ * updateThemeSettings, which debounces it.
+ * @param {HTMLIFrameElement} iframe
+ * @param {Object} settings
+ */
+export function applyRuntimeThemeSettings(iframe, settings) {
+  if (!iframe?.contentWindow) return;
 
   const variables = settingsToCssVariables(settings);
   const fontsUrl = themeFontsStylesheetUrl(collectThemeFonts(settings));
@@ -339,14 +444,6 @@ function updateThemeSettings(iframe, settings) {
   if (Object.keys(styleClasses).length > 0) {
     iframe.contentWindow.postMessage({ type: "UPDATE_STYLE_CLASSES", payload: styleClasses }, getPreviewTargetOrigin());
   }
-
-  // Debounce custom code (CSS / scripts) to avoid excessive re-execution
-  clearTimeout(customCodeTimer);
-  customCodeTimer = setTimeout(() => {
-    const { css, scripts } = extractCustomCode(settings);
-    iframe.contentWindow?.postMessage({ type: "UPDATE_CUSTOM_CSS", payload: css }, getPreviewTargetOrigin());
-    iframe.contentWindow?.postMessage({ type: "UPDATE_CUSTOM_SCRIPTS", payload: scripts }, getPreviewTargetOrigin());
-  }, 300);
 }
 
 /**
@@ -355,15 +452,15 @@ function updateThemeSettings(iframe, settings) {
  * @param {Object} settings - Theme settings object
  * @returns {Object<string, string>} Map of class prefix to value, e.g. { "corner": "rounded", "spacing": "airy" }
  */
-function extractStyleClasses(settings) {
-  const classMap = {
-    corner_style: "corner",
-    spacing_density: "spacing",
-    button_shape: "buttons",
-  };
+const STYLE_CLASS_PREFIXES = {
+  corner_style: "corner",
+  spacing_density: "spacing",
+  button_shape: "buttons",
+};
 
+function extractStyleClasses(settings) {
   const classes = {};
-  for (const [id, prefix] of Object.entries(classMap)) {
+  for (const [id, prefix] of Object.entries(STYLE_CLASS_PREFIXES)) {
     const value = readThemeSetting(settings, { group: "style", id });
     if (value !== undefined) classes[prefix] = value;
   }
@@ -410,6 +507,9 @@ function extractCustomCode(settings) {
 const RESERVED_CODE_TARGETS = { custom_css: "css", custom_head_scripts: "head", custom_footer_scripts: "footer" };
 
 let customCodeTimer = null;
+
+// The custom code last sent to each preview document.
+const lastCustomCode = new WeakMap();
 
 /**
  * Fetch global widgets (header and footer) for the active project.

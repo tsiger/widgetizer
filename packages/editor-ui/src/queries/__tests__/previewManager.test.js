@@ -11,7 +11,7 @@ vi.mock("../../lib/apiFetch", () => ({
   throwApiError: vi.fn(),
 }));
 
-import { fetchRenderedWidget, updatePreview } from "../previewManager";
+import { fetchRenderedWidget, setPreviewThemeReads, updatePreview } from "../previewManager";
 import { editorFetch } from "../../lib/apiFetch";
 
 afterEach(() => {
@@ -106,5 +106,121 @@ describe("updatePreview — theme settings in any group", () => {
   it("reads style classes from any group", async () => {
     const messages = await sent({ look: [{ id: "corner_style", type: "select", value: "rounded" }] });
     expect(messages.UPDATE_STYLE_CLASSES).toEqual({ corner: "rounded" });
+  });
+});
+
+describe("updatePreview — re-renders only what a site setting change can affect", () => {
+  const settings = (accent, extra = {}) => ({
+    settings: {
+      global: {
+        colors: [{ id: "accent", type: "color", outputAsCssVar: true, value: accent }],
+        general: [
+          { id: "show_breadcrumbs", type: "checkbox", value: extra.breadcrumbs ?? false },
+          { id: "date_format", type: "select", value: extra.dateFormat ?? "D MMM YYYY" },
+        ],
+      },
+    },
+  });
+  const widgets = { a: { type: "x", settings: {} }, b: { type: "y", settings: {} } };
+  const frame = () => ({ contentWindow: { postMessage: vi.fn() } });
+  const renderedIds = () => editorFetch.mock.calls.map(([, options]) => JSON.parse(options.body).widgetId).sort();
+  const respond = () =>
+    editorFetch.mockImplementation(async (_path, options) => ({
+      ok: true,
+      json: async () => ({ html: `<div>${JSON.parse(options.body).widgetId}</div>`, themeReads: ["general.date_format"] }),
+    }));
+
+  it("applies a colour at once and re-renders no widget that does not read it", async () => {
+    respond();
+    const iframe = frame();
+    setPreviewThemeReads(iframe, { widgets: { a: ["general.date_format"], b: [] }, layout: ["general.show_breadcrumbs"] });
+    const result = await updatePreview(iframe, { widgets, themeSettings: settings("#00f") }, { widgets, themeSettings: settings("#f00") });
+    expect(result).toEqual({});
+    expect(editorFetch).not.toHaveBeenCalled();
+    expect(iframe.contentWindow.postMessage.mock.calls.map(([m]) => m.type)).toContain("UPDATE_CSS_VARIABLES");
+  });
+
+  it("re-renders the widgets that read the changed setting, and those with unknown reads", async () => {
+    respond();
+    const iframe = frame();
+    setPreviewThemeReads(iframe, { widgets: { a: ["general.date_format"] }, layout: [] });
+    await updatePreview(
+      iframe,
+      { widgets, themeSettings: settings("#f00", { dateFormat: "YYYY-MM-DD" }) },
+      { widgets, themeSettings: settings("#f00") },
+    );
+    expect(renderedIds()).toEqual(["a", "b"]);
+    const morphed = iframe.contentWindow.postMessage.mock.calls.filter(([m]) => m.type === "MORPH_WIDGET");
+    expect(morphed.map(([m]) => m.payload.widgetId)).toEqual(["a", "b"]);
+  });
+
+  it("asks for a full reload when the layout reads a changed setting the runtime cannot apply", async () => {
+    respond();
+    const iframe = frame();
+    setPreviewThemeReads(iframe, { widgets: { a: [], b: [] }, layout: ["general.show_breadcrumbs"] });
+    const result = await updatePreview(
+      iframe,
+      { widgets, themeSettings: settings("#f00", { breadcrumbs: true }) },
+      { widgets, themeSettings: settings("#f00") },
+    );
+    expect(result).toEqual({ needsReload: true });
+    expect(editorFetch).not.toHaveBeenCalled();
+  });
+
+  it("reloads when the layout printed a setting, even one the runtime applies as a variable", async () => {
+    respond();
+    const iframe = frame();
+    setPreviewThemeReads(iframe, { widgets: { a: [], b: [] }, layout: ["colors.accent"] });
+    const result = await updatePreview(iframe, { widgets, themeSettings: settings("#00f") }, { widgets, themeSettings: settings("#f00") });
+    expect(result).toEqual({ needsReload: true });
+  });
+
+  it("re-renders a widget whose setting changed only by its default, or was removed", async () => {
+    respond();
+    const iframe = frame();
+    setPreviewThemeReads(iframe, { widgets: { a: ["general.show_breadcrumbs"], b: ["general.gone"] }, layout: [] });
+    const before = settings("#f00");
+    before.settings.global.general.push({ id: "gone", type: "text", value: "x" });
+    const after = settings("#f00");
+    delete after.settings.global.general[0].value;
+    after.settings.global.general[0].default = true;
+    await updatePreview(iframe, { widgets, themeSettings: after }, { widgets, themeSettings: before });
+    expect(renderedIds()).toEqual(["a", "b"]);
+  });
+
+  it("sends unchanged custom code only once", async () => {
+    vi.useFakeTimers();
+    const iframe = frame();
+    setPreviewThemeReads(iframe, { widgets: {}, layout: [] });
+    const withCode = (accent) => {
+      const theme = settings(accent);
+      theme.settings.global.advanced = [{ id: "custom_footer_scripts", type: "code", value: "<script>x</script>" }];
+      return theme;
+    };
+    await updatePreview(iframe, { widgets: {}, themeSettings: withCode("#00f") }, { widgets: {}, themeSettings: withCode("#f00") });
+    vi.advanceTimersByTime(400);
+    await updatePreview(iframe, { widgets: {}, themeSettings: withCode("#0f0") }, { widgets: {}, themeSettings: withCode("#00f") });
+    vi.advanceTimersByTime(400);
+    vi.useRealTimers();
+    const scripts = iframe.contentWindow.postMessage.mock.calls.filter(([m]) => m.type === "UPDATE_CUSTOM_SCRIPTS");
+    expect(scripts).toHaveLength(1);
+  });
+
+  it("applies nothing from an update a newer one overtook", async () => {
+    let release;
+    editorFetch.mockImplementationOnce(
+      () => new Promise((resolve) => (release = () => resolve({ ok: true, json: async () => ({ html: "old", themeReads: [] }) }))),
+    );
+    const iframe = frame();
+    setPreviewThemeReads(iframe, { widgets: {}, layout: [] });
+    const first = updatePreview(
+      iframe,
+      { widgets: { a: widgets.a }, themeSettings: settings("#f00", { dateFormat: "YYYY" }) },
+      { widgets: { a: widgets.a }, themeSettings: settings("#f00") },
+    );
+    await updatePreview(iframe, { widgets: { a: widgets.a }, themeSettings: settings("#f00") }, { widgets: { a: widgets.a }, themeSettings: settings("#f00") });
+    release();
+    expect(await first).toEqual({ stale: true });
+    expect(iframe.contentWindow.postMessage.mock.calls.some(([m]) => m.type === "MORPH_WIDGET" && m.payload.html === "old")).toBe(false);
   });
 });

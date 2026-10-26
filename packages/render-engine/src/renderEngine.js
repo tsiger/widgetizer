@@ -44,7 +44,8 @@ import { buildAssetUrl } from "@widgetizer/core/assetUrl";
 import { identityForTheme } from "@widgetizer/core/siteIdentity";
 import { resolveMenuSettings, schemaHasMenuSetting } from "./menuResolver.js";
 import { buildTranslations } from "@widgetizer/core/translations";
-import { readThemeSetting } from "@widgetizer/core/themeSettingChanges";
+import { findThemeSetting, readThemeSetting } from "@widgetizer/core/themeSettingChanges";
+import { trackThemeReads } from "@widgetizer/core/themeReads";
 // Without a loader the engine still has the built-in snippets' and widgets' English words.
 import coreSiteStringsEn from "@widgetizer/core/widgets/locales/en.json" with { type: "json" };
 
@@ -1075,6 +1076,11 @@ async function createBaseRenderContext(deps, rawThemeSettings, renderMode = "pre
   if (globals.dateFormat === undefined && themeDateFormat) {
     globals.dateFormat = themeDateFormat;
   }
+  // Where that setting lives, so `format_date` records the read under its real group.
+  if (globals.dateFormatSetting === undefined) {
+    const found = findThemeSetting(rawThemeSettings, { group: "general", id: "date_format" });
+    globals.dateFormatSetting = found?.group ? `${found.group}.date_format` : "general.date_format";
+  }
 
   // Collection items loader for the `| collection` filter. The shell supplies a
   // scope-aware factory (`deps.buildCollectionItemsLoader`) — the engine never
@@ -1391,8 +1397,13 @@ async function renderWidget(
     // read them. The page comes from `sharedGlobals.currentPageData`, set once per
     // render by the caller (a morph without it gets no `page`).
     const currentPageData = sharedGlobals?.currentPageData;
+    // A caller that sets `sharedGlobals.themeReads` ({ widgets: {} }) learns which
+    // site settings each widget read; the editor re-renders only the widgets a
+    // setting change can affect.
+    const themeReads = sharedGlobals?.themeReads ? new Set() : null;
     const renderContext = {
       ...baseContext,
+      ...(themeReads ? { theme: trackThemeReads(baseContext.theme, themeReads) } : {}),
       ...(sharedGlobals ? { project: projectContextFor(getProjectData(deps), sharedGlobals) } : {}),
       ...(currentPageData
         ? {
@@ -1422,13 +1433,22 @@ async function renderWidget(
       };
     }
 
-    // Render the template
+    // Render the template. Widgets render one after another, so the reads of the
+    // one rendering now are the only `currentThemeReads`.
+    const outerThemeReads = sharedGlobals?.currentThemeReads;
+    if (themeReads) sharedGlobals.currentThemeReads = themeReads;
     try {
-      return await engine.parseAndRender(templateForRender, renderContext, {
+      const html = await engine.parseAndRender(templateForRender, renderContext, {
         globals: renderContext.globals,
       });
+      if (themeReads) {
+        sharedGlobals.themeReads.widgets ||= {};
+        sharedGlobals.themeReads.widgets[widgetId] = [...themeReads];
+      }
+      return html;
     } finally {
       if (paginationPlan) delete sharedGlobals.collectionSlice;
+      if (themeReads) sharedGlobals.currentThemeReads = outerThemeReads;
     }
   } catch (error) {
     console.error(`Error rendering widget ${widgetId} (Project: ${deps.projectId}):`, error);
@@ -1507,8 +1527,10 @@ async function renderPageLayout(
     const breadcrumbs = await ensureBreadcrumbs(deps, sharedGlobals);
     const pagination = paginationContextFor(sharedGlobals);
 
+    const themeReads = sharedGlobals?.themeReads ? new Set() : null;
     const renderContext = {
       ...baseContext,
+      ...(themeReads ? { theme: trackThemeReads(baseContext.theme, themeReads) } : {}),
       header: contentSections.headerContent || "",
       main_content: contentSections.mainContent || "",
       footer: contentSections.footerContent || "",
@@ -1531,10 +1553,17 @@ async function renderPageLayout(
     // Get or create cached engine
     const engine = getOrCreateEngine(projectDir, themeSnippetsDir, deps.coreSnippetsDir);
 
-    const renderedHtml = await engine.parseAndRender(layoutTemplate, renderContext, {
-      globals: renderContext.globals,
-    });
-    return renderedHtml;
+    const outerThemeReads = sharedGlobals?.currentThemeReads;
+    if (themeReads) sharedGlobals.currentThemeReads = themeReads;
+    try {
+      const renderedHtml = await engine.parseAndRender(layoutTemplate, renderContext, {
+        globals: renderContext.globals,
+      });
+      if (themeReads) sharedGlobals.themeReads.layout = [...themeReads];
+      return renderedHtml;
+    } finally {
+      if (themeReads) sharedGlobals.currentThemeReads = outerThemeReads;
+    }
   } catch (error) {
     console.error(`Error rendering page layout for project ${deps.projectId}:`, error);
     return `<html><body><h1>Error rendering page</h1><pre>${escapeHtml(error.message)}</pre></body></html>`;

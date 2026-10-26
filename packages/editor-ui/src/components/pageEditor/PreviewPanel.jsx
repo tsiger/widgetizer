@@ -1,7 +1,15 @@
 import { useState, useEffect, useRef, useMemo, forwardRef } from "react";
 import { useTranslation } from "react-i18next";
 import { useThemeLocale } from "../../hooks/useThemeLocale";
-import { fetchPreviewToken, scrollElementIntoView, updatePreview } from "../../queries/previewManager";
+import {
+  applyRuntimeThemeSettings,
+  fetchPreviewToken,
+  invalidatePreviewUpdates,
+  scrollElementIntoView,
+  setPreviewThemeReads,
+  updatePreview,
+  updateThemeSettings,
+} from "../../queries/previewManager";
 import usePageStore from "../../stores/pageStore";
 import useProjectStore from "../../stores/projectStore";
 import useWidgetStore from "../../stores/widgetStore";
@@ -174,6 +182,18 @@ const PreviewPanel = forwardRef(function PreviewPanel(
   // Store pending scroll info for after PREVIEW_READY
   const pendingScrollRef = useRef(null);
 
+  // The site settings the preview shows right now (applied at once, ahead of the
+  // debounced update), and a counter so a slower, older update never lands last.
+  const appliedThemeRef = useRef(null);
+  const updateSeqRef = useRef(0);
+
+  // What the document being loaded was rendered from, and whether one is loading.
+  // Edits made while it loads went to the outgoing document, so when it is ready
+  // the editor compares against this snapshot and applies what is missing.
+  const renderedStateRef = useRef(null);
+  const navigatingRef = useRef(false);
+  const [reconcileKey, setReconcileKey] = useState(0);
+
   const { globalWidgets, sharedAreas } = usePageStore();
   // The page's widgets and its shared areas' widgets together: ids never clash, and
   // both are on the previewed page, so selection, labels and live settings updates
@@ -192,6 +212,10 @@ const PreviewPanel = forwardRef(function PreviewPanel(
     previousStateRef.current = null;
     pendingScrollRef.current = null;
     structuralReloadRef.current = false;
+    appliedThemeRef.current = null;
+    updateSeqRef.current += 1;
+    renderedStateRef.current = null;
+    navigatingRef.current = false;
     setPreviewSrc(null);
     setError(null);
     setInitialLoadComplete(false);
@@ -242,6 +266,16 @@ const PreviewPanel = forwardRef(function PreviewPanel(
     const handleMessage = (event) => {
       const { type } = event.data || {};
       if (type !== "PREVIEW_READY") return;
+      if (iframeRef.current && event.source === iframeRef.current.contentWindow) {
+        setPreviewThemeReads(iframeRef.current, event.data.payload?.themeReads || null);
+        navigatingRef.current = false;
+        const rendered = renderedStateRef.current;
+        if (rendered) {
+          previousStateRef.current = rendered;
+          appliedThemeRef.current = rendered.themeSettings;
+          setReconcileKey((key) => key + 1);
+        }
+      }
 
       const pending = pendingScrollRef.current;
       if (pending) {
@@ -300,6 +334,8 @@ const PreviewPanel = forwardRef(function PreviewPanel(
         const enhancedPageData = { ...page, globalWidgets, sharedAreas };
         const { token } = await fetchPreviewToken(enhancedPageData, themeSettings, runtimeMode);
         setPreviewSrc(buildPreviewUrl(token));
+        navigatingRef.current = true;
+        appliedThemeRef.current = themeSettings;
 
         // Store the initial state for future diffing
         previousStateRef.current = {
@@ -312,6 +348,7 @@ const PreviewPanel = forwardRef(function PreviewPanel(
           selectedBlockId,
           selectedGlobalWidgetId,
         };
+        renderedStateRef.current = previousStateRef.current;
       } catch (err) {
         console.error("Preview error:", err);
         setError(err.message || "Failed to load preview");
@@ -352,6 +389,19 @@ const PreviewPanel = forwardRef(function PreviewPanel(
       JSON.stringify(themeSettings) !== JSON.stringify(previousState?.themeSettings);
 
     if (!contentChanged) {
+      // Back at the baseline: an update still in flight is for an edit that was
+      // undone, and the preview may still show undone site settings.
+      invalidatePreviewUpdates(iframeRef.current);
+      updateSeqRef.current += 1;
+      if (appliedThemeRef.current && JSON.stringify(appliedThemeRef.current) !== JSON.stringify(themeSettings)) {
+        updateThemeSettings(iframeRef.current, themeSettings);
+        appliedThemeRef.current = themeSettings;
+      }
+      // A reload that was cancelled before it navigated will send no PREVIEW_READY.
+      if (!navigatingRef.current) {
+        structuralReloadRef.current = false;
+        pendingScrollRef.current = null;
+      }
       previousStateRef.current = {
         page,
         widgets,
@@ -367,6 +417,13 @@ const PreviewPanel = forwardRef(function PreviewPanel(
 
     const newState = { page, widgets, globalWidgets, sharedAreas, themeSettings };
     const { isStructural } = detectChangeType(newState, previousState);
+
+    // Site settings the runtime applies itself (CSS variables, fonts, style classes)
+    // show at once, without waiting for the debounce or any widget render.
+    if (!isStructural && JSON.stringify(themeSettings) !== JSON.stringify(appliedThemeRef.current)) {
+      applyRuntimeThemeSettings(iframeRef.current, themeSettings);
+      appliedThemeRef.current = themeSettings;
+    }
 
     // Immediate visual feedback for simple setting changes (text/images)
     if (!isStructural && iframeRef.current?.contentWindow && previousState?.widgets) {
@@ -491,14 +548,32 @@ const PreviewPanel = forwardRef(function PreviewPanel(
 
     // Debounced update - either full reload or morph depending on change type
     const timeoutId = setTimeout(async () => {
+      const seq = ++updateSeqRef.current;
+      const isCurrent = () => updateSeqRef.current === seq;
+      const reload = async () => {
+        const enhancedPageData = { ...page, globalWidgets, sharedAreas };
+        const { token } = await fetchPreviewToken(enhancedPageData, themeSettings, runtimeMode);
+        if (!isCurrent()) return;
+        renderedStateRef.current = {
+          page,
+          widgets,
+          globalWidgets,
+          sharedAreas,
+          themeSettings,
+          selectedWidgetId,
+          selectedBlockId,
+          selectedGlobalWidgetId,
+        };
+        navigatingRef.current = true;
+        setPreviewSrc(buildPreviewUrl(token));
+        appliedThemeRef.current = themeSettings;
+      };
       try {
         if (isStructural) {
           // STRUCTURAL CHANGE: Full page reload
           console.log("[Preview] FULL PAGE RELOAD (structural change)");
 
-          const enhancedPageData = { ...page, globalWidgets, sharedAreas };
-          const { token } = await fetchPreviewToken(enhancedPageData, themeSettings, runtimeMode);
-          setPreviewSrc(buildPreviewUrl(token));
+          await reload();
           // PREVIEW_READY handler will restore scroll + ungate SelectionOverlay
         } else {
           // CONTENT CHANGE: Morph individual widgets
@@ -522,28 +597,38 @@ const PreviewPanel = forwardRef(function PreviewPanel(
             page,
           };
 
-          await updatePreview(iframeRef.current, updateState, previousState || {});
+          const result = await updatePreview(iframeRef.current, updateState, previousState || {});
 
-          // Restore scroll position after morph
-          try {
-            iframeRef.current?.contentWindow?.scrollTo(0, morphScrollY);
-          } catch {
-            // skip scroll restore on error
+          // A newer update is under way and compares against the same baseline,
+          // so it covers this change too.
+          if (result?.stale || !isCurrent()) return;
+
+          if (result?.needsReload) {
+            // The page layout reads a changed site setting: only a full render shows it.
+            pendingScrollRef.current = { scrollY: morphScrollY, widgetId: selectedWidgetId, blockId: selectedBlockId };
+            structuralReloadRef.current = true;
+            await reload();
+          } else {
+            // Restore scroll position after morph
+            try {
+              iframeRef.current?.contentWindow?.scrollTo(0, morphScrollY);
+            } catch {
+              // skip scroll restore on error
+            }
+            setPreviewReadyKey((prev) => prev + 1);
           }
-          setPreviewReadyKey((prev) => prev + 1);
         }
       } catch (err) {
         console.error("Preview update error:", err);
         // Fallback to full reload on any error
         try {
-          const enhancedPageData = { ...page, globalWidgets, sharedAreas };
-          const { token } = await fetchPreviewToken(enhancedPageData, themeSettings, runtimeMode);
-          setPreviewSrc(buildPreviewUrl(token));
+          await reload();
         } catch (fallbackErr) {
           console.error("Preview fallback reload error:", fallbackErr);
         }
       }
 
+      if (!isCurrent()) return;
       previousStateRef.current = {
         page,
         widgets,
@@ -559,6 +644,7 @@ const PreviewPanel = forwardRef(function PreviewPanel(
     return () => clearTimeout(timeoutId);
   }, [
     initialLoadComplete,
+    reconcileKey,
     page,
     widgets,
     globalWidgets,

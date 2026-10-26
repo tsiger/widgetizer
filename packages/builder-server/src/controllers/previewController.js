@@ -64,6 +64,13 @@ export function injectRuntimeScript(html, previewMode = "editor", collectionPref
   return html;
 }
 
+// The site settings each widget and the layout read, for the editor's live
+// updates; the runtime hands them over with PREVIEW_READY.
+export function injectThemeReads(html, themeReads) {
+  const json = JSON.stringify(themeReads || {}).replace(/</g, "\\u003c");
+  return html.replace(/<\/body>/i, `<script type="application/json" id="widgetizer-theme-reads">${json}</script>\n</body>`);
+}
+
 // Inject an origin-root base tag so any stray relative URL resolves against the
 // render document's own origin (whichever port/host actually served it), not a
 // pinned SERVER_URL. Asset/media/forms URLs are already origin-relative.
@@ -127,6 +134,7 @@ async function generatePreviewHtml(pageData, rawThemeSettings, previewMode, coll
       defaultLanguage,
     }),
     currentPageData: pageData,
+    themeReads: { widgets: {} },
   };
 
   const pagination = await planPagination(
@@ -292,6 +300,7 @@ async function generatePreviewHtml(pageData, rawThemeSettings, previewMode, coll
   );
 
   renderedHtml = injectBaseTag(renderedHtml);
+  renderedHtml = injectThemeReads(renderedHtml, sharedGlobals.themeReads);
   renderedHtml = injectRuntimeScript(renderedHtml, previewMode, await itemPagePrefixes(collectionDeps), projectLanguages(project));
 
   return renderedHtml;
@@ -533,7 +542,7 @@ export async function createCollectionPreviewToken(req, res) {
  */
 export async function renderSingleWidget(req, res) {
   try {
-    const { widgetId, widget, themeSettings: rawThemeSettings, currentCanonicalPath, page, area } = req.body; // Expect themeSettings too
+    const { widgetId, widget, themeSettings: rawThemeSettings, currentCanonicalPath, page, area, withThemeReads } = req.body;
     const activeProjectId = req.activeProject.id;
     const isPlainObject = (value) => !!value && typeof value === "object" && !Array.isArray(value);
     const currentPage = isPlainObject(page) ? page : null;
@@ -556,6 +565,7 @@ export async function renderSingleWidget(req, res) {
           ? currentCanonicalPath
           : "",
       ...(currentPage ? { currentPageData: currentPage } : {}),
+      ...(withThemeReads === true ? { themeReads: { widgets: {} } } : {}),
     };
 
     const collectionDeps = collectionDepsFromReq(req);
@@ -614,6 +624,10 @@ export async function renderSingleWidget(req, res) {
     // Append enqueued asset tags so the preview runtime can load them on morph
     const assetTags = renderEnqueuedAssetTags(sharedGlobals);
 
+    if (withThemeReads === true) {
+      // null when the render failed: the editor then treats the widget as reading everything.
+      return res.json({ html: renderedWidget + assetTags, themeReads: sharedGlobals.themeReads.widgets[widgetId] || null });
+    }
     res.send(renderedWidget + assetTags);
   } catch (error) {
     console.error("Widget rendering error:", error);

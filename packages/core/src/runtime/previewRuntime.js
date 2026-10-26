@@ -59,6 +59,15 @@ const PREVIEW_SITE = (() => {
   };
 })();
 
+// The site settings each widget and the layout read during the full render.
+function readThemeReads() {
+  try {
+    return JSON.parse(document.getElementById("widgetizer-theme-reads")?.textContent || "null");
+  } catch {
+    return null;
+  }
+}
+
 // ── CSS Variables + Fonts ───────────────────────────────────────────────────
 
 function updateCssVariables(variables) {
@@ -1154,12 +1163,11 @@ function initializeRuntime() {
   // Re-render overlay on window resize
   window.addEventListener("resize", () => renderOverlay());
 
+  const announceReady = () => postToParent({ type: "PREVIEW_READY", payload: { themeReads: readThemeReads() } });
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", () => {
-      postToParent({ type: "PREVIEW_READY" });
-    });
+    document.addEventListener("DOMContentLoaded", announceReady);
   } else {
-    postToParent({ type: "PREVIEW_READY" });
+    announceReady();
   }
 }
 

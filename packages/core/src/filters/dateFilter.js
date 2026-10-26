@@ -16,6 +16,8 @@ export function registerDateFilter(engine) {
     // Two sources, as `page_url` has: `{% render %}` isolates the environment
     // scope, so inside a snippet `context.get(["globals"])` is undefined.
     const globals = this.context.get(["globals"]) || this.context.globals;
+    // The site's format is a site setting read outside `theme`, so the read is recorded here.
+    if (!(typeof overrideFormat === "string" && overrideFormat)) globals?.currentThemeReads?.add(globals.dateFormatSetting || "general.date_format");
     const format =
       (typeof overrideFormat === "string" && overrideFormat) || globals?.dateFormat || DEFAULT_DATE_FORMAT;
     // A date on a Greek page reads in Greek. The format itself is the site's
