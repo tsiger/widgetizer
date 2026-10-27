@@ -2,7 +2,7 @@
 
 Agent Skills for people who build with Widgetizer. Each skill folder contains portable authoring guidance and assets. Executable theme validation belongs to the app checkout; the skill explains when that validation is available and when it remains pending. These maintainer notes are not part of a distributed skill.
 
-For skill/tooling progress and remaining work, see [STATUS.md](STATUS.md). Premium theme study notes live with the private theme sources in `docs-llms-premium-themes/widgetizer-premium-themes.md`; finished-theme planning lives in `docs-llms-premium-themes/premium-theme-implementation.md`. Keep both documents in that private repository rather than in this skill folder or Google Drive.
+For skill/tooling progress and remaining work, see [STATUS.md](STATUS.md). Premium theme documentation lives with the private theme sources: `docs-llms-premium-themes/premium-themes.md` (how premium themes are made) and `docs-llms-premium-themes/theme-plan.md` (the planned themes). Keep it in that private repository rather than in this skill folder.
 
 ## widgetizer-theme-design
 
