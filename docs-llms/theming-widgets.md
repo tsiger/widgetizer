@@ -109,6 +109,12 @@ Every widget follows this structure:
 | `data-widget-id="{{ widget.id }}"`                    | For JavaScript targeting                                   |
 | `data-widget-type="{widget-name}"`                    | For debugging/identification                               |
 
+### Inline or Enqueued CSS
+
+**Inline is the default.** A widget's own layout and spacing go in a `<style>` block inside `widget.liquid`, scoped to `.widget-{{ widget.id }}`. It renders with the widget, so it can use that instance's setting values directly (columns, heights, ratios).
+
+**Enqueue a stylesheet only for a self-contained component:** a widget whose CSS is large and the same for every instance, usually paired with its own script, or that styles elements outside its own section (a modal added to the page body). Arch enqueues CSS for three widgets only: slideshow, audio player and video popup. A stylesheet shared by several widgets, such as a carousel, lives in the theme's `assets/` and is enqueued with `theme: true`.
+
 ### CSS Scoping & Nesting
 
 Wrap inline, per-instance CSS in a `.widget-{{ widget.id }}` block so it never leaks to other widgets; a widget's external stylesheet scopes its rules to `.widget-type-{name}` instead (see [Enqueuing External CSS & JS](#enqueuing-external-css--js)). Use **native CSS nesting** with `&`:
