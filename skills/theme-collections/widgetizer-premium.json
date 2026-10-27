@@ -97,6 +97,11 @@
       "id": "arch-style-css-organization",
       "instruction": "Complete premium themes are built on the shared premium source, which follows Arch: shared tokens for recurring design decisions in base.css, a common foundation for reusable elements, and scoped CSS per widget for its specific layout and appearance. A theme sets its look through its settings defaults; its own widgets carry their own scoped CSS. No theme restyles a shared widget.",
       "implementation": "Keep widget-specific styles with their widget and load them through the app's supported asset mechanism, as illustrated by themes/arch/widgets/video-popup/. Avoid accumulating widget styling in one global stylesheet."
+    },
+    {
+      "id": "complete-consistent-starter-content",
+      "instruction": "Ship a selected footer legal menu with working destinations and clearly labelled replace-before-publishing sample legal pages. Demo sites should show several social networks using network homepage URLs in Project details. Use consistent action appearance for comparable adjacent sections; use secondary buttons for image-with-text detail actions unless there is a purposeful hierarchy. Keep desktop navigation compact without reducing readable type or mobile touch targets. Verify palette borders against both main and secondary backgrounds.",
+      "implementation": "Check these defaults in the starter source and a newly created or isolated demonstration project, not only a manually edited preview. Social profiles belong to Project details; do not hardcode them in shared widgets."
     }
   ],
   "heroVariations": "Develop transparent headers over hero imagery and text-on-image heroes as useful options for the collection, starting with the Panna preview. Treat them as independent choices: text on an image can also sit beneath a solid header. Overlay navigation only when the opening widget supports it; other pages need a readable solid header. Compose and review the image, text contrast, navigation contrast and mobile crop together. Carry these options into full theme development where suitable.",
