@@ -277,12 +277,10 @@ Options: `--theme` (default `arch`), `--only` / `--except` preset ids, `--replac
 
 ## Checklist & Tracker
 
-There is no separate per-preset checklist in this doc — the authoritative
-per-preset status (which presets exist, their industries, and live-demo URLs)
-lives in `themes/arch/presets/presets.json`, and progress is tracked in the
-preset tracker (kept in `docs-llms/archive/`). Keep that tracker and
-`presets.json` as the single sources of truth to avoid divergence; the file-shape
-contract lives in [theme-preset-file-format.md](theme-preset-file-format.md).
+There is no separate per-preset checklist in this doc. Which presets a theme has,
+their industries and live-demo URLs live in its `presets/presets.json` (for Arch,
+`themes/arch/presets/presets.json`); the file-shape contract lives in
+[theme-preset-file-format.md](theme-preset-file-format.md).
 
 When finishing a preset, the load-bearing steps are: pack media (`npm run
 preset:media`), set the `screenshot.png`, register/update the `presets.json`

@@ -58,7 +58,7 @@ Every widget follows this structure:
 ```liquid
 <section
   id="{{ widget.id }}"
-  class="widget widget-{name} widget-{{ widget.id }}"
+  class="widget widget-type-{name} widget-{{ widget.id }}"
   data-widget-id="{{ widget.id }}"
   data-widget-type="{widget-name}"
 >
@@ -105,13 +105,13 @@ Every widget follows this structure:
 | Attribute                                             | Purpose                                                    |
 | ----------------------------------------------------- | ---------------------------------------------------------- |
 | `id="{{ widget.id }}"`                                | Unique widget instance ID for CSS scoping and JS targeting |
-| `class="widget widget-{name} widget-{{ widget.id }}"` | Base class + semantic name + scoped class                  |
+| `class="widget widget-type-{name} widget-{{ widget.id }}"` | Base class + widget type + instance class                  |
 | `data-widget-id="{{ widget.id }}"`                    | For JavaScript targeting                                   |
 | `data-widget-type="{widget-name}"`                    | For debugging/identification                               |
 
 ### CSS Scoping & Nesting
 
-Wrap all widget-specific CSS in a `.widget-{{ widget.id }}` block so it never leaks to other widgets, and use **native CSS nesting** with `&`:
+Wrap inline, per-instance CSS in a `.widget-{{ widget.id }}` block so it never leaks to other widgets; a widget's external stylesheet scopes its rules to `.widget-type-{name}` instead (see [Enqueuing External CSS & JS](#enqueuing-external-css--js)). Use **native CSS nesting** with `&`:
 
 ```css
 .widget-{{ widget.id }} {
@@ -421,7 +421,7 @@ Arch widgets support four color schemes. Each scheme is a class on the `<section
 
 ```liquid
 <section
-  class="widget widget-{name} widget-{{ widget.id }} color-scheme-{{ widget.settings.color_scheme }}"
+  class="widget widget-type-{name} widget-{{ widget.id }} color-scheme-{{ widget.settings.color_scheme }}"
   {% unless widget.settings.color_scheme == 'standard-primary' %}
     style="--widget-bg-color: var(--bg-primary);"
   {% endunless %}
@@ -447,7 +447,7 @@ Many Arch widgets also expose `top_spacing` and `bottom_spacing` settings so aut
 
 ```liquid
 <section
-  class="widget widget-{name} widget-{{ widget.id }}{% if widget.settings.top_spacing == 'none' %} spacing-top-none{% endif %}{% if widget.settings.bottom_spacing == 'none' %} spacing-bottom-none{% endif %}"
+  class="widget widget-type-{name} widget-{{ widget.id }}{% if widget.settings.top_spacing == 'none' %} spacing-top-none{% endif %}{% if widget.settings.bottom_spacing == 'none' %} spacing-bottom-none{% endif %}"
 >
   …
 </section>
@@ -461,7 +461,7 @@ Color schemes handle the section background, but you can still override it with 
 
 ```liquid
 <section
-  class="widget widget-{name} widget-{{ widget.id }} color-scheme-{{ widget.settings.color_scheme }}"
+  class="widget widget-type-{name} widget-{{ widget.id }} color-scheme-{{ widget.settings.color_scheme }}"
   style="--widget-bg-color: {{ widget.settings.background_color }};"
 >
   <!-- Content -->
@@ -1147,13 +1147,16 @@ All widgets must follow a strict heading hierarchy for SEO and accessibility:
 {% endif %}
 
 {%- comment -%} Item headings {%- endcomment -%}
-{% assign item_heading_level = 'h3' %}
-{% if widget.settings.title == blank %}
-  {% assign item_heading_level = 'h2' %}
+{% if widget.settings.title != blank %}
+  {% if widget.index == 1 %}{% assign item_level = 'h2' %}{% else %}{% assign item_level = 'h3' %}{% endif %}
+{% else %}
+  {% assign item_level = 'h2' %}
 {% endif %}
 
 {% for item in items %}
-  <{{ item_heading_level }} class="item-title">{{ item.title }}</{{ item_heading_level }}>
+  {% assign level = item_level %}
+  {% if widget.index == 1 and widget.settings.title == blank and forloop.first %}{% assign level = 'h1' %}{% endif %}
+  <{{ level }} class="item-title">{{ item.title }}</{{ level }}>
 {% endfor %}
 ```
 
@@ -1289,7 +1292,7 @@ Before submitting a widget:
 - [ ] Layout/Playback/Options consolidated under Display header when appropriate
 - [ ] Block settings organized with appropriate headers (Content, Layout, Style, Options)
 - [ ] Default blocks provided with meaningful content
-- [ ] All CSS scoped with `.widget-{{ widget.id }}`
+- [ ] Inline CSS scoped with `.widget-{{ widget.id }}`; a widget's external stylesheet scoped with `.widget-type-{name}`
 - [ ] Logical properties used (not `left`, `right`, etc.)
 - [ ] Design-system token variables used (not hardcoded values) — see [Design System](arch-design-system.md)
 - [ ] All text has `data-setting` attributes for live preview

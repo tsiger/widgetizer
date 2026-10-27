@@ -911,7 +911,7 @@ The priority system allows you to control the exact loading order of assets:
 {% enqueue_script src: "slideshow.js", priority: 40 %}
 
 {# Theme Overrides - Priority 50 (default) #}
-{% enqueue_style src: "theme.css", priority: 50 %}
+{% enqueue_style src: "overrides.css", priority: 50 %}
 
 {# Non-critical/Print - Priority 90+ #}
 {% enqueue_style src: "print.css", location: "footer", priority: 90, media: "print" %}
@@ -926,7 +926,7 @@ Directly includes CSS, JavaScript, or image assets in your templates. Unlike `en
 ```liquid
 {# Basic usage - CSS files #}
 {% asset src: "base.css" %}
-{% asset src: "theme.css" %}
+{% asset src: "overrides.css" %}
 
 {# Basic usage - JavaScript files #}
 {% asset src: "scripts.js" %}
@@ -951,7 +951,7 @@ Directly includes CSS, JavaScript, or image assets in your templates. Unlike `en
 {% asset src: "print.css", media: "print" %}
 
 {# CSS with ID attribute #}
-{% asset src: "theme.css", id: "theme-stylesheet" %}
+{% asset src: "base.css", id: "theme-stylesheet" %}
 
 {# External resource with crossorigin #}
 {% asset src: "font.css", crossorigin: "anonymous" %}

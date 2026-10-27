@@ -95,7 +95,7 @@ The [Widgetizer Theme skill](../skills/widgetizer-theme/SKILL.md) provides a tas
 
 ### **[arch-design-system.md](arch-design-system.md)** - Arch Theme Design System
 
-**Purpose**: Reference for the **Arch THEME's** CSS-custom-property design system — tokens, color schemes, typography, spacing, grid/carousel, component/block patterns, header/footer, body-class style settings, and the `theme.json` → `{% theme_settings %}` → `base.css` pipeline (renamed from `theme-design-system.md` to disambiguate from the editor-UI style guide) **When to use**:
+**Purpose**: Reference for the **Arch THEME's** CSS-custom-property design system — tokens, color schemes, typography, spacing, grid/carousel, component/block patterns, header/footer, body-class style settings, and the `theme.json` → `{% theme_settings %}` → `base.css` pipeline **When to use**:
 
 - Understanding the Arch theme's design tokens and CSS variables
 - Looking up spacing, typography, or color token values
@@ -384,7 +384,7 @@ The [Widgetizer Theme skill](../skills/widgetizer-theme/SKILL.md) provides a tas
 
 ### **[core-editor-ui-style-guide.md](core-editor-ui-style-guide.md)** - Editor/Admin App Style Guide
 
-**Purpose**: Standalone visual style guide for the **ADMIN/EDITOR app chrome** (pink accent + slate neutrals, typography, spacing, Tailwind/HTML snippets for buttons/inputs/tables/cards/badges/toasts/modals/sidebar/layout) — renamed from `core-design-system.md` to disambiguate from the Arch theme design system **When to use**:
+**Purpose**: Standalone visual style guide for the **ADMIN/EDITOR app chrome** (pink accent + slate neutrals, typography, spacing, Tailwind/HTML snippets for buttons/inputs/tables/cards/badges/toasts/modals/sidebar/layout) **When to use**:
 
 - Building or styling editor/admin UI chrome (not theme output)
 - Looking up the pink-accent + slate palette, typography, or spacing

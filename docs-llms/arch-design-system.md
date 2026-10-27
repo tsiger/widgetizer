@@ -1305,7 +1305,7 @@ Key attributes: `id` (anchor), `widget` (base styles), `widget-type-{name}` (typ
 
 ### Scoped Widget Styles
 
-Widgets that need custom CSS use instance-scoped `<style>` blocks with native nesting (`&`) under the unique `.widget-{{ widget.id }}` class:
+Inline widget CSS uses instance-scoped `<style>` blocks with native nesting (`&`) under the unique `.widget-{{ widget.id }}` class:
 
 ```liquid
 <style>

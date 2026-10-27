@@ -1,6 +1,6 @@
 # Future themes and Arch presets
 
-> **Status: Proposal.** Recorded on 2026-09-27. These are candidate directions, not an approved roadmap or proof of market defensibility.
+> **Status: Proposal.** These are candidate directions, not an approved roadmap or proof of market defensibility.
 
 ## Recommendation
 
