@@ -45,6 +45,11 @@
       "example": "Kiln's 'Made slowly. Lived with.' expresses one thought. Both lines use the same upright type and color; the line break provides enough structure."
     },
     {
+      "id": "introductions-read-in-one-column",
+      "instruction": "A page or section introduction reads top to bottom in one column: eyebrow, heading, then the description. Never split the heading and its description into side-by-side columns; the eye has to jump across the page to read one thought.",
+      "implementation": "Stack the three, start-aligned, with the description at a readable measure under the heading. The split introduction on Goodmove’s services page was refused: it broke the reading flow and looked empty."
+    },
+    {
       "id": "minimum-readable-type",
       "instruction": "Use a minimum of 16px for body text, navigation, buttons and form text. Reserve 14px for short secondary labels, captions and metadata; no visible theme text should fall below 14px. These are minimums, not target sizes: increase them when the chosen typeface needs more room to read comfortably. Keep these floors on mobile; adapt spacing and layout instead of shrinking text to fit.",
       "implementation": "Express the sizes in relative units that respect the visitor's font preferences: at a default 16px root, use at least 1rem for primary text and 0.875rem for secondary text. Do not reduce the root font size to evade the minimums. Check computed sizes and visual readability in desktop and mobile previews, including fluid type and responsive overrides. This collection preference addresses type size only; the later accessibility review must also assess contrast, zoom, spacing and interaction."
@@ -60,6 +65,11 @@
       "instruction": "Use a deliberate, shared grid for the page's section layouts. Establish consistent content boundaries, column tracks and gutters; build section compositions on that structure rather than positioning each group independently. Different sections may span different numbers of columns, but their alignment must follow the shared grid. Build balanced layouts around clear content relationships and a logical reading order. Complexity, staggered placement and asymmetry must serve the content. Do not scatter items around a photograph or create arbitrary empty areas merely to make a layout different. Using CSS Grid alone does not establish a coherent composition.",
       "implementation": "Define shared content-width and gutter tokens and use CSS Grid for the section columns. Choose the column count to suit the theme; twelve columns are not mandatory. Check the actual rendered edges of the header, hero and supporting sections, and align section introductions with the related columns beneath them. Do not treat a no-overflow result as evidence that alignment is correct. Keep an explanation, its action and supporting note visibly grouped. Let columns and rows grow with content; review longer headings, paragraphs and translated button labels at desktop, intermediate and phone widths. Assess whitespace and alignment across the whole section, including its right edge and adjacent sections. Check whether labels, headings, imagery and body copy form an immediately understandable group; matching column edges alone is not enough. Preserve meaningful layout variety without adding complexity for its own sake. Use one explicit shared column system, such as twelve or twenty-four columns, with consistent tracks and gutters across page sections. Header, hero, supporting content and footer must share deliberate outer boundaries; do not introduce unrelated maximum widths for individual sections. Verify alignment at wide desktop widths as well as tablet and phone sizes, including the author’s supplied screenshot dimensions when available.",
       "example": "Accord's initial engagement section aligned its columns but left two small labels isolated above a photograph while the main heading occupied the opposite column. The empty area and detached introduction made the composition unclear. Recompose the section around one clear introduction and a balanced relationship between the image and story; do not preserve the arrangement merely because it uses a grid."
+    },
+    {
+      "id": "sections-use-their-width",
+      "instruction": "Compose each section across the full content width. A heading, paragraph and actions pressed into one half of a band with the other half empty is not a composition. Centre balanced content, such as a call to action with one message and one main action, or place the parts across the columns with a reason for each placement.",
+      "implementation": "Check every band at desktop width for an unused half; the call-to-action band is the usual offender. Goodmove’s services page had its call to action pressed into the left half and was refused."
     },
     {
       "id": "purposeful-content-icons",
@@ -82,7 +92,13 @@
     },
     {
       "id": "purposeful-separators",
-      "instruction": "Use lines and borders when they clarify a specific relationship or contribute intentional character. Prefer spacing, alignment and grouping when these already separate the content clearly. Avoid stacking the last item border, a section border and a pricing border around the same transition. Review adjacent sections together, not only each widget in isolation."
+      "instruction": "Use lines and borders when they clarify a specific relationship or contribute intentional character. Prefer spacing, alignment and grouping when these already separate the content clearly. Avoid stacking the last item border, a section border and a pricing border around the same transition. Review adjacent sections together, not only each widget in isolation.",
+      "example": "Rows of image-with-text sections and side-by-side quotes need no rule between or above them; their spacing already separates them. Rules there were refused on Goodmove’s services page."
+    },
+    {
+      "id": "closing-band-differs-from-footer",
+      "instruction": "The last section before the footer never shares the footer’s colour scheme. Two dark bands on top of each other read as one block: the call to action loses its edge and the footer stops reading as the end of the page.",
+      "implementation": "Give the closing call to action its own scheme, usually the theme’s accent band, and let the footer be the only block in its colour. Decided on Goodmove’s services page: the call to action moved from the dark scheme to the yellow one."
     },
     {
       "id": "clear-information-and-interactions",
