@@ -3,6 +3,16 @@
   "scope": "Common (themes/common) and future themes explicitly created for this collection. These are the collection author's design rules, not Widgetizer platform requirements or defaults for other authors.",
   "rules": [
     {
+      "id": "any-niche-generic-naming",
+      "instruction": "Every theme can be used for any niche, including businesses, personal sites and hobby projects. The starter business is only an example. Name widgets, layouts, blocks and settings by their content, layout or behaviour. Use generic names for shared widgets and each theme's own widgets. Never base these names on the theme or its starter business.",
+      "implementation": "Use matching generic names for new widget type IDs and folders. Preserve released IDs unless an explicit migration is planned. Use Media cards, not Recommendations or Margin cards. Niche wording belongs in demo copy, not reusable editor controls."
+    },
+    {
+      "id": "optimize-generated-images",
+      "instruction": "Optimize every generated image before using it in a static preview, review project or released theme. Resize for its intended display size without upscaling. Use WebP, or JPEG when appropriate. Do not serve or package generated PNG originals. Use WebP for transparency.",
+      "implementation": "Keep original masters outside served and packaged assets. Compress images and inspect quality at their intended display size. Check file sizes, dimensions and actual format. Update image references and media manifests to the optimized files. Preserve the full composition; optimization does not authorize cropping."
+    },
+    {
       "id": "visual-selection-before-implementation",
       "instruction": "Follow the Widgetizer design skill's brief and question process, then build one standalone responsive static homepage and separate styleguide for owner approval before Widgetizer conversion. Carry existing answers forward and ask only about material unresolved choices. Base the direction on that skill, the supplied brief and these collection rules, rather than unrelated design workflows or external style catalogs.",
       "implementation": "Keep static prototypes separate from installable themes. Open the pages in the browser for the owner; never hand over links. Refine the actual pages until explicitly approved; do not create Widgetizer theme files before that approval. Preserve the approved prototype and reuse its markup/styles/assets during conversion. Once the theme is built, review the theme itself; do not compare it point by point with the prototype. Individual image assets may be generated when useful; generated website mockups are not the review artifact."
