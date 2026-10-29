@@ -122,8 +122,13 @@
     {
       "id": "reuse-widget-layouts-and-standard-controls",
       "instruction": "Use an existing widget when its purpose and content blocks fit. Add a reusable layout when positioning differs. One theme can establish the need. Create a separate widget only for different content, behaviour or requirements that cannot share a clear editing model. Use generic widget and layout names.",
-      "implementation": "Keep standard block controls and their behaviour consistent. Starter content chooses sizes, text treatment and button styles through settings. CSS must not override those choices. Preserve existing layout defaults. Verify heading and text sizes, muted text, both button styles and sizes, spacing and colours. Save, reload and check the result. Test affected earlier-theme examples when shared source changes.",
+      "implementation": "Render the closest existing widget with real settings before adding code. Record the settings tried and the essential requirement they cannot meet. Optional captions or notes alone do not justify another layout. Check ordinary content blocks first. Keep standard block controls and their behaviour consistent. Starter content chooses sizes, text treatment and button styles through settings. CSS must not override those choices. Preserve existing layout defaults. Verify heading and text sizes, muted text, both button styles and sizes, spacing and colours. Save, reload and check the result. Test affected earlier-theme examples when shared source changes. Fullwidth uses the available width with normal gutters. Split CTA actions reach the right content edge on desktop. Let headings use their column; do not impose a fixed character-width cap to force line breaks.",
       "example": "Common uses Call to action with the Split layout. It is not a separate Split invitation widget. Opening hours stay in the footer."
+    },
+    {
+      "id": "no-duplicate-header-destinations",
+      "instruction": "Never repeat a destination in the main navigation. Count the header action button too. When a page is the header action, omit its duplicate menu link.",
+      "implementation": "Compare destinations, not labels. Check desktop and mobile navigation, including translated menus."
     }
   ],
   "heroVariations": "Develop transparent headers over hero imagery and text-on-image heroes as useful options for the collection, starting with the Panna preview. Treat them as independent choices: text on an image can also sit beneath a solid header. Overlay navigation only when the opening widget supports it; other pages need a readable solid header. Compose and review the image, text contrast, navigation contrast and mobile crop together. Carry these options into full theme development where suitable.",
