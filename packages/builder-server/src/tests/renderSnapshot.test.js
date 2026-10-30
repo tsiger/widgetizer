@@ -5,11 +5,13 @@
  * preview document, a widget re-render (morph), the collection-item preview and
  * the export (publish mode) — compared with the HTML stored under
  * `fixtures/renderSnapshot/`. The fixture emits every URL the engine builds from
- * its bases: theme and widget assets, core and theme placeholders, uploaded
- * images and files (tags, richtext and collection items), site icons and the
- * form widget's action. A change to how any of them is built shows up as a diff
- * here, so a render change that is meant to leave output alone is checked
- * rather than assumed.
+ * its bases into the HTML: theme and widget assets, core and theme placeholders,
+ * uploaded images and files (tags, richtext and collection items) and site
+ * icons. It also renders the core form widget, whose action is written in its
+ * template rather than built from a base (the engine's own `formSubmitUrl` is
+ * checked in render-engine's mediaBase.test.js). A change to how any of them is
+ * built shows up as a diff here, so a render change that is meant to leave output
+ * alone is checked rather than assumed.
  *
  * Export output carries a per-export cache-busting token (`?v=…`) and the app
  * version in its banner comment; both are replaced by placeholders before
