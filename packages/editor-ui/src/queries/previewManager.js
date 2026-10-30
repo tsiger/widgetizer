@@ -11,13 +11,22 @@ const ALL_FONTS_LIST = [...fontDefinitions.system, ...fontDefinitions.google];
 
 /**
  * Fetch a preview token for src-based rendering.
+ *
+ * The answer is returned as the server sent it. A host whose preview documents
+ * load under a session of their own adds `session` (an opaque id) and its
+ * deadlines `absoluteExpiresAt` / `idleExpiresAt` (epoch milliseconds); the
+ * editor echoes the session on that document's widget re-renders and names it as
+ * `replaces` when it mints the next document in the same frame. The OSS server
+ * answers `{ token }` only, and is sent no `replaces`.
  * @param {Object} pageData - Page content including widgets and metadata
  * @param {Object} themeSettings - Current theme settings for rendering
  * @param {string} [previewMode="editor"] - Preview mode
- * @returns {Promise<{token: string}>} Object with token property
+ * @param {number} [pageNumber=1]
+ * @param {{ replaces?: string|null }} [options] - The session of the document this one replaces
+ * @returns {Promise<{token: string, session?: string, absoluteExpiresAt?: number, idleExpiresAt?: number}>}
  * @throws {Error} If the request fails
  */
-export async function fetchPreviewToken(pageData, themeSettings, previewMode = "editor", pageNumber = 1) {
+export async function fetchPreviewToken(pageData, themeSettings, previewMode = "editor", pageNumber = 1, { replaces } = {}) {
   try {
     return await editorFetchJson("/preview/token", {
       method: "POST",
@@ -29,6 +38,7 @@ export async function fetchPreviewToken(pageData, themeSettings, previewMode = "
         themeSettings,
         previewMode,
         ...(pageNumber > 1 ? { pageNumber } : {}),
+        ...(replaces ? { replaces } : {}),
       }),
     }, { fallbackMessage: "Failed to create preview token" });
   } catch (error) {
@@ -163,14 +173,38 @@ async function mapWithConcurrency(items, limit, task) {
 }
 
 /**
- * Fetch a single rendered widget together with the site settings it read.
- * @returns {Promise<{ html: string, themeReads: string[] | null }>}
+ * The preview document's session ended (the server answered 410): its widgets
+ * can no longer be re-rendered into it, and only a full reload — a new document
+ * with a new session — brings the preview back.
  */
-export async function fetchRenderedWidgetWithReads(widgetId, widget, themeSettings, currentCanonicalPath = "", page = null, area = null) {
+export class PreviewSessionExpired extends Error {
+  constructor() {
+    super("Preview session expired");
+    this.name = "PreviewSessionExpired";
+  }
+}
+
+/**
+ * Fetch a single rendered widget together with the site settings it read.
+ * @param {{ session?: string|null }} [options] - The preview document's session,
+ *   sent as `X-Preview-Session` when there is one.
+ * @returns {Promise<{ html: string, themeReads: string[] | null }>}
+ * @throws {PreviewSessionExpired} When the server answers 410
+ */
+export async function fetchRenderedWidgetWithReads(
+  widgetId,
+  widget,
+  themeSettings,
+  currentCanonicalPath = "",
+  page = null,
+  area = null,
+  { session } = {},
+) {
   const response = await editorFetch("/preview/widget", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      ...(session ? { "X-Preview-Session": session } : {}),
     },
     body: JSON.stringify({
       widgetId,
@@ -184,6 +218,7 @@ export async function fetchRenderedWidgetWithReads(widgetId, widget, themeSettin
   });
 
   if (!response.ok) {
+    if (response.status === 410) throw new PreviewSessionExpired();
     await throwApiError(response, "Failed to render widget");
   }
 
@@ -204,11 +239,13 @@ export async function fetchRenderedWidgetWithReads(widgetId, widget, themeSettin
  * @param {HTMLIFrameElement} iframe - Preview iframe element
  * @param {Object} newState - New page state with widgets, globalWidgets, themeSettings
  * @param {Object} [oldState] - Previous page state for comparison
+ * @param {{ session?: string|null }} [options] - The preview document's session, if the host gave it one
  * @returns {Promise<{ stale?: boolean, needsReload?: boolean }>} `stale` when a newer
  *   update started meanwhile (nothing was applied); `needsReload` when the page
- *   layout reads a changed site setting, so only a full render shows it.
+ *   layout reads a changed site setting, so only a full render shows it, or when
+ *   the document's session ended (nothing is morphed then).
  */
-export async function updatePreview(iframe, newState, oldState) {
+export async function updatePreview(iframe, newState, oldState, { session } = {}) {
   if (!iframe?.contentWindow || !newState) {
     return {};
   }
@@ -279,7 +316,10 @@ export async function updatePreview(iframe, newState, oldState) {
     jobs.push({ widgetId: "footer", data: newGlobalWidgets.footer, area: null });
   }
 
+  // Once one render says the document's session ended, the rest are not asked for.
+  let sessionExpired = false;
   const results = await mapWithConcurrency(jobs, RENDER_CONCURRENCY, async (job) => {
+    if (sessionExpired) return null;
     try {
       return await fetchRenderedWidgetWithReads(
         job.widgetId,
@@ -288,14 +328,22 @@ export async function updatePreview(iframe, newState, oldState) {
         currentCanonicalPath,
         newState.page,
         job.area,
+        { session },
       );
     } catch (error) {
+      if (error instanceof PreviewSessionExpired) {
+        sessionExpired = true;
+        return null;
+      }
       console.error(`Error updating widget ${job.widgetId}:`, error);
       return null;
     }
   });
 
   if (!isCurrent()) return { stale: true };
+  // Morph nothing: a page with some widgets swapped in and others not is worse
+  // than the full reload this asks for.
+  if (sessionExpired) return { needsReload: true };
 
   jobs.forEach((job, index) => {
     const result = results[index];

@@ -11,8 +11,15 @@ vi.mock("../../lib/apiFetch", () => ({
   throwApiError: vi.fn(),
 }));
 
-import { fetchRenderedWidget, setPreviewThemeReads, updatePreview } from "../previewManager";
-import { editorFetch } from "../../lib/apiFetch";
+import {
+  fetchPreviewToken,
+  fetchRenderedWidget,
+  fetchRenderedWidgetWithReads,
+  PreviewSessionExpired,
+  setPreviewThemeReads,
+  updatePreview,
+} from "../previewManager";
+import { editorFetch, editorFetchJson, throwApiError } from "../../lib/apiFetch";
 
 afterEach(() => {
   vi.clearAllMocks();
@@ -222,5 +229,100 @@ describe("updatePreview — re-renders only what a site setting change can affec
     release();
     expect(await first).toEqual({ stale: true });
     expect(iframe.contentWindow.postMessage.mock.calls.some(([m]) => m.type === "MORPH_WIDGET" && m.payload.html === "old")).toBe(false);
+  });
+});
+
+// A host may give each preview document a session of its own: the mint answers it,
+// widget re-renders echo it, and the next mint names it as the one it replaces. The
+// OSS server gives none, and then nothing about the requests changes.
+describe("preview sessions", () => {
+  // As a host serializes it: deadlines are epoch milliseconds.
+  const HOST_MINT = JSON.parse('{"token":"t1","session":"s_abc","absoluteExpiresAt":1767225600000,"idleExpiresAt":1767211200000}');
+
+  describe("fetchPreviewToken", () => {
+    it("returns the mint's answer as the server sent it", async () => {
+      editorFetchJson.mockResolvedValue(HOST_MINT);
+      expect(await fetchPreviewToken({ slug: "index" }, {})).toEqual(HOST_MINT);
+    });
+
+    it("names the replaced session only when there is one", async () => {
+      editorFetchJson.mockResolvedValue({ token: "t" });
+      await fetchPreviewToken({ slug: "index" }, {}, "editor", 1);
+      await fetchPreviewToken({ slug: "index" }, {}, "editor", 1, { replaces: null });
+      await fetchPreviewToken({ slug: "index" }, {}, "editor", 1, { replaces: "s_old" });
+      const bodies = editorFetchJson.mock.calls.map(([, options]) => JSON.parse(options.body));
+      expect(bodies[0]).toEqual({ pageData: { slug: "index" }, themeSettings: {}, previewMode: "editor" });
+      expect(bodies[1]).toEqual(bodies[0]);
+      expect(bodies[2]).toEqual({ ...bodies[0], replaces: "s_old" });
+    });
+  });
+
+  describe("fetchRenderedWidgetWithReads", () => {
+    const ok = () => editorFetch.mockResolvedValue({ ok: true, json: async () => ({ html: "<div></div>", themeReads: [] }) });
+
+    it("sends no session header without a session", async () => {
+      ok();
+      await fetchRenderedWidgetWithReads("w1", { type: "x" }, {});
+      await fetchRenderedWidgetWithReads("w1", { type: "x" }, {}, "", null, null, { session: null });
+      for (const [, options] of editorFetch.mock.calls) {
+        expect(options.headers).toEqual({ "Content-Type": "application/json" });
+      }
+    });
+
+    it("sends the session it is given", async () => {
+      ok();
+      await fetchRenderedWidgetWithReads("w1", { type: "x" }, {}, "", null, null, { session: "s_abc" });
+      expect(editorFetch.mock.calls[0][1].headers["X-Preview-Session"]).toBe("s_abc");
+    });
+
+    it("turns a 410 into PreviewSessionExpired", async () => {
+      editorFetch.mockResolvedValue({ ok: false, status: 410, json: async () => ({ code: "session_expired" }) });
+      await expect(fetchRenderedWidgetWithReads("w1", { type: "x" }, {}, "", null, null, { session: "s" })).rejects.toBeInstanceOf(
+        PreviewSessionExpired,
+      );
+    });
+  });
+
+  describe("updatePreview", () => {
+    const changed = { a: { type: "x", settings: { n: 2 } }, b: { type: "x", settings: { n: 2 } }, c: { type: "x", settings: { n: 2 } } };
+    const before = { a: { type: "x", settings: { n: 1 } }, b: { type: "x", settings: { n: 1 } }, c: { type: "x", settings: { n: 1 } } };
+    const frame = () => {
+      const iframe = { contentWindow: { postMessage: vi.fn() } };
+      setPreviewThemeReads(iframe, { widgets: {}, layout: [] });
+      return iframe;
+    };
+    const respondWith = (failing) =>
+      editorFetch.mockImplementation(async (_path, options) => {
+        const { widgetId } = JSON.parse(options.body);
+        if (widgetId === failing.id) return { ok: false, status: failing.status, json: async () => ({}) };
+        return { ok: true, json: async () => ({ html: `<div>${widgetId}</div>`, themeReads: [] }) };
+      });
+
+    it("echoes the document's session on every re-render", async () => {
+      respondWith({});
+      await updatePreview(frame(), { widgets: changed }, { widgets: before }, { session: "s_abc" });
+      expect(editorFetch).toHaveBeenCalledTimes(3);
+      for (const [, options] of editorFetch.mock.calls) expect(options.headers["X-Preview-Session"]).toBe("s_abc");
+    });
+
+    it("asks for a reload and morphs nothing when one render says the session ended", async () => {
+      respondWith({ id: "b", status: 410 });
+      const iframe = frame();
+      const result = await updatePreview(iframe, { widgets: changed }, { widgets: before }, { session: "s_abc" });
+      expect(result).toEqual({ needsReload: true });
+      expect(iframe.contentWindow.postMessage).not.toHaveBeenCalled();
+    });
+
+    it("still morphs the others when a render fails any other way", async () => {
+      respondWith({ id: "b", status: 500 });
+      throwApiError.mockImplementationOnce(async () => {
+        throw new Error("Failed to render widget");
+      });
+      const iframe = frame();
+      const result = await updatePreview(iframe, { widgets: changed }, { widgets: before });
+      expect(result).toEqual({});
+      const morphed = iframe.contentWindow.postMessage.mock.calls.filter(([m]) => m.type === "MORPH_WIDGET");
+      expect(morphed.map(([m]) => m.payload.widgetId)).toEqual(["a", "c"]);
+    });
   });
 });

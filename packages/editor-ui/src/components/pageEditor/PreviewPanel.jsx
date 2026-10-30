@@ -187,6 +187,12 @@ const PreviewPanel = forwardRef(function PreviewPanel(
   // frame may be on another origin, where the editor can't read it.
   const lastScrollYRef = useRef(0);
 
+  // The preview session of the newest document minted for this frame, when the
+  // host gives its preview documents one (OSS does not). Widget re-renders echo
+  // it, and the next mint names it as the session it replaces, so one frame
+  // holds one session however often it reloads.
+  const previewSessionRef = useRef(null);
+
   // The site settings the preview shows right now (applied at once, ahead of the
   // debounced update), and a counter so a slower, older update never lands last.
   const appliedThemeRef = useRef(null);
@@ -336,7 +342,10 @@ const PreviewPanel = forwardRef(function PreviewPanel(
         setError(null);
 
         const enhancedPageData = { ...page, globalWidgets, sharedAreas };
-        const { token } = await fetchPreviewToken(enhancedPageData, themeSettings, runtimeMode);
+        const { token, session } = await fetchPreviewToken(enhancedPageData, themeSettings, runtimeMode, 1, {
+          replaces: previewSessionRef.current,
+        });
+        previewSessionRef.current = session ?? null;
         setPreviewSrc(buildPreviewUrl(token));
         navigatingRef.current = true;
         appliedThemeRef.current = themeSettings;
@@ -556,7 +565,12 @@ const PreviewPanel = forwardRef(function PreviewPanel(
       const isCurrent = () => updateSeqRef.current === seq;
       const reload = async () => {
         const enhancedPageData = { ...page, globalWidgets, sharedAreas };
-        const { token } = await fetchPreviewToken(enhancedPageData, themeSettings, runtimeMode);
+        const { token, session } = await fetchPreviewToken(enhancedPageData, themeSettings, runtimeMode, 1, {
+          replaces: previewSessionRef.current,
+        });
+        // The server ended the replaced session as it minted this one, so this is
+        // the frame's live session even if a newer update discards the document.
+        previewSessionRef.current = session ?? null;
         if (!isCurrent()) return;
         renderedStateRef.current = {
           page,
@@ -596,14 +610,17 @@ const PreviewPanel = forwardRef(function PreviewPanel(
             page,
           };
 
-          const result = await updatePreview(iframeRef.current, updateState, previousState || {});
+          const result = await updatePreview(iframeRef.current, updateState, previousState || {}, {
+            session: previewSessionRef.current,
+          });
 
           // A newer update is under way and compares against the same baseline,
           // so it covers this change too.
           if (result?.stale || !isCurrent()) return;
 
           if (result?.needsReload) {
-            // The page layout reads a changed site setting: only a full render shows it.
+            // The page layout reads a changed site setting, or the document's session
+            // ended: only a full render shows it.
             pendingScrollRef.current = { scrollY: morphScrollY, widgetId: selectedWidgetId, blockId: selectedBlockId };
             structuralReloadRef.current = true;
             await reload();
