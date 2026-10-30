@@ -17,6 +17,16 @@ import { buildPreviewUrl, getPreviewTargetOrigin } from "../../lib/previewBase";
 import { readPreviewMessage } from "../../lib/previewMessages";
 import { createPreviewReloadCoordinator } from "../../lib/previewReload";
 import SelectionOverlay from "./SelectionOverlay";
+import { STANDALONE_SANDBOX } from "../preview/PreviewStage";
+
+// The editor's own preview frame runs the site's scripts beside the editor, so it
+// may neither navigate the editor's tab nor open windows (an unsandboxed pop-up
+// could navigate its opener). Downloads, new-tab links and modals are left out
+// too: the editor-mode runtime cancels every link click, and nothing built in
+// uses a modal. Fullscreen comes from the `allow` attribute, not the sandbox.
+// The sandbox binds only while the preview is on another origin; a same-origin
+// frame can reach the editor's document and remove it.
+const EDITOR_SANDBOX = "allow-scripts allow-same-origin allow-forms allow-presentation";
 
 /**
  * Detect if changes are structural (requiring full reload) or content-only (can be morphed)
@@ -734,12 +744,7 @@ const PreviewPanel = forwardRef(function PreviewPanel(
           ref={iframeRef}
           src={previewSrc}
           title={t("pageEditor.preview.title")}
-          {...(runtimeMode === "standalone"
-            ? {
-                sandbox:
-                  "allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-forms allow-presentation allow-top-navigation-by-user-activation",
-              }
-            : {})}
+          sandbox={runtimeMode === "standalone" ? STANDALONE_SANDBOX : EDITOR_SANDBOX}
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen"
           allowFullScreen
           className={`w-full h-full border-0 transition-all duration-300 ease-in-out mx-auto ${
