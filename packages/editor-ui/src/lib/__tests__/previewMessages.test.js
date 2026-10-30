@@ -1,7 +1,19 @@
 // @vitest-environment jsdom
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+vi.mock("../apiFetch", () => ({
+  editorFetch: vi.fn(),
+  editorFetchJson: vi.fn(),
+  rethrowQueryError: vi.fn((err) => {
+    throw err;
+  }),
+  throwApiError: vi.fn(),
+}));
+
 import { isPreviewMessage, readPreviewMessage } from "../previewMessages";
 import { getPreviewTargetOrigin, setPreviewRenderBase } from "../previewBase";
+import { editorFetch } from "../apiFetch";
+import { setPreviewThemeReads, updatePreview } from "../../queries/previewManager";
 
 // The inbound guard of the editor <-> preview bridge. The preview origin comes
 // from the render base (module state, reset after each test); the source check
@@ -121,6 +133,87 @@ describe("readPreviewMessage", () => {
 
     it("drops a payload that is not an object", () => {
       expect(read({ type: "PREVIEW_READY", payload: "ready" })).toBeNull();
+    });
+
+    it("returns fresh copies, never the sender's containers", () => {
+      const themeReads = { widgets: { w1: ["colors.accent"] }, layout: ["general.*"] };
+      const copy = themeReadsOf(themeReads);
+      expect(copy).toEqual(themeReads);
+      expect(copy).not.toBe(themeReads);
+      expect(copy.widgets).not.toBe(themeReads.widgets);
+      expect(copy.widgets.w1).not.toBe(themeReads.widgets.w1);
+      expect(copy.layout).not.toBe(themeReads.layout);
+    });
+
+    it("keeps a widget id of __proto__ an ordinary key", () => {
+      const widgets = JSON.parse('{"__proto__": ["colors.accent"]}');
+      const copy = themeReadsOf({ widgets });
+      expect(Object.getPrototypeOf(copy.widgets)).toBe(Object.prototype);
+      expect(Object.keys(copy.widgets)).toEqual(["__proto__"]);
+    });
+
+    it("reads a getter once: one that throws later cannot reach what it returned", () => {
+      let reads = 0;
+      const themeReads = {
+        get widgets() {
+          if (reads++) throw new Error("second read");
+          return { w1: ["colors.accent"] };
+        },
+      };
+      const copy = themeReadsOf(themeReads);
+      expect(copy).toEqual({ widgets: { w1: ["colors.accent"] } });
+      expect(() => JSON.stringify(copy)).not.toThrow();
+      // One that throws at once drops the whole message, without throwing.
+      const hostile = {
+        get layout() {
+          throw new Error("no");
+        },
+      };
+      expect(read({ type: "PREVIEW_READY", payload: { themeReads: hostile } })).toBeNull();
+    });
+
+    it("copies out of proxies, so later traps never run", () => {
+      let armed = false;
+      const trap = {
+        get(target, key, receiver) {
+          if (armed) throw new Error("trap");
+          return Reflect.get(target, key, receiver);
+        },
+        ownKeys(target) {
+          if (armed) throw new Error("trap");
+          return Reflect.ownKeys(target);
+        },
+      };
+      const list = new Proxy(["colors.accent"], trap);
+      const themeReads = new Proxy({ widgets: new Proxy({ w1: list }, trap), layout: list }, trap);
+      const copy = themeReadsOf(themeReads);
+      armed = true;
+      expect(copy).toEqual({ widgets: { w1: ["colors.accent"] }, layout: ["colors.accent"] });
+      expect(Array.isArray(copy.layout)).toBe(true);
+      expect([...copy.widgets.w1, ...Object.keys(copy.widgets)]).toEqual(["colors.accent", "w1"]);
+    });
+
+    it("hands the editor's live updates only the copy", async () => {
+      let reads = 0;
+      const widgets = { w1: ["colors.accent"] };
+      const themeReads = {
+        get widgets() {
+          if (reads++) throw new Error("second read");
+          return widgets;
+        },
+        layout: [],
+      };
+      const message = read({ type: "PREVIEW_READY", payload: { themeReads } });
+      // What PreviewPanel's PREVIEW_READY handler does with it, then a site setting change.
+      widgets.w1 = new Proxy([], { get: () => { throw new Error("late"); } });
+      setPreviewThemeReads(iframe, message.payload.themeReads);
+      editorFetch.mockResolvedValue({ ok: true, json: async () => ({ html: '<div data-widget-id="w1"></div>', themeReads: [] }) });
+      const theme = (accent) => ({ settings: { global: { colors: [{ id: "accent", type: "color", value: accent }] } } });
+      const widget = { type: "x", settings: {} };
+      await expect(
+        updatePreview(iframe, { widgets: { w1: widget }, themeSettings: theme("#00f") }, { widgets: { w1: widget }, themeSettings: theme("#f00") }),
+      ).resolves.toEqual({});
+      expect(JSON.parse(editorFetch.mock.calls[0][1].body).widgetId).toBe("w1");
     });
   });
 

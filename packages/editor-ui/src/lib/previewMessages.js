@@ -20,37 +20,56 @@ function isPlainObject(value) {
 
 const isShortString = (value, max) => typeof value === "string" && value.length <= max;
 
-function isStringList(value) {
-  if (!Array.isArray(value)) return false;
-  for (let i = 0; i < value.length; i++) {
-    if (!isShortString(value[i], MAX_THEME_READ_LENGTH)) return false;
+// A fresh array of the list's strings, each read once; null for anything else.
+function copyStringList(value) {
+  if (!Array.isArray(value)) return null;
+  const length = value.length;
+  const copy = [];
+  for (let i = 0; i < length; i++) {
+    const item = value[i];
+    if (!isShortString(item, MAX_THEME_READ_LENGTH)) return null;
+    copy.push(item);
   }
-  return true;
+  return copy;
 }
 
 // The site settings a full render read: `{ widgets?: { [widgetId]: string[] }, layout?: string[] }`.
-// Checked by shape only, with no count or size cap — a large page legitimately
+// Checked by shape: every key and string is capped at MAX_THEME_READ_LENGTH, but
+// neither the number of entries nor the total size is — a large page legitimately
 // reports thousands of widgets, and the browser has already copied the message by
-// the time it gets here. Any other shape (a cycle or a class instance included)
-// drops the whole value to null, which the editor reads as "unknown".
+// the time it gets here. Each property is read once and what passes is copied
+// into fresh objects and arrays, so nothing downstream ever touches the sender's
+// containers (a getter or proxy cannot answer differently later). Any other shape
+// (a cycle or a class instance included) drops the whole value to null, which the
+// editor reads as "unknown".
 function readThemeReads(value) {
-  if (value === null || value === undefined || !isPlainObject(value)) return null;
-  const { widgets, layout } = value;
+  if (!isPlainObject(value)) return null;
+  const widgets = value.widgets;
+  const layout = value.layout;
+  const copy = {};
   if (widgets !== undefined) {
     if (!isPlainObject(widgets)) return null;
+    const widgetsCopy = {};
     for (const key of Object.keys(widgets)) {
-      if (key.length > MAX_THEME_READ_LENGTH || !isStringList(widgets[key])) return null;
+      if (key.length > MAX_THEME_READ_LENGTH) return null;
+      const reads = copyStringList(widgets[key]);
+      if (!reads) return null;
+      // Defined, not assigned: a widget id of "__proto__" stays an ordinary key.
+      Object.defineProperty(widgetsCopy, key, { value: reads, enumerable: true, writable: true, configurable: true });
     }
+    copy.widgets = widgetsCopy;
   }
-  if (layout !== undefined && !isStringList(layout)) return null;
-  return {
-    ...(widgets !== undefined ? { widgets } : {}),
-    ...(layout !== undefined ? { layout } : {}),
-  };
+  if (layout !== undefined) {
+    const layoutCopy = copyStringList(layout);
+    if (!layoutCopy) return null;
+    copy.layout = layoutCopy;
+  }
+  return copy;
 }
 
-// One reader per inbound type; each returns the payload to use, or null to drop
-// the message. Types the editor does not handle have no entry and are dropped.
+// One reader per inbound type; each reads every field once and returns a fresh
+// payload to use, or null to drop the message. Types the editor does not handle
+// have no entry and are dropped.
 const PAYLOAD_READERS = {
   PREVIEW_READY(payload) {
     if (payload === undefined || payload === null) return { themeReads: null };
@@ -58,19 +77,24 @@ const PAYLOAD_READERS = {
     return { themeReads: readThemeReads(payload.themeReads) };
   },
   WIDGET_SELECTED(payload) {
-    if (!isPlainObject(payload) || !isShortString(payload.widgetId, MAX_ID_LENGTH)) return null;
-    const blockId = payload.blockId ?? null;
+    if (!isPlainObject(payload)) return null;
+    const { widgetId, blockId = null } = payload;
+    if (!isShortString(widgetId, MAX_ID_LENGTH)) return null;
     if (blockId !== null && !isShortString(blockId, MAX_ID_LENGTH)) return null;
-    return { widgetId: payload.widgetId, blockId };
+    return { widgetId, blockId };
   },
   REORDER_WIDGET(payload) {
-    if (!isPlainObject(payload) || !isShortString(payload.widgetId, MAX_ID_LENGTH)) return null;
-    if (payload.direction !== "up" && payload.direction !== "down") return null;
-    return { widgetId: payload.widgetId, direction: payload.direction };
+    if (!isPlainObject(payload)) return null;
+    const { widgetId, direction } = payload;
+    if (!isShortString(widgetId, MAX_ID_LENGTH)) return null;
+    if (direction !== "up" && direction !== "down") return null;
+    return { widgetId, direction };
   },
   NAVIGATE_PREVIEW(payload) {
-    if (!isPlainObject(payload) || !isShortString(payload.url, MAX_URL_LENGTH)) return null;
-    return { url: payload.url };
+    if (!isPlainObject(payload)) return null;
+    const { url } = payload;
+    if (!isShortString(url, MAX_URL_LENGTH)) return null;
+    return { url };
   },
   SCROLL_POSITION(payload) {
     if (!isPlainObject(payload)) return null;
@@ -114,11 +138,11 @@ export function readPreviewMessage(event, iframe) {
   if (!fromPreview(event, arguments.length > 1, iframe)) return null;
   try {
     const data = event.data;
-    if (!isPlainObject(data) || typeof data.type !== "string" || !Object.hasOwn(PAYLOAD_READERS, data.type)) {
-      return null;
-    }
-    const payload = PAYLOAD_READERS[data.type](data.payload);
-    return payload ? { type: data.type, payload } : null;
+    if (!isPlainObject(data)) return null;
+    const { type, payload: raw } = data;
+    if (typeof type !== "string" || !Object.hasOwn(PAYLOAD_READERS, type)) return null;
+    const payload = PAYLOAD_READERS[type](raw);
+    return payload ? { type, payload } : null;
   } catch {
     return null;
   }
