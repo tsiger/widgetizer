@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 // Mock the fetch layer so we can inspect the request the morph path sends.
 vi.mock("../../lib/apiFetch", () => ({
@@ -15,8 +15,10 @@ import {
   fetchPreviewToken,
   fetchRenderedWidget,
   fetchRenderedWidgetWithReads,
+  KEEP_ALIVE_MS,
   PreviewSessionExpired,
   setPreviewThemeReads,
+  startPreviewKeepAlive,
   updatePreview,
 } from "../previewManager";
 import { editorFetch, editorFetchJson, throwApiError } from "../../lib/apiFetch";
@@ -324,5 +326,164 @@ describe("preview sessions", () => {
       const morphed = iframe.contentWindow.postMessage.mock.calls.filter(([m]) => m.type === "MORPH_WIDGET");
       expect(morphed.map(([m]) => m.payload.widgetId)).toEqual(["a", "c"]);
     });
+  });
+});
+
+describe("startPreviewKeepAlive", () => {
+  const HOUR = 60 * 60 * 1000;
+  // The mint answer exactly as a host serializes it: epoch-millisecond numbers.
+  const MINTED_AT = Date.UTC(2026, 0, 1, 12);
+  const mintAnswer = () =>
+    JSON.parse(
+      JSON.stringify({ token: "t1", session: "s_abc", absoluteExpiresAt: MINTED_AT + 4 * HOUR, idleExpiresAt: MINTED_AT + HOUR / 2 }),
+    );
+
+  let visibility;
+  let onEnded;
+  let stop;
+
+  const start = (answer = mintAnswer()) => {
+    stop = startPreviewKeepAlive({ ...answer, onEnded });
+    return stop;
+  };
+  const show = async (state) => {
+    visibility = state;
+    document.dispatchEvent(new Event("visibilitychange"));
+    await vi.advanceTimersByTimeAsync(0);
+  };
+  const touches = () => editorFetchJson.mock.calls.filter(([path]) => path === "/preview/session/touch");
+  const gone = () => Object.assign(new Error("Preview session expired"), { status: 410, code: "session_expired" });
+
+  beforeEach(() => {
+    vi.useFakeTimers();
+    vi.setSystemTime(MINTED_AT);
+    visibility = "visible";
+    Object.defineProperty(document, "visibilityState", { configurable: true, get: () => visibility });
+    onEnded = vi.fn();
+    stop = null;
+    editorFetchJson.mockResolvedValue({ absoluteExpiresAt: MINTED_AT + 4 * HOUR, idleExpiresAt: MINTED_AT + HOUR });
+  });
+
+  afterEach(() => {
+    stop?.();
+    vi.useRealTimers();
+    delete document.visibilityState;
+  });
+
+  it("does nothing without a session", async () => {
+    start({ token: "t1" });
+    expect(vi.getTimerCount()).toBe(0);
+    await vi.advanceTimersByTimeAsync(5 * HOUR);
+    expect(editorFetchJson).not.toHaveBeenCalled();
+  });
+
+  it("does nothing, with one warning, when a deadline is not a number", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    start({ ...mintAnswer(), absoluteExpiresAt: new Date(MINTED_AT + 4 * HOUR).toISOString() });
+    expect(vi.getTimerCount()).toBe(0);
+    await vi.advanceTimersByTimeAsync(5 * HOUR);
+    await show("visible");
+    expect(editorFetchJson).not.toHaveBeenCalled();
+    expect(onEnded).not.toHaveBeenCalled();
+    expect(warn).toHaveBeenCalledTimes(1);
+    warn.mockRestore();
+  });
+
+  it("starts from a real mint answer without reloading", async () => {
+    start();
+    await vi.advanceTimersByTimeAsync(1000);
+    expect(onEnded).not.toHaveBeenCalled();
+    expect(editorFetchJson).not.toHaveBeenCalled();
+  });
+
+  it("touches the session on its cadence only while visible", async () => {
+    start();
+    await vi.advanceTimersByTimeAsync(KEEP_ALIVE_MS);
+    expect(touches()).toHaveLength(1);
+    expect(touches()[0][1]).toMatchObject({ method: "POST", body: JSON.stringify({ session: "s_abc" }) });
+    visibility = "hidden";
+    await vi.advanceTimersByTimeAsync(3 * KEEP_ALIVE_MS);
+    expect(touches()).toHaveLength(1);
+    visibility = "visible";
+    await vi.advanceTimersByTimeAsync(KEEP_ALIVE_MS);
+    expect(touches()).toHaveLength(2);
+  });
+
+  it("ends once at the absolute deadline when visible", async () => {
+    start();
+    await vi.advanceTimersByTimeAsync(4 * HOUR - 1);
+    expect(onEnded).not.toHaveBeenCalled();
+    await vi.advanceTimersByTimeAsync(1);
+    expect(onEnded).toHaveBeenCalledTimes(1);
+    await vi.advanceTimersByTimeAsync(HOUR);
+    await show("visible");
+    expect(onEnded).toHaveBeenCalledTimes(1);
+    expect(vi.getTimerCount()).toBe(0);
+  });
+
+  it("waits for a hidden tab to return, then ends once without asking the server", async () => {
+    start();
+    visibility = "hidden";
+    await vi.advanceTimersByTimeAsync(5 * HOUR);
+    expect(onEnded).not.toHaveBeenCalled();
+    await show("visible");
+    window.dispatchEvent(new Event("focus"));
+    expect(onEnded).toHaveBeenCalledTimes(1);
+    expect(editorFetchJson).not.toHaveBeenCalled();
+  });
+
+  it("touches on return before the deadline, and lets a 410 end it", async () => {
+    start();
+    visibility = "hidden";
+    await vi.advanceTimersByTimeAsync(HOUR);
+    editorFetchJson.mockRejectedValueOnce(gone());
+    await show("visible");
+    expect(touches()).toHaveLength(1);
+    expect(onEnded).toHaveBeenCalledTimes(1);
+  });
+
+  it("keeps going when a touch fails some other way", async () => {
+    start();
+    editorFetchJson.mockRejectedValueOnce(Object.assign(new Error("Bad gateway"), { status: 502 }));
+    await vi.advanceTimersByTimeAsync(KEEP_ALIVE_MS);
+    expect(onEnded).not.toHaveBeenCalled();
+    await vi.advanceTimersByTimeAsync(KEEP_ALIVE_MS);
+    expect(touches()).toHaveLength(2);
+  });
+
+  it("shares one request between focus, visibility and the interval", async () => {
+    let answer;
+    editorFetchJson.mockImplementation(() => new Promise((resolve) => (answer = resolve)));
+    start();
+    await vi.advanceTimersByTimeAsync(KEEP_ALIVE_MS - 1);
+    window.dispatchEvent(new Event("focus"));
+    await show("visible");
+    await vi.advanceTimersByTimeAsync(1);
+    expect(touches()).toHaveLength(1);
+    answer({});
+    await vi.advanceTimersByTimeAsync(KEEP_ALIVE_MS);
+    expect(touches()).toHaveLength(2);
+  });
+
+  it("stop() clears its timers and listeners, and ignores an answer still on its way", async () => {
+    let fail;
+    editorFetchJson.mockImplementation(() => new Promise((_resolve, reject) => (fail = reject)));
+    const removed = vi.spyOn(window, "removeEventListener");
+    const removedDoc = vi.spyOn(document, "removeEventListener");
+    start();
+    window.dispatchEvent(new Event("focus"));
+    expect(touches()).toHaveLength(1);
+    stop();
+    expect(vi.getTimerCount()).toBe(0);
+    expect(removed).toHaveBeenCalledWith("focus", expect.any(Function));
+    expect(removedDoc).toHaveBeenCalledWith("visibilitychange", expect.any(Function));
+    fail(gone());
+    await vi.advanceTimersByTimeAsync(5 * HOUR);
+    window.dispatchEvent(new Event("focus"));
+    await show("visible");
+    expect(onEnded).not.toHaveBeenCalled();
+    expect(touches()).toHaveLength(1);
+    removed.mockRestore();
+    removedDoc.mockRestore();
   });
 });

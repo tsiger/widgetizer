@@ -47,6 +47,111 @@ export async function fetchPreviewToken(pageData, themeSettings, previewMode = "
   }
 }
 
+// How often a visible preview touches its session, well inside any idle lifetime
+// a host would give it.
+export const KEEP_ALIVE_MS = 5 * 60 * 1000;
+
+// setTimeout fires at once for delays past this.
+const MAX_TIMER_MS = 2 ** 31 - 1;
+
+/**
+ * Keep a preview document's session alive while the tab is visible, and say when
+ * it has ended. Does nothing — and sends nothing — when the mint gave no session
+ * (the OSS server never does).
+ *
+ * While visible it touches the session every KEEP_ALIVE_MS, so the idle lifetime
+ * effectively runs only while the tab is hidden or closed. `onEnded` is called at
+ * most once: when the absolute deadline passes with the tab visible, when the tab
+ * becomes visible (or regains focus) after it, or when a touch answers 410. A
+ * hidden tab is never reloaded; it finds out on return. Other touch failures are
+ * ignored and retried on the next tick.
+ *
+ * @param {object} options
+ * @param {string|null|undefined} options.session
+ * @param {number} options.absoluteExpiresAt - Epoch ms; never moves for a session.
+ * @param {number} options.idleExpiresAt - Epoch ms. Only checked for shape: the idle
+ *   deadline is the server's to judge, so a touch (and its 410) decides, not a clock.
+ * @param {() => void} options.onEnded
+ * @returns {() => void} stop — clears the timers and listeners; answers that land after it are ignored.
+ */
+export function startPreviewKeepAlive({ session, absoluteExpiresAt, idleExpiresAt, onEnded }) {
+  if (!session) return () => {};
+  if (!Number.isFinite(absoluteExpiresAt) || !Number.isFinite(idleExpiresAt)) {
+    console.warn("Preview session has no usable deadlines; it is not kept alive.");
+    return () => {};
+  }
+
+  let stopped = false;
+  let ended = false;
+  let inFlight = null;
+  let deadlineTimer = null;
+
+  const visible = () => document.visibilityState === "visible";
+
+  const end = () => {
+    if (stopped || ended) return;
+    ended = true;
+    stop();
+    onEnded();
+  };
+
+  const touch = () => {
+    if (stopped || ended || inFlight) return;
+    inFlight = (async () => {
+      try {
+        await editorFetchJson(
+          "/preview/session/touch",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ session }),
+          },
+          { fallbackMessage: "Failed to keep the preview session alive" },
+        );
+      } catch (error) {
+        if (stopped || ended) return;
+        if (error?.status === 410) end();
+      } finally {
+        inFlight = null;
+      }
+    })();
+  };
+
+  const armDeadline = () => {
+    const delay = Math.min(Math.max(absoluteExpiresAt - Date.now(), 0), MAX_TIMER_MS);
+    deadlineTimer = setTimeout(() => {
+      if (Date.now() < absoluteExpiresAt) return armDeadline();
+      if (visible()) end();
+    }, delay);
+  };
+
+  const onReturn = () => {
+    if (stopped || ended || !visible()) return;
+    if (Date.now() >= absoluteExpiresAt) return end();
+    // Only the server knows whether the session idled out meanwhile.
+    touch();
+  };
+
+  const interval = setInterval(() => {
+    if (visible()) touch();
+  }, KEEP_ALIVE_MS);
+  armDeadline();
+  window.addEventListener("focus", onReturn);
+  document.addEventListener("visibilitychange", onReturn);
+
+  function stop() {
+    stopped = true;
+    clearInterval(interval);
+    clearTimeout(deadlineTimer);
+    window.removeEventListener("focus", onReturn);
+    document.removeEventListener("visibilitychange", onReturn);
+  }
+
+  return () => {
+    if (!stopped) stop();
+  };
+}
+
 /**
  * Fetch a rendered HTML preview of the page from the server.
  * @param {Object} pageData - Page content including widgets and metadata

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo, forwardRef } from "react";
+import { useState, useEffect, useLayoutEffect, useRef, useMemo, forwardRef } from "react";
 import { useTranslation } from "react-i18next";
 import { useThemeLocale } from "../../hooks/useThemeLocale";
 import {
@@ -15,6 +15,7 @@ import useProjectStore from "../../stores/projectStore";
 import useWidgetStore from "../../stores/widgetStore";
 import { buildPreviewUrl, getPreviewTargetOrigin } from "../../lib/previewBase";
 import { readPreviewMessage } from "../../lib/previewMessages";
+import { createPreviewReloadCoordinator } from "../../lib/previewReload";
 import SelectionOverlay from "./SelectionOverlay";
 
 /**
@@ -187,11 +188,11 @@ const PreviewPanel = forwardRef(function PreviewPanel(
   // frame may be on another origin, where the editor can't read it.
   const lastScrollYRef = useRef(0);
 
-  // The preview session of the newest document minted for this frame, when the
-  // host gives its preview documents one (OSS does not). Widget re-renders echo
-  // it, and the next mint names it as the session it replaces, so one frame
-  // holds one session however often it reloads.
-  const previewSessionRef = useRef(null);
+  // Mints and shows every new preview document, and keeps the frame's preview
+  // session alive when the host gives its documents one (OSS does not): widget
+  // re-renders echo that session, and the next mint names it as the one it
+  // replaces, so one frame holds one session however often it reloads.
+  const reloadCoordinatorRef = useRef(null);
 
   // The site settings the preview shows right now (applied at once, ahead of the
   // debounced update), and a counter so a slower, older update never lands last.
@@ -219,7 +220,58 @@ const PreviewPanel = forwardRef(function PreviewPanel(
   const activeProject = useProjectStore((state) => state.activeProject);
   const schemas = useWidgetStore((state) => state.schemas);
 
+  // What a reload renders: the editor's state as of the last commit. The
+  // coordinator's callbacks outlive renders, so they read it from here; a layout
+  // effect updates it before any effect below can start a load.
+  const latestStateRef = useRef(null);
+  useLayoutEffect(() => {
+    latestStateRef.current = {
+      page,
+      widgets,
+      globalWidgets,
+      sharedAreas,
+      themeSettings,
+      selectedWidgetId,
+      selectedBlockId,
+      selectedGlobalWidgetId,
+      runtimeMode,
+    };
+  });
+
   useEffect(() => {
+    const coordinator = createPreviewReloadCoordinator({
+      mint: async ({ replaces }) => {
+        const { runtimeMode: mode, ...rendered } = latestStateRef.current;
+        const enhancedPageData = { ...rendered.page, globalWidgets: rendered.globalWidgets, sharedAreas: rendered.sharedAreas };
+        const answer = await fetchPreviewToken(enhancedPageData, rendered.themeSettings, mode, 1, { replaces });
+        return { ...answer, rendered };
+      },
+      show: ({ token, rendered }) => {
+        renderedStateRef.current = rendered;
+        navigatingRef.current = true;
+        setPreviewSrc(buildPreviewUrl(token));
+        appliedThemeRef.current = rendered.themeSettings;
+      },
+      // The session ended: reload the way a structural change does, view and selection kept.
+      beginReload: () => {
+        const seq = ++updateSeqRef.current;
+        const { selectedWidgetId: widgetId, selectedBlockId: blockId } = latestStateRef.current;
+        pendingScrollRef.current = { scrollY: lastScrollYRef.current, widgetId, blockId };
+        structuralReloadRef.current = true;
+        return () => updateSeqRef.current === seq;
+      },
+      onReloadError: (err) => {
+        console.error("Preview reload error:", err);
+        structuralReloadRef.current = false;
+        pendingScrollRef.current = null;
+      },
+    });
+    reloadCoordinatorRef.current = coordinator;
+    return () => coordinator.dispose();
+  }, []);
+
+  useEffect(() => {
+    reloadCoordinatorRef.current?.release();
     previousStateRef.current = null;
     pendingScrollRef.current = null;
     lastScrollYRef.current = 0;
@@ -235,7 +287,9 @@ const PreviewPanel = forwardRef(function PreviewPanel(
   }, [activeProject?.id, page?.id, runtimeMode]);
 
   // Detect structural changes during render (before child effects fire).
-  // This sets the ref synchronously so SelectionOverlay can check it in its effects.
+  // This sets the ref synchronously so SelectionOverlay can check it in its effects,
+  // which is why refs are read and written during render here.
+  /* eslint-disable react-hooks/refs */
   if (initialLoadComplete && previousStateRef.current) {
     const prev = previousStateRef.current;
     const contentChanged =
@@ -259,6 +313,7 @@ const PreviewPanel = forwardRef(function PreviewPanel(
       }
     }
   }
+  /* eslint-enable react-hooks/refs */
 
   // Expose the iframe ref to the parent component
   useEffect(() => {
@@ -337,38 +392,23 @@ const PreviewPanel = forwardRef(function PreviewPanel(
     if (activeProject?.id && loadedProjectId && activeProject.id !== loadedProjectId) return;
 
     async function loadInitialPreview() {
+      const coordinator = reloadCoordinatorRef.current;
       try {
         setLoading(true);
         setError(null);
 
-        const enhancedPageData = { ...page, globalWidgets, sharedAreas };
-        const { token, session } = await fetchPreviewToken(enhancedPageData, themeSettings, runtimeMode, 1, {
-          replaces: previewSessionRef.current,
-        });
-        previewSessionRef.current = session ?? null;
-        setPreviewSrc(buildPreviewUrl(token));
-        navigatingRef.current = true;
-        appliedThemeRef.current = themeSettings;
+        // Not shown only when this panel's coordinator was replaced meanwhile (the
+        // effects re-ran); the load the new one started owns the frame.
+        if (!(await coordinator.load())) return;
 
         // Store the initial state for future diffing
-        previousStateRef.current = {
-          page,
-          widgets,
-          globalWidgets,
-          sharedAreas,
-          themeSettings,
-          selectedWidgetId,
-          selectedBlockId,
-          selectedGlobalWidgetId,
-        };
-        renderedStateRef.current = previousStateRef.current;
+        previousStateRef.current = renderedStateRef.current;
       } catch (err) {
         console.error("Preview error:", err);
         setError(err.message || "Failed to load preview");
-      } finally {
-        setLoading(false);
-        setInitialLoadComplete(true);
       }
+      setLoading(false);
+      setInitialLoadComplete(true);
     }
 
     loadInitialPreview();
@@ -563,29 +603,7 @@ const PreviewPanel = forwardRef(function PreviewPanel(
     const timeoutId = setTimeout(async () => {
       const seq = ++updateSeqRef.current;
       const isCurrent = () => updateSeqRef.current === seq;
-      const reload = async () => {
-        const enhancedPageData = { ...page, globalWidgets, sharedAreas };
-        const { token, session } = await fetchPreviewToken(enhancedPageData, themeSettings, runtimeMode, 1, {
-          replaces: previewSessionRef.current,
-        });
-        // The server ended the replaced session as it minted this one, so this is
-        // the frame's live session even if a newer update discards the document.
-        previewSessionRef.current = session ?? null;
-        if (!isCurrent()) return;
-        renderedStateRef.current = {
-          page,
-          widgets,
-          globalWidgets,
-          sharedAreas,
-          themeSettings,
-          selectedWidgetId,
-          selectedBlockId,
-          selectedGlobalWidgetId,
-        };
-        navigatingRef.current = true;
-        setPreviewSrc(buildPreviewUrl(token));
-        appliedThemeRef.current = themeSettings;
-      };
+      const reload = () => reloadCoordinatorRef.current.load(isCurrent);
       try {
         if (isStructural) {
           // STRUCTURAL CHANGE: Full page reload
@@ -611,7 +629,7 @@ const PreviewPanel = forwardRef(function PreviewPanel(
           };
 
           const result = await updatePreview(iframeRef.current, updateState, previousState || {}, {
-            session: previewSessionRef.current,
+            session: reloadCoordinatorRef.current.session,
           });
 
           // A newer update is under way and compares against the same baseline,
