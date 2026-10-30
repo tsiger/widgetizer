@@ -183,6 +183,10 @@ const PreviewPanel = forwardRef(function PreviewPanel(
   // Store pending scroll info for after PREVIEW_READY
   const pendingScrollRef = useRef(null);
 
+  // Where the preview document is scrolled, as its runtime last reported it: the
+  // frame may be on another origin, where the editor can't read it.
+  const lastScrollYRef = useRef(0);
+
   // The site settings the preview shows right now (applied at once, ahead of the
   // debounced update), and a counter so a slower, older update never lands last.
   const appliedThemeRef = useRef(null);
@@ -212,6 +216,7 @@ const PreviewPanel = forwardRef(function PreviewPanel(
   useEffect(() => {
     previousStateRef.current = null;
     pendingScrollRef.current = null;
+    lastScrollYRef.current = 0;
     structuralReloadRef.current = false;
     appliedThemeRef.current = null;
     updateSeqRef.current += 1;
@@ -240,14 +245,8 @@ const PreviewPanel = forwardRef(function PreviewPanel(
       if (isStructural && !structuralReloadRef.current) {
         structuralReloadRef.current = true;
         // Capture scrollY now while the old iframe content is still present
-        let scrollY = 0;
-        try {
-          scrollY = iframeRef.current?.contentWindow?.scrollY || 0;
-        } catch {
-          scrollY = 0;
-        }
         pendingScrollRef.current = {
-          scrollY,
+          scrollY: lastScrollYRef.current,
           widgetId: selectedWidgetId,
           blockId: selectedBlockId,
         };
@@ -262,11 +261,16 @@ const PreviewPanel = forwardRef(function PreviewPanel(
     }
   }, [ref]);
 
-  // Listen for PREVIEW_READY from the iframe to handle post-reload scroll restoration
+  // Listen for PREVIEW_READY from the iframe to handle post-reload scroll restoration,
+  // and for the scroll position the runtime reports.
   useEffect(() => {
     const handleMessage = (event) => {
       // Only this panel's own preview document, and only a well-formed message.
       const message = readPreviewMessage(event, iframeRef.current);
+      if (message?.type === "SCROLL_POSITION") {
+        lastScrollYRef.current = message.payload.scrollY;
+        return;
+      }
       if (message?.type !== "PREVIEW_READY") return;
       setPreviewThemeReads(iframeRef.current, message.payload.themeReads);
       navigatingRef.current = false;
@@ -580,12 +584,7 @@ const PreviewPanel = forwardRef(function PreviewPanel(
           console.log("[Preview] PARTIAL UPDATE (content change only)");
 
           // Capture scrollY before morph
-          let morphScrollY = 0;
-          try {
-            morphScrollY = iframeRef.current?.contentWindow?.scrollY || 0;
-          } catch {
-            morphScrollY = 0;
-          }
+          const morphScrollY = lastScrollYRef.current;
 
           const updateState = {
             widgets,
@@ -609,12 +608,12 @@ const PreviewPanel = forwardRef(function PreviewPanel(
             structuralReloadRef.current = true;
             await reload();
           } else {
-            // Restore scroll position after morph
-            try {
-              iframeRef.current?.contentWindow?.scrollTo(0, morphScrollY);
-            } catch {
-              // skip scroll restore on error
-            }
+            // Restore scroll position after morph. The runtime already keeps the view
+            // still across each swap; this lands after the morphs it was sent.
+            iframeRef.current?.contentWindow?.postMessage(
+              { type: "RESTORE_SCROLL", payload: { scrollY: morphScrollY } },
+              getPreviewTargetOrigin(),
+            );
             setPreviewReadyKey((prev) => prev + 1);
           }
         }

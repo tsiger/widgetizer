@@ -318,6 +318,13 @@ function reportElementBounds(widgetId, blockId = null) {
   postToParent({ type: "ELEMENT_BOUNDS", payload: { widgetId, blockId, bounds, blockBounds } });
 }
 
+// The editor keeps the document's scroll position across reloads, and can't read
+// it from a cross-origin frame, so the editor-mode runtime reports it.
+function reportScrollPosition() {
+  if (PREVIEW_MODE !== "editor") return;
+  postToParent({ type: "SCROLL_POSITION", payload: { scrollY: window.scrollY } });
+}
+
 // Scroll-triggered bounds reporting (debounced)
 let scrollDebounceTimer = null;
 function setupScrollBoundsReporting() {
@@ -332,6 +339,7 @@ function setupScrollBoundsReporting() {
         if (currentHoveredWidgetId) {
           reportHoverBounds();
         }
+        reportScrollPosition();
         renderOverlay();
       });
     },
@@ -1034,6 +1042,9 @@ function morphWidget(widgetId, newHtml) {
     preserveFormState(existingElement, newElement);
     cleanupWidget(widgetId);
 
+    // Swapping the element (and what its scripts do on update) can move the page;
+    // the view is put back where it was below.
+    const scrollY = window.scrollY;
     existingElement.parentNode.replaceChild(newElement, existingElement);
 
     if (newScripts.length > 0) {
@@ -1064,6 +1075,7 @@ function morphWidget(widgetId, newHtml) {
 
     newElement.dataset.initialized = "true";
     newElement.dispatchEvent(new CustomEvent("widget:updated", { bubbles: true, detail: { widgetId } }));
+    if (window.scrollY !== scrollY) window.scrollTo(0, scrollY);
 
     // Re-render overlay after morph (element positions may have changed)
     requestAnimationFrame(() => renderOverlay());
@@ -1163,7 +1175,10 @@ function initializeRuntime() {
   // Re-render overlay on window resize
   window.addEventListener("resize", () => renderOverlay());
 
-  const announceReady = () => postToParent({ type: "PREVIEW_READY", payload: { themeReads: readThemeReads() } });
+  const announceReady = () => {
+    postToParent({ type: "PREVIEW_READY", payload: { themeReads: readThemeReads() } });
+    reportScrollPosition();
+  };
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", announceReady);
   } else {
