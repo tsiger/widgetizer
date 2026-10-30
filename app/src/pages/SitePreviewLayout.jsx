@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 
 import { isStandalonePreviewNavigationUrl } from "@widgetizer/editor-ui/utils/previewLinkUtils";
 import { detachPreviewFromOpener } from "@widgetizer/editor-ui/lib/openSitePreview";
+import { readPreviewMessage } from "@widgetizer/editor-ui/lib/previewMessages";
 import PreviewModeToggle from "@widgetizer/editor-ui/components/preview/PreviewModeToggle.jsx";
 import PreviewStage, { STANDALONE_SANDBOX } from "@widgetizer/editor-ui/components/preview/PreviewStage.jsx";
 import DebugStatePanel from "../components/dev/DebugStatePanel";
@@ -37,11 +38,13 @@ export default function SitePreviewLayout() {
   useLayoutEffect(() => detachPreviewFromOpener(), []);
 
   // Follow links clicked inside the preview iframe (page<->page, page<->item).
+  // Only messages from the preview's origin count; the stage owns the iframe, so
+  // there is no frame to compare the sender with.
   useEffect(() => {
     const handleMessage = (event) => {
-      const targetUrl = event.data?.payload?.url;
-      if (event.data?.type === "NAVIGATE_PREVIEW" && isStandalonePreviewNavigationUrl(targetUrl)) {
-        navigate(targetUrl);
+      const message = readPreviewMessage(event);
+      if (message?.type === "NAVIGATE_PREVIEW" && isStandalonePreviewNavigationUrl(message.payload.url)) {
+        navigate(message.payload.url);
       }
     };
     window.addEventListener("message", handleMessage);

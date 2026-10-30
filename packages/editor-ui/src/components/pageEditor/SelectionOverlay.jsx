@@ -3,6 +3,7 @@ import useWidgetStore from "../../stores/widgetStore";
 import usePageStore from "../../stores/pageStore";
 import { scrollElementIntoView } from "../../queries/previewManager";
 import { getPreviewTargetOrigin } from "../../lib/previewBase";
+import { readPreviewMessage } from "../../lib/previewMessages";
 
 /**
  * SelectionOverlay - Message relay between React stores and the preview iframe.
@@ -75,7 +76,10 @@ export default function SelectionOverlay({
   // Listen for iframe messages
   useEffect(() => {
     const handleMessage = (event) => {
-      const { type, payload } = event.data || {};
+      // Only the preview iframe's own window, and only a well-formed message.
+      const message = readPreviewMessage(event, iframeRef?.current ?? null);
+      if (!message) return;
+      const { type, payload } = message;
 
       switch (type) {
         case "WIDGET_SELECTED":

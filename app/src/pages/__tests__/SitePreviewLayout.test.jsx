@@ -70,7 +70,10 @@ describe("SitePreviewLayout", () => {
 
     await act(async () => {
       window.dispatchEvent(
-        new MessageEvent("message", { data: { type: "NAVIGATE_PREVIEW", payload: { url: "/preview/about" } } }),
+        new MessageEvent("message", {
+          data: { type: "NAVIGATE_PREVIEW", payload: { url: "/preview/about" } },
+          origin: window.location.origin,
+        }),
       );
     });
 
@@ -83,10 +86,26 @@ describe("SitePreviewLayout", () => {
     const { container } = renderAt("/preview/home");
     await act(async () => {
       window.dispatchEvent(
-        new MessageEvent("message", { data: { type: "NAVIGATE_PREVIEW", payload: { url: "https://evil.example" } } }),
+        new MessageEvent("message", {
+          data: { type: "NAVIGATE_PREVIEW", payload: { url: "https://evil.example" } },
+          origin: window.location.origin,
+        }),
       );
     });
     // Still on the original route — the guard rejected the external URL.
+    expect(container.querySelector("iframe").getAttribute("src")).toBe("/render/home");
+  });
+
+  it("ignores NAVIGATE_PREVIEW from any origin but the preview's", async () => {
+    const { container } = renderAt("/preview/home");
+    await act(async () => {
+      window.dispatchEvent(
+        new MessageEvent("message", {
+          data: { type: "NAVIGATE_PREVIEW", payload: { url: "/preview/about" } },
+          origin: "https://evil.example",
+        }),
+      );
+    });
     expect(container.querySelector("iframe").getAttribute("src")).toBe("/render/home");
   });
 });

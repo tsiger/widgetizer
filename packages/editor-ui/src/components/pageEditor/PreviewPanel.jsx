@@ -14,6 +14,7 @@ import usePageStore from "../../stores/pageStore";
 import useProjectStore from "../../stores/projectStore";
 import useWidgetStore from "../../stores/widgetStore";
 import { buildPreviewUrl, getPreviewTargetOrigin } from "../../lib/previewBase";
+import { readPreviewMessage } from "../../lib/previewMessages";
 import SelectionOverlay from "./SelectionOverlay";
 
 /**
@@ -264,17 +265,16 @@ const PreviewPanel = forwardRef(function PreviewPanel(
   // Listen for PREVIEW_READY from the iframe to handle post-reload scroll restoration
   useEffect(() => {
     const handleMessage = (event) => {
-      const { type } = event.data || {};
-      if (type !== "PREVIEW_READY") return;
-      if (iframeRef.current && event.source === iframeRef.current.contentWindow) {
-        setPreviewThemeReads(iframeRef.current, event.data.payload?.themeReads || null);
-        navigatingRef.current = false;
-        const rendered = renderedStateRef.current;
-        if (rendered) {
-          previousStateRef.current = rendered;
-          appliedThemeRef.current = rendered.themeSettings;
-          setReconcileKey((key) => key + 1);
-        }
+      // Only this panel's own preview document, and only a well-formed message.
+      const message = readPreviewMessage(event, iframeRef.current);
+      if (message?.type !== "PREVIEW_READY") return;
+      setPreviewThemeReads(iframeRef.current, message.payload.themeReads);
+      navigatingRef.current = false;
+      const rendered = renderedStateRef.current;
+      if (rendered) {
+        previousStateRef.current = rendered;
+        appliedThemeRef.current = rendered.themeSettings;
+        setReconcileKey((key) => key + 1);
       }
 
       const pending = pendingScrollRef.current;
