@@ -28,6 +28,13 @@ import { STANDALONE_SANDBOX } from "../preview/PreviewStage";
 // frame can reach the editor's document and remove it.
 const EDITOR_SANDBOX = "allow-scripts allow-same-origin allow-forms allow-presentation";
 
+// What the error panel says about a failed preview load. A host that caps open
+// previews answers `code: "preview_capacity"`; anything else shows its own message.
+function previewErrorText(error, t) {
+  if (error?.code === "preview_capacity") return t("pageEditor.preview.tooManyPreviews");
+  return error?.message || "Failed to load preview";
+}
+
 /**
  * Detect if changes are structural (requiring full reload) or content-only (can be morphed)
  * Structural: widgets added, removed, or reordered
@@ -270,10 +277,12 @@ const PreviewPanel = forwardRef(function PreviewPanel(
         structuralReloadRef.current = true;
         return () => updateSeqRef.current === seq;
       },
+      // Shown in the error panel, never retried: its button loads the preview again.
       onReloadError: (err) => {
         console.error("Preview reload error:", err);
         structuralReloadRef.current = false;
         pendingScrollRef.current = null;
+        setError(err);
       },
     });
     reloadCoordinatorRef.current = coordinator;
@@ -290,17 +299,18 @@ const PreviewPanel = forwardRef(function PreviewPanel(
     updateSeqRef.current += 1;
     renderedStateRef.current = null;
     navigatingRef.current = false;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- another page or project: start the frame over
     setPreviewSrc(null);
     setError(null);
     setInitialLoadComplete(false);
     setLoading(Boolean(page?.id));
   }, [activeProject?.id, page?.id, runtimeMode]);
 
-  // Detect structural changes during render (before child effects fire).
-  // This sets the ref synchronously so SelectionOverlay can check it in its effects,
-  // which is why refs are read and written during render here.
-  /* eslint-disable react-hooks/refs */
-  if (initialLoadComplete && previousStateRef.current) {
+  // Detect structural changes after each commit, before any passive effect runs:
+  // SelectionOverlay's effects read structuralReloadRef to hold back scrolling
+  // while a structural reload is on its way, so it must already be set by then.
+  useLayoutEffect(() => {
+    if (!initialLoadComplete || !previousStateRef.current) return;
     const prev = previousStateRef.current;
     const contentChanged =
       JSON.stringify(page) !== JSON.stringify(prev?.page) ||
@@ -322,8 +332,7 @@ const PreviewPanel = forwardRef(function PreviewPanel(
         };
       }
     }
-  }
-  /* eslint-enable react-hooks/refs */
+  });
 
   // Expose the iframe ref to the parent component
   useEffect(() => {
@@ -403,19 +412,22 @@ const PreviewPanel = forwardRef(function PreviewPanel(
 
     async function loadInitialPreview() {
       const coordinator = reloadCoordinatorRef.current;
+      // Opening another page or project bumps the sequence: this load is then stale.
+      const seq = updateSeqRef.current;
       try {
         setLoading(true);
         setError(null);
 
-        // Not shown only when this panel's coordinator was replaced meanwhile (the
-        // effects re-ran); the load the new one started owns the frame.
-        if (!(await coordinator.load())) return;
+        // Not shown when a later load superseded this one, the editor moved to
+        // another page meanwhile, or the coordinator was replaced (the effects
+        // re-ran): the load that is current owns the frame and the flags below.
+        if (!(await coordinator.load(() => updateSeqRef.current === seq))) return;
 
         // Store the initial state for future diffing
         previousStateRef.current = renderedStateRef.current;
       } catch (err) {
         console.error("Preview error:", err);
-        setError(err.message || "Failed to load preview");
+        setError(err);
       }
       setLoading(false);
       setInitialLoadComplete(true);
@@ -437,9 +449,10 @@ const PreviewPanel = forwardRef(function PreviewPanel(
     runtimeMode,
   ]);
 
-  // Handle updates after initial load
+  // Handle updates after initial load. While the error panel shows a failed load,
+  // nothing updates (or mints) until its button loads the preview again.
   useEffect(() => {
-    if (!initialLoadComplete || !iframeRef.current) return;
+    if (!initialLoadComplete || !iframeRef.current || error) return;
 
     const previousState = previousStateRef.current;
 
@@ -638,9 +651,16 @@ const PreviewPanel = forwardRef(function PreviewPanel(
             page,
           };
 
-          const result = await updatePreview(iframeRef.current, updateState, previousState || {}, {
-            session: reloadCoordinatorRef.current.session,
-          });
+          let result;
+          try {
+            result = await updatePreview(iframeRef.current, updateState, previousState || {}, {
+              session: reloadCoordinatorRef.current.session,
+            });
+          } catch (err) {
+            // A failed re-render falls back to one full reload.
+            console.error("Preview update error:", err);
+            result = { needsReload: true };
+          }
 
           // A newer update is under way and compares against the same baseline,
           // so it covers this change too.
@@ -663,13 +683,12 @@ const PreviewPanel = forwardRef(function PreviewPanel(
           }
         }
       } catch (err) {
-        console.error("Preview update error:", err);
-        // Fallback to full reload on any error
-        try {
-          await reload();
-        } catch (fallbackErr) {
-          console.error("Preview fallback reload error:", fallbackErr);
-        }
+        // The reload's mint failed: shown in the error panel, not retried.
+        console.error("Preview reload error:", err);
+        structuralReloadRef.current = false;
+        pendingScrollRef.current = null;
+        setError(err);
+        return;
       }
 
       if (!isCurrent()) return;
@@ -688,6 +707,7 @@ const PreviewPanel = forwardRef(function PreviewPanel(
     return () => clearTimeout(timeoutId);
   }, [
     initialLoadComplete,
+    error,
     reconcileKey,
     page,
     widgets,
@@ -730,7 +750,7 @@ const PreviewPanel = forwardRef(function PreviewPanel(
       {error && (
         <div className="absolute inset-0 bg-red-50 p-4 text-red-700 z-20">
           <p className="font-bold">{t("pageEditor.preview.error")}</p>
-          <p className="text-sm">{error}</p>
+          <p className="text-sm">{previewErrorText(error, t)}</p>
           <button
             onClick={() => setInitialLoadComplete(false)}
             className="mt-2 px-2 py-1 bg-red-200 text-red-800 rounded text-xs hover:bg-red-300"

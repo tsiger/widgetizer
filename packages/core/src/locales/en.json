@@ -768,6 +768,7 @@
     "preview": {
       "loading": "Loading Preview...",
       "error": "Preview Error",
+      "tooManyPreviews": "Too many previews are open. Close some preview tabs, then reload.",
       "reload": "Reload Preview",
       "title": "Page Preview"
     },

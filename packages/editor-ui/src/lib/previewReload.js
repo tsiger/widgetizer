@@ -2,12 +2,15 @@
 //
 // Every full reload — the first load, a structural change, a morph that found the
 // document's session ended, and the keep-alive saying the session ended — mints
-// through load(). It names the frame's session as the one the new document
-// replaces (the server ends that one as it mints), keeps the newest session alive,
-// and stops the previous keep-alive first, so a late answer about a replaced
-// session can never reload the document that replaced it. requestReload() is the
-// session-ended entry: it does nothing while a mint is under way (that mint brings
-// a new session anyway), so overlapping "session ended" signals cause one reload.
+// through load(). Mints run one at a time: a load() asked for while one is under
+// way waits, and when that mint answers its document is dropped and a single
+// follow-up mints from the editor's state as it is then. So the document in the
+// frame is always the one whose session the coordinator holds and keeps alive,
+// and each mint names the newest live session as the one it replaces (the server
+// ends that one as it mints), so overlapping reloads leave one live session.
+// requestReload() is the session-ended entry: it does nothing while a mint is
+// under way (that mint brings a new session anyway), so overlapping "session
+// ended" signals cause one reload.
 //
 // When the host gives its preview documents no session (the OSS server never
 // does), the keep-alive is a no-op and replaces is never sent.
@@ -31,13 +34,15 @@ export function createPreviewReloadCoordinator({
   onReloadError = () => {},
   keepAlive = startPreviewKeepAlive,
 }) {
-  // The newest minted document's answer: its session is the frame's live one.
-  let current = null;
+  // The answer for the document in the frame; its session is the one re-renders echo.
+  let shown = null;
+  // The newest session minted for this frame, shown or not: the next mint replaces it.
+  let newestSession = null;
   let stopKeepAlive = () => {};
   let keepAliveGeneration = 0;
-  let mintTicket = 0;
-  let adoptedTicket = 0;
-  let mintsInFlight = 0;
+  let running = false;
+  // The load() waiting for the running mint: { isCurrent, resolve, reject }.
+  let queued = null;
   let disposed = false;
 
   const stopCurrentKeepAlive = () => {
@@ -46,57 +51,88 @@ export function createPreviewReloadCoordinator({
     stopKeepAlive = () => {};
   };
 
-  const keepCurrentAlive = () => {
+  // Keeps the shown document's session alive. When a mint that replaced it was
+  // dropped, that session is already gone and the first touch says so (410),
+  // which reloads the frame onto a live one.
+  const keepShownAlive = () => {
     stopCurrentKeepAlive();
     const generation = keepAliveGeneration;
     stopKeepAlive = keepAlive({
-      session: current?.session ?? null,
-      absoluteExpiresAt: current?.absoluteExpiresAt,
-      idleExpiresAt: current?.idleExpiresAt,
+      session: shown?.session ?? null,
+      absoluteExpiresAt: shown?.absoluteExpiresAt,
+      idleExpiresAt: shown?.idleExpiresAt,
       onEnded: () => {
         if (!disposed && generation === keepAliveGeneration) requestReload();
       },
     });
   };
 
-  /**
-   * Mint the next document and show it, unless `isCurrent()` says a newer update
-   * overtook this one by the time the mint answers.
-   * @param {() => boolean} [isCurrent]
-   * @returns {Promise<boolean>} whether the new document was shown
-   */
-  async function load(isCurrent = () => true) {
+  async function run(request) {
+    running = true;
     // The document on show is on its way out.
     stopCurrentKeepAlive();
-    const ticket = ++mintTicket;
-    mintsInFlight += 1;
     let minted;
+    let failure = null;
     try {
-      minted = await mint({ replaces: current?.session ?? null });
+      minted = await mint({ replaces: newestSession });
+      newestSession = minted?.session ?? null;
     } catch (error) {
-      // Nothing replaced the document on show: keep its session alive again.
-      if (!disposed && ticket === mintTicket) keepCurrentAlive();
-      throw error;
-    } finally {
-      mintsInFlight -= 1;
+      failure = error;
     }
-    if (disposed) return false;
-    // The server ended the replaced session, so this one is the frame's live session
-    // even when a newer update discards the document — unless a later mint already
-    // answered.
-    if (ticket > adoptedTicket) {
-      adoptedTicket = ticket;
-      current = minted ?? null;
-      keepCurrentAlive();
+    running = false;
+
+    if (disposed) {
+      request.resolve(false);
+      return;
     }
-    if (!isCurrent()) return false;
+    if (queued) {
+      // A newer load() was asked for meanwhile: this answer is out of date. Its
+      // session is named as the one the follow-up replaces, and never shown.
+      const next = queued;
+      queued = null;
+      request.resolve(false);
+      run(next);
+      return;
+    }
+    if (failure) {
+      keepShownAlive();
+      request.reject(failure);
+      return;
+    }
+    if (!request.isCurrent()) {
+      keepShownAlive();
+      request.resolve(false);
+      return;
+    }
+    shown = minted ?? null;
+    keepShownAlive();
     show(minted);
-    return true;
+    request.resolve(true);
+  }
+
+  /**
+   * Mint the next document and show it, unless `isCurrent()` says the editor
+   * moved on by the time the mint answers.
+   * @param {() => boolean} [isCurrent]
+   * @returns {Promise<boolean>} whether this call's document was shown; false when
+   *   a later load() superseded it or isCurrent() said no.
+   */
+  function load(isCurrent = () => true) {
+    if (disposed) return Promise.resolve(false);
+    return new Promise((resolve, reject) => {
+      const request = { isCurrent, resolve, reject };
+      if (running) {
+        queued?.resolve(false);
+        queued = request;
+        return;
+      }
+      run(request);
+    });
   }
 
   /** Reload because the frame's session ended. */
   function requestReload() {
-    if (disposed || mintsInFlight > 0) return;
+    if (disposed || running) return;
     const isCurrent = beginReload();
     load(isCurrent).catch(onReloadError);
   }
@@ -104,15 +140,20 @@ export function createPreviewReloadCoordinator({
   return {
     load,
     requestReload,
-    /** The frame's live session, for its widget re-renders; null when the host gives none. */
+    /** The shown document's session, for its widget re-renders; null when the host gives none. */
     get session() {
-      return current?.session ?? null;
+      return shown?.session ?? null;
     },
     /** The frame's document is gone (another page is opening); its session stays named for replaces. */
-    release: stopCurrentKeepAlive,
+    release() {
+      shown = null;
+      stopCurrentKeepAlive();
+    },
     /** The editor is closing: stop everything and ignore any answer still on its way. */
     dispose() {
       disposed = true;
+      queued?.resolve(false);
+      queued = null;
       stopCurrentKeepAlive();
     },
   };
