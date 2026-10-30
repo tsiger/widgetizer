@@ -128,7 +128,7 @@ describe("createPreviewReloadCoordinator", () => {
     holdsShown();
   });
 
-  it("an undo while a replacement mint is under way shows nothing new and keeps holding the shown document's session", async () => {
+  it("an undo while a replacement mint is under way lands the frame on a live session at once", async () => {
     const { coordinator, options, keepAlives, shown, live, answer, holdsShown } = setup();
     const first = coordinator.load();
     await answer(1);
@@ -137,17 +137,29 @@ describe("createPreviewReloadCoordinator", () => {
     const replacement = coordinator.load(() => false);
     await answer(2);
     expect(await replacement).toBe(false);
-    expect(shown.map((a) => a.token)).toEqual(["t1"]);
-    holdsShown();
-    // The shown session was ended by that mint; its keep-alive is back and its
-    // first touch will say so. The next mint replaces the newest session, s2.
-    expect(keepAlives.at(-1).session).toBe("s1");
-    expect([...live]).toEqual(["s2"]);
-    const next = coordinator.load();
-    await answer(3);
-    expect(await next).toBe(true);
+    // That mint ended s1, the shown session: a reload from the editor's state runs
+    // straight away, replacing s2, and no keep-alive restarts for s1.
+    expect(options.beginReload).toHaveBeenCalledTimes(1);
     expect(options.mint.mock.calls.at(-1)[0]).toEqual({ replaces: "s2" });
+    expect(keepAlives.map((k) => k.session)).toEqual(["s1"]);
+    await answer(3);
+    expect(shown.map((a) => a.token)).toEqual(["t1", "t3"]);
     expect([...live]).toEqual(["s3"]);
+    expect(live.has(coordinator.session)).toBe(true);
+    holdsShown();
+  });
+
+  it("reconciles nothing when the host gives no sessions", async () => {
+    const { coordinator, options, shown, answer, holdsShown } = setup({ sessions: false });
+    const first = coordinator.load();
+    await answer(1);
+    await first;
+    const replacement = coordinator.load(() => false);
+    await answer(2);
+    expect(await replacement).toBe(false);
+    expect(options.mint).toHaveBeenCalledTimes(2);
+    expect(options.beginReload).not.toHaveBeenCalled();
+    expect(shown.map((a) => a.token)).toEqual(["t1"]);
     holdsShown();
   });
 
@@ -230,17 +242,30 @@ describe("createPreviewReloadCoordinator", () => {
     holdsShown();
   });
 
-  it("keeps the shown document alive again when a mint fails, and rejects that load", async () => {
-    const { coordinator, keepAlives, answer, holdsShown } = setup({ fail: (n) => (n === 2 ? new Error("offline") : null) });
+  it("after a failed mint, nothing reloads on its own until a load succeeds", async () => {
+    const { coordinator, options, keepAlives, answer, holdsShown } = setup({ fail: (n) => (n === 2 ? new Error("offline") : null) });
     const first = coordinator.load();
     await answer(1);
     await first;
-    const failing = coordinator.load();
+    const failing = expect(coordinator.load()).rejects.toThrow("offline");
     await answer(2);
-    await expect(failing).rejects.toThrow("offline");
-    expect(keepAlives.map((k) => k.session)).toEqual(["s1", "s1"]);
+    await failing;
+    // The keep-alive is stopped and stays off: no deadline, focus or 410 can fire.
+    expect(keepAlives.map((k) => k.session)).toEqual(["s1"]);
     expect(keepAlives[0].stop).toHaveBeenCalled();
+    keepAlives[0].onEnded();
+    coordinator.requestReload();
+    await flush();
+    expect(options.mint).toHaveBeenCalledTimes(2);
+    expect(options.beginReload).not.toHaveBeenCalled();
+    // The editor asks again (the error panel's button): it loads, and the keep-alive is back.
+    const again = coordinator.load();
+    await answer(3);
+    expect(await again).toBe(true);
+    expect(keepAlives.at(-1).session).toBe("s3");
     holdsShown();
+    keepAlives.at(-1).onEnded();
+    expect(options.mint).toHaveBeenCalledTimes(4);
   });
 
   it("runs the follow-up when a superseded mint fails", async () => {
@@ -263,7 +288,21 @@ describe("createPreviewReloadCoordinator", () => {
     keepAlives[0].onEnded();
     await answer(2);
     expect(options.onReloadError).toHaveBeenCalledWith(expect.objectContaining({ message: "offline" }));
+    coordinator.requestReload();
     expect(options.mint).toHaveBeenCalledTimes(2);
+  });
+
+  it("reports a failed reconciling reload too, and stops there", async () => {
+    const { coordinator, options, answer } = setup({ fail: (n) => (n === 3 ? new Error("offline") : null) });
+    const first = coordinator.load();
+    await answer(1);
+    await first;
+    coordinator.load(() => false);
+    await answer(2);
+    await answer(3);
+    expect(options.onReloadError).toHaveBeenCalledWith(expect.objectContaining({ message: "offline" }));
+    coordinator.requestReload();
+    expect(options.mint).toHaveBeenCalledTimes(3);
   });
 
   it("release() stops the keep-alive and drops the shown session, keeping the newest one for replaces", async () => {

@@ -10,7 +10,10 @@
 // ends that one as it mints), so overlapping reloads leave one live session.
 // requestReload() is the session-ended entry: it does nothing while a mint is
 // under way (that mint brings a new session anyway), so overlapping "session
-// ended" signals cause one reload.
+// ended" signals cause one reload. A mint that answers after the editor moved on
+// has still ended the shown document's session, so the frame reloads at once onto
+// a live one. After a failed mint nothing reloads on its own until the editor
+// loads again (PreviewPanel's error panel button).
 //
 // When the host gives its preview documents no session (the OSS server never
 // does), the keep-alive is a no-op and replaces is never sent.
@@ -43,6 +46,9 @@ export function createPreviewReloadCoordinator({
   let running = false;
   // The load() waiting for the running mint: { isCurrent, resolve, reject }.
   let queued = null;
+  // A reload's mint failed: nothing reloads on its own (the keep-alive is off and
+  // requestReload() does nothing) until a load() the editor asks for succeeds.
+  let failed = false;
   let disposed = false;
 
   const stopCurrentKeepAlive = () => {
@@ -51,9 +57,7 @@ export function createPreviewReloadCoordinator({
     stopKeepAlive = () => {};
   };
 
-  // Keeps the shown document's session alive. When a mint that replaced it was
-  // dropped, that session is already gone and the first touch says so (410),
-  // which reloads the frame onto a live one.
+  // Keeps the shown document's session alive.
   const keepShownAlive = () => {
     stopCurrentKeepAlive();
     const generation = keepAliveGeneration;
@@ -95,16 +99,23 @@ export function createPreviewReloadCoordinator({
       return;
     }
     if (failure) {
-      keepShownAlive();
+      failed = true;
       request.reject(failure);
       return;
     }
     if (!request.isCurrent()) {
-      keepShownAlive();
       request.resolve(false);
+      if (minted?.session && shown?.session) {
+        // This mint ended the shown document's session, and its own document is not
+        // wanted: put a live document in the frame now, from the editor's state.
+        run({ isCurrent: beginReload(), resolve: () => {}, reject: onReloadError });
+      } else {
+        keepShownAlive();
+      }
       return;
     }
     shown = minted ?? null;
+    failed = false;
     keepShownAlive();
     show(minted);
     request.resolve(true);
@@ -130,9 +141,9 @@ export function createPreviewReloadCoordinator({
     });
   }
 
-  /** Reload because the frame's session ended. */
+  /** Reload because the frame's session ended; does nothing after a failed reload. */
   function requestReload() {
-    if (disposed || running) return;
+    if (disposed || running || failed) return;
     const isCurrent = beginReload();
     load(isCurrent).catch(onReloadError);
   }

@@ -195,7 +195,8 @@ const PreviewPanel = forwardRef(function PreviewPanel(
   const previousStateRef = useRef(null);
 
   // Track structural reload state to prevent SelectionOverlay from scrolling prematurely.
-  // The ref is set synchronously during render so child effects can read it immediately.
+  // A layout effect sets it after each commit, before any passive effect, so child
+  // effects read it up to date.
   const structuralReloadRef = useRef(false);
 
   // Store pending scroll info for after PREVIEW_READY
@@ -268,6 +269,8 @@ const PreviewPanel = forwardRef(function PreviewPanel(
         navigatingRef.current = true;
         setPreviewSrc(buildPreviewUrl(token));
         appliedThemeRef.current = rendered.themeSettings;
+        // A document is on show: whatever failed before no longer stands.
+        setError(null);
       },
       // The session ended: reload the way a structural change does, view and selection kept.
       beginReload: () => {

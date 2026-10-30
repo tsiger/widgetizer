@@ -54,8 +54,8 @@ export default function SelectionOverlay({
   // Scroll and update selection when it changes
   useEffect(() => {
     if (effectiveWidgetId) {
-      // Check the ref — it's set synchronously during PreviewPanel's render phase,
-      // so it's already up-to-date when this effect fires.
+      // Check the ref — PreviewPanel sets it in a layout effect, which runs before
+      // this (passive) effect, so it's already up-to-date when this effect fires.
       if (!structuralReloadRef?.current && iframeRef?.current) {
         scrollElementIntoView(iframeRef.current, effectiveWidgetId, selectedBlockId);
       }

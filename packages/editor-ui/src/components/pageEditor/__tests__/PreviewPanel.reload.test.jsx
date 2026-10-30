@@ -4,7 +4,7 @@
 // until the panel's button asks. Also: what the frame posts reaches the live
 // updates only as the validated copy.
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { render, screen, act, waitFor } from "@testing-library/react";
+import { render, screen, act, waitFor, fireEvent } from "@testing-library/react";
 
 vi.mock("react-i18next", () => ({ useTranslation: () => ({ t: (key) => key }) }));
 vi.mock("../../../hooks/useThemeLocale", () => ({ useThemeLocale: () => ({ tTheme: (key) => key }) }));
@@ -22,6 +22,10 @@ vi.mock("../../../stores/widgetStore", () => {
   hook.getState = () => state;
   return { default: hook };
 });
+vi.mock("../../../lib/apiFetch", async (importOriginal) => {
+  const actual = await importOriginal();
+  return { ...actual, editorFetchJson: vi.fn() };
+});
 vi.mock("../../../queries/previewManager", async (importOriginal) => {
   const actual = await importOriginal();
   return { ...actual, fetchPreviewToken: vi.fn(), updatePreview: vi.fn(), setPreviewThemeReads: vi.fn(actual.setPreviewThemeReads) };
@@ -29,6 +33,7 @@ vi.mock("../../../queries/previewManager", async (importOriginal) => {
 
 import PreviewPanel from "../PreviewPanel";
 import { fetchPreviewToken, setPreviewThemeReads } from "../../../queries/previewManager";
+import { editorFetchJson } from "../../../lib/apiFetch";
 
 const widget = { type: "x", settings: {}, blocks: {}, blocksOrder: [] };
 const pageWith = (ids, id = "p1") => ({ id, slug: id, widgetsOrder: ids });
@@ -44,6 +49,7 @@ const capacity = () =>
 let errorSpy;
 beforeEach(() => {
   fetchPreviewToken.mockReset();
+  editorFetchJson.mockReset();
   errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
   vi.spyOn(console, "log").mockImplementation(() => {});
 });
@@ -78,6 +84,55 @@ describe("PreviewPanel reload failures", () => {
     view.rerender(<Panel ids={["w1", "w2"]} />);
     await screen.findByText("Failed to create preview token", {}, { timeout: 2000 });
     expect(fetchPreviewToken).toHaveBeenCalledTimes(2);
+  });
+});
+
+describe("PreviewPanel after a failed reload, with host sessions", () => {
+  const touches = () => editorFetchJson.mock.calls.filter(([path]) => path === "/preview/session/touch");
+  const sessionGone = () => Object.assign(new Error("Preview session expired"), { status: 410, code: "session_expired" });
+
+  beforeEach(() => {
+    Object.defineProperty(document, "visibilityState", { configurable: true, get: () => "visible" });
+  });
+  afterEach(() => {
+    delete document.visibilityState;
+  });
+
+  it("nothing reloads on its own; Reload loads once, clears the error and keeps the session alive again", async () => {
+    // The first document's absolute deadline passes while the error shows.
+    fetchPreviewToken.mockResolvedValueOnce({ token: "t1", session: "s1", absoluteExpiresAt: Date.now() + 700, idleExpiresAt: Date.now() + 60000 });
+    const view = render(<Panel ids={["w1"]} />);
+    await waitFor(() => expect(view.container.querySelector("iframe")?.getAttribute("src")).toContain("/render/t1"));
+
+    fetchPreviewToken.mockRejectedValueOnce(capacity());
+    view.rerender(<Panel ids={["w1", "w2"]} />);
+    await screen.findByText("pageEditor.preview.tooManyPreviews", {}, { timeout: 2000 });
+    expect(fetchPreviewToken).toHaveBeenCalledTimes(2);
+
+    // Past the deadline, then focus and visibility; a touch would answer 410.
+    editorFetchJson.mockRejectedValue(sessionGone());
+    await act(() => new Promise((resolve) => setTimeout(resolve, 700)));
+    act(() => {
+      window.dispatchEvent(new Event("focus"));
+      document.dispatchEvent(new Event("visibilitychange"));
+    });
+    await act(() => new Promise((resolve) => setTimeout(resolve, 50)));
+    expect(touches()).toHaveLength(0);
+    expect(fetchPreviewToken).toHaveBeenCalledTimes(2);
+
+    // The error panel's button: one load, the error gone, the new session kept alive.
+    editorFetchJson.mockResolvedValue({});
+    fetchPreviewToken.mockResolvedValueOnce({ token: "t3", session: "s3", absoluteExpiresAt: Date.now() + 3600000, idleExpiresAt: Date.now() + 60000 });
+    fireEvent.click(screen.getByText("pageEditor.preview.reload"));
+    await waitFor(() => expect(view.container.querySelector("iframe")?.getAttribute("src")).toContain("/render/t3"));
+    expect(screen.queryByText("pageEditor.preview.tooManyPreviews")).toBeNull();
+    expect(fetchPreviewToken).toHaveBeenCalledTimes(3);
+    expect(fetchPreviewToken.mock.calls[2][4]).toEqual({ replaces: "s1" });
+    act(() => {
+      window.dispatchEvent(new Event("focus"));
+    });
+    await waitFor(() => expect(touches()).toHaveLength(1));
+    expect(JSON.parse(touches()[0][1].body)).toEqual({ session: "s3" });
   });
 });
 
