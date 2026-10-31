@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useMemo, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
@@ -22,6 +22,7 @@ export default function SitePreviewLayout() {
   const navigate = useNavigate();
   const location = useLocation();
   const [previewMode, setPreviewMode] = useState(() => localStorage.getItem("editorPreviewMode") || "desktop");
+  const iframeRef = useRef(null);
   const [preview, setPreview] = useState({ src: null, loading: true, notFound: false });
   const [resolvedPath, setResolvedPath] = useState(location.pathname);
 
@@ -38,11 +39,11 @@ export default function SitePreviewLayout() {
   useLayoutEffect(() => detachPreviewFromOpener(), []);
 
   // Follow links clicked inside the preview iframe (page<->page, page<->item).
-  // Only messages from the preview's origin count; the stage owns the iframe, so
-  // there is no frame to compare the sender with.
+  // Only messages from the frame on screen count: a message the previous frame
+  // queued before a remount (the stage keys its iframe by src) is dropped.
   useEffect(() => {
     const handleMessage = (event) => {
-      const message = readPreviewMessage(event);
+      const message = readPreviewMessage(event, iframeRef.current);
       if (message?.type === "NAVIGATE_PREVIEW" && isStandalonePreviewNavigationUrl(message.payload.url)) {
         navigate(message.payload.url);
       }
@@ -78,6 +79,7 @@ export default function SitePreviewLayout() {
         sandbox={STANDALONE_SANDBOX}
         loadingMessage={t("pagePreview.loading")}
         notFoundMessage={t("pagePreview.notFound")}
+        iframeRef={iframeRef}
       />
 
       <Outlet context={outletContext} />
