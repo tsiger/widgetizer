@@ -161,7 +161,7 @@ See [Site Exporting](core-export.md) for the export/import flow detail.
 
 **Tenant SVG icon sanitization.** `IconInput.jsx`'s `sanitizeIconBody()` (`packages/editor-ui/src/components/settings/inputs/IconInput.jsx`) runs the DOMPurify SVG profile, applied at both `dangerouslySetInnerHTML` sinks. Icon bodies come verbatim from the project's tenant-authored `assets/icons.json` (notably via ZIP import, which copies it unvalidated), so injecting them in the editor origin would be stored XSS. It wraps the body in `<svg>` first so the SVG profile does not blank the bare inner fragment.
 
-**PostMessage origin scoping.** The preview bridge uses `getPreviewTargetOrigin()` (the resolved peer origin) instead of `"*"` (`packages/editor-ui/src/lib/previewBase.js`, consumed by `PreviewPanel.jsx`), so editor↔preview messages cannot leak across origins when isolation is enabled.
+**PostMessage origin scoping.** The preview bridge uses `getPreviewTargetOrigin()` (the resolved peer origin) instead of `"*"` (`packages/editor-ui/src/lib/previewBase.js`, consumed by `PreviewPanel.jsx`), so editor↔preview messages cannot leak across origins when isolation is enabled. Inbound, `readPreviewMessage()` (`packages/editor-ui/src/lib/previewMessages.js`) accepts a message only from the preview's origin (and, where the listener owns the iframe, from that iframe's window) and only when its payload matches its type's shape; an origin of `"*"` (an unparsable render base) accepts nothing.
 
 **LiquidJS floor.** `liquidjs` is pinned to `^10.26.0` in `@widgetizer/core` + `@widgetizer/render-engine`, which fixes the GHSA RCE/SSTI and the `strip_html` ReDoS.
 
@@ -198,9 +198,11 @@ Optional security boundary that runs the preview iframe on a separate origin fro
 
 **Token-based rendering:** Builder POSTs page data to the preview-token route, which renders HTML server-side and stores it in an in-memory token store (`packages/builder-server/src/services/previewTokenStore.js`). The iframe loads `/render/:token` (on the preview origin when isolation is enabled). Tokens expire after 5 minutes (`TOKEN_TTL_MS`), capped at 1000 concurrent (`MAX_TOKENS`, oldest evicted), with a 1-minute periodic sweep.
 
-**PostMessage origin verification:** All `postMessage` calls use explicit target origins (not `"*"`) when isolation is enabled (`getPreviewTargetOrigin()` in `previewBase.js`). The preview runtime rejects messages from unexpected origins.
+**PostMessage origin verification:** All `postMessage` calls use explicit target origins (not `"*"`) when isolation is enabled (`getPreviewTargetOrigin()` in `previewBase.js`). The editor validates every inbound message's origin, sender and payload (§11). The preview runtime obeys only the origin passed as `?parentOrigin=`; an editor-mode runtime loaded without one obeys no control message, and a message without object data is ignored.
 
-**Inline overlay rendering:** Selection/hover overlays are rendered inside the iframe by `previewRuntime.js` (`packages/core/src/runtime/previewRuntime.js`, served raw to the iframe via `express.static(/runtime)`), eliminating cross-origin `contentDocument` access. When the preview loads same-origin, `postMessage` uses `"*"`.
+**Editor frame sandbox:** the editor's preview iframe is sandboxed without `allow-top-navigation*` and without pop-ups (`PreviewPanel.jsx`), so a site script cannot navigate the editor's tab, directly or through an opened window. Like any sandbox it binds only once the preview is cross-origin.
+
+**Inline overlay rendering:** Selection/hover overlays are rendered inside the iframe by `previewRuntime.js` (`packages/core/src/runtime/previewRuntime.js`, served raw to the iframe via `express.static(/runtime)`), eliminating cross-origin `contentDocument` access. The editor reads nothing from the frame directly: the runtime reports what the editor needs (selection, scroll position) by `postMessage`.
 
 ### Project-Switch Isolation
 
@@ -236,7 +238,7 @@ Prevents data from one project being shown, saved, previewed, or exported agains
 | `NODE_ENV` | `development` or `production` |
 | `PORT` | Server port (default 3001) |
 | `VITE_API_URL` | Backend API base URL for the frontend |
-| `SERVER_URL` | Server's own base URL for runtime/preview URLs |
+| `SERVER_URL` | Server's own base URL, printed at startup (defaults to `http://127.0.0.1:<port>`); preview URLs don't use it |
 
 Preview isolation variables are described in §13 above.
 

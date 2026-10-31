@@ -70,7 +70,11 @@ describe("SitePreviewLayout", () => {
 
     await act(async () => {
       window.dispatchEvent(
-        new MessageEvent("message", { data: { type: "NAVIGATE_PREVIEW", payload: { url: "/preview/about" } } }),
+        new MessageEvent("message", {
+          data: { type: "NAVIGATE_PREVIEW", payload: { url: "/preview/about" } },
+          origin: window.location.origin,
+          source: container.querySelector("iframe").contentWindow,
+        }),
       );
     });
 
@@ -83,10 +87,46 @@ describe("SitePreviewLayout", () => {
     const { container } = renderAt("/preview/home");
     await act(async () => {
       window.dispatchEvent(
-        new MessageEvent("message", { data: { type: "NAVIGATE_PREVIEW", payload: { url: "https://evil.example" } } }),
+        new MessageEvent("message", {
+          data: { type: "NAVIGATE_PREVIEW", payload: { url: "https://evil.example" } },
+          origin: window.location.origin,
+          source: container.querySelector("iframe").contentWindow,
+        }),
       );
     });
     // Still on the original route — the guard rejected the external URL.
+    expect(container.querySelector("iframe").getAttribute("src")).toBe("/render/home");
+  });
+
+  it("ignores NAVIGATE_PREVIEW from any origin but the preview's", async () => {
+    const { container } = renderAt("/preview/home");
+    await act(async () => {
+      window.dispatchEvent(
+        new MessageEvent("message", {
+          data: { type: "NAVIGATE_PREVIEW", payload: { url: "/preview/about" } },
+          origin: "https://evil.example",
+          source: container.querySelector("iframe").contentWindow,
+        }),
+      );
+    });
+    expect(container.querySelector("iframe").getAttribute("src")).toBe("/render/home");
+  });
+
+  it("ignores NAVIGATE_PREVIEW from a preview-origin window that is not the frame on screen", async () => {
+    const { container } = renderAt("/preview/home");
+    // A frame replaced since (the stage keys its iframe by src), or any other
+    // window on the preview's origin.
+    for (const source of [window, null]) {
+      await act(async () => {
+        window.dispatchEvent(
+          new MessageEvent("message", {
+            data: { type: "NAVIGATE_PREVIEW", payload: { url: "/preview/about" } },
+            origin: window.location.origin,
+            source,
+          }),
+        );
+      });
+    }
     expect(container.querySelector("iframe").getAttribute("src")).toBe("/render/home");
   });
 });

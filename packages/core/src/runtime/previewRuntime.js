@@ -20,8 +20,8 @@ import { getStandalonePreviewTarget } from "./standalonePreviewTarget.js";
 // sends `Referrer-Policy: no-referrer`. We use it to (a) target replies to the
 // editor instead of "*", and (b) reject control messages — notably the
 // script/HTML-injecting UPDATE_CUSTOM_SCRIPTS / MORPH_WIDGET — from any other
-// window. Empty when absent on standalone loads: we then fall back to permissive
-// behaviour so the preview never silently goes deaf.
+// window. Without it an editor-mode runtime obeys no control message at all; a
+// standalone load without it stays permissive, so its link navigation keeps working.
 const PARENT_ORIGIN = new URLSearchParams(window.location.search).get("parentOrigin") || "";
 
 function postToParent(data) {
@@ -318,6 +318,13 @@ function reportElementBounds(widgetId, blockId = null) {
   postToParent({ type: "ELEMENT_BOUNDS", payload: { widgetId, blockId, bounds, blockBounds } });
 }
 
+// The editor keeps the document's scroll position across reloads, and can't read
+// it from a cross-origin frame, so the editor-mode runtime reports it.
+function reportScrollPosition() {
+  if (PREVIEW_MODE !== "editor") return;
+  postToParent({ type: "SCROLL_POSITION", payload: { scrollY: window.scrollY } });
+}
+
 // Scroll-triggered bounds reporting (debounced)
 let scrollDebounceTimer = null;
 function setupScrollBoundsReporting() {
@@ -332,6 +339,7 @@ function setupScrollBoundsReporting() {
         if (currentHoveredWidgetId) {
           reportHoverBounds();
         }
+        reportScrollPosition();
         renderOverlay();
       });
     },
@@ -826,11 +834,17 @@ function setupOverlayClickHandler() {
 // ── Message Handler ─────────────────────────────────────────────────────────
 
 function handleMessage(event) {
+  if (!event.data || typeof event.data !== "object") return;
+
   // Only obey commands from the editor that framed us. Without this, any window
   // able to reach this iframe could post UPDATE_CUSTOM_SCRIPTS / MORPH_WIDGET and
-  // run code/inject HTML in the preview's origin. Enforced only when the editor
-  // told us its origin (see PARENT_ORIGIN); absent → permissive fallback.
-  if (PARENT_ORIGIN && event.origin !== PARENT_ORIGIN) return;
+  // run code/inject HTML in the preview's origin. An editor-mode runtime that was
+  // not told the editor's origin (see PARENT_ORIGIN) obeys nobody.
+  if (PARENT_ORIGIN) {
+    if (event.origin !== PARENT_ORIGIN) return;
+  } else if (PREVIEW_MODE === "editor") {
+    return;
+  }
 
   const { type, payload } = event.data;
 
@@ -1034,6 +1048,9 @@ function morphWidget(widgetId, newHtml) {
     preserveFormState(existingElement, newElement);
     cleanupWidget(widgetId);
 
+    // Swapping the element (and what its scripts do on update) can move the page;
+    // the view is put back where it was below.
+    const scrollY = window.scrollY;
     existingElement.parentNode.replaceChild(newElement, existingElement);
 
     if (newScripts.length > 0) {
@@ -1064,6 +1081,7 @@ function morphWidget(widgetId, newHtml) {
 
     newElement.dataset.initialized = "true";
     newElement.dispatchEvent(new CustomEvent("widget:updated", { bubbles: true, detail: { widgetId } }));
+    if (window.scrollY !== scrollY) window.scrollTo(0, scrollY);
 
     // Re-render overlay after morph (element positions may have changed)
     requestAnimationFrame(() => renderOverlay());
@@ -1163,7 +1181,10 @@ function initializeRuntime() {
   // Re-render overlay on window resize
   window.addEventListener("resize", () => renderOverlay());
 
-  const announceReady = () => postToParent({ type: "PREVIEW_READY", payload: { themeReads: readThemeReads() } });
+  const announceReady = () => {
+    postToParent({ type: "PREVIEW_READY", payload: { themeReads: readThemeReads() } });
+    reportScrollPosition();
+  };
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", announceReady);
   } else {

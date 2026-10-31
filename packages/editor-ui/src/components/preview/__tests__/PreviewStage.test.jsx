@@ -1,5 +1,6 @@
 // @vitest-environment jsdom
 import { describe, it, expect } from "vitest";
+import { createRef } from "react";
 import { render, screen } from "@testing-library/react";
 import PreviewStage, { STANDALONE_SANDBOX } from "../PreviewStage.jsx";
 
@@ -40,5 +41,17 @@ describe("PreviewStage", () => {
     expect(container.querySelector("iframe").style.maxWidth).toBe("24rem");
     rerender(<PreviewStage src="/render/tok" loading={false} notFound={false} isMobile={false} title="t" />);
     expect(container.querySelector("iframe").style.maxWidth).toBe("100%");
+  });
+
+  it("hands the mounted iframe to iframeRef, and the new one after a src change", () => {
+    const iframeRef = createRef();
+    const { container, rerender } = render(
+      <PreviewStage src="/render/a" loading={false} isMobile={false} title="t" iframeRef={iframeRef} />,
+    );
+    const first = container.querySelector("iframe");
+    expect(iframeRef.current).toBe(first);
+    rerender(<PreviewStage src="/render/b" loading={false} isMobile={false} title="t" iframeRef={iframeRef} />);
+    expect(iframeRef.current).toBe(container.querySelector("iframe"));
+    expect(iframeRef.current).not.toBe(first);
   });
 });

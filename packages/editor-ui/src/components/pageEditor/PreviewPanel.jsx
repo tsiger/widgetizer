@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo, forwardRef } from "react";
+import { useState, useEffect, useLayoutEffect, useRef, useMemo, forwardRef } from "react";
 import { useTranslation } from "react-i18next";
 import { useThemeLocale } from "../../hooks/useThemeLocale";
 import {
@@ -14,7 +14,26 @@ import usePageStore from "../../stores/pageStore";
 import useProjectStore from "../../stores/projectStore";
 import useWidgetStore from "../../stores/widgetStore";
 import { buildPreviewUrl, getPreviewTargetOrigin } from "../../lib/previewBase";
+import { readPreviewMessage } from "../../lib/previewMessages";
+import { createPreviewReloadCoordinator } from "../../lib/previewReload";
 import SelectionOverlay from "./SelectionOverlay";
+import { STANDALONE_SANDBOX } from "../preview/PreviewStage";
+
+// The editor's own preview frame runs the site's scripts beside the editor, so it
+// may neither navigate the editor's tab nor open windows (an unsandboxed pop-up
+// could navigate its opener). Downloads, new-tab links and modals are left out
+// too: the editor-mode runtime cancels every link click, and nothing built in
+// uses a modal. Fullscreen comes from the `allow` attribute, not the sandbox.
+// The sandbox binds only while the preview is on another origin; a same-origin
+// frame can reach the editor's document and remove it.
+const EDITOR_SANDBOX = "allow-scripts allow-same-origin allow-forms allow-presentation";
+
+// What the error panel says about a failed preview load. A host that caps open
+// previews answers `code: "preview_capacity"`; anything else shows its own message.
+function previewErrorText(error, t) {
+  if (error?.code === "preview_capacity") return t("pageEditor.preview.tooManyPreviews");
+  return error?.message || "Failed to load preview";
+}
 
 /**
  * Detect if changes are structural (requiring full reload) or content-only (can be morphed)
@@ -176,11 +195,22 @@ const PreviewPanel = forwardRef(function PreviewPanel(
   const previousStateRef = useRef(null);
 
   // Track structural reload state to prevent SelectionOverlay from scrolling prematurely.
-  // The ref is set synchronously during render so child effects can read it immediately.
+  // A layout effect sets it after each commit, before any passive effect, so child
+  // effects read it up to date.
   const structuralReloadRef = useRef(false);
 
   // Store pending scroll info for after PREVIEW_READY
   const pendingScrollRef = useRef(null);
+
+  // Where the preview document is scrolled, as its runtime last reported it: the
+  // frame may be on another origin, where the editor can't read it.
+  const lastScrollYRef = useRef(0);
+
+  // Mints and shows every new preview document, and keeps the frame's preview
+  // session alive when the host gives its documents one (OSS does not): widget
+  // re-renders echo that session, and the next mint names it as the one it
+  // replaces, so one frame holds one session however often it reloads.
+  const reloadCoordinatorRef = useRef(null);
 
   // The site settings the preview shows right now (applied at once, ahead of the
   // debounced update), and a counter so a slower, older update never lands last.
@@ -208,23 +238,82 @@ const PreviewPanel = forwardRef(function PreviewPanel(
   const activeProject = useProjectStore((state) => state.activeProject);
   const schemas = useWidgetStore((state) => state.schemas);
 
+  // What a reload renders: the editor's state as of the last commit. The
+  // coordinator's callbacks outlive renders, so they read it from here; a layout
+  // effect updates it before any effect below can start a load.
+  const latestStateRef = useRef(null);
+  useLayoutEffect(() => {
+    latestStateRef.current = {
+      page,
+      widgets,
+      globalWidgets,
+      sharedAreas,
+      themeSettings,
+      selectedWidgetId,
+      selectedBlockId,
+      selectedGlobalWidgetId,
+      runtimeMode,
+    };
+  });
+
   useEffect(() => {
+    const coordinator = createPreviewReloadCoordinator({
+      mint: async ({ replaces }) => {
+        const { runtimeMode: mode, ...rendered } = latestStateRef.current;
+        const enhancedPageData = { ...rendered.page, globalWidgets: rendered.globalWidgets, sharedAreas: rendered.sharedAreas };
+        const answer = await fetchPreviewToken(enhancedPageData, rendered.themeSettings, mode, 1, { replaces });
+        return { ...answer, rendered };
+      },
+      show: ({ token, rendered }) => {
+        renderedStateRef.current = rendered;
+        navigatingRef.current = true;
+        setPreviewSrc(buildPreviewUrl(token));
+        appliedThemeRef.current = rendered.themeSettings;
+        // A document is on show: whatever failed before no longer stands.
+        setError(null);
+      },
+      // The session ended: reload the way a structural change does, view and selection kept.
+      beginReload: () => {
+        const seq = ++updateSeqRef.current;
+        const { selectedWidgetId: widgetId, selectedBlockId: blockId } = latestStateRef.current;
+        pendingScrollRef.current = { scrollY: lastScrollYRef.current, widgetId, blockId };
+        structuralReloadRef.current = true;
+        return () => updateSeqRef.current === seq;
+      },
+      // Shown in the error panel, never retried: its button loads the preview again.
+      onReloadError: (err) => {
+        console.error("Preview reload error:", err);
+        structuralReloadRef.current = false;
+        pendingScrollRef.current = null;
+        setError(err);
+      },
+    });
+    reloadCoordinatorRef.current = coordinator;
+    return () => coordinator.dispose();
+  }, []);
+
+  useEffect(() => {
+    reloadCoordinatorRef.current?.release();
     previousStateRef.current = null;
     pendingScrollRef.current = null;
+    lastScrollYRef.current = 0;
     structuralReloadRef.current = false;
     appliedThemeRef.current = null;
     updateSeqRef.current += 1;
     renderedStateRef.current = null;
     navigatingRef.current = false;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- another page or project: start the frame over
     setPreviewSrc(null);
     setError(null);
     setInitialLoadComplete(false);
     setLoading(Boolean(page?.id));
   }, [activeProject?.id, page?.id, runtimeMode]);
 
-  // Detect structural changes during render (before child effects fire).
-  // This sets the ref synchronously so SelectionOverlay can check it in its effects.
-  if (initialLoadComplete && previousStateRef.current) {
+  // Detect structural changes after each commit, before any passive effect runs:
+  // SelectionOverlay's effects read structuralReloadRef to hold back scrolling
+  // while a structural reload is on its way, so it must already be set by then.
+  useLayoutEffect(() => {
+    if (!initialLoadComplete || !previousStateRef.current) return;
     const prev = previousStateRef.current;
     const contentChanged =
       JSON.stringify(page) !== JSON.stringify(prev?.page) ||
@@ -239,20 +328,14 @@ const PreviewPanel = forwardRef(function PreviewPanel(
       if (isStructural && !structuralReloadRef.current) {
         structuralReloadRef.current = true;
         // Capture scrollY now while the old iframe content is still present
-        let scrollY = 0;
-        try {
-          scrollY = iframeRef.current?.contentWindow?.scrollY || 0;
-        } catch {
-          scrollY = 0;
-        }
         pendingScrollRef.current = {
-          scrollY,
+          scrollY: lastScrollYRef.current,
           widgetId: selectedWidgetId,
           blockId: selectedBlockId,
         };
       }
     }
-  }
+  });
 
   // Expose the iframe ref to the parent component
   useEffect(() => {
@@ -261,20 +344,24 @@ const PreviewPanel = forwardRef(function PreviewPanel(
     }
   }, [ref]);
 
-  // Listen for PREVIEW_READY from the iframe to handle post-reload scroll restoration
+  // Listen for PREVIEW_READY from the iframe to handle post-reload scroll restoration,
+  // and for the scroll position the runtime reports.
   useEffect(() => {
     const handleMessage = (event) => {
-      const { type } = event.data || {};
-      if (type !== "PREVIEW_READY") return;
-      if (iframeRef.current && event.source === iframeRef.current.contentWindow) {
-        setPreviewThemeReads(iframeRef.current, event.data.payload?.themeReads || null);
-        navigatingRef.current = false;
-        const rendered = renderedStateRef.current;
-        if (rendered) {
-          previousStateRef.current = rendered;
-          appliedThemeRef.current = rendered.themeSettings;
-          setReconcileKey((key) => key + 1);
-        }
+      // Only this panel's own preview document, and only a well-formed message.
+      const message = readPreviewMessage(event, iframeRef.current);
+      if (message?.type === "SCROLL_POSITION") {
+        lastScrollYRef.current = message.payload.scrollY;
+        return;
+      }
+      if (message?.type !== "PREVIEW_READY") return;
+      setPreviewThemeReads(iframeRef.current, message.payload.themeReads);
+      navigatingRef.current = false;
+      const rendered = renderedStateRef.current;
+      if (rendered) {
+        previousStateRef.current = rendered;
+        appliedThemeRef.current = rendered.themeSettings;
+        setReconcileKey((key) => key + 1);
       }
 
       const pending = pendingScrollRef.current;
@@ -327,35 +414,26 @@ const PreviewPanel = forwardRef(function PreviewPanel(
     if (activeProject?.id && loadedProjectId && activeProject.id !== loadedProjectId) return;
 
     async function loadInitialPreview() {
+      const coordinator = reloadCoordinatorRef.current;
+      // Opening another page or project bumps the sequence: this load is then stale.
+      const seq = updateSeqRef.current;
       try {
         setLoading(true);
         setError(null);
 
-        const enhancedPageData = { ...page, globalWidgets, sharedAreas };
-        const { token } = await fetchPreviewToken(enhancedPageData, themeSettings, runtimeMode);
-        setPreviewSrc(buildPreviewUrl(token));
-        navigatingRef.current = true;
-        appliedThemeRef.current = themeSettings;
+        // Not shown when a later load superseded this one, the editor moved to
+        // another page meanwhile, or the coordinator was replaced (the effects
+        // re-ran): the load that is current owns the frame and the flags below.
+        if (!(await coordinator.load(() => updateSeqRef.current === seq))) return;
 
         // Store the initial state for future diffing
-        previousStateRef.current = {
-          page,
-          widgets,
-          globalWidgets,
-          sharedAreas,
-          themeSettings,
-          selectedWidgetId,
-          selectedBlockId,
-          selectedGlobalWidgetId,
-        };
-        renderedStateRef.current = previousStateRef.current;
+        previousStateRef.current = renderedStateRef.current;
       } catch (err) {
         console.error("Preview error:", err);
-        setError(err.message || "Failed to load preview");
-      } finally {
-        setLoading(false);
-        setInitialLoadComplete(true);
+        setError(err);
       }
+      setLoading(false);
+      setInitialLoadComplete(true);
     }
 
     loadInitialPreview();
@@ -374,9 +452,10 @@ const PreviewPanel = forwardRef(function PreviewPanel(
     runtimeMode,
   ]);
 
-  // Handle updates after initial load
+  // Handle updates after initial load. While the error panel shows a failed load,
+  // nothing updates (or mints) until its button loads the preview again.
   useEffect(() => {
-    if (!initialLoadComplete || !iframeRef.current) return;
+    if (!initialLoadComplete || !iframeRef.current || error) return;
 
     const previousState = previousStateRef.current;
 
@@ -550,24 +629,7 @@ const PreviewPanel = forwardRef(function PreviewPanel(
     const timeoutId = setTimeout(async () => {
       const seq = ++updateSeqRef.current;
       const isCurrent = () => updateSeqRef.current === seq;
-      const reload = async () => {
-        const enhancedPageData = { ...page, globalWidgets, sharedAreas };
-        const { token } = await fetchPreviewToken(enhancedPageData, themeSettings, runtimeMode);
-        if (!isCurrent()) return;
-        renderedStateRef.current = {
-          page,
-          widgets,
-          globalWidgets,
-          sharedAreas,
-          themeSettings,
-          selectedWidgetId,
-          selectedBlockId,
-          selectedGlobalWidgetId,
-        };
-        navigatingRef.current = true;
-        setPreviewSrc(buildPreviewUrl(token));
-        appliedThemeRef.current = themeSettings;
-      };
+      const reload = () => reloadCoordinatorRef.current.load(isCurrent);
       try {
         if (isStructural) {
           // STRUCTURAL CHANGE: Full page reload
@@ -580,12 +642,7 @@ const PreviewPanel = forwardRef(function PreviewPanel(
           console.log("[Preview] PARTIAL UPDATE (content change only)");
 
           // Capture scrollY before morph
-          let morphScrollY = 0;
-          try {
-            morphScrollY = iframeRef.current?.contentWindow?.scrollY || 0;
-          } catch {
-            morphScrollY = 0;
-          }
+          const morphScrollY = lastScrollYRef.current;
 
           const updateState = {
             widgets,
@@ -597,35 +654,44 @@ const PreviewPanel = forwardRef(function PreviewPanel(
             page,
           };
 
-          const result = await updatePreview(iframeRef.current, updateState, previousState || {});
+          let result;
+          try {
+            result = await updatePreview(iframeRef.current, updateState, previousState || {}, {
+              session: reloadCoordinatorRef.current.session,
+            });
+          } catch (err) {
+            // A failed re-render falls back to one full reload.
+            console.error("Preview update error:", err);
+            result = { needsReload: true };
+          }
 
           // A newer update is under way and compares against the same baseline,
           // so it covers this change too.
           if (result?.stale || !isCurrent()) return;
 
           if (result?.needsReload) {
-            // The page layout reads a changed site setting: only a full render shows it.
+            // The page layout reads a changed site setting, or the document's session
+            // ended: only a full render shows it.
             pendingScrollRef.current = { scrollY: morphScrollY, widgetId: selectedWidgetId, blockId: selectedBlockId };
             structuralReloadRef.current = true;
             await reload();
           } else {
-            // Restore scroll position after morph
-            try {
-              iframeRef.current?.contentWindow?.scrollTo(0, morphScrollY);
-            } catch {
-              // skip scroll restore on error
-            }
+            // Restore scroll position after morph. The runtime already keeps the view
+            // still across each swap; this lands after the morphs it was sent.
+            iframeRef.current?.contentWindow?.postMessage(
+              { type: "RESTORE_SCROLL", payload: { scrollY: morphScrollY } },
+              getPreviewTargetOrigin(),
+            );
             setPreviewReadyKey((prev) => prev + 1);
           }
         }
       } catch (err) {
-        console.error("Preview update error:", err);
-        // Fallback to full reload on any error
-        try {
-          await reload();
-        } catch (fallbackErr) {
-          console.error("Preview fallback reload error:", fallbackErr);
-        }
+        // The reload's mint failed: shown in the error panel, not retried.
+        console.error("Preview reload error:", err);
+        structuralReloadRef.current = false;
+        pendingScrollRef.current = null;
+        setError(err);
+        return;
       }
 
       if (!isCurrent()) return;
@@ -644,6 +710,7 @@ const PreviewPanel = forwardRef(function PreviewPanel(
     return () => clearTimeout(timeoutId);
   }, [
     initialLoadComplete,
+    error,
     reconcileKey,
     page,
     widgets,
@@ -686,7 +753,7 @@ const PreviewPanel = forwardRef(function PreviewPanel(
       {error && (
         <div className="absolute inset-0 bg-red-50 p-4 text-red-700 z-20">
           <p className="font-bold">{t("pageEditor.preview.error")}</p>
-          <p className="text-sm">{error}</p>
+          <p className="text-sm">{previewErrorText(error, t)}</p>
           <button
             onClick={() => setInitialLoadComplete(false)}
             className="mt-2 px-2 py-1 bg-red-200 text-red-800 rounded text-xs hover:bg-red-300"
@@ -700,12 +767,7 @@ const PreviewPanel = forwardRef(function PreviewPanel(
           ref={iframeRef}
           src={previewSrc}
           title={t("pageEditor.preview.title")}
-          {...(runtimeMode === "standalone"
-            ? {
-                sandbox:
-                  "allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-forms allow-presentation allow-top-navigation-by-user-activation",
-              }
-            : {})}
+          sandbox={runtimeMode === "standalone" ? STANDALONE_SANDBOX : EDITOR_SANDBOX}
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen"
           allowFullScreen
           className={`w-full h-full border-0 transition-all duration-300 ease-in-out mx-auto ${

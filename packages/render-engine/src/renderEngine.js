@@ -907,10 +907,12 @@ async function createBaseRenderContext(deps, rawThemeSettings, renderMode = "pre
       ? deps.preprocessThemeSettings(rawThemeSettings)
       : {};
 
-  // Preview emits origin-relative URLs (the serving shell owns the origin: OSS uses
-  // the render document's origin + <base href="/">; hosted its own <base href> →
-  // APP_ORIGIN). Publish already used "".
-  const apiUrl = "";
+  // The base of the preview's media, site-icon and form URLs. The shell may pass an
+  // absolute base in `sharedGlobals.apiUrl` (e.g. one that carries a path the
+  // serving origin authorises by); OSS passes "", so its preview URLs stay
+  // origin-relative and resolve against the render document's own origin.
+  // Publish output never uses it.
+  const apiUrl = (sharedGlobals && sharedGlobals.apiUrl) || "";
 
   // Depth-aware output prefix for static export. Collection item pages render one
   // directory deep ({slugPrefix}/{slug}.html), so their asset/link hrefs need an
