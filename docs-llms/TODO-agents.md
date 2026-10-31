@@ -45,20 +45,6 @@ Was DESKTOP-WINDOW-OPEN. `electron/main.js` set no `setWindowOpenHandler`, so an
 
 Not tasks yet. Checks need confirming first; later items wait for their stated need; embedding requirements are not OSS release work. Promote a note to a GitHub issue when it becomes real work.
 
-### Confirmed — to file on GitHub
-
-#### MEDIA-STREAM-CLOSE · Media responses leave the file open when the client goes away
-
-**Confirmed · Unrated · OSS**
-
-`serveProjectMedia` (`controllers/mediaController.js` ~733 and ~744) sends files with `stream.pipe(res)`. `pipe()` does not destroy the source when the response closes early, so a client that disconnects mid-file leaves the `fs.ReadStream` paused with its file descriptor open for the life of the process. Range support makes this routine: a video or audio player opens `bytes=0-` and drops it on every seek. Reproduced 2026-10-27 on Node 24: 20 clients aborting after the first chunk left 20 descriptors open after GC (`lsof`). Enough of them and the server hits EMFILE and fails every request. A stream that errors after the headers are sent also leaves the response hanging.
-
-Fix: `stream.pipeline(source, res, cb)` (destroys both sides on close or error; answer 500 in the callback only if no headers were sent), or `res.on("close", () => source.destroy())`. Check the two zip downloads too: `archive.pipe(res)` in `exportController.js` (~1592) and `projectController.js` (~1282) keep archiving after the client leaves.
-
-**Done when:** a test that aborts a ranged media request sees the source stream destroyed; aborted zip downloads stop their archive.
-
-**Start:** [mediaController.js](../packages/builder-server/src/controllers/mediaController.js). **Source:** a security review of a port of this route, 2026-10-27.
-
 ### Later — only when the stated need arises
 
 #### T4 · Automate a basic website-building check
