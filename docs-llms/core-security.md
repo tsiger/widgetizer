@@ -238,7 +238,7 @@ Prevents data from one project being shown, saved, previewed, or exported agains
 | `NODE_ENV` | `development` or `production` |
 | `PORT` | Server port (default 3001) |
 | `VITE_API_URL` | Backend API base URL for the frontend |
-| `SERVER_URL` | Server's own base URL for runtime/preview URLs |
+| `SERVER_URL` | Server's own base URL, printed at startup (defaults to `http://127.0.0.1:<port>`); preview URLs don't use it |
 
 Preview isolation variables are described in §13 above.
 
