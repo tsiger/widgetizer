@@ -1,0 +1,67 @@
+{
+  "version": 1,
+  "description": "One id, type, English label and value set per idea; labels give the English label of each value. A widget that shows one of these ideas uses this entry. Generated table: widget-editing-model.md (node scripts/build-widget-vocabulary.js).",
+  "groups": {
+    "widget": ["content_header", "display_header", "appearance_header"],
+    "block": ["content_header", "display_header"]
+  },
+  "entries": [
+    { "context": "introduction", "id": "eyebrow", "type": "text", "label": "Eyebrow text", "group": "content_header" },
+    { "context": "introduction", "id": "title", "type": "text", "label": "Heading", "group": "content_header" },
+    { "context": "introduction", "id": "title_size", "type": "select", "label": "Heading size", "group": "content_header", "note": "Optional. Options are the theme's heading scale." },
+    { "context": "introduction", "id": "description", "type": ["text", "textarea", "richtext"], "label": "Description", "group": "content_header" },
+    { "context": "introduction", "id": "intro_link", "type": "link", "label": "Action", "group": "content_header" },
+    { "context": "introduction", "id": "intro_link_style", "type": "select", "label": "Action style", "values": ["primary", "secondary", "link"], "labels": { "primary": "Primary", "secondary": "Secondary", "link": "Text link" }, "group": "content_header" },
+    { "context": "introduction", "id": "heading_alignment", "type": "select", "label": "Alignment", "values": ["start", "center"], "labels": { "start": "Start", "center": "Center" }, "group": "content_header" },
+
+    { "context": "item", "id": "heading", "type": "text", "label": "Heading", "group": "content_header", "note": "The heading of a block or a repeated item." },
+    { "context": "item", "id": "description", "type": ["text", "textarea", "richtext"], "label": "Description", "group": "content_header" },
+    { "context": "item", "id": "image", "type": "image", "label": "Image", "group": "content_header", "note": "Put placement or crop advice in the description, not the label." },
+    { "context": "item", "id": "caption", "type": ["text", "textarea"], "label": "Caption", "group": "content_header" },
+    { "context": "item", "id": "price", "type": "text", "label": "Price", "group": "content_header" },
+
+    { "context": "button", "id": "link", "type": "link", "label": "Button", "group": "content_header", "note": "A block or item with one button." },
+    { "context": "button", "id": "style", "type": "select", "label": "Button style", "values": ["primary", "secondary", "link"], "labels": { "primary": "Primary", "secondary": "Secondary", "link": "Text link" }, "group": "display_header" },
+    { "context": "button-pair", "id": "link", "type": "link", "label": "Button 1", "group": "content_header", "note": "A block with two buttons uses link + link_2." },
+    { "context": "button-pair", "id": "link_2", "type": "link", "label": "Button 2", "group": "content_header" },
+    { "context": "button-pair", "id": "style", "type": "select", "label": "Button 1 style", "values": ["primary", "secondary", "link"], "labels": { "primary": "Primary", "secondary": "Secondary", "link": "Text link" }, "group": "display_header" },
+    { "context": "button-pair", "id": "style_2", "type": "select", "label": "Button 2 style", "values": ["primary", "secondary", "link"], "labels": { "primary": "Primary", "secondary": "Secondary", "link": "Text link" }, "group": "display_header" },
+
+    { "context": "collection", "id": "limit", "type": "number", "label": "Number of items", "group": "content_header" },
+    { "context": "collection", "id": "link_text", "type": "text", "label": "Button text", "group": "content_header", "note": "Links to each item's own page. Empty means no button." },
+    { "context": "collection", "id": "item_link_style", "type": "select", "label": "Button style", "values": ["primary", "secondary", "link"], "labels": { "primary": "Primary", "secondary": "Secondary", "link": "Text link" }, "group": "content_header", "note": "One style for every item's button. Also used by list widgets whose items share a button style." },
+    { "context": "collection", "id": "show_image", "type": "checkbox", "label": "Show image", "default": true, "group": "content_header" },
+    { "context": "collection", "id": "show_summary", "type": "checkbox", "label": "Show summary", "default": true, "group": "content_header" },
+    { "context": "collection", "id": "show_button", "type": "checkbox", "label": "Show button", "default": true, "group": "content_header" },
+    { "context": "collection", "id": "show_date", "type": "checkbox", "label": "Show date", "default": true, "group": "content_header" },
+    { "context": "collection", "id": "show_time", "type": "checkbox", "label": "Show time", "default": true, "group": "content_header" },
+    { "context": "collection", "id": "show_label", "type": "checkbox", "label": "Show label", "default": true, "group": "content_header" },
+    { "context": "collection", "id": "show_details", "type": "checkbox", "label": "Show details", "default": true, "group": "content_header" },
+    { "context": "collection", "id": "show_price", "type": "checkbox", "label": "Show price", "default": true, "group": "content_header" },
+
+    { "context": "display", "id": "aspect_ratio", "type": "select", "label": "Aspect ratio", "values": ["auto", "1 / 1", "4 / 3", "3 / 2", "3 / 4", "16 / 9"], "labels": { "auto": "Auto", "1 / 1": "1:1", "4 / 3": "4:3", "3 / 2": "3:2", "3 / 4": "3:4", "16 / 9": "16:9" }, "group": "display_header", "note": "Use these values; add original only when the design has its own crop. Not every widget needs every ratio." },
+    { "context": "display", "id": "image_position", "type": "select", "label": "Image position", "values": ["start", "end"], "labels": { "start": "Start", "end": "End" }, "group": "display_header", "note": "Any two-sided layout uses <part>_position with start / end." },
+    { "context": "display", "id": "vertical_alignment", "type": "select", "label": "Vertical alignment", "values": ["start", "center", "end"], "labels": { "start": "Top", "center": "Center", "end": "Bottom" }, "group": "display_header" },
+    { "context": "display", "id": "text_alignment", "type": "select", "label": "Text alignment", "values": ["start", "center"], "labels": { "start": "Start", "center": "Center" }, "group": "display_header" },
+    { "context": "display", "id": "content_width", "type": "select", "label": "Content width", "group": "display_header" },
+    { "context": "display", "id": "columns_desktop", "type": "range", "label": "Desktop columns", "group": "display_header" },
+    { "context": "display", "id": "staggered", "type": "checkbox", "label": "Staggered layout", "group": "display_header" },
+
+    { "context": "appearance", "id": "color_scheme", "type": "select", "label": "Color Scheme", "group": "appearance_header", "required": true, "note": "Options are the theme's colour schemes." },
+    { "context": "appearance", "id": "top_spacing", "type": "select", "label": "Top spacing", "values": ["auto", "small", "none"], "labels": { "auto": "Auto", "small": "Small", "none": "None" }, "group": "appearance_header", "required": true },
+    { "context": "appearance", "id": "bottom_spacing", "type": "select", "label": "Bottom spacing", "values": ["auto", "small", "none"], "labels": { "auto": "Auto", "small": "Small", "none": "None" }, "group": "appearance_header", "required": true }
+  ],
+  "replaced": {
+    "button_style": "item_link_style",
+    "read_more_text": "link_text",
+    "show_read_more": "show_button",
+    "show_excerpt": "show_summary",
+    "show_cover": "show_image",
+    "text_position": "vertical_alignment",
+    "max_width": "content_width",
+    "columns": "columns_desktop",
+    "view_all_link": "intro_link",
+    "button_link": "link",
+    "background": "color_scheme"
+  }
+}

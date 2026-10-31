@@ -2,7 +2,69 @@
 
 How to decide what a widget's editor shows: which parts are settings, which are blocks, and which controls every widget carries. The goal is a widget that an owner can bend to other content and other niches without asking for a new widget.
 
-These are **Conventions** unless marked otherwise. They come from Arch and from widgets that owners have reviewed. When a theme already follows a different pattern, keep its pattern inside that theme.
+These are **Conventions** unless marked otherwise. They come from Arch and from widgets that owners have reviewed. A released theme keeps the ids its saved content already uses; every new widget follows the vocabulary below.
+
+## Vocabulary
+
+One id, type, English label and value set per idea. When a widget shows one of these ideas, it uses this entry exactly. A new idea gets a new, plain name; it never reuses an id below with another meaning. The table is generated from [widget-vocabulary.json](widget-vocabulary.json).
+
+<!-- vocabulary:start -->
+| Context | Id | Type | Label | Values | Group |
+| --- | --- | --- | --- | --- | --- |
+| introduction | `eyebrow` | text | Eyebrow text |  | content_header |
+| introduction | `title` | text | Heading |  | content_header |
+| introduction | `title_size` | select | Heading size |  | content_header |
+| introduction | `description` | text or textarea or richtext | Description |  | content_header |
+| introduction | `intro_link` | link | Action |  | content_header |
+| introduction | `intro_link_style` | select | Action style | `primary` (Primary), `secondary` (Secondary), `link` (Text link) | content_header |
+| introduction | `heading_alignment` | select | Alignment | `start` (Start), `center` (Center) | content_header |
+| item | `heading` | text | Heading |  | content_header |
+| item | `description` | text or textarea or richtext | Description |  | content_header |
+| item | `image` | image | Image |  | content_header |
+| item | `caption` | text or textarea | Caption |  | content_header |
+| item | `price` | text | Price |  | content_header |
+| button | `link` | link | Button |  | content_header |
+| button | `style` | select | Button style | `primary` (Primary), `secondary` (Secondary), `link` (Text link) | display_header |
+| button-pair | `link` | link | Button 1 |  | content_header |
+| button-pair | `link_2` | link | Button 2 |  | content_header |
+| button-pair | `style` | select | Button 1 style | `primary` (Primary), `secondary` (Secondary), `link` (Text link) | display_header |
+| button-pair | `style_2` | select | Button 2 style | `primary` (Primary), `secondary` (Secondary), `link` (Text link) | display_header |
+| collection | `limit` | number | Number of items |  | content_header |
+| collection | `link_text` | text | Button text |  | content_header |
+| collection | `item_link_style` | select | Button style | `primary` (Primary), `secondary` (Secondary), `link` (Text link) | content_header |
+| collection | `show_image` | checkbox | Show image | default `true` | content_header |
+| collection | `show_summary` | checkbox | Show summary | default `true` | content_header |
+| collection | `show_button` | checkbox | Show button | default `true` | content_header |
+| collection | `show_date` | checkbox | Show date | default `true` | content_header |
+| collection | `show_time` | checkbox | Show time | default `true` | content_header |
+| collection | `show_label` | checkbox | Show label | default `true` | content_header |
+| collection | `show_details` | checkbox | Show details | default `true` | content_header |
+| collection | `show_price` | checkbox | Show price | default `true` | content_header |
+| display | `aspect_ratio` | select | Aspect ratio | `auto` (Auto), `1 / 1` (1:1), `4 / 3` (4:3), `3 / 2` (3:2), `3 / 4` (3:4), `16 / 9` (16:9) | display_header |
+| display | `image_position` | select | Image position | `start` (Start), `end` (End) | display_header |
+| display | `vertical_alignment` | select | Vertical alignment | `start` (Top), `center` (Center), `end` (Bottom) | display_header |
+| display | `text_alignment` | select | Text alignment | `start` (Start), `center` (Center) | display_header |
+| display | `content_width` | select | Content width |  | display_header |
+| display | `columns_desktop` | range | Desktop columns |  | display_header |
+| display | `staggered` | checkbox | Staggered layout |  | display_header |
+| appearance | `color_scheme` | select | Color Scheme |  | appearance_header |
+| appearance | `top_spacing` | select | Top spacing | `auto` (Auto), `small` (Small), `none` (None) | appearance_header |
+| appearance | `bottom_spacing` | select | Bottom spacing | `auto` (Auto), `small` (Small), `none` (None) | appearance_header |
+
+Replaced ids, never to be used again:
+
+- `button_style` → `item_link_style`
+- `read_more_text` → `link_text`
+- `show_read_more` → `show_button`
+- `show_excerpt` → `show_summary`
+- `show_cover` → `show_image`
+- `text_position` → `vertical_alignment`
+- `max_width` → `content_width`
+- `columns` → `columns_desktop`
+- `view_all_link` → `intro_link`
+- `button_link` → `link`
+- `background` → `color_scheme`
+<!-- vocabulary:end -->
 
 ## Settings or blocks
 
@@ -50,6 +112,11 @@ List widgets and side-by-side widgets open with the same introduction, as widget
 | `heading_alignment` | `select` | `start`, `center` |
 
 Use `title` for a section heading and `heading` only inside blocks or opening widgets that already use it; do not mix both in one widget.
+
+## The introduction's action
+
+- Start alignment: the action follows the titles. When the titles span the width, it sits beside them, at the end of the row; on phones, under them. When the titles are a side column, it sits under them in that column.
+- Center alignment: the action sits after the items, in every layout.
 
 ## Controls every widget carries
 

@@ -27,6 +27,17 @@ skills/widgetizer-theme/
   agents/openai.yaml       display metadata for OpenAI's skill UI
 ```
 
+### The widget vocabulary
+
+`references/widget-vocabulary.json` lists one id, type, English label and value set per widget idea. The table in `references/widget-editing-model.md` is generated from it:
+
+```bash
+node scripts/build-widget-vocabulary.js           # regenerate the table
+node scripts/build-widget-vocabulary.js --check   # exit 1 when the table is stale
+```
+
+Change the JSON, never the table by hand. Explanations around the table stay hand-written.
+
 ### Keeping it true to the app
 
 `references/contract.json` is generated from the source: app/LiquidJS versions, setting types, LiquidJS built-ins, registered custom tags and their argument names, registered filters, core widgets/snippets/visitor strings, default image sizes, collection sorts and structured-data rules, and font stacks/weights. It records names and selected metadata, not the full behavior of the app.
