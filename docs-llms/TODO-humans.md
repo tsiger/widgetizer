@@ -18,10 +18,14 @@ Closed in this milestone: 26 issues (the milestone's Closed tab).
 
 Bugs, improvements and decisions are on GitHub (issues without a milestone are unscheduled). What stays here needs confirming first, waits for a need, or only matters to apps that embed Widgetizer.
 
+### Confirmed, to file on GitHub
+
+MEDIA-STREAM-CLOSE a dropped media download keeps its file open (video seeking makes it common; enough of them stop the server)
+
 ### Later, only when the need arises
 
 T4 browser smoke test · T17 stricter old tests · T33 repeated editor code · T39 usage labels during a refresh · T43 template trust review · T61 preview startup warnings · T63 unused publishing route · T67 export links through linked folders · T71 real-navigation prompt tests · R1-COORD structural overlap · R1-RESTART edits across a restart · R1-CONTRACT shared save rules · R2-REPAIR repair dead links · R2-MENU menu matching for new setting types · R3-DRAFT recover work after a language is removed · R3-FOLDERS empty language folders · R5-NESTED links inside structured settings · R8-ARCHIVE unusual backup formats · QA-EXTRA extra checks when changing an area
 
 ### Embedding apps (not OSS release work)
 
-T74 complete page-render entry point · H-PAGES enforce a page allowance · H-WRITES consistent custom saves · H-ADAPTERS verify adapters · H-RENDER custom publishing · H-BACKUP custom backup and language setup · H-THEMES custom theme updates · T30 project copying · T49 helpers through storage adapters · H-MULTIPROCESS several servers on one project
+T74 complete page-render entry point · H-PAGES enforce a page allowance · H-WRITES consistent custom saves · H-ADAPTERS verify adapters · H-RENDER custom publishing · H-BACKUP custom backup and language setup · H-THEMES custom theme updates · H-DBFALLBACK stop a silent second database · H-COLLECTION-DEPS collection rendering reads the global database · T30 project copying · T49 helpers through storage adapters · H-MULTIPROCESS several servers on one project

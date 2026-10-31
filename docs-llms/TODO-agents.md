@@ -45,6 +45,20 @@ Was DESKTOP-WINDOW-OPEN. `electron/main.js` set no `setWindowOpenHandler`, so an
 
 Not tasks yet. Checks need confirming first; later items wait for their stated need; embedding requirements are not OSS release work. Promote a note to a GitHub issue when it becomes real work.
 
+### Confirmed — to file on GitHub
+
+#### MEDIA-STREAM-CLOSE · Media responses leave the file open when the client goes away
+
+**Confirmed · Unrated · OSS**
+
+`serveProjectMedia` (`controllers/mediaController.js` ~733 and ~744) sends files with `stream.pipe(res)`. `pipe()` does not destroy the source when the response closes early, so a client that disconnects mid-file leaves the `fs.ReadStream` paused with its file descriptor open for the life of the process. Range support makes this routine: a video or audio player opens `bytes=0-` and drops it on every seek. Reproduced 2026-10-27 on Node 24: 20 clients aborting after the first chunk left 20 descriptors open after GC (`lsof`). Enough of them and the server hits EMFILE and fails every request. A stream that errors after the headers are sent also leaves the response hanging.
+
+Fix: `stream.pipeline(source, res, cb)` (destroys both sides on close or error; answer 500 in the callback only if no headers were sent), or `res.on("close", () => source.destroy())`. Check the two zip downloads too: `archive.pipe(res)` in `exportController.js` (~1592) and `projectController.js` (~1282) keep archiving after the client leaves.
+
+**Done when:** a test that aborts a ranged media request sees the source stream destroyed; aborted zip downloads stop their archive.
+
+**Start:** [mediaController.js](../packages/builder-server/src/controllers/mediaController.js). **Source:** a security review of a port of this route, 2026-10-27.
+
 ### Later — only when the stated need arises
 
 #### T4 · Automate a basic website-building check
@@ -310,6 +324,29 @@ Prepare whole update, record version after success, preserve recovery data when 
 **Done when:** Failed updates have verified retry/recovery behaviour and plain user messages.
 
 **Start:** [themes.md](domain/operations/themes.md). **Source:** R6 integration.
+
+#### H-DBFALLBACK · Let an embedding app forbid the fallback database
+
+**Open · Unrated · Embedding**
+
+`getDb()` (`db/index.js` ~45) opens `<DATA_DIR>/widgetizer.db` itself when no connection was injected with `initDb()`. An embedding app that shares its own connection then gets a silent second database whenever builder-server code runs before `initDb()` (seen in an embedder's tests: renders read an empty database and passed). Three related gaps, found 2026-10-26:
+- add an opt-in strict mode (e.g. `initDb({ ..., allowFallback: false })` or a separate switch) where `getDb()` throws before `ensureDirSync(DATA_DIR)` if nothing was injected; the OSS shells keep the fallback;
+- `closeDb()` (~65) closes an injected connection the embedder owns; it should only drop the reference to an injected one and close only what it opened itself;
+- `runMigrations()` (`db/migrations.js` ~224) fails with `no such column: version` when the tracking table exists with another shape; name the table and say its schema is incompatible instead (don't alter it).
+
+**Done when:** strict mode throws without creating a file, `closeDb()` leaves an injected connection open, and the incompatible-table error names the table; OSS shells behave as today.
+
+**Start:** [db/index.js](../packages/builder-server/src/db/index.js), [db/migrations.js](../packages/builder-server/src/db/migrations.js). **Source:** embedder test isolation, 2026-10-26.
+
+#### H-COLLECTION-DEPS · Collection render deps read the global project repository
+
+**Open · Unrated · Embedding**
+
+`buildCollectionRenderDeps()` (`services/renderingService.js` ~168) is documented as pure scope-first, but its first line reads `projectRepo.getProjectById(scope.projectId)` through the global `getDb()`, so every render that wires collection deps needs the database injected even when no widget uses a collection. Take the project's language info (or a `getProjectData` callback) from the caller instead.
+
+**Done when:** the function reads only what its caller passes; OSS and embedded renders produce the same output.
+
+**Start:** [renderingService.js](../packages/builder-server/src/services/renderingService.js). **Source:** embedder test isolation, 2026-10-26.
 
 #### T30 · Make project copying easier to embed
 
