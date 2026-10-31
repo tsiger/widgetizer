@@ -586,6 +586,18 @@ function setupInteractionHandler() {
       if (linkElement) {
         if (PREVIEW_MODE === "standalone") {
           const href = linkElement.getAttribute("href");
+          // The iframe's base URL points at project assets. Resolve fragment
+          // destinations inside the rendered document instead of navigating out.
+          if (href?.startsWith("#")) {
+            event.preventDefault();
+            const destination = document.getElementById(href.slice(1));
+            if (destination) {
+              if (!destination.hasAttribute("tabindex")) destination.tabIndex = -1;
+              destination.focus({ preventScroll: true });
+              destination.scrollIntoView();
+            }
+            return;
+          }
           const targetUrl = getStandalonePreviewTarget(href, { collectionPrefixes: COLLECTION_PREFIXES, ...PREVIEW_SITE });
           event.preventDefault();
           event.stopPropagation();
