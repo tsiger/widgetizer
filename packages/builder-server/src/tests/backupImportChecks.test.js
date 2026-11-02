@@ -15,6 +15,7 @@ import assert from "node:assert/strict";
 import fs from "fs-extra";
 import path from "path";
 import os from "os";
+import crypto from "crypto";
 
 const TEST_ROOT = path.join(os.tmpdir(), `widgetizer-backup-checks-${Date.now()}`);
 const TEST_DATA_DIR = path.join(TEST_ROOT, "data");
@@ -196,6 +197,37 @@ describe("a backup made by the app", () => {
   });
 });
 
+describe("a backup download the client abandons", () => {
+  it("stops and the request finishes", async () => {
+    // Incompressible and large, so the download is still mid-file when the client leaves.
+    const big = path.join(getProjectDir(source.folderName), "uploads", "files", "big.bin");
+    await fs.outputFile(big, crypto.randomBytes(32 * 1024 * 1024));
+    try {
+      const res = new PassThrough();
+      Object.assign(res, {
+        _status: 200, headersSent: false,
+        status(c) { res._status = c; return res; },
+        json(d) { res._json = d; return res; },
+        setHeader() { return res; },
+      });
+      // The client leaves a megabyte in, partway through the large file.
+      let received = 0;
+      res.on("data", (chunk) => {
+        received += chunk.length;
+        if (received > 1024 * 1024 && !res.destroyed) res.destroy();
+      });
+      const exporting = exportProject(mockReq({ params: { projectId: source.id } }), res);
+      const outcome = await Promise.race([
+        exporting.then(() => "finished"),
+        new Promise((resolve) => setTimeout(() => resolve("still running"), 3000)),
+      ]);
+      assert.equal(outcome, "finished", "an abandoned backup download must stop, not run on");
+    } finally {
+      await fs.remove(big);
+    }
+  });
+});
+
 describe("unreadable project content in a backup", () => {
   const contentFiles = [
     "pages/index.json",
@@ -310,6 +342,41 @@ describe("ZIP entries that are not plain paths, or not intact", () => {
     zip.getEntries()[0].header.crc = 12345;
     await assert.rejects(() => extractZipSafely(zip, buffer.length, path.join(TEST_ROOT, "bad-crc")), /damaged/);
   });
+
+  // A refused entry must not get its target opened: a write stream opened and
+  // then abandoned keeps its file descriptor until the process exits.
+  for (const [label, spoil, refusal] of [
+    ["is encrypted", (entry) => (entry.header.flags |= 1), /encrypted entry/],
+    ["uses an unknown compression method", (entry) => (entry.header.method = 99), /compression method/],
+    [
+      "cannot be read",
+      (entry) => (entry.getCompressedData = () => {
+        throw new Error("bad data");
+      }),
+      /damaged/,
+    ],
+  ]) {
+    it(`never opens the target of an entry that ${label}`, async () => {
+      const source = new AdmZip();
+      source.addFile("theme/refused.txt", Buffer.from("refused content"));
+      const buffer = source.toBuffer();
+      const zip = new AdmZip(buffer);
+      spoil(zip.getEntries()[0]);
+      const dest = path.join(TEST_ROOT, `refused-${Math.random().toString(36).slice(2)}`);
+      const opened = [];
+      const createWriteStream = fs.createWriteStream;
+      fs.createWriteStream = (target, ...rest) => {
+        opened.push(target);
+        return createWriteStream.call(fs, target, ...rest);
+      };
+      try {
+        await assert.rejects(() => extractZipSafely(zip, buffer.length, dest), refusal);
+      } finally {
+        fs.createWriteStream = createWriteStream;
+      }
+      assert.deepEqual(opened, [], "no write stream may be opened for a refused entry");
+    });
+  }
 
   it("reads backslash folders and empty files as adm-zip did", async () => {
     const zip = new AdmZip();

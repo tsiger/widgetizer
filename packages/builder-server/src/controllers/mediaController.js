@@ -1,5 +1,6 @@
 import fs from "fs-extra";
 import path from "path";
+import { pipeline } from "stream";
 import { v4 as uuidv4 } from "uuid";
 import multer from "multer";
 import sharp from "sharp";
@@ -653,6 +654,58 @@ export async function deleteProjectMedia(req, res) {
 }
 
 /**
+ * Send a media file stream as the response body.
+ *
+ * `pipeline`, not `pipe`: when the client goes away (a video player drops its
+ * request on every seek) it destroys the file stream, which `pipe` leaves open
+ * with its descriptor held until the process runs out of them. When the file
+ * fails partway, it destroys the response, so the client sees the transfer cut
+ * off instead of waiting on it; the headers are already sent by then, so no
+ * error status is possible. Only a failure of the file itself is logged — a
+ * client that leaves is routine.
+ *
+ * Nothing is sent until the file has produced its first bytes (or ended), so a
+ * file that can't be read at all — removed or made unreadable after `stat` —
+ * still gets a 500 rather than a dropped connection.
+ */
+async function streamToResponse(stream, res) {
+  const ready = await new Promise((resolve) => {
+    const settle = (outcome) => {
+      stream.off("readable", onReadable);
+      stream.off("error", onError);
+      res.off("close", onClose);
+      resolve(outcome);
+    };
+    const onReadable = () => settle({ ok: true });
+    const onError = (err) => settle({ ok: false, err });
+    const onClose = () => settle({ ok: false });
+    stream.once("readable", onReadable);
+    stream.once("error", onError);
+    res.once("close", onClose);
+  });
+  if (!ready.ok) {
+    stream.destroy();
+    if (!ready.err) return; // the client left first
+    console.error("Error streaming project media:", ready.err);
+    if (!res.headersSent && !res.destroyed) {
+      // The file's length and range were set for the body that never came.
+      res.removeHeader("Content-Length");
+      res.removeHeader("Content-Range");
+      res.status(500).json({ error: "Failed to serve project media" });
+    }
+    return;
+  }
+
+  let sourceFailed = false;
+  stream.once("error", () => {
+    sourceFailed = true;
+  });
+  pipeline(stream, res, (err) => {
+    if (err && sourceFailed) console.error("Error streaming project media:", err);
+  });
+}
+
+/**
  * Serves a media file from a project's uploads directory.
  * Supports lookup by file ID or filename, handles images, videos, and audio.
  * @param {import('express').Request} req - Express request object with projectId and fileId/filename in params
@@ -697,11 +750,6 @@ export async function serveProjectMedia(req, res) {
     res.setHeader("Content-Type", getContentType(path.extname(key).toLowerCase()));
     res.setHeader("Accept-Ranges", "bytes");
 
-    const onStreamError = (err) => {
-      console.error("Error streaming project media:", err);
-      if (!res.headersSent) res.status(500).json({ error: "Failed to serve project media" });
-    };
-
     // Honor byte-range requests so audio/video can seek (HTTP 206). Without this,
     // media plays from the start (off a 200) but seeking snaps back to 0.
     const rangeHeader = req.headers.range;
@@ -729,8 +777,7 @@ export async function serveProjectMedia(req, res) {
       res.status(206);
       res.setHeader("Content-Range", `bytes ${start}-${end}/${fileSize}`);
       res.setHeader("Content-Length", end - start + 1);
-      rangeStream.on("error", onStreamError);
-      rangeStream.pipe(res);
+      await streamToResponse(rangeStream, res);
       return;
     }
 
@@ -740,8 +787,7 @@ export async function serveProjectMedia(req, res) {
       return res.status(404).json({ error: "File not found" });
     }
     res.setHeader("Content-Length", fileSize);
-    stream.on("error", onStreamError);
-    stream.pipe(res);
+    await streamToResponse(stream, res);
   } catch (error) {
     console.error("Error serving project media:", error);
     if (handleProjectResolutionError(res, error)) return;

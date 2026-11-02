@@ -83,7 +83,7 @@
     "isomorphic-dompurify": "^2.25.0",
     "liquidjs": "^10.26.0",
     "lucide-react": "^0.563.0",
-    "multer": "^2.1.1",
+    "multer": "^2.5.0",
     "prettier": "^3.5.3",
     "prismjs": "^1.30.0",
     "rc-slider": "^11.1.8",

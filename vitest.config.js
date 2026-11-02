@@ -9,6 +9,11 @@ export default mergeConfig(
   defineConfig({
     test: {
       environment: "node",
+      // Vite loads the developer's local env file into import.meta.env, and
+      // VITE_API_URL there (http://localhost:3001 in .env.example) would become
+      // the editor's default API and preview origin. Tests that need a split
+      // origin set it explicitly; the rest must not depend on a local file.
+      env: { VITE_API_URL: "" },
       setupFiles: ["./vitest.setup.js"],
       include: [
         "app/src/**/*.test.{js,jsx}",
