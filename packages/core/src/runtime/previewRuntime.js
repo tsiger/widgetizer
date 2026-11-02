@@ -1059,17 +1059,28 @@ function morphWidget(widgetId, newHtml) {
 
     // Load enqueued styles/scripts that aren't already in the document
     // Resolved against this document's <base>: the parsed fragment has none, so its own .src can point elsewhere.
-    const absolute = (url) => new URL(url, document.baseURI).href;
+    // A missing address, or one that can't be parsed (a stylesheet link in pasted embed
+    // code, a broken template), comes back null and is skipped, as a full page load would
+    // fail to load it; throwing here would abandon the rest of the update.
+    const absolute = (url) => {
+      if (!url) return null;
+      try {
+        return new URL(url, document.baseURI).href;
+      } catch {
+        return null;
+      }
+    };
     const loadedStyles = new Set([...document.querySelectorAll('link[rel="stylesheet"][href]')].map((l) => l.href));
     const loadedScripts = new Set([...document.querySelectorAll("script[src]")].map((s) => s.src));
     for (const link of enqueuedLinks) {
-      if (!loadedStyles.has(absolute(link.getAttribute("href")))) {
+      const href = absolute(link.getAttribute("href"));
+      if (href && !loadedStyles.has(href)) {
         document.head.appendChild(link.cloneNode(true));
       }
     }
     for (const script of enqueuedScripts) {
       const src = absolute(script.getAttribute("src"));
-      if (!loadedScripts.has(src)) {
+      if (src && !loadedScripts.has(src)) {
         loadedScripts.add(src);
         const s = document.createElement("script");
         s.src = src;
