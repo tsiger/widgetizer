@@ -99,6 +99,8 @@ describe("streamZipToResponse", () => {
           },
         },
       ]);
+      // Marked handled at once: the rejection may land before the test awaits it.
+      finished.catch(() => {});
     };
     await fetch(baseUrl)
       .then((response) => response.arrayBuffer())
@@ -179,6 +181,8 @@ describe("streamZipToResponse", () => {
           },
         },
       ]);
+      // Marked handled at once: the rejection may land before the test awaits it.
+      finished.catch(() => {});
     };
     const outcome = await Promise.race([
       fetch(baseUrl)

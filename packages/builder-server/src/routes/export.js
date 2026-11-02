@@ -4,6 +4,7 @@ import fs from "fs";
 import { getPublishDir } from "../config.js";
 import { getContentType } from "../utils/mimeTypes.js";
 import { isWithinDirectory } from "../utils/pathSecurity.js";
+import { sendFileDone } from "../utils/sendFileOutcome.js";
 import {
   exportProject,
   getExportHistory,
@@ -146,15 +147,13 @@ function serveExportFile(req, res) {
     const ext = path.extname(fileToSend).toLowerCase();
     res.setHeader("Content-Type", getContentType(ext));
 
-    // Use sendFile instead of manual streaming for better error handling
-    res.sendFile(fileToSend, (err) => {
-      if (err) {
+    res.sendFile(
+      fileToSend,
+      sendFileDone(res, (err) => {
         console.error(`Error sending file ${fileToSend}:`, err);
-        if (!res.headersSent) {
-          res.status(500).json({ error: "Failed to serve file", message: err.message });
-        }
-      }
-    });
+        res.status(500).json({ error: "Failed to serve file", message: err.message });
+      }),
+    );
   } catch (error) {
     console.error("Error serving export file:", error);
     if (!res.headersSent) {

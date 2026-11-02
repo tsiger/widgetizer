@@ -1,6 +1,7 @@
 import express from "express";
 import path from "path";
 import { STATIC_CORE_ASSETS_DIR } from "../config.js";
+import { sendFileDone } from "../utils/sendFileOutcome.js";
 
 const router = express.Router();
 
@@ -21,12 +22,13 @@ router.get("/assets/:filename", (req, res) => {
 
   const filePath = path.join(coreAssetsDir, filename);
 
-  res.sendFile(filePath, (err) => {
-    if (err) {
+  res.sendFile(
+    filePath,
+    sendFileDone(res, (err) => {
       console.error(`Core asset not found: ${filename}`, err.message);
       res.status(404).json({ error: "Asset not found" });
-    }
-  });
+    }),
+  );
 });
 
 export default router;

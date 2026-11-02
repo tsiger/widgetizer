@@ -1,7 +1,12 @@
 // This middleware handles errors globally, preventing the server from crashing.
 
  
-const errorHandler = (err, req, res, _next) => {
+const errorHandler = (err, req, res, next) => {
+  // Once the response has started no error status can follow: hand the error to
+  // Express's default handler, which closes the connection and logs the real
+  // error (answering here would fail with ERR_HTTP_HEADERS_SENT and lose it).
+  if (res.headersSent) return next(err);
+
   // Multer reports per-file size breaches mid-stream, before the whole file is
   // buffered. Map those uploads to 413.
   if (err?.code === "LIMIT_FILE_SIZE") {
