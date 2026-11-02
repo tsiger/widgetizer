@@ -10,7 +10,7 @@
     {
       "id": "optimize-generated-images",
       "instruction": "Optimize every generated image before using it in a static preview, review project or released theme. Resize for its intended display size without upscaling. Use WebP, or JPEG when appropriate. Do not serve or package generated PNG originals. Use WebP for transparency.",
-      "implementation": "Keep original masters outside served and packaged assets. Compress images and inspect quality at their intended display size. Check file sizes, dimensions and actual format. Update image references and media manifests to the optimized files. Preserve the full composition; optimization does not authorize cropping."
+      "implementation": "Do not keep generated originals once the optimized files are in the theme. Compress images and inspect quality at their intended display size. Check file sizes, dimensions and actual format. Update image references and media manifests to the optimized files. Preserve the full composition; optimization does not authorize cropping."
     },
     {
       "id": "visual-selection-before-implementation",
