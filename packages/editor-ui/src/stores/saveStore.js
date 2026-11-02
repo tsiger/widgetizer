@@ -450,12 +450,14 @@ const useAutoSave = create((set, get) => ({
               ? { pages: pageSaveResult.listingAnchorMovedFrom }
               : state.listingAnchorMoved,
             // Any of them can carry it: a header-only or area-only save reports it
-            // on its own response, and theme settings on theirs.
-            mediaUsageStale: [pageSaveResult, ...globalSaveResults].some((result) =>
-              result?.warnings?.some((w) => w?.code === "MEDIA_USAGE_STALE"),
-            ) || themeUsageStale
-              ? { at: Date.now() }
-              : state.mediaUsageStale,
+            // on its own response, and theme settings on theirs. Which part carried
+            // it is kept, so the notice can name what was saved.
+            mediaUsageStale: (() => {
+              const page = [pageSaveResult, ...globalSaveResults].some((result) =>
+                result?.warnings?.some((w) => w?.code === "MEDIA_USAGE_STALE"),
+              );
+              return page || themeUsageStale ? { at: Date.now(), page, theme: themeUsageStale } : state.mediaUsageStale;
+            })(),
             themeConflict: themeConflict ? { at: Date.now(), editsDropped: themeEditsDropped } : state.themeConflict,
           };
         });

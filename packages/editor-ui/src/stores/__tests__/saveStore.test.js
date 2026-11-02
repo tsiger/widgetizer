@@ -523,6 +523,52 @@ describe("saveStore (useAutoSave)", () => {
       expect(useAutoSave.getState().mediaUsageStale).not.toBe(null);
       expect(applyThemeCorrections).not.toHaveBeenCalled();
     });
+
+    // The editor words its notice by what was saved: "this page" is wrong when
+    // only the site settings carried the warning.
+    it("records that only the site settings carried it", async () => {
+      seedPageStore();
+      makeThemeStoreLive({ colors: { primary: "#fff" } }, { colors: { primary: "#000" } });
+      useAutoSave.getState().setThemeSettingsModified(true);
+      mockThemeStoreState.saveSettings.mockResolvedValueOnce({
+        warnings: [{ code: "MEDIA_USAGE_STALE", path: "theme.json" }],
+      });
+
+      await useAutoSave.getState().save(false);
+
+      expect(useAutoSave.getState().mediaUsageStale).toMatchObject({ page: false, theme: true });
+    });
+
+    it("records it as the site settings' when the page saved without it", async () => {
+      seedPageStore();
+      useAutoSave.getState().markWidgetModified("w-1");
+      makeThemeStoreLive({ colors: { primary: "#fff" } }, { colors: { primary: "#000" } });
+      useAutoSave.getState().setThemeSettingsModified(true);
+      mockThemeStoreState.saveSettings.mockResolvedValueOnce({
+        warnings: [{ code: "MEDIA_USAGE_STALE", path: "theme.json" }],
+      });
+
+      await useAutoSave.getState().save(false);
+
+      expect(savePageContent).toHaveBeenCalled();
+      expect(useAutoSave.getState().mediaUsageStale).toMatchObject({ page: false, theme: true });
+    });
+
+    it("records both when the page and the site settings carried it", async () => {
+      seedPageStore();
+      useAutoSave.getState().markWidgetModified("w-1");
+      savePageContent.mockResolvedValueOnce({ warnings: [{ code: "MEDIA_USAGE_STALE", path: "page-1" }] });
+      makeThemeStoreLive({ colors: { primary: "#fff" } }, { colors: { primary: "#000" } });
+      useAutoSave.getState().setThemeSettingsModified(true);
+      mockThemeStoreState.saveSettings.mockResolvedValueOnce({
+        warnings: [{ code: "MEDIA_USAGE_STALE", path: "theme.json" }],
+      });
+
+      await useAutoSave.getState().save(false);
+
+      expect(mockThemeStoreState.saveSettings).toHaveBeenCalled();
+      expect(useAutoSave.getState().mediaUsageStale).toMatchObject({ page: true, theme: true });
+    });
   });
 
   // --------------------------------------------------------------------------
