@@ -396,7 +396,7 @@ These are historical suggestions, not an active audit plan or proof that tests a
 | C8 | Anchor uniqueness per language and collection; concurrent claims; generated URL depth |
 | C9 | Defaults/merge versus existing uploaded assets and existing exports; UI locale separation |
 | C10 | Cache reuse across language renders; manual order, invalid items and partial translations combined; C8's authoring rules need their own assessment |
-| M1 | Fail each original/rendition/DB step; generated filename collisions and quotas |
+| M1 | Generated filename collisions and quotas. Failing the original/rendition/DB steps proved real (files left behind; half-written files in the local adapter): [GH221](https://github.com/tsiger/widgetizer/issues/221). |
 | M2 | Rendered output, rather than repository and round-trip only |
 | M3 | Repeated refs/owner variety if relevant. Usage-sync failure → delete is covered by R1; do not repeat as missing. |
 | M4 | Partial asset deletion remains a candidate. R3 brought item copy/version/discard and language ops inside coordination. Remaining structural scope is R1-COORD; cross-process scope is H-MULTIPROCESS. |
@@ -405,7 +405,7 @@ These are historical suggestions, not an active audit plan or proof that tests a
 | T1 | Library deletion in-use checks, invalid packages, cache refresh and independent project copies |
 | T2 | Database-version-write failure is an accepted limitation, not a new fix task. Project deletion reports a folder it could not remove (`folderLeftBehind`). |
 | O1 | Full navigation assertions beyond C10's inspected additions: same slugs, collection prefixes, clean URLs, pagination and token expiry |
-| O2 | Output/record cleanup for failures; retained-version boundaries and export/delete concurrency |
+| O2 | Retained-version boundaries and export/delete concurrency. Output cleanup after a failed export proved real (the partial `v<N>` folder stays): [GH220](https://github.com/tsiger/widgetizer/issues/220). |
 | O3 | Both real-project walkthroughs complete; no remaining task from this row. |
 | O4 | Actual language-name text/interpolation, repeated exports and project switching; one layout assertion does not cover all UI states |
 | O5 | Translated media/structured data combinations if relevant. Form collisions/limits were checked in R7. |

@@ -40,13 +40,14 @@ Code is organized by concern across the workspace packages and the OSS shell:
 
 ### DI assembly & scoped routers
 
-`setupBuilderServer({ adapters, plugins })` (`packages/builder-server/src/setupBuilderServer.js`) returns three routers:
+`setupBuilderServer({ adapters, plugins })` (`packages/builder-server/src/setupBuilderServer.js`) returns four routers:
 
 - `actorScopedRouter` — `/projects`, `/themes`, `/settings`, `/core`
 - `projectScopedRouter` — `/pages`, `/menus`, `/media`, `/preview`, `/export`, `/widgets`, `/icons`, `/collections`, `/languages`, `/translations`
+- `mediaFileRouter` — the media files as the browser loads them, `/projects/:projectId/{media/:fileId,uploads/images/:filename,uploads/files/:filename}` (project id in the path, since a browser load can't send `X-Project-Id`)
 - `previewRouter` — `GET /render/:token`
 
-`createEditorApp({ adapters, plugins })` (`packages/builder-server/src/createApp.js`) is the **single** editor app factory. It wires both scoped routers under `/api` and the preview router at `/`, plus helmet/cors/JSON-limits/error-handler. `initDb({ getConnection })` injects the SQLite connection. Required adapter keys: `scopeResolver`, `previewScopeResolver`, `storage`, `assetStorage`, `publish`, `limits`.
+`createEditorApp({ adapters, plugins })` (`packages/builder-server/src/createApp.js`) is the **single** editor app factory. It wires the media file router at `/api/media` (ahead of the others), both scoped routers under `/api` and the preview router at `/`, plus helmet/cors/JSON-limits/error-handler. `initDb({ getConnection })` injects the SQLite connection. Required adapter keys: `scopeResolver`, `previewScopeResolver`, `storage`, `assetStorage`, `publish`, `limits`.
 
 The `resolveActiveProject` middleware (in builder-server) delegates to `req.adapters.scopeResolver.resolveScope(req)`, sets `req.scope` (`{ actor, projectId, folderName }`) and `req.activeProject`, and enforces a write-guard: on POST/PUT/PATCH/DELETE a mismatching `X-Project-Id` header or `:projectId` param vs `scope.projectId` → `409 PROJECT_MISMATCH`. `req.adapters` is attached per-router. OSS mounts the actor + project routers both under `/api`; hosted mounts the project router under `/api/projects/:projectId`. See [Packages & Adapter Architecture](core-packages.md) for the adapter contracts, `Scope` shape, and `LIMIT_KEYS`.
 

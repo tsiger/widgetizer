@@ -122,10 +122,10 @@ OSS's `LocalLimitsAdapter` returns the App Settings upload cap for `MAX_UPLOAD_S
 
 ### `setupBuilderServer({ adapters, plugins })`
 
-Returns three Express routers:
+Returns four Express routers:
 
 ```js
-const { actorScopedRouter, projectScopedRouter, previewRouter } = setupBuilderServer({ adapters, plugins });
+const { actorScopedRouter, projectScopedRouter, mediaFileRouter, previewRouter } = setupBuilderServer({ adapters, plugins });
 ```
 
 **Required adapter keys:** `scopeResolver`, `previewScopeResolver`, `storage`, `assetStorage`, `publish`, `limits`.
@@ -134,15 +134,16 @@ const { actorScopedRouter, projectScopedRouter, previewRouter } = setupBuilderSe
 | --- | --- |
 | `actorScopedRouter` | `/projects`, `/themes`, `/settings`, `/core` |
 | `projectScopedRouter` | `/pages`, `/menus`, `/media`, `/preview`, `/export`, `/widgets`, `/icons`, `/collections`, `/languages`, `/translations` |
+| `mediaFileRouter` | `GET /projects/:projectId/media/:fileId`, `/projects/:projectId/uploads/images/:filename`, `/projects/:projectId/uploads/files/:filename` — browser-loaded media files. The OSS shell mounts it at `/api/media`; an embedding app that serves those URLs itself leaves it out. |
 | `previewRouter` | `GET /render/:token` |
 
 `req.adapters` is attached **per-router** (not app-wide), so each router is self-sufficient wherever it is mounted.
 
 ### `createEditorApp({ adapters, plugins })`
 
-Wires both scoped routers under `/api` and the `previewRouter` at `/`, plus helmet, cors, per-route JSON body limits, static UI serving, and the error handler. This is what the OSS shell calls.
+Wires the `mediaFileRouter` at `/api/media` (ahead of the others), both scoped routers under `/api` and the `previewRouter` at `/`, plus helmet, cors, per-route JSON body limits, static UI serving, and the error handler. This is what the OSS shell calls.
 
-**OSS vs hosted mounting:** OSS mounts the actor and project routers both under `/api`. Hosted mounts the project router under `/api/projects/:projectId` (the project id is in the URL for the multi-tenant host).
+**OSS vs hosted mounting:** OSS mounts the actor and project routers both under `/api`, and the media file router at `/api/media`. Hosted mounts the project router under `/api/projects/:projectId` (the project id is in the URL for the multi-tenant host) and serves the media file URLs itself, so it doesn't mount `mediaFileRouter`.
 
 ### `initDb({ getConnection })`
 

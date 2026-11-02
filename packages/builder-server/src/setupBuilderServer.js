@@ -5,6 +5,7 @@ import themeRoutes from "./routes/themes.js";
 import pagesRoutes from "./routes/pages.js";
 import menusRoutes from "./routes/menus.js";
 import mediaRoutes from "./routes/media.js";
+import mediaFileRoutes from "./routes/mediaFiles.js";
 import previewRoutes from "./routes/preview.js";
 import sharedAreasRoutes from "./routes/sharedAreas.js";
 import exportRoutes from "./routes/export.js";
@@ -54,16 +55,19 @@ function attachAdapters(router, adapters) {
  * delegates to, so swapping adapters swaps tenancy behaviour with no route
  * changes.
  *
- * Returns three mountable routers so each shell can place them where it needs:
+ * Returns four mountable routers so each shell can place them where it needs:
  *  - actorScopedRouter   — operations not tied to a selected project
  *                          (projects, theme library, app settings, core assets)
  *  - projectScopedRouter — operations on the active project's content
  *                          (pages, menus, media, preview, export)
+ *  - mediaFileRouter     — the project's media files as the browser loads them
+ *                          (`/projects/:projectId/...`, project id in the path)
  *  - previewRouter       — token-based preview render endpoint
  *
- * OSS mounts actor- and project-scoped routers both under `/api` (reproducing
- * today's URLs); hosted can mount the project-scoped router under
- * `/api/projects/:projectId`.
+ * OSS mounts actor- and project-scoped routers both under `/api` and the media
+ * file router at `/api/media` (reproducing today's URLs); hosted can mount the
+ * project-scoped router under `/api/projects/:projectId`, and an app that serves
+ * the media file URLs itself leaves mediaFileRouter out.
  *
  * The db connection is injected separately via `initDb({ getConnection })` —
  * that is the single, working connection seam, so setupBuilderServer takes no
@@ -110,5 +114,9 @@ export function setupBuilderServer({ adapters, plugins = [] } = {}) {
   attachAdapters(previewRouter, adapters);
   previewRouter.get("/render/:token", renderPreviewToken);
 
-  return { actorScopedRouter, projectScopedRouter, previewRouter };
+  const mediaFileRouter = express.Router();
+  attachAdapters(mediaFileRouter, adapters);
+  mediaFileRouter.use(mediaFileRoutes);
+
+  return { actorScopedRouter, projectScopedRouter, mediaFileRouter, previewRouter };
 }

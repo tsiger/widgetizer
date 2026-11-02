@@ -145,7 +145,7 @@ See [Site Exporting](core-export.md) for the export/import flow detail.
 **Path/isolation guards** (each rejects path separators and `..`):
 
 - **`serveAsset`** (`previewController.js`) allow-lists the folder segment to `{ assets, widgets }` — anything else is `400` (SA-01) — then `path.normalize`s the subpath, strips leading `..`, and re-checks `isWithinDirectory(filePath, baseDir)`.
-- **Media-metadata route** owner-checks the inner `:projectId` before returning metadata (TI-03).
+- **Media-metadata save** takes the project from the resolved scope and looks the file up within it, so another project's file id is a 404 (TI-03).
 - **Export serve** binds to `req.scope.folderName` via `exportDirBelongsToScope()` (`exportController.js`): it rejects `/`, `\`, and `..`, then anchors the directory to `<folderName>` or `<folderName>-v<digits>` (an anchored allowlist, not a prefix match) (TI-02/SA-13). See [Site Exporting](core-export.md).
 - **Slugs and ids from a request** become storage keys or folders before they are used (`middleware/slugValidators.js`); Express decodes `%2F` in params, so `..%2Ftheme` would otherwise reach the project's `theme.json`. Collection slugs and types must match `^[a-z0-9-]+$`; page and menu slugs (route params, the page save's body `slug`, bulk-delete lists) and theme ids on every `/api/themes/:id` route must be a single name (`isSafePathSegment`, `utils/pathSecurity.js`: no separator, NUL, `.` or `..`), because a theme's own page files and uploaded theme folders keep names outside the strict form.
 - **Theme and preset names on project creation** must each be a single name; `scaffoldProjectContent` and `resolvePresetPaths` re-check them for callers that skip the route.

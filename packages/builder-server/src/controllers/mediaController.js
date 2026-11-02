@@ -507,8 +507,9 @@ export async function uploadProjectMedia(req, res) {
 }
 
 /**
- * Updates metadata (alt text, title, description) for a media file.
- * @param {import('express').Request} req - Express request object with projectId and fileId in params, metadata in body
+ * Updates metadata (alt text, title, caption) for a media file of the request's
+ * project (`req.scope`), for the default language or `?language=`.
+ * @param {import('express').Request} req - Express request object with fileId in params, metadata in body
  * @param {import('express').Response} res - Express response object
  * @returns {Promise<void>}
  */
@@ -517,17 +518,11 @@ export async function updateMediaMetadata(req, res) {
     const lang = requestLanguage(req, res);
     if (!lang) return;
 
-    const { projectId, fileId } = req.params;
-    // Bind the inner :projectId to the owner-resolved scope. This route is
-    // path-in-path (.../media/projects/:projectId/media/:fileId/metadata); the
-    // router-level resolveActiveProject owner-checks the outer/stashed id before
-    // the inner :projectId binds, so without this a caller could target another
-    // tenant's project id in the leaf and overwrite their media metadata. OSS
-    // standalone is byte-neutral: its single active project's id always equals
-    // req.params.projectId, so the guard never fires for legitimate edits.
-    if (req.scope && projectId !== req.scope.projectId) {
-      return res.status(403).json({ error: "Project mismatch" });
-    }
+    // The project is the one resolveActiveProject resolved (and, in a
+    // multi-tenant host, authorized) for this request; the file is looked up
+    // within it, so another project's file id is simply not found.
+    const { projectId } = req.scope;
+    const { fileId } = req.params;
     const alt = stripHtmlToText(req.body.alt);
     const title = stripHtmlToText(req.body.title);
     const caption = stripHtmlToText(req.body.caption);
@@ -736,8 +731,8 @@ export async function serveProjectMedia(req, res) {
     }
 
     // This route is project-id-in-path (browser-native loads can't carry the
-    // X-Project-Id header), so resolveActiveProject may not have run — build the
-    // scope from the project, preserving any actor already resolved.
+    // X-Project-Id header), so the file's project comes from the path, not from
+    // the active project resolveActiveProject found; keep its actor, if any.
     const folderName = await getProjectFolderName(projectId);
     const scope = { ...(req.scope || {}), projectId, folderName };
 

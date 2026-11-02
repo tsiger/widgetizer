@@ -204,6 +204,35 @@ export async function deleteProjectMedia(projectId, fileId) {
 }
 
 /**
+ * Save a media file's alt text, title and caption, for the default language or
+ * the one given. Only these three are per language; the binary and everything
+ * else about the file are shared. Invalidates the project's media cache, so
+ * image inputs and the Media page see the new text on their next load.
+ * @param {string} projectId - The ID of the project
+ * @param {string} fileId - The ID of the file
+ * @param {{alt?: string|null, title?: string|null, caption?: string|null}} metadata
+ * @param {string} [language] - The language being edited; omitted for the default
+ * @returns {Promise<{message: string, file: Object}>} The updated file
+ * @throws {Error} If the metadata cannot be saved
+ */
+export async function saveMediaMetadata(projectId, fileId, metadata, language) {
+  try {
+    const query = language ? `?language=${encodeURIComponent(language)}` : "";
+    const data = await editorFetchJson(`/media/${fileId}/metadata${query}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(metadata),
+    }, { fallbackMessage: "Failed to update metadata" });
+
+    invalidateMediaCache(projectId);
+
+    return data;
+  } catch (err) {
+    rethrowQueryError(err, "Failed to update metadata");
+  }
+}
+
+/**
  * Delete multiple media files from a project in a single operation.
  * Automatically invalidates the media cache if files were deleted.
  * @param {string} projectId - The ID of the project

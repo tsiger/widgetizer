@@ -2,16 +2,11 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { act, renderHook } from "@testing-library/react";
 
-// After a successful metadata save the hook must drop the shared 30s media cache
-// so the page editor's image inputs re-fetch fresh metadata instead of serving
-// stale cached data.
+// The metadata drawer's hook: saving through saveMediaMetadata (which owns the
+// route and the media cache) and opening files.
 
 vi.mock("../../queries/mediaManager", () => ({
-  invalidateMediaCache: vi.fn(),
-}));
-
-vi.mock("../../lib/apiFetch", () => ({
-  apiFetch: vi.fn(),
+  saveMediaMetadata: vi.fn(),
 }));
 
 vi.mock("../../lib/config", () => ({
@@ -19,8 +14,7 @@ vi.mock("../../lib/config", () => ({
 }));
 
 import useMediaMetadata from "../useMediaMetadata.js";
-import { invalidateMediaCache } from "../../queries/mediaManager";
-import { apiFetch } from "../../lib/apiFetch";
+import { saveMediaMetadata } from "../../queries/mediaManager";
 
 const ACTIVE_PROJECT = { id: "proj-1" };
 
@@ -29,21 +23,22 @@ afterEach(() => {
 });
 
 describe("useMediaMetadata", () => {
-  it("invalidates the shared media cache after a successful metadata save", async () => {
-    apiFetch.mockResolvedValue({
-      ok: true,
-      json: async () => ({ file: { metadata: { alt: "new" } } }),
-    });
-
+  // The save itself (route, cache invalidation) is saveMediaMetadata's, tested
+  // in the query suite; the hook passes the language and keeps the list current.
+  it("saves through saveMediaMetadata and updates the file in the list", async () => {
+    saveMediaMetadata.mockResolvedValue({ file: { metadata: { alt: "new" }, translations: {} } });
+    const setFiles = vi.fn();
     const { result } = renderHook(() =>
-      useMediaMetadata({ activeProject: ACTIVE_PROJECT, showToast: vi.fn(), setFiles: vi.fn() }),
+      useMediaMetadata({ activeProject: ACTIVE_PROJECT, showToast: vi.fn(), setFiles }),
     );
 
     await act(async () => {
-      await result.current.handleSaveMetadata("file-1", { alt: "new" });
+      await result.current.handleSaveMetadata("file-1", { alt: "new" }, "el");
     });
 
-    expect(invalidateMediaCache).toHaveBeenCalledWith("proj-1");
+    expect(saveMediaMetadata).toHaveBeenCalledWith("proj-1", "file-1", { alt: "new" }, "el");
+    const [[update]] = setFiles.mock.calls;
+    expect(update([{ id: "file-1", metadata: { alt: "old" } }])[0].metadata.alt).toBe("new");
   });
 
   it("opens a file without a link back to the editor", () => {

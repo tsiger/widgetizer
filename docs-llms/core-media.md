@@ -205,9 +205,9 @@ Targeted updates run automatically on the corresponding write/delete/rename:
 
 Express 5 + `multer` (memory storage) + `sharp`. Controller: `packages/builder-server/src/controllers/mediaController.js`. The backend is adapter-agnostic and scope-first — every storage/limits call takes `req.scope` (`{ actor, projectId, folderName }`). See [Packages & Adapter Architecture](core-packages.md) and [Platform Security](core-security.md#11-cross-tenant-safety-multi-tenant-host-contract).
 
-### API Routes (`packages/builder-server/src/routes/media.js`)
+### API Routes (`packages/builder-server/src/routes/media.js`, `routes/mediaFiles.js`)
 
-The router applies `resolveActiveProject` so active-project management routes carry the `X-Project-Id` header and read `req.scope` — the project id stays out of the path. Hosted serves these same relative routes under `/api/projects/:projectId` via the project-scoped router.
+**Management** (`routes/media.js`, in the project-scoped router). The router applies `resolveActiveProject`, so these calls carry the `X-Project-Id` header and read `req.scope` — the project id stays out of the path. The editor reaches them through its API base (`editorFetch`): `/api/media/…` in the OSS shell, `/api/projects/:projectId/media/…` in a host that mounts the project-scoped router there.
 
 | Method | Endpoint (under the media router) | Middleware | Controller | Description |
 | --- | --- | --- | --- | --- |
@@ -217,19 +217,19 @@ The router applies `resolveActiveProject` so active-project management routes ca
 | `POST` | `/refresh-usage` | | `refreshMediaUsage` | Full usage rescan for the project. |
 | `GET` | `/:fileId/usage` | | `getMediaFileUsage` | Usage info for one file. |
 | `DELETE` | `/:fileId` | | `deleteProjectMedia` | Delete one file; blocked if in use. |
+| `PUT` | `/:fileId/metadata` | `metadataValidators` | `updateMediaMetadata` | Update alt/title/caption (HTML stripped). The default language updates the `media_files` row; `?language=` for another language writes its `media_file_translations` override (an omitted field inherits). |
 
-Browser-native loads (`<img src>`, downloads) and the metadata editor cannot carry the `X-Project-Id` header, so these keep the project id in the path and read `req.params.projectId`:
+**Files** (`routes/mediaFiles.js`, its own `mediaFileRouter`). Browser-native loads (`<img src>`, audio/video, downloads, "open in a new tab") cannot carry the `X-Project-Id` header, so these keep the project id in the path and `serveProjectMedia` reads `req.params.projectId`. Each route runs `standardJsonParser` and `resolveActiveProject` itself. The OSS shell mounts the router at `/api/media` (before the project-scoped router), giving `/api/media/projects/:projectId/…` — the URLs the editor and preview renders build. A host that serves those URLs itself doesn't mount it.
 
-| Method | Endpoint | Controller | Description |
+| Method | Endpoint (under `mediaFileRouter`) | Controller | Description |
 | --- | --- | --- | --- |
-| `PUT` | `/projects/:projectId/media/:fileId/metadata` | `updateMediaMetadata` | Update alt/title/caption (HTML stripped). The default language updates the `media_files` row; `?language=` for another language writes its `media_file_translations` override (an omitted field inherits). |
 | `GET` | `/projects/:projectId/media/:fileId` | `serveProjectMedia` | Serve a file by metadata ID. |
 | `GET` | `/projects/:projectId/uploads/images/:filename` | `serveProjectMedia` | Serve an image by filename. |
 | `GET` | `/projects/:projectId/uploads/files/:filename` | `serveProjectMedia` | Serve a file asset / audio by filename. |
 
 **Identifier contract:** `:projectId` is always the project UUID; the backend resolves it to `folderName` for storage keys. If it cannot be resolved the request fails with a standardized code (`PROJECT_NOT_FOUND`, `PROJECT_DIR_MISSING`) — no fallback directories are created.
 
-**TI-03 cross-tenant guard.** The metadata route is path-in-path (`.../media/projects/:projectId/...`). The router-level `resolveActiveProject` owner-checks the stashed/outer id before the inner `:projectId` binds, so `updateMediaMetadata` asserts `projectId === req.scope.projectId` and returns `403` on mismatch — preventing a caller from targeting another tenant's project id in the leaf. OSS standalone is byte-neutral (its single active project's id always equals `req.params.projectId`).
+**Cross-tenant safety of metadata saves (TI-03).** `updateMediaMetadata` takes the project from `req.scope` — the one `resolveActiveProject` resolved, and in a multi-tenant host authorized — and looks the file up within it, so another project's file id is a 404. No project id comes from the path.
 
 ### Upload Flow (`uploadProjectMedia`)
 
@@ -292,7 +292,7 @@ The thumbnail/preview path falls back to the original image when a `thumb` varia
 
 ## 5. Security
 
-Upload validation (MIME allowlist, two-gate size enforcement, decompression-bomb guards, SVG sanitization), the TI-03 cross-tenant metadata guard, and per-scope asset isolation are summarized above. For the platform-wide contract see [Platform Security](core-security.md).
+Upload validation (MIME allowlist, two-gate size enforcement, decompression-bomb guards, SVG sanitization), the project-scoped metadata save (TI-03), and per-scope asset isolation are summarized above. For the platform-wide contract see [Platform Security](core-security.md).
 
 ---
 

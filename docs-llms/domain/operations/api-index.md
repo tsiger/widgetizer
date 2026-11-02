@@ -86,7 +86,7 @@ This index cross-checks the operation directory against the backend surface. It 
 
 ## media
 
-[Route declarations](../../../packages/builder-server/src/routes/media.js) · [Behavior walkthrough](media.md)
+[Route declarations](../../../packages/builder-server/src/routes/media.js) · [File routes](../../../packages/builder-server/src/routes/mediaFiles.js) · [Behavior walkthrough](media.md)
 
 | Method | Local path |
 | --- | --- |
@@ -96,7 +96,7 @@ This index cross-checks the operation directory against the backend surface. It 
 | POST | `/api/media/refresh-usage` |
 | GET | `/api/media/:fileId/usage` |
 | DELETE | `/api/media/:fileId` |
-| PUT | `/api/media/projects/:projectId/media/:fileId/metadata` |
+| PUT | `/api/media/:fileId/metadata` |
 | GET | `/api/media/projects/:projectId/media/:fileId` |
 | GET | `/api/media/projects/:projectId/uploads/images/:filename` |
 | GET | `/api/media/projects/:projectId/uploads/files/:filename` |
