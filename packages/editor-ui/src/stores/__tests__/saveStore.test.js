@@ -439,6 +439,41 @@ describe("saveStore (useAutoSave)", () => {
       });
     });
 
+    // The page editor words the refusal by which part was refused: the site
+    // settings are saved after the page, so the page may already be saved.
+    it("marks a refusal of the site settings as theirs", async () => {
+      seedPageStore();
+      makeThemeStoreLive({ colors: { primary: "#fff" } }, { colors: { primary: "#000" } });
+      useAutoSave.getState().setThemeSettingsModified(true);
+      const err = Object.assign(new Error("no longer in the media library"), { code: "MEDIA_REFERENCE_MISSING", status: 409 });
+      mockThemeStoreState.saveSettings.mockRejectedValueOnce(err);
+
+      await expect(useAutoSave.getState().save(false)).rejects.toMatchObject({
+        code: "MEDIA_REFERENCE_MISSING",
+        savePart: "theme",
+      });
+    });
+
+    it("passes on a refusal it cannot mark unchanged", async () => {
+      seedPageStore();
+      makeThemeStoreLive({ colors: { primary: "#fff" } }, { colors: { primary: "#000" } });
+      useAutoSave.getState().setThemeSettingsModified(true);
+      const err = Object.freeze(Object.assign(new Error("no longer in the media library"), { code: "MEDIA_REFERENCE_MISSING" }));
+      mockThemeStoreState.saveSettings.mockRejectedValueOnce(err);
+
+      await expect(useAutoSave.getState().save(false)).rejects.toBe(err);
+    });
+
+    it("leaves a refusal of the page unmarked", async () => {
+      seedPageStore();
+      useAutoSave.getState().markWidgetModified("w-1");
+      rejectWithMissingMedia();
+
+      const err = await useAutoSave.getState().save(false).catch((e) => e);
+      expect(err.code).toBe("MEDIA_REFERENCE_MISSING");
+      expect(err.savePart).toBeUndefined();
+    });
+
     it("leaves the baseline alone, so the next save still sends the refused edit", async () => {
       const page = seedPageStore();
       useAutoSave.getState().markWidgetModified("w-1");

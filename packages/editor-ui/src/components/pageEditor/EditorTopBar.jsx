@@ -13,6 +13,7 @@ import { pageEditorHref, pageAddHref, pagesListHref } from "../../lib/contentRou
 import { useEditorPath } from "../../lib/routeBase.jsx";
 import { openPagePreview } from "../../lib/openSitePreview.js";
 import { SlotOutlet } from "../../extension/PluginProvider.jsx";
+import { saveFailureMessageKey } from "../../utils/saveFailureMessage.js";
 
 export default function EditorTopBar({
   pageName,
@@ -24,9 +25,11 @@ export default function EditorTopBar({
   const { t } = useTranslation();
   const { hasUnsavedChanges, hasUnsavedPageChanges, isSaving, save, stopAutoSave } = useAutoSave();
 
-  // A manual save that the server refused. Nothing was written and the editor still
-  // holds every edit, so the one thing that must not happen is failing silently —
-  // the refusal the user can act on is an image that has left the library.
+  // A manual save that the server refused. The refused part wrote nothing and the
+  // editor still holds its edits (the page may already be saved when the site
+  // settings are the part refused), so the one thing that must not happen is
+  // failing silently — the refusal the user can act on is an image that has left
+  // the library.
   const saveAndReport = useCallback(() => {
     save(false)
       .then((result) => {
@@ -37,11 +40,7 @@ export default function EditorTopBar({
         }
       })
       .catch((err) => {
-        if (err?.code === "MEDIA_REFERENCE_MISSING") {
-          useToastStore.getState().showToast(t("pageEditor.mediaUsage.missing"), "error");
-        } else {
-          useToastStore.getState().showToast(t("pageEditor.toolbar.saveFailed"), "error");
-        }
+        useToastStore.getState().showToast(t(saveFailureMessageKey(err)), "error");
         console.error("Failed to save:", err);
       });
   }, [save, t]);

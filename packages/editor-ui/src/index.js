@@ -32,3 +32,6 @@ export { subscribeMutationSuccess } from "./lib/mutationEvents.js";
 // only — the caller resolves labels/handlers/enabled state per half. Implements
 // WAI-ARIA menu-button pattern; open/close/outside/Escape are encapsulated.
 export { default as SplitButton } from "./components/ui/SplitButton.jsx";
+// The message key for a page-editor save the server refused, naming the part
+// refused (page or site settings); for a host running its own save button.
+export { saveFailureMessageKey } from "./utils/saveFailureMessage.js";
