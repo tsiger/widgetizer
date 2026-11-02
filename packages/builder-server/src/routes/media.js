@@ -6,7 +6,6 @@ import {
   getProjectMedia,
   uploadProjectMedia,
   deleteProjectMedia,
-  serveProjectMedia,
   uploadWithLimit,
   bulkDeleteProjectMedia,
   updateMediaMetadata,
@@ -44,56 +43,23 @@ router.get("/:fileId/usage", [param("fileId").notEmpty()], validateRequest, getM
 // Delete a media file
 router.delete("/:fileId", [param("fileId").notEmpty()], validateRequest, deleteProjectMedia);
 
-// --- Project-id-in-path routes. Browser-native loads (<img src>, downloads)
-// and the metadata editor cannot carry the X-Project-Id header, so these keep
-// the project id in the URL and read req.params.projectId directly. The hosted
-// shell serves media via the cloud asset adapter's getUrl instead. ---
-
+// Update a file's alt text, title and caption (per language via ?language=).
+//
 // `null` is not a value to clean — it is the request saying "inherit the default
 // language". Trimming it would turn it into a deliberate blank, which is a
 // different thing on disk and to a screen reader. Exported so that rule can be
 // tested on its own; the controller never sees what this strips.
 export const metadataValidators = [
-  param("projectId").notEmpty(),
   param("fileId").notEmpty(),
   body("alt").optional({ nullable: true }).trim().customSanitizer(stripHtmlToText),
   body("title").optional({ nullable: true }).trim().customSanitizer(stripHtmlToText),
   body("caption").optional({ nullable: true }).trim().customSanitizer(stripHtmlToText),
 ];
 
-// Update media metadata
-router.put("/projects/:projectId/media/:fileId/metadata", metadataValidators, validateRequest, updateMediaMetadata);
+router.put("/:fileId/metadata", metadataValidators, validateRequest, updateMediaMetadata);
 
-// Serve a media file by ID
-router.get(
-  "/projects/:projectId/media/:fileId",
-  [param("projectId").notEmpty(), param("fileId").notEmpty()],
-  validateRequest,
-  serveProjectMedia,
-);
-
-// Serve media files directly from uploads/images
-router.get(
-  "/projects/:projectId/uploads/images/:filename",
-  [param("projectId").notEmpty(), param("filename").notEmpty()],
-  validateRequest,
-  (req, res) => {
-    const { filename } = req.params;
-    req.params.filename = filename;
-    serveProjectMedia(req, res);
-  },
-);
-
-// Serve file assets directly from uploads/files
-router.get(
-  "/projects/:projectId/uploads/files/:filename",
-  [param("projectId").notEmpty(), param("filename").notEmpty()],
-  validateRequest,
-  (req, res) => {
-    const { filename } = req.params;
-    req.params.filename = filename;
-    serveProjectMedia(req, res);
-  },
-);
+// The files themselves are served by routes/mediaFiles.js: browser loads
+// (<img src>, downloads) can't carry the X-Project-Id header, so those routes
+// keep the project id in the path and are mounted separately.
 
 export default router;
