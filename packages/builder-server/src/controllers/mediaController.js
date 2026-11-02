@@ -663,40 +663,58 @@ export async function deleteProjectMedia(req, res) {
  * file that can't be read at all — removed or made unreadable after `stat` —
  * still gets a 500 rather than a dropped connection.
  */
-async function streamToResponse(stream, res) {
-  const ready = await new Promise((resolve) => {
-    const settle = (outcome) => {
-      stream.off("readable", onReadable);
-      stream.off("error", onError);
-      res.off("close", onClose);
-      resolve(outcome);
-    };
-    const onReadable = () => settle({ ok: true });
-    const onError = (err) => settle({ ok: false, err });
-    const onClose = () => settle({ ok: false });
-    stream.once("readable", onReadable);
-    stream.once("error", onError);
-    res.once("close", onClose);
-  });
-  if (!ready.ok) {
-    stream.destroy();
-    if (!ready.err) return; // the client left first
-    console.error("Error streaming project media:", ready.err);
-    if (!res.headersSent && !res.destroyed) {
-      // The file's length and range were set for the body that never came.
-      res.removeHeader("Content-Length");
-      res.removeHeader("Content-Range");
-      res.status(500).json({ error: "Failed to serve project media" });
+function streamToResponse(stream, res) {
+  return new Promise((resolve) => {
+    // The client left while the file was being opened: nothing to send it.
+    if (res.destroyed) {
+      stream.destroy();
+      resolve();
+      return;
     }
-    return;
-  }
-
-  let sourceFailed = false;
-  stream.once("error", () => {
-    sourceFailed = true;
-  });
-  pipeline(stream, res, (err) => {
-    if (err && sourceFailed) console.error("Error streaming project media:", err);
+    const stopWaiting = () => {
+      stream.off("readable", onReadable);
+      stream.off("error", onEarlyError);
+      res.off("close", onEarlyClose);
+    };
+    // The pipeline starts inside this callback, so there is no moment between
+    // "readable" and the pipeline when an error or a closed response has no
+    // listener.
+    const onReadable = () => {
+      stopWaiting();
+      if (res.destroyed) {
+        stream.destroy();
+        resolve();
+        return;
+      }
+      let sourceFailed = false;
+      stream.once("error", () => {
+        sourceFailed = true;
+      });
+      pipeline(stream, res, (err) => {
+        if (err && sourceFailed) console.error("Error streaming project media:", err);
+      });
+      resolve();
+    };
+    const onEarlyError = (err) => {
+      stopWaiting();
+      stream.destroy();
+      console.error("Error streaming project media:", err);
+      if (!res.headersSent && !res.destroyed) {
+        // The file's length and range were set for the body that never came.
+        res.removeHeader("Content-Length");
+        res.removeHeader("Content-Range");
+        res.status(500).json({ error: "Failed to serve project media" });
+      }
+      resolve();
+    };
+    const onEarlyClose = () => {
+      stopWaiting();
+      stream.destroy();
+      resolve();
+    };
+    stream.once("readable", onReadable);
+    stream.once("error", onEarlyError);
+    res.once("close", onEarlyClose);
   });
 }
 
@@ -765,6 +783,16 @@ export async function serveProjectMedia(req, res) {
         return res.status(416).setHeader("Content-Range", `bytes */${fileSize}`).end();
       }
 
+      // Express runs this GET handler for HEAD as well: answer with the headers
+      // alone rather than open (and read through) the file. So a HEAD doesn't
+      // notice a file that fails to open after the stat above; a GET would.
+      if (req.method === "HEAD") {
+        res.status(206);
+        res.setHeader("Content-Range", `bytes ${start}-${end}/${fileSize}`);
+        res.setHeader("Content-Length", end - start + 1);
+        return res.end();
+      }
+
       const rangeStream = await req.adapters.assetStorage.download(scope, key, { start, end });
       if (!rangeStream) {
         return res.status(404).json({ error: "File not found" });
@@ -776,7 +804,11 @@ export async function serveProjectMedia(req, res) {
       return;
     }
 
-    // No (or malformed) range — stream the full file.
+    // No (or malformed) range — stream the full file (HEAD: its headers only).
+    if (req.method === "HEAD") {
+      res.setHeader("Content-Length", fileSize);
+      return res.end();
+    }
     const stream = await req.adapters.assetStorage.download(scope, key);
     if (!stream) {
       return res.status(404).json({ error: "File not found" });
