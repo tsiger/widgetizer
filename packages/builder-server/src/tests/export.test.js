@@ -21,7 +21,10 @@ import assert from "node:assert/strict";
 import fs from "fs-extra";
 import path from "path";
 import os from "os";
+import crypto from "crypto";
+import { PassThrough } from "stream";
 import { fileURLToPath } from "node:url";
+import AdmZip from "adm-zip";
 
 // ============================================================================
 // Isolated test environment
@@ -1318,14 +1321,39 @@ describe("downloadExport", () => {
     await fs.remove(path.join(PUBLISH_DIR, testExportDir));
   });
 
-  it("sets correct ZIP response headers", async () => {
-    const req = mockReq({
-      params: { exportDir: testExportDir },
-      scope: { projectId: PROJECT_ID, folderName: testExportDir },
+  /** A response that is a real writable stream, collecting what the ZIP sends. */
+  function streamRes() {
+    const res = new PassThrough();
+    const chunks = [];
+    res.on("data", (chunk) => chunks.push(chunk));
+    Object.assign(res, {
+      _status: 200,
+      _headers: {},
+      headersSent: false,
+      status(code) {
+        res._status = code;
+        return res;
+      },
+      json(data) {
+        res._json = data;
+        return res;
+      },
+      setHeader(key, value) {
+        res._headers[key] = value;
+        return res;
+      },
+      body: () => Buffer.concat(chunks),
     });
-    const res = mockRes();
+    return res;
+  }
 
-    // downloadExport pipes to res as a stream — we need a writable mock
+  const downloadReq = (exportDir) =>
+    mockReq({ params: { exportDir }, scope: { projectId: PROJECT_ID, folderName: exportDir } });
+
+  it("sets correct ZIP response headers", async () => {
+    const req = downloadReq(testExportDir);
+    const res = streamRes();
+
     await downloadExport(req, res);
 
     assert.equal(res._headers["Content-Type"], "application/zip");
@@ -1334,6 +1362,81 @@ describe("downloadExport", () => {
       "Content-Disposition should include dir name",
     );
     assert.ok(res._headers["Content-Disposition"].includes(".zip"), "Should have .zip extension");
+  });
+
+  it("zips folders (empty ones too) and dotfiles, and leaves out system junk", async () => {
+    const dir = "test-download-entries";
+    const full = path.join(PUBLISH_DIR, dir);
+    await fs.outputFile(path.join(full, "index.html"), "a");
+    await fs.outputFile(path.join(full, "assets", "css", "s.css"), "b");
+    await fs.ensureDir(path.join(full, "empty"));
+    await fs.outputFile(path.join(full, ".htaccess"), "c");
+    await fs.outputFile(path.join(full, "sub", ".hidden", "h.txt"), "d");
+    await fs.outputFile(path.join(full, ".DS_Store"), "junk");
+    await fs.outputFile(path.join(full, "assets", "Thumbs.db"), "junk");
+    await fs.outputFile(path.join(full, "__MACOSX", "x"), "junk");
+    // Links are kept as links and never followed — not into a folder of the
+    // export, and not out of it.
+    const outside = path.join(PUBLISH_DIR, "test-download-outside");
+    await fs.outputFile(path.join(outside, "secret.txt"), "outside the export");
+    await fs.symlink("index.html", path.join(full, "link.html"));
+    await fs.symlink("assets", path.join(full, "linkdir"));
+    await fs.symlink(path.relative(full, outside), path.join(full, "escape"));
+    try {
+      const res = streamRes();
+      const ended = new Promise((resolve) => res.on("end", resolve));
+      await downloadExport(downloadReq(dir), res);
+      await ended;
+      const entries = new AdmZip(res.body()).getEntries();
+      const names = entries.map((entry) => entry.entryName).sort();
+      assert.deepEqual(names, [
+        ".htaccess",
+        "assets/",
+        "assets/css/",
+        "assets/css/s.css",
+        "empty/",
+        "escape",
+        "index.html",
+        "link.html",
+        "linkdir",
+        "sub/",
+        "sub/.hidden/",
+        "sub/.hidden/h.txt",
+      ]);
+      const SYMLINK = 0o120000;
+      const links = Object.fromEntries(
+        entries
+          .filter((entry) => ((entry.header.attr >>> 16) & 0o170000) === SYMLINK)
+          .map((entry) => [entry.entryName, entry.getData().toString()]),
+      );
+      assert.deepEqual(links, { escape: "../test-download-outside", "link.html": "index.html", linkdir: "assets" });
+    } finally {
+      await fs.remove(full);
+      await fs.remove(outside);
+    }
+  });
+
+  it("stops when the client abandons the download, and the request finishes", async () => {
+    const dir = "test-download-abandoned";
+    const full = path.join(PUBLISH_DIR, dir);
+    // Incompressible and large, so the download is still mid-file when the client leaves.
+    await fs.outputFile(path.join(full, "big.bin"), crypto.randomBytes(32 * 1024 * 1024));
+    try {
+      const res = streamRes();
+      // The client leaves a megabyte in, partway through the large file.
+      let received = 0;
+      res.on("data", (chunk) => {
+        received += chunk.length;
+        if (received > 1024 * 1024 && !res.destroyed) res.destroy();
+      });
+      const outcome = await Promise.race([
+        downloadExport(downloadReq(dir), res).then(() => "finished"),
+        new Promise((resolve) => setTimeout(() => resolve("still running"), 3000)),
+      ]);
+      assert.equal(outcome, "finished", "an abandoned download must stop, not run on");
+    } finally {
+      await fs.remove(full);
+    }
   });
 
   it("returns 400 when exportDir is missing", async () => {

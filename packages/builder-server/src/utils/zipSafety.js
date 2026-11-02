@@ -53,13 +53,18 @@ export function unpackBudget(zipSizeBytes) {
 }
 
 /**
- * Stream one entry's unpacked bytes into `sink`, stopping as soon as they pass
- * `maxBytes`. The sizes a ZIP records about itself can be false, so the limit
- * applies to the bytes actually produced; the recorded length and CRC are then
- * checked, as adm-zip's own reader did, so a damaged entry is refused.
+ * Stream one entry's unpacked bytes into the sink `openSink()` returns,
+ * stopping as soon as they pass `maxBytes`. The sizes a ZIP records about itself
+ * can be false, so the limit applies to the bytes actually produced; the
+ * recorded length and CRC are then checked, as adm-zip's own reader did, so a
+ * damaged entry is refused.
+ *
+ * The sink is opened only once every check that can refuse the entry up front
+ * has passed, right before `pipeline` takes charge of it: a file write stream
+ * opened and then abandoned by an early refusal would keep its descriptor open.
  * @returns {Promise<number>} bytes produced
  */
-async function streamEntry(entry, maxBytes, sink, onTooLarge = () => new UnsafeZipError(ZIP_BOMB_MESSAGE)) {
+async function streamEntry(entry, maxBytes, openSink, onTooLarge = () => new UnsafeZipError(ZIP_BOMB_MESSAGE)) {
   const { header } = entry;
   if (header.encrypted || header.flags & 1) {
     throw new UnsafeZipError(`This ZIP file contains an encrypted entry (${entry.entryName}), which cannot be read.`);
@@ -76,7 +81,7 @@ async function streamEntry(entry, maxBytes, sink, onTooLarge = () => new UnsafeZ
   // An empty file some writers store as "deflated" with no bytes at all, which
   // the inflater would otherwise read as a cut-off stream.
   if (compressed.length === 0 && Number(header.size) === 0) {
-    await pipeline(Readable.from([]), sink);
+    await pipeline(Readable.from([]), openSink());
     return 0;
   }
 
@@ -90,7 +95,7 @@ async function streamEntry(entry, maxBytes, sink, onTooLarge = () => new UnsafeZ
       callback(null, chunk);
     },
   });
-  const stages = [Readable.from([compressed]), ...(header.method === 8 ? [zlib.createInflateRaw()] : []), counter, sink];
+  const stages = [Readable.from([compressed]), ...(header.method === 8 ? [zlib.createInflateRaw()] : []), counter, openSink()];
   try {
     await pipeline(...stages);
   } catch (error) {
@@ -124,7 +129,7 @@ export async function readZipEntry(entry, zipSizeBytes) {
     limit === MAX_METADATA_BYTES
       ? new UnsafeZipError(`${entry.entryName} in this ZIP file is too large to be what it claims.`)
       : new UnsafeZipError(ZIP_BOMB_MESSAGE);
-  await streamEntry(entry, limit, collect, tooLarge);
+  await streamEntry(entry, limit, () => collect, tooLarge);
   return Buffer.concat(chunks);
 }
 
@@ -198,6 +203,6 @@ export async function extractZipSafely(zip, zipSizeBytes, destDir, { skip } = {}
     written.add(key);
 
     await fs.ensureDir(path.dirname(target));
-    total += await streamEntry(entry, budget - total, fs.createWriteStream(target));
+    total += await streamEntry(entry, budget - total, () => fs.createWriteStream(target));
   }
 }
