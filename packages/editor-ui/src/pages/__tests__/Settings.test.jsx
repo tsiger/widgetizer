@@ -170,6 +170,57 @@ describe("Site settings save", () => {
   });
 });
 
+describe("Site settings load", () => {
+  it("shows a failed load with a way to try again", async () => {
+    getThemeSettings.mockReset().mockRejectedValueOnce(new Error("offline")).mockResolvedValueOnce(
+      JSON.parse(JSON.stringify(THEME)),
+    );
+    render(<Settings />);
+
+    expect(await screen.findByText("themeSettings.toasts.loadError")).toBeTruthy();
+    expect(screen.queryByText("themeSettings.noSettings")).toBe(null);
+    fireEvent.click(screen.getByRole("button", { name: "themeSettings.retry" }));
+
+    expect(await screen.findByText("change accent")).toBeTruthy();
+    expect(getThemeSettings).toHaveBeenCalledTimes(2);
+  });
+
+  it("loads again on return after a failed load", async () => {
+    getThemeSettings.mockReset().mockRejectedValueOnce(new Error("offline")).mockResolvedValueOnce(
+      JSON.parse(JSON.stringify(THEME)),
+    );
+    const first = render(<Settings />);
+    await screen.findByText("themeSettings.toasts.loadError");
+    first.unmount();
+
+    render(<Settings />);
+
+    expect(await screen.findByText("change accent")).toBeTruthy();
+    expect(getThemeSettings).toHaveBeenCalledTimes(2);
+  });
+
+  it("doesn't start a second load while one is still running", async () => {
+    let land;
+    getThemeSettings.mockReset().mockReturnValueOnce(new Promise((resolve) => (land = resolve)));
+    const first = render(<Settings />);
+    first.unmount();
+    render(<Settings />);
+
+    land(JSON.parse(JSON.stringify(THEME)));
+    expect(await screen.findByText("change accent")).toBeTruthy();
+    expect(getThemeSettings).toHaveBeenCalledTimes(1);
+  });
+
+  it("tries once per visit when the load keeps failing", async () => {
+    getThemeSettings.mockReset().mockRejectedValue(new Error("offline"));
+    render(<Settings />);
+
+    await screen.findByText("themeSettings.toasts.loadError");
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    expect(getThemeSettings).toHaveBeenCalledTimes(1);
+  });
+});
+
 describe("Site settings discard", () => {
   // Reproduced 2026-10-09: edit a setting, leave and choose "Discard changes",
   // then save anything in the page editor — the discarded value was written to

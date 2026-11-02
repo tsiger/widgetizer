@@ -268,7 +268,7 @@ When the user switches projects, the app must ensure no data from the previous p
 - **themeStore** is the canonical owner of theme settings across Settings and the editor. It uses `activeLoadId` to drop stale loads, and its `resetForProjectChange()` action is invoked by the shared route boundary on real project switches. Applying a theme update calls its `invalidate()`, so Settings and the editor load the updated settings instead of keeping (and saving) the copy they loaded before; an unsaved Site settings draft is discarded with it.
 - **widgetStore** resets schemas and selection via `resetForProjectChange()`, reads the project ID internally via `getActiveProjectId()`, and now relies on the shared route boundary rather than page-local reset calls.
 - **saveStore** preserves edits when a stale save is rejected with `PROJECT_MISMATCH`, stops auto-save retries, and is reset centrally on project switches by the shared route boundary.
-- **Settings.jsx** reads/writes through `themeStore`; it still guards save completion against mid-flight project changes, but project-switch reset ownership now lives in the route boundary rather than the page component.
+- **Settings.jsx** reads/writes through `themeStore`; it guards save completion against mid-flight project changes, while project-switch reset ownership lives in the route boundary. A failed load shows its error with a **Try again** button, and opening Site settings again reloads a project whose settings never arrived (once per visit, so a load that keeps failing doesn't loop).
 - **useExportState / ExportCreator** guard history loads and export completion against project changes mid-flight
 
 ### Known limitation

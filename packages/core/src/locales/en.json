@@ -969,6 +969,7 @@
     "title": "Site settings",
     "loading": "Loading settings...",
     "noSettings": "No theme settings available",
+    "retry": "Try again",
     "save": "Save Settings",
     "cancel": "Cancel",
     "toasts": {
