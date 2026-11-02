@@ -168,6 +168,23 @@ describe("Site settings save", () => {
     await waitFor(() => expect(showToast).toHaveBeenCalledWith("themeSettings.toasts.conflict", "warning"));
     expect(useThemeStore.getState().hasUnsavedThemeChanges()).toBe(true);
   });
+
+  // Retrying cannot fix a save refused for an image deleted from the library.
+  it("says the chosen image is no longer in the library", async () => {
+    saveThemeSettingChanges.mockRejectedValueOnce(
+      Object.assign(new Error("missing"), { status: 409, code: "MEDIA_REFERENCE_MISSING" }),
+    );
+    fireEvent.click(await openAndEdit());
+
+    await waitFor(() => expect(showToast).toHaveBeenCalledWith("themeSettings.toasts.mediaMissing", "error"));
+  });
+
+  it("keeps the generic message for any other failed save", async () => {
+    saveThemeSettingChanges.mockRejectedValueOnce(Object.assign(new Error("boom"), { status: 500 }));
+    fireEvent.click(await openAndEdit());
+
+    await waitFor(() => expect(showToast).toHaveBeenCalledWith("themeSettings.toasts.saveError", "error"));
+  });
 });
 
 describe("Site settings load", () => {

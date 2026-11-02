@@ -129,7 +129,10 @@ export default function Settings() {
     } catch (error) {
       if (useProjectStore.getState().activeProject?.id !== projectAtSaveStart.id) return;
       console.error("Failed to save theme settings:", error);
-      showToast(t("themeSettings.toasts.saveError"), "error");
+      // Retrying can't fix a refusal for an image deleted from the library.
+      const message =
+        error?.code === "MEDIA_REFERENCE_MISSING" ? "themeSettings.toasts.mediaMissing" : "themeSettings.toasts.saveError";
+      showToast(t(message), "error");
     }
   };
 
