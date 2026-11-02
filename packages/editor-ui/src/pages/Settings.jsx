@@ -46,6 +46,7 @@ export default function Settings() {
 
   const settings = useThemeStore((s) => s.settings);
   const loading = useThemeStore((s) => s.loading);
+  const loadError = useThemeStore((s) => s.error);
   const saving = useThemeStore((s) => s.saving);
   const hasChanges = useThemeStore((s) => s.hasUnsavedThemeChanges());
   const { loadSettings, updateThemeSetting, resetThemeSettings, saveSettings, clearConflict, discardDraft } =
@@ -60,10 +61,12 @@ export default function Settings() {
   // The project-scoped boundary in RequireActiveProject remounts this
   // component on project switch. The loadedProjectId check preserves
   // in-flight drafts when navigating Settings -> Editor -> Settings
-  // within the same project.
+  // within the same project. A failed load leaves this project's id with no
+  // settings, so coming back tries again — once per visit: the store is read
+  // here, not subscribed to, or a load that keeps failing would retry in a loop.
   useEffect(() => {
-    const { loadedProjectId } = useThemeStore.getState();
-    if (loadedProjectId !== activeProject?.id) {
+    const { loadedProjectId, settings: loaded, loading: inFlight } = useThemeStore.getState();
+    if (loadedProjectId !== activeProject?.id || (!loaded && !inFlight)) {
       loadSettings(activeProject?.id);
     }
   }, [activeProject?.id, loadSettings]);
@@ -126,7 +129,10 @@ export default function Settings() {
     } catch (error) {
       if (useProjectStore.getState().activeProject?.id !== projectAtSaveStart.id) return;
       console.error("Failed to save theme settings:", error);
-      showToast(t("themeSettings.toasts.saveError"), "error");
+      // Retrying can't fix a refusal for an image deleted from the library.
+      const message =
+        error?.code === "MEDIA_REFERENCE_MISSING" ? "themeSettings.toasts.mediaMissing" : "themeSettings.toasts.saveError";
+      showToast(t(message), "error");
     }
   };
 
@@ -171,6 +177,13 @@ export default function Settings() {
               values={extractSettingsValues(settings)}
               onChange={handleSettingChange}
             />
+          ) : loadError ? (
+            <div className="p-6 text-center text-slate-500">
+              <p className="mb-4">{t("themeSettings.toasts.loadError")}</p>
+              <Button onClick={() => loadSettings(activeProject?.id)} variant="secondary">
+                {t("themeSettings.retry")}
+              </Button>
+            </div>
           ) : (
             <div className="p-6 text-center text-slate-500">{t("themeSettings.noSettings")}</div>
           )}

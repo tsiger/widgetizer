@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { resolveUsageTitle, buildUsageTitleMap, GLOBAL_USAGE_TITLES } from "../mediaUsageDisplay";
+import { resolveUsageTitle, buildUsageTitleMap, GLOBAL_USAGE_TITLES, mediaUsageStaleMessage } from "../mediaUsageDisplay";
 
 describe("resolveUsageTitle", () => {
   it("returns title/name/id from an object entry", () => {
@@ -219,5 +219,23 @@ describe("usage labels on a site with more than one language", () => {
     expect(resolveUsageTitle("page:slug:el/sxetika", map)).toBe("Sxetika (Ελληνικά)");
     expect(resolveUsageTitle("collection:slug:news/story", map)).toBe("Article: Story");
     expect(resolveUsageTitle("collection:slug:news/el/story", map)).toBe("Article: Istoria (Ελληνικά)");
+  });
+});
+
+describe("mediaUsageStaleMessage", () => {
+  const t = (key) => key;
+
+  it("names the page when the page carried the warning", () => {
+    expect(mediaUsageStaleMessage({ page: true, theme: false }, t)).toBe("pageEditor.mediaUsage.stale");
+  });
+
+  it("names the site settings when only they carried it", () => {
+    expect(mediaUsageStaleMessage({ page: false, theme: true }, t)).toBe("themeSettings.toasts.mediaUsageStale");
+  });
+
+  it("names both when both carried it", () => {
+    expect(mediaUsageStaleMessage({ page: true, theme: true }, t)).toBe(
+      "pageEditor.mediaUsage.stale themeSettings.toasts.mediaUsageStale",
+    );
   });
 });

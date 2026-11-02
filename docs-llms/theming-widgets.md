@@ -624,7 +624,7 @@ widgets/
 {% enqueue_script src: "slideshow.js", priority: 30 %}
 ```
 
-Enqueued assets are rendered by `{% header_assets %}` (styles) and `{% footer_assets %}` (scripts) in the layout template, sorted by `priority`. During editor partial updates (widget morphing), newly enqueued assets are appended to the single-widget render response and loaded by the preview runtime, so a script like `carousel.js` becomes available immediately when a setting change triggers its enqueue.
+Enqueued assets are rendered by `{% header_assets %}` (styles) and `{% footer_assets %}` (scripts) in the layout template, sorted by `priority`. During editor partial updates (widget morphing), newly enqueued assets are appended to the single-widget render response and loaded by the preview runtime, so a script like `carousel.js` becomes available immediately when a setting change triggers its enqueue. The runtime picks up every stylesheet link in the response, including ones written in the widget's own markup; one with no address or an address the browser can't parse is skipped, and the rest of the update still applies.
 
 **Asset resolution:**
 

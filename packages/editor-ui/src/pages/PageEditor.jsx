@@ -19,6 +19,7 @@ import useNavigationGuard from "../hooks/useNavigationGuard";
 import { EditingLanguageProvider } from "../lib/editingLanguage.jsx";
 import useDeleteKeyShortcut from "../hooks/useDeleteKeyShortcut";
 import { useThemeLocale } from "../hooks/useThemeLocale";
+import { mediaUsageStaleMessage } from "../utils/mediaUsageDisplay";
 
 export default function PageEditor() {
   const { t } = useTranslation();
@@ -87,7 +88,7 @@ export default function PageEditor() {
   const mediaUsageStale = useAutoSave((state) => state.mediaUsageStale);
   useEffect(() => {
     if (!mediaUsageStale) return;
-    useToastStore.getState().showToast(t("pageEditor.mediaUsage.stale"), "warning");
+    useToastStore.getState().showToast(mediaUsageStaleMessage(mediaUsageStale, t), "warning");
     useAutoSave.getState().clearMediaUsageStale();
   }, [mediaUsageStale, t]);
 

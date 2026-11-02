@@ -174,6 +174,10 @@ Lives in builder-server. It delegates to `req.adapters.scopeResolver.resolveScop
 - `subscribeMutationSuccess(handler)` (`lib/mutationEvents.js`, exported from the package root) — registers a listener called with `{ method, path }` after a successful modifying request; returns an unsubscribe function. Two announce points: `apiFetch` (any non-GET/HEAD/OPTIONS response that is `ok` and not a followed redirect; `path` as passed in, API base included for editor calls) and `uploadRequest` (XHR uploads, announced as `POST` on a 2xx unless the XHR followed a redirect).
 - "Success" means HTTP success, not a content change: read-shaped POSTs (preview render, export, media refresh-usage) and a `207` partial result are announced too, so subscribers filter for what they care about. A listener that throws or returns a rejecting promise is logged and never breaks the request.
 
+### Save-failure message
+
+- `saveFailureMessageKey(err)` (`utils/saveFailureMessage.js`, exported from the package root) — the i18n key for a page-editor save the server refused, for a host running its own save button: a refusal over an image no longer in the media library names the part refused (`pageEditor.mediaUsage.missing`, or `pageEditor.mediaUsage.missingSiteSettings` when `saveStore` marked the refusal as the site settings' with `savePart: "theme"` — they save after the page, so the page may already be saved); anything else is `pageEditor.toolbar.saveFailed`.
+
 ### Route base
 
 - `lib/routeBase.jsx` — `RouteBaseProvider` + `useEditorPath()` (React context) builds hrefs from a configurable base: `""` in OSS, `/sites/:siteId/edit` in hosted. Internal links go through `useEditorPath()` so they resolve correctly under either host.
