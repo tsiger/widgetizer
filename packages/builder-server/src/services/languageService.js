@@ -247,7 +247,7 @@ async function seedGlobals(storage, scope, lang, menuRefs) {
     // Preflight has already proven this readable, so a parse error here would
     // be a real surprise rather than a missing file.
     const schema = await readJson(storage, scope, `widgets/global/${widget.type || type}/schema.json`);
-    // A header saved before repeated blocks were dropped can still carry them.
+    // A stored header can carry repeated blocks (written by hand, restored from a backup).
     const copy = uniqueBlockOrder(withRemappedMenus(widget, schema, menuRefs));
     await storage.write(scope, globalKey(type, lang), JSON.stringify(copy, null, 2));
     // The copy holds the same images as its source; without its own usage rows
@@ -282,7 +282,7 @@ async function seedAreas(storage, scope, lang, menuRefs, areaIds) {
       }
       widgets[widgetId] = schema ? withRemappedMenus(widget, schema, menuRefs) : widget;
     }
-    // An area saved before repeats were dropped can still carry them.
+    // A stored area can carry repeats (written by hand, restored from a backup).
     const copy = { ...area, widgets: uniqueBlockOrders(widgets), widgetsOrder: uniqueWidgetOrder(area.widgetsOrder) };
     await storage.write(scope, areaKey(id, lang), JSON.stringify(copy, null, 2));
     await updateAreaMediaUsage(scope.projectId, id, copy, lang);

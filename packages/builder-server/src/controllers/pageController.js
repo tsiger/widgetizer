@@ -1023,7 +1023,7 @@ export async function duplicatePage(req, res) {
     const uuid = randomUUID();
     const newPage = {
       ...originalPageData,
-      // A file saved before repeats were dropped can still carry them.
+      // A stored file can carry repeats (written by hand, restored from a backup).
       widgets: uniqueBlockOrders(duplicatedWidgets),
       widgetsOrder: uniqueWidgetOrder(originalPageData.widgetsOrder),
       uuid,
@@ -1098,7 +1098,7 @@ export async function createPageLanguageVersion(req, res) {
         // the new version at the other language. The new version starts with its
         // own automatic address instead.
         ...(source.seo ? { seo: { ...source.seo, canonical_url: "" } } : {}),
-        // A file saved before repeats were dropped can still carry them.
+        // A stored file can carry repeats (written by hand, restored from a backup).
         widgetsOrder: uniqueWidgetOrder(source.widgetsOrder),
         widgets: uniqueBlockOrders(source.widgets),
         uuid: randomUUID(),

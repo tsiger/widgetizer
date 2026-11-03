@@ -248,7 +248,7 @@ describe("loading a page's shared areas", () => {
     expect(useAutoSave.getState().hasUnsavedPageChanges()).toBe(false);
   });
 
-  // Content saved before repeats were dropped can still carry them; the editor
+  // Stored content can carry repeats (written by hand, restored from a backup); the editor
   // lists each widget once, as the page renders it.
   it("lists a widget the stored order names twice once, and calls nothing unsaved", async () => {
     getPage.mockResolvedValue({

@@ -209,7 +209,7 @@ describe("create a page's version in another language", () => {
   });
 
   it("copies the order once, though the source names a widget twice", async () => {
-    // As a page saved before repeats were dropped would be on disk.
+    // As a page written by hand or restored from a backup can be on disk.
     await seedPage("about", { widgets: { a: { type: "text" }, b: { type: "text" } }, widgetsOrder: ["a", "a", "b", "a"] });
     const res = await createPageVersion("about", { targetLanguage: "el" });
     assert.equal(res._status, 201);

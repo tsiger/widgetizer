@@ -170,7 +170,7 @@ describe("a language", () => {
 
   it("copies an area's order once, though the default language's names a widget twice", async () => {
     const project = await createSite("Repeats");
-    // As an area saved before repeats were dropped would be on disk.
+    // As an area written by hand or restored from a backup can be on disk.
     const english = await fs.readJson(areaPath(project));
     const [first] = english.widgetsOrder;
     await fs.writeJson(areaPath(project), { ...english, widgetsOrder: [first, ...english.widgetsOrder, first] });

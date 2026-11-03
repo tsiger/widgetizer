@@ -92,7 +92,7 @@ async function readSharedAreas(language) {
       const area = data.areas?.[id];
       sharedAreas[id] = {
         widgets: uniqueBlockOrders(area?.widgets) || {},
-        // Each widget once, as it renders (stored content can predate that rule).
+        // Each widget once, as it renders (stored content can carry repeats).
         widgetsOrder: Array.isArray(area?.widgetsOrder)
           ? uniqueWidgetOrder(area.widgetsOrder)
           : Object.keys(area?.widgets || {}),
@@ -186,8 +186,8 @@ const usePageStore = create(
           const cleanPageData = {
             ...pageData,
             widgets: cleanWidgets,
-            // Each widget once, as the page renders it (a stored file can predate
-            // that rule); the next save writes the cleaned order.
+            // Each widget once, as the page renders it (a stored file can carry
+            // repeats); the next save writes the cleaned order.
             ...(Array.isArray(pageData.widgetsOrder) ? { widgetsOrder: uniqueWidgetOrder(pageData.widgetsOrder) } : {}),
           };
 

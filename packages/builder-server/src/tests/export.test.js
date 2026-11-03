@@ -1949,8 +1949,8 @@ describe("file asset export", () => {
   });
 });
 
-// A page file whose order names a widget more than once (saved before repeats
-// were dropped, or written by hand) renders it once.
+// A page file whose order names a widget more than once (written by hand, or
+// restored from a backup) renders it once.
 describe("exportProject — a page order that names a widget more than once", () => {
   const repeatsPage = () => path.join(getProjectPagesDir(PROJECT_FOLDER), "repeats.json");
   after(async () => {

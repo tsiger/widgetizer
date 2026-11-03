@@ -772,8 +772,8 @@ describe("buildFormsManifest — a repeated form widget", () => {
     return null;
   };
 
-  // A guard: identical forms already merge by key; the next case is the one a
-  // repeat used to change.
+  // A guard: identical forms merge by key; the next case is the one a repeat
+  // affects.
   it("builds the same manifest as the form named once", () => {
     const widget = makeFormWidget({ formName: "Contact", blocks: SIMPLE_FIELDS });
     assert.deepEqual(buildFormsManifest(pages(["w1", "w1", "w1"], widget), APP_VERSION), buildFormsManifest(pages(["w1"], widget), APP_VERSION));

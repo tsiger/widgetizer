@@ -65,7 +65,7 @@ export async function saveSharedArea(req, res) {
     const maxWidgets = typeof widgetCap === "number" && widgetCap > 0 ? widgetCap : MAX_WIDGETS_PER_PAGE;
     // A repeated id is the same widget again, rendered on every page. Dropped
     // rather than refused: the editor posts back the order it loaded.
-    // A body that isn't an object is refused just below, as before.
+    // A body that isn't an object is refused just below.
     const body = {
       ...req.body,
       widgets: uniqueBlockOrders(req.body?.widgets),

@@ -1963,7 +1963,7 @@ describe("a widget order that names a widget more than once", () => {
 
   it("is copied once by a duplicate", async () => {
     const page = await createTestPage("Repeats Source");
-    // As a page saved before repeats were dropped would be on disk.
+    // As a page written by hand or restored from a backup can be on disk.
     const file = getPagePath(activeProject.folderName, page.slug);
     await fs.writeJson(file, { ...(await fs.readJson(file)), widgets, widgetsOrder: ["a", "a", "b"] });
 
