@@ -202,6 +202,37 @@ describe("shared areas in an export", () => {
   });
 });
 
+// The page's pagination plan names its listing widget by id. An area widget can
+// carry the same id (stored content isn't kept unique across files), and it is not
+// the page's listing: it lists from the start on every copy of the page.
+describe("an area widget with the id of the page's paginating widget", () => {
+  const enArea = () =>
+    areaOf({
+      a1: notice("Shared English"),
+      a3: {
+        type: "areanav",
+        settings: { nav: "m-main", cta: { href: "about.html", text: "About us", pageUuid: "p-en-about" } },
+      },
+    });
+  let exportDir;
+  before(async () => {
+    await writeArea("", areaOf({ w1: { type: "news-grid", settings: { limit: 1 } } }));
+    await resetExports();
+    const res = await runExport();
+    assert.equal(res._status, 200, JSON.stringify(res._json));
+    exportDir = latestExportDir();
+  });
+  after(() => writeArea("", enArea()));
+
+  it("gets neither the page's slice nor its pager", async () => {
+    for (const file of ["index.html", "page/2.html"]) {
+      const area = areaOn(await fs.readFile(path.join(exportDir, ...file.split("/")), "utf8"));
+      assert.match(area, /<li>\s*Alpha\s*<\/li>/, file);
+      assert.doesNotMatch(area, /Beta/, file);
+    }
+  });
+});
+
 describe("shared areas in the editor preview", () => {
   async function preview(pageData) {
     const res = { _status: 200, _json: null, status(code) { res._status = code; return res; }, json(data) { res._json = data; return res; } };

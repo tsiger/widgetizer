@@ -79,10 +79,12 @@ export default function PagePreview() {
     let cancelled = false;
     (async () => {
       try {
-        const { globalWidgets } = usePageStore.getState();
+        // The areas go with the page as the store holds them: a load can repair ids
+        // in both, and the server renders its stored copy of any area not sent.
+        const { globalWidgets, sharedAreas } = usePageStore.getState();
         const themeSettings = useThemeStore.getState().settings;
         const { token } = await fetchPreviewToken(
-          { ...page, globalWidgets },
+          { ...page, globalWidgets, sharedAreas },
           themeSettings,
           "standalone",
           Number(pageNumber) || 1,

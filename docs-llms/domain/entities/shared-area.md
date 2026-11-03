@@ -31,6 +31,10 @@ With the page: Save and autosave include a changed area, undo covers it, and lea
 
 If two windows edit the same area, the last save wins, as for the header and footer.
 
+### When an area widget has the same id as a page widget
+
+Each file keeps its widget ids unique, but an area and a page (or two areas) can use the same id, for example when a theme update adds an area. When the page opens, the editor gives the area's widget a new id, saved with the page, and says which ids it renamed. The page's widget keeps its id. See [widget ids](widget.md#widget-ids).
+
 ### When a theme stops showing an area
 
 The content is kept. The editor lists it as "not shown by this theme", its images stay protected from deletion, its links stay maintained, and backups carry it. If the theme brings the area back under the same id, the content shows again.
