@@ -13,9 +13,13 @@
  * reproduces today's OSS behavior.
  *
  * Note: actor-scoped / shell calls (projects, themes, app settings) and the few
- * project-id-in-path editor endpoints (e.g. `/api/projects/:id/widgets`, media,
- * export) keep using `apiFetch` with absolute paths until the hosted route
- * scheme is aligned (Stage 2).
+ * project-id-in-path editor endpoints (e.g. `/api/projects/:id/widgets`,
+ * export) keep using `apiFetch` with absolute paths. Media files the browser
+ * loads itself (`<img src>`, `window.open`) are absolute too
+ * (`/api/media/projects/:id/…`): such a load can't carry the `X-Project-Id`
+ * header, so the project id is in the path, and the shell serves those URLs
+ * from its own mount (the OSS shell: `mediaFileRouter` at `/api/media`). Media
+ * management, metadata saves included, goes through this base.
  */
 let _apiBase = "/api";
 

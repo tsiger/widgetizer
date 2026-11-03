@@ -24,4 +24,4 @@ T4 browser smoke test · T17 stricter old tests · T33 repeated editor code · T
 
 ### Embedding apps (not OSS release work)
 
-T74 complete page-render entry point · H-PAGES enforce a page allowance · H-WRITES consistent custom saves · H-ADAPTERS verify adapters · H-RENDER custom publishing · H-BACKUP custom backup and language setup · H-THEMES custom theme updates · T30 project copying · T49 helpers through storage adapters · H-MULTIPROCESS several servers on one project
+T74 complete page-render entry point · H-PAGES enforce a page allowance · H-WRITES consistent custom saves · H-ADAPTERS verify adapters · H-RENDER custom publishing · H-BACKUP custom backup and language setup · H-THEMES custom theme updates · H-DBFALLBACK stop a silent second database · H-COLLECTION-DEPS collection rendering reads the global database · T30 project copying · T49 helpers through storage adapters · H-MULTIPROCESS several servers on one project

@@ -386,7 +386,17 @@ const useAutoSave = create((set, get) => ({
         let themeConflict = false;
         let themeEditsDropped = false;
         if ((themeSettingsModified || hasThemeDrift) && themeSettings && activeProject) {
-          const themeResult = await useThemeStore.getState().saveSettings(activeProject.id);
+          // A refusal here is the site settings', and the page above may already be
+          // saved; marked so the editor's message can say which part was refused.
+          const themeResult = await useThemeStore
+            .getState()
+            .saveSettings(activeProject.id)
+            .catch((err) => {
+              // Only an error that can take the mark gets it; throwing here would
+              // replace the server's refusal.
+              if (err && typeof err === "object" && Object.isExtensible(err)) err.savePart = "theme";
+              throw err;
+            });
           if (get().saveGeneration !== myGeneration) {
             // Discarded mid-flight. The submitted values DID reach the server, and
             // no local state can undo that. themeStore normally takes the server's
@@ -450,12 +460,14 @@ const useAutoSave = create((set, get) => ({
               ? { pages: pageSaveResult.listingAnchorMovedFrom }
               : state.listingAnchorMoved,
             // Any of them can carry it: a header-only or area-only save reports it
-            // on its own response, and theme settings on theirs.
-            mediaUsageStale: [pageSaveResult, ...globalSaveResults].some((result) =>
-              result?.warnings?.some((w) => w?.code === "MEDIA_USAGE_STALE"),
-            ) || themeUsageStale
-              ? { at: Date.now() }
-              : state.mediaUsageStale,
+            // on its own response, and theme settings on theirs. Which part carried
+            // it is kept, so the notice can name what was saved.
+            mediaUsageStale: (() => {
+              const page = [pageSaveResult, ...globalSaveResults].some((result) =>
+                result?.warnings?.some((w) => w?.code === "MEDIA_USAGE_STALE"),
+              );
+              return page || themeUsageStale ? { at: Date.now(), page, theme: themeUsageStale } : state.mediaUsageStale;
+            })(),
             themeConflict: themeConflict ? { at: Date.now(), editsDropped: themeEditsDropped } : state.themeConflict,
           };
         });

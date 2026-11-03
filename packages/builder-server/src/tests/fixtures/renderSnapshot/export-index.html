@@ -1,0 +1,393 @@
+<!--
+Made with Widgetizer vVERSION
+Per aspera ad astra
+-->
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Home</title>
+    <link rel="stylesheet" href="assets/base.css?v=TOKEN" />
+    <script src="assets/site.js?v=TOKEN"></script>
+    <link rel="icon" href="favicon.svg" />
+    <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+    <link rel="stylesheet" href="assets/media-text.css?v=TOKEN" />
+  </head>
+  <body class="page-index">
+    <header data-widget-id="header">
+      <img src="assets/images/hero.jpg" alt="" width="200" height="150" loading="lazy" />
+    </header>
+    <main>
+      <section class="media-text" data-widget-id="w1" data-widget-type="media-text">
+        <img src="assets/images/hero.jpg" alt="" width="200" height="150" loading="lazy" />
+        <div class="body">
+          <p>Read <a href="assets/files/guide.pdf">the guide</a>.</p>
+          <p><img src="assets/images/hero.jpg" alt="Hero" /></p>
+        </div>
+      </section>
+      <section data-widget-id="w2" data-widget-type="news-list">
+        <a href="news/story.html">Story</a
+        ><img src="assets/images/hero.jpg" alt="" width="200" height="150" loading="lazy" />
+        <div class="item-body">
+          <p>Read <a href="assets/files/guide.pdf">the guide</a>.</p>
+          <p><img src="assets/images/hero.jpg" alt="Hero" /></p>
+        </div>
+      </section>
+
+      <section
+        id="w3"
+        class="widget widget-core-form widget-w3 color-scheme-standard-primary form-style-outlined"
+        data-widget-id="w3"
+        data-widget-type="core-form"
+        data-widget-index="3"
+      >
+        <style>
+          .widget-w3 {
+            & .form-content-wrapper {
+              display: grid;
+              grid-template-columns: 1fr;
+              gap: var(--space-lg);
+            }
+
+            & .form-form {
+              display: flex;
+              flex-direction: column;
+              gap: var(--space-md);
+            }
+
+            & .form-field {
+              display: flex;
+              flex-direction: column;
+              gap: var(--space-xs);
+            }
+
+            & .form-label {
+              display: inline-flex;
+              align-items: baseline;
+              gap: var(--space-2xs);
+              font-size: calc(var(--font-size-sm) * var(--body-scale));
+              font-weight: 500;
+              color: var(--text-heading);
+            }
+
+            & .form-required {
+              color: var(--accent);
+              font-weight: 500;
+            }
+
+            & .form-required-note,
+            & .form-error {
+              margin: 0;
+              font-size: calc(var(--font-size-sm) * var(--body-scale));
+              color: var(--text-content);
+            }
+
+            & .form-error {
+              font-weight: 500;
+              color: var(--text-heading);
+            }
+
+            & .form-input,
+            & .form-textarea,
+            & .form-select {
+              width: 100%;
+              padding: var(--space-sm) var(--space-md);
+              background-color: var(--bg-primary);
+              color: var(--text-content);
+              border: var(--border-width-thin) solid var(--border-color);
+              border-radius: var(--radius-sm);
+              font-family: inherit;
+              font-size: calc(var(--font-size-base) * var(--body-scale));
+              line-height: 1.5;
+              transition:
+                border-color var(--transition-speed-fast),
+                box-shadow var(--transition-speed-fast);
+            }
+
+            & .form-textarea {
+              min-height: 12rem;
+              resize: vertical;
+            }
+
+            & .form-select {
+              appearance: none;
+              background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M6 9l6 6 6-6'/></svg>");
+              background-repeat: no-repeat;
+              background-position: right var(--space-md) center;
+              background-size: 1.4rem;
+              padding-inline-end: calc(var(--space-md) * 2 + 1.4rem);
+            }
+
+            &.color-scheme-standard-secondary,
+            &.color-scheme-highlight-secondary {
+              & .form-input,
+              & .form-textarea,
+              & .form-select {
+                background-color: var(--bg-secondary);
+              }
+            }
+
+            & .form-input:focus-visible,
+            & .form-textarea:focus-visible,
+            & .form-select:focus-visible {
+              outline: none;
+              border-color: var(--accent);
+              box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 20%, transparent);
+            }
+
+            & .form-fieldset {
+              border: none;
+              padding: 0;
+              margin: 0;
+              display: flex;
+              flex-direction: column;
+              gap: var(--space-xs);
+            }
+
+            & .form-fieldset .form-label {
+              margin-block-end: var(--space-xs);
+            }
+
+            & .form-radio,
+            & .form-consent {
+              display: inline-flex;
+              align-items: flex-start;
+              gap: var(--space-sm);
+              font-size: calc(var(--font-size-sm) * var(--body-scale));
+              color: var(--text-content);
+              cursor: pointer;
+            }
+
+            & .form-radio input[type="radio"],
+            & .form-consent input[type="checkbox"] {
+              margin: 0.2rem 0 0 0;
+              accent-color: var(--accent);
+              flex-shrink: 0;
+            }
+
+            & .form-honeypot {
+              position: absolute;
+              left: -9999px;
+              width: 1px;
+              height: 1px;
+              opacity: 0;
+              pointer-events: none;
+            }
+
+            & .form-turnstile:not(:empty) {
+              margin-block-start: var(--space-xs);
+            }
+
+            & .form-status {
+              margin: 0;
+              font-size: calc(var(--font-size-sm) * var(--body-scale));
+              color: var(--text-content);
+              min-height: 1.5em;
+            }
+
+            & .form-status:empty {
+              display: none;
+            }
+
+            & .form-submit {
+              align-self: flex-start;
+              margin-block-start: var(--space-xs);
+            }
+
+            & .form-info {
+              display: flex;
+              flex-direction: column;
+              gap: var(--space-xl);
+            }
+
+            & .form-info-block {
+              display: flex;
+              flex-direction: column;
+              gap: var(--space-sm);
+            }
+
+            /* Underlined variant */
+            &.form-style-underlined {
+              & .form-input,
+              & .form-textarea,
+              & .form-select {
+                border-width: 0;
+                border-block-end: var(--border-width-thin) solid var(--border-color);
+                border-radius: 0;
+                background-color: transparent;
+                padding-inline: 0;
+              }
+
+              & .form-select {
+                background-position: right 0 center;
+                padding-inline-end: calc(1.4rem + var(--space-sm));
+              }
+
+              & .form-input:focus-visible,
+              & .form-textarea:focus-visible,
+              & .form-select:focus-visible {
+                border-color: var(--accent);
+                box-shadow: 0 1px 0 0 var(--accent);
+              }
+            }
+
+            @media (min-width: 750px) {
+              & .form-content-wrapper:not(.no-sidebar) {
+                grid-template-columns: 7fr 3fr;
+                gap: var(--space-3xl);
+              }
+
+              &.layout-reverse .form-content-wrapper:not(.no-sidebar) {
+                grid-template-columns: 3fr 7fr;
+              }
+
+              &.layout-reverse .form-main {
+                order: 2;
+              }
+
+              &.layout-reverse .form-info {
+                order: 1;
+              }
+            }
+          }
+        </style>
+
+        <div class="widget-container">
+          <div class="widget-header">
+            <span class="w-eyebrow reveal reveal-up" style="--reveal-delay: 0" data-setting="eyebrow">Contact</span>
+
+            <h2 class="w-headline reveal reveal-up" style="--reveal-delay: 1" data-setting="title">Get in touch</h2>
+
+            <p class="w-description reveal reveal-up" style="--reveal-delay: 2" data-setting="description">
+              Send us a message and we&#39;ll get back to you within one business day.
+            </p>
+          </div>
+
+          <div class="widget-content widget-content-md">
+            <div class="form-content-wrapper no-sidebar">
+              <div class="form-main">
+                <form
+                  class="form-form"
+                  data-widgetizer-form="contact"
+                  action="/__widgetizer/forms/contact"
+                  method="post"
+                >
+                  <p class="form-required-note">
+                    <span class="form-required" aria-hidden="true">*</span> Required fields
+                  </p>
+
+                  <div class="form-field reveal reveal-up" style="--reveal-delay: 0" data-block-id="b1">
+                    <label class="form-label" for="form-w3-b1">
+                      <span data-setting="label">Email</span>
+                      <span class="form-required" aria-hidden="true">*</span>
+                    </label>
+
+                    <input
+                      type="email"
+                      id="form-w3-b1"
+                      name="email"
+                      class="form-input"
+                      autocomplete="email"
+                      required
+                      aria-required="true"
+                    />
+
+                    <p class="form-error" id="form-w3-b1-error" hidden></p>
+                  </div>
+
+                  <input
+                    type="text"
+                    name="website"
+                    tabindex="-1"
+                    autocomplete="off"
+                    aria-hidden="true"
+                    class="form-honeypot"
+                    data-widgetizer-honeypot
+                  />
+
+                  <div class="form-turnstile" data-widgetizer-turnstile></div>
+
+                  <p class="form-status" data-widgetizer-form-status aria-live="polite"></p>
+
+                  <button type="submit" class="widget-button widget-button-primary form-submit">Send message</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <script>
+          (function () {
+            var section = document.getElementById("w3");
+            var form = section && section.querySelector("form[data-widgetizer-form]");
+            if (!form || form.dataset.fieldErrors) return;
+            form.dataset.fieldErrors = "true";
+            var focusQueued = false;
+
+            function errorFor(field) {
+              var block = field.closest("[data-block-id]");
+              return block
+                ? document.getElementById("form-w3-" + block.getAttribute("data-block-id") + "-error")
+                : null;
+            }
+
+            function describe(field, id, on) {
+              var ids = (field.getAttribute("aria-describedby") || "").split(" ").filter(function (token) {
+                return token && token !== id;
+              });
+              if (on) ids.push(id);
+              if (ids.length) field.setAttribute("aria-describedby", ids.join(" "));
+              else field.removeAttribute("aria-describedby");
+            }
+
+            form.addEventListener(
+              "invalid",
+              function (event) {
+                var field = event.target;
+                var error = errorFor(field);
+                if (!error) return;
+                event.preventDefault();
+                error.textContent = field.validationMessage;
+                error.hidden = false;
+                field.setAttribute("aria-invalid", "true");
+                describe(field, error.id, true);
+                if (!focusQueued) {
+                  focusQueued = true;
+                  field.focus();
+                  setTimeout(function () {
+                    focusQueued = false;
+                  });
+                }
+              },
+              true,
+            );
+
+            function clearValid() {
+              Array.prototype.forEach.call(form.querySelectorAll('[aria-invalid="true"]'), function (field) {
+                if (!field.validity.valid) return;
+                field.removeAttribute("aria-invalid");
+                var error = errorFor(field);
+                if (!error) return;
+                describe(field, error.id, false);
+                if (!form.querySelector('[aria-describedby~="' + error.id + '"]')) {
+                  error.textContent = "";
+                  error.hidden = true;
+                }
+              });
+            }
+
+            form.addEventListener("input", clearValid);
+            form.addEventListener("change", clearValid);
+          })();
+        </script>
+      </section>
+
+      <p class="bases" data-image="assets/images" data-file="assets/files"></p>
+      <img src="assets/images/hero.jpg" alt="" width="200" height="150" loading="lazy" />
+      <img src="assets/placeholder.svg" alt="Placeholder" />
+      <img src="assets/custom-placeholder.svg" alt="Placeholder" />
+    </main>
+    <footer data-widget-id="footer">Footer</footer>
+    <script src="assets/media-text.js?v=TOKEN"></script>
+  </body>
+</html>

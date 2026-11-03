@@ -40,6 +40,9 @@ describe("getPreviewTargetOrigin", () => {
   it("uses only the origin of an absolute base, dropping any path", () => {
     setPreviewRenderBase("http://localhost:3001/render/abc123");
     expect(getPreviewTargetOrigin()).toBe("http://localhost:3001");
+    // A preview served from its own origin under a per-project path.
+    setPreviewRenderBase("http://127.0.0.1:3001/p/x");
+    expect(getPreviewTargetOrigin()).toBe("http://127.0.0.1:3001");
   });
 });
 
@@ -64,6 +67,13 @@ describe("buildPreviewUrl", () => {
     setPreviewRenderBase("/api/projects/x/preview");
     expect(buildPreviewUrl("abc")).toBe(
       `/api/projects/x/preview/render/abc?parentOrigin=${encodeURIComponent(window.location.origin)}`,
+    );
+  });
+
+  it("builds a cross-origin render URL under an absolute base with a path", () => {
+    setPreviewRenderBase("http://127.0.0.1:3001/p/x");
+    expect(buildPreviewUrl("abc")).toBe(
+      `http://127.0.0.1:3001/p/x/render/abc?parentOrigin=${encodeURIComponent(window.location.origin)}`,
     );
   });
 

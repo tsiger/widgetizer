@@ -107,7 +107,7 @@ Every widget follows this structure:
 | `id="{{ widget.id }}"`                                | Unique widget instance ID for CSS scoping and JS targeting |
 | `class="widget widget-type-{name} widget-{{ widget.id }}"` | Base class + widget type + instance class                  |
 | `data-widget-id="{{ widget.id }}"`                    | For JavaScript targeting                                   |
-| `data-widget-type="{widget-name}"`                    | For debugging/identification                               |
+| `data-widget-type="{widget-name}"`                    | Identification; the editor tells the site's header and footer apart by it (the checker warns without it) |
 
 ### Inline or Enqueued CSS
 
@@ -624,7 +624,7 @@ widgets/
 {% enqueue_script src: "slideshow.js", priority: 30 %}
 ```
 
-Enqueued assets are rendered by `{% header_assets %}` (styles) and `{% footer_assets %}` (scripts) in the layout template, sorted by `priority`. During editor partial updates (widget morphing), newly enqueued assets are appended to the single-widget render response and loaded by the preview runtime, so a script like `carousel.js` becomes available immediately when a setting change triggers its enqueue.
+Enqueued assets are rendered by `{% header_assets %}` (styles) and `{% footer_assets %}` (scripts) in the layout template, sorted by `priority`. During editor partial updates (widget morphing), newly enqueued assets are appended to the single-widget render response and loaded by the preview runtime, so a script like `carousel.js` becomes available immediately when a setting change triggers its enqueue. The runtime picks up every stylesheet link in the response, including ones written in the widget's own markup; one with no address or an address the browser can't parse is skipped, and the rest of the update still applies.
 
 **Asset resolution:**
 

@@ -119,4 +119,45 @@ describe("mediaManager", () => {
       { fallbackMessage: "Failed to delete file" },
     );
   });
+
+  // The save goes through the editor API base like every other media call, so
+  // it reaches the project however the app mounts the project-scoped routes.
+  it("saves metadata through the project-relative route, with the language", async () => {
+    const saved = { file: { id: "file-1", metadata: { alt: "new" } } };
+    editorFetchJson.mockResolvedValue(saved);
+    const { saveMediaMetadata } = await import("../mediaManager");
+
+    expect(await saveMediaMetadata("project-1", "file-1", { alt: "new" })).toEqual(saved);
+    expect(editorFetchJson).toHaveBeenLastCalledWith(
+      "/media/file-1/metadata",
+      { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ alt: "new" }) },
+      { fallbackMessage: "Failed to update metadata" },
+    );
+
+    await saveMediaMetadata("project-1", "file-1", { alt: "neu" }, "de-AT");
+    expect(editorFetchJson.mock.lastCall[0]).toBe("/media/file-1/metadata?language=de-AT");
+  });
+
+  it("passes a server refusal on with its status, code and message", async () => {
+    const refusal = Object.assign(new Error("The active project has changed. Please reload the page."), {
+      name: "ApiError",
+      status: 409,
+      code: "PROJECT_MISMATCH",
+    });
+    editorFetchJson.mockRejectedValue(refusal);
+    const { saveMediaMetadata } = await import("../mediaManager");
+
+    await expect(saveMediaMetadata("project-1", "file-1", { alt: "new" })).rejects.toBe(refusal);
+  });
+
+  it("drops the project's media cache after a metadata save", async () => {
+    editorFetchJson.mockResolvedValue({ files: [] });
+    const { getProjectMedia, saveMediaMetadata } = await import("../mediaManager");
+
+    await getProjectMedia("project-1");
+    await saveMediaMetadata("project-1", "file-1", { alt: "new" });
+    await getProjectMedia("project-1");
+
+    expect(editorFetchJson.mock.calls.filter(([path]) => path === "/media")).toHaveLength(2);
+  });
 });

@@ -49,7 +49,7 @@ A page is a complete document in one project language. It owns its widget instan
 | `uuid` | Stable across normal edits and slug changes |
 | `id` / `slug` | Address and filename; unique within a language |
 | `translationGroupId` | Joins independent language versions |
-| `widgets` / `widgetsOrder` | Instance map plus explicit display order |
+| `widgets` / `widgetsOrder` | Instance map plus explicit display order; a repeat in the order is skipped on every render and dropped on save, page copy and editor load (`@widgetizer/core/widgetOrder`). What renders, and with no order list at all, is in [widget ids](widget.md#widget-ids) |
 | `parentPageUuid` | Reference to another page, not ownership; a self-reference is dropped on save and the save succeeds |
 | `seo` | Version-specific metadata; can reference media |
 

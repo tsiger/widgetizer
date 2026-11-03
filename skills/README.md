@@ -27,6 +27,17 @@ skills/widgetizer-theme/
   agents/openai.yaml       display metadata for OpenAI's skill UI
 ```
 
+### The widget vocabulary
+
+`references/widget-vocabulary.json` lists one id, type, English label and value set per widget idea. The table in `references/widget-editing-model.md` is generated from it:
+
+```bash
+node scripts/build-widget-vocabulary.js           # regenerate the table
+node scripts/build-widget-vocabulary.js --check   # exit 1 when the table is stale
+```
+
+Change the JSON, never the table by hand. Explanations around the table stay hand-written.
+
 ### Keeping it true to the app
 
 `references/contract.json` is generated from the source: app/LiquidJS versions, setting types, LiquidJS built-ins, registered custom tags and their argument names, registered filters, core widgets/snippets/visitor strings, default image sizes, collection sorts and structured-data rules, and font stacks/weights. It records names and selected metadata, not the full behavior of the app.
@@ -80,6 +91,7 @@ Audited against app version 0.9.10. When a contract changes, these are the place
 | theme-structure-and-lifecycle | `packages/builder-server/src/controllers/themeController.js`, `utils/semver.js`, `utils/projectScaffold.js`, `services/themeUpdateService.js`, `packages/core/src/tags/themeSettings.js`, `tags/FontsTag.js` | `docs-llms/theming.md`, `docs-llms/theme-updates.md`, `tests/themes.test.js`, `tests/themeUpdateApplyToDir.test.js` |
 | liquid-and-render-context | `packages/render-engine/src/renderEngine.js`, `packages/core/src/tags/`, `filters/`, `snippets/` | `docs-llms/theming.md`, `tests/rendering.test.js`, `tests/renderCollectionItemPage.test.js` |
 | widgets-and-settings | `packages/core/src/config/settingTypes.js`, `packages/editor-ui/src/components/settings/SettingsRenderer.jsx`, `stores/widgetStoreHelpers.js`, `packages/core/src/runtime/previewRuntime.js` | `docs-llms/theming-setting-types.md`, `docs-llms/theming-widgets.md` |
+| widget-editing-model | Arch widget schemas in `themes/arch/widgets/`; reviewed premium shared widgets | `docs-llms/theming-widgets.md` |
 | assets-and-browser-behavior | `packages/core/src/utils/assetUrl.js`, `packages/core/src/tags/`, `packages/builder-server/src/controllers/exportController.js`, `packages/core/src/runtime/previewRuntime.js` | `docs-llms/core-export.md`, `docs-llms/core-form-widget.md`, `packages/core/src/tags/__tests__/pathPrefixing.test.js` |
 | templates-collections-and-presets | `packages/builder-server/src/controllers/themeController.js`, `controllers/projectController.js`, `utils/projectScaffold.js`, `services/collectionService.js`, `packages/core/src/structuredData/collectionTypes.js` | `docs-llms/core-collections.md`, `docs-llms/theme-presets.md`, `tests/collectionService.test.js`, `tests/presetMediaSeeding.test.js`, `tests/collectionPresetSeeding.test.js` |
 | localization | `packages/builder-server/src/services/siteStringsService.js`, `packages/core/src/filters/siteStringFilter.js`, `packages/editor-ui/src/stores/widgetStoreHelpers.js` | `docs-llms/domain/multilingual.md`, `tests/siteStrings.test.js`, `scripts/validate-theme-locales.js` |

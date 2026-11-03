@@ -727,7 +727,8 @@
     "themeConflict": "Site settings were changed elsewhere since this editor opened. Your theme changes are kept on top of the current settings and will be saved.",
     "mediaUsage": {
       "stale": "Your page is saved. Widgetizer could not update its record of which images this page uses, so the media library may show one as unused until you press Refresh usage there.",
-      "missing": "Your changes were not saved: this page uses an image that is no longer in the media library. Choose a different image, or upload it again, then save."
+      "missing": "Your changes were not saved: this page uses an image that is no longer in the media library. Choose a different image, or upload it again, then save.",
+      "missingSiteSettings": "Your site settings were not saved: an image chosen in them is no longer in the media library. Choose a different image, or upload it again, then save."
     },
     "widgetName": {
       "header": "Internal name",
@@ -768,6 +769,7 @@
     "preview": {
       "loading": "Loading Preview...",
       "error": "Preview Error",
+      "tooManyPreviews": "Too many previews are open. Close some preview tabs, then reload.",
       "reload": "Reload Preview",
       "title": "Page Preview"
     },
@@ -968,6 +970,7 @@
     "title": "Site settings",
     "loading": "Loading settings...",
     "noSettings": "No theme settings available",
+    "retry": "Try again",
     "save": "Save Settings",
     "cancel": "Cancel",
     "toasts": {
@@ -978,7 +981,8 @@
       "settingRemoved": "A setting you changed no longer exists in this theme, so that change was not saved.",
       "valueCorrected": "\"{{label}}\" contained an invalid value and was reset.",
       "valueCorrectedUnnamed": "A setting contained an invalid value and was reset.",
-      "mediaUsageStale": "Your settings are saved. Widgetizer could not update its record of which images they use, so the media library may show one as unused until you press Refresh usage there."
+      "mediaUsageStale": "Your settings are saved. Widgetizer could not update its record of which images they use, so the media library may show one as unused until you press Refresh usage there.",
+      "mediaMissing": "Your settings were not saved: an image chosen in them is no longer in the media library. Choose a different image, or upload it again, then save."
     }
   },
   "themes": {

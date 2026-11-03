@@ -51,13 +51,16 @@ function applySharedMiddleware(app) {
 function mountEditorApiRoutes(app, { adapters, plugins } = {}) {
   // JSON body parsing is applied per-router (not globally) so that the page
   // content save route can use a higher limit. See middleware/jsonParser.js.
-  const { actorScopedRouter, projectScopedRouter, previewRouter } = setupBuilderServer({
+  const { actorScopedRouter, projectScopedRouter, mediaFileRouter, previewRouter } = setupBuilderServer({
     adapters,
     plugins,
   });
 
   // OSS mounts both scoped routers under /api, reproducing today's URLs
-  // (/api/projects, /api/pages, ...).
+  // (/api/projects, /api/pages, ...), and the media files at
+  // /api/media/projects/:projectId/... — the media file router first, so a file
+  // load doesn't also run the media management router's middleware.
+  app.use("/api/media", mediaFileRouter);
   app.use("/api", actorScopedRouter);
   app.use("/api", projectScopedRouter);
 

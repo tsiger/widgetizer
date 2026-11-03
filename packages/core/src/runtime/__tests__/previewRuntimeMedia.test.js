@@ -17,6 +17,7 @@ const widgetHtml = (src) => `
 const selections = [];
 
 beforeAll(async () => {
+  window.history.replaceState(null, "", `?parentOrigin=${encodeURIComponent(window.location.origin)}`);
   // No script tag on first load, as when the widget started out as a YouTube embed.
   document.body.innerHTML = widgetHtml("/uploads/a.mp4").replace(/<script[^>]*><\/script>/, "");
   window.parent.postMessage = (data) => {

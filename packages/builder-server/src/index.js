@@ -10,7 +10,9 @@ export { setupBuilderServer } from "./setupBuilderServer.js";
 export { getDb, initDb, closeDb } from "./db/index.js";
 export { runMigrations, DEFAULT_TRACKING_TABLE } from "./db/migrations.js";
 export { DATA_DIR } from "./config.js";
-// Hosted mounts the three routers into its own Express app and needs the app-level
+// An embedding app mounts the routers it needs (setupBuilderServer returns four;
+// one that serves media file URLs itself leaves out mediaFileRouter) into its own
+// Express app, and needs the app-level
 // error mapper (the routers carry their own JSON parsers + scope middleware, but
 // the WidgetizerError -> HTTP mapping is applied app-wide).
 export { default as errorHandler } from "./middleware/errorHandler.js";

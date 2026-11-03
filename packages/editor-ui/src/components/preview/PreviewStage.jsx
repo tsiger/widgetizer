@@ -19,6 +19,8 @@ export const STANDALONE_SANDBOX =
  * @param {string} [props.sandbox] - iframe sandbox (omit for none).
  * @param {string} [props.loadingMessage] - Optional loading text.
  * @param {string} [props.notFoundMessage] - Optional not-found text.
+ * @param {import("react").RefObject<HTMLIFrameElement>} [props.iframeRef] - Receives the
+ *   iframe, so a message listener can check a message came from the frame on screen.
  */
 export default function PreviewStage({
   src,
@@ -29,6 +31,7 @@ export default function PreviewStage({
   sandbox,
   loadingMessage,
   notFoundMessage,
+  iframeRef,
 }) {
   return (
     <div className={`relative min-h-0 flex-1 transition-colors duration-300 ${isMobile ? "bg-slate-200" : "bg-white"}`}>
@@ -45,6 +48,7 @@ export default function PreviewStage({
       {src && !notFound && (
         <iframe
           key={src}
+          ref={iframeRef}
           src={src}
           title={title}
           sandbox={sandbox}

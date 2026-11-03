@@ -758,3 +758,57 @@ describe("widget.liquid rendering vs manifest consistency", () => {
     assert.deepEqual(extractOptionValues(html), ["genikh-erwthsh", "yposthri3h", "option-3"]);
   });
 });
+
+// A form the order names more than once is one form on the page: it is built,
+// and any problem with it reported, once.
+describe("buildFormsManifest — a repeated form widget", () => {
+  const pages = (widgetsOrder, widget) => [{ id: "index", widgets: { w1: widget }, widgetsOrder }];
+  const failure = (fn) => {
+    try {
+      fn();
+    } catch (err) {
+      return err.message;
+    }
+    return null;
+  };
+
+  // A guard: identical forms merge by key; the next case is the one a repeat
+  // affects.
+  it("builds the same manifest as the form named once", () => {
+    const widget = makeFormWidget({ formName: "Contact", blocks: SIMPLE_FIELDS });
+    assert.deepEqual(buildFormsManifest(pages(["w1", "w1", "w1"], widget), APP_VERSION), buildFormsManifest(pages(["w1"], widget), APP_VERSION));
+  });
+
+  it("reports a problem with it once", () => {
+    const widget = makeFormWidget({ formName: "Contact", blocks: [{ type: "field", settings: { type: "text" } }] });
+    const once = failure(() => buildFormsManifest(pages(["w1"], widget), APP_VERSION));
+    assert.ok(once, "the field without a label is refused");
+    assert.equal(failure(() => buildFormsManifest(pages(["w1", "w1", "w1"], widget), APP_VERSION)), once);
+  });
+});
+
+describe("buildFormsManifest — a repeated field block", () => {
+  it("lists the field once instead of refusing a duplicate field", () => {
+    const widget = makeFormWidget({ formName: "Contact", blocks: SIMPLE_FIELDS });
+    const once = buildFormsManifest([{ id: "index", widgets: { w1: widget }, widgetsOrder: ["w1"] }], APP_VERSION);
+    const repeated = { ...widget, blocksOrder: [...widget.blocksOrder, widget.blocksOrder[0], widget.blocksOrder[0]] };
+    assert.deepEqual(buildFormsManifest([{ id: "index", widgets: { w1: repeated }, widgetsOrder: ["w1"] }], APP_VERSION), once);
+  });
+});
+
+// The manifest holds the forms export publishes, so it reads the widgets the page
+// renders: a form stored under the header's or footer's id renders nowhere.
+describe("buildFormsManifest — only the forms a page renders", () => {
+  it("skips a block order entry that isn't an id", () => {
+    const widget = makeFormWidget({ formName: "Contact", blocks: SIMPLE_FIELDS });
+    widget.blocksOrder = [{ toString: null }, ...widget.blocksOrder];
+    const { manifest } = buildFormsManifest([{ id: "index", widgets: { w1: widget }, widgetsOrder: ["w1"] }], APP_VERSION);
+    assert.equal(manifest.forms.length, 1);
+  });
+
+  it("leaves out a form widget stored under the header's or footer's id", () => {
+    const widget = makeFormWidget({ formName: "Contact", blocks: SIMPLE_FIELDS });
+    const pages = [{ id: "index", widgets: { header: widget, footer: widget }, widgetsOrder: ["header", "footer"] }];
+    assert.equal(buildFormsManifest(pages, APP_VERSION).manifest, null);
+  });
+});

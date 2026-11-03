@@ -6,6 +6,7 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 
 import { parseVersion as parseSemver } from "../packages/builder-server/src/utils/semver.js";
 import { isWithinDirectory } from "../packages/core/src/utils/pathSecurity.js";
+import { validateTheme } from "./validate-theme.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
@@ -105,6 +106,30 @@ function readJson(filePath) {
 // parseSemver is the shared builder-server semver parser, re-exported here so
 // the tool (and its tests) keep one source of truth for version parsing.
 export { parseSemver };
+
+/**
+ * Why a theme can't be released as it is, or null: the app's own checker
+ * (`validateTheme`) found errors. Warnings don't block. With `replacing`, the
+ * `updates/<version>/` folder being regenerated is left out, since `--force`
+ * exists to replace a folder that may be half-written.
+ * @param {{ findings: Array<{ level: string, file: string, message: string }> }} report
+ * @param {{ replacing?: string|null }} [options]
+ * @returns {string|null}
+ */
+export function validationRefusal(report, { replacing = null } = {}) {
+  const skipped = replacing ? `updates/${replacing}/` : null;
+  const errors = report.findings.filter(
+    (finding) => finding.level === "error" && !(skipped && `${finding.file}/`.startsWith(skipped)),
+  );
+  if (errors.length === 0) return null;
+  const lines = errors.slice(0, 20).map((finding) => `  ${finding.file}: ${finding.message}`);
+  if (errors.length > lines.length) lines.push(`  … and ${errors.length - lines.length} more`);
+  return [
+    `The theme checker found ${errors.length} error(s); fix them before generating an update:`,
+    ...lines,
+    "Run npm run validate:theme -- <theme-path> for the full report.",
+  ].join("\n");
+}
 
 export function parseVersionFromTag(tag) {
   // Accept a clean x.y.z only when it sits at the END of the tag, optionally
@@ -347,6 +372,14 @@ async function main() {
 
   if (!existsSync(themeJsonPath)) {
     fail(`Theme path must contain theme.json: ${themeDir}`);
+  }
+
+  // A release must not ship a theme the app's own checker refuses.
+  const checked = validateTheme(themeDir);
+  const refusal = validationRefusal(checked, { replacing: force ? targetVersion : null });
+  if (refusal) fail(refusal);
+  if (checked.warnings > 0) {
+    warn(`The theme checker reports ${checked.warnings} warning(s); see npm run validate:theme -- ${themeArg}.`);
   }
 
   const gitRoot = git(["rev-parse", "--show-toplevel"]).trim();

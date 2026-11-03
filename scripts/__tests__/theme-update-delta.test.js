@@ -1,4 +1,6 @@
 import fs from "fs-extra";
+import { spawnSync } from "node:child_process";
+import { fileURLToPath } from "node:url";
 import os from "node:os";
 import path from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
@@ -17,6 +19,7 @@ import {
   isDeletionEligible,
   parseDiffNameStatus,
   buildPlan,
+  validationRefusal,
 } from "../theme-update-delta.js";
 
 const cleanupPaths = [];
@@ -218,4 +221,50 @@ describe("buildPlan", () => {
     expect(skippedByPath["widgets/ghost/widget.liquid"]).toMatch(/missing/i);
     expect(skippedByPath["widgets/renamed.liquid"]).toMatch(/unsupported git status R/i);
   });
+});
+
+// The theme is checked before its update is planned: a release must not ship a
+// theme the app's own checker refuses.
+describe("validationRefusal", () => {
+  const report = (findings) => ({ findings });
+  const error = (file, message = "broken") => ({ level: "error", file, rule: "template-shape", message });
+
+  it("lets a theme with no errors through, warnings and all", () => {
+    expect(validationRefusal(report([{ level: "warning", file: "screenshot.png", rule: "screenshot", message: "size" }]))).toBe(null);
+  });
+
+  it("refuses a theme with errors, naming each", () => {
+    const refusal = validationRefusal(report([error("templates/index.json", "widgetsOrder contains duplicate ids.")]));
+    expect(refusal).toMatch(/1 error/);
+    expect(refusal).toMatch(/templates\/index\.json: widgetsOrder contains duplicate ids\./);
+  });
+
+  // --force replaces that folder, so a half-written one must not block it.
+  it("ignores the update folder being replaced", () => {
+    const findings = [error("updates/1.2.0/theme.json"), error("updates/1.1.0/theme.json")];
+    expect(validationRefusal(report(findings), { replacing: "1.2.0" })).toMatch(/updates\/1\.1\.0/);
+    expect(validationRefusal(report([error("updates/1.2.0/theme.json")]), { replacing: "1.2.0" })).toBe(null);
+  });
+});
+
+// The command itself: the check runs before anything touches git, so a theme
+// copy outside the repository is enough to see it refuse.
+describe("theme:update-delta on a theme the checker refuses", () => {
+  const script = fileURLToPath(new URL("../theme-update-delta.js", import.meta.url));
+  const arch = fileURLToPath(new URL("../../themes/arch", import.meta.url));
+
+  for (const args of [["--dry-run"], []]) {
+    it(`stops before planning${args.length ? " (dry run)" : ""}`, async () => {
+      const dir = path.join(await makeTempDir("wz-delta-refuse-"), "arch");
+      await fs.copy(arch, dir);
+      const page = path.join(dir, "presets", "arch", "templates", "index.json");
+      const json = await fs.readJson(page);
+      await fs.writeJson(page, { ...json, widgetsOrder: [...json.widgetsOrder, json.widgetsOrder[0]] });
+
+      const run = spawnSync(process.execPath, [script, dir, ...args], { encoding: "utf8" });
+      expect(run.status).toBe(1);
+      expect(run.stderr).toMatch(/presets\/arch\/templates\/index\.json: widgetsOrder contains duplicate ids\./);
+      expect(run.stdout).not.toMatch(/Using baseline tag/);
+    }, 30_000);
+  }
 });

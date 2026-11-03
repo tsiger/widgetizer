@@ -123,3 +123,19 @@ export function resolveUsageTitle(usageEntry, usageTitleMap = {}) {
   // Unresolved page / collection / unknown source — fall back to the raw string.
   return usageEntry;
 }
+
+/**
+ * The notice for a save whose image-usage records could not be updated, worded
+ * by what carried the warning (`saveStore`'s `mediaUsageStale`): the page (its
+ * header, footer and areas included), the site settings, or both.
+ *
+ * @param {{ page?: boolean, theme?: boolean }} stale
+ * @param {(key: string) => string} t
+ * @returns {string}
+ */
+export function mediaUsageStaleMessage(stale, t) {
+  const messages = [];
+  if (stale.page || !stale.theme) messages.push(t("pageEditor.mediaUsage.stale"));
+  if (stale.theme) messages.push(t("themeSettings.toasts.mediaUsageStale"));
+  return messages.join(" ");
+}

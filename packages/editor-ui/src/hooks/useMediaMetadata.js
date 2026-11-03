@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { API_URL } from "../lib/config";
-import { apiFetch } from "../lib/apiFetch";
-import { invalidateMediaCache } from "../queries/mediaManager";
+import { saveMediaMetadata } from "../queries/mediaManager";
 
 /**
  * Hook for managing media file metadata editing via a drawer interface.
@@ -51,23 +50,7 @@ export default function useMediaMetadata({ activeProject, showToast, setFiles })
 
     setIsSavingMetadata(true);
     try {
-      // Only alt/title/caption are per language; the binary and everything else
-      // about the file are shared, so the language is all that is added here.
-      const query = language ? `?language=${encodeURIComponent(language)}` : "";
-      const response = await apiFetch(`/api/media/projects/${activeProject.id}/media/${fileId}/metadata${query}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(metadata),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to update metadata");
-      }
-
-      const updatedFileData = await response.json();
+      const updatedFileData = await saveMediaMetadata(activeProject.id, fileId, metadata, language);
 
       // Update the file in the local state
       setFiles((prevFiles) =>
@@ -77,10 +60,6 @@ export default function useMediaMetadata({ activeProject, showToast, setFiles })
             : file,
         ),
       );
-
-      // Drop the shared 30s media cache so the page editor's image inputs re-fetch
-      // fresh metadata on their next load instead of serving stale cached data.
-      invalidateMediaCache(activeProject.id);
 
       showToast("Metadata updated successfully", "success");
       handleCloseDrawer(); // Close drawer on successful save

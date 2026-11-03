@@ -1,4 +1,5 @@
-import { describe, it, expect, beforeEach, afterEach } from "vitest";
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
+import fs from "fs/promises";
 import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
@@ -106,5 +107,34 @@ describe("planPagination", () => {
   it("plans nothing without a way to count items", async () => {
     const plan = await planPagination({ projectDir }, { w1: paginating({ limit: 2 }) }, ["w1"], { pageSlug: "blog" });
     expect(plan).toBeNull();
+  });
+
+  // A widget that turns out not to paginate is passed over; a repeat of it in the
+  // order is not read again.
+  it("reads a repeated widget's schema once", async () => {
+    const readFile = vi.spyOn(fs, "readFile");
+    try {
+      const widgets = { w1: paginating({ limit: "" }) };
+      expect(await planPagination(deps(), widgets, ["w1", "w1", "w1"], { pageSlug: "blog" })).toBeNull();
+      const schemaReads = readFile.mock.calls.filter(([file]) => String(file).endsWith(path.join("news-grid", "schema.json")));
+      expect(schemaReads).toHaveLength(1);
+    } finally {
+      readFile.mockRestore();
+    }
+  });
+});
+
+// The plan follows the widgets the page renders: a widget under the header's or
+// footer's id, or left out of the order, renders nothing, so it paginates nothing.
+describe("planPagination — only a widget that renders", () => {
+  it("passes over a widget stored under the header's or footer's id", async () => {
+    const widgets = { header: paginating({ limit: 3 }), footer: paginating({ limit: 3 }) };
+    expect(await planPagination(deps(), widgets, ["header", "footer"], { pageSlug: "blog" })).toBeNull();
+  });
+
+  it("plans nothing for an empty order, and plans from the widgets' own order without one", async () => {
+    const widgets = { w1: paginating({ limit: 3 }) };
+    expect(await planPagination(deps(), widgets, [], { pageSlug: "blog" })).toBeNull();
+    expect((await planPagination(deps(), widgets, undefined, { pageSlug: "blog" })).widgetId).toBe("w1");
   });
 });

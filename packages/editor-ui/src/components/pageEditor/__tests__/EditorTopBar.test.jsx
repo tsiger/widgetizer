@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, fireEvent, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { PluginProvider } from "../../../extension/PluginProvider.jsx";
@@ -358,5 +358,32 @@ describe("EditorTopBar back to pages", () => {
     renderFor(undefined);
     fireEvent.click(screen.getByTitle("pageEditor.toolbar.backToPages"));
     expect(navigate).toHaveBeenCalledWith("/pages");
+  });
+});
+
+// The site settings save after the page, so a refusal of theirs must not tell
+// the user the page uses the missing image.
+describe("EditorTopBar save refusals", () => {
+  const original = useAutoSave.getState();
+  afterEach(() => useAutoSave.setState({ save: original.save, hasUnsavedChanges: original.hasUnsavedChanges }));
+
+  async function refuseWith(err) {
+    useToastStore.setState({ toasts: [] });
+    useAutoSave.setState({ save: vi.fn().mockRejectedValue(err), hasUnsavedChanges: () => true });
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    renderTopBar();
+    fireEvent.click(screen.getByTitle("pageEditor.toolbar.save (Ctrl+S)"));
+    await vi.waitFor(() => expect(useToastStore.getState().toasts.length).toBe(1));
+    return useToastStore.getState().toasts[0].message;
+  }
+
+  it("names the site settings when they were the part refused", async () => {
+    const err = Object.assign(new Error("missing"), { code: "MEDIA_REFERENCE_MISSING", savePart: "theme" });
+    expect(await refuseWith(err)).toBe("pageEditor.mediaUsage.missingSiteSettings");
+  });
+
+  it("names the page when the page was refused", async () => {
+    const err = Object.assign(new Error("missing"), { code: "MEDIA_REFERENCE_MISSING" });
+    expect(await refuseWith(err)).toBe("pageEditor.mediaUsage.missing");
   });
 });

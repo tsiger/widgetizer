@@ -14,6 +14,7 @@ import assert from "node:assert/strict";
 import fs from "fs-extra";
 import path from "path";
 import os from "os";
+import { Readable } from "stream";
 
 const TEST_ROOT = path.join(os.tmpdir(), `widgetizer-media-video-test-${Date.now()}`);
 process.env.DATA_ROOT = path.join(TEST_ROOT, "data");
@@ -53,10 +54,14 @@ const MP4_BYTES = Buffer.concat([
 const assetScopes = [];
 let server;
 let baseUrl;
+// When set, `download` returns this function's stream instead of the file's,
+// so a test can serve a stream it controls (one that never ends, or fails).
+let downloadOverride = null;
 
 function recordingAssetStorage(inner) {
   return new Proxy(inner, {
     get(target, prop) {
+      if (prop === "download" && downloadOverride) return async () => downloadOverride();
       const value = target[prop];
       if (typeof value !== "function") return value;
       return (scope, ...rest) => {
@@ -122,6 +127,7 @@ before(async () => {
 
 after(async () => {
   console.error = _origError;
+  server.closeAllConnections(); // a response left hanging must not hold the suite open
   await new Promise((resolve) => server.close(resolve));
   closeDb();
   await fs.remove(TEST_ROOT);
@@ -212,12 +218,177 @@ describe("MP4 upload over HTTP", () => {
         }
       });
 
-      it(`answers an unsatisfiable range ${label} with 416`, async () => {
+      it(`answers an unsatisfiable range ${label} with 416, HEAD too`, async () => {
+        const head = await fetch(url(), { method: "HEAD", headers: { Range: `bytes=${size}-` } });
+        assert.equal(head.status, 416);
+        assert.equal(head.headers.get("content-range"), `bytes */${size}`);
         const { response } = await getBytes(url(), { Range: `bytes=${size}-` });
         assert.equal(response.status, 416);
         assert.equal(response.headers.get("content-range"), `bytes */${size}`);
       });
     }
+
+    // A player drops its request on every seek. The file stream behind a
+    // dropped request must be closed, or its descriptor stays open for good.
+    for (const [label, headers] of [
+      ["a whole-file request", {}],
+      ["a ranged request", { Range: "bytes=0-" }],
+    ]) {
+      it(`closes the file when the client drops ${label}`, async () => {
+        let destroyed = false;
+        downloadOverride = () =>
+          new Readable({
+            read() {
+              this.push(Buffer.alloc(16 * 1024, 7)); // never ends, like a long video
+            },
+            destroy(err, callback) {
+              destroyed = true;
+              callback(err);
+            },
+          });
+        try {
+          const controller = new AbortController();
+          const response = await fetch(byName(), { headers, signal: controller.signal });
+          await response.body.getReader().read(); // the first bytes arrive
+          controller.abort();
+          for (let i = 0; i < 50 && !destroyed; i++) await new Promise((resolve) => setTimeout(resolve, 20));
+          assert.equal(destroyed, true, "the source stream must be destroyed, or its file stays open");
+        } finally {
+          downloadOverride = null;
+        }
+      });
+    }
+
+    for (const [label, headers] of [
+      ["a whole-file request", {}],
+      ["a ranged request", { Range: "bytes=0-99" }],
+    ]) {
+      it(`answers 500 when the file can't be read at all (${label})`, async () => {
+        downloadOverride = () =>
+          new Readable({
+            read() {
+              this.destroy(Object.assign(new Error("permission denied"), { code: "EACCES" }));
+            },
+          });
+        try {
+          const response = await fetch(byName(), { headers });
+          assert.equal(response.status, 500);
+          assert.equal(response.headers.get("content-range"), null);
+          assert.deepEqual(await response.json(), { error: "Failed to serve project media" });
+        } finally {
+          downloadOverride = null;
+        }
+      });
+    }
+
+    // The hand-over from "the file is readable" to the pipeline has no gap: an
+    // error right after the first bytes still has a listener.
+    it("handles a file that fails right after its first bytes", async () => {
+      const uncaught = [];
+      const onUncaught = (err) => uncaught.push(err.message);
+      process.on("uncaughtException", onUncaught);
+      downloadOverride = () => {
+        let sent = false;
+        return new Readable({
+          read() {
+            if (sent) return;
+            sent = true;
+            this.push(Buffer.alloc(1024, 7));
+            process.nextTick(() => this.destroy(new Error("read failed just after the first bytes")));
+          },
+        });
+      };
+      try {
+        await fetch(byName())
+          .then((response) => response.arrayBuffer())
+          .catch(() => {});
+        await new Promise((resolve) => setTimeout(resolve, 100));
+        assert.deepEqual(uncaught, []);
+      } finally {
+        process.off("uncaughtException", onUncaught);
+        downloadOverride = null;
+      }
+    });
+
+    it("closes the file when the client left while it was being opened", async () => {
+      let destroyed = false;
+      downloadOverride = async () => {
+        await new Promise((resolve) => setTimeout(resolve, 200)); // the client leaves meanwhile
+        return new Readable({
+          read() {
+            this.push(Buffer.alloc(1024, 7));
+          },
+          destroy(err, callback) {
+            destroyed = true;
+            callback(err);
+          },
+        });
+      };
+      try {
+        const controller = new AbortController();
+        const request = fetch(byName(), { signal: controller.signal }).catch(() => {});
+        await new Promise((resolve) => setTimeout(resolve, 50));
+        controller.abort();
+        await request;
+        for (let i = 0; i < 50 && !destroyed; i++) await new Promise((resolve) => setTimeout(resolve, 20));
+        assert.equal(destroyed, true, "a file opened for a client that already left must be closed");
+      } finally {
+        downloadOverride = null;
+      }
+    });
+
+    // Express runs the GET handler for HEAD; a HEAD needs only the headers, so
+    // the file mustn't be opened (let alone read through to the end).
+    for (const [label, headers, status, length, contentRange] of [
+      ["a whole-file HEAD", {}, 200, String(size), null],
+      ["a ranged HEAD", { Range: "bytes=100-199" }, 206, "100", `bytes 100-199/${size}`],
+    ]) {
+      it(`answers ${label} with the headers alone, without opening the file`, async () => {
+        let opened = 0;
+        downloadOverride = () => {
+          opened += 1;
+          return Readable.from([Buffer.alloc(0)]);
+        };
+        try {
+          const response = await fetch(byName(), { method: "HEAD", headers });
+          assert.equal(response.status, status);
+          assert.equal(response.headers.get("content-length"), length);
+          assert.equal(response.headers.get("content-range"), contentRange);
+          assert.equal(response.headers.get("content-type"), "video/mp4");
+          assert.equal(opened, 0, "a HEAD must not open the file");
+        } finally {
+          downloadOverride = null;
+        }
+      });
+    }
+
+    it("ends the response when the file fails partway through", async () => {
+      downloadOverride = () => {
+        let sent = false;
+        return new Readable({
+          read() {
+            if (sent) return; // the next bytes never come; the read fails instead
+            sent = true;
+            this.push(Buffer.alloc(1024, 7));
+            setTimeout(() => this.destroy(new Error("disk read failed")), 100);
+          },
+        });
+      };
+      try {
+        const response = await fetch(byName());
+        assert.equal(response.status, 200); // headers were already on their way
+        const outcome = await Promise.race([
+          response.arrayBuffer().then(
+            () => "completed",
+            () => "cut off",
+          ),
+          new Promise((resolve) => setTimeout(() => resolve("still waiting"), 2000)),
+        ]);
+        assert.equal(outcome, "cut off", "a failed file must end the response, not leave the client waiting");
+      } finally {
+        downloadOverride = null;
+      }
+    });
 
     it("does not serve one project's video under another project's id", async () => {
       assetScopes.length = 0;

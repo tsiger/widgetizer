@@ -5,12 +5,11 @@
 // (`/render/:token`), so the default base reproduces today's behaviour
 // (VITE_API_URL when the bundle and API are split in dev, else same-origin "").
 //
-// A nested host (hosted mounts the editor under /sites/:siteId/edit and serves
-// the render endpoint under its project-scoped API) needs the iframe to hit a
-// proxied, same-origin `/api/...` path so the session cookie authorizes the
-// preview's media/asset subrequests. It calls setPreviewRenderBase() once on
-// mount, mirroring setApiBase(). Registry (not context) so PreviewPanel's
-// non-hook helper can read it.
+// A host that serves its render documents elsewhere (another path, or another
+// origin entirely) calls setPreviewRenderBase() once on mount, mirroring
+// setApiBase(). The base's origin is also the one postMessage targets and the
+// one inbound preview messages must come from (previewMessages.js). Registry
+// (not context) so PreviewPanel's non-hook helper can read it.
 let _previewRenderBase = import.meta.env.VITE_API_URL || "";
 
 export function setPreviewRenderBase(base) {

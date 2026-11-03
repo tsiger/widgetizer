@@ -3,6 +3,7 @@ import useProjectStore from "../stores/projectStore";
 import useWidgetStore from "../stores/widgetStore";
 import fontDefinitions from "@widgetizer/core/config/fonts.json" with { type: "json" };
 import { getPreviewTargetOrigin } from "../lib/previewBase";
+import { pageOpensTransparent } from "../lib/transparentHeader";
 import { readThemeSetting, themeSettingsOfType } from "@widgetizer/core/themeSettingChanges";
 import { changedThemeSettingPaths, readsDependOn } from "@widgetizer/core/themeReads";
 import { collectThemeFonts, themeFontsStylesheetUrl } from "@widgetizer/core/themeFonts";
@@ -11,13 +12,22 @@ const ALL_FONTS_LIST = [...fontDefinitions.system, ...fontDefinitions.google];
 
 /**
  * Fetch a preview token for src-based rendering.
+ *
+ * The answer is returned as the server sent it. A host whose preview documents
+ * load under a session of their own adds `session` (an opaque id) and its
+ * deadlines `absoluteExpiresAt` / `idleExpiresAt` (epoch milliseconds); the
+ * editor echoes the session on that document's widget re-renders and names it as
+ * `replaces` when it mints the next document in the same frame. The OSS server
+ * answers `{ token }` only, and is sent no `replaces`.
  * @param {Object} pageData - Page content including widgets and metadata
  * @param {Object} themeSettings - Current theme settings for rendering
  * @param {string} [previewMode="editor"] - Preview mode
- * @returns {Promise<{token: string}>} Object with token property
+ * @param {number} [pageNumber=1]
+ * @param {{ replaces?: string|null }} [options] - The session of the document this one replaces
+ * @returns {Promise<{token: string, session?: string, absoluteExpiresAt?: number, idleExpiresAt?: number}>}
  * @throws {Error} If the request fails
  */
-export async function fetchPreviewToken(pageData, themeSettings, previewMode = "editor", pageNumber = 1) {
+export async function fetchPreviewToken(pageData, themeSettings, previewMode = "editor", pageNumber = 1, { replaces } = {}) {
   try {
     return await editorFetchJson("/preview/token", {
       method: "POST",
@@ -29,12 +39,118 @@ export async function fetchPreviewToken(pageData, themeSettings, previewMode = "
         themeSettings,
         previewMode,
         ...(pageNumber > 1 ? { pageNumber } : {}),
+        ...(replaces ? { replaces } : {}),
       }),
     }, { fallbackMessage: "Failed to create preview token" });
   } catch (error) {
     console.error("Preview token error:", error);
     rethrowQueryError(error, "Failed to create preview token");
   }
+}
+
+// How often a visible preview touches its session, well inside any idle lifetime
+// a host would give it.
+export const KEEP_ALIVE_MS = 5 * 60 * 1000;
+
+// setTimeout fires at once for delays past this.
+const MAX_TIMER_MS = 2 ** 31 - 1;
+
+/**
+ * Keep a preview document's session alive while the tab is visible, and say when
+ * it has ended. Does nothing — and sends nothing — when the mint gave no session
+ * (the OSS server never does).
+ *
+ * While visible it touches the session every KEEP_ALIVE_MS, so the idle lifetime
+ * effectively runs only while the tab is hidden or closed. `onEnded` is called at
+ * most once: when the absolute deadline passes with the tab visible, when the tab
+ * becomes visible (or regains focus) after it, or when a touch answers 410. A
+ * hidden tab is never reloaded; it finds out on return. Other touch failures are
+ * ignored and retried on the next tick.
+ *
+ * @param {object} options
+ * @param {string|null|undefined} options.session
+ * @param {number} options.absoluteExpiresAt - Epoch ms; never moves for a session.
+ * @param {number} options.idleExpiresAt - Epoch ms. Only checked for shape: the idle
+ *   deadline is the server's to judge, so a touch (and its 410) decides, not a clock.
+ * @param {() => void} options.onEnded
+ * @returns {() => void} stop — clears the timers and listeners; answers that land after it are ignored.
+ */
+export function startPreviewKeepAlive({ session, absoluteExpiresAt, idleExpiresAt, onEnded }) {
+  if (!session) return () => {};
+  if (!Number.isFinite(absoluteExpiresAt) || !Number.isFinite(idleExpiresAt)) {
+    console.warn("Preview session has no usable deadlines; it is not kept alive.");
+    return () => {};
+  }
+
+  let stopped = false;
+  let ended = false;
+  let inFlight = null;
+  let deadlineTimer = null;
+
+  const visible = () => document.visibilityState === "visible";
+
+  const end = () => {
+    if (stopped || ended) return;
+    ended = true;
+    stop();
+    onEnded();
+  };
+
+  const touch = () => {
+    if (stopped || ended || inFlight) return;
+    inFlight = (async () => {
+      try {
+        await editorFetchJson(
+          "/preview/session/touch",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ session }),
+          },
+          { fallbackMessage: "Failed to keep the preview session alive" },
+        );
+      } catch (error) {
+        if (stopped || ended) return;
+        if (error?.status === 410) end();
+      } finally {
+        inFlight = null;
+      }
+    })();
+  };
+
+  const armDeadline = () => {
+    const delay = Math.min(Math.max(absoluteExpiresAt - Date.now(), 0), MAX_TIMER_MS);
+    deadlineTimer = setTimeout(() => {
+      if (Date.now() < absoluteExpiresAt) return armDeadline();
+      if (visible()) end();
+    }, delay);
+  };
+
+  const onReturn = () => {
+    if (stopped || ended || !visible()) return;
+    if (Date.now() >= absoluteExpiresAt) return end();
+    // Only the server knows whether the session idled out meanwhile.
+    touch();
+  };
+
+  const interval = setInterval(() => {
+    if (visible()) touch();
+  }, KEEP_ALIVE_MS);
+  armDeadline();
+  window.addEventListener("focus", onReturn);
+  document.addEventListener("visibilitychange", onReturn);
+
+  function stop() {
+    stopped = true;
+    clearInterval(interval);
+    clearTimeout(deadlineTimer);
+    window.removeEventListener("focus", onReturn);
+    document.removeEventListener("visibilitychange", onReturn);
+  }
+
+  return () => {
+    if (!stopped) stop();
+  };
 }
 
 /**
@@ -163,14 +279,38 @@ async function mapWithConcurrency(items, limit, task) {
 }
 
 /**
- * Fetch a single rendered widget together with the site settings it read.
- * @returns {Promise<{ html: string, themeReads: string[] | null }>}
+ * The preview document's session ended (the server answered 410): its widgets
+ * can no longer be re-rendered into it, and only a full reload — a new document
+ * with a new session — brings the preview back.
  */
-export async function fetchRenderedWidgetWithReads(widgetId, widget, themeSettings, currentCanonicalPath = "", page = null, area = null) {
+export class PreviewSessionExpired extends Error {
+  constructor() {
+    super("Preview session expired");
+    this.name = "PreviewSessionExpired";
+  }
+}
+
+/**
+ * Fetch a single rendered widget together with the site settings it read.
+ * @param {{ session?: string|null }} [options] - The preview document's session,
+ *   sent as `X-Preview-Session` when there is one.
+ * @returns {Promise<{ html: string, themeReads: string[] | null }>}
+ * @throws {PreviewSessionExpired} When the server answers 410
+ */
+export async function fetchRenderedWidgetWithReads(
+  widgetId,
+  widget,
+  themeSettings,
+  currentCanonicalPath = "",
+  page = null,
+  area = null,
+  { session } = {},
+) {
   const response = await editorFetch("/preview/widget", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      ...(session ? { "X-Preview-Session": session } : {}),
     },
     body: JSON.stringify({
       widgetId,
@@ -184,6 +324,7 @@ export async function fetchRenderedWidgetWithReads(widgetId, widget, themeSettin
   });
 
   if (!response.ok) {
+    if (response.status === 410) throw new PreviewSessionExpired();
     await throwApiError(response, "Failed to render widget");
   }
 
@@ -204,11 +345,13 @@ export async function fetchRenderedWidgetWithReads(widgetId, widget, themeSettin
  * @param {HTMLIFrameElement} iframe - Preview iframe element
  * @param {Object} newState - New page state with widgets, globalWidgets, themeSettings
  * @param {Object} [oldState] - Previous page state for comparison
+ * @param {{ session?: string|null }} [options] - The preview document's session, if the host gave it one
  * @returns {Promise<{ stale?: boolean, needsReload?: boolean }>} `stale` when a newer
  *   update started meanwhile (nothing was applied); `needsReload` when the page
- *   layout reads a changed site setting, so only a full render shows it.
+ *   layout reads a changed site setting, so only a full render shows it, or when
+ *   the document's session ended (nothing is morphed then).
  */
-export async function updatePreview(iframe, newState, oldState) {
+export async function updatePreview(iframe, newState, oldState, { session } = {}) {
   if (!iframe?.contentWindow || !newState) {
     return {};
   }
@@ -279,7 +422,10 @@ export async function updatePreview(iframe, newState, oldState) {
     jobs.push({ widgetId: "footer", data: newGlobalWidgets.footer, area: null });
   }
 
+  // Once one render says the document's session ended, the rest are not asked for.
+  let sessionExpired = false;
   const results = await mapWithConcurrency(jobs, RENDER_CONCURRENCY, async (job) => {
+    if (sessionExpired) return null;
     try {
       return await fetchRenderedWidgetWithReads(
         job.widgetId,
@@ -288,14 +434,22 @@ export async function updatePreview(iframe, newState, oldState) {
         currentCanonicalPath,
         newState.page,
         job.area,
+        { session },
       );
     } catch (error) {
+      if (error instanceof PreviewSessionExpired) {
+        sessionExpired = true;
+        return null;
+      }
       console.error(`Error updating widget ${job.widgetId}:`, error);
       return null;
     }
   });
 
   if (!isCurrent()) return { stale: true };
+  // Morph nothing: a page with some widgets swapped in and others not is worse
+  // than the full reload this asks for.
+  if (sessionExpired) return { needsReload: true };
 
   jobs.forEach((job, index) => {
     const result = results[index];
@@ -311,17 +465,7 @@ export async function updatePreview(iframe, newState, oldState) {
   // Sync transparent-header body class when header settings change
   if (headerChanged) {
     const transparentOn = !!newGlobalWidgets.header?.settings?.transparent_on_hero;
-    let shouldBeTransparent = false;
-
-    if (transparentOn) {
-      const widgetOrder = newState.page?.widgetsOrder || Object.keys(newWidgets);
-      const firstWidgetId = widgetOrder[0];
-      const firstWidget = firstWidgetId && newWidgets[firstWidgetId];
-      if (firstWidget) {
-        const schemas = useWidgetStore.getState().schemas;
-        shouldBeTransparent = schemas[firstWidget.type]?.supportsTransparentHeader === true;
-      }
-    }
+    const shouldBeTransparent = transparentOn && pageOpensTransparent(newState.page, useWidgetStore.getState().schemas);
 
     iframe.contentWindow.postMessage(
       { type: "UPDATE_BODY_CLASS", payload: { className: "transparent-header", enabled: shouldBeTransparent } },

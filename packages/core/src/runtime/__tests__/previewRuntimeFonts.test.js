@@ -4,10 +4,14 @@ import { beforeAll, describe, expect, it } from "vitest";
 const fontLinks = () => [...document.querySelectorAll('link[rel="stylesheet"]')].map((link) => link.href);
 
 function post(payload) {
-  window.dispatchEvent(new MessageEvent("message", { data: { type: "LOAD_FONTS", payload } }));
+  window.dispatchEvent(
+    new MessageEvent("message", { data: { type: "LOAD_FONTS", payload }, origin: window.location.origin }),
+  );
 }
 
 beforeAll(async () => {
+  // The editor's origin, as the editor passes it; without it the runtime obeys no message.
+  window.history.replaceState(null, "", `?parentOrigin=${encodeURIComponent(window.location.origin)}`);
   document.head.innerHTML =
     '<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400&display=swap" rel="stylesheet">';
   await import("../previewRuntime.js");

@@ -168,6 +168,34 @@ describe("a language", () => {
     assert.equal(greek.widgets.n1.settings.cta.text, "About us", "words are copied, not translated");
   });
 
+  it("copies an area's order once, though the default language's names a widget twice", async () => {
+    const project = await createSite("Repeats");
+    // As an area written by hand or restored from a backup can be on disk.
+    const english = await fs.readJson(areaPath(project));
+    const [first] = english.widgetsOrder;
+    await fs.writeJson(areaPath(project), { ...english, widgetsOrder: [first, ...english.widgetsOrder, first] });
+
+    const res = await call(createLanguage, { body: { code: "el" }, project });
+    assert.equal(res._status, 201, JSON.stringify(res._json));
+    assert.deepEqual((await fs.readJson(areaPath(project, "el"))).widgetsOrder, english.widgetsOrder);
+  });
+
+  it("copies the header's and an area widget's repeated block once", async () => {
+    const project = await createSite("Block repeats");
+    const dir = getProjectDir(project.folderName);
+    const headerFile = path.join(dir, "pages", "global", "header.json");
+    await fs.outputJson(headerFile, { type: "header", settings: {}, blocks: { b1: { type: "link", settings: {} } }, blocksOrder: ["b1", "b1"] });
+    const english = await fs.readJson(areaPath(project));
+    const [first] = english.widgetsOrder;
+    english.widgets[first] = { ...english.widgets[first], blocks: { c1: { type: "item", settings: {} } }, blocksOrder: ["c1", "c1", "c1"] };
+    await fs.writeJson(areaPath(project), english);
+
+    const res = await call(createLanguage, { body: { code: "el" }, project });
+    assert.equal(res._status, 201, JSON.stringify(res._json));
+    assert.deepEqual((await fs.readJson(path.join(dir, "pages", "el", "global", "header.json"))).blocksOrder, ["b1"]);
+    assert.deepEqual((await fs.readJson(areaPath(project, "el"))).widgets[first].blocksOrder, ["c1"]);
+  });
+
   it("does not get a file for an area never filled in the default language", async () => {
     await writeTheme("1.0.0");
     const project = await createSite("Empty area");

@@ -14,6 +14,7 @@
     "./lib/activeProjectId": "./src/lib/activeProjectId.js",
     "./lib/uploadRequest": "./src/lib/uploadRequest.js",
     "./lib/previewBase": "./src/lib/previewBase.js",
+    "./lib/previewMessages": "./src/lib/previewMessages.js",
     "./lib/openSitePreview": "./src/lib/openSitePreview.js",
     "./queries/pageManager": "./src/queries/pageManager.js",
     "./queries/menuManager": "./src/queries/menuManager.js",

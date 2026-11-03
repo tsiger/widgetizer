@@ -1874,3 +1874,101 @@ describe("deleting a parent page that has translations", () => {
     assert.equal(await parentOf("de", "team"), "about-de");
   });
 });
+
+// ---------------------------------------------------------------------------
+// A widget order naming the same widget more than once: every renderer would
+// render each entry, so the widget ceiling would not bound render work. Repeats
+// are dropped quietly (first one kept) rather than refused, because the editor
+// posts back whatever order it loaded, and a refusal would leave content that
+// already carries repeats unsaveable.
+// ---------------------------------------------------------------------------
+
+describe("a widget order that names a widget more than once", () => {
+  beforeEach(async () => {
+    await resetPages();
+  });
+
+  const widgets = {
+    a: { type: "text", settings: {} },
+    b: { type: "text", settings: {} },
+  };
+  const stored = async (slug) => (await fs.readJson(getPagePath(activeProject.folderName, slug))).widgetsOrder;
+
+  it("is stored once by a content save", async () => {
+    const page = await createTestPage("Repeats Saved");
+    const res = await callController(savePageContent, {
+      params: { id: page.slug },
+      body: { name: "Repeats Saved", slug: page.slug, widgets, widgetsOrder: ["a", "b", "a", "a", "b"] },
+    });
+    assert.equal(res._status, 200);
+    assert.deepEqual(await stored(page.slug), ["a", "b"]);
+  });
+
+  it("doesn't count repeats against the widget ceiling", async () => {
+    const page = await createTestPage("Repeats Counted");
+    const res = await callController(savePageContent, {
+      params: { id: page.slug },
+      body: { name: "Repeats Counted", slug: page.slug, widgets, widgetsOrder: Array(6000).fill("a") },
+    });
+    assert.equal(res._status, 200);
+    assert.deepEqual(await stored(page.slug), ["a"]);
+  });
+
+  it("is stored once by a page update", async () => {
+    const page = await createTestPage("Repeats Updated");
+    const res = await callController(updatePage, {
+      params: { id: page.slug },
+      body: { name: "Repeats Updated", slug: page.slug, widgets, widgetsOrder: ["b", "b", "a"] },
+    });
+    assert.equal(res._status, 200);
+    assert.deepEqual(await stored(page.slug), ["b", "a"]);
+  });
+
+  it("starts empty on a new page, which has no widgets yet", async () => {
+    const page = await createTestPage("Repeats Created", { widgetsOrder: ["a", "a", "a"] });
+    assert.deepEqual(await stored(page.slug), []);
+  });
+
+  // The same one level down: a widget's blocksOrder.
+  const withBlocks = (blocksOrder) => ({
+    a: { type: "text", settings: {}, blocks: { x: { type: "item", settings: {} }, y: { type: "item", settings: {} } }, blocksOrder },
+  });
+  const storedBlocks = async (slug) => (await fs.readJson(getPagePath(activeProject.folderName, slug))).widgets.a.blocksOrder;
+
+  it("stores a widget's repeated block once, on a content save and an update", async () => {
+    const page = await createTestPage("Block Repeats");
+    let res = await callController(savePageContent, {
+      params: { id: page.slug },
+      body: { name: "Block Repeats", slug: page.slug, widgets: withBlocks(["x", "x", "y", "x"]), widgetsOrder: ["a"] },
+    });
+    assert.equal(res._status, 200);
+    assert.deepEqual(await storedBlocks(page.slug), ["x", "y"]);
+
+    res = await callController(updatePage, {
+      params: { id: page.slug },
+      body: { name: "Block Repeats", slug: page.slug, widgets: withBlocks(["y", "y", "x"]), widgetsOrder: ["a"] },
+    });
+    assert.equal(res._status, 200);
+    assert.deepEqual(await storedBlocks(page.slug), ["y", "x"]);
+  });
+
+  it("copies a widget's repeated block once in a duplicate", async () => {
+    const page = await createTestPage("Block Source");
+    const file = getPagePath(activeProject.folderName, page.slug);
+    await fs.writeJson(file, { ...(await fs.readJson(file)), widgets: withBlocks(["x", "x", "y"]), widgetsOrder: ["a"] });
+    const res = await callController(duplicatePage, { params: { id: page.slug } });
+    assert.equal(res._status, 201);
+    assert.deepEqual(await storedBlocks(res._json.slug), ["x", "y"]);
+  });
+
+  it("is copied once by a duplicate", async () => {
+    const page = await createTestPage("Repeats Source");
+    // As a page written by hand or restored from a backup can be on disk.
+    const file = getPagePath(activeProject.folderName, page.slug);
+    await fs.writeJson(file, { ...(await fs.readJson(file)), widgets, widgetsOrder: ["a", "a", "b"] });
+
+    const res = await callController(duplicatePage, { params: { id: page.slug } });
+    assert.equal(res._status, 201);
+    assert.deepEqual(await stored(res._json.slug), ["a", "b"]);
+  });
+});

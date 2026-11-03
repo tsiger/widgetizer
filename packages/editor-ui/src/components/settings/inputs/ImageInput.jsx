@@ -1,8 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { uploadProjectMedia, getProjectMedia, invalidateMediaCache } from "../../../queries/mediaManager";
+import { uploadProjectMedia, getProjectMedia, saveMediaMetadata } from "../../../queries/mediaManager";
 import { API_URL } from "../../../lib/config";
-import { apiFetch } from "../../../lib/apiFetch";
 import useProjectStore from "../../../stores/projectStore";
 import useToastStore from "../../../stores/toastStore";
 import useAppSettings from "../../../hooks/useAppSettings";
@@ -110,24 +109,12 @@ export default function ImageInput({ id, value = "", onChange, size = "full", la
   const handleSaveMetadata = async (fileId, metadata, language) => {
     setIsSavingMetadata(true);
     try {
-      const query = language ? `?language=${encodeURIComponent(language)}` : "";
-      const response = await apiFetch(`/api/media/projects/${activeProject.id}/media/${fileId}/metadata${query}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(metadata),
-      });
-
-      if (!response.ok) throw new Error("Failed to update metadata");
-
-      const updatedFileData = await response.json();
+      const updatedFileData = await saveMediaMetadata(activeProject.id, fileId, metadata, language);
       setCurrentImageFile((prev) => ({
         ...prev,
         metadata: updatedFileData.file.metadata,
         translations: updatedFileData.file.translations,
       }));
-      // Drop the shared 30s media cache so the Media page (and other image inputs)
-      // re-fetch fresh metadata on their next load instead of serving stale data.
-      invalidateMediaCache(activeProject.id);
       setMetadataDrawerVisible(false);
       showToast("Metadata updated.", "success");
     } catch (err) {

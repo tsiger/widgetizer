@@ -21,7 +21,10 @@ import assert from "node:assert/strict";
 import fs from "fs-extra";
 import path from "path";
 import os from "os";
+import crypto from "crypto";
+import { PassThrough } from "stream";
 import { fileURLToPath } from "node:url";
+import AdmZip from "adm-zip";
 
 // ============================================================================
 // Isolated test environment
@@ -1318,14 +1321,39 @@ describe("downloadExport", () => {
     await fs.remove(path.join(PUBLISH_DIR, testExportDir));
   });
 
-  it("sets correct ZIP response headers", async () => {
-    const req = mockReq({
-      params: { exportDir: testExportDir },
-      scope: { projectId: PROJECT_ID, folderName: testExportDir },
+  /** A response that is a real writable stream, collecting what the ZIP sends. */
+  function streamRes() {
+    const res = new PassThrough();
+    const chunks = [];
+    res.on("data", (chunk) => chunks.push(chunk));
+    Object.assign(res, {
+      _status: 200,
+      _headers: {},
+      headersSent: false,
+      status(code) {
+        res._status = code;
+        return res;
+      },
+      json(data) {
+        res._json = data;
+        return res;
+      },
+      setHeader(key, value) {
+        res._headers[key] = value;
+        return res;
+      },
+      body: () => Buffer.concat(chunks),
     });
-    const res = mockRes();
+    return res;
+  }
 
-    // downloadExport pipes to res as a stream — we need a writable mock
+  const downloadReq = (exportDir) =>
+    mockReq({ params: { exportDir }, scope: { projectId: PROJECT_ID, folderName: exportDir } });
+
+  it("sets correct ZIP response headers", async () => {
+    const req = downloadReq(testExportDir);
+    const res = streamRes();
+
     await downloadExport(req, res);
 
     assert.equal(res._headers["Content-Type"], "application/zip");
@@ -1334,6 +1362,81 @@ describe("downloadExport", () => {
       "Content-Disposition should include dir name",
     );
     assert.ok(res._headers["Content-Disposition"].includes(".zip"), "Should have .zip extension");
+  });
+
+  it("zips folders (empty ones too) and dotfiles, and leaves out system junk", async () => {
+    const dir = "test-download-entries";
+    const full = path.join(PUBLISH_DIR, dir);
+    await fs.outputFile(path.join(full, "index.html"), "a");
+    await fs.outputFile(path.join(full, "assets", "css", "s.css"), "b");
+    await fs.ensureDir(path.join(full, "empty"));
+    await fs.outputFile(path.join(full, ".htaccess"), "c");
+    await fs.outputFile(path.join(full, "sub", ".hidden", "h.txt"), "d");
+    await fs.outputFile(path.join(full, ".DS_Store"), "junk");
+    await fs.outputFile(path.join(full, "assets", "Thumbs.db"), "junk");
+    await fs.outputFile(path.join(full, "__MACOSX", "x"), "junk");
+    // Links are kept as links and never followed — not into a folder of the
+    // export, and not out of it.
+    const outside = path.join(PUBLISH_DIR, "test-download-outside");
+    await fs.outputFile(path.join(outside, "secret.txt"), "outside the export");
+    await fs.symlink("index.html", path.join(full, "link.html"));
+    await fs.symlink("assets", path.join(full, "linkdir"));
+    await fs.symlink(path.relative(full, outside), path.join(full, "escape"));
+    try {
+      const res = streamRes();
+      const ended = new Promise((resolve) => res.on("end", resolve));
+      await downloadExport(downloadReq(dir), res);
+      await ended;
+      const entries = new AdmZip(res.body()).getEntries();
+      const names = entries.map((entry) => entry.entryName).sort();
+      assert.deepEqual(names, [
+        ".htaccess",
+        "assets/",
+        "assets/css/",
+        "assets/css/s.css",
+        "empty/",
+        "escape",
+        "index.html",
+        "link.html",
+        "linkdir",
+        "sub/",
+        "sub/.hidden/",
+        "sub/.hidden/h.txt",
+      ]);
+      const SYMLINK = 0o120000;
+      const links = Object.fromEntries(
+        entries
+          .filter((entry) => ((entry.header.attr >>> 16) & 0o170000) === SYMLINK)
+          .map((entry) => [entry.entryName, entry.getData().toString()]),
+      );
+      assert.deepEqual(links, { escape: "../test-download-outside", "link.html": "index.html", linkdir: "assets" });
+    } finally {
+      await fs.remove(full);
+      await fs.remove(outside);
+    }
+  });
+
+  it("stops when the client abandons the download, and the request finishes", async () => {
+    const dir = "test-download-abandoned";
+    const full = path.join(PUBLISH_DIR, dir);
+    // Incompressible and large, so the download is still mid-file when the client leaves.
+    await fs.outputFile(path.join(full, "big.bin"), crypto.randomBytes(32 * 1024 * 1024));
+    try {
+      const res = streamRes();
+      // The client leaves a megabyte in, partway through the large file.
+      let received = 0;
+      res.on("data", (chunk) => {
+        received += chunk.length;
+        if (received > 1024 * 1024 && !res.destroyed) res.destroy();
+      });
+      const outcome = await Promise.race([
+        downloadExport(downloadReq(dir), res).then(() => "finished"),
+        new Promise((resolve) => setTimeout(() => resolve("still running"), 3000)),
+      ]);
+      assert.equal(outcome, "finished", "an abandoned download must stop, not run on");
+    } finally {
+      await fs.remove(full);
+    }
   });
 
   it("returns 400 when exportDir is missing", async () => {
@@ -1843,5 +1946,94 @@ describe("file asset export", () => {
       !html.includes("/uploads/images/"),
       "Exported HTML should not contain raw /uploads/images/ storage paths",
     );
+  });
+});
+
+// A page file whose order names a widget more than once (written by hand, or
+// restored from a backup) renders it once.
+describe("exportProject — a page order that names a widget more than once", () => {
+  const repeatsPage = () => path.join(getProjectPagesDir(PROJECT_FOLDER), "repeats.json");
+  after(async () => {
+    await fs.remove(repeatsPage());
+  });
+
+  it("renders the widget once", async () => {
+    await fs.writeFile(
+      repeatsPage(),
+      JSON.stringify({
+        name: "Repeats",
+        slug: "repeats",
+        uuid: "page-uuid-repeats",
+        widgets: { "link-1": { type: "core-link", settings: { href: "/contact.html", text: "Only once, please" } } },
+        widgetsOrder: ["link-1", "link-1", "link-1"],
+      }),
+    );
+    const res = await callController(exportProject, { params: { projectId: PROJECT_ID } });
+    assert.equal(res._status, 200, JSON.stringify(res._json));
+    const html = await fs.readFile(path.join(await getLatestExportDir(), "repeats.html"), "utf8");
+    assert.equal(html.split("Only once, please").length - 1, 1);
+  });
+});
+
+// Export renders a page's widgets as the editor's preview does: the ones its order
+// names that the page holds itself, never one stored under the header's or footer's
+// id or an inherited name; with no order list at all, the page's widgets in their own
+// order. The transparent header follows the first widget shown.
+describe("exportProject — which widgets a page renders", () => {
+  const pageFile = () => path.join(getProjectPagesDir(PROJECT_FOLDER), "which.json");
+  const headerFile = () => path.join(getProjectPagesDir(PROJECT_FOLDER), "global", "header.json");
+  const leadDir = () => path.join(getProjectDir(PROJECT_FOLDER), "widgets", "lead");
+  let header;
+  before(async () => {
+    header = await fs.readFile(headerFile(), "utf8");
+    await fs.outputFile(path.join(leadDir(), "widget.liquid"), "<section>Lead widget</section>");
+    await fs.outputFile(
+      path.join(leadDir(), "schema.json"),
+      JSON.stringify({ name: "lead", supportsTransparentHeader: true, settings: [] }),
+    );
+  });
+  after(async () => {
+    await fs.remove(pageFile());
+    await fs.remove(leadDir());
+    await fs.writeFile(headerFile(), header);
+  });
+
+  const link = (text) => ({ type: "core-link", settings: { href: "/contact.html", text } });
+  const exportPage = async (fields) => {
+    await fs.writeFile(
+      pageFile(),
+      JSON.stringify({ name: "Which", slug: "which", uuid: "page-uuid-which", widgets: {}, ...fields }),
+    );
+    const res = await callController(exportProject, { params: { projectId: PROJECT_ID } });
+    assert.equal(res._status, 200, JSON.stringify(res._json));
+    return fs.readFile(path.join(await getLatestExportDir(), "which.html"), "utf8");
+  };
+
+  it("leaves out an inherited name instead of an error placeholder", async () => {
+    const html = await exportPage({ widgets: { a: link("Shown link") }, widgetsOrder: ["constructor", "a"] });
+    assert.match(html, /Shown link/);
+    assert.doesNotMatch(html, /data-widget-id="constructor"/);
+  });
+
+  // A hand-made file can hold anything in the order; an entry that isn't an id is
+  // skipped, never a crash of the whole export.
+  it("skips an order entry that isn't an id", async () => {
+    const html = await exportPage({ widgets: { a: link("Shown link") }, widgetsOrder: [{ toString: null }, 7, "a"] });
+    assert.match(html, /Shown link/);
+  });
+
+  it("renders the page's widgets in their own order when it has no order list", async () => {
+    const html = await exportPage({ widgets: { a: link("First link"), header: link("Hidden link"), b: link("Second link") } });
+    assert.match(html, /First link[\s\S]*Second link/);
+    assert.doesNotMatch(html, /Hidden link/);
+  });
+
+  it("makes the header transparent by the first widget shown", async () => {
+    await fs.writeFile(headerFile(), JSON.stringify({ type: "core-spacer", settings: { height: 10, transparent_on_hero: true } }));
+    const html = await exportPage({
+      widgets: { header: link("Hidden link"), first: { type: "lead", settings: {} } },
+      widgetsOrder: ["gone", "header", "first"],
+    });
+    assert.match(html, /<body class="[^"]*transparent-header/);
   });
 });

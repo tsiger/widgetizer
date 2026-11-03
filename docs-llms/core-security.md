@@ -145,7 +145,7 @@ See [Site Exporting](core-export.md) for the export/import flow detail.
 **Path/isolation guards** (each rejects path separators and `..`):
 
 - **`serveAsset`** (`previewController.js`) allow-lists the folder segment to `{ assets, widgets }` — anything else is `400` (SA-01) — then `path.normalize`s the subpath, strips leading `..`, and re-checks `isWithinDirectory(filePath, baseDir)`.
-- **Media-metadata route** owner-checks the inner `:projectId` before returning metadata (TI-03).
+- **Media-metadata save** takes the project from the resolved scope and looks the file up within it, so another project's file id is a 404 (TI-03).
 - **Export serve** binds to `req.scope.folderName` via `exportDirBelongsToScope()` (`exportController.js`): it rejects `/`, `\`, and `..`, then anchors the directory to `<folderName>` or `<folderName>-v<digits>` (an anchored allowlist, not a prefix match) (TI-02/SA-13). See [Site Exporting](core-export.md).
 - **Slugs and ids from a request** become storage keys or folders before they are used (`middleware/slugValidators.js`); Express decodes `%2F` in params, so `..%2Ftheme` would otherwise reach the project's `theme.json`. Collection slugs and types must match `^[a-z0-9-]+$`; page and menu slugs (route params, the page save's body `slug`, bulk-delete lists) and theme ids on every `/api/themes/:id` route must be a single name (`isSafePathSegment`, `utils/pathSecurity.js`: no separator, NUL, `.` or `..`), because a theme's own page files and uploaded theme folders keep names outside the strict form.
 - **Theme and preset names on project creation** must each be a single name; `scaffoldProjectContent` and `resolvePresetPaths` re-check them for callers that skip the route.
@@ -155,13 +155,13 @@ See [Site Exporting](core-export.md) for the export/import flow detail.
 
 **DoS limit keys** (enforced via the `LimitsAdapter` over `scope`; OSS `LocalLimitsAdapter` returns the App Settings upload cap for `MAX_UPLOAD_SIZE_BYTES` and `Infinity` for the count/quota keys, while hosted `CloudLimitsAdapter` returns finite tenant ceilings — see [Packages & Adapter Architecture](core-packages.md)):
 
-- `MAX_WIDGETS_PER_PAGE` — `savePageContent` returns `422` over-cap.
+- `MAX_WIDGETS_PER_PAGE` — `savePageContent` returns `422` over-cap. A widget order that names an id more than once is stored and rendered once per id (`uniqueWidgetOrder`, `@widgetizer/core/widgetOrder`), so repeats can't multiply render work past the cap: every render loop goes through it, and so do page and shared-area saves, page/area copies and the editor's load, so stored repeats clean themselves up. A widget's `blocksOrder` follows the same rule (`uniqueBlockOrder`, applied in `renderWidget` for every render); the server does not enforce a schema's `maxBlocks` — only the editor's add-block control does.
 - `MAX_MENU_ITEMS` + `MAX_MENU_DEPTH` (`= 32`, a hard structural cap exported from `@widgetizer/core/adapters`) — `menuController.validateMenuTree` walks the item tree **iteratively** (explicit stack, O(maxItems)) before any recursive sanitize/label/clone, bailing on either ceiling (`422`); the render engine's `resolveMenuItemLinks` is independently depth-capped at `MAX_MENU_DEPTH`.
 - `MAX_UPLOAD_SIZE_BYTES` — `mediaController.uploadWithLimit` applies it as a streaming multer `limits.fileSize`; the `errorHandler` maps `LIMIT_FILE_SIZE` → `413` (§7). See [Media Library](core-media.md).
 
 **Tenant SVG icon sanitization.** `IconInput.jsx`'s `sanitizeIconBody()` (`packages/editor-ui/src/components/settings/inputs/IconInput.jsx`) runs the DOMPurify SVG profile, applied at both `dangerouslySetInnerHTML` sinks. Icon bodies come verbatim from the project's tenant-authored `assets/icons.json` (notably via ZIP import, which copies it unvalidated), so injecting them in the editor origin would be stored XSS. It wraps the body in `<svg>` first so the SVG profile does not blank the bare inner fragment.
 
-**PostMessage origin scoping.** The preview bridge uses `getPreviewTargetOrigin()` (the resolved peer origin) instead of `"*"` (`packages/editor-ui/src/lib/previewBase.js`, consumed by `PreviewPanel.jsx`), so editor↔preview messages cannot leak across origins when isolation is enabled.
+**PostMessage origin scoping.** The preview bridge uses `getPreviewTargetOrigin()` (the resolved peer origin) instead of `"*"` (`packages/editor-ui/src/lib/previewBase.js`, consumed by `PreviewPanel.jsx`), so editor↔preview messages cannot leak across origins when isolation is enabled. Inbound, `readPreviewMessage()` (`packages/editor-ui/src/lib/previewMessages.js`) accepts a message only from the preview's origin (and, where the listener owns the iframe, from that iframe's window) and only when its payload matches its type's shape; an origin of `"*"` (an unparsable render base) accepts nothing.
 
 **LiquidJS floor.** `liquidjs` is pinned to `^10.26.0` in `@widgetizer/core` + `@widgetizer/render-engine`, which fixes the GHSA RCE/SSTI and the `strip_html` ReDoS.
 
@@ -198,9 +198,11 @@ Optional security boundary that runs the preview iframe on a separate origin fro
 
 **Token-based rendering:** Builder POSTs page data to the preview-token route, which renders HTML server-side and stores it in an in-memory token store (`packages/builder-server/src/services/previewTokenStore.js`). The iframe loads `/render/:token` (on the preview origin when isolation is enabled). Tokens expire after 5 minutes (`TOKEN_TTL_MS`), capped at 1000 concurrent (`MAX_TOKENS`, oldest evicted), with a 1-minute periodic sweep.
 
-**PostMessage origin verification:** All `postMessage` calls use explicit target origins (not `"*"`) when isolation is enabled (`getPreviewTargetOrigin()` in `previewBase.js`). The preview runtime rejects messages from unexpected origins.
+**PostMessage origin verification:** All `postMessage` calls use explicit target origins (not `"*"`) when isolation is enabled (`getPreviewTargetOrigin()` in `previewBase.js`). The editor validates every inbound message's origin, sender and payload (§11). The preview runtime obeys only the origin passed as `?parentOrigin=`; an editor-mode runtime loaded without one obeys no control message, and a message without object data is ignored.
 
-**Inline overlay rendering:** Selection/hover overlays are rendered inside the iframe by `previewRuntime.js` (`packages/core/src/runtime/previewRuntime.js`, served raw to the iframe via `express.static(/runtime)`), eliminating cross-origin `contentDocument` access. When the preview loads same-origin, `postMessage` uses `"*"`.
+**Editor frame sandbox:** the editor's preview iframe is sandboxed without `allow-top-navigation*` and without pop-ups (`PreviewPanel.jsx`), so a site script cannot navigate the editor's tab, directly or through an opened window. Like any sandbox it binds only once the preview is cross-origin.
+
+**Inline overlay rendering:** Selection/hover overlays are rendered inside the iframe by `previewRuntime.js` (`packages/core/src/runtime/previewRuntime.js`, served raw to the iframe via `express.static(/runtime)`), eliminating cross-origin `contentDocument` access. The editor reads nothing from the frame directly: the runtime reports what the editor needs (selection, scroll position) by `postMessage`.
 
 ### Project-Switch Isolation
 
@@ -236,7 +238,7 @@ Prevents data from one project being shown, saved, previewed, or exported agains
 | `NODE_ENV` | `development` or `production` |
 | `PORT` | Server port (default 3001) |
 | `VITE_API_URL` | Backend API base URL for the frontend |
-| `SERVER_URL` | Server's own base URL for runtime/preview URLs |
+| `SERVER_URL` | Server's own base URL, printed at startup (defaults to `http://127.0.0.1:<port>`); preview URLs don't use it |
 
 Preview isolation variables are described in §13 above.
 

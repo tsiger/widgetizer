@@ -207,12 +207,15 @@ Each page is a single JSON file in `templates/`. The filename is the page slug w
 
 ### 3.1 Widget instance IDs
 
-Widget instance IDs are the keys in the `widgets` object. They are freeform strings that:
+Widget instance IDs are the keys in the `widgets` object. They:
 
-- Use `snake_case`
-- Are descriptive of the widget's role on the page
-- Must be unique within the page
-- Must appear in `widgetsOrder` to be rendered
+- Must start with a letter or digit and use only letters, digits, `_` and `-`, at most 128 characters
+- Must not be `header` or `footer` (the site's header and footer) or a built-in JavaScript property name (`constructor`, `toString`, …)
+- Must be unique within the page, and not used by any shared-area template of the theme or preset (an area renders on every page)
+- Must appear in `widgetsOrder` to be rendered (a page with no `widgetsOrder` renders its widgets in the order written; give every page one)
+- By convention use `snake_case` and describe the widget's role on the page
+
+The theme checker refuses an id that breaks the first three rules.
 
 Examples: `"hero_banner"`, `"menu_starters"`, `"team_section"`, `"contact_map"`, `"faq"`
 
@@ -247,12 +250,12 @@ Examples: `"hero_banner"`, `"menu_starters"`, `"team_section"`, `"contact_map"`,
 
 ### 3.3 Block IDs
 
-Block IDs are the keys in the `blocks` object. They are freeform strings that:
+Block IDs are the keys in the `blocks` object. They:
 
-- Use `kebab-case`
-- Are descriptive of the block's content
+- Follow the same character, length and built-in-name rules as widget IDs (`header`/`footer` are allowed)
 - Must be unique within the widget
 - Must appear in `blocksOrder` to be rendered
+- By convention use `kebab-case` and describe the block's content
 
 Examples: `"hero-heading"`, `"hero-text"`, `"starter-1"`, `"quote-2"`, `"info-hours"`
 

@@ -3,6 +3,7 @@ import { temporal } from "zundo";
 import { getPage } from "../queries/pageManager";
 import { getGlobalWidgets } from "../queries/previewManager";
 import { getSharedAreas } from "../queries/sharedAreaManager";
+import { uniqueBlockOrder, uniqueBlockOrders, uniqueWidgetOrder } from "@widgetizer/core/widgetOrder";
 import { getActiveProjectId } from "../lib/activeProjectId";
 import useThemeStore from "./themeStore";
 
@@ -64,7 +65,8 @@ async function readGlobalWidgets(language) {
             type,
             settings: data[type].settings || {},
             blocks: data[type].blocks || {},
-            blocksOrder: data[type].blocksOrder || [],
+            // Each block once, as it renders.
+            blocksOrder: uniqueWidgetOrder(data[type].blocksOrder) || [],
           }
         : null;
     return { header: shape("header"), footer: shape("footer") };
@@ -89,8 +91,11 @@ async function readSharedAreas(language) {
     for (const { id } of declaredAreas) {
       const area = data.areas?.[id];
       sharedAreas[id] = {
-        widgets: area?.widgets || {},
-        widgetsOrder: Array.isArray(area?.widgetsOrder) ? area.widgetsOrder : Object.keys(area?.widgets || {}),
+        widgets: uniqueBlockOrders(area?.widgets) || {},
+        // Each widget once, as it renders (stored content can carry repeats).
+        widgetsOrder: Array.isArray(area?.widgetsOrder)
+          ? uniqueWidgetOrder(area.widgetsOrder)
+          : Object.keys(area?.widgets || {}),
       };
     }
     const retainedAreas = (Array.isArray(data?.retained) ? data.retained : []).map(({ id }) => ({
@@ -171,16 +176,23 @@ const usePageStore = create(
           const pageData = await getPage(pageId, language);
 
           // Filter out any header/footer widgets that might exist in page data
-          const cleanWidgets = {};
-          Object.entries(pageData.widgets).forEach(([id, widget]) => {
-            if (widget.type !== "header" && widget.type !== "footer") {
-              cleanWidgets[id] = widget;
-            }
-          });
+          // Built with fromEntries: parsed JSON can hold `__proto__` as a widget id,
+          // and assigning that key would set the map's prototype instead.
+          const cleanWidgets = Object.fromEntries(
+            Object.entries(pageData.widgets)
+              .filter(([, widget]) => widget.type !== "header" && widget.type !== "footer")
+              .map(([id, widget]) => [id, uniqueBlockOrder(widget)]),
+          );
 
           const cleanPageData = {
             ...pageData,
             widgets: cleanWidgets,
+            // Each widget once, as the page renders it (a stored file can carry
+            // repeats), and with no order list the widgets in their own order, as
+            // they render then; the next save writes the order.
+            widgetsOrder: Array.isArray(pageData.widgetsOrder)
+              ? uniqueWidgetOrder(pageData.widgetsOrder)
+              : Object.keys(cleanWidgets),
           };
 
           // In the language the page came back in — a default-language load passes

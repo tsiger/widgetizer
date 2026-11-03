@@ -1,5 +1,6 @@
 import fs from "fs-extra";
 import path from "path";
+import { pipeline } from "stream";
 import { v4 as uuidv4 } from "uuid";
 import multer from "multer";
 import sharp from "sharp";
@@ -506,8 +507,9 @@ export async function uploadProjectMedia(req, res) {
 }
 
 /**
- * Updates metadata (alt text, title, description) for a media file.
- * @param {import('express').Request} req - Express request object with projectId and fileId in params, metadata in body
+ * Updates metadata (alt text, title, caption) for a media file of the request's
+ * project (`req.scope`), for the default language or `?language=`.
+ * @param {import('express').Request} req - Express request object with fileId in params, metadata in body
  * @param {import('express').Response} res - Express response object
  * @returns {Promise<void>}
  */
@@ -516,17 +518,11 @@ export async function updateMediaMetadata(req, res) {
     const lang = requestLanguage(req, res);
     if (!lang) return;
 
-    const { projectId, fileId } = req.params;
-    // Bind the inner :projectId to the owner-resolved scope. This route is
-    // path-in-path (.../media/projects/:projectId/media/:fileId/metadata); the
-    // router-level resolveActiveProject owner-checks the outer/stashed id before
-    // the inner :projectId binds, so without this a caller could target another
-    // tenant's project id in the leaf and overwrite their media metadata. OSS
-    // standalone is byte-neutral: its single active project's id always equals
-    // req.params.projectId, so the guard never fires for legitimate edits.
-    if (req.scope && projectId !== req.scope.projectId) {
-      return res.status(403).json({ error: "Project mismatch" });
-    }
+    // The project is the one resolveActiveProject resolved (and, in a
+    // multi-tenant host, authorized) for this request; the file is looked up
+    // within it, so another project's file id is simply not found.
+    const { projectId } = req.scope;
+    const { fileId } = req.params;
     const alt = stripHtmlToText(req.body.alt);
     const title = stripHtmlToText(req.body.title);
     const caption = stripHtmlToText(req.body.caption);
@@ -653,6 +649,76 @@ export async function deleteProjectMedia(req, res) {
 }
 
 /**
+ * Send a media file stream as the response body.
+ *
+ * `pipeline`, not `pipe`: when the client goes away (a video player drops its
+ * request on every seek) it destroys the file stream, which `pipe` leaves open
+ * with its descriptor held until the process runs out of them. When the file
+ * fails partway, it destroys the response, so the client sees the transfer cut
+ * off instead of waiting on it; the headers are already sent by then, so no
+ * error status is possible. Only a failure of the file itself is logged — a
+ * client that leaves is routine.
+ *
+ * Nothing is sent until the file has produced its first bytes (or ended), so a
+ * file that can't be read at all — removed or made unreadable after `stat` —
+ * still gets a 500 rather than a dropped connection.
+ */
+function streamToResponse(stream, res) {
+  return new Promise((resolve) => {
+    // The client left while the file was being opened: nothing to send it.
+    if (res.destroyed) {
+      stream.destroy();
+      resolve();
+      return;
+    }
+    const stopWaiting = () => {
+      stream.off("readable", onReadable);
+      stream.off("error", onEarlyError);
+      res.off("close", onEarlyClose);
+    };
+    // The pipeline starts inside this callback, so there is no moment between
+    // "readable" and the pipeline when an error or a closed response has no
+    // listener.
+    const onReadable = () => {
+      stopWaiting();
+      if (res.destroyed) {
+        stream.destroy();
+        resolve();
+        return;
+      }
+      let sourceFailed = false;
+      stream.once("error", () => {
+        sourceFailed = true;
+      });
+      pipeline(stream, res, (err) => {
+        if (err && sourceFailed) console.error("Error streaming project media:", err);
+      });
+      resolve();
+    };
+    const onEarlyError = (err) => {
+      stopWaiting();
+      stream.destroy();
+      console.error("Error streaming project media:", err);
+      if (!res.headersSent && !res.destroyed) {
+        // The file's length and range were set for the body that never came.
+        res.removeHeader("Content-Length");
+        res.removeHeader("Content-Range");
+        res.status(500).json({ error: "Failed to serve project media" });
+      }
+      resolve();
+    };
+    const onEarlyClose = () => {
+      stopWaiting();
+      stream.destroy();
+      resolve();
+    };
+    stream.once("readable", onReadable);
+    stream.once("error", onEarlyError);
+    res.once("close", onEarlyClose);
+  });
+}
+
+/**
  * Serves a media file from a project's uploads directory.
  * Supports lookup by file ID or filename, handles images, videos, and audio.
  * @param {import('express').Request} req - Express request object with projectId and fileId/filename in params
@@ -683,8 +749,8 @@ export async function serveProjectMedia(req, res) {
     }
 
     // This route is project-id-in-path (browser-native loads can't carry the
-    // X-Project-Id header), so resolveActiveProject may not have run — build the
-    // scope from the project, preserving any actor already resolved.
+    // X-Project-Id header), so the file's project comes from the path, not from
+    // the active project resolveActiveProject found; keep its actor, if any.
     const folderName = await getProjectFolderName(projectId);
     const scope = { ...(req.scope || {}), projectId, folderName };
 
@@ -696,11 +762,6 @@ export async function serveProjectMedia(req, res) {
 
     res.setHeader("Content-Type", getContentType(path.extname(key).toLowerCase()));
     res.setHeader("Accept-Ranges", "bytes");
-
-    const onStreamError = (err) => {
-      console.error("Error streaming project media:", err);
-      if (!res.headersSent) res.status(500).json({ error: "Failed to serve project media" });
-    };
 
     // Honor byte-range requests so audio/video can seek (HTTP 206). Without this,
     // media plays from the start (off a 200) but seeking snaps back to 0.
@@ -722,6 +783,16 @@ export async function serveProjectMedia(req, res) {
         return res.status(416).setHeader("Content-Range", `bytes */${fileSize}`).end();
       }
 
+      // Express runs this GET handler for HEAD as well: answer with the headers
+      // alone rather than open (and read through) the file. So a HEAD doesn't
+      // notice a file that fails to open after the stat above; a GET would.
+      if (req.method === "HEAD") {
+        res.status(206);
+        res.setHeader("Content-Range", `bytes ${start}-${end}/${fileSize}`);
+        res.setHeader("Content-Length", end - start + 1);
+        return res.end();
+      }
+
       const rangeStream = await req.adapters.assetStorage.download(scope, key, { start, end });
       if (!rangeStream) {
         return res.status(404).json({ error: "File not found" });
@@ -729,19 +800,21 @@ export async function serveProjectMedia(req, res) {
       res.status(206);
       res.setHeader("Content-Range", `bytes ${start}-${end}/${fileSize}`);
       res.setHeader("Content-Length", end - start + 1);
-      rangeStream.on("error", onStreamError);
-      rangeStream.pipe(res);
+      await streamToResponse(rangeStream, res);
       return;
     }
 
-    // No (or malformed) range — stream the full file.
+    // No (or malformed) range — stream the full file (HEAD: its headers only).
+    if (req.method === "HEAD") {
+      res.setHeader("Content-Length", fileSize);
+      return res.end();
+    }
     const stream = await req.adapters.assetStorage.download(scope, key);
     if (!stream) {
       return res.status(404).json({ error: "File not found" });
     }
     res.setHeader("Content-Length", fileSize);
-    stream.on("error", onStreamError);
-    stream.pipe(res);
+    await streamToResponse(stream, res);
   } catch (error) {
     console.error("Error serving project media:", error);
     if (handleProjectResolutionError(res, error)) return;

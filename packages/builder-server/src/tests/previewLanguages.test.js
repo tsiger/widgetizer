@@ -103,7 +103,7 @@ async function seed() {
   await fs.writeFile(
     path.join(projectDir, "layout.liquid"),
     `<!DOCTYPE html><html lang="{{ page.language }}" dir="{{ page.dir }}"><head>{% seo %}<title>{{ page.seo.title }}</title></head>` +
-      `<body>{{ header | raw }}` +
+      `<body class="{{ body_class }}">{{ header | raw }}` +
       `<nav class="langs">{% for t in page.translations %}` +
       `<a href="{{ t.href }}" data-lang="{{ t.language }}" data-fallback="{{ t.fallback }}"{% if t.active %} aria-current="true"{% endif %}>{{ t.label }}</a>` +
       `{% endfor %}</nav>` +
@@ -353,6 +353,60 @@ describe("a numbered page preview", () => {
   it("keeps the same trail on a later page", async () => {
     const html = await pageHtml(2);
     assert.match(html, /<nav class="crumbs">.*Blog.*<\/nav>/s);
+  });
+});
+
+// An order that names a widget more than once renders it once, numbered once.
+describe("a page whose order names a widget more than once", () => {
+  it("renders it once in the preview, and numbers what follows by the widgets shown", async () => {
+    const req = mockReq({
+      pageData: {
+        id: "about",
+        uuid: "u-about",
+        slug: "about",
+        name: "About",
+        widgets: { first: { type: "position", settings: {} }, second: { type: "position", settings: {} } },
+        widgetsOrder: ["first", "first", "first", "second", "first"],
+      },
+      themeSettings: RAW_THEME_SETTINGS,
+      previewMode: "standalone",
+      pageNumber: 1,
+    });
+    const res = mockRes();
+    await createPreviewToken(req, res);
+    assert.equal(res._status, 200, JSON.stringify(res._json));
+    const html = getToken(res._json.token);
+    // The test widget prints only its number, once per render.
+    assert.deepEqual(html.match(/\[\d+\]/g), ["[1]", "[2]"]);
+  });
+});
+
+// A widget's repeated block renders once: renderWidget hands Liquid the order
+// with each block id once, for every caller.
+describe("a widget whose block order names a block more than once", () => {
+  it("renders the block once", async () => {
+    await fs.outputFile(
+      path.join(getProjectDir(PROJECT_FOLDER), "widgets", "cards", "widget.liquid"),
+      `<section>{% for id in widget.blocksOrder %}<i>{{ widget.blocks[id].settings.label }}</i>{% endfor %}</section>`,
+    );
+    await fs.outputJson(path.join(getProjectDir(PROJECT_FOLDER), "widgets", "cards", "schema.json"), { type: "cards", settings: [] });
+    const req = mockReq({
+      pageData: {
+        id: "about",
+        uuid: "u-about",
+        slug: "about",
+        name: "About",
+        widgets: { c: { type: "cards", settings: {}, blocks: { x: { type: "card", settings: { label: "Card X" } } }, blocksOrder: ["x", "x", "x"] } },
+        widgetsOrder: ["c"],
+      },
+      themeSettings: RAW_THEME_SETTINGS,
+      previewMode: "standalone",
+      pageNumber: 1,
+    });
+    const res = mockRes();
+    await createPreviewToken(req, res);
+    assert.equal(res._status, 200, JSON.stringify(res._json));
+    assert.equal(getToken(res._json.token).split("Card X").length - 1, 1);
   });
 });
 
@@ -682,6 +736,12 @@ describe("a morphed widget's place on the page", () => {
     assert.match(await morph("second", page), /\[2\]/);
   });
 
+  // A repeat renders once in the full render, so it takes one number.
+  it("numbers a widget after a repeated one as the full render does", async () => {
+    const repeated = { ...page, widgetsOrder: ["first", "first", "first", "second"] };
+    assert.match(await morph("second", repeated), /\[2\]/);
+  });
+
   it("leaves a widget outside the page order unnumbered", async () => {
     assert.match(await morph("header", page), /\[\]/);
   });
@@ -691,8 +751,9 @@ describe("a morphed widget's place on the page", () => {
     assert.match(await morph("second", unordered), /\[2\]/);
   });
 
-  // A page widget may be called "footer"; the global footer is still unnumbered.
-  it("leaves the global footer unnumbered when a page widget shares its id", async () => {
+  // A page widget stored as "footer" renders nowhere, so it takes no number and the
+  // next widget is 1; the global footer is unnumbered too.
+  it("leaves the global footer and a footer-id page widget unnumbered", async () => {
     const footerTemplate = path.join(getProjectDir(PROJECT_FOLDER), "widgets", "global", "footer", "widget.liquid");
     const original = await fs.readFile(footerTemplate, "utf8");
     await fs.writeFile(footerTemplate, "<footer>[{{ widget.index }}]</footer>");
@@ -704,10 +765,90 @@ describe("a morphed widget's place on the page", () => {
         widgetsOrder: ["footer", "first"],
       };
       assert.match(await morph("footer", sharing, "footer"), /<footer>\[\]<\/footer>/);
-      assert.match(await morph("footer", sharing), /\[1\]/);
-      assert.match(await morph("first", sharing), /\[2\]/);
+      assert.match(await morph("footer", sharing), /\[\]/);
+      assert.match(await morph("first", sharing), /\[1\]/);
     } finally {
       await fs.writeFile(footerTemplate, original);
     }
+  });
+});
+
+// The page's widgets are the ones its order names, each once, that the page holds
+// itself: not the header's or footer's id (those render as the site's own), not an
+// id with no widget, not an inherited name. With no order list at all the page's
+// widgets render in their own order; an empty list renders none. Every number and
+// the transparent header follow the widgets shown.
+describe("which widgets a page renders", () => {
+  before(async () => {
+    const projectDir = getProjectDir(PROJECT_FOLDER);
+    await fs.outputFile(path.join(projectDir, "widgets", "lead", "widget.liquid"), `<p>[{{ widget.index }}]</p>`);
+    await fs.outputFile(
+      path.join(projectDir, "widgets", "lead", "schema.json"),
+      JSON.stringify({ name: "lead", supportsTransparentHeader: true, settings: [] }),
+    );
+  });
+
+  const preview = async (fields, globalWidgets) => {
+    const req = mockReq({
+      pageData: { id: "about", uuid: "u-about", slug: "about", name: "About", ...fields, ...(globalWidgets ? { globalWidgets } : {}) },
+      themeSettings: RAW_THEME_SETTINGS,
+      previewMode: "standalone",
+      pageNumber: 1,
+    });
+    const res = mockRes();
+    await createPreviewToken(req, res);
+    assert.equal(res._status, 200, JSON.stringify(res._json));
+    return getToken(res._json.token);
+  };
+  const position = { type: "position", settings: {} };
+
+  it("leaves out a widget stored under the header's or footer's id, and numbers what's shown", async () => {
+    const html = await preview({
+      widgets: { header: position, footer: position, first: position, second: position },
+      widgetsOrder: ["header", "first", "footer", "second"],
+    });
+    assert.deepEqual(html.match(/\[\d+\]/g), ["[1]", "[2]"]);
+  });
+
+  it("leaves out an inherited name, so the first widget shown is number 1", async () => {
+    const html = await preview({ widgets: { first: position }, widgetsOrder: ["constructor", "toString", "first"] });
+    assert.deepEqual(html.match(/\[\d+\]/g), ["[1]"]);
+    assert.doesNotMatch(html, /widget-error/);
+  });
+
+  it("renders the page's widgets in their own order when it has no order list, and none for an empty one", async () => {
+    const widgets = { header: position, first: position, second: position };
+    assert.deepEqual((await preview({ widgets })).match(/\[\d+\]/g), ["[1]", "[2]"]);
+    assert.equal((await preview({ widgets, widgetsOrder: [] })).match(/\[\d+\]/g), null);
+  });
+
+  it("makes the header transparent by the first widget shown", async () => {
+    const globalWidgets = { header: { type: "header", settings: { transparent_on_hero: true } } };
+    const html = await preview(
+      { widgets: { header: position, first: { type: "lead", settings: {} } }, widgetsOrder: ["gone", "header", "first"] },
+      globalWidgets,
+    );
+    assert.match(html, /<body class="[^"]*transparent-header/);
+  });
+
+  it("numbers a live edit by the widgets shown, and leaves a header-id page widget unnumbered", async () => {
+    const page = {
+      slug: "about",
+      language: "en",
+      widgets: { header: position, first: position, second: position },
+      widgetsOrder: ["header", "first", "second"],
+    };
+    const morph = async (widgetId) => {
+      let html = "";
+      const res = { send: (body) => ((html = body), res), status: () => res, json: (body) => ((html = JSON.stringify(body)), res) };
+      await renderSingleWidget(
+        mockReq({ widgetId, widget: position, themeSettings: RAW_THEME_SETTINGS, currentCanonicalPath: "about.html", page }),
+        res,
+      );
+      return html;
+    };
+    assert.match(await morph("first"), /\[1\]/);
+    assert.match(await morph("second"), /\[2\]/);
+    assert.match(await morph("header"), /\[\]/);
   });
 });

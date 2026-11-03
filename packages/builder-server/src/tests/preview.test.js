@@ -239,6 +239,15 @@ describe("saveGlobalWidget", () => {
     await fs.remove(path.join(globalDir(), "footer.json"));
   });
 
+  it("stores a repeated block once", async () => {
+    const res = await callController(saveGlobalWidget, {
+      params: { type: "header" },
+      body: { type: "header", settings: {}, blocks: { b1: { type: "link", settings: {} } }, blocksOrder: ["b1", "b1", "b1"] },
+    });
+    assert.equal(res._status, 200);
+    assert.deepEqual((await fs.readJson(path.join(globalDir(), "header.json"))).blocksOrder, ["b1"]);
+  });
+
   it("saves header widget data", async () => {
     const widgetData = {
       type: "theme-header",

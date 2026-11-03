@@ -39,6 +39,7 @@ Besides the root index, `packages/core/package.json` maps these subpaths (all un
 | `./assetUrl` | Versioned theme/widget asset URLs |
 | `./urlSafety`, `./escapeHtml`, `./pathSecurity` | `sanitizeHref` / site-URL validation, HTML escaping, `isWithinDirectory` / `assertWithin` |
 | `./richtextLinks`, `./richtextMedia` | Stable-reference link and media path handling inside richtext |
+| `./widgetOrder` | `uniqueWidgetOrder` / `uniqueBlockOrder` / `uniqueBlockOrders`: a page's or area's widget order, and a widget's `blocksOrder`, with each id kept once (first place); used by every render and by saves, page/area/language copies and the editor's load |
 | `./mimeTypes`, `./youtube`, `./blockLimits` | Content types, YouTube embed helpers, block caps |
 | `./config/settingTypes`, `./config/fonts.json`, `./locales/*` | Setting-type registry, font list, core widget dictionaries |
 
@@ -122,10 +123,10 @@ OSS's `LocalLimitsAdapter` returns the App Settings upload cap for `MAX_UPLOAD_S
 
 ### `setupBuilderServer({ adapters, plugins })`
 
-Returns three Express routers:
+Returns four Express routers:
 
 ```js
-const { actorScopedRouter, projectScopedRouter, previewRouter } = setupBuilderServer({ adapters, plugins });
+const { actorScopedRouter, projectScopedRouter, mediaFileRouter, previewRouter } = setupBuilderServer({ adapters, plugins });
 ```
 
 **Required adapter keys:** `scopeResolver`, `previewScopeResolver`, `storage`, `assetStorage`, `publish`, `limits`.
@@ -134,15 +135,16 @@ const { actorScopedRouter, projectScopedRouter, previewRouter } = setupBuilderSe
 | --- | --- |
 | `actorScopedRouter` | `/projects`, `/themes`, `/settings`, `/core` |
 | `projectScopedRouter` | `/pages`, `/menus`, `/media`, `/preview`, `/export`, `/widgets`, `/icons`, `/collections`, `/languages`, `/translations` |
+| `mediaFileRouter` | `GET /projects/:projectId/media/:fileId`, `/projects/:projectId/uploads/images/:filename`, `/projects/:projectId/uploads/files/:filename` — browser-loaded media files. The OSS shell mounts it at `/api/media`; an embedding app that serves those URLs itself leaves it out. |
 | `previewRouter` | `GET /render/:token` |
 
 `req.adapters` is attached **per-router** (not app-wide), so each router is self-sufficient wherever it is mounted.
 
 ### `createEditorApp({ adapters, plugins })`
 
-Wires both scoped routers under `/api` and the `previewRouter` at `/`, plus helmet, cors, per-route JSON body limits, static UI serving, and the error handler. This is what the OSS shell calls.
+Wires the `mediaFileRouter` at `/api/media` (ahead of the others), both scoped routers under `/api` and the `previewRouter` at `/`, plus helmet, cors, per-route JSON body limits, static UI serving, and the error handler. This is what the OSS shell calls.
 
-**OSS vs hosted mounting:** OSS mounts the actor and project routers both under `/api`. Hosted mounts the project router under `/api/projects/:projectId` (the project id is in the URL for the multi-tenant host).
+**OSS vs hosted mounting:** OSS mounts the actor and project routers both under `/api`, and the media file router at `/api/media`. Hosted mounts the project router under `/api/projects/:projectId` (the project id is in the URL for the multi-tenant host) and serves the media file URLs itself, so it doesn't mount `mediaFileRouter`.
 
 ### `initDb({ getConnection })`
 
@@ -173,6 +175,10 @@ Lives in builder-server. It delegates to `req.adapters.scopeResolver.resolveScop
 - `subscribeMutationSuccess(handler)` (`lib/mutationEvents.js`, exported from the package root) — registers a listener called with `{ method, path }` after a successful modifying request; returns an unsubscribe function. Two announce points: `apiFetch` (any non-GET/HEAD/OPTIONS response that is `ok` and not a followed redirect; `path` as passed in, API base included for editor calls) and `uploadRequest` (XHR uploads, announced as `POST` on a 2xx unless the XHR followed a redirect).
 - "Success" means HTTP success, not a content change: read-shaped POSTs (preview render, export, media refresh-usage) and a `207` partial result are announced too, so subscribers filter for what they care about. A listener that throws or returns a rejecting promise is logged and never breaks the request.
 
+### Save-failure message
+
+- `saveFailureMessageKey(err)` (`utils/saveFailureMessage.js`, exported from the package root) — the i18n key for a page-editor save the server refused, for a host running its own save button: a refusal over an image no longer in the media library names the part refused (`pageEditor.mediaUsage.missing`, or `pageEditor.mediaUsage.missingSiteSettings` when `saveStore` marked the refusal as the site settings' with `savePart: "theme"` — they save after the page, so the page may already be saved); anything else is `pageEditor.toolbar.saveFailed`.
+
 ### Route base
 
 - `lib/routeBase.jsx` — `RouteBaseProvider` + `useEditorPath()` (React context) builds hrefs from a configurable base: `""` in OSS, `/sites/:siteId/edit` in hosted. Internal links go through `useEditorPath()` so they resolve correctly under either host.
@@ -202,6 +208,8 @@ Exported as `@widgetizer/editor-ui/tailwind-preset` → `packages/editor-ui/src/
 `@widgetizer/render-engine` never resolves projects or touches SQLite. Its functions take a `RenderDeps` bag that supplies both capabilities and filesystem roots; the engine reads templates, schemas, snippets, menus, and icons from those supplied paths rather than importing builder-server services or concrete storage adapters. The bag has these keys:
 
 `projectId`, `projectDir` (absolute), `coreWidgetsDir`, `coreSnippetsDir`, `getProjectData()`, `getMediaFiles()`, `listPages()`, `sanitizeWidgetData()`, `preprocessThemeSettings()`, `buildRuntimeSiteIcons()`. Optional `loadSiteStrings()` supplies all configured languages' visitor dictionaries; the engine uses it when available and caches the result on render globals. Optional collection capabilities (`buildCollectionItemsLoader`, `getCollectionSchemas`, `loadCollectionItemsByUuid`, `countCollectionItems`) come from builder-server's `buildCollectionRenderDeps`; `planPagination` returns `null` without `countCollectionItems`. The engine does not resolve storage scope itself, and the widget, schema, collection, menu, icon and layout paths it opens go through `resolveInside` (`safePath.js`), which contains both `..` and symlink escapes inside the roots `deps` supplied.
+
+A preview render's URLs hang off `sharedGlobals.apiUrl`: theme and widget assets, placeholders, uploaded media (`imagePath` / `filePath`, richtext, collection items), runtime site icons and the engine's `formSubmitUrl`. OSS passes `""`, so they stay origin-relative (`/api/media/projects/:id/uploads/images/…`) and resolve against the render document's own origin; a host may pass an absolute base, path included, and every one of them follows it. Publish output never uses it. `packages/builder-server/src/tests/renderSnapshot.test.js` pins the preview, morph, collection-item and export output byte for byte.
 
 builder-server's `services/renderingService.js` is a **thin wrapper**: `buildRenderDeps(projectId)` resolves `folderName` (the project-resolution error boundary lives here), assembles the bag, and preserves the historical `(projectId, …)` call signatures so existing controllers are unchanged. Hosted assembles its own (cloud) deps bag and reuses the shared helpers re-exported from builder-server's index.
 

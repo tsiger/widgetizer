@@ -50,6 +50,7 @@ Read [structure and lifecycle](references/theme-structure-and-lifecycle.md) befo
 | --- | --- |
 | `layout.liquid`, snippets, tags, filters, escaping, links | [Liquid and render context](references/liquid-and-render-context.md) |
 | Widget schemas, blocks, setting types, editor attributes | [Widgets and settings](references/widgets-and-settings.md) |
+| Deciding settings or blocks, the standard controls of a new widget | [Widget editing model](references/widget-editing-model.md) |
 | CSS/JS files, icons, images, widget JavaScript, editor events | [Assets and browser behavior](references/assets-and-browser-behavior.md) |
 | Starter pages, menus, collections, pagination, presets | [Templates, collections, and presets](references/templates-collections-and-presets.md) |
 | Editor labels, visitor-facing words, languages | [Localization](references/localization.md) |

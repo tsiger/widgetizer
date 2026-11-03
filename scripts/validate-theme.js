@@ -21,6 +21,14 @@ import { createLiquidEngine } from "@widgetizer/render-engine";
 import { splitAssetRef } from "@widgetizer/core/assetUrl";
 import { isValidLanguageCode } from "@widgetizer/core/languages";
 import { readAreaDeclarations, areaWidgetProblem } from "@widgetizer/core/sharedAreas";
+import {
+  isValidBlockId,
+  isValidWidgetId,
+  renderedWidgetOrder,
+  RESERVED_WIDGET_IDS,
+  WIDGET_ID_MAX_LENGTH,
+  WIDGET_ID_RE,
+} from "@widgetizer/core/widgetOrder";
 import { validateCollectionSchema } from "../packages/builder-server/src/services/collectionService.js";
 import { isNewerVersion, sortVersions } from "../packages/builder-server/src/utils/semver.js";
 import { sanitizeVideoPath } from "../packages/builder-server/src/services/sanitizationService.js";
@@ -744,6 +752,13 @@ export function validateTheme(dir) {
           file,
           "editor-attributes",
           'The widget\'s outer element needs data-widget-id="{{ widget.id }}" or the editor cannot select or update it.',
+        );
+      }
+      if (!/data-widget-type\s*=/.test(source)) {
+        warn(
+          file,
+          "editor-attributes",
+          "The widget's outer element should carry data-widget-type (its type) beside data-widget-id; the editor uses it to tell the site's header and footer from page widgets.",
         );
       }
       if (widget.blocks.size > 0) {
@@ -1575,10 +1590,11 @@ export function validateTheme(dir) {
     }
     const blockMap = blocks ?? {};
     const orderList = order ?? [];
+    checkIds(file, `${where}: block`, [...Object.keys(blockMap), ...orderList], isValidBlockId);
     if (new Set(orderList).size !== orderList.length)
       error(file, "template-shape", `${where}: blocksOrder contains duplicate ids.`);
     for (const id of orderList) {
-      if (!Object.hasOwn(blockMap, id))
+      if (typeof id === "string" && !Object.hasOwn(blockMap, id))
         error(file, "template-shape", `${where}: blocksOrder lists "${id}", which is not in "blocks".`);
     }
     for (const [id, block] of Object.entries(blockMap)) {
@@ -1610,9 +1626,79 @@ export function validateTheme(dir) {
     }
   }
 
-  function checkTemplates(dir, menuIds) {
+  /**
+   * Report each id in `ids` that breaks the id rule (see @widgetizer/core/widgetOrder),
+   * once: widget and block ids become HTML ids, the editor's data-widget-id lookups
+   * and text in a theme's own CSS and scripts.
+   */
+  function checkIds(file, label, ids, isValid) {
+    for (const id of new Set(ids)) {
+      if (isValid(id)) continue;
+      let why = `must start with a letter or digit and use only letters, digits, "_" and "-" (${WIDGET_ID_RE})`;
+      if (typeof id !== "string") why = "must be a string";
+      else if (RESERVED_WIDGET_IDS.includes(id) && isValid === isValidWidgetId)
+        why = `names the site's ${id}, which renders as its own; a page or area widget renders nowhere under it`;
+      else if (id.length > WIDGET_ID_MAX_LENGTH) why = `is longer than ${WIDGET_ID_MAX_LENGTH} characters`;
+      else if (WIDGET_ID_RE.test(id)) why = "is a built-in JavaScript property name";
+      error(file, "widget-id", `${label} id ${JSON.stringify(id)} ${why}.`);
+    }
+  }
+
+  /**
+   * A page's or area's widgets and their order: the shape, ids, repeats, and what
+   * renders. A missing order renders the widgets as written; an empty one renders
+   * none. Returns false when the shape is unusable.
+   */
+  function checkWidgetList(file, widgets, order, holder) {
+    if (!isObject(widgets) || (order !== undefined && !Array.isArray(order))) {
+      error(
+        file,
+        "template-shape",
+        `${holder} hold "widgets" (an object keyed by widget id) and "widgetsOrder" (an array of those ids).`,
+      );
+      return false;
+    }
+    checkIds(file, "Widget", [...Object.keys(widgets), ...(order ?? [])], isValidWidgetId);
+    if (order === undefined) {
+      if (Object.keys(widgets).length > 0)
+        warn(
+          file,
+          "template-shape",
+          'There is no "widgetsOrder", so the widgets render in the order they are written; list their ids in "widgetsOrder" to set it.',
+        );
+      return true;
+    }
+    // A repeated id would render the same widget again.
+    if (new Set(order).size !== order.length) error(file, "template-shape", "widgetsOrder contains duplicate ids.");
+    // An entry that isn't a string was reported above.
+    for (const id of order) {
+      if (typeof id === "string" && !Object.hasOwn(widgets, id))
+        error(file, "template-shape", `widgetsOrder lists "${id}", which is not in "widgets".`);
+    }
+    for (const id of Object.keys(widgets)) {
+      if (!order.includes(id))
+        warn(file, "template-shape", `Widget "${id}" is not in widgetsOrder, so it will not render.`);
+    }
+    return true;
+  }
+
+  /** Widget ids of an area template, or none when it isn't one. */
+  function areaWidgetIds(file) {
+    const area = readJson(file);
+    return isObject(area) && isObject(area.widgets) ? Object.keys(area.widgets) : [];
+  }
+
+  /**
+   * @param {string} dir - the templates/ folder checked
+   * @param {Set<string>} menuIds
+   * @param {{ inheritedAreasDir?: string }} [options] - for a preset with its own
+   *   templates: the theme's area templates, used for each area the preset doesn't supply
+   */
+  function checkTemplates(dir, menuIds, { inheritedAreasDir } = {}) {
     const pageFiles = listFiles(dir, ".json");
     const pageSlugs = new Set(pageFiles.map((name) => name.replace(/\.json$/, "")));
+    // Widget id → the page templates that use it, for the clash check below.
+    const pageWidgetIds = new Map();
 
     for (const name of pageFiles) {
       const file = path.join(dir, name);
@@ -1644,28 +1730,15 @@ export function validateTheme(dir) {
       }
 
       const widgets = page.widgets ?? {};
-      const order = page.widgetsOrder ?? [];
-      if (!isObject(widgets) || !Array.isArray(order)) {
-        error(
-          file,
-          "template-shape",
-          '"widgets" must be an object keyed by widget id and "widgetsOrder" an array of those ids.',
-        );
-        continue;
-      }
-      if (new Set(order).size !== order.length) error(file, "template-shape", "widgetsOrder contains duplicate ids.");
-      for (const id of order) {
-        if (!Object.hasOwn(widgets, id))
-          error(file, "template-shape", `widgetsOrder lists "${id}", which is not in "widgets".`);
-      }
-      let paginating = 0;
+      if (!checkWidgetList(file, widgets, page.widgetsOrder, "Pages")) continue;
       for (const [id, instance] of Object.entries(widgets)) {
-        if (!order.includes(id))
-          warn(file, "template-shape", `Widget "${id}" is not in widgetsOrder, so it will not render.`);
         checkWidgetInstance(file, id, instance, pageSlugs, menuIds);
-        if (instance?.settings?.paginate === true) paginating++;
+        pageWidgetIds.set(id, [...(pageWidgetIds.get(id) ?? []), file]);
       }
-      if (paginating > 1) error(file, "pagination", "Only one widget per page may paginate.");
+      const paginating = renderedWidgetOrder(widgets, page.widgetsOrder).filter(
+        (id) => widgets[id]?.settings?.paginate === true,
+      );
+      if (paginating.length > 1) error(file, "pagination", "Only one widget per page may paginate.");
     }
 
     for (const type of ["header", "footer"]) {
@@ -1701,25 +1774,40 @@ export function validateTheme(dir) {
       const area = readJson(file);
       if (!isObject(area)) continue;
       const widgets = area.widgets ?? {};
-      const order = area.widgetsOrder ?? [];
-      if (!isObject(widgets) || !Array.isArray(order)) {
-        error(
-          file,
-          "template-shape",
-          'A shared area holds "widgets" (an object keyed by widget id) and "widgetsOrder" (an array of those ids).',
-        );
-        continue;
-      }
-      for (const widgetId of order) {
-        if (!Object.hasOwn(widgets, widgetId))
-          error(file, "template-shape", `widgetsOrder lists "${widgetId}", which is not in "widgets".`);
-      }
+      if (!checkWidgetList(file, widgets, area.widgetsOrder, "Shared areas")) continue;
       for (const [widgetId, instance] of Object.entries(widgets)) {
-        if (!order.includes(widgetId))
-          warn(file, "template-shape", `Widget "${widgetId}" is not in widgetsOrder, so it will not render.`);
         const problem = areaWidgetProblem(instance);
         if (problem) error(file, "shared-areas", `widget "${widgetId}": ${problem}`);
         else checkWidgetInstance(file, widgetId, instance, pageSlugs, menuIds);
+      }
+    }
+
+    // Every area renders on every page, so an id an area uses must not be a page's
+    // or another area's: the page would hold two widgets with one HTML id, and the
+    // editor would mix them up. A preset's own area replaces the theme's.
+    const areaFiles = new Map(listFiles(areasDir, ".json").map((name) => [name, path.join(areasDir, name)]));
+    if (inheritedAreasDir) {
+      for (const name of listFiles(inheritedAreasDir, ".json"))
+        if (!areaFiles.has(name)) areaFiles.set(name, path.join(inheritedAreasDir, name));
+    }
+    const areaWidgetOwner = new Map();
+    for (const [name, file] of areaFiles) {
+      const areaId = name.replace(/\.json$/, "");
+      for (const widgetId of areaWidgetIds(file)) {
+        for (const pageFile of pageWidgetIds.get(widgetId) ?? [])
+          error(
+            pageFile,
+            "widget-id",
+            `Widget id ${JSON.stringify(widgetId)} is also a widget of the shared area "${areaId}", which renders on every page; give one of them another id.`,
+          );
+        const otherArea = areaWidgetOwner.get(widgetId);
+        if (otherArea)
+          error(
+            file,
+            "widget-id",
+            `Widget id ${JSON.stringify(widgetId)} is also a widget of the shared area "${otherArea}"; both render on every page, so give one of them another id.`,
+          );
+        else areaWidgetOwner.set(widgetId, areaId);
       }
     }
     return pageSlugs;
@@ -1889,10 +1977,13 @@ export function validateTheme(dir) {
       }
 
       const menuIds = isDir(path.join(dir, "menus")) ? checkMenus(path.join(dir, "menus")) : rootMenuIds;
-      checkTemplates(
-        isDir(path.join(dir, "templates")) ? path.join(dir, "templates") : path.join(themeRoot, "templates"),
-        menuIds,
-      );
+      // A preset with its own templates replaces the theme's pages and inherits
+      // each area it doesn't supply.
+      if (isDir(path.join(dir, "templates")))
+        checkTemplates(path.join(dir, "templates"), menuIds, {
+          inheritedAreasDir: path.join(themeRoot, "templates", "global", "areas"),
+        });
+      else checkTemplates(path.join(themeRoot, "templates"), menuIds);
 
       for (const type of listDirs(path.join(dir, "collections"))) {
         const collection = theme.collections.get(type);

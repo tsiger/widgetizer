@@ -29,6 +29,7 @@ import {
   resolveSiteString,
 } from "@widgetizer/core";
 import { escapeHtml } from "@widgetizer/core/escapeHtml";
+import { renderedWidgetOrder, uniqueWidgetOrder } from "@widgetizer/core/widgetOrder";
 import { resolveRichtextMediaInWidgetData } from "@widgetizer/core/richtextMedia";
 import {
   resolveRichtextLinksInWidgetData,
@@ -619,11 +620,9 @@ async function planPagination(deps, widgets, widgetsOrder, { pageSlug, currentPa
   // The plan carries the language because it outlives this call: every pager URL
   // is built from it later, and a copy of a Greek page lives beside the Greek one.
   const { defaultLanguage } = await languageSettings(deps, null);
-  const order = Array.isArray(widgetsOrder) && widgetsOrder.length > 0 ? widgetsOrder : Object.keys(widgets || {});
-
-  for (const widgetId of order) {
-    if (typeof widgetId !== "string") continue;
-    const widget = widgets?.[widgetId];
+  // Only a widget the page renders can paginate it.
+  for (const widgetId of renderedWidgetOrder(widgets, widgetsOrder)) {
+    const widget = widgets[widgetId];
     if (widget?.settings?.paginate !== true || typeof widget.type !== "string") continue;
 
     const schemaPath = await resolveInside(deps.projectDir, "widgets", widget.type, "schema.json");
@@ -907,10 +906,12 @@ async function createBaseRenderContext(deps, rawThemeSettings, renderMode = "pre
       ? deps.preprocessThemeSettings(rawThemeSettings)
       : {};
 
-  // Preview emits origin-relative URLs (the serving shell owns the origin: OSS uses
-  // the render document's origin + <base href="/">; hosted its own <base href> →
-  // APP_ORIGIN). Publish already used "".
-  const apiUrl = "";
+  // The base of the preview's media, site-icon and form URLs. The shell may pass an
+  // absolute base in `sharedGlobals.apiUrl` (e.g. one that carries a path the
+  // serving origin authorises by); OSS passes "", so its preview URLs stay
+  // origin-relative and resolve against the render document's own origin.
+  // Publish output never uses it.
+  const apiUrl = (sharedGlobals && sharedGlobals.apiUrl) || "";
 
   // Depth-aware output prefix for static export. Collection item pages render one
   // directory deep ({slugPrefix}/{slug}.html), so their asset/link hrefs need an
@@ -1139,7 +1140,12 @@ async function renderWidget(
   { area = null } = {},
 ) {
   try {
-    const { type, settings = {}, blocks = {}, blocksOrder = [] } = widgetData;
+    const { type, settings = {}, blocks = {} } = widgetData;
+    // Each block once, as for widgets: templates loop this order, so a repeated
+    // id would render the same block again.
+    const blocksOrder = Array.isArray(widgetData.blocksOrder)
+      ? uniqueWidgetOrder(widgetData.blocksOrder)
+      : (widgetData.blocksOrder ?? []);
     const projectDir = deps.projectDir;
 
     // Determine if this is a core widget (prefixed with "core-")
@@ -1616,9 +1622,10 @@ async function renderSharedAreas(deps, areasById, rawThemeSettings, renderMode =
   const rendered = {};
   for (const [areaId, area] of Object.entries(areasById || {})) {
     const widgets = area?.widgets || {};
-    const order = Array.isArray(area?.widgetsOrder) ? area.widgetsOrder : Object.keys(widgets);
     let html = "";
-    for (const widgetId of order) {
+    // As a page's: never one stored under the header's or footer's id, which would
+    // carry their data-widget-id into the page.
+    for (const widgetId of renderedWidgetOrder(widgets, area?.widgetsOrder)) {
       const widget = widgets[widgetId];
       if (!widget?.type) continue;
       html += await renderWidget(deps, widgetId, widget, rawThemeSettings, renderMode, sharedGlobals, null, {

@@ -1,4 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
+import { renderedWidgetOrder } from "@widgetizer/core/widgetOrder";
 
 vi.mock("../../queries/pageManager", () => ({
   getPage: vi.fn(),
@@ -34,6 +35,7 @@ const { default: usePageStore } = await import("../pageStore");
 const { default: useWidgetStore, findWidgetOwner, areaModifiedKey } = await import("../widgetStore");
 const { getPage, savePageContent } = await import("../../queries/pageManager");
 const { getSharedAreas, saveSharedArea } = await import("../../queries/sharedAreaManager");
+const { getGlobalWidgets } = await import("../../queries/previewManager");
 
 const clone = (value) => JSON.parse(JSON.stringify(value));
 
@@ -244,6 +246,69 @@ describe("loading a page's shared areas", () => {
     expect(state.sharedAreas).toEqual({ before_footer: AREA });
     expect(state.originalSharedAreas).toEqual({ before_footer: AREA });
     expect(state.retainedAreas).toEqual([{ id: "old_banner", widgetCount: 1 }]);
+    expect(useAutoSave.getState().hasUnsavedPageChanges()).toBe(false);
+  });
+
+  // Stored content can carry repeats (written by hand, restored from a backup); the editor
+  // lists each widget once, as the page renders it.
+  // A page file with no order list renders its widgets in their own order, so the
+  // editor lists them that way; the next save writes the order. An empty list is
+  // an order, and lists nothing.
+  it("lists a page's widgets in their own order when it has no order list, and calls nothing unsaved", async () => {
+    getPage.mockResolvedValue({ id: "about", language: "el", widgets: { b: { type: "rich-text" }, a: { type: "rich-text" } } });
+    getSharedAreas.mockResolvedValue({ declared: [], retained: [], areas: {} });
+    await usePageStore.getState().loadPage("about", "el");
+    expect(usePageStore.getState().page.widgetsOrder).toEqual(["b", "a"]);
+    expect(useAutoSave.getState().hasUnsavedPageChanges()).toBe(false);
+
+    getPage.mockResolvedValue({ id: "about", language: "el", widgets: { b: { type: "rich-text" } }, widgetsOrder: [] });
+    await usePageStore.getState().loadPage("about", "el");
+    expect(usePageStore.getState().page.widgetsOrder).toEqual([]);
+  });
+
+  // Parsed JSON can hold `__proto__` as a widget id. Copied key by key it would set
+  // the rebuilt map's prototype, and the page's other widgets would read as no
+  // widgets map at all.
+  it("keeps the page's widgets a plain map when one is stored as __proto__", async () => {
+    getPage.mockResolvedValue(
+      JSON.parse('{"id": "about", "language": "el", "widgets": {"__proto__": {"type": "rich-text"}, "a": {"type": "rich-text"}}, "widgetsOrder": ["__proto__", "a"]}'),
+    );
+    getSharedAreas.mockResolvedValue({ declared: [], retained: [], areas: {} });
+    await usePageStore.getState().loadPage("about", "el");
+    const { widgets, widgetsOrder } = usePageStore.getState().page;
+    expect(Object.getPrototypeOf(widgets)).toBe(Object.prototype);
+    expect(renderedWidgetOrder(widgets, widgetsOrder)).toEqual(["a"]);
+  });
+
+  it("lists a widget the stored order names twice once, and calls nothing unsaved", async () => {
+    getPage.mockResolvedValue({
+      id: "about",
+      language: "el",
+      widgets: { a: { type: "rich-text", blocks: { x: { type: "item" } }, blocksOrder: ["x", "x"] }, b: { type: "rich-text" } },
+      widgetsOrder: ["a", "b", "a", "a"],
+    });
+    getGlobalWidgets.mockResolvedValueOnce({
+      header: { type: "header", settings: {}, blocks: { h1: { type: "link" } }, blocksOrder: ["h1", "h1"] },
+      footer: null,
+    });
+    getSharedAreas.mockResolvedValue({
+      declared: [{ id: "before_footer", label: "Before footer" }],
+      retained: [],
+      areas: {
+        before_footer: {
+          widgets: { a1: { ...AREA.widgets.a1, blocks: { z: { type: "item" } }, blocksOrder: ["z", "z", "z"] } },
+          widgetsOrder: [...AREA.widgetsOrder, ...AREA.widgetsOrder],
+        },
+      },
+    });
+    await usePageStore.getState().loadPage("about", "el");
+
+    const state = usePageStore.getState();
+    expect(state.page.widgetsOrder).toEqual(["a", "b"]);
+    expect(state.page.widgets.a.blocksOrder).toEqual(["x"]);
+    expect(state.globalWidgets.header.blocksOrder).toEqual(["h1"]);
+    expect(state.sharedAreas.before_footer.widgetsOrder).toEqual(AREA.widgetsOrder);
+    expect(state.sharedAreas.before_footer.widgets.a1.blocksOrder).toEqual(["z"]);
     expect(useAutoSave.getState().hasUnsavedPageChanges()).toBe(false);
   });
 

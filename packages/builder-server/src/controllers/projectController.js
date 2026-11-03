@@ -4,7 +4,7 @@ import { extractZipSafely, openZip, readZipEntry, UnsafeZipError } from "../util
 import { mediaLibraryProblem, contentFilesProblem } from "../utils/backupContentChecks.js";
 import path from "path";
 import * as themeController from "./themeController.js";
-import archiver from "archiver";
+import { streamZipToResponse } from "../utils/zipResponse.js";
 import {
   DATA_DIR,
   APP_ROOT,
@@ -1244,8 +1244,8 @@ export async function exportProject(req, res) {
 
     // Media metadata is read BEFORE the response starts streaming. It is part of
     // the backup, not a nicety, so a read failure has to be answerable with a
-    // status code — once `archive.pipe(res)` runs, the only thing left to send
-    // is a truncated ZIP that looks like a complete one.
+    // status code — once the ZIP starts streaming, a failure can only cut the
+    // download off.
     let mediaData;
     try {
       mediaData = mediaRepo.getMediaFiles(project.id);
@@ -1265,25 +1265,6 @@ export async function exportProject(req, res) {
     res.setHeader("Content-Type", "application/zip");
     res.setHeader("Content-Disposition", `attachment; filename="${zipFilename}"`);
 
-    // Create ZIP archive
-    const archive = archiver("zip", {
-      zlib: { level: 9 }, // Maximum compression
-    });
-
-    // Handle archiver errors
-    archive.on("error", (err) => {
-      console.error("Archive error:", err);
-      if (!res.headersSent) {
-        res.status(500).json({ error: "Failed to create ZIP archive" });
-      }
-    });
-
-    // Pipe archive data to response
-    archive.pipe(res);
-
-    // Add manifest
-    archive.append(JSON.stringify(manifest, null, 2), { name: "project-export.json" });
-
     // Add all project files recursively
     // Exclude system files and directories
     const excludePatterns = [/^\./, /node_modules/, /\.git/];
@@ -1301,33 +1282,36 @@ export async function exportProject(req, res) {
       return excludePatterns.some((pattern) => pattern.test(relativePath));
     };
 
-    async function addDirectory(dir, baseDir = projectDir) {
-      const entries = await fs.readdir(dir, { withFileTypes: true });
-      for (const entry of entries) {
+    async function* projectFiles(dir) {
+      for (const entry of await fs.readdir(dir, { withFileTypes: true })) {
         const fullPath = path.join(dir, entry.name);
         if (shouldExclude(fullPath)) continue;
 
         if (entry.isDirectory()) {
-          await addDirectory(fullPath, baseDir);
+          yield* projectFiles(fullPath);
         } else if (entry.isFile()) {
-          const relativePath = path.relative(baseDir, fullPath);
-          archive.file(fullPath, { name: relativePath });
+          yield {
+            name: path.relative(projectDir, fullPath),
+            stats: await fs.stat(fullPath),
+            open: () => fs.createReadStream(fullPath),
+          };
         }
       }
     }
 
-    await addDirectory(projectDir);
+    async function* backupEntries() {
+      yield { name: "project-export.json", content: JSON.stringify(manifest, null, 2) };
+      yield* projectFiles(projectDir);
+      // Serialize media metadata from SQLite into the ZIP. Written even when the
+      // library is empty: the entry's presence is what tells a restore that this
+      // backup describes the library, rather than leaving it to guess.
+      yield { name: MEDIA_METADATA_ENTRY, content: JSON.stringify({ files: mediaData.files || [] }, null, 2) };
+    }
 
-    // Serialize media metadata from SQLite into the ZIP. Written even when the
-    // library is empty: the entry's presence is what tells a restore that this
-    // backup describes the library, rather than leaving it to guess.
-    archive.append(JSON.stringify({ files: mediaData.files || [] }, null, 2), { name: MEDIA_METADATA_ENTRY });
-
-    // Finalize the archive
-    await archive.finalize();
+    await streamZipToResponse(res, backupEntries());
   } catch (error) {
     console.error("Error exporting project:", error);
-    if (!res.headersSent) {
+    if (!res.headersSent && !res.destroyed) {
       res.status(500).json({ error: error.message || "Failed to export project" });
     }
   }
