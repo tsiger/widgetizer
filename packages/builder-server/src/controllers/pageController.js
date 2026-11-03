@@ -435,55 +435,50 @@ export async function updatePage(req, res) {
       if (paginationError) return res.status(422).json({ error: paginationError });
     }
 
-    // Read old file first to preserve original creation date and uuid
-    let originalCreationDate = new Date().toISOString();
-    let existingUuid = null;
-    let existingGroupId = null;
-    let existingWidgets = {};
-    try {
-      const oldBuf = await storage.read(scope, pageKey(oldSlug, lang));
-      if (oldBuf != null) {
-        const oldData = JSON.parse(oldBuf.toString("utf8"));
-        originalCreationDate = oldData.created || originalCreationDate;
-        existingUuid = oldData.uuid || null; // Preserve stable uuid across renames
-        existingGroupId = oldData.translationGroupId || null;
-        existingWidgets = oldData.widgets || {}; // Preserve widgets if not included in request
-      }
-      // If old file doesn't exist (e.g. first save after create error, or manual rename), allow creation
-    } catch (readError) {
-      console.warn(`Could not read old page file ${oldSlug} during update: ${readError.message}`);
-    }
-
-    // Construct the final page data for saving
-    const resolvedUuid = existingUuid || randomUUID();
-    // A page cannot be its own parent. The picker never offers it, and the
-    // breadcrumb builder would drop the loop anyway, but a direct API call
-    // should not be able to write it.
-    const parentPageUuid =
-      typeof pageData.parentPageUuid === "string" &&
-      pageData.parentPageUuid.trim() &&
-      pageData.parentPageUuid !== resolvedUuid
-        ? pageData.parentPageUuid.trim()
-        : undefined;
-
-    const finalUpdatedPageData = {
-      ...pageData, // Start with submitted data
-      parentPageUuid, // undefined drops the key entirely when cleared
-      uuid: resolvedUuid, // Preserve existing uuid or generate new one if missing
-      translationGroupId: existingGroupId || resolvedUuid,
-      language: lang.language,
-      id: finalNewSlug, // Use the final unique slug as ID
-      slug: finalNewSlug, // Use the final unique slug
-      name: pageData.name || `Page ${finalNewSlug}`, // Ensure name exists
-      widgets: pageData.widgets || existingWidgets, // Use submitted widgets or keep existing
-      created: originalCreationDate, // Preserve original creation date
-      updated: new Date().toISOString(), // Set new update timestamp
-    };
-
     // Both writes in one section, for the same reason as savePageContent below:
     // the sweep writes other pages in this language and must not outlive the
-    // section that checked the language still exists.
+    // section that checked the language still exists. The stored page is read in
+    // the section too: anything the request doesn't name (the widgets and their
+    // order, when the page settings form saves) is the stored page's as it is now,
+    // so content saved after the form was opened is kept.
+    let finalUpdatedPageData;
     const movedFrom = await withContentWriteLock(scope.projectId, async () => {
+      let stored = {};
+      try {
+        const oldBuf = await storage.read(scope, pageKey(oldSlug, lang));
+        // If the old file doesn't exist (e.g. first save after a create error, or a
+        // manual rename), the update creates it.
+        if (oldBuf != null) stored = JSON.parse(oldBuf.toString("utf8"));
+      } catch (readError) {
+        console.warn(`Could not read old page file ${oldSlug} during update: ${readError.message}`);
+      }
+
+      const resolvedUuid = stored.uuid || randomUUID();
+      // A page cannot be its own parent. The picker never offers it, and the
+      // breadcrumb builder would drop the loop anyway, but a direct API call
+      // should not be able to write it. A request that doesn't name a parent keeps
+      // the stored one; an empty one clears it.
+      const requestedParent = Object.hasOwn(pageData, "parentPageUuid") ? pageData.parentPageUuid : stored.parentPageUuid;
+      const parentPageUuid =
+        typeof requestedParent === "string" && requestedParent.trim() && requestedParent !== resolvedUuid
+          ? requestedParent.trim()
+          : undefined;
+
+      finalUpdatedPageData = {
+        ...stored, // The stored page, as it is now
+        ...pageData, // What the request names
+        parentPageUuid, // undefined drops the key entirely when cleared
+        uuid: resolvedUuid, // Preserve existing uuid or generate new one if missing
+        translationGroupId: stored.translationGroupId || resolvedUuid,
+        language: lang.language,
+        id: finalNewSlug, // Use the final unique slug as ID
+        slug: finalNewSlug, // Use the final unique slug
+        name: pageData.name || `Page ${finalNewSlug}`, // Ensure name exists
+        widgets: pageData.widgets || stored.widgets || {},
+        created: stored.created || new Date().toISOString(), // Preserve original creation date
+        updated: new Date().toISOString(), // Set new update timestamp
+      };
+
       await persistPageInSection({
         scope,
         storage,

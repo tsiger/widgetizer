@@ -445,6 +445,86 @@ describe("updatePage", () => {
     assert.equal(res._json.data.name, "New Name");
   });
 
+  // The page settings form sends only its own fields. Everything else is the stored
+  // page's, read as the update writes, so content saved after the form opened stays.
+  it("keeps the stored content and other fields when the request doesn't send them", async () => {
+    const page = await createTestPage("Keeps Content");
+    await callController(savePageContent, {
+      params: { id: page.slug },
+      body: {
+        name: page.name,
+        slug: page.slug,
+        widgets: { w1: { type: "text", settings: { text: "Saved since" } } },
+        widgetsOrder: ["w1"],
+        extra: "kept",
+      },
+    });
+
+    const res = await callController(updatePage, {
+      params: { id: page.slug },
+      body: { name: "Renamed", slug: page.slug, seo: { description: "New" } },
+    });
+    assert.equal(res._status, 200);
+
+    const read = await callController(getPage, { params: { id: page.slug } });
+    assert.equal(read._json.name, "Renamed");
+    assert.equal(read._json.seo.description, "New");
+    assert.deepEqual(read._json.widgetsOrder, ["w1"]);
+    assert.equal(read._json.widgets.w1.settings.text, "Saved since");
+    assert.equal(read._json.extra, "kept");
+  });
+
+  // The stored page is read once the update holds the write section, so a content
+  // save that got there first is the one the update builds on.
+  it("builds on a content save that holds the write section when it arrives", async () => {
+    const page = await createTestPage("Queued Behind Save");
+    const pagePath = path.join(getProjectPagesDir(activeProject.folderName), `${page.slug}.json`);
+    let update;
+    await withContentWriteLock(activeProject.id, async () => {
+      update = callController(updatePage, { params: { id: page.slug }, body: { name: "Renamed Later", slug: page.slug } });
+      // Let the update run up to the section it waits for.
+      await new Promise((resolve) => setTimeout(resolve, 50));
+      const stored = await fs.readJson(pagePath);
+      await fs.writeJson(pagePath, { ...stored, widgets: { w1: { type: "text", settings: {} } }, widgetsOrder: ["w1"] });
+    });
+    const res = await update;
+    assert.equal(res._status, 200);
+    const read = await fs.readJson(pagePath);
+    assert.equal(read.name, "Renamed Later");
+    assert.deepEqual(read.widgetsOrder, ["w1"]);
+  });
+
+  it("keeps the parent page when the request doesn't name one, and clears it when sent empty", async () => {
+    const parent = await createTestPage("Kept Parent");
+    const child = await createTestPage("Kept Child");
+    await callController(updatePage, {
+      params: { id: child.slug },
+      body: { name: child.name, slug: child.slug, parentPageUuid: parent.uuid },
+    });
+
+    await callController(updatePage, { params: { id: child.slug }, body: { name: "Kept Child", slug: child.slug } });
+    let read = await callController(getPage, { params: { id: child.slug } });
+    assert.equal(read._json.parentPageUuid, parent.uuid);
+
+    await callController(updatePage, {
+      params: { id: child.slug },
+      body: { name: "Kept Child", slug: child.slug, parentPageUuid: "" },
+    });
+    read = await callController(getPage, { params: { id: child.slug } });
+    assert.equal("parentPageUuid" in read._json, false);
+  });
+
+  it("still takes widgets the request does send", async () => {
+    const page = await createTestPage("Takes Widgets");
+    const res = await callController(updatePage, {
+      params: { id: page.slug },
+      body: { name: page.name, slug: page.slug, widgets: { w2: { type: "text", settings: {} } }, widgetsOrder: ["w2"] },
+    });
+    assert.equal(res._status, 200);
+    const read = await callController(getPage, { params: { id: page.slug } });
+    assert.deepEqual(read._json.widgetsOrder, ["w2"]);
+  });
+
   it("preserves UUID across updates", async () => {
     const page = await createTestPage("UUID Preserve");
 
