@@ -1,4 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
+import { renderedWidgetOrder } from "@widgetizer/core/widgetOrder";
 
 vi.mock("../../queries/pageManager", () => ({
   getPage: vi.fn(),
@@ -250,6 +251,35 @@ describe("loading a page's shared areas", () => {
 
   // Stored content can carry repeats (written by hand, restored from a backup); the editor
   // lists each widget once, as the page renders it.
+  // A page file with no order list renders its widgets in their own order, so the
+  // editor lists them that way; the next save writes the order. An empty list is
+  // an order, and lists nothing.
+  it("lists a page's widgets in their own order when it has no order list, and calls nothing unsaved", async () => {
+    getPage.mockResolvedValue({ id: "about", language: "el", widgets: { b: { type: "rich-text" }, a: { type: "rich-text" } } });
+    getSharedAreas.mockResolvedValue({ declared: [], retained: [], areas: {} });
+    await usePageStore.getState().loadPage("about", "el");
+    expect(usePageStore.getState().page.widgetsOrder).toEqual(["b", "a"]);
+    expect(useAutoSave.getState().hasUnsavedPageChanges()).toBe(false);
+
+    getPage.mockResolvedValue({ id: "about", language: "el", widgets: { b: { type: "rich-text" } }, widgetsOrder: [] });
+    await usePageStore.getState().loadPage("about", "el");
+    expect(usePageStore.getState().page.widgetsOrder).toEqual([]);
+  });
+
+  // Parsed JSON can hold `__proto__` as a widget id. Copied key by key it would set
+  // the rebuilt map's prototype, and the page's other widgets would read as no
+  // widgets map at all.
+  it("keeps the page's widgets a plain map when one is stored as __proto__", async () => {
+    getPage.mockResolvedValue(
+      JSON.parse('{"id": "about", "language": "el", "widgets": {"__proto__": {"type": "rich-text"}, "a": {"type": "rich-text"}}, "widgetsOrder": ["__proto__", "a"]}'),
+    );
+    getSharedAreas.mockResolvedValue({ declared: [], retained: [], areas: {} });
+    await usePageStore.getState().loadPage("about", "el");
+    const { widgets, widgetsOrder } = usePageStore.getState().page;
+    expect(Object.getPrototypeOf(widgets)).toBe(Object.prototype);
+    expect(renderedWidgetOrder(widgets, widgetsOrder)).toEqual(["a"]);
+  });
+
   it("lists a widget the stored order names twice once, and calls nothing unsaved", async () => {
     getPage.mockResolvedValue({
       id: "about",

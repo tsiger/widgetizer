@@ -795,3 +795,20 @@ describe("buildFormsManifest — a repeated field block", () => {
     assert.deepEqual(buildFormsManifest([{ id: "index", widgets: { w1: repeated }, widgetsOrder: ["w1"] }], APP_VERSION), once);
   });
 });
+
+// The manifest holds the forms export publishes, so it reads the widgets the page
+// renders: a form stored under the header's or footer's id renders nowhere.
+describe("buildFormsManifest — only the forms a page renders", () => {
+  it("skips a block order entry that isn't an id", () => {
+    const widget = makeFormWidget({ formName: "Contact", blocks: SIMPLE_FIELDS });
+    widget.blocksOrder = [{ toString: null }, ...widget.blocksOrder];
+    const { manifest } = buildFormsManifest([{ id: "index", widgets: { w1: widget }, widgetsOrder: ["w1"] }], APP_VERSION);
+    assert.equal(manifest.forms.length, 1);
+  });
+
+  it("leaves out a form widget stored under the header's or footer's id", () => {
+    const widget = makeFormWidget({ formName: "Contact", blocks: SIMPLE_FIELDS });
+    const pages = [{ id: "index", widgets: { header: widget, footer: widget }, widgetsOrder: ["header", "footer"] }];
+    assert.equal(buildFormsManifest(pages, APP_VERSION).manifest, null);
+  });
+});

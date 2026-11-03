@@ -16,6 +16,7 @@ import useWidgetStore from "../../stores/widgetStore";
 import { buildPreviewUrl, getPreviewTargetOrigin } from "../../lib/previewBase";
 import { readPreviewMessage } from "../../lib/previewMessages";
 import { createPreviewReloadCoordinator } from "../../lib/previewReload";
+import { pageOpensTransparent } from "../../lib/transparentHeader";
 import SelectionOverlay from "./SelectionOverlay";
 import { STANDALONE_SANDBOX } from "../preview/PreviewStage";
 
@@ -609,15 +610,7 @@ const PreviewPanel = forwardRef(function PreviewPanel(
       const oldTransparent = previousState.globalWidgets?.header?.settings?.transparent_on_hero;
       const newTransparent = globalWidgets?.header?.settings?.transparent_on_hero;
       if (oldTransparent !== newTransparent) {
-        let shouldBeTransparent = false;
-        if (newTransparent) {
-          const widgetOrder = page?.widgetsOrder || Object.keys(widgets || {});
-          const firstWidgetId = widgetOrder[0];
-          const firstWidget = firstWidgetId && widgets?.[firstWidgetId];
-          if (firstWidget) {
-            shouldBeTransparent = schemas[firstWidget.type]?.supportsTransparentHeader === true;
-          }
-        }
+        const shouldBeTransparent = !!newTransparent && pageOpensTransparent(page, schemas);
         iframeRef.current.contentWindow.postMessage(
           { type: "UPDATE_BODY_CLASS", payload: { className: "transparent-header", enabled: shouldBeTransparent } },
           getPreviewTargetOrigin(),

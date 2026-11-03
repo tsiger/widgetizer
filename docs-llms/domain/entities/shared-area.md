@@ -43,7 +43,7 @@ The content is kept. The editor lists it as "not shown by this theme", its image
 | Placement | `{{ shared_areas.<id> \| raw }}` in `layout.liquid`; an area the layout does not print never shows |
 | Default storage | `pages/global/areas/<id>.json` |
 | Additional-language storage | `pages/<code>/global/areas/<id>.json` |
-| Shape | `{ widgets, widgetsOrder }`, like a page's widgets; no slug, uuid or SEO. An id appears in the order once: a repeat is dropped on save, language seeding and template fill, and skipped on render |
+| Shape | `{ widgets, widgetsOrder }`, like a page's widgets; no slug, uuid or SEO. An id appears in the order once: a repeat is dropped on save, language seeding and template fill, and skipped on render. A widget stored as `header`/`footer` renders nowhere, as on a page ([widget ids](widget.md#widget-ids)) |
 | Missing file | An empty area |
 | Unreadable file | Reported as an error; never treated as empty or overwritten; left out of rendering |
 | API | `GET /api/shared-areas?language=` (declared, retained, content); `PUT /api/shared-areas/:id?language=` saves one declared area |

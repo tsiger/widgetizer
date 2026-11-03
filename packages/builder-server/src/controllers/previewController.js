@@ -40,7 +40,7 @@ import { isProjectResolutionError } from "../utils/projectErrors.js";
 import { generateToken, getToken } from "../services/previewTokenStore.js";
 import { LANGUAGE_CODE_RE, DEFAULT_LANGUAGE } from "@widgetizer/core/languages";
 import { AREA_ID_RE } from "@widgetizer/core/sharedAreas";
-import { uniqueBlockOrder, uniqueWidgetOrder } from "@widgetizer/core/widgetOrder";
+import { isRenderedWidget, renderedWidgetOrder, uniqueBlockOrder, uniqueWidgetOrder } from "@widgetizer/core/widgetOrder";
 
 // Inject the runtime script and base tag into rendered HTML. The site's
 // languages travel with it: a preview renders at the root, so a link reads as
@@ -169,10 +169,11 @@ async function generatePreviewHtml(pageData, rawThemeSettings, previewMode, coll
     }
   }
 
-  // Render page widgets in the middle, each once: a repeated id is the same widget.
-  const widgetOrder = uniqueWidgetOrder(pageData.widgetsOrder) || Object.keys(pageData.widgets || {});
+  // The page's widgets in the middle, as every render picks them (each once, never
+  // one stored under the header's or footer's id; see renderedWidgetOrder).
+  const widgetOrder = renderedWidgetOrder(pageData.widgets, pageData.widgetsOrder);
 
-  if (widgetOrder.length > 0 && pageData.widgets) {
+  if (widgetOrder.length > 0) {
     let widgetIndex = 0;
     for (const widgetId of widgetOrder) {
       const widget = pageData.widgets[widgetId];
@@ -282,9 +283,9 @@ async function generatePreviewHtml(pageData, rawThemeSettings, previewMode, coll
   let extraBodyClasses = "";
   const headerSettings = pageData.globalWidgets?.header?.settings;
   if (headerSettings?.transparent_on_hero) {
-    const widgetOrder = pageData.widgetsOrder || Object.keys(pageData.widgets || {});
+    // Over the first widget the page shows.
     const firstWidgetId = widgetOrder[0];
-    const firstWidget = firstWidgetId && pageData.widgets?.[firstWidgetId];
+    const firstWidget = firstWidgetId && pageData.widgets[firstWidgetId];
     if (firstWidget && await widgetSupportsTransparentHeader(activeProjectId, firstWidget.type)) {
       extraBodyClasses = "transparent-header";
     }
@@ -590,11 +591,11 @@ export async function renderSingleWidget(req, res) {
       if (pagination) sharedGlobals.paginationPlan = pagination;
     }
 
-    // The full render numbers the page's widgets 1, 2, … in widgetsOrder (or the
-    // widgets' own order when there is none), skipping ids with no data, and themes
-    // branch on it (`widget.index == 1` picks the h1). The header and footer keep
-    // null, as in the full render; they are told apart by type, as the engine does,
-    // since a page widget may share their id. So does a widget not in the order.
+    // The full render numbers the widgets the page shows 1, 2, … (see
+    // renderedWidgetOrder), and themes branch on it (`widget.index == 1` picks the
+    // h1). The header and footer keep null, as in the full render, and so does a
+    // page widget stored under their id, which renders nowhere, or one not in the
+    // order. The widget itself comes in the request, beside the page.
     let widgetIndex = null;
     const isGlobal = widget?.type === "header" || widget?.type === "footer";
     if (currentPage && !isGlobal) {
@@ -602,11 +603,7 @@ export async function renderSingleWidget(req, res) {
       const order = Array.isArray(currentPage.widgetsOrder)
         ? uniqueWidgetOrder(currentPage.widgetsOrder)
         : Object.keys(pageWidgets);
-      // The order comes from the request body, so an entry that is not a string id
-      // is skipped, where the full render's direct lookup could throw or miscount.
-      const present = order.filter(
-        (id) => typeof id === "string" && (id === widgetId || (Object.hasOwn(pageWidgets, id) && pageWidgets[id])),
-      );
+      const present = order.filter((id) => isRenderedWidget(id === widgetId ? { [id]: widget } : pageWidgets, id));
       const position = present.indexOf(widgetId);
       if (position !== -1) widgetIndex = position + 1;
     }

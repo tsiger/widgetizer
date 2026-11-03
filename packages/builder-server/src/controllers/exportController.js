@@ -44,7 +44,7 @@ import { identityReadiness } from "@widgetizer/core/siteIdentity";
 import { emptyArticleFields } from "@widgetizer/core/structuredData";
 import { listingParentStatus } from "@widgetizer/core/breadcrumbs";
 import { readThemeSetting } from "@widgetizer/core/themeSettingChanges";
-import { uniqueWidgetOrder } from "@widgetizer/core/widgetOrder";
+import { isRenderedWidget, RESERVED_WIDGET_IDS, renderedWidgetOrder, uniqueWidgetOrder } from "@widgetizer/core/widgetOrder";
 
 function structuredDataIssueMessage(warning) {
   if (warning.code === "emptyArticleFields") {
@@ -689,31 +689,32 @@ export async function exportProjectToDir(projectId, options = {}, collectionDeps
 
       // Render page-specific widgets sequentially
       let pageWidgetsHtml = "";
-      if (pageData.widgets && pageData.widgetsOrder) {
-        let widgetIndex = 0;
-        // Each once: a repeated id is the same widget.
-        for (const widgetId of uniqueWidgetOrder(pageData.widgetsOrder)) {
-          // Skip header/footer as they are rendered separately
-          if (widgetId === "header" || widgetId === "footer") {
-            continue;
-          }
-          const widget = pageData.widgets[widgetId];
-          if (!widget) {
+      let widgetIndex = 0;
+      // The widgets the page shows, as every render picks them (see
+      // renderedWidgetOrder); an order entry with no widget behind it is reported.
+      const candidates = Array.isArray(pageData.widgetsOrder)
+        ? uniqueWidgetOrder(pageData.widgetsOrder)
+        : Object.keys(pageData.widgets || {});
+      for (const widgetId of candidates) {
+        if (!isRenderedWidget(pageData.widgets, widgetId)) {
+          // A hand-made order can hold anything; only a missing widget is worth a word.
+          if (typeof widgetId === "string" && !RESERVED_WIDGET_IDS.includes(widgetId)) {
             console.warn(` -> Widget data missing for ID: ${widgetId} on page ${pageData.id}`);
-            continue;
           }
-          widgetIndex += 1; // 1-based index (first widget = 1, second = 2, etc.)
-          pageWidgetsHtml += await renderWidget(
-            projectId,
-            widgetId,
-            widget,
-            rawThemeSettings,
-            "publish",
-            sharedGlobals,
-            widgetIndex,
-            renderCollectionDeps,
-          );
+          continue;
         }
+        const widget = pageData.widgets[widgetId];
+        widgetIndex += 1; // 1-based index (first widget = 1, second = 2, etc.)
+        pageWidgetsHtml += await renderWidget(
+          projectId,
+          widgetId,
+          widget,
+          rawThemeSettings,
+          "publish",
+          sharedGlobals,
+          widgetIndex,
+          renderCollectionDeps,
+        );
       }
 
       // Render footer if exists
@@ -733,9 +734,9 @@ export async function exportProjectToDir(projectId, options = {}, collectionDeps
       // Determine if transparent header should be active for this page
       let extraBodyClasses = "";
       if (pageHeaderData?.settings?.transparent_on_hero) {
-        const widgetOrder = pageData.widgetsOrder || Object.keys(pageData.widgets || {});
-        const firstWidgetId = widgetOrder[0];
-        const firstWidget = firstWidgetId && pageData.widgets?.[firstWidgetId];
+        // Over the first widget the page shows.
+        const firstWidgetId = renderedWidgetOrder(pageData.widgets, pageData.widgetsOrder)[0];
+        const firstWidget = firstWidgetId && pageData.widgets[firstWidgetId];
         if (firstWidget && await widgetSupportsTransparentHeader(projectId, firstWidget.type)) {
           extraBodyClasses = "transparent-header";
         }

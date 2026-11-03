@@ -46,7 +46,7 @@ You have three testimonials. Duplicate the second, replace the copied quote and 
 
 A block is a child instance inside a page widget or a global widget. Its type must correspond to a block definition in that widget's schema. It is not a reusable global object and has no independent backend CRUD resource.
 
-- The owner's `blocks` map holds `{ type, settings }` keyed by block ID.
+- The owner's `blocks` map holds `{ type, settings }` keyed by block ID. A block id follows the same rule as a widget id — a letter or digit, then letters, digits, `_` and `-`, at most 128 characters, and not a built-in JavaScript property name (`constructor`, `toString`, …) — and is unique within its widget (`header`/`footer` are free here); see [widget ids](widget.md#widget-ids). The editor's own ids are `block_<uuid>`; theme ids are usually `kebab-case`.
 - `blocksOrder` defines display order; a block id appears in it once (a repeat is skipped when the widget renders and dropped on save, copy and editor load).
 - Defaults come from the block schema, with default-block overrides where supplied.
 - Add, duplicate, remove, reorder, and edit update the owning widget; save persists the page or global document.

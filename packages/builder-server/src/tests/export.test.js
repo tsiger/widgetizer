@@ -1974,3 +1974,66 @@ describe("exportProject — a page order that names a widget more than once", ()
     assert.equal(html.split("Only once, please").length - 1, 1);
   });
 });
+
+// Export renders a page's widgets as the editor's preview does: the ones its order
+// names that the page holds itself, never one stored under the header's or footer's
+// id or an inherited name; with no order list at all, the page's widgets in their own
+// order. The transparent header follows the first widget shown.
+describe("exportProject — which widgets a page renders", () => {
+  const pageFile = () => path.join(getProjectPagesDir(PROJECT_FOLDER), "which.json");
+  const headerFile = () => path.join(getProjectPagesDir(PROJECT_FOLDER), "global", "header.json");
+  const leadDir = () => path.join(getProjectDir(PROJECT_FOLDER), "widgets", "lead");
+  let header;
+  before(async () => {
+    header = await fs.readFile(headerFile(), "utf8");
+    await fs.outputFile(path.join(leadDir(), "widget.liquid"), "<section>Lead widget</section>");
+    await fs.outputFile(
+      path.join(leadDir(), "schema.json"),
+      JSON.stringify({ name: "lead", supportsTransparentHeader: true, settings: [] }),
+    );
+  });
+  after(async () => {
+    await fs.remove(pageFile());
+    await fs.remove(leadDir());
+    await fs.writeFile(headerFile(), header);
+  });
+
+  const link = (text) => ({ type: "core-link", settings: { href: "/contact.html", text } });
+  const exportPage = async (fields) => {
+    await fs.writeFile(
+      pageFile(),
+      JSON.stringify({ name: "Which", slug: "which", uuid: "page-uuid-which", widgets: {}, ...fields }),
+    );
+    const res = await callController(exportProject, { params: { projectId: PROJECT_ID } });
+    assert.equal(res._status, 200, JSON.stringify(res._json));
+    return fs.readFile(path.join(await getLatestExportDir(), "which.html"), "utf8");
+  };
+
+  it("leaves out an inherited name instead of an error placeholder", async () => {
+    const html = await exportPage({ widgets: { a: link("Shown link") }, widgetsOrder: ["constructor", "a"] });
+    assert.match(html, /Shown link/);
+    assert.doesNotMatch(html, /data-widget-id="constructor"/);
+  });
+
+  // A hand-made file can hold anything in the order; an entry that isn't an id is
+  // skipped, never a crash of the whole export.
+  it("skips an order entry that isn't an id", async () => {
+    const html = await exportPage({ widgets: { a: link("Shown link") }, widgetsOrder: [{ toString: null }, 7, "a"] });
+    assert.match(html, /Shown link/);
+  });
+
+  it("renders the page's widgets in their own order when it has no order list", async () => {
+    const html = await exportPage({ widgets: { a: link("First link"), header: link("Hidden link"), b: link("Second link") } });
+    assert.match(html, /First link[\s\S]*Second link/);
+    assert.doesNotMatch(html, /Hidden link/);
+  });
+
+  it("makes the header transparent by the first widget shown", async () => {
+    await fs.writeFile(headerFile(), JSON.stringify({ type: "core-spacer", settings: { height: 10, transparent_on_hero: true } }));
+    const html = await exportPage({
+      widgets: { header: link("Hidden link"), first: { type: "lead", settings: {} } },
+      widgetsOrder: ["gone", "header", "first"],
+    });
+    assert.match(html, /<body class="[^"]*transparent-header/);
+  });
+});

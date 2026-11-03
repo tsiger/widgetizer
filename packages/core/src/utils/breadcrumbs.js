@@ -10,6 +10,7 @@
  * the `breadcrumbs` snippet.
  */
 import { pageHref, itemHref } from "./internalHref.js";
+import { renderedWidgetOrder } from "./widgetOrder.js";
 import { isHomeSlug, pagedHref, pageOutputPath, itemOutputPath, translationGroupIdOf } from "./contentAddress.js";
 
 /** A parent chain longer than this is treated as broken data, not walked. */
@@ -230,8 +231,9 @@ export function buildBreadcrumbs({
  * Index the pages that list each collection, for `listingPages` above: which
  * page is a collection's anchor, and how many pages list it at all.
  *
- * A widget counts when its schema declares `collection.type`; it is the anchor
- * when that widget's `listing_anchor` setting is on. Two anchors is broken data
+ * A widget counts when the page renders it (see `renderedWidgetOrder`) and its
+ * schema declares `collection.type`; it is the anchor when that widget's
+ * `listing_anchor` setting is on. Two anchors is broken data
  * — first page by slug wins so every render agrees.
  *
  * @param {Iterable<object>} pages - page objects carrying `widgets`
@@ -247,7 +249,8 @@ export function indexListingPages(pages, schemasByType) {
   const sorted = [...pages].sort((a, b) => String(a?.slug || "").localeCompare(String(b?.slug || "")));
   for (const page of sorted) {
     if (!page?.uuid) continue;
-    for (const widget of Object.values(page.widgets || {})) {
+    for (const widgetId of renderedWidgetOrder(page.widgets, page.widgetsOrder)) {
+      const widget = page.widgets[widgetId];
       const declared = get(widget?.type)?.collection?.type;
       if (!declared) continue;
 

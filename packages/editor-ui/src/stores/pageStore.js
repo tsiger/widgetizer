@@ -176,19 +176,23 @@ const usePageStore = create(
           const pageData = await getPage(pageId, language);
 
           // Filter out any header/footer widgets that might exist in page data
-          const cleanWidgets = {};
-          Object.entries(pageData.widgets).forEach(([id, widget]) => {
-            if (widget.type !== "header" && widget.type !== "footer") {
-              cleanWidgets[id] = uniqueBlockOrder(widget);
-            }
-          });
+          // Built with fromEntries: parsed JSON can hold `__proto__` as a widget id,
+          // and assigning that key would set the map's prototype instead.
+          const cleanWidgets = Object.fromEntries(
+            Object.entries(pageData.widgets)
+              .filter(([, widget]) => widget.type !== "header" && widget.type !== "footer")
+              .map(([id, widget]) => [id, uniqueBlockOrder(widget)]),
+          );
 
           const cleanPageData = {
             ...pageData,
             widgets: cleanWidgets,
             // Each widget once, as the page renders it (a stored file can carry
-            // repeats); the next save writes the cleaned order.
-            ...(Array.isArray(pageData.widgetsOrder) ? { widgetsOrder: uniqueWidgetOrder(pageData.widgetsOrder) } : {}),
+            // repeats), and with no order list the widgets in their own order, as
+            // they render then; the next save writes the order.
+            widgetsOrder: Array.isArray(pageData.widgetsOrder)
+              ? uniqueWidgetOrder(pageData.widgetsOrder)
+              : Object.keys(cleanWidgets),
           };
 
           // In the language the page came back in — a default-language load passes

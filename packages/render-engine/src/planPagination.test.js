@@ -123,3 +123,18 @@ describe("planPagination", () => {
     }
   });
 });
+
+// The plan follows the widgets the page renders: a widget under the header's or
+// footer's id, or left out of the order, renders nothing, so it paginates nothing.
+describe("planPagination — only a widget that renders", () => {
+  it("passes over a widget stored under the header's or footer's id", async () => {
+    const widgets = { header: paginating({ limit: 3 }), footer: paginating({ limit: 3 }) };
+    expect(await planPagination(deps(), widgets, ["header", "footer"], { pageSlug: "blog" })).toBeNull();
+  });
+
+  it("plans nothing for an empty order, and plans from the widgets' own order without one", async () => {
+    const widgets = { w1: paginating({ limit: 3 }) };
+    expect(await planPagination(deps(), widgets, [], { pageSlug: "blog" })).toBeNull();
+    expect((await planPagination(deps(), widgets, undefined, { pageSlug: "blog" })).widgetId).toBe("w1");
+  });
+});
