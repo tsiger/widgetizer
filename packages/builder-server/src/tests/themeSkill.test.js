@@ -874,6 +874,15 @@ describe("shared areas in a theme", () => {
     assert.deepEqual(findings, []);
   });
 
+  it("refuses an area order that names a widget twice, as a page's", async () => {
+    const findings = await findingsAfter("area-repeat", async (dir) => {
+      await declare(dir);
+      await place(dir);
+      await startWith(dir, { widgets: { w1: { type: "hero", settings: {} } }, widgetsOrder: ["w1", "w1"] });
+    });
+    assert.ok(hasError(findings, "template-shape"), JSON.stringify(findings));
+  });
+
   it("refuses a bad declaration", async () => {
     const findings = await findingsAfter("area-bad-id", (dir) => declare(dir, [{ id: "Before-Footer", label: "x" }]));
     assert.ok(hasError(findings, "shared-areas"), JSON.stringify(findings));

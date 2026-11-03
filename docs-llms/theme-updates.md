@@ -288,7 +288,7 @@ A project with no preset gets `accent` `#00ff00`, the new theme default.
 6. System syncs seed updates into `data/themes/{name}/updates/` and builds `latest/` there
 7. Zip and distribute the entire theme folder (including `updates/`)
 
-> For bundled themes maintained in git (e.g. Arch), steps 1–3 can be generated automatically with `npm run theme:update-delta -- themes/{name} --from <old-version> --version <new-version>` (add `--dry-run` to preview). It git-diffs between release tags and writes the `updates/<version>/` folder — copied files for additions/edits plus `deleted/` markers for removals. See `scripts/theme-update-delta.js`.
+> For bundled themes maintained in git (e.g. Arch), steps 1–3 can be generated automatically with `npm run theme:update-delta -- themes/{name} --from <old-version> --version <new-version>` (add `--dry-run` to preview). It runs the theme checker (`validateTheme`, as `npm run validate:theme`) first and stops on any error (warnings are printed; with `--force`, the `updates/<version>/` folder being replaced is left out of the check), then git-diffs between release tags and writes the `updates/<version>/` folder — copied files for additions/edits plus `deleted/` markers for removals. See `scripts/theme-update-delta.js`.
 
 ### Distributing Theme Updates
 

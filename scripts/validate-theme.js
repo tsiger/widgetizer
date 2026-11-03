@@ -1710,6 +1710,8 @@ export function validateTheme(dir) {
         );
         continue;
       }
+      // As on a page: a repeated id would render the same widget again.
+      if (new Set(order).size !== order.length) error(file, "template-shape", "widgetsOrder contains duplicate ids.");
       for (const widgetId of order) {
         if (!Object.hasOwn(widgets, widgetId))
           error(file, "template-shape", `widgetsOrder lists "${widgetId}", which is not in "widgets".`);
