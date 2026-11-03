@@ -17,6 +17,7 @@ import { LIMIT_KEYS, MAX_WIDGETS_PER_PAGE } from "@widgetizer/core/adapters";
 import { sanitizeSlug, generateUniqueSlug } from "../utils/slugHelpers.js";
 import { generateCopyName } from "../utils/namingHelpers.js";
 import { isHomeSlug, isReservedPageSlug, pageKey, pagesDir } from "@widgetizer/core/contentAddress";
+import { uniqueBlockOrders, uniqueWidgetOrder } from "@widgetizer/core/widgetOrder";
 import { requestLanguage, projectLanguageContexts, withoutLanguage } from "../utils/contentLanguage.js";
 import {
   assertHasIdentity,
@@ -360,6 +361,9 @@ export async function updatePage(req, res) {
   try {
     const oldSlug = req.params.id; // The slug used to identify the file to update
     const pageData = req.body; // Contains potentially new name and slug
+    // Kept once each, as a content save does.
+    if (Array.isArray(pageData.widgetsOrder)) pageData.widgetsOrder = uniqueWidgetOrder(pageData.widgetsOrder);
+    if (pageData.widgets) pageData.widgets = uniqueBlockOrders(pageData.widgets);
     let desiredNewSlug = pageData.slug; // The slug the user wants
 
     // Defensive sanitization for SEO fields
@@ -733,7 +737,9 @@ export async function createPage(req, res) {
       language: lang.language,
       id: slug,
       slug,
+      // A new page has no widgets yet, so no order to keep.
       widgets: {},
+      widgetsOrder: [],
       created: new Date().toISOString(),
       updated: new Date().toISOString(),
     };
@@ -767,6 +773,12 @@ export async function savePageContent(req, res) {
   const { id } = req.params;
   try {
     const pageData = req.body; // Get all data including SEO
+    // A repeated id is the same widget again; every renderer would render each
+    // entry. Dropped rather than refused: the editor posts back the order it
+    // loaded, so content that already carries repeats must still save.
+    pageData.widgetsOrder = uniqueWidgetOrder(pageData.widgetsOrder);
+    // The same for each widget's blocks.
+    pageData.widgets = uniqueBlockOrders(pageData.widgets);
 
     // Defensive sanitization for SEO fields
     if (pageData.seo) {
@@ -1011,7 +1023,9 @@ export async function duplicatePage(req, res) {
     const uuid = randomUUID();
     const newPage = {
       ...originalPageData,
-      widgets: duplicatedWidgets,
+      // A file saved before repeats were dropped can still carry them.
+      widgets: uniqueBlockOrders(duplicatedWidgets),
+      widgetsOrder: uniqueWidgetOrder(originalPageData.widgetsOrder),
       uuid,
       translationGroupId: uuid,
       language: lang.language,
@@ -1084,6 +1098,9 @@ export async function createPageLanguageVersion(req, res) {
         // the new version at the other language. The new version starts with its
         // own automatic address instead.
         ...(source.seo ? { seo: { ...source.seo, canonical_url: "" } } : {}),
+        // A file saved before repeats were dropped can still carry them.
+        widgetsOrder: uniqueWidgetOrder(source.widgetsOrder),
+        widgets: uniqueBlockOrders(source.widgets),
         uuid: randomUUID(),
         translationGroupId: groupId,
         language: target.language,

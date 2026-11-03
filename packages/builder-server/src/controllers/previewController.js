@@ -40,6 +40,7 @@ import { isProjectResolutionError } from "../utils/projectErrors.js";
 import { generateToken, getToken } from "../services/previewTokenStore.js";
 import { LANGUAGE_CODE_RE, DEFAULT_LANGUAGE } from "@widgetizer/core/languages";
 import { AREA_ID_RE } from "@widgetizer/core/sharedAreas";
+import { uniqueBlockOrder, uniqueWidgetOrder } from "@widgetizer/core/widgetOrder";
 
 // Inject the runtime script and base tag into rendered HTML. The site's
 // languages travel with it: a preview renders at the root, so a link reads as
@@ -168,8 +169,8 @@ async function generatePreviewHtml(pageData, rawThemeSettings, previewMode, coll
     }
   }
 
-  // Render page widgets in the middle
-  const widgetOrder = pageData.widgetsOrder || Object.keys(pageData.widgets || {});
+  // Render page widgets in the middle, each once: a repeated id is the same widget.
+  const widgetOrder = uniqueWidgetOrder(pageData.widgetsOrder) || Object.keys(pageData.widgets || {});
 
   if (widgetOrder.length > 0 && pageData.widgets) {
     let widgetIndex = 0;
@@ -598,7 +599,9 @@ export async function renderSingleWidget(req, res) {
     const isGlobal = widget?.type === "header" || widget?.type === "footer";
     if (currentPage && !isGlobal) {
       const pageWidgets = isPlainObject(currentPage.widgets) ? currentPage.widgets : {};
-      const order = Array.isArray(currentPage.widgetsOrder) ? currentPage.widgetsOrder : Object.keys(pageWidgets);
+      const order = Array.isArray(currentPage.widgetsOrder)
+        ? uniqueWidgetOrder(currentPage.widgetsOrder)
+        : Object.keys(pageWidgets);
       // The order comes from the request body, so an entry that is not a string id
       // is skipped, where the full render's direct lookup could throw or miscount.
       const present = order.filter(
@@ -710,7 +713,8 @@ export async function getGlobalWidgets(req, res) {
 export async function saveGlobalWidget(req, res) {
   try {
     const { type } = req.params;
-    const widgetData = req.body;
+    // Each block once: the header's or footer's template loops this order.
+    const widgetData = uniqueBlockOrder(req.body);
 
     if (type !== "header" && type !== "footer") {
       return res.status(400).json({ error: "Invalid widget type" });

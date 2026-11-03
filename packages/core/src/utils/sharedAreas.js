@@ -1,3 +1,5 @@
+import { uniqueWidgetOrder } from "./widgetOrder.js";
+
 // A shared area is a named place in a theme's layout that the site owner fills
 // with ordinary widgets, shared by every page of one language. The theme declares
 // the areas in theme.json (`sharedAreas: [{ id, label }]`) and places each one in
@@ -94,7 +96,7 @@ export function areaWidgetProblem(widget) {
  */
 export function areaFromTemplate(template) {
   const source = template?.widgets && typeof template.widgets === "object" ? template.widgets : {};
-  const order = Array.isArray(template?.widgetsOrder) ? template.widgetsOrder : Object.keys(source);
+  const order = Array.isArray(template?.widgetsOrder) ? uniqueWidgetOrder(template.widgetsOrder) : Object.keys(source);
   const area = emptyArea();
   for (const id of order) {
     const widget = source[id];

@@ -71,6 +71,11 @@ describe("emptyArea", () => {
 });
 
 describe("areaFromTemplate", () => {
+  it("keeps a widget the template's order names twice once", () => {
+    const template = { widgets: { a: { type: "text", settings: {} } }, widgetsOrder: ["a", "a", "a"] };
+    expect(areaFromTemplate(template).widgetsOrder).toEqual(["a"]);
+  });
+
   it("keeps the widget list in order and nothing else", () => {
     const template = {
       name: "ignored",

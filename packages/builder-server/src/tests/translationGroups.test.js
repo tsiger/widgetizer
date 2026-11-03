@@ -208,6 +208,24 @@ describe("create a page's version in another language", () => {
     assert.equal(italian._json.translationGroupId, source.uuid);
   });
 
+  it("copies the order once, though the source names a widget twice", async () => {
+    // As a page saved before repeats were dropped would be on disk.
+    await seedPage("about", { widgets: { a: { type: "text" }, b: { type: "text" } }, widgetsOrder: ["a", "a", "b", "a"] });
+    const res = await createPageVersion("about", { targetLanguage: "el" });
+    assert.equal(res._status, 201);
+    assert.deepEqual(res._json.widgetsOrder, ["a", "b"]);
+  });
+
+  it("copies a widget's repeated block once", async () => {
+    await seedPage("about", {
+      widgets: { a: { type: "text", blocks: { x: { type: "item" } }, blocksOrder: ["x", "x"] } },
+      widgetsOrder: ["a"],
+    });
+    const res = await createPageVersion("about", { targetLanguage: "el" });
+    assert.equal(res._status, 201);
+    assert.deepEqual(res._json.widgets.a.blocksOrder, ["x"]);
+  });
+
   it("refuses its own language, an unknown one, and a missing page", async () => {
     await seedPage();
     assert.equal((await createPageVersion("about", { targetLanguage: "en" }))._status, 400);

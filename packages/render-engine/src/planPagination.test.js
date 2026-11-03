@@ -1,4 +1,5 @@
-import { describe, it, expect, beforeEach, afterEach } from "vitest";
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
+import fs from "fs/promises";
 import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
@@ -106,5 +107,19 @@ describe("planPagination", () => {
   it("plans nothing without a way to count items", async () => {
     const plan = await planPagination({ projectDir }, { w1: paginating({ limit: 2 }) }, ["w1"], { pageSlug: "blog" });
     expect(plan).toBeNull();
+  });
+
+  // A widget that turns out not to paginate is passed over; a repeat of it in the
+  // order is not read again.
+  it("reads a repeated widget's schema once", async () => {
+    const readFile = vi.spyOn(fs, "readFile");
+    try {
+      const widgets = { w1: paginating({ limit: "" }) };
+      expect(await planPagination(deps(), widgets, ["w1", "w1", "w1"], { pageSlug: "blog" })).toBeNull();
+      const schemaReads = readFile.mock.calls.filter(([file]) => String(file).endsWith(path.join("news-grid", "schema.json")));
+      expect(schemaReads).toHaveLength(1);
+    } finally {
+      readFile.mockRestore();
+    }
   });
 });

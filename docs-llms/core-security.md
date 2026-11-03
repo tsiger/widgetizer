@@ -155,7 +155,7 @@ See [Site Exporting](core-export.md) for the export/import flow detail.
 
 **DoS limit keys** (enforced via the `LimitsAdapter` over `scope`; OSS `LocalLimitsAdapter` returns the App Settings upload cap for `MAX_UPLOAD_SIZE_BYTES` and `Infinity` for the count/quota keys, while hosted `CloudLimitsAdapter` returns finite tenant ceilings — see [Packages & Adapter Architecture](core-packages.md)):
 
-- `MAX_WIDGETS_PER_PAGE` — `savePageContent` returns `422` over-cap.
+- `MAX_WIDGETS_PER_PAGE` — `savePageContent` returns `422` over-cap. A widget order that names an id more than once is stored and rendered once per id (`uniqueWidgetOrder`, `@widgetizer/core/widgetOrder`), so repeats can't multiply render work past the cap: every render loop goes through it, and so do page and shared-area saves, page/area copies and the editor's load, so stored repeats clean themselves up. A widget's `blocksOrder` follows the same rule (`uniqueBlockOrder`, applied in `renderWidget` for every render); the server does not enforce a schema's `maxBlocks` — only the editor's add-block control does.
 - `MAX_MENU_ITEMS` + `MAX_MENU_DEPTH` (`= 32`, a hard structural cap exported from `@widgetizer/core/adapters`) — `menuController.validateMenuTree` walks the item tree **iteratively** (explicit stack, O(maxItems)) before any recursive sanitize/label/clone, bailing on either ceiling (`422`); the render engine's `resolveMenuItemLinks` is independently depth-capped at `MAX_MENU_DEPTH`.
 - `MAX_UPLOAD_SIZE_BYTES` — `mediaController.uploadWithLimit` applies it as a streaming multer `limits.fileSize`; the `errorHandler` maps `LIMIT_FILE_SIZE` → `413` (§7). See [Media Library](core-media.md).
 

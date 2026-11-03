@@ -29,6 +29,7 @@
     "./breadcrumbs": "./src/utils/breadcrumbs.js",
     "./contentAddress": "./src/utils/contentAddress.js",
     "./sharedAreas": "./src/utils/sharedAreas.js",
+    "./widgetOrder": "./src/utils/widgetOrder.js",
     "./siteIdentity": "./src/utils/siteIdentity.js",
     "./languages": "./src/utils/languages.js",
     "./mediaMetadata": "./src/utils/mediaMetadata.js",

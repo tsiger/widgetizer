@@ -34,6 +34,7 @@ const { default: usePageStore } = await import("../pageStore");
 const { default: useWidgetStore, findWidgetOwner, areaModifiedKey } = await import("../widgetStore");
 const { getPage, savePageContent } = await import("../../queries/pageManager");
 const { getSharedAreas, saveSharedArea } = await import("../../queries/sharedAreaManager");
+const { getGlobalWidgets } = await import("../../queries/previewManager");
 
 const clone = (value) => JSON.parse(JSON.stringify(value));
 
@@ -244,6 +245,40 @@ describe("loading a page's shared areas", () => {
     expect(state.sharedAreas).toEqual({ before_footer: AREA });
     expect(state.originalSharedAreas).toEqual({ before_footer: AREA });
     expect(state.retainedAreas).toEqual([{ id: "old_banner", widgetCount: 1 }]);
+    expect(useAutoSave.getState().hasUnsavedPageChanges()).toBe(false);
+  });
+
+  // Content saved before repeats were dropped can still carry them; the editor
+  // lists each widget once, as the page renders it.
+  it("lists a widget the stored order names twice once, and calls nothing unsaved", async () => {
+    getPage.mockResolvedValue({
+      id: "about",
+      language: "el",
+      widgets: { a: { type: "rich-text", blocks: { x: { type: "item" } }, blocksOrder: ["x", "x"] }, b: { type: "rich-text" } },
+      widgetsOrder: ["a", "b", "a", "a"],
+    });
+    getGlobalWidgets.mockResolvedValueOnce({
+      header: { type: "header", settings: {}, blocks: { h1: { type: "link" } }, blocksOrder: ["h1", "h1"] },
+      footer: null,
+    });
+    getSharedAreas.mockResolvedValue({
+      declared: [{ id: "before_footer", label: "Before footer" }],
+      retained: [],
+      areas: {
+        before_footer: {
+          widgets: { a1: { ...AREA.widgets.a1, blocks: { z: { type: "item" } }, blocksOrder: ["z", "z", "z"] } },
+          widgetsOrder: [...AREA.widgetsOrder, ...AREA.widgetsOrder],
+        },
+      },
+    });
+    await usePageStore.getState().loadPage("about", "el");
+
+    const state = usePageStore.getState();
+    expect(state.page.widgetsOrder).toEqual(["a", "b"]);
+    expect(state.page.widgets.a.blocksOrder).toEqual(["x"]);
+    expect(state.globalWidgets.header.blocksOrder).toEqual(["h1"]);
+    expect(state.sharedAreas.before_footer.widgetsOrder).toEqual(AREA.widgetsOrder);
+    expect(state.sharedAreas.before_footer.widgets.a1.blocksOrder).toEqual(["z"]);
     expect(useAutoSave.getState().hasUnsavedPageChanges()).toBe(false);
   });
 

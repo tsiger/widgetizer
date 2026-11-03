@@ -29,6 +29,7 @@ import {
   resolveSiteString,
 } from "@widgetizer/core";
 import { escapeHtml } from "@widgetizer/core/escapeHtml";
+import { uniqueWidgetOrder } from "@widgetizer/core/widgetOrder";
 import { resolveRichtextMediaInWidgetData } from "@widgetizer/core/richtextMedia";
 import {
   resolveRichtextLinksInWidgetData,
@@ -619,7 +620,8 @@ async function planPagination(deps, widgets, widgetsOrder, { pageSlug, currentPa
   // The plan carries the language because it outlives this call: every pager URL
   // is built from it later, and a copy of a Greek page lives beside the Greek one.
   const { defaultLanguage } = await languageSettings(deps, null);
-  const order = Array.isArray(widgetsOrder) && widgetsOrder.length > 0 ? widgetsOrder : Object.keys(widgets || {});
+  const order =
+    Array.isArray(widgetsOrder) && widgetsOrder.length > 0 ? uniqueWidgetOrder(widgetsOrder) : Object.keys(widgets || {});
 
   for (const widgetId of order) {
     if (typeof widgetId !== "string") continue;
@@ -1141,7 +1143,12 @@ async function renderWidget(
   { area = null } = {},
 ) {
   try {
-    const { type, settings = {}, blocks = {}, blocksOrder = [] } = widgetData;
+    const { type, settings = {}, blocks = {} } = widgetData;
+    // Each block once, as for widgets: templates loop this order, so a repeated
+    // id would render the same block again.
+    const blocksOrder = Array.isArray(widgetData.blocksOrder)
+      ? uniqueWidgetOrder(widgetData.blocksOrder)
+      : (widgetData.blocksOrder ?? []);
     const projectDir = deps.projectDir;
 
     // Determine if this is a core widget (prefixed with "core-")
@@ -1618,7 +1625,7 @@ async function renderSharedAreas(deps, areasById, rawThemeSettings, renderMode =
   const rendered = {};
   for (const [areaId, area] of Object.entries(areasById || {})) {
     const widgets = area?.widgets || {};
-    const order = Array.isArray(area?.widgetsOrder) ? area.widgetsOrder : Object.keys(widgets);
+    const order = Array.isArray(area?.widgetsOrder) ? uniqueWidgetOrder(area.widgetsOrder) : Object.keys(widgets);
     let html = "";
     for (const widgetId of order) {
       const widget = widgets[widgetId];

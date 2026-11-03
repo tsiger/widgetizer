@@ -232,6 +232,12 @@ describe("shared areas in the editor preview", () => {
     assert.doesNotMatch(area, /Shared English/);
   });
 
+  it("renders a widget the area's order names twice once", async () => {
+    const repeated = { ...areaOf({ a9: notice("Just once") }), widgetsOrder: ["a9", "a9", "a9"] };
+    const area = areaOn(await preview({ ...page, sharedAreas: { before_footer: repeated } }));
+    assert.equal(area.split("Just once").length - 1, 1);
+  });
+
   it("marks an empty area so the editor can find it, and renders no widgets in it", async () => {
     const area = areaOn(await preview({ ...page, sharedAreas: { before_footer: areaOf({}) } }));
     assert.equal(area, '<div data-shared-area="before_footer" style="display: contents"></div>');
