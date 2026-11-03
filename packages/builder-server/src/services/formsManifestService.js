@@ -1,5 +1,6 @@
 import { handleize } from "@widgetizer/core";
 import { MAX_FORMS_PER_SITE } from "@widgetizer/core/adapters";
+import { uniqueWidgetOrder } from "@widgetizer/core/widgetOrder";
 import { languageFolder, pageOutputPath } from "@widgetizer/core/contentAddress";
 
 const FORM_WIDGET_TYPE = "core-form";
@@ -197,7 +198,8 @@ function buildFormFromWidget(widget, widgetId, pageId, pagePath, errors, langFol
     return null;
   }
 
-  const blockIds = Array.isArray(widget.blocksOrder) ? widget.blocksOrder : [];
+  // Each field once, as it renders.
+  const blockIds = Array.isArray(widget.blocksOrder) ? uniqueWidgetOrder(widget.blocksOrder) : [];
   const blocks = widget.blocks || {};
   const fields = [];
   const seenKeys = new Map();
@@ -284,7 +286,7 @@ export function buildFormsManifest(
     const pagePath = `/${pageOutputPath(pageId, 1, lang)}`;
 
     const widgets = pageData.widgets || {};
-    const order = Array.isArray(pageData.widgetsOrder) ? pageData.widgetsOrder : Object.keys(widgets);
+    const order = Array.isArray(pageData.widgetsOrder) ? uniqueWidgetOrder(pageData.widgetsOrder) : Object.keys(widgets);
 
     for (const widgetId of order) {
       const widget = widgets[widgetId];

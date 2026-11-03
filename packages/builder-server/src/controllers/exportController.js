@@ -44,6 +44,7 @@ import { identityReadiness } from "@widgetizer/core/siteIdentity";
 import { emptyArticleFields } from "@widgetizer/core/structuredData";
 import { listingParentStatus } from "@widgetizer/core/breadcrumbs";
 import { readThemeSetting } from "@widgetizer/core/themeSettingChanges";
+import { uniqueWidgetOrder } from "@widgetizer/core/widgetOrder";
 
 function structuredDataIssueMessage(warning) {
   if (warning.code === "emptyArticleFields") {
@@ -690,7 +691,8 @@ export async function exportProjectToDir(projectId, options = {}, collectionDeps
       let pageWidgetsHtml = "";
       if (pageData.widgets && pageData.widgetsOrder) {
         let widgetIndex = 0;
-        for (const widgetId of pageData.widgetsOrder) {
+        // Each once: a repeated id is the same widget.
+        for (const widgetId of uniqueWidgetOrder(pageData.widgetsOrder)) {
           // Skip header/footer as they are rendered separately
           if (widgetId === "header" || widgetId === "footer") {
             continue;

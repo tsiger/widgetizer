@@ -1,5 +1,6 @@
 import { LIMIT_KEYS, MAX_WIDGETS_PER_PAGE } from "@widgetizer/core/adapters";
 import { areaKey } from "@widgetizer/core/contentAddress";
+import { uniqueBlockOrders, uniqueWidgetOrder } from "@widgetizer/core/widgetOrder";
 import { requestLanguage } from "../utils/contentLanguage.js";
 import { isProjectResolutionError } from "../utils/projectErrors.js";
 import { updateAreaMediaUsage, extractMediaPathsFromArea } from "../services/mediaUsageService.js";
@@ -62,10 +63,18 @@ export async function saveSharedArea(req, res) {
 
     const widgetCap = await req.adapters?.limits?.getLimit?.(scope, LIMIT_KEYS.MAX_WIDGETS_PER_PAGE);
     const maxWidgets = typeof widgetCap === "number" && widgetCap > 0 ? widgetCap : MAX_WIDGETS_PER_PAGE;
-    const problem = areaSaveProblem(req.body, maxWidgets);
+    // A repeated id is the same widget again, rendered on every page. Dropped
+    // rather than refused: the editor posts back the order it loaded.
+    // A body that isn't an object is refused just below, as before.
+    const body = {
+      ...req.body,
+      widgets: uniqueBlockOrders(req.body?.widgets),
+      widgetsOrder: uniqueWidgetOrder(req.body?.widgetsOrder),
+    };
+    const problem = areaSaveProblem(body, maxWidgets);
     if (problem) return res.status(problem.status).json({ error: problem.message });
 
-    const area = { widgets: req.body.widgets, widgetsOrder: req.body.widgetsOrder };
+    const area = { widgets: body.widgets, widgetsOrder: body.widgetsOrder };
 
     // The write and its usage sync are one media section, like a page save: media
     // deletion verifies and deletes in the same section, so it cannot run between them.

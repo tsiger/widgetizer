@@ -758,3 +758,40 @@ describe("widget.liquid rendering vs manifest consistency", () => {
     assert.deepEqual(extractOptionValues(html), ["genikh-erwthsh", "yposthri3h", "option-3"]);
   });
 });
+
+// A form the order names more than once is one form on the page: it is built,
+// and any problem with it reported, once.
+describe("buildFormsManifest — a repeated form widget", () => {
+  const pages = (widgetsOrder, widget) => [{ id: "index", widgets: { w1: widget }, widgetsOrder }];
+  const failure = (fn) => {
+    try {
+      fn();
+    } catch (err) {
+      return err.message;
+    }
+    return null;
+  };
+
+  // A guard: identical forms already merge by key; the next case is the one a
+  // repeat used to change.
+  it("builds the same manifest as the form named once", () => {
+    const widget = makeFormWidget({ formName: "Contact", blocks: SIMPLE_FIELDS });
+    assert.deepEqual(buildFormsManifest(pages(["w1", "w1", "w1"], widget), APP_VERSION), buildFormsManifest(pages(["w1"], widget), APP_VERSION));
+  });
+
+  it("reports a problem with it once", () => {
+    const widget = makeFormWidget({ formName: "Contact", blocks: [{ type: "field", settings: { type: "text" } }] });
+    const once = failure(() => buildFormsManifest(pages(["w1"], widget), APP_VERSION));
+    assert.ok(once, "the field without a label is refused");
+    assert.equal(failure(() => buildFormsManifest(pages(["w1", "w1", "w1"], widget), APP_VERSION)), once);
+  });
+});
+
+describe("buildFormsManifest — a repeated field block", () => {
+  it("lists the field once instead of refusing a duplicate field", () => {
+    const widget = makeFormWidget({ formName: "Contact", blocks: SIMPLE_FIELDS });
+    const once = buildFormsManifest([{ id: "index", widgets: { w1: widget }, widgetsOrder: ["w1"] }], APP_VERSION);
+    const repeated = { ...widget, blocksOrder: [...widget.blocksOrder, widget.blocksOrder[0], widget.blocksOrder[0]] };
+    assert.deepEqual(buildFormsManifest([{ id: "index", widgets: { w1: repeated }, widgetsOrder: ["w1"] }], APP_VERSION), once);
+  });
+});

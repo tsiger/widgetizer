@@ -3,6 +3,7 @@ import { temporal } from "zundo";
 import { getPage } from "../queries/pageManager";
 import { getGlobalWidgets } from "../queries/previewManager";
 import { getSharedAreas } from "../queries/sharedAreaManager";
+import { uniqueBlockOrder, uniqueBlockOrders, uniqueWidgetOrder } from "@widgetizer/core/widgetOrder";
 import { getActiveProjectId } from "../lib/activeProjectId";
 import useThemeStore from "./themeStore";
 
@@ -64,7 +65,8 @@ async function readGlobalWidgets(language) {
             type,
             settings: data[type].settings || {},
             blocks: data[type].blocks || {},
-            blocksOrder: data[type].blocksOrder || [],
+            // Each block once, as it renders.
+            blocksOrder: uniqueWidgetOrder(data[type].blocksOrder) || [],
           }
         : null;
     return { header: shape("header"), footer: shape("footer") };
@@ -89,8 +91,11 @@ async function readSharedAreas(language) {
     for (const { id } of declaredAreas) {
       const area = data.areas?.[id];
       sharedAreas[id] = {
-        widgets: area?.widgets || {},
-        widgetsOrder: Array.isArray(area?.widgetsOrder) ? area.widgetsOrder : Object.keys(area?.widgets || {}),
+        widgets: uniqueBlockOrders(area?.widgets) || {},
+        // Each widget once, as it renders (stored content can predate that rule).
+        widgetsOrder: Array.isArray(area?.widgetsOrder)
+          ? uniqueWidgetOrder(area.widgetsOrder)
+          : Object.keys(area?.widgets || {}),
       };
     }
     const retainedAreas = (Array.isArray(data?.retained) ? data.retained : []).map(({ id }) => ({
@@ -174,13 +179,16 @@ const usePageStore = create(
           const cleanWidgets = {};
           Object.entries(pageData.widgets).forEach(([id, widget]) => {
             if (widget.type !== "header" && widget.type !== "footer") {
-              cleanWidgets[id] = widget;
+              cleanWidgets[id] = uniqueBlockOrder(widget);
             }
           });
 
           const cleanPageData = {
             ...pageData,
             widgets: cleanWidgets,
+            // Each widget once, as the page renders it (a stored file can predate
+            // that rule); the next save writes the cleaned order.
+            ...(Array.isArray(pageData.widgetsOrder) ? { widgetsOrder: uniqueWidgetOrder(pageData.widgetsOrder) } : {}),
           };
 
           // In the language the page came back in — a default-language load passes

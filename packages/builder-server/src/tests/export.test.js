@@ -1948,3 +1948,29 @@ describe("file asset export", () => {
     );
   });
 });
+
+// A page file whose order names a widget more than once (saved before repeats
+// were dropped, or written by hand) renders it once.
+describe("exportProject — a page order that names a widget more than once", () => {
+  const repeatsPage = () => path.join(getProjectPagesDir(PROJECT_FOLDER), "repeats.json");
+  after(async () => {
+    await fs.remove(repeatsPage());
+  });
+
+  it("renders the widget once", async () => {
+    await fs.writeFile(
+      repeatsPage(),
+      JSON.stringify({
+        name: "Repeats",
+        slug: "repeats",
+        uuid: "page-uuid-repeats",
+        widgets: { "link-1": { type: "core-link", settings: { href: "/contact.html", text: "Only once, please" } } },
+        widgetsOrder: ["link-1", "link-1", "link-1"],
+      }),
+    );
+    const res = await callController(exportProject, { params: { projectId: PROJECT_ID } });
+    assert.equal(res._status, 200, JSON.stringify(res._json));
+    const html = await fs.readFile(path.join(await getLatestExportDir(), "repeats.html"), "utf8");
+    assert.equal(html.split("Only once, please").length - 1, 1);
+  });
+});

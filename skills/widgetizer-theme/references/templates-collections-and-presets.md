@@ -22,7 +22,7 @@
 }
 ```
 
-Every `widgetsOrder` key must identify an actual widget instance. Each instance `type` must resolve to a supplied theme widget or an enabled core widget. Every ordered block key must exist and use a declared block type. Omit `blocks`/`blocksOrder` for blockless widgets. Use explicit block instances when authoring pages; schema `defaultBlocks` does not backfill them at render time.
+Every `widgetsOrder` key must identify an actual widget instance, and appear once (the same for a widget's `blocksOrder`); the checker refuses a repeat in a page, preset or shared-area template. Each instance `type` must resolve to a supplied theme widget or an enabled core widget. Every ordered block key must exist and use a declared block type. Omit `blocks`/`blocksOrder` for blockless widgets. Use explicit block instances when authoring pages; schema `defaultBlocks` does not backfill them at render time.
 
 `templates/global/header.json` and `footer.json` contain a **single widget instance** (`type`, `settings`, optional `blocks`/`blocksOrder`), not a page's `widgets` map. Their schemas/templates reside at `widgets/global/<type>/`.
 

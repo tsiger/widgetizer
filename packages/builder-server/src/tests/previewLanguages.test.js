@@ -356,6 +356,60 @@ describe("a numbered page preview", () => {
   });
 });
 
+// An order that names a widget more than once renders it once, numbered once.
+describe("a page whose order names a widget more than once", () => {
+  it("renders it once in the preview, and numbers what follows by the widgets shown", async () => {
+    const req = mockReq({
+      pageData: {
+        id: "about",
+        uuid: "u-about",
+        slug: "about",
+        name: "About",
+        widgets: { first: { type: "position", settings: {} }, second: { type: "position", settings: {} } },
+        widgetsOrder: ["first", "first", "first", "second", "first"],
+      },
+      themeSettings: RAW_THEME_SETTINGS,
+      previewMode: "standalone",
+      pageNumber: 1,
+    });
+    const res = mockRes();
+    await createPreviewToken(req, res);
+    assert.equal(res._status, 200, JSON.stringify(res._json));
+    const html = getToken(res._json.token);
+    // The test widget prints only its number, once per render.
+    assert.deepEqual(html.match(/\[\d+\]/g), ["[1]", "[2]"]);
+  });
+});
+
+// A widget's repeated block renders once: renderWidget hands Liquid the order
+// with each block id once, for every caller.
+describe("a widget whose block order names a block more than once", () => {
+  it("renders the block once", async () => {
+    await fs.outputFile(
+      path.join(getProjectDir(PROJECT_FOLDER), "widgets", "cards", "widget.liquid"),
+      `<section>{% for id in widget.blocksOrder %}<i>{{ widget.blocks[id].settings.label }}</i>{% endfor %}</section>`,
+    );
+    await fs.outputJson(path.join(getProjectDir(PROJECT_FOLDER), "widgets", "cards", "schema.json"), { type: "cards", settings: [] });
+    const req = mockReq({
+      pageData: {
+        id: "about",
+        uuid: "u-about",
+        slug: "about",
+        name: "About",
+        widgets: { c: { type: "cards", settings: {}, blocks: { x: { type: "card", settings: { label: "Card X" } } }, blocksOrder: ["x", "x", "x"] } },
+        widgetsOrder: ["c"],
+      },
+      themeSettings: RAW_THEME_SETTINGS,
+      previewMode: "standalone",
+      pageNumber: 1,
+    });
+    const res = mockRes();
+    await createPreviewToken(req, res);
+    assert.equal(res._status, 200, JSON.stringify(res._json));
+    assert.equal(getToken(res._json.token).split("Card X").length - 1, 1);
+  });
+});
+
 // §7c/§7d end to end: what a theme is handed, and what a crawler is handed.
 describe("a page rendered in a translated site", () => {
   async function pageHtml(pageData) {
@@ -680,6 +734,12 @@ describe("a morphed widget's place on the page", () => {
   it("numbers the widget as the full render does", async () => {
     assert.match(await morph("first", page), /\[1\]/);
     assert.match(await morph("second", page), /\[2\]/);
+  });
+
+  // A repeat renders once in the full render, so it takes one number.
+  it("numbers a widget after a repeated one as the full render does", async () => {
+    const repeated = { ...page, widgetsOrder: ["first", "first", "first", "second"] };
+    assert.match(await morph("second", repeated), /\[2\]/);
   });
 
   it("leaves a widget outside the page order unnumbered", async () => {

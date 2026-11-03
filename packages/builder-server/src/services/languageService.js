@@ -1,5 +1,6 @@
 import { randomUUID } from "crypto";
 import { isValidLanguageCode, normalizeLanguageCode } from "@widgetizer/core/languages";
+import { uniqueBlockOrder, uniqueBlockOrders, uniqueWidgetOrder } from "@widgetizer/core/widgetOrder";
 import {
   areaKey,
   areasDir,
@@ -246,7 +247,8 @@ async function seedGlobals(storage, scope, lang, menuRefs) {
     // Preflight has already proven this readable, so a parse error here would
     // be a real surprise rather than a missing file.
     const schema = await readJson(storage, scope, `widgets/global/${widget.type || type}/schema.json`);
-    const copy = withRemappedMenus(widget, schema, menuRefs);
+    // A header saved before repeated blocks were dropped can still carry them.
+    const copy = uniqueBlockOrder(withRemappedMenus(widget, schema, menuRefs));
     await storage.write(scope, globalKey(type, lang), JSON.stringify(copy, null, 2));
     // The copy holds the same images as its source; without its own usage rows
     // clearing the source's would mark them unused while this one still shows them.
@@ -280,7 +282,8 @@ async function seedAreas(storage, scope, lang, menuRefs, areaIds) {
       }
       widgets[widgetId] = schema ? withRemappedMenus(widget, schema, menuRefs) : widget;
     }
-    const copy = { ...area, widgets };
+    // An area saved before repeats were dropped can still carry them.
+    const copy = { ...area, widgets: uniqueBlockOrders(widgets), widgetsOrder: uniqueWidgetOrder(area.widgetsOrder) };
     await storage.write(scope, areaKey(id, lang), JSON.stringify(copy, null, 2));
     await updateAreaMediaUsage(scope.projectId, id, copy, lang);
   }

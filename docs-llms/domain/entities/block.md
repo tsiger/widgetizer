@@ -47,7 +47,7 @@ You have three testimonials. Duplicate the second, replace the copied quote and 
 A block is a child instance inside a page widget or a global widget. Its type must correspond to a block definition in that widget's schema. It is not a reusable global object and has no independent backend CRUD resource.
 
 - The owner's `blocks` map holds `{ type, settings }` keyed by block ID.
-- `blocksOrder` defines display order.
+- `blocksOrder` defines display order; a block id appears in it once (a repeat is skipped when the widget renders and dropped on save, copy and editor load).
 - Defaults come from the block schema, with default-block overrides where supplied.
 - Add, duplicate, remove, reorder, and edit update the owning widget; save persists the page or global document.
 - Duplication creates a new block ID. Removing a block does not delete its referenced media.

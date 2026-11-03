@@ -220,6 +220,32 @@ describe("saving a shared area", () => {
   });
 });
 
+// An area is rendered on every page, so a repeat there multiplies across the
+// site. Repeats are dropped (first kept) rather than refused: the editor posts
+// back the order it loaded.
+describe("a shared area's order that names a widget more than once", () => {
+  it("is saved once", async () => {
+    const body = { widgets: { w1: widget("rich-text"), w2: widget("rich-text") }, widgetsOrder: ["w1", "w2", "w1", "w2"] };
+    const saved = await call(saveSharedArea, { params: { id: "before_footer" }, body });
+    assert.equal(saved._status, 200, JSON.stringify(saved._json));
+    assert.deepEqual((await fs.readJson(areaFile("before_footer"))).widgetsOrder, ["w1", "w2"]);
+  });
+
+  it("saves an area widget's repeated block once", async () => {
+    const w1 = { ...widget("rich-text"), blocks: { b1: { type: "item", settings: {} } }, blocksOrder: ["b1", "b1"] };
+    const saved = await call(saveSharedArea, { params: { id: "before_footer" }, body: { widgets: { w1 }, widgetsOrder: ["w1"] } });
+    assert.equal(saved._status, 200, JSON.stringify(saved._json));
+    assert.deepEqual((await fs.readJson(areaFile("before_footer"))).widgets.w1.blocksOrder, ["b1"]);
+  });
+
+  it("doesn't count repeats against the widget ceiling", async () => {
+    widgetLimit = 2;
+    const body = { widgets: { w1: widget("rich-text") }, widgetsOrder: ["w1", "w1", "w1"] };
+    const saved = await call(saveSharedArea, { params: { id: "before_footer" }, body });
+    assert.equal(saved._status, 200, JSON.stringify(saved._json));
+  });
+});
+
 describe("images in a shared area", () => {
   const withImage = () => area({ w1: widget("image", { image: "/uploads/images/hero.jpg" }) });
   const usedIn = () => mediaRepo.getMediaFileById(PROJECT_ID, IMAGE_ID).usedIn;

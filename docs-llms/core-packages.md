@@ -39,6 +39,7 @@ Besides the root index, `packages/core/package.json` maps these subpaths (all un
 | `./assetUrl` | Versioned theme/widget asset URLs |
 | `./urlSafety`, `./escapeHtml`, `./pathSecurity` | `sanitizeHref` / site-URL validation, HTML escaping, `isWithinDirectory` / `assertWithin` |
 | `./richtextLinks`, `./richtextMedia` | Stable-reference link and media path handling inside richtext |
+| `./widgetOrder` | `uniqueWidgetOrder` / `uniqueBlockOrder` / `uniqueBlockOrders`: a page's or area's widget order, and a widget's `blocksOrder`, with each id kept once (first place); used by every render and by saves, page/area/language copies and the editor's load |
 | `./mimeTypes`, `./youtube`, `./blockLimits` | Content types, YouTube embed helpers, block caps |
 | `./config/settingTypes`, `./config/fonts.json`, `./locales/*` | Setting-type registry, font list, core widget dictionaries |
 
