@@ -30,7 +30,8 @@ What it checks:
 - **Reserved names:** settings the app reads by id (`favicon`, `date_format`, custom code, `use_bunny_fonts`) may sit in any group, but each id must appear only once across `settings.global`.
 - **Liquid:** LiquidJS parses the templates, including nested blocks and `{% liquid %}`, and rejects unknown tags/filters. Additional checks cover custom argument names, required arguments, literal snippets/assets, and foreign objects that were not assigned locally. Author-defined local variables are valid.
 - **Settings used in templates:** direct `widget.settings.x` and `theme.group.x` references, including literal bracket keys, are compared with the theme's own definitions. Direct plain-text output through `raw` is flagged; rich text without `raw` receives a warning.
-- **Editor contract:** `data-widget-id`, block order and `data-block-id`.
+- **Editor contract:** `data-widget-id` (and a warning without `data-widget-type`), block order and `data-block-id`.
+- **Widget and block ids:** the id rule (letters, digits, `_`, `-`; at most 128; no built-in names; no `header`/`footer` widget ids), in maps and orders, and no widget id shared between a shared-area template and a page or another area template.
 - **Layout:** main content, header and footer, asset hooks, and the tags that theme settings depend on.
 - **Assets:** enqueued files exist, and no two CSS/JS files share a name across widgets and `assets/`.
 - **Starter pages and menus:** page shape, every widget and block type exists, every stored setting is declared and has the right shape, order arrays match, internal links and menu ids point at something.

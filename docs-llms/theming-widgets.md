@@ -107,7 +107,7 @@ Every widget follows this structure:
 | `id="{{ widget.id }}"`                                | Unique widget instance ID for CSS scoping and JS targeting |
 | `class="widget widget-type-{name} widget-{{ widget.id }}"` | Base class + widget type + instance class                  |
 | `data-widget-id="{{ widget.id }}"`                    | For JavaScript targeting                                   |
-| `data-widget-type="{widget-name}"`                    | For debugging/identification                               |
+| `data-widget-type="{widget-name}"`                    | Identification; the editor tells the site's header and footer apart by it (the checker warns without it) |
 
 ### Inline or Enqueued CSS
 
