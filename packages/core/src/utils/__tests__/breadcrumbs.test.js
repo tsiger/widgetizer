@@ -253,6 +253,21 @@ describe("indexListingPages", () => {
     expect(index.get("news").anchorPageUuid).toBe(blog.uuid);
   });
 
+  // A page lists a collection only through a widget it shows: one left out of the
+  // order, or stored under the header's or footer's id, renders nothing.
+  it("counts only the widgets the page renders", () => {
+    const blog = {
+      ...withWidgets("blog", {
+        unlisted: { type: "news-grid", settings: { listing_anchor: true } },
+        header: { type: "projects-grid" },
+        hero: { type: "hero" },
+      }),
+      widgetsOrder: ["hero", "header"],
+    };
+    expect(indexListingPages([blog], schemas).size).toBe(0);
+    expect(indexListingPages([{ ...blog, widgetsOrder: ["unlisted"] }], schemas).get("news").anchorPageUuid).toBe(blog.uuid);
+  });
+
   it("ignores widgets whose schema declares no collection", () => {
     const home = withWidgets("index", { w1: { type: "hero" }, w2: { type: "unknown-widget" } });
     expect(indexListingPages([home], schemas).size).toBe(0);

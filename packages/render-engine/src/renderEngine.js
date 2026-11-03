@@ -29,7 +29,7 @@ import {
   resolveSiteString,
 } from "@widgetizer/core";
 import { escapeHtml } from "@widgetizer/core/escapeHtml";
-import { uniqueWidgetOrder } from "@widgetizer/core/widgetOrder";
+import { renderedWidgetOrder, uniqueWidgetOrder } from "@widgetizer/core/widgetOrder";
 import { resolveRichtextMediaInWidgetData } from "@widgetizer/core/richtextMedia";
 import {
   resolveRichtextLinksInWidgetData,
@@ -620,12 +620,9 @@ async function planPagination(deps, widgets, widgetsOrder, { pageSlug, currentPa
   // The plan carries the language because it outlives this call: every pager URL
   // is built from it later, and a copy of a Greek page lives beside the Greek one.
   const { defaultLanguage } = await languageSettings(deps, null);
-  const order =
-    Array.isArray(widgetsOrder) && widgetsOrder.length > 0 ? uniqueWidgetOrder(widgetsOrder) : Object.keys(widgets || {});
-
-  for (const widgetId of order) {
-    if (typeof widgetId !== "string") continue;
-    const widget = widgets?.[widgetId];
+  // Only a widget the page renders can paginate it.
+  for (const widgetId of renderedWidgetOrder(widgets, widgetsOrder)) {
+    const widget = widgets[widgetId];
     if (widget?.settings?.paginate !== true || typeof widget.type !== "string") continue;
 
     const schemaPath = await resolveInside(deps.projectDir, "widgets", widget.type, "schema.json");
@@ -1625,9 +1622,10 @@ async function renderSharedAreas(deps, areasById, rawThemeSettings, renderMode =
   const rendered = {};
   for (const [areaId, area] of Object.entries(areasById || {})) {
     const widgets = area?.widgets || {};
-    const order = Array.isArray(area?.widgetsOrder) ? uniqueWidgetOrder(area.widgetsOrder) : Object.keys(widgets);
     let html = "";
-    for (const widgetId of order) {
+    // As a page's: never one stored under the header's or footer's id, which would
+    // carry their data-widget-id into the page.
+    for (const widgetId of renderedWidgetOrder(widgets, area?.widgetsOrder)) {
       const widget = widgets[widgetId];
       if (!widget?.type) continue;
       html += await renderWidget(deps, widgetId, widget, rawThemeSettings, renderMode, sharedGlobals, null, {

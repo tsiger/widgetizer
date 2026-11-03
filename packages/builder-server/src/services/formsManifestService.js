@@ -1,6 +1,6 @@
 import { handleize } from "@widgetizer/core";
 import { MAX_FORMS_PER_SITE } from "@widgetizer/core/adapters";
-import { uniqueWidgetOrder } from "@widgetizer/core/widgetOrder";
+import { renderedWidgetOrder, uniqueWidgetOrder } from "@widgetizer/core/widgetOrder";
 import { languageFolder, pageOutputPath } from "@widgetizer/core/contentAddress";
 
 const FORM_WIDGET_TYPE = "core-form";
@@ -206,7 +206,7 @@ function buildFormFromWidget(widget, widgetId, pageId, pagePath, errors, langFol
   let fieldIndex = 0;
 
   for (const blockId of blockIds) {
-    const block = blocks[blockId];
+    const block = typeof blockId === "string" && Object.hasOwn(blocks, blockId) ? blocks[blockId] : null;
     if (!block) continue;
     if (block.type !== "field" && block.type !== "choice" && block.type !== "consent") continue;
 
@@ -285,12 +285,10 @@ export function buildFormsManifest(
     const folder = languageFolder(lang);
     const pagePath = `/${pageOutputPath(pageId, 1, lang)}`;
 
-    const widgets = pageData.widgets || {};
-    const order = Array.isArray(pageData.widgetsOrder) ? uniqueWidgetOrder(pageData.widgetsOrder) : Object.keys(widgets);
-
-    for (const widgetId of order) {
-      const widget = widgets[widgetId];
-      if (!widget || widget.type !== FORM_WIDGET_TYPE) continue;
+    // The forms export publishes: the page's widgets as every render picks them.
+    for (const widgetId of renderedWidgetOrder(pageData.widgets, pageData.widgetsOrder)) {
+      const widget = pageData.widgets[widgetId];
+      if (widget.type !== FORM_WIDGET_TYPE) continue;
 
       const form = buildFormFromWidget(widget, widgetId, pageId, pagePath, errors, folder);
       if (!form) continue;

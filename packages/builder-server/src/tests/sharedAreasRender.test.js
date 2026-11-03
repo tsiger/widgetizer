@@ -238,6 +238,19 @@ describe("shared areas in the editor preview", () => {
     assert.equal(area.split("Just once").length - 1, 1);
   });
 
+  // The header and footer render as the site's own; an area widget stored under
+  // their id would carry their data-widget-id, and the editor's live edits of the
+  // real one would land on it. An inherited name holds no widget either.
+  it("leaves out a widget stored under the header's or footer's id, and an inherited name", async () => {
+    const named = {
+      widgets: { header: notice("Not the header"), footer: notice("Not the footer"), a9: notice("Shown") },
+      widgetsOrder: ["header", "constructor", "a9", "footer"],
+    };
+    const area = areaOn(await preview({ ...page, sharedAreas: { before_footer: named } }));
+    assert.match(area, />Shown</);
+    assert.doesNotMatch(area, /Not the (header|footer)|widget-error/);
+  });
+
   it("marks an empty area so the editor can find it, and renders no widgets in it", async () => {
     const area = areaOn(await preview({ ...page, sharedAreas: { before_footer: areaOf({}) } }));
     assert.equal(area, '<div data-shared-area="before_footer" style="display: contents"></div>');

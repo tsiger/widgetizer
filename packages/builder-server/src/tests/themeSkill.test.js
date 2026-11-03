@@ -918,3 +918,215 @@ describe("shared areas in a theme", () => {
     }
   });
 });
+
+// Widget and block ids become HTML ids, the preview's data-widget-id lookups and
+// text in themes' own CSS and scripts: a letter or digit, then letters, digits,
+// `_` and `-`, at most 128 characters, never a built-in property name, and never
+// `header`/`footer` for a page or area widget. Templates are where readable ids
+// reach sites, so the checker holds them to it.
+describe("widget and block ids in templates", () => {
+  const index = (dir) => path.join(dir, "templates/index.json");
+  const rename = (widgets, from, to) => {
+    const out = {};
+    for (const [id, widget] of Object.entries(widgets)) out[id === from ? to : id] = widget;
+    return out;
+  };
+  const renameWidget = (dir, from, to) =>
+    editJson(index(dir), (page) => {
+      page.widgets = rename(page.widgets, from, to);
+      page.widgetsOrder = page.widgetsOrder.map((id) => (id === from ? to : id));
+    });
+  const errorsOf = (findings, rule) => findings.filter((finding) => finding.level === "error" && finding.rule === rule);
+
+  for (const [name, id] of [
+    ["header", "header"],
+    ["footer", "footer"],
+    ["built-in", "constructor"],
+    ["spaced", "hero banner"],
+    ["dotted", "hero.banner"],
+    ["leading-underscore", "_hero"],
+    ["long", "h".repeat(129)],
+  ]) {
+    it(`refuses a page widget id that breaks the rule (${name})`, async () => {
+      const findings = await findingsAfter(`widget-id-${name}`, (dir) => renameWidget(dir, "hero", id));
+      assert.ok(errorsOf(findings, "widget-id").length > 0, JSON.stringify(findings));
+    });
+  }
+
+  it("refuses an order entry that breaks the rule, even with no widget behind it", async () => {
+    const findings = await findingsAfter("widget-id-order", (dir) =>
+      editJson(index(dir), (page) => {
+        page.widgetsOrder.push("bad id");
+      }),
+    );
+    assert.ok(errorsOf(findings, "widget-id").some((finding) => finding.message.includes('"bad id"')), JSON.stringify(findings));
+  });
+
+  it("refuses a block id that breaks the rule, in the map or the order", async () => {
+    const findings = await findingsAfter("block-id", (dir) =>
+      editJson(index(dir), (page) => {
+        page.widgets.faq.blocks = rename(page.widgets.faq.blocks, "faq-1", "faq 1");
+        page.widgets.faq.blocksOrder = page.widgets.faq.blocksOrder.map((id) => (id === "faq-1" ? "faq 1" : id));
+        page.widgets.faq.blocksOrder.push("toString");
+      }),
+    );
+    const messages = errorsOf(findings, "widget-id").map((finding) => finding.message);
+    assert.ok(messages.some((message) => message.includes('"faq 1"')), JSON.stringify(findings));
+    assert.ok(messages.some((message) => message.includes('"toString"')), JSON.stringify(findings));
+  });
+
+  it("reports an order entry that isn't a string instead of failing", async () => {
+    const findings = await findingsAfter("widget-id-object", (dir) =>
+      editJson(index(dir), (page) => {
+        page.widgetsOrder.push({ toString: null });
+        page.widgets.faq.blocksOrder.push({ toString: null });
+      }),
+    );
+    assert.equal(errorsOf(findings, "widget-id").length, 2, JSON.stringify(findings));
+  });
+
+  it("accepts the editor's own ids and the starter's", async () => {
+    const findings = await findingsAfter("widget-id-editor", (dir) =>
+      renameWidget(dir, "hero", "widget_3f2a9c1e-8d4b-4e6f-9a0b-1c2d3e4f5a6b"),
+    );
+    assert.deepEqual(findings, []);
+  });
+
+  it("warns once, not per widget, about a page with no widgetsOrder: its widgets render in the order written", async () => {
+    const findings = await findingsAfter("no-order", (dir) =>
+      editJson(index(dir), (page) => {
+        delete page.widgetsOrder;
+      }),
+    );
+    const warnings = findings.filter((finding) => finding.level === "warning");
+    assert.equal(warnings.length, 1, JSON.stringify(findings));
+    assert.match(warnings[0].message, /widgetsOrder/);
+    assert.doesNotMatch(warnings[0].message, /will not render/);
+  });
+
+  it("counts only the widgets a page renders toward its one paginating widget", async () => {
+    const findings = await findingsAfter("pagination-unrendered", (dir) =>
+      editJson(index(dir), (page) => {
+        page.widgets.hero.settings.paginate = true;
+        page.widgets.spare = { type: "hero", settings: { paginate: true } };
+      }),
+    );
+    assert.equal(errorsOf(findings, "pagination").length, 0, JSON.stringify(findings));
+  });
+
+  it("warns about a widget template without data-widget-type", async () => {
+    const findings = await findingsAfter("no-widget-type", (dir) =>
+      edit(path.join(dir, "widgets/hero/widget.liquid"), (text) => text.replace(/\s*data-widget-type="[^"]*"/g, "")),
+    );
+    assert.ok(
+      findings.some((finding) => finding.level === "warning" && finding.rule === "editor-attributes"),
+      JSON.stringify(findings),
+    );
+  });
+
+  describe("shared-area templates", () => {
+    const declare = (dir) =>
+      editJson(path.join(dir, "theme.json"), (json) => {
+        json.sharedAreas = [
+          { id: "before_footer", label: "Before footer" },
+          { id: "after_header", label: "After header" },
+        ];
+      });
+    const place = (dir) =>
+      edit(path.join(dir, "layout.liquid"), (text) =>
+        text.replace(
+          "{{ footer | raw }}",
+          "{{ shared_areas.after_header | raw }}\n    {{ shared_areas.before_footer | raw }}\n    {{ footer | raw }}",
+        ),
+      );
+    const area = (dir, areaId, ids, root = "templates") =>
+      fs.outputJson(path.join(dir, root, "global/areas", `${areaId}.json`), {
+        widgets: Object.fromEntries(ids.map((id) => [id, { type: "hero", settings: {} }])),
+        widgetsOrder: ids,
+      });
+    const withAreas = async (dir) => {
+      await declare(dir);
+      await place(dir);
+    };
+
+    it("refuses an area widget id that a page template also uses", async () => {
+      const findings = await findingsAfter("area-page-clash", async (dir) => {
+        await withAreas(dir);
+        await area(dir, "before_footer", ["hero"]);
+      });
+      assert.ok(errorsOf(findings, "widget-id").some((finding) => finding.message.includes('"hero"')), JSON.stringify(findings));
+    });
+
+    it("names every page template that uses an area's widget id", async () => {
+      const findings = await findingsAfter("area-page-clash-two", async (dir) => {
+        await withAreas(dir);
+        await area(dir, "before_footer", ["hero"]);
+        await fs.copy(path.join(dir, "templates/index.json"), path.join(dir, "templates/about.json"));
+        await editJson(path.join(dir, "templates/about.json"), (page) => {
+          page.slug = "about";
+        });
+      });
+      const files = errorsOf(findings, "widget-id").map((finding) => finding.file).sort();
+      assert.deepEqual(files, ["templates/about.json", "templates/index.json"], JSON.stringify(findings));
+    });
+
+    it("refuses an id two area templates both use", async () => {
+      const findings = await findingsAfter("area-area-clash", async (dir) => {
+        await withAreas(dir);
+        await area(dir, "before_footer", ["promo"]);
+        await area(dir, "after_header", ["promo"]);
+      });
+      assert.ok(errorsOf(findings, "widget-id").some((finding) => finding.message.includes('"promo"')), JSON.stringify(findings));
+    });
+
+    it("refuses header/footer as an area widget id", async () => {
+      const findings = await findingsAfter("area-reserved", async (dir) => {
+        await withAreas(dir);
+        await area(dir, "before_footer", ["footer"]);
+      });
+      assert.ok(errorsOf(findings, "widget-id").length > 0, JSON.stringify(findings));
+    });
+
+    it("accepts distinct ids", async () => {
+      const findings = await findingsAfter("area-distinct", async (dir) => {
+        await withAreas(dir);
+        await area(dir, "before_footer", ["promo"]);
+        await area(dir, "after_header", ["notice"]);
+      });
+      assert.deepEqual(findings, []);
+    });
+
+    // A preset with its own templates replaces the theme's pages, and inherits each
+    // area it doesn't supply; its own copy of an area replaces the theme's.
+    const withPreset = async (dir) => {
+      await fs.outputJson(path.join(dir, "presets/presets.json"), { default: "dark", presets: [{ id: "dark", name: "Dark" }] });
+      await fs.outputJson(path.join(dir, "presets/dark/preset.json"), { settings: {} });
+      await fs.copy(path.join(dir, "templates"), path.join(dir, "presets/dark/templates"));
+      await fs.remove(path.join(dir, "presets/dark/templates/global/areas"));
+    };
+
+    it("checks a preset's pages against the areas it inherits", async () => {
+      const findings = await findingsAfter("preset-inherited-clash", async (dir) => {
+        await withAreas(dir);
+        await area(dir, "before_footer", ["promo"]);
+        await withPreset(dir);
+        await renameWidget(dir.replace(/$/, "/presets/dark"), "hero", "promo");
+      });
+      assert.ok(
+        errorsOf(findings, "widget-id").some((finding) => finding.file.startsWith("presets/dark/")),
+        JSON.stringify(findings),
+      );
+    });
+
+    it("compares a preset's own area, not the theme's copy it replaces", async () => {
+      const findings = await findingsAfter("preset-own-area", async (dir) => {
+        await withAreas(dir);
+        await area(dir, "before_footer", ["promo"]);
+        await withPreset(dir);
+        await area(dir, "before_footer", ["notice"], "presets/dark/templates");
+        await renameWidget(dir.replace(/$/, "/presets/dark"), "hero", "promo");
+      });
+      assert.equal(errorsOf(findings, "widget-id").length, 0, JSON.stringify(findings));
+    });
+  });
+});

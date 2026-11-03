@@ -50,12 +50,20 @@ A widget instance belongs to a page version. Its `type` selects a widget definit
 
 | Instance data | Meaning |
 | --- | --- |
-| Entry key such as `widget_<uuid>` | Identity within the page's widget map/order |
+| Entry key such as `widget_<uuid>` | Identity within the page's widget map/order (see [widget ids](#widget-ids)) |
 | `type` | Schema and Liquid template to use |
 | `settings` | Values for that instance |
 | `blocks` and `blocksOrder` | Child instances and their display order |
 
 Adding a widget builds settings/default blocks from its schema. A localized `defaultKey` alone stays a runtime suggestion; paired with a literal `default`, it seeds a stored localized value. Starter blocks can use `defaultKeys` for their own initial wording; see [settings defaults](settings.md#localized-defaults-and-dates). Duplicating or pasting a widget generates a new widget ID and new block IDs, inserts it into the order, and clears listing/pagination flags. Copying places a snapshot in editor memory; persistence happens when the containing page is saved.
+
+### Widget ids
+
+A widget id is a letter or digit, then letters, digits, `_` and `-`, at most 128 characters, and not a built-in JavaScript property name (`constructor`, `toString`, …); a page or area widget id is never `header` or `footer`, which name the site's header and footer. It is unique within its file (a page's or an area's `widgets`). The editor's own ids (`widget_<uuid>`) and theme ids in `snake_case` fit. The id becomes the widget's HTML id, the `data-widget-id` the editor's preview looks up, and text a theme can put into its own CSS and scripts; the rule (`@widgetizer/core/widgetOrder`) keeps it safe in all of them, and the theme checker holds templates to it.
+
+Uniqueness across a page and its shared areas is not part of the rule: an area renders on every page of its language, so a clash can't be refused by saving one file. The theme checker refuses an area template id that a page or another area template of the same theme or preset uses.
+
+What renders from a page's or area's widgets (`renderedWidgetOrder`): the ids its `widgetsOrder` names, each once, that the map holds itself — never `header`/`footer`, an id with no widget, an inherited name, or `__proto__`. With no `widgetsOrder` at all, the map's widgets render in their own order; an empty one renders none. Every render, `widget.index`, the pagination plan, the forms manifest, the collection listing index and the transparent-header check go by it. A stored id that otherwise breaks the rule still renders.
 
 A widget has no independent language or translation-group record. Creating a page version initially copies the widget content, after which the versions can diverge in content and structure. Copying an entire page can retain its child IDs because those children live in a different page document; that differs from duplicating a widget within a page.
 

@@ -3,6 +3,7 @@ import useProjectStore from "../stores/projectStore";
 import useWidgetStore from "../stores/widgetStore";
 import fontDefinitions from "@widgetizer/core/config/fonts.json" with { type: "json" };
 import { getPreviewTargetOrigin } from "../lib/previewBase";
+import { pageOpensTransparent } from "../lib/transparentHeader";
 import { readThemeSetting, themeSettingsOfType } from "@widgetizer/core/themeSettingChanges";
 import { changedThemeSettingPaths, readsDependOn } from "@widgetizer/core/themeReads";
 import { collectThemeFonts, themeFontsStylesheetUrl } from "@widgetizer/core/themeFonts";
@@ -464,17 +465,7 @@ export async function updatePreview(iframe, newState, oldState, { session } = {}
   // Sync transparent-header body class when header settings change
   if (headerChanged) {
     const transparentOn = !!newGlobalWidgets.header?.settings?.transparent_on_hero;
-    let shouldBeTransparent = false;
-
-    if (transparentOn) {
-      const widgetOrder = newState.page?.widgetsOrder || Object.keys(newWidgets);
-      const firstWidgetId = widgetOrder[0];
-      const firstWidget = firstWidgetId && newWidgets[firstWidgetId];
-      if (firstWidget) {
-        const schemas = useWidgetStore.getState().schemas;
-        shouldBeTransparent = schemas[firstWidget.type]?.supportsTransparentHeader === true;
-      }
-    }
+    const shouldBeTransparent = transparentOn && pageOpensTransparent(newState.page, useWidgetStore.getState().schemas);
 
     iframe.contentWindow.postMessage(
       { type: "UPDATE_BODY_CLASS", payload: { className: "transparent-header", enabled: shouldBeTransparent } },
