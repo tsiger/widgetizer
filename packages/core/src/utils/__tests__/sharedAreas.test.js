@@ -76,6 +76,17 @@ describe("areaFromTemplate", () => {
     expect(areaFromTemplate(template).widgetsOrder).toEqual(["a"]);
   });
 
+  // Parsed JSON holds `__proto__` as an ordinary key. Assigned into a new map it
+  // would set that map's prototype and the widget would be gone before the editor
+  // could rename it.
+  it("keeps a widget stored under `__proto__` as an ordinary key", () => {
+    const template = JSON.parse('{"widgets": {"__proto__": {"type": "text", "settings": {}}}, "widgetsOrder": ["__proto__"]}');
+    const area = areaFromTemplate(template);
+    expect(Object.hasOwn(area.widgets, "__proto__")).toBe(true);
+    expect(Object.getPrototypeOf(area.widgets)).toBe(Object.prototype);
+    expect(JSON.parse(JSON.stringify(area)).widgets.__proto__).toEqual({ type: "text", settings: {} });
+  });
+
   it("keeps the widget list in order and nothing else", () => {
     const template = {
       name: "ignored",

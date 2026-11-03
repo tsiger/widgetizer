@@ -816,6 +816,21 @@ describe("duplicatePage", () => {
     assert.equal(res._json.name, "Original Page (Copy)");
   });
 
+  // The editor renames a `__proto__` widget when it opens the copy; the copy must
+  // still hold it as an ordinary key for that.
+  it("keeps a widget stored under `__proto__`", async () => {
+    const page = await createTestPage("Proto Original");
+    const body = JSON.parse(
+      `{"name": "${page.name}", "slug": "${page.slug}", "widgets": {"__proto__": {"type": "text", "settings": {}}}, "widgetsOrder": ["__proto__"]}`,
+    );
+    await callController(savePageContent, { params: { id: page.slug }, body });
+
+    const res = await callController(duplicatePage, { params: { id: page.slug } });
+    assert.equal(res._status, 201, JSON.stringify(res._json));
+    const copy = JSON.parse(await fs.readFile(path.join(getProjectPagesDir(activeProject.folderName), `${res._json.slug}.json`), "utf8"));
+    assert.equal(Object.hasOwn(copy.widgets, "__proto__"), true);
+  });
+
   it("assigns a new UUID to the copy", async () => {
     const page = await createTestPage("UUID Page");
 
@@ -1068,6 +1083,26 @@ describe("parentPageUuid", () => {
     assert.equal("parentPageUuid" in read._json, false);
   });
 
+  // The reference sweep rewrites pages that linked to the deleted one; a widget held
+  // under `__proto__` (parsed JSON) has to survive it for the editor to rename it.
+  it("keeps a `__proto__` widget on a page the reference sweep rewrites", async () => {
+    const target = await createTestPage("Doomed Target");
+    const linker = await createTestPage("Proto Linker");
+    const body = JSON.parse(
+      JSON.stringify({ name: linker.name, slug: linker.slug, widgetsOrder: ["w1", "__proto__"] }).replace(
+        /}$/,
+        `, "widgets": {"w1": {"type": "text", "settings": {"link": {"href": "${target.slug}.html", "text": "Go", "pageUuid": "${target.uuid}"}}}, "__proto__": {"type": "text", "settings": {}}}}`,
+      ),
+    );
+    await callController(savePageContent, { params: { id: linker.slug }, body });
+
+    await callController(deletePage, { params: { id: target.slug } });
+
+    const file = JSON.parse(await fs.readFile(path.join(getProjectPagesDir(activeProject.folderName), `${linker.slug}.json`), "utf8"));
+    assert.equal(file.widgets.w1.settings.link.pageUuid, undefined, "the sweep ran on this page");
+    assert.equal(Object.hasOwn(file.widgets, "__proto__"), true);
+  });
+
   it("clears the pointer on pages whose parent is deleted", async () => {
     const parent = await createTestPage("Doomed Parent");
     const child = await createTestPage("Surviving Child");
@@ -1190,6 +1225,92 @@ describe("listing anchor (one page per collection)", () => {
     assert.equal(res._status, 422);
     const read = await callController(getPage, { params: { id: page.slug } });
     assert.deepEqual(read._json.widgets, {});
+  });
+
+  // A widget in the page's map but not in its order renders nowhere (hand-made or
+  // old content), so it holds no listing role: the rules go by what the page shows.
+  describe("a widget the page doesn't show", () => {
+    const hidden = (settings) => ({
+      widgets: {
+        w1: { type: "news-grid", settings: { paginate: true } },
+        w9: { type: "news-grid", settings },
+      },
+      widgetsOrder: ["w1"],
+    });
+
+    it("isn't a second paginating widget", async () => {
+      const page = await createTestPage("Hidden Pager");
+      const { widgets, widgetsOrder } = hidden({ paginate: true });
+      const res = await callController(savePageContent, {
+        params: { id: page.slug },
+        body: { name: page.name, slug: page.slug, widgets, widgetsOrder },
+      });
+      assert.equal(res._status, 200);
+    });
+
+    it("takes no listing anchor from another page", async () => {
+      const holder = await createTestPage("Anchor Holder Visible");
+      await saveWith(holder.slug, holder.name, { w1: { type: "news-grid", settings: { listing_anchor: true } } });
+      const page = await createTestPage("Hidden Anchor");
+      const { widgets } = hidden({ listing_anchor: true });
+      const res = await callController(savePageContent, {
+        params: { id: page.slug },
+        body: { name: page.name, slug: page.slug, widgets: { w1: { type: "news-grid", settings: {} }, w9: widgets.w9 }, widgetsOrder: ["w1"] },
+      });
+      assert.equal(res._status, 200);
+      assert.deepEqual(res._json.listingAnchorMovedFrom ?? [], []);
+      const holderRead = await callController(getPage, { params: { id: holder.slug } });
+      assert.equal(holderRead._json.widgets.w1.settings.listing_anchor, true);
+    });
+
+    it("keeps its listing anchor when another page claims the collection", async () => {
+      const page = await createTestPage("Hidden Anchor Kept");
+      await callController(savePageContent, {
+        params: { id: page.slug },
+        body: {
+          name: page.name,
+          slug: page.slug,
+          widgets: { w1: { type: "news-grid", settings: {} }, w9: { type: "news-grid", settings: { listing_anchor: true } } },
+          widgetsOrder: ["w1"],
+        },
+      });
+      const claimant = await createTestPage("Visible Claimant");
+      const res = await saveWith(claimant.slug, claimant.name, { w1: { type: "news-grid", settings: { listing_anchor: true } } });
+      assert.equal(res._status, 200);
+      assert.equal((res._json.listingAnchorMovedFrom ?? []).includes("Hidden Anchor Kept"), false);
+      const read = await callController(getPage, { params: { id: page.slug } });
+      assert.equal(read._json.widgets.w9.settings.listing_anchor, true);
+    });
+
+    it("still has pagination turned off when its schema cannot paginate", async () => {
+      await fs.outputFile(
+        path.join(getProjectDir(activeProject.folderName), "widgets", "plain-grid", "schema.json"),
+        JSON.stringify({ type: "plain-grid", settings: [] }),
+      );
+      const page = await createTestPage("Hidden Cannot Paginate");
+      const res = await callController(savePageContent, {
+        params: { id: page.slug },
+        body: {
+          name: page.name,
+          slug: page.slug,
+          widgets: { w1: { type: "news-grid", settings: {} }, w9: { type: "plain-grid", settings: { paginate: true } } },
+          widgetsOrder: ["w1"],
+        },
+      });
+      assert.equal(res._status, 200);
+      const read = await callController(getPage, { params: { id: page.slug } });
+      assert.equal(read._json.widgets.w9.settings.paginate, false);
+    });
+
+    it("isn't a second paginating widget through the page details update either", async () => {
+      const page = await createTestPage("Hidden Pager Details");
+      const { widgets, widgetsOrder } = hidden({ paginate: true });
+      const res = await callController(updatePage, {
+        params: { id: page.slug },
+        body: { name: page.name, slug: page.slug, widgets, widgetsOrder },
+      });
+      assert.equal(res._status, 200);
+    });
   });
 
   it("keeps pagination on a duplicated page, but not the anchor", async () => {

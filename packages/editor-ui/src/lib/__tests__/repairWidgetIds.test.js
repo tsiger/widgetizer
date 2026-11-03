@@ -184,6 +184,27 @@ describe("repairWidgetIds", () => {
       ]);
     });
 
+    // A theme loops blocksOrder (Arch's footer sizes its grid by it), so an entry with
+    // no block, whatever its name, is dropped like a widget order entry.
+    it("drops block order entries that name no block", () => {
+      const result = repair({
+        pageData: page({ hero: w("text", { blocks: { real: w() }, blocksOrder: ["constructor", "__proto__", "real", 7] }) }),
+        globalWidgets: { header: null, footer: w("footer", { blocks: { col: w() }, blocksOrder: ["gone", "col"] }) },
+      });
+      expect(result.page.widgets.hero.blocksOrder).toEqual(["real"]);
+      expect(result.globalWidgets.footer.blocksOrder).toEqual(["col"]);
+      expect(result.changed).toBe(true);
+      expect(result.report.blocks).toEqual([]);
+    });
+
+    // An empty order lets the editor add blocks again: blockLimits counts the order.
+    it("drops block order entries from a widget with no blocks map at all", () => {
+      const result = repair({ pageData: page({ hero: w("text", { blocksOrder: ["constructor", "__proto__", "gone"] }) }) });
+      expect(result.page.widgets.hero.blocksOrder).toEqual([]);
+      expect(Object.hasOwn(result.page.widgets.hero, "blocks")).toBe(false);
+      expect(result.changed).toBe(true);
+    });
+
     it("renames the blocks of a widget that is renamed too, from their old ids", () => {
       const result = repair({ pageData: page({ "bad id": w("text", { blocks: { "x y": w() }, blocksOrder: ["x y"] }) }) });
       const widget = Object.values(result.page.widgets)[0];

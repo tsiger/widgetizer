@@ -17,7 +17,7 @@ import { LIMIT_KEYS, MAX_WIDGETS_PER_PAGE } from "@widgetizer/core/adapters";
 import { sanitizeSlug, generateUniqueSlug } from "../utils/slugHelpers.js";
 import { generateCopyName } from "../utils/namingHelpers.js";
 import { isHomeSlug, isReservedPageSlug, pageKey, pagesDir } from "@widgetizer/core/contentAddress";
-import { uniqueBlockOrders, uniqueWidgetOrder } from "@widgetizer/core/widgetOrder";
+import { renderedWidgetOrder, uniqueBlockOrders, uniqueWidgetOrder } from "@widgetizer/core/widgetOrder";
 import { requestLanguage, projectLanguageContexts, withoutLanguage } from "../utils/contentLanguage.js";
 import {
   assertHasIdentity,
@@ -70,9 +70,12 @@ async function readWidgetSchema(storage, scope, type) {
   }
 }
 
-async function enforcePaginationRules({ scope, storage, widgets }) {
+async function enforcePaginationRules({ scope, storage, widgets, widgetsOrder }) {
   const paginators = [];
-  for (const widget of Object.values(widgets || {})) {
+  // Only the widgets the page shows count: one it holds but renders nowhere splits
+  // nothing. Every widget still has `paginate` switched off when its schema can't.
+  const shown = new Set(renderedWidgetOrder(widgets, widgetsOrder));
+  for (const [id, widget] of Object.entries(widgets || {})) {
     if (widget?.settings?.paginate !== true) continue;
     const schema = await readWidgetSchema(storage, scope, widget.type);
     const perPageSetting = schema?.collection?.perPageSetting;
@@ -80,6 +83,7 @@ async function enforcePaginationRules({ scope, storage, widgets }) {
       widget.settings.paginate = false;
       continue;
     }
+    if (!shown.has(id)) continue;
     const declared = schema.settings.find((setting) => setting?.id === perPageSetting);
     const perPage = Number(widget.settings[perPageSetting] ?? declared?.default);
     if (!Number.isInteger(perPage) || perPage < 1) {
@@ -422,7 +426,12 @@ export async function updatePage(req, res) {
     }
 
     if (pageData.widgets) {
-      const paginationError = await enforcePaginationRules({ scope, storage, widgets: pageData.widgets });
+      const paginationError = await enforcePaginationRules({
+        scope,
+        storage,
+        widgets: pageData.widgets,
+        widgetsOrder: pageData.widgetsOrder,
+      });
       if (paginationError) return res.status(422).json({ error: paginationError });
     }
 
@@ -491,6 +500,7 @@ export async function updatePage(req, res) {
             storage,
             keepPageId: finalNewSlug,
             widgets: finalUpdatedPageData.widgets,
+            widgetsOrder: finalUpdatedPageData.widgetsOrder,
             lang,
           })
         : [];
@@ -825,7 +835,12 @@ export async function savePageContent(req, res) {
         .json({ error: `Too many widgets on this page (${widgetCount}); the maximum is ${maxWidgets}.` });
     }
 
-    const paginationError = await enforcePaginationRules({ scope, storage, widgets: pageData.widgets });
+    const paginationError = await enforcePaginationRules({
+      scope,
+      storage,
+      widgets: pageData.widgets,
+      widgetsOrder: pageData.widgetsOrder,
+    });
     if (paginationError) return res.status(422).json({ error: paginationError });
 
     // Read existing data to preserve timestamps etc.
@@ -881,6 +896,7 @@ export async function savePageContent(req, res) {
         storage,
         keepPageId: pageData.slug,
         widgets: updatedPageData.widgets,
+        widgetsOrder: updatedPageData.widgetsOrder,
         lang,
       });
       return { ...persisted, movedFrom: moved };
@@ -912,9 +928,10 @@ export async function savePageContent(req, res) {
  * a widget whose schema does not declare one can never hold an anchor. Each
  * language has its own listing pages, so the sweep stays inside the language.
  */
-async function clearListingAnchorsElsewhere({ scope, storage, keepPageId, widgets, lang }) {
+async function clearListingAnchorsElsewhere({ scope, storage, keepPageId, widgets, widgetsOrder, lang }) {
   const claimed = new Set();
-  for (const widget of Object.values(widgets || {})) {
+  // Only a widget the page shows claims its collection, as the listing index reads it.
+  for (const widget of renderedWidgetOrder(widgets, widgetsOrder).map((id) => widgets[id])) {
     if (widget?.settings?.listing_anchor && widget.type) claimed.add(widget.type);
   }
   if (claimed.size === 0) return [];
@@ -946,7 +963,8 @@ async function clearListingAnchorsElsewhere({ scope, storage, keepPageId, widget
     const page = JSON.parse(buf.toString("utf8"));
 
     let modified = false;
-    for (const widget of Object.values(page.widgets || {})) {
+    // Only a widget the page shows holds the anchor; one it doesn't show keeps its setting.
+    for (const widget of renderedWidgetOrder(page.widgets, page.widgetsOrder).map((id) => page.widgets[id])) {
       if (!widget?.settings?.listing_anchor || !widget.type) continue;
       const collectionType = await collectionOf(widget.type);
       if (!collectionType || !claimedCollections.has(collectionType)) continue;
@@ -1011,13 +1029,13 @@ export async function duplicatePage(req, res) {
     // leave two pages claiming the same collection, which the save-time sweep
     // never sees (a duplicate is written directly), so the tie-break would pick
     // by slug rather than by what the user meant. The copy starts unclaimed.
-    const duplicatedWidgets = {};
-    for (const [widgetId, widget] of Object.entries(originalPageData.widgets || {})) {
-      duplicatedWidgets[widgetId] =
-        widget?.settings?.listing_anchor === true
-          ? { ...widget, settings: { ...widget.settings, listing_anchor: false } }
-          : widget;
-    }
+    // fromEntries keeps an own `__proto__` widget key an ordinary key.
+    const duplicatedWidgets = Object.fromEntries(
+      Object.entries(originalPageData.widgets || {}).map(([widgetId, widget]) => [
+        widgetId,
+        widget?.settings?.listing_anchor === true ? { ...widget, settings: { ...widget.settings, listing_anchor: false } } : widget,
+      ]),
+    );
 
     // A copy is a new page in its own translation group, not a translation of the original.
     const uuid = randomUUID();

@@ -272,6 +272,62 @@ describe("a theme update", () => {
   });
 });
 
+// Parsed JSON holds `__proto__` as an ordinary key, and the editor renames such a
+// widget when it opens the page. Every copy on the way there keeps it, or the widget
+// is gone before it can be renamed (a key assigned into a fresh map would set the
+// map's prototype instead).
+describe("an area widget stored under `__proto__`", () => {
+  const PROTO_AREA = '{"widgets": {"__proto__": {"type": "nav", "settings": {"cta": {"href": "about.html", "text": "Hi"}}}}, "widgetsOrder": ["__proto__"]}';
+  const writeProtoTemplate = async () => {
+    await fs.outputFile(path.join(getThemeDir(THEME), "templates", "global", "areas", "before_footer.json"), PROTO_AREA);
+    invalidateThemeSourceCache(THEME);
+  };
+  const ownProto = async (file) => {
+    const area = JSON.parse(await fs.readFile(file, "utf8"));
+    return Object.hasOwn(area.widgets, "__proto__") && area.widgets.__proto__?.type === "nav";
+  };
+
+  it("keeps it through a new project's starting content", async () => {
+    await writeTheme("1.0.0");
+    await writeProtoTemplate();
+    const project = await createSite("Proto start");
+    assert.equal(await ownProto(areaPath(project)), true);
+  });
+
+  it("keeps it in a new language's copy", async () => {
+    await writeTheme("1.0.0");
+    await writeProtoTemplate();
+    const project = await createSite("Proto language");
+    const res = await call(createLanguage, { body: { code: "el" }, project });
+    assert.equal(res._status, 201, JSON.stringify(res._json));
+    assert.equal(await ownProto(areaPath(project, "el")), true);
+  });
+
+  it("keeps a header block stored under `__proto__` in a new language's copy", async () => {
+    await writeTheme("1.0.0");
+    const project = await createSite("Proto header");
+    const dir = getProjectDir(project.folderName);
+    await fs.outputFile(
+      path.join(dir, "pages", "global", "header.json"),
+      '{"type": "header", "settings": {}, "blocks": {"__proto__": {"type": "link", "settings": {}}}, "blocksOrder": ["__proto__"]}',
+    );
+    const res = await call(createLanguage, { body: { code: "el" }, project });
+    assert.equal(res._status, 201, JSON.stringify(res._json));
+    const header = JSON.parse(await fs.readFile(path.join(dir, "pages", "el", "global", "header.json"), "utf8"));
+    assert.equal(Object.hasOwn(header.blocks, "__proto__"), true);
+  });
+
+  it("keeps it when a theme update brings the area in", async () => {
+    await writeTheme("1.0.0");
+    const project = await createSite("Proto update");
+    await writeTheme("2.0.0");
+    await writeProtoTemplate();
+    const res = await call(applyProjectThemeUpdate, { params: { id: project.id } });
+    assert.equal(res._status, 200, JSON.stringify(res._json));
+    assert.equal(await ownProto(areaPath(project)), true);
+  });
+});
+
 describe("a preset", () => {
   async function writePreset(id, { areaTemplate } = {}) {
     const dir = path.join(getThemeDir(THEME), "presets", id);

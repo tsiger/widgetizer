@@ -7,6 +7,7 @@ import { useTranslation } from "react-i18next";
 import { useThemeLocale } from "../../hooks/useThemeLocale";
 import useCollections from "../../hooks/useCollections";
 import useToastStore from "../../stores/toastStore";
+import { renderedWidgetOrder } from "@widgetizer/core/widgetOrder";
 
 const DEFAULT_ITEMS_PER_PAGE = 12;
 
@@ -91,9 +92,11 @@ export default function SettingsPanel({
       const perPageSetting = currentWidgetSchema?.collection?.perPageSetting;
       const values = { [settingId]: value };
       if (settingId === "paginate" && value === true) {
-        const holder = Object.entries(page?.widgets || {}).find(
-          ([id, widget]) => id !== selectedWidgetId && widget?.settings?.paginate === true,
-        )?.[1];
+        // Among the widgets the page shows, as the save and the render count them.
+        const holder = renderedWidgetOrder(page?.widgets, page?.widgetsOrder)
+          .filter((id) => id !== selectedWidgetId)
+          .map((id) => page.widgets[id])
+          .find((widget) => widget?.settings?.paginate === true);
         if (holder) {
           const holderName = holder.settings?.name || tTheme(widgetSchemas?.[holder.type]?.displayName) || holder.type;
           showToast(t("pageEditor.paginate.onlyOne", { widget: holderName }), "error");

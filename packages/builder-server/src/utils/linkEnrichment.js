@@ -90,18 +90,20 @@ async function updatePageWidgets(pagesDir, widgetProcessor) {
       if (page.type === "header" || page.type === "footer") continue;
 
       let modified = false;
-      const processedWidgets = {};
+      // Entries, not assignment: an own `__proto__` widget key (parsed JSON can hold
+      // one) assigned into a fresh map would set its prototype and drop the widget.
+      const processedEntries = [];
 
       for (const [widgetId, widget] of Object.entries(page.widgets || {})) {
         const processed = widgetProcessor(widget);
-        processedWidgets[widgetId] = processed;
+        processedEntries.push([widgetId, processed]);
         if (JSON.stringify(processed) !== JSON.stringify(widget)) {
           modified = true;
         }
       }
 
       if (modified) {
-        page.widgets = processedWidgets;
+        page.widgets = Object.fromEntries(processedEntries);
         await fs.outputFile(pagePath, JSON.stringify(page, null, 2));
       }
     }
@@ -111,8 +113,9 @@ async function updatePageWidgets(pagesDir, widgetProcessor) {
 /** A shared area with widgetProcessor applied to each of its widgets. */
 function processAreaWidgets(area, widgetProcessor) {
   if (!area?.widgets || typeof area.widgets !== "object") return area;
-  const widgets = {};
-  for (const [id, widget] of Object.entries(area.widgets)) widgets[id] = widgetProcessor(widget);
+  // Built with fromEntries: an own `__proto__` key (parsed JSON can hold one) stays
+  // an ordinary key, where assigning it would set the map's prototype.
+  const widgets = Object.fromEntries(Object.entries(area.widgets).map(([id, widget]) => [id, widgetProcessor(widget)]));
   return { ...area, widgets };
 }
 
@@ -345,10 +348,11 @@ async function updatePagesViaStorage(
       const page = JSON.parse(buf.toString("utf8"));
 
       let modified = false;
-      const processedWidgets = {};
+      // Entries, not assignment: keeps an own `__proto__` widget key (see above).
+      const processedEntries = [];
       for (const [widgetId, widget] of Object.entries(page.widgets || {})) {
         const processed = widgetProcessor(widget);
-        processedWidgets[widgetId] = processed;
+        processedEntries.push([widgetId, processed]);
         if (JSON.stringify(processed) !== JSON.stringify(widget)) modified = true;
       }
 
@@ -368,7 +372,7 @@ async function updatePagesViaStorage(
       }
 
       if (modified) {
-        page.widgets = processedWidgets;
+        page.widgets = Object.fromEntries(processedEntries);
         await storage.write(scope, key, JSON.stringify(page, null, 2));
       }
       // Later loop checks see this page's new parent only once it is on disk: a
@@ -683,10 +687,10 @@ export async function enrichThemeUpdateAdditions({ pagesDir, additions, themeJso
     if (content.type === "header" || content.type === "footer") {
       addition.content = transformWidgetSettings(content, enrichValue);
     } else if (content.widgets && typeof content.widgets === "object") {
-      const widgets = {};
-      for (const [widgetId, widget] of Object.entries(content.widgets)) {
-        widgets[widgetId] = transformWidgetSettings(widget, enrichValue);
-      }
+      // fromEntries keeps an own `__proto__` widget key an ordinary key.
+      const widgets = Object.fromEntries(
+        Object.entries(content.widgets).map(([widgetId, widget]) => [widgetId, transformWidgetSettings(widget, enrichValue)]),
+      );
       addition.content = { ...content, widgets };
     }
   }

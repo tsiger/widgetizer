@@ -36,12 +36,15 @@ const keysOf = (map) => (isPlainMap(map) ? Object.keys(map) : []);
 const renameKeys = (map, renames) => Object.fromEntries(Object.entries(map).map(([id, value]) => [renames.get(id) ?? id, value]));
 
 /**
- * A widget with its bad block ids renamed (in `blocks` and `blocksOrder`), or the
- * widget itself when none is bad. Renamed blocks are added to `report`.
+ * A widget with its bad block ids renamed (in `blocks` and `blocksOrder`) and order
+ * entries naming no block dropped, or the widget itself when there is nothing to
+ * repair. Renamed blocks are added to `report`.
  */
 function repairBlocks(widget, ownerKey, widgetId, report) {
-  if (!isPlainMap(widget) || !isPlainMap(widget.blocks)) return widget;
-  const ids = Object.keys(widget.blocks);
+  if (!isPlainMap(widget)) return widget;
+  // A widget with no blocks map still has an order to clean: every entry names nothing.
+  const hasBlocks = isPlainMap(widget.blocks);
+  const ids = hasBlocks ? Object.keys(widget.blocks) : [];
   const taken = new Set(ids);
   const renames = new Map();
   for (const id of ids) {
@@ -51,14 +54,18 @@ function repairBlocks(widget, ownerKey, widgetId, report) {
     renames.set(id, to);
     report.push({ owner: ownerKey, widget: widgetId, from: id, to });
   }
-  if (renames.size === 0) return widget;
-  return {
-    ...widget,
-    blocks: renameKeys(widget.blocks, renames),
-    ...(Array.isArray(widget.blocksOrder)
-      ? { blocksOrder: widget.blocksOrder.map((id) => renames.get(id) ?? id) }
-      : {}),
-  };
+  const blocks = renames.size ? renameKeys(widget.blocks, renames) : hasBlocks ? widget.blocks : {};
+  // A theme loops blocksOrder, so an entry that names no block is dropped, as a
+  // widget order entry is.
+  const order = Array.isArray(widget.blocksOrder)
+    ? widget.blocksOrder
+        .map((id) => (typeof id === "string" ? (renames.get(id) ?? id) : id))
+        .filter((id) => typeof id === "string" && Object.hasOwn(blocks, id))
+    : widget.blocksOrder;
+  const orderChanged =
+    Array.isArray(order) && (order.length !== widget.blocksOrder.length || order.some((id, i) => id !== widget.blocksOrder[i]));
+  if (renames.size === 0 && !orderChanged) return widget;
+  return { ...widget, ...(hasBlocks ? { blocks } : {}), ...(Array.isArray(order) ? { blocksOrder: order } : {}) };
 }
 
 /**
@@ -71,7 +78,8 @@ function repairBlocks(widget, ownerKey, widgetId, report) {
  *   then the areas in the order the theme declares them, then a page widget that
  *   renders nowhere; every other copy gets a new id;
  * - order entries that name no widget are dropped (an area save refuses them);
- * - a block id that breaks the rule gets a new one.
+ * - a block id that breaks the rule gets a new one, and block order entries that
+ *   name no block are dropped.
  *
  * Areas the theme doesn't declare are neither rendered nor edited, so they are left
  * alone. Anything not repaired comes back as the same object.
