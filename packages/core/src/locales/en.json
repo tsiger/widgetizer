@@ -718,6 +718,10 @@
       "formNotAllowed": "A form can't be placed in a shared area yet.",
       "loadFailed": "Shared areas could not be loaded, so they can't be edited right now."
     },
+    "idRepairs": {
+      "renamed": "Some ids on this page clashed or weren't valid, so they were renamed: {{ids}}. Custom CSS, scripts or links that use the old ids need updating. Your next save keeps the new ids.",
+      "block": "{{block}} (a block in {{widget}})"
+    },
     "listingAnchor": {
       "header": "Collection",
       "label": "Main {{collection}} page",

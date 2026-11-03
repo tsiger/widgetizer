@@ -5,6 +5,7 @@ import { getGlobalWidgets } from "../queries/previewManager";
 import { getSharedAreas } from "../queries/sharedAreaManager";
 import { uniqueBlockOrder, uniqueBlockOrders, uniqueWidgetOrder } from "@widgetizer/core/widgetOrder";
 import { getActiveProjectId } from "../lib/activeProjectId";
+import { repairWidgetIds } from "../lib/repairWidgetIds";
 import useThemeStore from "./themeStore";
 
 /**
@@ -129,6 +130,9 @@ const usePageStore = create(
       // content the theme no longer shows) are listed with their widget counts.
       // originalSharedAreas is the last-saved copy, per area, like the globals'.
       ...NO_AREAS,
+      // What the last load renamed to repair stored ids ({ widgets, blocks }, as
+      // repairWidgetIds reports it), or null. The page editor announces it.
+      idRepairs: null,
 
       // Thin proxy snapshot — NOT the canonical copy. themeStore owns the truth.
       themeSettingsSnapshot: null,
@@ -153,6 +157,7 @@ const usePageStore = create(
             globalWidgets: { header: null, footer: null },
             originalGlobalWidgets: { header: null, footer: null },
             ...NO_AREAS,
+            idRepairs: null,
             themeSettingsSnapshot: null,
             loadedProjectId: projectId,
           });
@@ -168,6 +173,7 @@ const usePageStore = create(
           globalWidgets: { header: null, footer: null },
           originalGlobalWidgets: { header: null, footer: null },
           ...NO_AREAS,
+          idRepairs: null,
           themeSettingsSnapshot: null,
         });
 
@@ -220,13 +226,25 @@ const usePageStore = create(
           // Take an initial snapshot for undo tracking
           const themeSnapshot = useThemeStore.getState().settings;
 
-          set({
+          // Ids that break the rule, or that the page and an area both use, are
+          // repaired in the copy the editor works on. The stored content stays the
+          // saved baseline, so the repair reads as unsaved and the next save writes it.
+          const repair = repairWidgetIds({
             page: cleanPageData,
-            originalPage: JSON.parse(JSON.stringify(cleanPageData)),
+            sharedAreas: areas.sharedAreas,
+            declaredAreaIds: areas.declaredAreas.map(({ id }) => id),
             globalWidgets,
+          });
+
+          set({
+            page: repair.page,
+            originalPage: JSON.parse(JSON.stringify(cleanPageData)),
+            globalWidgets: repair.globalWidgets,
             originalGlobalWidgets: JSON.parse(JSON.stringify(globalWidgets)),
             ...areas,
+            sharedAreas: repair.sharedAreas,
             originalSharedAreas: JSON.parse(JSON.stringify(areas.sharedAreas)),
+            idRepairs: repair.changed ? repair.report : null,
             themeSettingsSnapshot: themeSnapshot ? JSON.parse(JSON.stringify(themeSnapshot)) : null,
             loading: false,
             error: null,
@@ -247,6 +265,7 @@ const usePageStore = create(
             globalWidgets: { header: null, footer: null },
             originalGlobalWidgets: { header: null, footer: null },
             ...NO_AREAS,
+            idRepairs: null,
             themeSettingsSnapshot: null,
             loadedProjectId: projectId,
           });
@@ -315,6 +334,8 @@ const usePageStore = create(
         }
       },
 
+      clearIdRepairs: () => set({ idRepairs: null }),
+
       clearPage: () => {
         set({
           page: null,
@@ -322,6 +343,7 @@ const usePageStore = create(
           globalWidgets: { header: null, footer: null },
           originalGlobalWidgets: { header: null, footer: null },
           ...NO_AREAS,
+          idRepairs: null,
           themeSettingsSnapshot: null,
           loadedProjectId: null,
           loading: false,

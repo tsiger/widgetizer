@@ -20,6 +20,7 @@ import { EditingLanguageProvider } from "../lib/editingLanguage.jsx";
 import useDeleteKeyShortcut from "../hooks/useDeleteKeyShortcut";
 import { useThemeLocale } from "../hooks/useThemeLocale";
 import { mediaUsageStaleMessage } from "../utils/mediaUsageDisplay";
+import { announceIdRepairs, dismissIdRepairs } from "../lib/idRepairNotice";
 
 export default function PageEditor() {
   const { t } = useTranslation();
@@ -62,11 +63,23 @@ export default function PageEditor() {
     // here — a suspension that outlived its session would silently stop saving a
     // page that is perfectly fine.
     useAutoSave.getState().resumeSaving();
+    // A selection is an id on the page it was made on; on another page the same id
+    // can name a different widget.
+    useWidgetStore.getState().resetSelection();
+    // The id-repair notice names the previous page's ids.
+    dismissIdRepairs();
     usePageStore.getState().loadPage(pageId, searchParams.get("language") || undefined);
     if (activeProject?.id) {
       useWidgetStore.getState().loadSchemas(searchParams.get("language") || "");
     }
   }, [searchParams, activeProject?.id]);
+
+  // The load renamed stored ids that broke the rule or clashed: say which, and
+  // schedule the save that writes the repair.
+  const idRepairs = usePageStore((state) => state.idRepairs);
+  useEffect(() => {
+    if (idRepairs) announceIdRepairs(t);
+  }, [idRepairs, t]);
 
   // A save can move a collection's listing anchor onto this page, clearing it on
   // another. The store records that as data; announcing it belongs here, where
