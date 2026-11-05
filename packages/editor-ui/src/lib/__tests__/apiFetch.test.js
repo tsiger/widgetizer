@@ -50,6 +50,52 @@ describe("apiFetch", () => {
     });
   });
 
+  it("adds the registered hook headers, which the caller's own headers override", async () => {
+    const { setRequestHooks } = await import("../requestHooks");
+    getActiveProjectId.mockReturnValue(null);
+    setRequestHooks({ requestHeaders: async () => ({ "X-Shell": "a", "Content-Type": "text/plain" }) });
+
+    await apiFetch("/api/themes", { headers: { "Content-Type": "application/json" } });
+
+    expect(fetchMock).toHaveBeenCalledWith("http://api.test/api/themes", {
+      headers: { "X-Shell": "a", "Content-Type": "application/json" },
+    });
+  });
+
+  it("reports every response, failed ones included, to the registered hook", async () => {
+    const { setRequestHooks } = await import("../requestHooks");
+    const observeResponse = vi.fn();
+    const remove = setRequestHooks({ observeResponse });
+    fetchMock.mockResolvedValueOnce({ ok: false, status: 409, headers: new Headers({ "X-Shell-State": "b" }) });
+
+    await apiFetch("/api/pages/home", { method: "PUT" });
+
+    const seen = observeResponse.mock.calls[0][0];
+    expect(seen).toMatchObject({ status: 409, method: "PUT", path: "/api/pages/home" });
+    expect(seen.getHeader("x-shell-state")).toBe("b");
+
+    remove();
+    await apiFetch("/api/themes");
+    expect(observeResponse).toHaveBeenCalledTimes(1);
+  });
+
+  it("a throwing hook never breaks the request", async () => {
+    const { setRequestHooks } = await import("../requestHooks");
+    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    setRequestHooks({
+      requestHeaders: () => {
+        throw new Error("boom");
+      },
+      observeResponse: () => {
+        throw new Error("boom");
+      },
+    });
+
+    await expect(apiFetch("/api/themes")).resolves.toEqual({ ok: true });
+    expect(errorSpy).toHaveBeenCalledTimes(2);
+    errorSpy.mockRestore();
+  });
+
   it("omits the project header when there is no active project", async () => {
     getActiveProjectId.mockReturnValue(null);
 

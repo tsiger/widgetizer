@@ -2,6 +2,7 @@ import { API_URL } from "./config";
 import { getActiveProjectId } from "./activeProjectId";
 import { getApiBase } from "./apiBase";
 import { notifyMutationSuccess } from "./mutationEvents";
+import { hookHeaders, observeHookResponse } from "./requestHooks";
 
 const NON_MUTATING_METHODS = new Set(["GET", "HEAD", "OPTIONS"]);
 
@@ -22,7 +23,7 @@ export class ApiError extends Error {
 
 export async function apiFetch(path, options = {}) {
   const url = API_URL(path);
-  const headers = { ...options.headers };
+  const headers = { ...(await hookHeaders()), ...options.headers };
 
   const projectId = getActiveProjectId();
   if (projectId) {
@@ -32,6 +33,7 @@ export async function apiFetch(path, options = {}) {
   const response = await fetch(url, { ...options, headers });
 
   const method = (options.method || "GET").toUpperCase();
+  observeHookResponse({ status: response.status, getHeader: (name) => response.headers.get(name), method, path });
   // A followed redirect (e.g. an intermediary bouncing to a login page) lands
   // on a 200 response that is not the mutation endpoint succeeding, so it must
   // not be announced as one.

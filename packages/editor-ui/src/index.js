@@ -28,6 +28,9 @@ export { resolveLucideIcon } from "./utils/lucideIcon.js";
 // Fires `{ method, path }` after every successful (`response.ok`) modifying
 // apiFetch call; an embedding shell subscribes to react to mutations.
 export { subscribeMutationSuccess } from "./lib/mutationEvents.js";
+// Add headers to every editor request and see every response's status and
+// headers (apiFetch and the uploads alike); an embedding shell registers them.
+export { setRequestHooks } from "./lib/requestHooks.js";
 // A two-part button: primary action + optional dropdown menu. Presentational
 // only — the caller resolves labels/handlers/enabled state per half. Implements
 // WAI-ARIA menu-button pattern; open/close/outside/Escape are encapsulated.
