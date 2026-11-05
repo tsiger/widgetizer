@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { Search, Check, ChevronsUpDown } from "lucide-react";
 import fontDefinitions from "@widgetizer/core/config/fonts.json" with { type: "json" };
+import { themeFontsStylesheetUrl } from "@widgetizer/core/themeFonts";
 
 const FONT_WEIGHT_NAMES = {
   100: "Thin",
@@ -52,7 +53,7 @@ function loadFontForPreview(font) {
   loadedFonts.add(font.name);
 
   const weight = font.defaultWeight || 400;
-  const url = `https://fonts.bunny.net/css?family=${encodeURIComponent(font.name)}:wght@${weight}&display=swap`;
+  const url = themeFontsStylesheetUrl({ fonts: { [font.name]: [weight] }, useBunnyFonts: true });
   const link = document.createElement("link");
   link.rel = "stylesheet";
   link.href = url;
@@ -72,16 +73,11 @@ function loadFontPreview(fontName, weight) {
   cache[fontName] = Array.from(weights);
   window[FONT_PREVIEW_CACHE_KEY] = cache;
 
-  const families = Object.entries(cache)
-    .map(([name, fontWeights]) => {
-      const sorted = [...fontWeights].sort((a, b) => a - b);
-      return `${encodeURIComponent(name)}:wght@${sorted.join(";")}`;
-    })
-    .join("|");
-
-  if (!families) return;
-
-  const url = `https://fonts.bunny.net/css?family=${families}&display=swap`;
+  const fonts = Object.fromEntries(
+    Object.entries(cache).map(([name, fontWeights]) => [name, [...fontWeights].sort((a, b) => a - b)]),
+  );
+  const url = themeFontsStylesheetUrl({ fonts, useBunnyFonts: true });
+  if (!url) return;
   let link = document.getElementById(FONT_PREVIEW_LINK_ID);
   if (!link) {
     link = document.createElement("link");
