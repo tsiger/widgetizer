@@ -24,6 +24,9 @@ const LANGUAGE_OPTIONS = [
   { value: "latin", label: "Latin", subsets: ["latin", "latin-ext"] },
   { value: "greek", label: "Greek", subsets: ["greek", "greek-ext"] },
   { value: "cyrillic", label: "Cyrillic", subsets: ["cyrillic", "cyrillic-ext"] },
+  { value: "armenian", label: "Armenian", subsets: ["armenian"] },
+  { value: "georgian", label: "Georgian", subsets: ["georgian"] },
+  { value: "ethiopic", label: "Ethiopic", subsets: ["ethiopic"] },
   { value: "hebrew", label: "Hebrew", subsets: ["hebrew"] },
   { value: "arabic", label: "Arabic", subsets: ["arabic"] },
   { value: "vietnamese", label: "Vietnamese", subsets: ["vietnamese"] },
@@ -31,10 +34,17 @@ const LANGUAGE_OPTIONS = [
   { value: "devanagari", label: "Devanagari", subsets: ["devanagari"] },
   { value: "bengali", label: "Bengali", subsets: ["bengali"] },
   { value: "gujarati", label: "Gujarati", subsets: ["gujarati"] },
+  { value: "gurmukhi", label: "Gurmukhi", subsets: ["gurmukhi"] },
   { value: "tamil", label: "Tamil", subsets: ["tamil"] },
+  { value: "telugu", label: "Telugu", subsets: ["telugu"] },
+  { value: "sinhala", label: "Sinhala", subsets: ["sinhala"] },
+  { value: "myanmar", label: "Myanmar (Burmese)", subsets: ["myanmar"] },
+  { value: "khmer", label: "Khmer", subsets: ["khmer"] },
+  { value: "lao", label: "Lao", subsets: ["lao"] },
   { value: "korean", label: "Korean", subsets: ["korean"] },
   { value: "japanese", label: "Japanese", subsets: ["japanese"] },
-  { value: "chinese", label: "Chinese", subsets: ["chinese-simplified", "chinese-traditional"] },
+  { value: "chinese-simplified", label: "Chinese (Simplified)", subsets: ["chinese-simplified"] },
+  { value: "chinese-traditional", label: "Chinese (Traditional)", subsets: ["chinese-traditional"] },
 ].map((option) => {
   const count = GOOGLE_FONTS.filter((font) =>
     font.subsets?.some((subset) => option.subsets.includes(subset))
