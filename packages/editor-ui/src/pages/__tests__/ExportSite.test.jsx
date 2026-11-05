@@ -15,8 +15,9 @@ vi.mock("../../stores/projectStore", () => {
 vi.mock("../../hooks/useThemeLocale", () => ({
   useThemeLocale: () => ({ tTheme: (str) => (str?.startsWith("tTheme:") ? str.slice(7) : str) }),
 }));
+const showToast = vi.fn();
 vi.mock("../../stores/toastStore", () => {
-  const state = { showToast: () => {} };
+  const state = { showToast: (...args) => showToast(...args) };
   const hook = (selector) => (selector ? selector(state) : state);
   hook.getState = () => state;
   return { default: hook };
@@ -39,6 +40,7 @@ const RECORD = { version: 1, timestamp: "2026-09-15T10:00:00.000Z" };
 beforeEach(() => {
   exportProjectAPI.mockReset();
   getExportHistory.mockReset();
+  showToast.mockReset();
   projectState = { activeProject: { id: "project-1", name: "Crumbly" } };
 });
 
@@ -143,5 +145,62 @@ describe("ExportSite — items that stop an export", () => {
     expect(screen.getByText("exportSite.invalidItems.more")).toBeInTheDocument();
     // A single-language site does not name the language.
     expect(screen.getAllByRole("listitem")[0].textContent).not.toContain("(");
+  });
+});
+
+describe("ExportSite — a history that can't be loaded", () => {
+  const badReply = () => Object.assign(new Error("Failed to get export history"), { code: "UNEXPECTED_REPLY" });
+
+  it("says so instead of 'No exports yet', offers only Try again, and Try again loads it", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    getExportHistory.mockRejectedValueOnce(badReply()).mockResolvedValue({ exports: [RECORD] });
+    render(<ExportSite />);
+
+    expect(await screen.findByText("exportSite.history.loadFailedTitle")).toBeInTheDocument();
+    expect(screen.queryByText("exportSite.history.noExportsTitle")).toBeNull();
+    expect(showToast).toHaveBeenCalledWith("exportSite.history.loadError", "error");
+    // Not offered while the history is unreadable: what it would do to it is unknown.
+    expect(screen.queryByRole("button", { name: "exportSite.creator.exportButton" })).toBeNull();
+
+    fireEvent.click(screen.getByRole("button", { name: "exportSite.history.retry" }));
+    expect(await screen.findByTestId("export-history")).toBeInTheDocument();
+    expect(screen.queryByText("exportSite.history.loadFailedTitle")).toBeNull();
+  });
+
+  it("says so when the history can't be reloaded after an export", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    getExportHistory.mockResolvedValueOnce({ exports: [] }).mockRejectedValueOnce(badReply());
+    exportProjectAPI.mockResolvedValue({
+      success: true,
+      exportRecord: RECORD,
+      structuredData: { readiness: [{ item: "logo", ok: true }], warnings: [] },
+    });
+    render(<ExportSite />);
+    fireEvent.click(await screen.findByRole("button", { name: "exportSite.creator.exportButton" }));
+
+    expect(await screen.findByText("exportSite.history.loadFailedTitle")).toBeInTheDocument();
+    expect(showToast).toHaveBeenCalledWith("exportSite.history.loadError", "error");
+    expect(screen.queryByRole("button", { name: "exportSite.creator.exportButton" })).toBeNull();
+  });
+
+  it("keeps a shown history that can't be refreshed, says it may be out of date, and Try again refreshes it", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    getExportHistory
+      .mockResolvedValueOnce({ exports: [RECORD] })
+      .mockRejectedValueOnce(badReply())
+      .mockResolvedValue({ exports: [RECORD, { version: 2, timestamp: "2026-09-16T10:00:00.000Z" }] });
+    exportProjectAPI.mockResolvedValue({
+      success: true,
+      exportRecord: { version: 2 },
+      structuredData: { readiness: [{ item: "logo", ok: true }], warnings: [] },
+    });
+    render(<ExportSite />);
+    await screen.findByTestId("export-history");
+    fireEvent.click(screen.getByRole("button", { name: "exportSite.creator.exportButton" }));
+
+    expect(await screen.findByText("exportSite.history.loadFailedStale")).toBeInTheDocument();
+    expect(screen.getByTestId("export-history")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "exportSite.history.retry" }));
+    await waitFor(() => expect(screen.queryByText("exportSite.history.loadFailedStale")).toBeNull());
   });
 });

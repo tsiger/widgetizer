@@ -385,7 +385,9 @@ Powers the link picker in `LinkInput.jsx`, the richtext internal-link picker (`R
 **Returns:**
 
 - `options` (array): Grouped option objects. Page options have `{ value: uuid, label, slug, isPage, group: "Pages", language }`; collection-item options have `{ value: uuid, label, isCollectionItem, collectionType, slugPrefix, slug, group, language }`.
-- `loading` (boolean): True while the first load is in flight.
+- `loading` (boolean): True while a load is in flight, the first one or a retry.
+- `failed` (boolean): True when the load couldn't read everything: the page list, the collection list, or some collection's items. The options keep what was read, and each picker shows `LinkTargetsNotice` ("Some pages and items couldn't be loaded…") with **Try again**; a link already set is kept as it is.
+- `retry` (function): Loads again in every mounted picker, so **Try again** in one clears the notice in all of them.
 
 **Named export:**
 
@@ -396,6 +398,7 @@ Powers the link picker in `LinkInput.jsx`, the richtext internal-link picker (`R
 - Module-level cache (1-minute TTL) keyed by project **and** its language list (adding, removing or reordering languages changes the answer under the same project id), shared across all pickers, so the many link inputs a page can host don't each refetch.
 - Single in-flight promise per project deduplicates concurrent loads.
 - A load that was in flight when the cache was invalidated still answers the picker that started it, but doesn't refill the cache, so the next picker loads afresh.
+- A load that couldn't read everything isn't cached either, so the next picker asks again.
 
 #### Used In
 

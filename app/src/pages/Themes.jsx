@@ -222,6 +222,8 @@ export default function Themes() {
   const { t } = useTranslation();
   const [themes, setThemes] = useState([]);
   const [loading, setLoading] = useState(true);
+  // The last load failed, so the list shown is empty or out of date, not what's installed.
+  const [loadFailed, setLoadFailed] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState({});
   const [updatingThemeId, setUpdatingThemeId] = useState(null);
@@ -231,17 +233,39 @@ export default function Themes() {
   const { settings } = useAppSettings();
   const maxSizeMB = settings?.export?.maxImportSizeMB || 500;
 
-  const fetchThemes = useCallback(async () => {
-    try {
-      setLoading(true);
-      const themesData = await getAllThemes();
-      setThemes(themesData);
-    } catch (error) {
-      console.error("Error fetching themes:", error);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  // The page loads its list whenever fetchThemes changes, so the latest `t` is
+  // read through a ref rather than made a dependency.
+  const tRef = useRef(t);
+  useEffect(() => {
+    tRef.current = t;
+  });
+
+  // Reloads can overlap (two theme updates finishing close together); only the
+  // newest one's result is applied, so an older one that settles late, failed
+  // or not, can't overwrite it.
+  const latestLoadRef = useRef(0);
+
+  const fetchThemes = useCallback(
+    async ({ forceRefresh } = {}) => {
+      const load = ++latestLoadRef.current;
+      const isLatest = () => load === latestLoadRef.current;
+      try {
+        setLoading(true);
+        const themesData = await getAllThemes(forceRefresh ? { forceRefresh } : undefined);
+        if (!isLatest()) return;
+        setThemes(themesData);
+        setLoadFailed(false);
+      } catch (error) {
+        if (!isLatest()) return;
+        console.error("Error fetching themes:", error);
+        setLoadFailed(true);
+        showToast(tRef.current("themes.toasts.loadError"), "error");
+      } finally {
+        if (isLatest()) setLoading(false);
+      }
+    },
+    [showToast],
+  );
 
   useEffect(() => {
     fetchThemes();
@@ -384,8 +408,30 @@ export default function Themes() {
     );
   }
 
+  const retryButton = (
+    <Button variant="secondary" onClick={() => fetchThemes({ forceRefresh: true })}>
+      {t("themes.retry")}
+    </Button>
+  );
+
+  // Not "No themes available": the themes are installed, only the list didn't
+  // load. Uploading isn't offered until it does.
+  if (loadFailed && themes.length === 0) {
+    return (
+      <PageLayout title={t("themes.title")} description={t("themes.description")}>
+        <EmptyState title={t("themes.loadFailedTitle")} description={t("themes.loadFailedDesc")} action={retryButton} />
+      </PageLayout>
+    );
+  }
+
   return (
     <PageLayout title={t("themes.title")} description={t("themes.description")}>
+      {loadFailed && (
+        <div className="mb-6 flex items-center justify-between gap-4 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          <span>{t("themes.loadFailedStale")}</span>
+          {retryButton}
+        </div>
+      )}
       <div className="mb-6">
         <FileUploader
           onUpload={onThemeDrop}

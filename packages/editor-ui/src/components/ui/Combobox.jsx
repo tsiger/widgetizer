@@ -4,7 +4,7 @@ import ComboboxOptionList from "./ComboboxOptionList.jsx";
 import ComboboxLanguageBadge from "./ComboboxLanguageBadge.jsx";
 import { useIsMultilang } from "../../stores/projectStore";
 
-export default function Combobox({ options, value, onChange, placeholder }) {
+export default function Combobox({ options, value, onChange, placeholder, notice, inputRef }) {
   const [isOpen, setIsOpen] = useState(false);
   const [displayValue, setDisplayValue] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
@@ -74,6 +74,7 @@ export default function Combobox({ options, value, onChange, placeholder }) {
     <div className="relative" ref={containerRef}>
       <div className="relative">
         <input
+          ref={inputRef}
           type="text"
           value={displayValue}
           onChange={handleInputChange}
@@ -99,6 +100,7 @@ export default function Combobox({ options, value, onChange, placeholder }) {
           options={filteredOptions}
           onSelect={handleOptionClick}
           emptyText="No matching pages found. Type to add a custom link."
+          notice={notice}
           className="z-10"
         />
       )}

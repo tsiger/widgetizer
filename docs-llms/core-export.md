@@ -14,16 +14,18 @@ The export interface is a small orchestrator (`packages/editor-ui/src/pages/Expo
 
 - `/export-site` renders inside the site workspace shell.
 - `RequireActiveProject` redirects to `/projects` if accessed without an active project.
-- Two display modes: a history view when exports exist, and an empty-state `ExportCreator` (`variant="empty"`) when none do.
+- Three display modes: a history view when exports exist, an empty-state `ExportCreator` (`variant="empty"`) when none do, and a failure card ("The export history couldn't be loaded", with **Try again** and no export controls) when the history can't be read. A failed history must not read as "No exports yet": a failed load deletes nothing, it only leaves the list unknown. **Try again** is disabled while a load runs.
+- When a reload fails while the history is showing (e.g. the refresh after an export), the rows stay, a red bar above them says the list may be out of date, with **Try again**, and the creator stays usable.
 
 ### State Hook — `useExportState` (`packages/editor-ui/src/hooks/useExportState.js`)
 
 Centralizes export state and data loading:
 
 - **Active project** (from `projectStore`) and validation
-- **Export history** loading, with a stale-response gate (`createAsyncRequestGate`) so a project switch mid-fetch is dropped safely
+- **Export history** loading through one stale-response gate (`createAsyncRequestGate`) shared by every load (opening, **Try again**, the refresh after an export): only the newest load's result is applied, and a project switch mid-fetch is dropped safely
 - **`maxVersionsToKeep`** and **`developerMode`** read from the history response (the latter gates the Issues column in the history table)
 - `loadExportHistory(projectId)` for refreshing after an export completes
+- **`historyFailed`**: the last history load failed (initial or refresh). Each failure also shows the toast "Couldn't load the export history."; a successful load clears it
 
 ### Components
 

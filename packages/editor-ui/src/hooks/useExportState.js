@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import { getExportHistory } from "../queries/exportManager";
 import { createAsyncRequestGate } from "../lib/asyncRequestGate";
 import useProjectStore from "../stores/projectStore";
@@ -19,6 +20,7 @@ import useToastStore from "../stores/toastStore";
  *   exportHistory: Array,
  *   setExportHistory: Function,
  *   loadingHistory: boolean,
+ *   historyFailed: boolean,
  *   maxVersionsToKeep: number,
  *   developerMode: boolean,
  *   loadExportHistory: (projectId: string) => Promise<void>
@@ -30,38 +32,47 @@ export default function useExportState() {
   const [skippedLanguages, setSkippedLanguages] = useState([]);
   const [exportHistory, setExportHistory] = useState([]);
   const [loadingHistory, setLoadingHistory] = useState(false);
+  // The last load failed, so the list shown is empty or out of date, not the history.
+  const [historyFailed, setHistoryFailed] = useState(false);
+  const { t } = useTranslation();
   const [maxVersionsToKeep, setMaxVersionsToKeep] = useState(10);
   const [developerMode, setDeveloperMode] = useState(false);
 
   const activeProject = useProjectStore((state) => state.activeProject);
   const showToast = useToastStore((state) => state.showToast);
 
-  // Gate for the effect-driven initial load — start/invalidate replaces the
-  // closure `stale` boolean so late responses are safely dropped.
+  // One gate for every history load (the page opening, Try again, the refresh
+  // after an export): each load takes a token, and only the newest one's result
+  // is applied, so an older load that settles late, failed or not, can't
+  // overwrite it. A project switch invalidates the gate too.
   const gateRef = useRef(createAsyncRequestGate());
 
-  // Load export history — guards against stale responses when called
-  // after an export completes and the active project has changed since.
+  // Load export history (Try again, and the refresh after an export completes).
   const loadExportHistory = async (projectId) => {
     if (!projectId) return;
 
+    const gate = gateRef.current;
+    const token = gate.start();
+    // The project check stays: an export started in one project can finish
+    // after the user switched to another.
+    const isCurrent = () => gate.isCurrent(token) && useProjectStore.getState().activeProject?.id === projectId;
     setLoadingHistory(true);
     try {
       const result = await getExportHistory(projectId);
-      // Drop the response if the active project changed during the fetch
-      if (useProjectStore.getState().activeProject?.id !== projectId) return;
+      if (!isCurrent()) return;
       setExportHistory(result.exports || []);
       if (result.maxVersionsToKeep) {
         setMaxVersionsToKeep(result.maxVersionsToKeep);
       }
       setDeveloperMode(Boolean(result.developerMode));
+      setHistoryFailed(false);
     } catch (error) {
-      if (useProjectStore.getState().activeProject?.id !== projectId) return;
+      if (!isCurrent()) return;
       console.error("Failed to load export history:", error);
+      setHistoryFailed(true);
+      showToast(t("exportSite.history.loadError"), "error");
     } finally {
-      if (useProjectStore.getState().activeProject?.id === projectId) {
-        setLoadingHistory(false);
-      }
+      if (isCurrent()) setLoadingHistory(false);
     }
   };
 
@@ -72,6 +83,7 @@ export default function useExportState() {
       setStructuredDataSummary(null);
       setSkippedLanguages([]);
       setLoadingHistory(false);
+      setHistoryFailed(false);
       return;
     }
 
@@ -88,17 +100,20 @@ export default function useExportState() {
           setMaxVersionsToKeep(result.maxVersionsToKeep);
         }
         setDeveloperMode(Boolean(result.developerMode));
+        setHistoryFailed(false);
       })
       .catch((err) => {
         if (!gate.isCurrent(token)) return;
         console.error("Failed to fetch export history:", err);
-        showToast("Could not load active project details.", "error");
+        setHistoryFailed(true);
+        showToast(t("exportSite.history.loadError"), "error");
       })
       .finally(() => {
         if (gate.isCurrent(token)) setLoadingHistory(false);
       });
 
     return () => gate.invalidate();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- `t` changing must not refetch the history
   }, [activeProject?.id, showToast]);
 
   return {
@@ -112,6 +127,7 @@ export default function useExportState() {
     exportHistory,
     setExportHistory,
     loadingHistory,
+    historyFailed,
     maxVersionsToKeep,
     developerMode,
     loadExportHistory,

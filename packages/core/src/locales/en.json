@@ -495,7 +495,10 @@
       "importNewVideo": "Upload a video",
       "fileFormats": "PDF, MP3, MP4",
       "videoFormats": "MP4",
-      "browseLibrary": "Choose from library"
+      "browseLibrary": "Choose from library",
+      "notInLibrary": "Not in the media library. Choose another file or remove it.",
+      "detailsFailed": "This file's details couldn't be loaded.",
+      "retry": "Try again"
     },
     "mediaSelector": {
       "title": "Select Media",
@@ -509,6 +512,10 @@
       "importNew": "Upload image",
       "uploaderTitle": "Upload New Media",
       "uploaderDesc": "Select files to add to your library"
+    },
+    "linkTargets": {
+      "loadFailed": "Some pages and items couldn't be loaded, so they're missing from this list. You can still type a URL.",
+      "retry": "Try again"
     }
   },
   "settings": {
@@ -914,6 +921,11 @@
       "loading": "Loading export history...",
       "noExportsTitle": "No exports yet",
       "noExportsDesc": "Create your first export above!",
+      "loadFailedTitle": "The export history couldn't be loaded",
+      "loadFailedDesc": "Your earlier exports are still there; only the list didn't load. Try again to see them and to export.",
+      "loadFailedStale": "The export history couldn't be refreshed, so it may be out of date.",
+      "loadError": "Couldn't load the export history.",
+      "retry": "Try again",
       "headers": {
         "version": "Version",
         "created": "Created",
@@ -1015,6 +1027,10 @@
     "active": "Active",
     "emptyTitle": "No themes available",
     "emptyDesc": "Upload a theme using the area above to get started",
+    "loadFailedTitle": "The themes couldn't be loaded",
+    "loadFailedDesc": "Your installed themes are still there; only the list didn't load. Try again to see them and to upload a theme.",
+    "loadFailedStale": "The theme list couldn't be refreshed, so it may be out of date.",
+    "retry": "Try again",
     "updateAvailable": "Update available",
     "buttons": {
       "rebuildThemes": "Rebuild Themes",
@@ -1029,7 +1045,8 @@
       "rebuildSuccess": "Rebuilt {{count}} theme(s) successfully",
       "rebuildError": "Failed to rebuild themes",
       "updateSuccess": "Theme updated successfully!",
-      "updateError": "Failed to update theme"
+      "updateError": "Failed to update theme",
+      "loadError": "Couldn't load the themes."
     }
   },
   "pagePreview": {

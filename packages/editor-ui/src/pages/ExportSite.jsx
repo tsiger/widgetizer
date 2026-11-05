@@ -3,6 +3,9 @@ import PageLayout from "../components/layout/PageLayout";
 import ExportCreator from "../components/export/ExportCreator";
 import ExportHistoryTable from "../components/export/ExportHistoryTable";
 import useExportState from "../hooks/useExportState";
+import Button from "../components/ui/Button";
+import EmptyState from "../components/ui/EmptyState";
+import { Package } from "lucide-react";
 
 export default function ExportSite() {
   const { t } = useTranslation();
@@ -17,11 +20,17 @@ export default function ExportSite() {
     exportHistory,
     setExportHistory,
     loadingHistory,
+    historyFailed,
     maxVersionsToKeep,
     developerMode,
     loadExportHistory,
   } = useExportState();
   const hasExports = exportHistory.length > 0;
+  const retryButton = (
+    <Button variant="secondary" disabled={loadingHistory} onClick={() => loadExportHistory(activeProject?.id)}>
+      {t("exportSite.history.retry")}
+    </Button>
+  );
 
   // The first export flips the page from the empty-state branch to the history
   // branch, remounting ExportCreator, so its results live here rather than in it.
@@ -42,6 +51,13 @@ export default function ExportSite() {
         <div className="space-y-6">
           <ExportCreator {...creatorProps} />
 
+          {historyFailed && (
+            <div className="flex items-center justify-between gap-4 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+              <span>{t("exportSite.history.loadFailedStale")}</span>
+              {retryButton}
+            </div>
+          )}
+
           <ExportHistoryTable
             exportHistory={exportHistory}
             loadingHistory={loadingHistory}
@@ -51,6 +67,15 @@ export default function ExportSite() {
             setExportHistory={setExportHistory}
           />
         </div>
+      ) : historyFailed ? (
+        // Not "No exports yet": the exports are there, only the list didn't load.
+        // Exporting isn't offered until it does.
+        <EmptyState
+          icon={<Package size={48} />}
+          title={t("exportSite.history.loadFailedTitle")}
+          description={t("exportSite.history.loadFailedDesc")}
+          action={retryButton}
+        />
       ) : (
         <ExportCreator
           {...creatorProps}

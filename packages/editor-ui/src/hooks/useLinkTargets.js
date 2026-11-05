@@ -15,7 +15,11 @@ import useProjectStore, { useDefaultLanguage, useExtraLanguages } from "../store
  * stored ref is a uuid and the rendered href is re-derived at render time, so a
  * briefly-stale label never produces a wrong link.
  *
- * @returns {{ options: Array, loading: boolean }}
+ * A load that couldn't read everything (the page list, or some collection's
+ * items) reports `failed`, keeps what it did read, and isn't cached, so the next
+ * picker asks again; `retry` asks again now.
+ *
+ * @returns {{ options: Array, loading: boolean, failed: boolean, retry: () => void }}
  */
 
 const CACHE_DURATION = 60000; // 1 minute
@@ -53,16 +57,25 @@ export function invalidateLinkTargetsCache(projectId) {
   }
 }
 
+// Every mounted picker, so Try again in one refreshes them all: they share one
+// load, and a failed load isn't cached for the others to pick up.
+const retryListeners = new Set();
+function retryAll() {
+  for (const listener of retryListeners) listener();
+}
+
 /** Case-insensitive label sort for a predictable, human-friendly picker. */
 const byLabel = (a, b) => String(a.label).localeCompare(String(b.label), undefined, { sensitivity: "base" });
 
 const groupLabel = (schema) => schema.displayNamePlural || schema.displayName || schema.type;
 
+/** @returns {Promise<{ options: Array, complete: boolean }>} rejects when the page list can't be read */
 async function loadTargets(languages, defaultLanguage) {
   // Every language, because a page may exist in only one of them (§4a) — grouped
   // language-major so a picker showing them all reads as one block per language.
   const pages = await getAllPages();
 
+  let complete = true;
   let schemas = [];
   try {
     // Collection groups by display name A–Z, items A–Z within each group.
@@ -70,6 +83,7 @@ async function loadTargets(languages, defaultLanguage) {
     schemas.sort((a, b) => byLabel({ label: groupLabel(a) }, { label: groupLabel(b) }));
   } catch (err) {
     console.error("Failed to load collection schemas for link targets:", err);
+    complete = false;
   }
 
   const options = [];
@@ -107,11 +121,12 @@ async function loadTargets(languages, defaultLanguage) {
         );
       } catch (err) {
         console.error(`Failed to load ${schema.type} items for link targets:`, err);
+        complete = false;
       }
     }
   }
 
-  return options;
+  return { options, complete };
 }
 
 export default function useLinkTargets() {
@@ -124,12 +139,21 @@ export default function useLinkTargets() {
 
   const [options, setOptions] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [failed, setFailed] = useState(false);
+  const [attempt, setAttempt] = useState(0);
+
+  useEffect(() => {
+    const listener = () => setAttempt((n) => n + 1);
+    retryListeners.add(listener);
+    return () => retryListeners.delete(listener);
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
 
     if (!activeProjectId) {
       setOptions([]);
+      setFailed(false);
       setLoading(false);
       return undefined;
     }
@@ -138,6 +162,7 @@ export default function useLinkTargets() {
     const cached = cache.get(key);
     if (cached && Date.now() - cached.time < CACHE_DURATION) {
       setOptions(cached.data);
+      setFailed(false);
       setLoading(false);
       return undefined;
     }
@@ -149,9 +174,9 @@ export default function useLinkTargets() {
       const load = (async () => {
         try {
           const languages = languageKey.split(",");
-          const data = await loadTargets(languages, languages[0]);
-          if (generation === startedIn) cache.set(key, { data, time: Date.now() });
-          return data;
+          const result = await loadTargets(languages, languages[0]);
+          if (result.complete && generation === startedIn) cache.set(key, { data: result.options, time: Date.now() });
+          return result;
         } finally {
           // An invalidation may have dropped this load and a newer one taken its key.
           if (inflight.get(key) === load) inflight.delete(key);
@@ -162,11 +187,16 @@ export default function useLinkTargets() {
     }
 
     promise
-      .then((data) => {
-        if (!cancelled) setOptions(data);
+      .then((result) => {
+        if (cancelled) return;
+        setOptions(result.options);
+        setFailed(!result.complete);
       })
-      .catch(() => {
-        if (!cancelled) setOptions([]);
+      .catch((err) => {
+        if (cancelled) return;
+        console.error("Failed to load link targets:", err);
+        setOptions([]);
+        setFailed(true);
       })
       .finally(() => {
         if (!cancelled) setLoading(false);
@@ -175,7 +205,7 @@ export default function useLinkTargets() {
     return () => {
       cancelled = true;
     };
-  }, [activeProjectId, languageKey]);
+  }, [activeProjectId, languageKey, attempt]);
 
-  return { options, loading };
+  return { options, loading, failed, retry: retryAll };
 }

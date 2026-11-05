@@ -63,3 +63,29 @@ describe("Combobox — grouped options", () => {
     expect(screen.getByText("Alpha")).toBeTruthy();
   });
 });
+
+describe("Combobox — a notice about the list", () => {
+  const notice = (onRetry) => (
+    <div role="alert">
+      list incomplete <button onClick={onRetry}>retry</button>
+    </div>
+  );
+
+  it("takes the place of the no-matches text when the list is empty", () => {
+    render(<Combobox options={[]} value="" onChange={vi.fn()} placeholder="Select…" notice={notice(vi.fn())} />);
+    fireEvent.focus(screen.getByPlaceholderText("Select…"));
+    expect(screen.getByRole("alert")).toHaveTextContent("list incomplete");
+    expect(screen.queryByText(/No matching pages found/)).toBeNull();
+  });
+
+  it("sits above the options it did get, and its button works with the list open", () => {
+    const onRetry = vi.fn();
+    render(<Combobox options={GROUPED} value="" onChange={vi.fn()} placeholder="Select…" notice={notice(onRetry)} />);
+    fireEvent.focus(screen.getByPlaceholderText("Select…"));
+    const alert = screen.getByRole("alert");
+    expect(alert.compareDocumentPosition(screen.getByText("About")) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "retry" }));
+    expect(onRetry).toHaveBeenCalledTimes(1);
+    expect(screen.getByText("About")).toBeTruthy();
+  });
+});

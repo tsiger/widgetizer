@@ -5,7 +5,7 @@
  * listing is per language, so it is asked once per language.
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { cleanup, render, screen, waitFor } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 
 const getAllPages = vi.fn();
 const getCollectionSchemas = vi.fn();
@@ -21,9 +21,18 @@ const { default: useLinkTargets, invalidateLinkTargetsCache } = await import("..
 const { default: useProjectStore } = await import("../../stores/projectStore");
 
 function Probe() {
-  const { options, loading } = useLinkTargets();
+  const { options, loading, failed, retry } = useLinkTargets();
   if (loading) return <div>loading</div>;
-  return <div data-testid="targets">{options.map((o) => `${o.label}:${o.language}`).join("|")}</div>;
+  return (
+    <>
+      <div data-testid="targets">{options.map((o) => `${o.label}:${o.language}`).join("|")}</div>
+      {failed && (
+        <button type="button" onClick={retry}>
+          failed
+        </button>
+      )}
+    </>
+  );
 }
 
 const targets = () => screen.getByTestId("targets").textContent.split("|");
@@ -183,6 +192,58 @@ describe("useLinkTargets across languages", () => {
 
     await waitFor(() => expect(screen.queryByTestId("targets")).toBeTruthy());
     expect(targets()).toEqual(["About:en", "Launch day:en", "Sxetika:el"]);
+    consoleErrorSpy.mockRestore();
+  });
+});
+
+describe("useLinkTargets when targets can't be loaded", () => {
+  it("reports a page list that failed, and Try again loads it", async () => {
+    setSiteLanguages([]);
+    const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    getAllPages.mockRejectedValueOnce(Object.assign(new Error("Failed to get pages"), { code: "UNEXPECTED_REPLY" }));
+    render(<Probe />);
+
+    fireEvent.click(await screen.findByRole("button", { name: "failed" }));
+    await waitFor(() => expect(targets()).toEqual(["About:en", "Launch day:en"]));
+    expect(screen.queryByRole("button", { name: "failed" })).toBeNull();
+    consoleErrorSpy.mockRestore();
+  });
+
+  it("reports a load that missed some items, and doesn't keep it for the next picker", async () => {
+    setSiteLanguages([]);
+    const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    getCollectionItems.mockRejectedValueOnce(new Error("boom"));
+    const first = render(<Probe />);
+
+    expect(await screen.findByRole("button", { name: "failed" })).toBeTruthy();
+    expect(targets()).toEqual(["About:en"]);
+    first.unmount();
+
+    render(<Probe />);
+    await waitFor(() => expect(targets()).toEqual(["About:en", "Launch day:en"]));
+    expect(screen.queryByRole("button", { name: "failed" })).toBeNull();
+    consoleErrorSpy.mockRestore();
+  });
+
+  it("Try again in one picker refreshes every picker on screen", async () => {
+    setSiteLanguages([]);
+    const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    getAllPages.mockRejectedValueOnce(new Error("Failed to get pages"));
+    render(
+      <>
+        <Probe />
+        <Probe />
+      </>,
+    );
+
+    const buttons = await screen.findAllByRole("button", { name: "failed" });
+    expect(buttons).toHaveLength(2);
+    fireEvent.click(buttons[0]);
+    await waitFor(() => expect(screen.queryAllByRole("button", { name: "failed" })).toHaveLength(0));
+    expect(screen.getAllByTestId("targets").map((el) => el.textContent)).toEqual([
+      "About:en|Launch day:en",
+      "About:en|Launch day:en",
+    ]);
     consoleErrorSpy.mockRestore();
   });
 });

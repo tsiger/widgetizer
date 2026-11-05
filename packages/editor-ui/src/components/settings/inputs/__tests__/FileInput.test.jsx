@@ -152,3 +152,110 @@ describe("FileInput in its default file mode", () => {
     expect(showToast).toHaveBeenCalledWith("components.fileInput.selectFileOnly", "error");
   });
 });
+
+describe("FileInput — a stored file is always shown", () => {
+  it("shows a file the library has by its library name, with no note", async () => {
+    getProjectMedia.mockReset().mockResolvedValue({ files: [{ ...MP3, filename: "Song (master).mp3" }] });
+    render(<FileInput id="f" value="/uploads/files/song.mp3" onChange={vi.fn()} />);
+    expect(await screen.findByText("Song (master).mp3")).toBeTruthy();
+    expect(screen.queryByText("components.fileInput.notInLibrary")).toBeNull();
+    expect(screen.queryByText("components.fileInput.detailsFailed")).toBeNull();
+  });
+
+  it("shows a stored file the library doesn't have, says so, and still lets it be removed", async () => {
+    const onChange = vi.fn();
+    render(<FileInput id="f" value="/uploads/files/missing-track.mp3" onChange={onChange} />);
+
+    expect(await screen.findByText("components.fileInput.notInLibrary")).toBeTruthy();
+    expect(screen.getByText("missing-track.mp3")).toBeTruthy();
+    expect(screen.queryByText("components.fileInput.importNew")).toBeNull();
+    fireEvent.click(screen.getByTitle("components.fileInput.remove"));
+    expect(onChange).toHaveBeenLastCalledWith("");
+  });
+
+  it("shows the stored file when the library can't be read, and Try again asks the server again", async () => {
+    getProjectMedia
+      .mockReset()
+      .mockRejectedValueOnce(Object.assign(new Error("Failed to get media files"), { code: "UNEXPECTED_REPLY" }))
+      .mockResolvedValue({ files: LIBRARY });
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    render(<FileInput id="f" value="/uploads/files/song.mp3" onChange={vi.fn()} />);
+
+    expect(await screen.findByText("components.fileInput.detailsFailed")).toBeTruthy();
+    expect(screen.getByText("song.mp3")).toBeTruthy();
+    expect(screen.queryByText("components.fileInput.importNew")).toBeNull();
+
+    fireEvent.click(screen.getByRole("button", { name: "components.fileInput.retry" }));
+    await waitFor(() => expect(screen.queryByText("components.fileInput.detailsFailed")).toBeNull());
+    expect(getProjectMedia).toHaveBeenLastCalledWith("p1", true);
+    expect(screen.queryByText("components.fileInput.notInLibrary")).toBeNull();
+  });
+
+  it("offers an upload when nothing is stored", () => {
+    render(<FileInput id="f" value="" onChange={vi.fn()} />);
+    expect(screen.getByText("components.fileInput.importNew")).toBeTruthy();
+  });
+
+  it("asks the server again before calling a file missing, so a list read before an upload doesn't hide it", async () => {
+    // The first read is the cached list from before the upload; the fresh one has the file.
+    getProjectMedia.mockReset().mockResolvedValueOnce({ files: [PDF] }).mockResolvedValueOnce({ files: [PDF, MP3] });
+    render(<FileInput id="f" value="/uploads/files/song.mp3" onChange={vi.fn()} />);
+
+    await waitFor(() => expect(getProjectMedia).toHaveBeenCalledTimes(2));
+    expect(getProjectMedia).toHaveBeenLastCalledWith("p1", true);
+    await waitFor(() => expect(screen.queryByText("components.fileInput.notInLibrary")).toBeNull());
+    expect(screen.getByText("song.mp3")).toBeTruthy();
+  });
+
+  it("drops the previous file's note as soon as another file is chosen", async () => {
+    let resolveSecond;
+    getProjectMedia
+      .mockReset()
+      .mockResolvedValueOnce({ files: LIBRARY })
+      .mockResolvedValueOnce({ files: LIBRARY })
+      .mockReturnValueOnce(new Promise((resolve) => (resolveSecond = resolve)));
+    const { rerender } = render(<FileInput id="f" value="/uploads/files/missing-track.mp3" onChange={vi.fn()} />);
+    expect(await screen.findByText("components.fileInput.notInLibrary")).toBeTruthy();
+
+    rerender(<FileInput id="f" value="/uploads/files/brochure.pdf" onChange={vi.fn()} />);
+    expect(screen.queryByText("components.fileInput.notInLibrary")).toBeNull();
+    expect(screen.getByText("brochure.pdf")).toBeTruthy();
+    resolveSecond({ files: LIBRARY });
+    await waitFor(() => expect(screen.queryByText("components.fileInput.notInLibrary")).toBeNull());
+  });
+
+  it("drops the failure note while Try again is loading", async () => {
+    let resolveRetry;
+    getProjectMedia
+      .mockReset()
+      .mockRejectedValueOnce(new Error("Failed to get media files"))
+      .mockReturnValueOnce(new Promise((resolve) => (resolveRetry = resolve)));
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    render(<FileInput id="f" value="/uploads/files/song.mp3" onChange={vi.fn()} />);
+
+    fireEvent.click(await screen.findByRole("button", { name: "components.fileInput.retry" }));
+    expect(screen.queryByText("components.fileInput.detailsFailed")).toBeNull();
+    expect(screen.getByText("song.mp3")).toBeTruthy();
+    resolveRetry({ files: LIBRARY });
+    await waitFor(() => expect(getProjectMedia).toHaveBeenCalledTimes(2));
+  });
+
+  it("still checks again before calling a later file missing, after an earlier Try again", async () => {
+    getProjectMedia
+      .mockReset()
+      .mockRejectedValueOnce(new Error("Failed to get media files"))
+      .mockRejectedValueOnce(new Error("Failed to get media files"))
+      // The later file: a list from before its upload, then a fresh one with it.
+      .mockResolvedValueOnce({ files: [PDF] })
+      .mockResolvedValueOnce({ files: [PDF, MP3] });
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    const { rerender } = render(<FileInput id="f" value="/uploads/files/brochure.pdf" onChange={vi.fn()} />);
+    fireEvent.click(await screen.findByRole("button", { name: "components.fileInput.retry" }));
+    await screen.findByRole("button", { name: "components.fileInput.retry" });
+
+    rerender(<FileInput id="f" value="/uploads/files/song.mp3" onChange={vi.fn()} />);
+    await waitFor(() => expect(getProjectMedia).toHaveBeenCalledTimes(4));
+    await waitFor(() => expect(screen.queryByText("components.fileInput.notInLibrary")).toBeNull());
+    expect(screen.queryByText("components.fileInput.detailsFailed")).toBeNull();
+  });
+});
