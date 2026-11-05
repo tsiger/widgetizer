@@ -140,6 +140,8 @@ const { actorScopedRouter, projectScopedRouter, mediaFileRouter, previewRouter }
 
 `req.adapters` is attached **per-router** (not app-wide), so each router is self-sufficient wherever it is mounted.
 
+JSON replies from `actorScopedRouter` and `projectScopedRouter` carry `Cache-Control: no-store` unless the handler sets its own caching (`middleware/noStoreJson.js`), so the browser never hands the editor a stored copy. Non-JSON replies (theme assets, export downloads) and the media file and preview routers cache as usual. An embedding app gets this wherever it mounts the two routers; a request neither router answers leaves them unmarked, so the app's own routes after them keep their caching.
+
 ### `createEditorApp({ adapters, plugins })`
 
 Wires the `mediaFileRouter` at `/api/media` (ahead of the others), both scoped routers under `/api` and the `previewRouter` at `/`, plus helmet, cors, per-route JSON body limits, static UI serving, and the error handler. This is what the OSS shell calls.
@@ -169,6 +171,7 @@ Lives in builder-server. It delegates to `req.adapters.scopeResolver.resolveScop
 
 - `lib/apiBase.js` — module singleton `_apiBase` (default `/api`), with `setApiBase` / `getApiBase`.
 - `lib/apiFetch.js` — `editorFetch(path, opts)` calls `apiFetch(getApiBase() + path)` and injects the `X-Project-Id` header. Query managers pass project-relative paths; the base is resolved at call time.
+- `apiFetchJson` / `editorFetchJson` take an `expect` option, `"array"` or `"object"`: a successful reply of another shape (an empty body, an HTML page from something in front of the server, a list where an object belongs) is rejected as an `ApiError` with code `UNEXPECTED_REPLY` and the call's fallback message, so the screen's load-error path shows it. Every editor GET query names its shape, except the active-project read, whose reply is `null` when there are no projects.
 
 ### Mutation-success notification
 

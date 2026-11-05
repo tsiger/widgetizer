@@ -103,12 +103,35 @@ export async function throwApiError(response, fallbackMessage = "Request failed"
   });
 }
 
-export async function parseJsonResponse(response, { fallbackMessage = "Request failed", emptyValue = null } = {}) {
+const REPLY_SHAPES = {
+  array: (data) => Array.isArray(data),
+  object: (data) => data !== null && typeof data === "object" && !Array.isArray(data),
+};
+
+/**
+ * `expect` ("array" or "object") names the shape a successful reply must have.
+ * A reply of any other shape (an empty body, an HTML page from something in
+ * front of the server, a list where an object belongs) fails like a failed
+ * request, with code `UNEXPECTED_REPLY`, so the caller's load-error path shows
+ * it instead of a screen treating it as empty content.
+ */
+export async function parseJsonResponse(
+  response,
+  { fallbackMessage = "Request failed", emptyValue = null, expect } = {},
+) {
   if (!response.ok) {
     await throwApiError(response, fallbackMessage);
   }
 
   const data = await readResponseBody(response);
+  if (expect && !REPLY_SHAPES[expect](data)) {
+    throw new ApiError(fallbackMessage, {
+      status: response.status,
+      statusText: response.statusText,
+      code: "UNEXPECTED_REPLY",
+      data,
+    });
+  }
   return data ?? emptyValue;
 }
 

@@ -18,6 +18,7 @@ import { apiFetchJson, rethrowQueryError } from "../lib/apiFetch";
 export async function getAppSettings() {
   try {
     return await apiFetchJson("/api/settings", {}, {
+      expect: "object",
       fallbackMessage: "Failed to fetch application settings",
     });
   } catch (error) {

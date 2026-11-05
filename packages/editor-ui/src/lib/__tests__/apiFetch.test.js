@@ -219,4 +219,51 @@ describe("apiFetch", () => {
 
     expect(response.ok).toBe(true);
   });
+
+  describe("a reply of the wrong shape is a failed request", () => {
+    const reply = (body) => ({ ok: true, status: 200, statusText: "OK", text: vi.fn().mockResolvedValue(body) });
+
+    for (const [label, body] of [
+      ["an empty body", ""],
+      ["an HTML page", "<html>Sign in</html>"],
+      ["an object", JSON.stringify({ pages: [] })],
+      ["null", "null"],
+    ]) {
+      it(`rejects ${label} where a list is expected`, async () => {
+        fetchMock.mockResolvedValue(reply(body));
+        await expect(apiFetchJson("/api/pages", {}, { fallbackMessage: "Failed to get pages", expect: "array" })).rejects.toMatchObject({
+          name: "ApiError",
+          message: "Failed to get pages",
+          code: "UNEXPECTED_REPLY",
+          status: 200,
+        });
+      });
+    }
+
+    for (const [label, body] of [
+      ["an empty body", ""],
+      ["a list", "[]"],
+      ["a string", JSON.stringify("ok")],
+    ]) {
+      it(`rejects ${label} where an object is expected`, async () => {
+        fetchMock.mockResolvedValue(reply(body));
+        await expect(apiFetchJson("/api/settings", {}, { fallbackMessage: "Failed to get settings", expect: "object" })).rejects.toMatchObject({
+          code: "UNEXPECTED_REPLY",
+          message: "Failed to get settings",
+        });
+      });
+    }
+
+    it("passes a reply of the expected shape through", async () => {
+      fetchMock.mockResolvedValue(reply(JSON.stringify([{ id: "home" }])));
+      await expect(apiFetchJson("/api/pages", {}, { expect: "array" })).resolves.toEqual([{ id: "home" }]);
+      fetchMock.mockResolvedValue(reply(JSON.stringify({ count: 2 })));
+      await expect(apiFetchJson("/api/x", {}, { expect: "object" })).resolves.toEqual({ count: 2 });
+    });
+
+    it("without an expected shape, keeps passing any reply through", async () => {
+      fetchMock.mockResolvedValue(reply(""));
+      await expect(apiFetchJson("/api/pages/home", { method: "DELETE" })).resolves.toBeNull();
+    });
+  });
 });

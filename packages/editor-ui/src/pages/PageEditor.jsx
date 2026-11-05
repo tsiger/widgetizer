@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 import WidgetList from "../components/pageEditor/WidgetList";
@@ -8,10 +8,11 @@ import SettingsPanel from "../components/pageEditor/SettingsPanel";
 import EditorTopBar from "../components/pageEditor/EditorTopBar";
 import ThemeSelector from "../components/pageEditor/ThemeSelector";
 import LoadingSpinner from "../components/ui/LoadingSpinner";
+import Button from "../components/ui/Button";
 
 import usePageStore from "../stores/pageStore";
 import useThemeStore from "../stores/themeStore";
-import useProjectStore from "../stores/projectStore";
+import useProjectStore, { useIsMultilang } from "../stores/projectStore";
 import useWidgetStore from "../stores/widgetStore";
 import useAutoSave from "../stores/saveStore";
 import useToastStore from "../stores/toastStore";
@@ -21,6 +22,8 @@ import useDeleteKeyShortcut from "../hooks/useDeleteKeyShortcut";
 import { useThemeLocale } from "../hooks/useThemeLocale";
 import { mediaUsageStaleMessage } from "../utils/mediaUsageDisplay";
 import { announceIdRepairs, dismissIdRepairs } from "../lib/idRepairNotice";
+import { useEditorPath } from "../lib/routeBase.jsx";
+import { pagesListHref } from "../lib/contentRoutes";
 
 export default function PageEditor() {
   const { t } = useTranslation();
@@ -44,6 +47,10 @@ export default function PageEditor() {
     setSelectedGlobalWidgetId,
     selectedThemeGroup,
   } = useWidgetStore();
+  const widgetsLoadError = useWidgetStore((state) => !state.loading && state.error);
+  const navigate = useNavigate();
+  const editorPath = useEditorPath();
+  const isMultilang = useIsMultilang();
 
   // Add navigation guard
   useNavigationGuard();
@@ -160,6 +167,29 @@ export default function PageEditor() {
     return (
       <div className="flex h-full items-center justify-center">
         <p className="text-red-500">{t("pageEditor.error", { message: error })}</p>
+      </div>
+    );
+  }
+
+  // Without the schemas there are no settings and nothing to insert, and the
+  // editor would look as if the page had no widgets.
+  if (widgetsLoadError) {
+    return (
+      <div className="flex h-full flex-col items-center justify-center gap-4" role="alert">
+        <p className="text-red-500">{t("pageEditor.widgetsLoadError")}</p>
+        <div className="flex gap-2">
+          <Button
+            variant="secondary"
+            onClick={() =>
+              navigate(editorPath(pagesListHref(isMultilang ? searchParams.get("language") || undefined : undefined)))
+            }
+          >
+            {t("pageEditor.toolbar.backToPages")}
+          </Button>
+          <Button variant="primary" onClick={() => useWidgetStore.getState().loadSchemas(searchParams.get("language") || "")}>
+            {t("pageEditor.widgetsLoadRetry")}
+          </Button>
+        </div>
       </div>
     );
   }

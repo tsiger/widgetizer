@@ -305,11 +305,12 @@ Used in `PageForm.jsx` and `CollectionItemForm.jsx`.
 
 ## Media Management Hooks
 
-The media library is built from four cooperating hooks. They are documented in full in [Media Library](core-media.md); the one-line roles:
+The media library is built from five cooperating hooks. They are documented in full in [Media Library](core-media.md); the one-line roles:
 
 - `useMediaState` (`packages/editor-ui/src/hooks/useMediaState.js`) — core state, data loading, view-mode persistence, and search filtering for the media library.
 - `useMediaUpload` (`packages/editor-ui/src/hooks/useMediaUpload.js`) — file upload operations with per-file XHR progress and toast feedback; uploaded files go to the top of the list (and the shared media cache), matching the library's newest-first order.
 - `useMediaSelection` (`packages/editor-ui/src/hooks/useMediaSelection.js`) — file selection and deletion workflows, with usage-protection validation via `useConfirmationModal`.
+- `useMediaUsageTitles` (`packages/editor-ui/src/hooks/useMediaUsageTitles.js`) — the titles the "Used in" labels show, from the page list and every collection's items. When the page list can't be loaded it keeps only the global labels and calls `onError`, and the library shows a toast saying the labels show raw references.
 - `useMediaMetadata` (`packages/editor-ui/src/hooks/useMediaMetadata.js`) — metadata-edit drawer state and saving (alt text, title, caption; these three are per language, sent with `?language=`) plus image viewing.
 
 See [Media Library](core-media.md) for the full architecture, API, and usage-protection rules.

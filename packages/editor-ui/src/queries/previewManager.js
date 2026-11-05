@@ -665,6 +665,7 @@ export async function getGlobalWidgets(language) {
   const query = language ? `?language=${encodeURIComponent(language)}` : "";
   try {
     return await editorFetchJson(`/preview/global-widgets${query}`, {}, {
+      expect: "object",
       fallbackMessage: "Failed to fetch global widgets",
     });
   } catch (error) {
@@ -716,6 +717,7 @@ export async function getProjectWidgets(language) {
     // language, so the schemas are fetched for the language being edited.
     const query = language ? `?language=${encodeURIComponent(language)}` : "";
     return await editorFetchJson(`/widgets${query}`, {}, {
+      expect: "array",
       fallbackMessage: "Failed to get project widgets",
     });
   } catch (error) {

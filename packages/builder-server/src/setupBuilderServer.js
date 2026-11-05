@@ -19,6 +19,7 @@ import coreRoutes from "./routes/core.js";
 import { renderPreviewToken } from "./controllers/previewController.js";
 import { resolveActiveProject } from "./middleware/resolveActiveProject.js";
 import { standardJsonParser } from "./middleware/jsonParser.js";
+import { noStoreJson, endNoStoreJson } from "./middleware/noStoreJson.js";
 
 /**
  * The adapter keys every shell must supply. setupBuilderServer fails loudly when
@@ -80,13 +81,16 @@ export function setupBuilderServer({ adapters, plugins = [] } = {}) {
 
   const actorScopedRouter = express.Router();
   attachAdapters(actorScopedRouter, adapters);
+  actorScopedRouter.use(noStoreJson);
   actorScopedRouter.use("/projects", projectRoutes);
   actorScopedRouter.use("/themes", themeRoutes);
   actorScopedRouter.use("/settings", appSettingsRoutes);
   actorScopedRouter.use("/core", coreRoutes);
+  actorScopedRouter.use(endNoStoreJson);
 
   const projectScopedRouter = express.Router();
   attachAdapters(projectScopedRouter, adapters);
+  projectScopedRouter.use(noStoreJson);
   projectScopedRouter.use("/pages", pagesRoutes);
   projectScopedRouter.use("/menus", menusRoutes);
   projectScopedRouter.use("/media", mediaRoutes);
@@ -109,6 +113,7 @@ export function setupBuilderServer({ adapters, plugins = [] } = {}) {
       projectScopedRouter[route.method.toLowerCase()](route.path, standardJsonParser, resolveActiveProject, route.handler);
     }
   }
+  projectScopedRouter.use(endNoStoreJson);
 
   const previewRouter = express.Router();
   attachAdapters(previewRouter, adapters);

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Image } from "lucide-react";
 import { API_URL } from "../lib/config";
@@ -18,9 +18,7 @@ import useMediaUpload from "../hooks/useMediaUpload";
 import useMediaSelection from "../hooks/useMediaSelection";
 import useMediaMetadata from "../hooks/useMediaMetadata";
 import useAppSettings from "../hooks/useAppSettings";
-import { getAllPages } from "../queries/pageManager";
-import { getCollectionSchemas, getCollectionItems } from "../queries/collectionManager";
-import { buildUsageTitleMap } from "../utils/mediaUsageDisplay";
+import useMediaUsageTitles from "../hooks/useMediaUsageTitles";
 import { useDefaultLanguage, useExtraLanguages } from "../stores/projectStore";
 import { showRejectedFiles } from "../utils/uploadFeedback";
 import { MEDIA_ACCEPT, mapDropzoneRejections } from "../utils/uploadValidation";
@@ -31,7 +29,6 @@ export default function Media() {
   // Use our custom hooks to manage different aspects of media functionality
   const mediaState = useMediaState();
   const maxSizeMB = settings?.media?.maxFileSizeMB ?? 50;
-  const [usageTitleMap, setUsageTitleMap] = useState({});
   const defaultLanguage = useDefaultLanguage();
   const languages = useExtraLanguages();
 
@@ -109,41 +106,12 @@ export default function Media() {
     ? API_URL(`/api/media/projects/${mediaState.activeProject?.id}${currentLightboxImage.path}`)
     : null;
 
-  useEffect(() => {
-    async function loadUsageTitles() {
-      if (!mediaState.activeProject) {
-        setUsageTitleMap({});
-        return;
-      }
-
-      try {
-        // Pages + collections feed the "Used in" labels. A collections failure
-        // must not blank the page titles, so it degrades to [] independently.
-        // Pages come back in every language at once; items are listed one
-        // language at a time, so each language is asked for.
-        const itemsIn = (type, language) =>
-          getCollectionItems(type, language ? { language } : undefined)
-            .then((items) =>
-              Array.isArray(items) ? items.map((item) => ({ ...item, language: item.language || language })) : [],
-            )
-            .catch(() => []);
-        const [pages, schemas] = await Promise.all([getAllPages(), getCollectionSchemas().catch(() => [])]);
-        const collections = await Promise.all(
-          schemas.map(async (schema) => ({
-            schema,
-            items: (
-              await Promise.all([itemsIn(schema.type), ...languages.map((code) => itemsIn(schema.type, code))])
-            ).flat(),
-          })),
-        );
-        setUsageTitleMap(buildUsageTitleMap({ pages, collections, defaultLanguage }));
-      } catch {
-        setUsageTitleMap(buildUsageTitleMap());
-      }
-    }
-
-    loadUsageTitles();
-  }, [mediaState.activeProject, defaultLanguage, languages]);
+  const usageTitleMap = useMediaUsageTitles({
+    project: mediaState.activeProject,
+    defaultLanguage,
+    languages,
+    onError: () => mediaState.showToast(t("media.usageTitlesError"), "error"),
+  });
 
   // Early returns for various states
   if (mediaState.loading) {

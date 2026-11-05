@@ -270,6 +270,7 @@ The Media page (`packages/editor-ui/src/pages/Media.jsx`) orchestrates specializ
 - `useMediaUpload` — XHR progress tracking, batched (chunks of 5) multi-file uploads, client-side SVG sanitization via `DOMPurify` (server re-sanitizes — see § Upload Flow), per-file error reporting and toasts.
 - `useMediaSelection` — multi-select, select-all/none with filtering, usage-aware single/bulk deletion, confirmation-modal state.
 - `useMediaMetadata` — metadata drawer state, saving alt/title/caption via the API.
+- `useMediaUsageTitles` — the page and item names the "Used in" labels show. If the page list can't be loaded, the labels show raw references and the page shows a toast saying so.
 
 See [Custom Hooks](core-hooks.md) for hook-by-hook detail.
 

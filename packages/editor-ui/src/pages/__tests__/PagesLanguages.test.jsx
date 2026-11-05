@@ -296,3 +296,47 @@ describe("a multilingual project with no pages yet", () => {
     expect(navigate).toHaveBeenCalledWith("/pages/add?language=el");
   });
 });
+
+describe("a page list that can't be loaded", () => {
+  it("says so with a way to try again, not that the site has no pages", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    getAllPages.mockReset().mockRejectedValueOnce(Object.assign(new Error("Failed to get pages"), { code: "UNEXPECTED_REPLY" }));
+    renderList();
+
+    expect(await screen.findByText("pages.loadFailed")).toBeTruthy();
+    expect(screen.queryByText("pages.noPagesYet")).toBeNull();
+    expect(showToast).toHaveBeenCalledWith("pages.toasts.loadError", "error");
+
+    getAllPages.mockResolvedValueOnce([EN_ABOUT]);
+    fireEvent.click(screen.getByRole("button", { name: "pages.retry" }));
+    expect(await screen.findByText("About")).toBeTruthy();
+    expect(screen.queryByText("pages.loadFailed")).toBeNull();
+  });
+
+  it("keeps the rows a failed reload can't replace, says they may be out of date, and offers to try again", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    projectState = { activeProject: { id: "p1", defaultLanguage: "en", languages: [] } };
+    getAllPages.mockReset().mockResolvedValueOnce([EN_ABOUT]);
+    const { rerender } = renderList();
+    expect(await screen.findByText("About")).toBeTruthy();
+
+    // A reload (here, the project's identity changing) that gets a bad reply.
+    getAllPages.mockRejectedValueOnce(Object.assign(new Error("Failed to get pages"), { code: "UNEXPECTED_REPLY" }));
+    projectState = { activeProject: { id: "p2", defaultLanguage: "en", languages: [] } };
+    rerender(<Pages />);
+    expect(await screen.findByText("pages.loadFailedStale")).toBeTruthy();
+    expect(screen.getByText("About")).toBeTruthy();
+
+    getAllPages.mockResolvedValueOnce([EN_ALONE]);
+    fireEvent.click(screen.getByRole("button", { name: "pages.retry" }));
+    expect(await screen.findByText("Careers")).toBeTruthy();
+    expect(screen.queryByText("pages.loadFailedStale")).toBeNull();
+  });
+
+  it("still invites a first page when the list loads empty", async () => {
+    getAllPages.mockReset().mockResolvedValueOnce([]);
+    renderList();
+    expect(await screen.findByText("pages.noPagesYet")).toBeTruthy();
+    expect(screen.queryByText("pages.loadFailed")).toBeNull();
+  });
+});

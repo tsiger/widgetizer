@@ -95,7 +95,7 @@ export async function getExportHistory(projectId) {
       headers: {
         "Content-Type": "application/json",
       },
-    }, { fallbackMessage: "Failed to get export history" });
+    }, { expect: "object", fallbackMessage: "Failed to get export history" });
   } catch (error) {
     console.error("Export History API Error:", error);
     rethrowQueryError(error, "Failed to get export history");
@@ -145,7 +145,7 @@ export async function getExportEntryFile(exportDir) {
       headers: {
         "Content-Type": "application/json",
       },
-    }, { fallbackMessage: "Failed to get export entry file" });
+    }, { expect: "object", fallbackMessage: "Failed to get export entry file" });
   } catch (error) {
     console.error("Export Files API Error:", error);
     rethrowQueryError(error, "Failed to get export entry file");

@@ -33,7 +33,7 @@ describe("collectionManager", () => {
     expect(editorFetchJson).toHaveBeenCalledWith(
       "/collections/schemas",
       {},
-      { fallbackMessage: expect.any(String) },
+      { expect: "array", fallbackMessage: expect.any(String) },
     );
     expect(result).toBe(schemas);
   });
@@ -46,7 +46,7 @@ describe("collectionManager", () => {
     expect(editorFetchJson).toHaveBeenCalledWith(
       "/collections/schema/portfolio",
       {},
-      { fallbackMessage: expect.any(String) },
+      { expect: "object", fallbackMessage: expect.any(String) },
     );
   });
 
@@ -58,7 +58,7 @@ describe("collectionManager", () => {
     expect(editorFetchJson).toHaveBeenCalledWith(
       "/collections/portfolio",
       {},
-      { fallbackMessage: expect.any(String) },
+      { expect: "array", fallbackMessage: expect.any(String) },
     );
   });
 
@@ -81,7 +81,7 @@ describe("collectionManager", () => {
     expect(editorFetchJson).toHaveBeenCalledWith(
       "/collections/portfolio/alpha",
       {},
-      { fallbackMessage: expect.any(String) },
+      { expect: "object", fallbackMessage: expect.any(String) },
     );
   });
 
