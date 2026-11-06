@@ -81,7 +81,8 @@ export default function FileUploader({
         {...getRootProps()}
         className={`relative p-8 border-2 border-dashed ${borderColor} ${bgColor} rounded-sm text-center cursor-pointer transition-all duration-200 hover:border-slate-400 focus:outline-none`}
       >
-        <input {...getInputProps()} />
+        {/* react-dropzone labels the hidden input "file upload" in English; give it the uploader's own words. */}
+        <input {...getInputProps({ "aria-label": title || t("components.fileUploader.inputLabel") })} />
 
         <div className="flex flex-col items-center justify-center gap-3">
           <div className={`p-3 rounded-full bg-white shadow-sm ${uploading ? "opacity-50" : ""}`}>

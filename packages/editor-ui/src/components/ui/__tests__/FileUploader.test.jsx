@@ -52,6 +52,17 @@ describe("FileUploader", () => {
     expect(onReject.mock.calls[0][0].map(({ file }) => file.name)).toEqual(["notes.txt"]);
   });
 
+  it("labels the hidden file input with the uploader's own words, not react-dropzone's English default", () => {
+    const { container, rerender } = render(<FileUploader onUpload={vi.fn()} title="Upload Media" />);
+    expect(container.querySelector("input[type=file]").getAttribute("aria-label")).toBe("Upload Media");
+
+    rerender(<FileUploader onUpload={vi.fn()} />);
+    // The test i18n instance has no resources, so t() returns the key.
+    expect(container.querySelector("input[type=file]").getAttribute("aria-label")).toBe(
+      "components.fileUploader.inputLabel",
+    );
+  });
+
   it("uploads a single file dropped on a single-file uploader", async () => {
     const onUpload = vi.fn();
     const onReject = vi.fn();
