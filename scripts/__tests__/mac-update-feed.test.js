@@ -12,14 +12,19 @@ releaseDate: '2026-11-06T21:00:00.000Z'
 `;
 
 describe("darwinVersionForMacOS", () => {
-  it("maps the app's macOS minimum to the Darwin version os.release() reports", () => {
+  it("maps a macOS minimum to the Darwin version os.release() reports", () => {
+    expect(darwinVersionForMacOS("11.0")).toBe("20.0.0");
     expect(darwinVersionForMacOS("13.0")).toBe("22.0.0");
-    expect(darwinVersionForMacOS("12.0")).toBe("21.0.0");
-    expect(darwinVersionForMacOS("14")).toBe("23.0.0");
+    expect(darwinVersionForMacOS("15")).toBe("24.0.0");
   });
 
-  it("refuses versions before macOS 11, where the mapping doesn't hold", () => {
-    expect(() => darwinVersionForMacOS("10.15")).toThrow(/11 or later/);
+  it("maps macOS 26 (Tahoe) to Darwin 25, not 35", () => {
+    expect(darwinVersionForMacOS("26.0")).toBe("25.0.0");
+  });
+
+  it("refuses a macOS it has no row for", () => {
+    expect(() => darwinVersionForMacOS("10.15")).toThrow(/add it/);
+    expect(() => darwinVersionForMacOS("27.0")).toThrow(/add it/);
     expect(() => darwinVersionForMacOS("")).toThrow();
   });
 });
@@ -32,8 +37,7 @@ describe("withMinimumSystemVersion", () => {
   });
 
   it("replaces a value already there instead of adding a second one", () => {
-    const once = withMinimumSystemVersion(FEED, "21.0.0");
-    const twice = withMinimumSystemVersion(once, "22.0.0");
+    const twice = withMinimumSystemVersion(withMinimumSystemVersion(FEED, "21.0.0"), "22.0.0");
     expect(twice.match(/minimumSystemVersion/g)).toHaveLength(1);
     expect(twice).toContain("minimumSystemVersion: 22.0.0");
   });

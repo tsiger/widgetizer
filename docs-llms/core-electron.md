@@ -86,7 +86,7 @@ If you build the Windows app on macOS, native modules like `sharp` may be missin
 - **Windows** target is `nsis` (installer), `x64` only — required for auto-updates.
 - **Linux** target is `deb`, `x64` or `arm64`, for Debian-family distributions.
 - **macOS** targets are `dmg` (first-time install) + `zip` (for seamless auto-updates via electron-updater), each for `arm64` and `x64`.
-- **macOS minimum** is macOS 13 (Ventura), set by Electron (the app's `LSMinimumSystemVersion`). A signed Mac build then adds `minimumSystemVersion` (the matching Darwin version, 22.0.0) to `dist-electron/latest-mac.yml` (`scripts/mac-update-feed.js`), because electron-builder doesn't, and without it electron-updater would offer the update to older Macs that can't open it.
+- **macOS minimum** is macOS 13 (Ventura), set by Electron (the app's `LSMinimumSystemVersion`). A signed Mac build then adds `minimumSystemVersion` to `dist-electron/latest-mac.yml` (`scripts/mac-update-feed.js`), because electron-builder doesn't, and without it electron-updater would offer the update to older Macs that can't open it. The value is the Darwin version `os.release()` reports, not the macOS name: macOS 13 is Darwin 22, so `22.0.0` (the script's table maps each macOS; macOS 26 Tahoe is Darwin 25). Mac builds run with `--publish never`, so electron-builder can't upload the feed before the minimum is added.
 - macOS builds are signed and notarized with a Developer ID Application certificate.
 
 ### Linux packaging
