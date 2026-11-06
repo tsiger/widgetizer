@@ -12,18 +12,19 @@
 # ---------------------------------------------------------------------------
 # Both stages use the floating Node 24 tag on purpose: whoever builds the image
 # gets the newest Node 24 release and its security fixes, with no pin to bump.
-# Keep the two stages on the same tag so the native modules compiled here match
+# Keep the two stages on the same tag so the native modules installed here match
 # the runtime. (The node-brotli-usage rule wants a pinned patch release; the
 # floating tag is the deliberate choice, and it resolves to a fixed release.)
 # nosemgrep: node-brotli-usage
 FROM node:24-slim AS builder
 WORKDIR /app
 
-# Toolchain used to compile native modules (better-sqlite3, sharp) from source
-# when no prebuilt binary is available. It only lives in this build stage, so it
-# never bloats the final image.
+# better-sqlite3 and sharp ship prebuilt Linux binaries, so nothing is compiled.
+# `npm ci` still runs better-sqlite3's node-gyp step, which finds its bundled
+# binary and builds nothing but needs Python and make to run at all. This stage
+# only; the final image has neither.
 RUN apt-get update \
-  && apt-get install -y --no-install-recommends python3 make g++ ca-certificates \
+  && apt-get install -y --no-install-recommends python3 make ca-certificates \
   && rm -rf /var/lib/apt/lists/*
 
 # Copy only the manifests first so the `npm ci` layer stays cached until a
@@ -49,7 +50,7 @@ RUN printf 'VITE_API_URL=\n' > .env.production \
   && npm run build
 
 # Drop devDependencies (electron, vite, vitest, ...) while keeping the
-# already-compiled native modules. This is what makes the runtime image small.
+# native modules' binaries. This is what makes the runtime image small.
 RUN npm prune --omit=dev
 
 # ---------------------------------------------------------------------------
