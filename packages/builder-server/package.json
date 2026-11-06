@@ -20,7 +20,7 @@
     "express-validator": "^7.3.2",
     "fs-extra": "^11.4.1",
     "helmet": "^8.3.0",
-    "html-validate": "^10.17.0",
+    "html-validate": "^11.17.0",
     "isomorphic-dompurify": "^4.6.0",
     "multer": "^2.5.0",
     "prettier": "^3.9.10",
