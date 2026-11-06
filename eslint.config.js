@@ -20,6 +20,10 @@ const reactCompilerFindingsAsWarnings = {
   "react-hooks/static-components": "warn",
 };
 
+// ESLint 10 tracks JSX references itself (`<Card />` counts as using `Card`), so
+// eslint-plugin-react's workaround for that is redundant.
+const jsxReferencesTrackedByEslint = { "react/jsx-uses-vars": "off" };
+
 export default [
   // data/ is runtime state (installed theme copies, projects), not source. A theme
   // update's deleted/ folder holds plain-text markers named after the removed
@@ -97,6 +101,7 @@ export default [
       ...react.configs["jsx-runtime"].rules,
       ...reactHooks.configs.recommended.rules,
       ...reactCompilerFindingsAsWarnings,
+      ...jsxReferencesTrackedByEslint,
       "no-unused-vars": ["error", { argsIgnorePattern: "^_", varsIgnorePattern: "^_" }],
       "react/prop-types": "off",
     },
@@ -149,6 +154,7 @@ export default [
       ...react.configs["jsx-runtime"].rules,
       ...reactHooks.configs.recommended.rules,
       ...reactCompilerFindingsAsWarnings,
+      ...jsxReferencesTrackedByEslint,
       "no-unused-vars": ["error", { argsIgnorePattern: "^_", varsIgnorePattern: "^_" }],
       "react/jsx-no-target-blank": "off",
       "react-refresh/only-export-components": ["warn", { allowConstantExport: true }],
