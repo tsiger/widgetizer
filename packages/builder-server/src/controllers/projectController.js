@@ -1,6 +1,6 @@
 import fs from "fs-extra";
 import { isSafePathSegment } from "../utils/pathSecurity.js";
-import { extractZipSafely, openZip, readZipEntry, UnsafeZipError } from "../utils/zipSafety.js";
+import { DuplicateZipEntryError, extractZipSafely, openZip, readZipEntry, UnsafeZipError } from "../utils/zipSafety.js";
 import { mediaLibraryProblem, contentFilesProblem } from "../utils/backupContentChecks.js";
 import path from "path";
 import * as themeController from "./themeController.js";
@@ -1489,6 +1489,16 @@ export async function importProject(req, res) {
     try {
       zip = await openZip(uploadedFilePath);
     } catch (error) {
+      // A backup made before media metadata became SQLite-only can carry two
+      // entries named `uploads/media.json`: the file that was on disk and the
+      // serialized library. They describe different libraries and nothing says
+      // which is current, so the import refuses rather than picking one.
+      if (error instanceof DuplicateZipEntryError && error.entryName === "uploads/media.json") {
+        return res.status(400).json({
+          error:
+            "This backup contains more than one media library (two copies of uploads/media.json), and there is no way to tell which one is current. Re-export the project with this version and import that backup instead.",
+        });
+      }
       return res.status(400).json({ error: error.message });
     }
     // The unpacking budget is measured against the file as it is on disk.
@@ -1506,18 +1516,6 @@ export async function importProject(req, res) {
 
     if (zipEntries.length === 0) {
       return res.status(400).json({ error: "Uploaded ZIP file is empty" });
-    }
-
-    // A backup made before media metadata became SQLite-only can carry two
-    // entries named `uploads/media.json` — the file that was on disk and the
-    // serialized library. They describe different libraries and nothing says
-    // which is current, so the import refuses rather than picking one.
-    const mediaMetadataEntries = zipEntries.filter((entry) => entry.entryName === "uploads/media.json");
-    if (mediaMetadataEntries.length > 1) {
-      return res.status(400).json({
-        error:
-          "This backup contains more than one media library (two copies of uploads/media.json), and there is no way to tell which one is current. Re-export the project with this version and import that backup instead.",
-      });
     }
 
     // Find and validate manifest

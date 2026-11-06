@@ -33,6 +33,16 @@ export class UnsafeZipError extends Error {
 const ZIP_BOMB_MESSAGE = `This ZIP file unpacks to more than ${MAX_COMPRESSION_RATIO} times its own size, which is how a malicious ZIP file (a "ZIP bomb") fills a disk. Nothing was unpacked from it.`;
 const damaged = (entryName) => new UnsafeZipError(`This ZIP file is damaged and could not be read (${entryName}).`);
 
+/** A ZIP that holds two entries under one name; `entryName` is that name. */
+export class DuplicateZipEntryError extends UnsafeZipError {
+  constructor(entryName) {
+    super(
+      `This ZIP file holds more than one file named "${entryName}", so there is no way to tell which one to use. Nothing was unpacked from it.`,
+    );
+    this.entryName = entryName;
+  }
+}
+
 /**
  * Open a ZIP for reading. A file that is not a readable ZIP is refused rather
  * than failing as a server error.
@@ -41,8 +51,14 @@ const damaged = (entryName) => new UnsafeZipError(`This ZIP file is damaged and 
 export async function openZip(zipPath) {
   const AdmZip = (await import("adm-zip")).default;
   try {
-    return new AdmZip(zipPath);
-  } catch {
+    const zip = new AdmZip(zipPath);
+    // adm-zip reads the entry list lazily; read it here so a bad one is refused here.
+    zip.getEntries();
+    return zip;
+  } catch (error) {
+    // adm-zip refuses repeated entry names itself and says so only in its message.
+    const duplicate = /Duplicate entry name "(.*)"/.exec(error?.message ?? "");
+    if (duplicate) throw new DuplicateZipEntryError(duplicate[1]);
     throw new UnsafeZipError("This file is not a readable ZIP file.");
   }
 }
