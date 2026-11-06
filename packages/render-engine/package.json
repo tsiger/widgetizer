@@ -9,6 +9,6 @@
   },
   "dependencies": {
     "@widgetizer/core": "*",
-    "liquidjs": "^10.26.0"
+    "liquidjs": "^10.30.1"
   }
 }
