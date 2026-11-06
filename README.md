@@ -35,6 +35,8 @@ Get the latest desktop builds from the latest GitHub release:
 
 On the release page, grab the `.exe` installer for Windows or the `.dmg` file for macOS.
 
+Widgetizer Desktop needs macOS 13 (Ventura) or later, or 64-bit Windows 10 or later.
+
 ## 📚 Documentation
 
 Visit **[docs.widgetizer.org](https://docs.widgetizer.org)** for guides on themes, presets, project workflows, export, and customization.

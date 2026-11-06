@@ -13,12 +13,14 @@
  *        linux: install both supported Sharp architectures
  *   3. Native rebuild for Electron (`@electron/rebuild --force`)
  *   4. electron-builder with the right platform flag, env vars, and target arg
+ *   5. mac (signed): add the app's macOS minimum to latest-mac.yml (scripts/mac-update-feed.js)
  */
 
 import { spawnSync } from "node:child_process";
 import { existsSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { createInterface } from "node:readline";
-import { resolve } from "node:path";
+import { join, resolve } from "node:path";
+import { darwinVersionForMacOS, withMinimumSystemVersion } from "./mac-update-feed.js";
 
 const args = process.argv.slice(2);
 const platformIdx = args.indexOf("--platform");
@@ -157,3 +159,23 @@ if (platform === "win" && unsigned) {
 }
 
 run("npx", builderArgs, builderEnv);
+
+// 5. Mac update feed: electron-updater offers an update to any Mac unless the feed names a minimum.
+if (platform === "mac" && !unsigned) {
+  const feedPath = "dist-electron/latest-mac.yml";
+  if (!existsSync(feedPath)) throw new Error(`${feedPath} is missing after a signed Mac build`);
+  const minimums = readdirSync("dist-electron", { withFileTypes: true })
+    .filter((entry) => entry.isDirectory() && entry.name.startsWith("mac"))
+    .map((entry) => join("dist-electron", entry.name, "Widgetizer.app/Contents/Info.plist"))
+    .filter((plist) => existsSync(plist))
+    .map((plist) => {
+      const result = spawnSync("plutil", ["-extract", "LSMinimumSystemVersion", "raw", plist], { encoding: "utf8" });
+      if (result.status !== 0) throw new Error(`No LSMinimumSystemVersion in ${plist}`);
+      return result.stdout.trim();
+    });
+  if (!minimums.length) throw new Error("No built Mac app found in dist-electron to read the macOS minimum from");
+  const darwinVersions = [...new Set(minimums.map(darwinVersionForMacOS))];
+  if (darwinVersions.length !== 1) throw new Error(`The Mac builds disagree on the macOS minimum: ${minimums.join(", ")}`);
+  writeFileSync(feedPath, withMinimumSystemVersion(readFileSync(feedPath, "utf8"), darwinVersions[0]));
+  console.log(`\n${feedPath}: minimumSystemVersion ${darwinVersions[0]} (macOS ${minimums[0]})`);
+}

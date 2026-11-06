@@ -157,7 +157,7 @@ Output goes to `dist-electron/`.
 6. Attach **all** of these files from `dist-electron/`:
    - Mac: `.dmg`, `.dmg.blockmap`, `.zip`, `.zip.blockmap`, `latest-mac.yml`
    - Windows: `.exe`, `.exe.blockmap`, `latest.yml`
-7. The `latest-mac.yml` and `latest.yml` files are critical — electron-updater reads them to detect new versions. The `.blockmap` files enable delta updates.
+7. The `latest-mac.yml` and `latest.yml` files are critical — electron-updater reads them to detect new versions. The `.blockmap` files enable delta updates. `latest-mac.yml` must carry `minimumSystemVersion` (the signed Mac build adds it; see `docs-llms/core-electron.md`), or Macs below the app's macOS minimum are offered an update they can't open.
 
 ### Auto-Updates
 
