@@ -10,7 +10,11 @@
 # ---------------------------------------------------------------------------
 # Stage 1 (build): install every dependency and compile the frontend bundle.
 # ---------------------------------------------------------------------------
-FROM node:24.22.2-slim AS builder
+# Both stages use the floating Node 24 tag on purpose: whoever builds the image
+# gets the newest Node 24 release and its security fixes, with no pin to bump.
+# Keep the two stages on the same tag so the native modules compiled here match
+# the runtime.
+FROM node:24-slim AS builder
 WORKDIR /app
 
 # Toolchain used to compile native modules (better-sqlite3, sharp) from source
@@ -49,7 +53,7 @@ RUN npm prune --omit=dev
 # ---------------------------------------------------------------------------
 # Stage 2 (runtime): just Node + the built app. No build tools, no dev deps.
 # ---------------------------------------------------------------------------
-FROM node:24.22.2-slim AS runtime
+FROM node:24-slim AS runtime
 WORKDIR /app
 
 ENV NODE_ENV=production
