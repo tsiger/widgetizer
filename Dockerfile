@@ -10,7 +10,7 @@
 # ---------------------------------------------------------------------------
 # Stage 1 (build): install every dependency and compile the frontend bundle.
 # ---------------------------------------------------------------------------
-FROM node:20-slim AS builder
+FROM node:24.22.2-slim AS builder
 WORKDIR /app
 
 # Toolchain used to compile native modules (better-sqlite3, sharp) from source
@@ -49,7 +49,7 @@ RUN npm prune --omit=dev
 # ---------------------------------------------------------------------------
 # Stage 2 (runtime): just Node + the built app. No build tools, no dev deps.
 # ---------------------------------------------------------------------------
-FROM node:20-slim AS runtime
+FROM node:24.22.2-slim AS runtime
 WORKDIR /app
 
 ENV NODE_ENV=production

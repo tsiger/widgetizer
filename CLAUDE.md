@@ -30,7 +30,7 @@ npm run validate:theme -- themes/arch   # App-owned static theme checks (LiquidJ
 - **Hybrid storage** — SQLite (`data/widgetizer.db`) for metadata (projects, media metadata/usage, app settings, export history); filesystem content is split between the `StorageAdapter` (page/menu/global JSON, theme files) and `AssetStorageAdapter` (uploaded binaries).
 - **Frontend**: React 19, Zustand (state), Tailwind CSS 4, Vite 7.
 - **Backend**: Express 5 (ES modules), LiquidJS templates, Sharp for images.
-- **Node**: Requires >=20.19.5.
+- **Node**: Requires >=24.22.1.
 
 ### Directory Layout
 

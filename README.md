@@ -59,7 +59,7 @@ The code is split into npm workspace packages under `packages/` (core, render en
 
 ### Requirements
 
-- **Node.js:** `>= 20.19.5`
+- **Node.js:** `>= 24.22.1`
 - **npm:** `>= 8`
 
 ### Web App

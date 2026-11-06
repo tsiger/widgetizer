@@ -14,7 +14,7 @@
     "./server": "./packages/builder-server/src/createApp.js"
   },
   "engines": {
-    "node": ">=20.19.5"
+    "node": ">=24.22.1"
   },
   "scripts": {
     "dev": "vite",
