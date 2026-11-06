@@ -541,7 +541,7 @@ export async function createProject(req, res) {
     } catch (error) {
       await discardHalfMadeProject(null, projectDir);
       console.error(`[ProjectController] Reading the preset failed: ${error.message}`);
-      throw new Error("The project could not be created from this preset, so nothing was created.");
+      throw new Error("The project could not be created from this preset, so nothing was created.", { cause: error });
     }
     // A preset the user picked and did not get is a failed creation, not a
     // warning: the project would claim that preset while missing its content,
@@ -554,7 +554,7 @@ export async function createProject(req, res) {
       } catch (error) {
         await discardHalfMadeProject(null, projectDir);
         console.error(`[ProjectController] Seeding preset collections failed: ${error.message}`);
-        throw new Error("The project could not be created from this preset, so nothing was created.");
+        throw new Error("The project could not be created from this preset, so nothing was created.", { cause: error });
       }
     }
 
@@ -593,7 +593,7 @@ export async function createProject(req, res) {
         // The row exists by now, so both halves have to go.
         await discardHalfMadeProject(newProject.id, projectDir);
         console.error(`[ProjectController] Seeding preset media failed: ${error.message}`);
-        throw new Error("The project could not be created from this preset, so nothing was created.");
+        throw new Error("The project could not be created from this preset, so nothing was created.", { cause: error });
       }
     }
 
@@ -787,7 +787,7 @@ export async function updateProject(req, res) {
           await fs.copy(oldDir, newDir);
         } catch (copyError) {
           await discardCopy();
-          throw new Error(`Failed to rename project directory: ${copyError.message}`);
+          throw new Error(`Failed to rename project directory: ${copyError.message}`, { cause: copyError });
         }
       }
 
@@ -949,7 +949,7 @@ export async function duplicateProject(req, res) {
         );
       }
       console.error(`[ProjectController] Duplication failed: ${copyError.message}`);
-      throw new Error("The project could not be duplicated, so no copy was made.");
+      throw new Error("The project could not be duplicated, so no copy was made.", { cause: copyError });
     }
 
     // Save new project to DB
@@ -970,7 +970,7 @@ export async function duplicateProject(req, res) {
     } catch (mediaError) {
       await discardHalfMadeProject(newProject.id, newDir);
       console.error(`[ProjectController] Duplicating the media library failed: ${mediaError.message}`);
-      throw new Error("The project could not be duplicated, so no copy was made.");
+      throw new Error("The project could not be duplicated, so no copy was made.", { cause: mediaError });
     }
 
     await refreshMediaUsageAfterStructuralChange(newProject.id, "project duplication");
@@ -1683,7 +1683,7 @@ export async function importProject(req, res) {
         try {
           mediaData = await fs.readJson(mediaJsonPath);
         } catch (mediaError) {
-          throw new Error(`This backup's media library could not be read (uploads/media.json): ${mediaError.message}`);
+          throw new Error(`This backup's media library could not be read (uploads/media.json): ${mediaError.message}`, { cause: mediaError });
         }
         // A library with no files is a project that has none, and restores as
         // none. A file that parses but is not a library at all — `{}`, or a
@@ -1704,7 +1704,7 @@ export async function importProject(req, res) {
             mediaRepo.writeMediaData(newProject.id, mediaData);
           }
         } catch (mediaError) {
-          throw new Error(`This backup's media library could not be restored: ${mediaError.message}`);
+          throw new Error(`This backup's media library could not be restored: ${mediaError.message}`, { cause: mediaError });
         }
         // Only now: the file is the restore's input, and deleting it after a
         // failure would turn a recoverable one into a silent loss.

@@ -98,7 +98,7 @@ npm run test:frontend   # Vitest (editor-ui / core / render-engine)
 
 ## Linting
 
-ESLint 9 flat config covering the packages, the shells, and electron, plus the local `require-scope-arg` rule.
+ESLint 10 flat config covering the packages, the shells, and electron, plus the local `require-scope-arg` rule.
 
 ```bash
 npm run lint            # eslint src packages app server.js

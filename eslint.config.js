@@ -8,6 +8,18 @@ import requireScopeArg from "./eslint-rules/require-scope-arg.js";
 // Local-only plugin housing repo-specific lint rules.
 const local = { rules: { "require-scope-arg": requireScopeArg } };
 
+// React Compiler checks from eslint-plugin-react-hooks that flag existing editor
+// and shell code (7.1.1 found 36 places). Reported as warnings until that code is
+// reworked component by component; the other hooks rules stay errors.
+const reactCompilerFindingsAsWarnings = {
+  "react-hooks/globals": "warn",
+  "react-hooks/immutability": "warn",
+  "react-hooks/preserve-manual-memoization": "warn",
+  "react-hooks/purity": "warn",
+  "react-hooks/set-state-in-effect": "warn",
+  "react-hooks/static-components": "warn",
+};
+
 export default [
   // data/ is runtime state (installed theme copies, projects), not source. A theme
   // update's deleted/ folder holds plain-text markers named after the removed
@@ -84,6 +96,7 @@ export default [
       ...react.configs.recommended.rules,
       ...react.configs["jsx-runtime"].rules,
       ...reactHooks.configs.recommended.rules,
+      ...reactCompilerFindingsAsWarnings,
       "no-unused-vars": ["error", { argsIgnorePattern: "^_", varsIgnorePattern: "^_" }],
       "react/prop-types": "off",
     },
@@ -135,6 +148,7 @@ export default [
       ...react.configs.recommended.rules,
       ...react.configs["jsx-runtime"].rules,
       ...reactHooks.configs.recommended.rules,
+      ...reactCompilerFindingsAsWarnings,
       "no-unused-vars": ["error", { argsIgnorePattern: "^_", varsIgnorePattern: "^_" }],
       "react/jsx-no-target-blank": "off",
       "react-refresh/only-export-components": ["warn", { allowConstantExport: true }],

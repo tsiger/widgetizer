@@ -296,7 +296,7 @@ export async function importProject(file, optionsOrProgress) {
       normalizedError.aborted = error.aborted;
       throw normalizedError;
     }
-    throw new Error("Failed to import project");
+    throw new Error("Failed to import project", { cause: error });
   }
 }
 

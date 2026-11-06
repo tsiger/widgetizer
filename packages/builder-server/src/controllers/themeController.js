@@ -176,7 +176,7 @@ async function _ensureThemesDirectoryOnce() {
     await fs.mkdir(userThemesDir, { recursive: true });
   } catch (error) {
     console.error("Error creating themes directory:", error);
-    throw new Error("Failed to create themes directory");
+    throw new Error("Failed to create themes directory", { cause: error });
   }
 
   // Provision any seed theme that isn't installed yet. Per-theme (not
@@ -443,7 +443,7 @@ async function layerThemeSnapshot({ baseDir, updates, targetDir }) {
       // rename-aside swap keeps the previous complete snapshot in place,
       // and the update-import validation caller likewise wants a corrupt
       // effective theme rejected rather than approximated.
-      throw new Error(`Failed to apply theme update ${version}: ${error.message}`);
+      throw new Error(`Failed to apply theme update ${version}: ${error.message}`, { cause: error });
     }
   }
 }
@@ -1174,7 +1174,7 @@ export async function copyThemeToProject(themeName, projectDir, excludeDirs = []
   } catch (error) {
     console.error(`Error during theme copy from ${sourceDir} to ${projectDir}:`, error);
     // Provide a more specific error if possible
-    throw new Error(`Failed to copy theme files: ${error.message}`);
+    throw new Error(`Failed to copy theme files: ${error.message}`, { cause: error });
   }
 }
 

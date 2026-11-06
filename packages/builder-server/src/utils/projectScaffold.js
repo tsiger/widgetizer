@@ -49,7 +49,7 @@ export async function scaffoldProjectContent({ projectDir, theme, preset }) {
     themeVersion = await themeController.copyThemeToProject(theme, projectDir, ["templates"]);
   } catch (error) {
     await fs.remove(projectDir);
-    throw new Error(`Failed to copy theme: ${error.message}`);
+    throw new Error(`Failed to copy theme: ${error.message}`, { cause: error });
   }
 
   // Resolve preset paths (templates, menus, settings overrides). This can fail
@@ -66,7 +66,7 @@ export async function scaffoldProjectContent({ projectDir, theme, preset }) {
   } catch (error) {
     await fs.remove(projectDir);
     console.error(`[projectScaffold] Reading the preset failed: ${error.message}`);
-    throw new Error("The project could not be created from this preset, so nothing was created.");
+    throw new Error("The project could not be created from this preset, so nothing was created.", { cause: error });
   }
 
   // If preset has custom menus, replace root menus with preset menus
@@ -84,7 +84,7 @@ export async function scaffoldProjectContent({ projectDir, theme, preset }) {
       await fs.remove(stagedMenusDir).catch(() => {});
       await fs.remove(projectDir);
       console.error(`[projectScaffold] Applying the preset's menus failed: ${error.message}`);
-      throw new Error("The project could not be created from this preset, so nothing was created.");
+      throw new Error("The project could not be created from this preset, so nothing was created.", { cause: error });
     }
   }
 
@@ -119,7 +119,7 @@ export async function scaffoldProjectContent({ projectDir, theme, preset }) {
     await enrichNewProjectReferences(pagesDir, menusDir);
   } catch (error) {
     await fs.remove(projectDir);
-    throw new Error(`Failed to process templates: ${error.message}`);
+    throw new Error(`Failed to process templates: ${error.message}`, { cause: error });
   }
 
   // Apply preset settings overrides to the project's theme.json
@@ -134,7 +134,7 @@ export async function scaffoldProjectContent({ projectDir, theme, preset }) {
     } catch (error) {
       await fs.remove(projectDir);
       console.error(`[projectScaffold] Applying the preset's settings failed: ${error.message}`);
-      throw new Error("The project could not be created from this preset, so nothing was created.");
+      throw new Error("The project could not be created from this preset, so nothing was created.", { cause: error });
     }
   }
 
