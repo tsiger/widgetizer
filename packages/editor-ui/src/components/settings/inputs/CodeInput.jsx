@@ -1,5 +1,5 @@
 import { useEffect, useRef, useMemo, useState, useCallback } from "react";
-import Editor from "react-simple-code-editor";
+import CodeEditorModule from "react-simple-code-editor";
 import { highlight, languages } from "prismjs";
 import "prismjs/components/prism-css";
 import "prismjs/components/prism-markup";
@@ -7,6 +7,12 @@ import "prismjs/components/prism-javascript";
 import "prismjs/themes/prism.css";
 import { Maximize2, X } from "lucide-react";
 import "./CodeInput.css";
+
+// react-simple-code-editor ships only CommonJS compiled from ES modules: the
+// component is `module.exports.default`. This package is "type": "module", so
+// Vite 8 (like Node) hands a default import the whole `module.exports`; older
+// bundlers handed over `.default`. Accept either.
+const Editor = CodeEditorModule.default ?? CodeEditorModule;
 
 /**
  * CodeInput component

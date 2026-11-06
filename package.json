@@ -81,7 +81,7 @@
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.3",
     "@testing-library/user-event": "^14.6.8",
-    "@vitejs/plugin-react": "^5.2.0",
+    "@vitejs/plugin-react": "^6.1.2",
     "chokidar": "^5.0.0",
     "concurrently": "^9.2.5",
     "cross-env": "^10.1.0",
@@ -95,7 +95,7 @@
     "nodemon": "^3.1.14",
     "postcss": "^8.5.32",
     "tailwindcss": "^4.3.3",
-    "vite": "^7.3.7",
+    "vite": "^8.3.5",
     "vitest": "^4.1.12",
     "wait-on": "^9.5.1"
   },
