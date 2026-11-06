@@ -1398,7 +1398,10 @@ async function renderWidget(
     };
 
     // Merge with widget-specific context
-    const paginationPlan = sharedGlobals?.paginationPlan?.widgetId === widgetId ? sharedGlobals.paginationPlan : null;
+    // The plan is the page's: it names a page widget, so an area widget that shares
+    // its id (ids are unique per file, not across a page and its areas) isn't it.
+    const paginationPlan =
+      sharedGlobals?.paginationPlan?.widgetId === widgetId && !area ? sharedGlobals.paginationPlan : null;
     // `page` and `project` match what the layout sees, so a header or footer can
     // read them. The page comes from `sharedGlobals.currentPageData`, set once per
     // render by the caller (a morph without it gets no `page`).

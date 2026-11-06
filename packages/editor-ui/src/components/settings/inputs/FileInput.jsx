@@ -31,6 +31,8 @@ const MODES = {
   },
 };
 
+const NOT_LOOKED_UP = { status: "loading", record: null };
+
 export default function FileInput({ id, value = "", onChange, filterType = "file" }) {
   const { t } = useTranslation();
   const mode = MODES[filterType] ?? MODES.file;
@@ -43,26 +45,50 @@ export default function FileInput({ id, value = "", onChange, filterType = "file
   const { settings } = useAppSettings();
 
   const [selectorDrawerVisible, setSelectorDrawerVisible] = useState(false);
-  const [currentFile, setCurrentFile] = useState(null);
+  // What the media library says about the stored file: `found` (its record),
+  // `missing` (the library has no such file) or `failed` (the library couldn't
+  // be read). The stored file is shown in every case; only the note differs.
+  const [lookup, setLookup] = useState(NOT_LOOKED_UP);
+  const [lookupAttempt, setLookupAttempt] = useState(0);
+  const currentFile = lookup.record;
 
-  // Get the current file metadata when value changes
+  // Get the current file metadata when value changes. Keyed on the project's
+  // id, not the store object, so a new object for the same project doesn't
+  // look the file up again.
+  const activeProjectId = activeProject?.id;
   useEffect(() => {
-    if (value && activeProject) {
-      const fetchFileData = async () => {
-        try {
-          const mediaData = await getProjectMedia(activeProject.id);
-          const fileRecord = mediaData.files.find((file) => file.path === value);
-          setCurrentFile(fileRecord || null);
-        } catch (error) {
-          console.error("Error fetching file metadata:", error);
-          setCurrentFile(null);
-        }
-      };
-      fetchFileData();
-    } else {
-      setCurrentFile(null);
+    if (!value || !activeProjectId) {
+      setLookup(NOT_LOOKED_UP);
+      return undefined;
     }
-  }, [value, activeProject]);
+    let cancelled = false;
+    // Each lookup starts clean: a note about the previous file, or about the
+    // failed read being retried, mustn't stay up while this one runs. The
+    // filename from the path shows meanwhile.
+    setLookup(NOT_LOOKED_UP);
+    (async () => {
+      try {
+        const findIn = (mediaData) => mediaData.files.find((file) => file.path === value);
+        // A retry skips the media cache.
+        let fileRecord = findIn(await getProjectMedia(activeProjectId, lookupAttempt > 0));
+        // The list read may predate an upload that just set this value (it can
+        // join a request already in flight), so a fresh read, made once that
+        // one has settled, decides before the file is called missing.
+        if (!fileRecord && !cancelled) {
+          fileRecord = findIn(await getProjectMedia(activeProjectId, true));
+        }
+        if (cancelled) return;
+        setLookup(fileRecord ? { status: "found", record: fileRecord } : { status: "missing", record: null });
+      } catch (error) {
+        if (cancelled) return;
+        console.error("Error fetching file metadata:", error);
+        setLookup({ status: "failed", record: null });
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [value, activeProjectId, lookupAttempt]);
 
   const handleFileChange = async (event) => {
     const file = event.target.files[0];
@@ -140,25 +166,43 @@ export default function FileInput({ id, value = "", onChange, filterType = "file
         className="hidden"
       />
 
-      {value && currentFile ? (
-        <div className="flex items-center gap-3 p-3 bg-slate-50 border border-slate-200 rounded-md">
-          <div className="flex-shrink-0 w-10 h-10 bg-slate-200 rounded flex items-center justify-center">
-            <FileIcon className="text-slate-500" size={20} />
+      {value ? (
+        <div className="p-3 bg-slate-50 border border-slate-200 rounded-md">
+          <div className="flex items-center gap-3">
+            <div className="flex-shrink-0 w-10 h-10 bg-slate-200 rounded flex items-center justify-center">
+              <FileIcon className="text-slate-500" size={20} />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-slate-700 truncate">{displayFilename}</p>
+              {displayExtension && (
+                <p className="text-xs text-slate-500 uppercase">{displayExtension}</p>
+              )}
+            </div>
+            <button
+              type="button"
+              onClick={handleRemove}
+              className="flex-shrink-0 p-1 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-200 transition-colors"
+              title={t("components.fileInput.remove")}
+            >
+              <X size={16} />
+            </button>
           </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-slate-700 truncate">{displayFilename}</p>
-            {displayExtension && (
-              <p className="text-xs text-slate-500 uppercase">{displayExtension}</p>
-            )}
-          </div>
-          <button
-            type="button"
-            onClick={handleRemove}
-            className="flex-shrink-0 p-1 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-200 transition-colors"
-            title={t("components.fileInput.remove")}
-          >
-            <X size={16} />
-          </button>
+          {/* Under the file row, full width: the row is narrow in the settings panel. */}
+          {lookup.status === "missing" && (
+            <p className="mt-2 text-xs text-red-700">{t("components.fileInput.notInLibrary")}</p>
+          )}
+          {lookup.status === "failed" && (
+            <p className="mt-2 text-xs text-red-700">
+              {t("components.fileInput.detailsFailed")}{" "}
+              <button
+                type="button"
+                className="font-medium underline hover:text-red-900"
+                onClick={() => setLookupAttempt((n) => n + 1)}
+              >
+                {t("components.fileInput.retry")}
+              </button>
+            </p>
+          )}
         </div>
       ) : (
         <div

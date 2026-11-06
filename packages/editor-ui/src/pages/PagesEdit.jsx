@@ -57,11 +57,10 @@ export default function PagesEdit() {
     setIsSubmitting(true);
 
     try {
-      const result = await updatePage(id, {
-        ...page,
-        ...formData,
-        updated: new Date().toISOString(),
-      });
+      // Only what the form edits, and the page's language (the update reads it from
+      // the body). The page's content is the editor's: it can be saved again while
+      // this form is open, and sending the copy loaded here would overwrite it.
+      const result = await updatePage(id, { ...formData, language: page.language });
 
       if (result.success) {
         const savedName = result.data?.name || formData.name;

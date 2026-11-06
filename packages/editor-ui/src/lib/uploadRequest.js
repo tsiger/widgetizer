@@ -1,6 +1,7 @@
 import { API_URL } from "./config";
 import { getActiveProjectId } from "./activeProjectId";
 import { notifyMutationSuccess } from "./mutationEvents";
+import { hookHeaders, observeHookResponse } from "./requestHooks";
 
 function parseResponseBody(responseText) {
   if (!responseText) return null;
@@ -73,6 +74,7 @@ export async function uploadFormData(path, formData, { onProgress, signal } = {}
     };
 
     xhr.onload = () => {
+      observeHookResponse({ status: xhr.status, getHeader: (name) => xhr.getResponseHeader(name), method: "POST", path });
       const data = parseResponseBody(xhr.responseText);
 
       if (xhr.status >= 200 && xhr.status < 300) {
@@ -108,6 +110,15 @@ export async function uploadFormData(path, formData, { onProgress, signal } = {}
       xhr.setRequestHeader("X-Project-Id", projectId);
     }
 
-    xhr.send(formData);
+    // The shell's headers may take a moment (see requestHooks.js); XHR takes
+    // headers any time between open() and send(). Nothing is sent once the
+    // caller has aborted.
+    hookHeaders().then((extra) => {
+      if (signal?.aborted) return;
+      for (const [name, value] of Object.entries(extra)) {
+        xhr.setRequestHeader(name, value);
+      }
+      xhr.send(formData);
+    });
   });
 }

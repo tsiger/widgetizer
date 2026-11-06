@@ -29,7 +29,7 @@ const languageQuery = (language) => (language ? `?language=${encodeURIComponent(
  */
 export async function getAllMenus() {
   try {
-    return await editorFetchJson("/menus", {}, { fallbackMessage: "Failed to get menus" });
+    return await editorFetchJson("/menus", {}, { expect: "array", fallbackMessage: "Failed to get menus" });
   } catch (error) {
     console.error("Error getting menus:", error);
     rethrowQueryError(error, "Failed to get menus");
@@ -88,7 +88,7 @@ export async function deleteMenu(id, language) {
  */
 export async function getMenu(id, language) {
   try {
-    return await editorFetchJson(`/menus/${id}${languageQuery(language)}`, {}, { fallbackMessage: "Failed to get menu" });
+    return await editorFetchJson(`/menus/${id}${languageQuery(language)}`, {}, { expect: "object", fallbackMessage: "Failed to get menu" });
   } catch (error) {
     console.error("Error getting menu:", error);
     rethrowQueryError(error, "Failed to get menu");

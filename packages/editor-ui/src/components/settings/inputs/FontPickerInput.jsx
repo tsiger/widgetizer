@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { Search, Check, ChevronsUpDown } from "lucide-react";
 import fontDefinitions from "@widgetizer/core/config/fonts.json" with { type: "json" };
+import { themeFontsStylesheetUrl } from "@widgetizer/core/themeFonts";
 
 const FONT_WEIGHT_NAMES = {
   100: "Thin",
@@ -23,6 +24,9 @@ const LANGUAGE_OPTIONS = [
   { value: "latin", label: "Latin", subsets: ["latin", "latin-ext"] },
   { value: "greek", label: "Greek", subsets: ["greek", "greek-ext"] },
   { value: "cyrillic", label: "Cyrillic", subsets: ["cyrillic", "cyrillic-ext"] },
+  { value: "armenian", label: "Armenian", subsets: ["armenian"] },
+  { value: "georgian", label: "Georgian", subsets: ["georgian"] },
+  { value: "ethiopic", label: "Ethiopic", subsets: ["ethiopic"] },
   { value: "hebrew", label: "Hebrew", subsets: ["hebrew"] },
   { value: "arabic", label: "Arabic", subsets: ["arabic"] },
   { value: "vietnamese", label: "Vietnamese", subsets: ["vietnamese"] },
@@ -30,10 +34,17 @@ const LANGUAGE_OPTIONS = [
   { value: "devanagari", label: "Devanagari", subsets: ["devanagari"] },
   { value: "bengali", label: "Bengali", subsets: ["bengali"] },
   { value: "gujarati", label: "Gujarati", subsets: ["gujarati"] },
+  { value: "gurmukhi", label: "Gurmukhi", subsets: ["gurmukhi"] },
   { value: "tamil", label: "Tamil", subsets: ["tamil"] },
+  { value: "telugu", label: "Telugu", subsets: ["telugu"] },
+  { value: "sinhala", label: "Sinhala", subsets: ["sinhala"] },
+  { value: "myanmar", label: "Myanmar (Burmese)", subsets: ["myanmar"] },
+  { value: "khmer", label: "Khmer", subsets: ["khmer"] },
+  { value: "lao", label: "Lao", subsets: ["lao"] },
   { value: "korean", label: "Korean", subsets: ["korean"] },
   { value: "japanese", label: "Japanese", subsets: ["japanese"] },
-  { value: "chinese", label: "Chinese", subsets: ["chinese-simplified", "chinese-traditional"] },
+  { value: "chinese-simplified", label: "Chinese (Simplified)", subsets: ["chinese-simplified"] },
+  { value: "chinese-traditional", label: "Chinese (Traditional)", subsets: ["chinese-traditional"] },
 ].map((option) => {
   const count = GOOGLE_FONTS.filter((font) =>
     font.subsets?.some((subset) => option.subsets.includes(subset))
@@ -52,7 +63,7 @@ function loadFontForPreview(font) {
   loadedFonts.add(font.name);
 
   const weight = font.defaultWeight || 400;
-  const url = `https://fonts.bunny.net/css?family=${encodeURIComponent(font.name)}:wght@${weight}&display=swap`;
+  const url = themeFontsStylesheetUrl({ fonts: { [font.name]: [weight] }, useBunnyFonts: true });
   const link = document.createElement("link");
   link.rel = "stylesheet";
   link.href = url;
@@ -72,16 +83,11 @@ function loadFontPreview(fontName, weight) {
   cache[fontName] = Array.from(weights);
   window[FONT_PREVIEW_CACHE_KEY] = cache;
 
-  const families = Object.entries(cache)
-    .map(([name, fontWeights]) => {
-      const sorted = [...fontWeights].sort((a, b) => a - b);
-      return `${encodeURIComponent(name)}:wght@${sorted.join(";")}`;
-    })
-    .join("|");
-
-  if (!families) return;
-
-  const url = `https://fonts.bunny.net/css?family=${families}&display=swap`;
+  const fonts = Object.fromEntries(
+    Object.entries(cache).map(([name, fontWeights]) => [name, [...fontWeights].sort((a, b) => a - b)]),
+  );
+  const url = themeFontsStylesheetUrl({ fonts, useBunnyFonts: true });
+  if (!url) return;
   let link = document.getElementById(FONT_PREVIEW_LINK_ID);
   if (!link) {
     link = document.createElement("link");

@@ -31,6 +31,10 @@ class MockXMLHttpRequest {
     this.headers[key] = value;
   }
 
+  getResponseHeader(name) {
+    return this.responseHeaders?.[name.toLowerCase()] ?? null;
+  }
+
   send(body) {
     this.body = body;
   }
@@ -78,6 +82,29 @@ describe("uploadFormData", () => {
     expect(xhr.headers["X-Project-Id"]).toBe("project-123");
     expect(xhr.body).toBe(formData);
     expect(onProgress).toHaveBeenCalledWith(25);
+  });
+
+  it("adds the registered hook headers and reports the response to the hook", async () => {
+    const { setRequestHooks } = await import("../requestHooks");
+    const { uploadFormData } = await import("../uploadRequest");
+    const observeResponse = vi.fn();
+    setRequestHooks({ requestHeaders: async () => ({ "X-Shell": "a" }), observeResponse });
+
+    const promise = uploadFormData("/api/media", {});
+    const xhr = xhrInstances[0];
+    await new Promise((resolve) => setTimeout(resolve));
+    expect(xhr.headers["X-Shell"]).toBe("a");
+    expect(xhr.headers["X-Project-Id"]).toBe("project-123");
+    xhr.status = 409;
+    xhr.responseHeaders = { "x-shell-state": "b" };
+    xhr.responseText = "{}";
+    xhr.onload();
+    await expect(promise).rejects.toMatchObject({ status: 409 });
+
+    expect(observeResponse).toHaveBeenCalledTimes(1);
+    const seen = observeResponse.mock.calls[0][0];
+    expect(seen).toMatchObject({ status: 409, method: "POST", path: "/api/media" });
+    expect(seen.getHeader("X-Shell-State")).toBe("b");
   });
 
   it("rejects with a normalized error from a JSON message payload", async () => {

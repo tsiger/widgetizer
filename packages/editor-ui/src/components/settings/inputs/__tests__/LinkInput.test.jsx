@@ -22,13 +22,17 @@ const OPTIONS = [
   },
 ];
 
+let linkTargets = { options: OPTIONS, loading: false, failed: false, retry: () => {} };
 vi.mock("../../../../hooks/useLinkTargets", () => ({
-  default: () => ({ options: OPTIONS, loading: false }),
+  default: () => linkTargets,
 }));
+vi.mock("react-i18next", () => ({ useTranslation: () => ({ t: (key) => key }) }));
 // The picker itself is not under test: one button per choice it can report.
 vi.mock("../../../ui/Combobox", () => ({
-  default: ({ onChange }) => (
+  default: ({ onChange, notice, inputRef }) => (
     <div>
+      <input ref={inputRef} aria-label="link url" />
+      {notice}
       <button onClick={() => onChange("p-about")}>page</button>
       <button onClick={() => onChange("i-launch")}>item</button>
       <button onClick={() => onChange("https://example.com")}>custom</button>
@@ -74,5 +78,35 @@ describe("LinkInput target choice", () => {
   it("stores no ref for a custom URL", () => {
     const stored = choose({ pageUuid: "p-about", href: "about.html", text: "Go" }, "custom");
     expect(stored).toEqual({ href: "https://example.com", text: "Go", target: "_self" });
+  });
+});
+
+describe("LinkInput when pages and items couldn't be loaded", () => {
+  afterEach(() => {
+    linkTargets = { options: OPTIONS, loading: false, failed: false, retry: () => {} };
+  });
+
+  it("says so inside the picker's list, and Try again asks again", () => {
+    const retry = vi.fn();
+    linkTargets = { options: [], loading: false, failed: true, retry };
+    render(<LinkInput id="link" value={{ href: "contact.html" }} onChange={() => {}} />);
+
+    expect(screen.getByRole("alert")).toHaveTextContent("components.linkTargets.loadFailed");
+    fireEvent.click(screen.getByRole("button", { name: "components.linkTargets.retry" }));
+    expect(retry).toHaveBeenCalledTimes(1);
+  });
+
+  it("gives focus back to the field, so it isn't lost when the notice goes away", () => {
+    linkTargets = { options: [], loading: false, failed: true, retry: vi.fn() };
+    render(<LinkInput id="link" value={{ href: "contact.html" }} onChange={() => {}} />);
+    const button = screen.getByRole("button", { name: "components.linkTargets.retry" });
+    button.focus();
+    fireEvent.click(button);
+    expect(document.activeElement).toBe(screen.getByLabelText("link url"));
+  });
+
+  it("shows nothing extra when they loaded", () => {
+    render(<LinkInput id="link" value={{ href: "contact.html" }} onChange={() => {}} />);
+    expect(screen.queryByRole("alert")).toBeNull();
   });
 });

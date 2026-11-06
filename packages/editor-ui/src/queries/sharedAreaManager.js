@@ -12,6 +12,7 @@ const languageQuery = (language) => (language ? `?language=${encodeURIComponent(
 export async function getSharedAreas(language) {
   try {
     return await editorFetchJson(`/shared-areas${languageQuery(language)}`, {}, {
+      expect: "object",
       fallbackMessage: "Failed to fetch shared areas",
     });
   } catch (error) {

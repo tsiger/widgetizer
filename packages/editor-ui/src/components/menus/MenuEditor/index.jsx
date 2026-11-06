@@ -25,6 +25,7 @@ import {
   removeActiveFromFlat,
 } from "./utils/treeUtils";
 import useLinkTargets from "../../../hooks/useLinkTargets";
+import LinkTargetsNotice from "../../settings/inputs/LinkTargetsNotice";
 
 const DRAG_DEPTH_STEP = 32; // horizontal drag needed to change depth
 
@@ -40,7 +41,7 @@ function MenuEditor({ initialItems = [], onChange, onDeleteItem }) {
   // `hasItemPages` collection (#11), grouped + cached + cache-invalidated by the
   // shared hook — the same source LinkInput uses. (`pages` keeps its historical
   // name; it now also carries collection-item options.)
-  const { options: pages } = useLinkTargets();
+  const { options: pages, failed: linkTargetsFailed, retry: retryLinkTargets } = useLinkTargets();
   const [openDropdownId, setOpenDropdownId] = useState(null);
 
   // Cross-level drag state
@@ -485,6 +486,12 @@ function MenuEditor({ initialItems = [], onChange, onDeleteItem }) {
             Add Item
           </Button>
         </div>
+
+        {linkTargetsFailed && (
+          <div className="mb-2">
+            <LinkTargetsNotice onRetry={retryLinkTargets} />
+          </div>
+        )}
 
         <SortableList
           flattenedItems={flattenedItems}

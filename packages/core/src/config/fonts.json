@@ -549,6 +549,26 @@
       ]
     },
     {
+      "name": "Brygada 1918",
+      "stack": "\"Brygada 1918\", serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        400,
+        500,
+        600,
+        700
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "greek",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
+    },
+    {
       "name": "Cabin",
       "stack": "\"Cabin\", sans-serif",
       "isGoogleFont": true,
@@ -791,6 +811,31 @@
         500,
         600,
         700
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "greek",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
+    },
+    {
+      "name": "Commissioner",
+      "stack": "\"Commissioner\", sans-serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        100,
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
       ],
       "defaultWeight": 400,
       "subsets": [
@@ -1223,6 +1268,31 @@
       ]
     },
     {
+      "name": "Geologica",
+      "stack": "\"Geologica\", sans-serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        100,
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "greek",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
+    },
+    {
       "name": "Glegoo",
       "stack": "\"Glegoo\", serif",
       "isGoogleFont": true,
@@ -1255,6 +1325,47 @@
         "cyrillic-ext",
         "latin",
         "latin-ext"
+      ]
+    },
+    {
+      "name": "Google Sans",
+      "stack": "\"Google Sans\", sans-serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        400,
+        500,
+        600,
+        700
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "arabic",
+        "armenian",
+        "bengali",
+        "canadian-aboriginal",
+        "cyrillic",
+        "cyrillic-ext",
+        "devanagari",
+        "ethiopic",
+        "georgian",
+        "greek",
+        "greek-ext",
+        "gujarati",
+        "gurmukhi",
+        "hebrew",
+        "kannada",
+        "khmer",
+        "lao",
+        "latin",
+        "latin-ext",
+        "malayalam",
+        "oriya",
+        "sinhala",
+        "symbols",
+        "tamil",
+        "telugu",
+        "thai",
+        "vietnamese"
       ]
     },
     {
@@ -2302,6 +2413,122 @@
       ]
     },
     {
+      "name": "Noto Sans Armenian",
+      "stack": "\"Noto Sans Armenian\", sans-serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        100,
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "armenian",
+        "latin",
+        "latin-ext"
+      ]
+    },
+    {
+      "name": "Noto Sans Ethiopic",
+      "stack": "\"Noto Sans Ethiopic\", sans-serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        100,
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "ethiopic",
+        "latin",
+        "latin-ext"
+      ]
+    },
+    {
+      "name": "Noto Sans Georgian",
+      "stack": "\"Noto Sans Georgian\", sans-serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        100,
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "cyrillic-ext",
+        "georgian",
+        "greek-ext",
+        "latin",
+        "latin-ext",
+        "math",
+        "symbols"
+      ]
+    },
+    {
+      "name": "Noto Sans Gujarati",
+      "stack": "\"Noto Sans Gujarati\", sans-serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        100,
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "gujarati",
+        "latin",
+        "latin-ext",
+        "math",
+        "symbols"
+      ]
+    },
+    {
+      "name": "Noto Sans Gurmukhi",
+      "stack": "\"Noto Sans Gurmukhi\", sans-serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        100,
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "gurmukhi",
+        "latin",
+        "latin-ext"
+      ]
+    },
+    {
       "name": "Noto Sans Hebrew",
       "stack": "\"Noto Sans Hebrew\", sans-serif",
       "isGoogleFont": true,
@@ -2350,6 +2577,28 @@
       ]
     },
     {
+      "name": "Noto Sans Khmer",
+      "stack": "\"Noto Sans Khmer\", sans-serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        100,
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "khmer",
+        "latin",
+        "latin-ext"
+      ]
+    },
+    {
       "name": "Noto Sans KR",
       "stack": "\"Noto Sans KR\", sans-serif",
       "isGoogleFont": true,
@@ -2371,6 +2620,50 @@
         "latin",
         "latin-ext",
         "vietnamese"
+      ]
+    },
+    {
+      "name": "Noto Sans Lao",
+      "stack": "\"Noto Sans Lao\", sans-serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        100,
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "lao",
+        "latin",
+        "latin-ext"
+      ]
+    },
+    {
+      "name": "Noto Sans Myanmar",
+      "stack": "\"Noto Sans Myanmar\", sans-serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        100,
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin",
+        "latin-ext",
+        "myanmar"
       ]
     },
     {
@@ -2398,6 +2691,28 @@
       ]
     },
     {
+      "name": "Noto Sans Sinhala",
+      "stack": "\"Noto Sans Sinhala\", sans-serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        100,
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin",
+        "latin-ext",
+        "sinhala"
+      ]
+    },
+    {
       "name": "Noto Sans TC",
       "stack": "\"Noto Sans TC\", sans-serif",
       "isGoogleFont": true,
@@ -2419,6 +2734,28 @@
         "latin",
         "latin-ext",
         "vietnamese"
+      ]
+    },
+    {
+      "name": "Noto Sans Telugu",
+      "stack": "\"Noto Sans Telugu\", sans-serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        100,
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin",
+        "latin-ext",
+        "telugu"
       ]
     },
     {
@@ -2445,6 +2782,124 @@
         "latin",
         "latin-ext",
         "math",
+        "vietnamese"
+      ]
+    },
+    {
+      "name": "Noto Serif Display",
+      "stack": "\"Noto Serif Display\", serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        100,
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "greek",
+        "greek-ext",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
+    },
+    {
+      "name": "Noto Serif JP",
+      "stack": "\"Noto Serif JP\", serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "cyrillic",
+        "japanese",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
+    },
+    {
+      "name": "Noto Serif KR",
+      "stack": "\"Noto Serif KR\", serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "cyrillic",
+        "korean",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
+    },
+    {
+      "name": "Noto Serif SC",
+      "stack": "\"Noto Serif SC\", serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "chinese-simplified",
+        "cyrillic",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
+    },
+    {
+      "name": "Noto Serif TC",
+      "stack": "\"Noto Serif TC\", serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "chinese-traditional",
+        "cyrillic",
+        "latin",
+        "latin-ext",
         "vietnamese"
       ]
     },
@@ -3112,6 +3567,31 @@
       ]
     },
     {
+      "name": "Roboto Flex",
+      "stack": "\"Roboto Flex\", sans-serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        100,
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "greek",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
+    },
+    {
       "name": "Roboto Mono",
       "stack": "\"Roboto Mono\", monospace",
       "isGoogleFont": true,
@@ -3373,6 +3853,78 @@
       ],
       "defaultWeight": 400,
       "subsets": [
+        "latin",
+        "latin-ext"
+      ]
+    },
+    {
+      "name": "Sofia Sans",
+      "stack": "\"Sofia Sans\", sans-serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        100,
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "greek",
+        "latin",
+        "latin-ext"
+      ]
+    },
+    {
+      "name": "Sofia Sans Condensed",
+      "stack": "\"Sofia Sans Condensed\", sans-serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        100,
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "greek",
+        "latin",
+        "latin-ext"
+      ]
+    },
+    {
+      "name": "Sofia Sans Extra Condensed",
+      "stack": "\"Sofia Sans Extra Condensed\", sans-serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        100,
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "greek",
         "latin",
         "latin-ext"
       ]

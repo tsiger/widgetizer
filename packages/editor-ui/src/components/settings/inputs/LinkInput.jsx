@@ -1,6 +1,7 @@
-import { useMemo, useCallback } from "react";
+import { useMemo, useCallback, useRef } from "react";
 
 import useLinkTargets from "../../../hooks/useLinkTargets";
+import LinkTargetsNotice from "./LinkTargetsNotice";
 import { resolveStoredLink } from "../../../utils/linkValueResolver";
 import TextInput from "./TextInput";
 import CheckboxInput from "./CheckboxInput";
@@ -9,7 +10,14 @@ import Combobox from "../../ui/Combobox";
 
 export default function LinkInput({ id, value = {}, onChange, setting }) {
   // Pages + collection item pages, grouped, loaded once per project.
-  const { options, loading } = useLinkTargets();
+  const { options, loading, failed, retry } = useLinkTargets();
+  const inputRef = useRef(null);
+  // Try again takes the notice away with its button; focus goes back to the field
+  // rather than being dropped on the page.
+  const retryTargets = () => {
+    inputRef.current?.focus();
+    retry();
+  };
 
   // value (uuid) -> option, for resolving the current selection.
   const optionsByUuid = useMemo(() => {
@@ -93,6 +101,8 @@ export default function LinkInput({ id, value = {}, onChange, setting }) {
           value={comboboxValue}
           onChange={handleLinkChange}
           placeholder="Select a page or type a URL..."
+          notice={failed ? <LinkTargetsNotice onRetry={retryTargets} /> : null}
+          inputRef={inputRef}
         />
       </SettingsField>
 

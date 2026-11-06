@@ -46,7 +46,7 @@ describe("mediaManager", () => {
     expect(editorFetchJson).toHaveBeenCalledWith(
       "/media",
       {},
-      { fallbackMessage: "Failed to get media files" },
+      { expect: "object", fallbackMessage: "Failed to get media files" },
     );
   });
 

@@ -140,6 +140,8 @@ const { actorScopedRouter, projectScopedRouter, mediaFileRouter, previewRouter }
 
 `req.adapters` is attached **per-router** (not app-wide), so each router is self-sufficient wherever it is mounted.
 
+JSON replies from `actorScopedRouter` and `projectScopedRouter` carry `Cache-Control: no-store` unless the handler sets its own caching (`middleware/noStoreJson.js`), so the browser never hands the editor a stored copy. Non-JSON replies (theme assets, export downloads) and the media file and preview routers cache as usual. An embedding app gets this wherever it mounts the two routers; a request neither router answers leaves them unmarked, so the app's own routes after them keep their caching.
+
 ### `createEditorApp({ adapters, plugins })`
 
 Wires the `mediaFileRouter` at `/api/media` (ahead of the others), both scoped routers under `/api` and the `previewRouter` at `/`, plus helmet, cors, per-route JSON body limits, static UI serving, and the error handler. This is what the OSS shell calls.
@@ -169,11 +171,16 @@ Lives in builder-server. It delegates to `req.adapters.scopeResolver.resolveScop
 
 - `lib/apiBase.js` — module singleton `_apiBase` (default `/api`), with `setApiBase` / `getApiBase`.
 - `lib/apiFetch.js` — `editorFetch(path, opts)` calls `apiFetch(getApiBase() + path)` and injects the `X-Project-Id` header. Query managers pass project-relative paths; the base is resolved at call time.
+- `apiFetchJson` / `editorFetchJson` take an `expect` option, `"array"` or `"object"`: a successful reply of another shape (an empty body, an HTML page from something in front of the server, a list where an object belongs) is rejected as an `ApiError` with code `UNEXPECTED_REPLY` and the call's fallback message, so the screen's load-error path shows it. Every editor GET query names its shape, except the active-project read, whose reply is `null` when there are no projects.
 
 ### Mutation-success notification
 
 - `subscribeMutationSuccess(handler)` (`lib/mutationEvents.js`, exported from the package root) — registers a listener called with `{ method, path }` after a successful modifying request; returns an unsubscribe function. Two announce points: `apiFetch` (any non-GET/HEAD/OPTIONS response that is `ok` and not a followed redirect; `path` as passed in, API base included for editor calls) and `uploadRequest` (XHR uploads, announced as `POST` on a 2xx unless the XHR followed a redirect).
 - "Success" means HTTP success, not a content change: read-shaped POSTs (preview render, export, media refresh-usage) and a `207` partial result are announced too, so subscribers filter for what they care about. A listener that throws or returns a rejecting promise is logged and never breaks the request.
+
+### Request hooks
+
+- `setRequestHooks({ requestHeaders, observeResponse })` (`lib/requestHooks.js`, exported from the package root) — lets an embedding shell add headers to every editor request and see every response, for both transports (`apiFetch` and the `uploadRequest` XHR uploads). `requestHeaders()` may return a promise (a shell fetching a fresh auth token); use header names the editor doesn't set itself (in `apiFetch` the request's own headers win; an XHR combines repeated names). `observeResponse({ status, getHeader, method, path })` runs for each response that reached the server, not for network failures or aborts. One registration at a time (a new call replaces the old); returns a function that removes it. The OSS shells register nothing, so nothing is added or observed; a hook that throws is logged and never breaks the request.
 
 ### Save-failure message
 

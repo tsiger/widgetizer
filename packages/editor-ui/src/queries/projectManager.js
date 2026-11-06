@@ -71,7 +71,7 @@ export async function getAllProjects({ forceRefresh } = {}) {
 
   const fetchPromise = (async () => {
     try {
-      const data = await apiFetchJson("/api/projects", {}, { fallbackMessage: "Failed to get projects" });
+      const data = await apiFetchJson("/api/projects", {}, { expect: "array", fallbackMessage: "Failed to get projects" });
       // Only populate cache if no invalidation occurred since this fetch started
       if (projectsListCache.version === versionAtStart) {
         projectsListCache = { data, timestamp: Date.now(), promise: null, version: versionAtStart };
@@ -314,6 +314,7 @@ export async function importProject(file, optionsOrProgress) {
 export async function checkThemeUpdates(projectId) {
   try {
     return await apiFetchJson(`/api/projects/${projectId}/theme-updates/status`, {}, {
+      expect: "object",
       fallbackMessage: "Failed to check theme updates",
     });
   } catch (error) {

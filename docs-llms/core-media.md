@@ -270,6 +270,7 @@ The Media page (`packages/editor-ui/src/pages/Media.jsx`) orchestrates specializ
 - `useMediaUpload` — XHR progress tracking, batched (chunks of 5) multi-file uploads, client-side SVG sanitization via `DOMPurify` (server re-sanitizes — see § Upload Flow), per-file error reporting and toasts.
 - `useMediaSelection` — multi-select, select-all/none with filtering, usage-aware single/bulk deletion, confirmation-modal state.
 - `useMediaMetadata` — metadata drawer state, saving alt/title/caption via the API.
+- `useMediaUsageTitles` — the page and item names the "Used in" labels show. If the page list can't be loaded, the labels show raw references and the page shows a toast saying so.
 
 See [Custom Hooks](core-hooks.md) for hook-by-hook detail.
 
@@ -286,7 +287,7 @@ The thumbnail/preview path falls back to the original image when a `thumb` varia
 ### Setting Inputs (`packages/editor-ui/src/components/settings/inputs/`)
 
 - `ImageInput` — image picker with **default** mode (wide preview, Upload + Browse below) and **compact** mode (`compact: true` — square preview with stacked actions and hover Edit/Remove; used for small assets like the Arch `favicon`). Opens `MediaSelectorDrawer` with `filterType="image"`.
-- `FileInput` — filename-oriented picker for file assets (`type: "file"` in `SettingsRenderer`; also `type: "video"` with `filterType="video"`). In file mode upload accepts `NON_IMAGE_ACCEPT` and Browse opens `MediaSelectorDrawer` with `filterType="file"`; in video mode both are MP4-only and a non-MP4 selection is refused. Shows filename + extension badge + clear; no thumbnail. `value` is the file path string (e.g. `/uploads/files/brochure.pdf`). See [Setting Types](theming-setting-types.md) for the `file` type.
+- `FileInput` — filename-oriented picker for file assets (`type: "file"` in `SettingsRenderer`; also `type: "video"` with `filterType="video"`). In file mode upload accepts `NON_IMAGE_ACCEPT` and Browse opens `MediaSelectorDrawer` with `filterType="file"`; in video mode both are MP4-only and a non-MP4 selection is refused. Shows filename + extension badge + clear; no thumbnail. `value` is the file path string (e.g. `/uploads/files/brochure.pdf`). A stored file is always shown, by its library name when the library has it and by the path's filename otherwise: a path the library doesn't list (checked again with a fresh read first, since the cached list may predate an upload) gets "Not in the media library", and a library that can't be read gets "This file's details couldn't be loaded" with **Try again**. The empty upload box means no file is stored. See [Setting Types](theming-setting-types.md) for the `file` type.
 
 `MediaSelectorDrawer` is also used by `PageForm` (featured image). The Arch theme's `resource-list` widget uses the `file` setting type for download lists.
 

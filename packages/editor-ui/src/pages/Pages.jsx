@@ -35,6 +35,8 @@ export default function Pages() {
   const navigate = useNavigate();
   const editorPath = useEditorPath();
   const [pages, setPages] = useState([]);
+  // A list that failed to load must not read as a site without pages.
+  const [loadFailed, setLoadFailed] = useState(false);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [openMenuId, setOpenMenuId] = useState(null);
@@ -117,6 +119,7 @@ export default function Pages() {
   useEffect(() => {
     if (!activeProject?.id) {
       setPages([]);
+      setLoadFailed(false);
       setLoading(false);
       clearSelection();
       return;
@@ -154,11 +157,13 @@ export default function Pages() {
       setLoading(true);
       const data = await getAllPages();
       setPages(data);
+      setLoadFailed(false);
       // Signal components that derive state from the page list (e.g. the Sidebar's
       // Site-preview gate) so they re-check after an in-place create/delete.
       usePageListStore.getState().notifyPagesChanged();
     } catch (error) {
       console.error("Error loading pages:", error);
+      setLoadFailed(true);
       showToast(t("pages.toasts.loadError"), "error");
     } finally {
       setLoading(false);
@@ -263,6 +268,14 @@ export default function Pages() {
       }
     >
       {languageTabs}
+      {hasPages && loadFailed && (
+        <div className="mb-4 flex items-center justify-between gap-4 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          <span>{t("pages.loadFailedStale")}</span>
+          <Button variant="secondary" size="sm" onClick={loadPages}>
+            {t("pages.retry")}
+          </Button>
+        </div>
+      )}
       {hasPages && (
         <>
           {/* Toolbar */}
@@ -450,7 +463,16 @@ export default function Pages() {
         </>
       )}
 
-      {!hasPages && (
+      {!hasPages && loadFailed && (
+        <div className="p-8 text-center">
+          <p className="text-slate-600 mb-4">{t("pages.loadFailed")}</p>
+          <Button variant="secondary" onClick={loadPages}>
+            {t("pages.retry")}
+          </Button>
+        </div>
+      )}
+
+      {!hasPages && !loadFailed && (
         <div className="p-8 text-center">
           <FileText className="mx-auto mb-4 text-slate-400" size={48} />
           <h2 className="text-xl font-semibold mb-2">{t("pages.noPagesYet")}</h2>

@@ -89,7 +89,7 @@ export async function getAllThemes({ forceRefresh } = {}) {
 
   const fetchPromise = (async () => {
     try {
-      const data = await apiFetchJson("/api/themes", {}, { fallbackMessage: "Failed to get themes" });
+      const data = await apiFetchJson("/api/themes", {}, { expect: "array", fallbackMessage: "Failed to get themes" });
       // Only populate cache if no invalidation occurred since this fetch started
       if (themesListCache.version === versionAtStart) {
         themesListCache = { data, timestamp: Date.now(), promise: null, version: versionAtStart };
@@ -130,7 +130,7 @@ export function getThemeScreenshotUrl(themeId) {
  */
 export async function getTheme(themeId) {
   try {
-    return await apiFetchJson(`/api/themes/${themeId}`, {}, { fallbackMessage: "Failed to get theme" });
+    return await apiFetchJson(`/api/themes/${themeId}`, {}, { expect: "object", fallbackMessage: "Failed to get theme" });
   } catch (error) {
     console.error("Error getting theme:", error);
     rethrowQueryError(error, "Failed to get theme");
@@ -148,6 +148,7 @@ export async function getThemeWidgets(themeId) {
   try {
     // If no themeId is provided, use the active project's theme
     return await apiFetchJson(`/api/themes/${themeId || "default"}/widgets`, {}, {
+      expect: "array",
       fallbackMessage: "Failed to get theme widgets",
     });
   } catch (error) {
@@ -166,6 +167,7 @@ export async function getThemeWidgets(themeId) {
 export async function getThemeTemplates(themeId) {
   try {
     return await apiFetchJson(`/api/themes/${themeId || "default"}/templates`, {}, {
+      expect: "array",
       fallbackMessage: "Failed to get theme templates",
     });
   } catch (error) {
@@ -189,6 +191,7 @@ export async function getThemeSettings(projectId) {
 
   try {
     return await apiFetchJson(`/api/themes/project/${resolvedProjectId}`, {}, {
+      expect: "object",
       fallbackMessage: "Failed to fetch theme settings",
     });
   } catch (error) {
@@ -316,6 +319,7 @@ export async function uploadThemeZip(zipFile, onProgress) {
 export async function getThemeVersions(themeId) {
   try {
     return await apiFetchJson(`/api/themes/${themeId}/versions`, {}, {
+      expect: "object",
       fallbackMessage: "Failed to get theme versions",
     });
   } catch (error) {
@@ -327,16 +331,17 @@ export async function getThemeVersions(themeId) {
 /**
  * Get the count of themes that have updates available.
  * Used for displaying update badges in the UI.
- * @returns {Promise<{count: number}>} Object with update count
+ * @returns {Promise<{count: number}>} Object with update count; rejects when the count can't be read
  */
 export async function getThemeUpdateCount() {
   try {
     return await apiFetchJson("/api/themes/update-count", {}, {
+      expect: "object",
       fallbackMessage: "Failed to get theme update count",
     });
   } catch (error) {
-    console.error("Error getting theme update count:", error);
-    return { count: 0 };
+    // The badge's store logs a failure and keeps the count it last knew.
+    rethrowQueryError(error, "Failed to get theme update count");
   }
 }
 
@@ -388,6 +393,7 @@ export async function deleteTheme(themeId) {
 export async function getThemePresets(themeId) {
   try {
     return await apiFetchJson(`/api/themes/${themeId}/presets`, {}, {
+      expect: "object",
       fallbackMessage: "Failed to fetch theme presets",
     });
   } catch (error) {

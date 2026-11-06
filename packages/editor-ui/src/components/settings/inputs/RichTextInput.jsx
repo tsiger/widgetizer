@@ -28,6 +28,7 @@ import ResolvedImage from "./ResolvedImage";
 import MediaSelectorDrawer from "../../media/MediaSelectorDrawer";
 import useProjectStore from "../../../stores/projectStore";
 import useLinkTargets from "../../../hooks/useLinkTargets";
+import LinkTargetsNotice from "./LinkTargetsNotice";
 import { useIsMultilang } from "../../../stores/projectStore";
 import { useEditingLanguage } from "../../../lib/editingLanguage.jsx";
 import { groupLinkTargets } from "../../../lib/linkTargetGroups";
@@ -39,35 +40,49 @@ import "./RichTextInput.css";
 /** A picker (mounted only when internal targets are allowed + the link row is open) so
  *  useLinkTargets fetches lazily. Selecting a page/item applies a stable internal link. */
 function InternalLinkPicker({ onPick }) {
-  const { options, loading } = useLinkTargets();
+  const { options, loading, failed, retry } = useLinkTargets();
+  const selectRef = useRef(null);
   const isMultilang = useIsMultilang();
   const editingLanguage = useEditingLanguage();
   const groups = groupLinkTargets(options, { isMultilang, editingLanguage });
   return (
-    <select
-      className="richtext-link-input richtext-link-picker"
-      defaultValue=""
-      disabled={loading}
-      onChange={(e) => {
-        const opt = options.find((o) => o.value === e.target.value);
-        if (opt) onPick(opt);
-        e.target.value = "";
-      }}
-      title="Link to a page or collection item"
-    >
-      <option value="" disabled>
-        {loading ? "Loading…" : "Link to page/item…"}
-      </option>
-      {groups.map((g) => (
-        <optgroup key={g.key} label={g.label}>
-          {g.items.map((o) => (
-            <option key={o.value} value={o.value}>
-              {o.label}
-            </option>
-          ))}
-        </optgroup>
-      ))}
-    </select>
+    <>
+      <select
+        ref={selectRef}
+        className="richtext-link-input richtext-link-picker"
+        defaultValue=""
+        disabled={loading}
+        onChange={(e) => {
+          const opt = options.find((o) => o.value === e.target.value);
+          if (opt) onPick(opt);
+          e.target.value = "";
+        }}
+        title="Link to a page or collection item"
+      >
+        <option value="" disabled>
+          {loading ? "Loading…" : "Link to page/item…"}
+        </option>
+        {groups.map((g) => (
+          <optgroup key={g.key} label={g.label}>
+            {g.items.map((o) => (
+              <option key={o.value} value={o.value}>
+                {o.label}
+              </option>
+            ))}
+          </optgroup>
+        ))}
+      </select>
+      {failed && (
+        <div className="mt-1">
+          <LinkTargetsNotice
+            onRetry={() => {
+              selectRef.current?.focus();
+              retry();
+            }}
+          />
+        </div>
+      )}
+    </>
   );
 }
 

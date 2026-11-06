@@ -42,8 +42,10 @@ const SCHEMA = {
 const temporal = () => usePageStore.temporal.getState();
 const widget = () => usePageStore.getState().page.widgets.w1;
 
-function renderPanel(settings) {
-  usePageStore.setState({ page: { id: "blog", widgets: { w1: { type: "news-grid", settings } }, widgetsOrder: ["w1"] } });
+function renderPanel(settings, others = {}, othersOrder = []) {
+  usePageStore.setState({
+    page: { id: "blog", widgets: { w1: { type: "news-grid", settings }, ...others }, widgetsOrder: ["w1", ...othersOrder] },
+  });
   temporal().clear();
   render(
     <SettingsPanel
@@ -92,6 +94,19 @@ describe("Split into pages", () => {
 
     temporal().undo();
     expect(widget().settings).toEqual({ limit: 0 });
+  });
+
+  // One widget the page shows may split it, as the save and the render count them.
+  it("is refused while another widget the page shows splits it", () => {
+    renderPanel({ limit: 6 }, { w2: { type: "news-grid", settings: { limit: 6, paginate: true } } }, ["w2"]);
+    onChange("paginate", true);
+    expect(widget().settings.paginate).toBeUndefined();
+  });
+
+  it("isn't refused for a widget the page holds but doesn't show", () => {
+    renderPanel({ limit: 6 }, { w9: { type: "news-grid", settings: { limit: 6, paginate: true } } });
+    onChange("paginate", true);
+    expect(widget().settings.paginate).toBe(true);
   });
 
   it("stays on when the main page setting is turned off", () => {

@@ -22,6 +22,9 @@ import { useEditingLanguage } from "../../lib/editingLanguage.jsx";
  * @param {object[]} options    Already-filtered options ({ value, label, group?, language? }).
  * @param {(option: object) => void} onSelect  Called with the clicked option.
  * @param {string} emptyText    Shown when `options` is empty.
+ * @param {import("react").ReactNode} [notice] Something to say about the list itself
+ *   (e.g. that it couldn't all be loaded). It takes the place of `emptyText` when
+ *   there are no options, and sits above them otherwise.
  * @param {string} [className]  Extra classes for the `<ul>` (e.g. the z-index hook).
  * @param {string} [initialLanguage] The language filter to open on instead of the
  *   language being edited, e.g. a selection's own language so it is in view.
@@ -35,6 +38,7 @@ export default function ComboboxOptionList({
   options,
   onSelect,
   emptyText,
+  notice,
   className = "",
   initialLanguage,
   selectedValue,
@@ -89,6 +93,11 @@ export default function ComboboxOptionList({
               {code === ALL_LANGUAGES ? "All" : hreflangCase(code)}
             </button>
           ))}
+        </li>
+      )}
+      {notice && visible.length > 0 && (
+        <li role="presentation" className="border-b border-slate-100 px-3 py-2">
+          {notice}
         </li>
       )}
       {visible.length > 0 ? (
@@ -146,7 +155,7 @@ export default function ComboboxOptionList({
           role={pickOnly ? "presentation" : undefined}
           className="relative cursor-default select-none py-2 pl-3 pr-9 text-slate-500"
         >
-          {emptyText}
+          {notice || emptyText}
         </li>
       )}
     </ul>

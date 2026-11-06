@@ -19,7 +19,7 @@ import { editorFetchJson, rethrowQueryError } from "../lib/apiFetch";
  */
 export async function getAllPages() {
   try {
-    return await editorFetchJson("/pages", {}, { fallbackMessage: "Failed to get pages" });
+    return await editorFetchJson("/pages", {}, { expect: "array", fallbackMessage: "Failed to get pages" });
   } catch (error) {
     rethrowQueryError(error, "Failed to get pages");
   }
@@ -73,7 +73,7 @@ export async function bulkDeletePages(pageIds, language) {
 export async function getPage(id, language) {
   const query = language ? `?language=${encodeURIComponent(language)}` : "";
   try {
-    return await editorFetchJson(`/pages/${id}${query}`, {}, { fallbackMessage: "Failed to get page" });
+    return await editorFetchJson(`/pages/${id}${query}`, {}, { expect: "object", fallbackMessage: "Failed to get page" });
   } catch (error) {
     rethrowQueryError(error, "Failed to get page");
   }

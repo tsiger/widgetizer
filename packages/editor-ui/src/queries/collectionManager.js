@@ -39,7 +39,7 @@ const languageQuery = (language) => (language ? `?language=${encodeURIComponent(
  */
 export async function getCollectionSchemas() {
   try {
-    return await editorFetchJson("/collections/schemas", {}, { fallbackMessage: "Failed to get collections" });
+    return await editorFetchJson("/collections/schemas", {}, { expect: "array", fallbackMessage: "Failed to get collections" });
   } catch (error) {
     rethrowQueryError(error, "Failed to get collections");
   }
@@ -52,7 +52,7 @@ export async function getCollectionSchemas() {
  */
 export async function getCollectionSchema(type) {
   try {
-    return await editorFetchJson(`/collections/schema/${type}`, {}, { fallbackMessage: "Failed to get collection" });
+    return await editorFetchJson(`/collections/schema/${type}`, {}, { expect: "object", fallbackMessage: "Failed to get collection" });
   } catch (error) {
     rethrowQueryError(error, "Failed to get collection");
   }
@@ -77,7 +77,7 @@ export async function getCollectionItems(type, params) {
       const query = search.toString();
       if (query) path += `?${query}`;
     }
-    return await editorFetchJson(path, {}, { fallbackMessage: "Failed to get collection items" });
+    return await editorFetchJson(path, {}, { expect: "array", fallbackMessage: "Failed to get collection items" });
   } catch (error) {
     rethrowQueryError(error, "Failed to get collection items");
   }
@@ -94,7 +94,7 @@ export async function getCollectionItem(type, slug, language) {
     return await editorFetchJson(
       `/collections/${type}/${slug}${languageQuery(language)}`,
       {},
-      { fallbackMessage: "Failed to get item" },
+      { expect: "object", fallbackMessage: "Failed to get item" },
     );
   } catch (error) {
     rethrowQueryError(error, "Failed to get item");
@@ -302,7 +302,7 @@ export async function createItemLanguageVersion(type, slug, { targetLanguage, so
  */
 export async function getTranslationGroup(groupId) {
   try {
-    return await editorFetchJson(`/translations/${groupId}`, {}, { fallbackMessage: "Failed to read the group" });
+    return await editorFetchJson(`/translations/${groupId}`, {}, { expect: "object", fallbackMessage: "Failed to read the group" });
   } catch (error) {
     rethrowQueryError(error, "Failed to read the group");
   }

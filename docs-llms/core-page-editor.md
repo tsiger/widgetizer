@@ -53,6 +53,7 @@ The `PageEditor` does not manage complex state internally. Instead, it relies on
 4. Simultaneously, it calls `useWidgetStore.getState().loadSchemas(language)`. `pageStore.loadPage()` fetches page data and that page language's global widgets (`readGlobalWidgets`), then ensures `themeStore` has theme settings for the same project before capturing a history snapshot for undo/redo. Project-switch store reset is coordinated by the OSS shell's `projectSwitchCoordinator`.
 5.  Before loading, it calls `useAutoSave.getState().resumeSaving()`: a page load is a new editing session, so saving suspended by a removed language (see Saving Changes) is re-enabled and its banner cleared.
 6.  While data is being fetched, a `LoadingSpinner` is displayed.
+    If the widget schemas fail to load, the editor shows that failure, with **Back to Pages** and a **Try again** button that calls `loadSchemas` again, instead of the editor: without schemas there are no settings and nothing to insert, and the page would look as if it had no widgets.
 7.  The editor renders inside `EditingLanguageProvider` with the loaded page's language.
 
 ### Editing a Widget

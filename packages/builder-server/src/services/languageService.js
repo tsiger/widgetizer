@@ -213,14 +213,16 @@ function withRemappedMenus(widget, schema, menuRefs) {
   for (const id of menuIds.settings) {
     if (id in settings) settings[id] = remapped(settings[id], menuRefs);
   }
-  const blocks = {};
-  for (const [blockId, block] of Object.entries(widget.blocks || {})) {
-    const blockSettings = { ...(block?.settings || {}) };
-    for (const id of menuIds.blocks.get(block?.type) || []) {
-      if (id in blockSettings) blockSettings[id] = remapped(blockSettings[id], menuRefs);
-    }
-    blocks[blockId] = { ...block, settings: blockSettings };
-  }
+  // fromEntries keeps an own `__proto__` block key an ordinary key.
+  const blocks = Object.fromEntries(
+    Object.entries(widget.blocks || {}).map(([blockId, block]) => {
+      const blockSettings = { ...(block?.settings || {}) };
+      for (const id of menuIds.blocks.get(block?.type) || []) {
+        if (id in blockSettings) blockSettings[id] = remapped(blockSettings[id], menuRefs);
+      }
+      return [blockId, { ...block, settings: blockSettings }];
+    }),
+  );
   return { ...widget, settings, blocks };
 }
 
@@ -272,7 +274,9 @@ async function seedAreas(storage, scope, lang, menuRefs, areaIds) {
     const area = await readJson(storage, scope, areaKey(id));
     if (!area?.widgets) continue;
 
-    const widgets = {};
+    // Collected as entries: an own `__proto__` widget key assigned into a fresh map
+    // would set its prototype instead.
+    const entries = [];
     for (const [widgetId, widget] of Object.entries(area.widgets)) {
       // Each widget's own schema says which settings name a menu. Core widgets
       // select no menus, and a widget whose schema cannot be read keeps its own.
@@ -280,8 +284,9 @@ async function seedAreas(storage, scope, lang, menuRefs, areaIds) {
       if (typeof widget?.type === "string" && !widget.type.startsWith("core-")) {
         schema = await readJson(storage, scope, `widgets/${widget.type}/schema.json`).catch(() => null);
       }
-      widgets[widgetId] = schema ? withRemappedMenus(widget, schema, menuRefs) : widget;
+      entries.push([widgetId, schema ? withRemappedMenus(widget, schema, menuRefs) : widget]);
     }
+    const widgets = Object.fromEntries(entries);
     // A stored area can carry repeats (written by hand, restored from a backup).
     const copy = { ...area, widgets: uniqueBlockOrders(widgets), widgetsOrder: uniqueWidgetOrder(area.widgetsOrder) };
     await storage.write(scope, areaKey(id, lang), JSON.stringify(copy, null, 2));

@@ -17,7 +17,7 @@ import { LIMIT_KEYS, MAX_WIDGETS_PER_PAGE } from "@widgetizer/core/adapters";
 import { sanitizeSlug, generateUniqueSlug } from "../utils/slugHelpers.js";
 import { generateCopyName } from "../utils/namingHelpers.js";
 import { isHomeSlug, isReservedPageSlug, pageKey, pagesDir } from "@widgetizer/core/contentAddress";
-import { uniqueBlockOrders, uniqueWidgetOrder } from "@widgetizer/core/widgetOrder";
+import { renderedWidgetOrder, uniqueBlockOrders, uniqueWidgetOrder } from "@widgetizer/core/widgetOrder";
 import { requestLanguage, projectLanguageContexts, withoutLanguage } from "../utils/contentLanguage.js";
 import {
   assertHasIdentity,
@@ -70,9 +70,12 @@ async function readWidgetSchema(storage, scope, type) {
   }
 }
 
-async function enforcePaginationRules({ scope, storage, widgets }) {
+async function enforcePaginationRules({ scope, storage, widgets, widgetsOrder }) {
   const paginators = [];
-  for (const widget of Object.values(widgets || {})) {
+  // Only the widgets the page shows count: one it holds but renders nowhere splits
+  // nothing. Every widget still has `paginate` switched off when its schema can't.
+  const shown = new Set(renderedWidgetOrder(widgets, widgetsOrder));
+  for (const [id, widget] of Object.entries(widgets || {})) {
     if (widget?.settings?.paginate !== true) continue;
     const schema = await readWidgetSchema(storage, scope, widget.type);
     const perPageSetting = schema?.collection?.perPageSetting;
@@ -80,6 +83,7 @@ async function enforcePaginationRules({ scope, storage, widgets }) {
       widget.settings.paginate = false;
       continue;
     }
+    if (!shown.has(id)) continue;
     const declared = schema.settings.find((setting) => setting?.id === perPageSetting);
     const perPage = Number(widget.settings[perPageSetting] ?? declared?.default);
     if (!Number.isInteger(perPage) || perPage < 1) {
@@ -422,59 +426,59 @@ export async function updatePage(req, res) {
     }
 
     if (pageData.widgets) {
-      const paginationError = await enforcePaginationRules({ scope, storage, widgets: pageData.widgets });
+      const paginationError = await enforcePaginationRules({
+        scope,
+        storage,
+        widgets: pageData.widgets,
+        widgetsOrder: pageData.widgetsOrder,
+      });
       if (paginationError) return res.status(422).json({ error: paginationError });
     }
 
-    // Read old file first to preserve original creation date and uuid
-    let originalCreationDate = new Date().toISOString();
-    let existingUuid = null;
-    let existingGroupId = null;
-    let existingWidgets = {};
-    try {
-      const oldBuf = await storage.read(scope, pageKey(oldSlug, lang));
-      if (oldBuf != null) {
-        const oldData = JSON.parse(oldBuf.toString("utf8"));
-        originalCreationDate = oldData.created || originalCreationDate;
-        existingUuid = oldData.uuid || null; // Preserve stable uuid across renames
-        existingGroupId = oldData.translationGroupId || null;
-        existingWidgets = oldData.widgets || {}; // Preserve widgets if not included in request
-      }
-      // If old file doesn't exist (e.g. first save after create error, or manual rename), allow creation
-    } catch (readError) {
-      console.warn(`Could not read old page file ${oldSlug} during update: ${readError.message}`);
-    }
-
-    // Construct the final page data for saving
-    const resolvedUuid = existingUuid || randomUUID();
-    // A page cannot be its own parent. The picker never offers it, and the
-    // breadcrumb builder would drop the loop anyway, but a direct API call
-    // should not be able to write it.
-    const parentPageUuid =
-      typeof pageData.parentPageUuid === "string" &&
-      pageData.parentPageUuid.trim() &&
-      pageData.parentPageUuid !== resolvedUuid
-        ? pageData.parentPageUuid.trim()
-        : undefined;
-
-    const finalUpdatedPageData = {
-      ...pageData, // Start with submitted data
-      parentPageUuid, // undefined drops the key entirely when cleared
-      uuid: resolvedUuid, // Preserve existing uuid or generate new one if missing
-      translationGroupId: existingGroupId || resolvedUuid,
-      language: lang.language,
-      id: finalNewSlug, // Use the final unique slug as ID
-      slug: finalNewSlug, // Use the final unique slug
-      name: pageData.name || `Page ${finalNewSlug}`, // Ensure name exists
-      widgets: pageData.widgets || existingWidgets, // Use submitted widgets or keep existing
-      created: originalCreationDate, // Preserve original creation date
-      updated: new Date().toISOString(), // Set new update timestamp
-    };
-
     // Both writes in one section, for the same reason as savePageContent below:
     // the sweep writes other pages in this language and must not outlive the
-    // section that checked the language still exists.
+    // section that checked the language still exists. The stored page is read in
+    // the section too: anything the request doesn't name (the widgets and their
+    // order, when the page settings form saves) is the stored page's as it is now,
+    // so content saved after the form was opened is kept.
+    let finalUpdatedPageData;
     const movedFrom = await withContentWriteLock(scope.projectId, async () => {
+      let stored = {};
+      try {
+        const oldBuf = await storage.read(scope, pageKey(oldSlug, lang));
+        // If the old file doesn't exist (e.g. first save after a create error, or a
+        // manual rename), the update creates it.
+        if (oldBuf != null) stored = JSON.parse(oldBuf.toString("utf8"));
+      } catch (readError) {
+        console.warn(`Could not read old page file ${oldSlug} during update: ${readError.message}`);
+      }
+
+      const resolvedUuid = stored.uuid || randomUUID();
+      // A page cannot be its own parent. The picker never offers it, and the
+      // breadcrumb builder would drop the loop anyway, but a direct API call
+      // should not be able to write it. A request that doesn't name a parent keeps
+      // the stored one; an empty one clears it.
+      const requestedParent = Object.hasOwn(pageData, "parentPageUuid") ? pageData.parentPageUuid : stored.parentPageUuid;
+      const parentPageUuid =
+        typeof requestedParent === "string" && requestedParent.trim() && requestedParent !== resolvedUuid
+          ? requestedParent.trim()
+          : undefined;
+
+      finalUpdatedPageData = {
+        ...stored, // The stored page, as it is now
+        ...pageData, // What the request names
+        parentPageUuid, // undefined drops the key entirely when cleared
+        uuid: resolvedUuid, // Preserve existing uuid or generate new one if missing
+        translationGroupId: stored.translationGroupId || resolvedUuid,
+        language: lang.language,
+        id: finalNewSlug, // Use the final unique slug as ID
+        slug: finalNewSlug, // Use the final unique slug
+        name: pageData.name || `Page ${finalNewSlug}`, // Ensure name exists
+        widgets: pageData.widgets || stored.widgets || {},
+        created: stored.created || new Date().toISOString(), // Preserve original creation date
+        updated: new Date().toISOString(), // Set new update timestamp
+      };
+
       await persistPageInSection({
         scope,
         storage,
@@ -491,6 +495,7 @@ export async function updatePage(req, res) {
             storage,
             keepPageId: finalNewSlug,
             widgets: finalUpdatedPageData.widgets,
+            widgetsOrder: finalUpdatedPageData.widgetsOrder,
             lang,
           })
         : [];
@@ -825,7 +830,12 @@ export async function savePageContent(req, res) {
         .json({ error: `Too many widgets on this page (${widgetCount}); the maximum is ${maxWidgets}.` });
     }
 
-    const paginationError = await enforcePaginationRules({ scope, storage, widgets: pageData.widgets });
+    const paginationError = await enforcePaginationRules({
+      scope,
+      storage,
+      widgets: pageData.widgets,
+      widgetsOrder: pageData.widgetsOrder,
+    });
     if (paginationError) return res.status(422).json({ error: paginationError });
 
     // Read existing data to preserve timestamps etc.
@@ -881,6 +891,7 @@ export async function savePageContent(req, res) {
         storage,
         keepPageId: pageData.slug,
         widgets: updatedPageData.widgets,
+        widgetsOrder: updatedPageData.widgetsOrder,
         lang,
       });
       return { ...persisted, movedFrom: moved };
@@ -912,9 +923,10 @@ export async function savePageContent(req, res) {
  * a widget whose schema does not declare one can never hold an anchor. Each
  * language has its own listing pages, so the sweep stays inside the language.
  */
-async function clearListingAnchorsElsewhere({ scope, storage, keepPageId, widgets, lang }) {
+async function clearListingAnchorsElsewhere({ scope, storage, keepPageId, widgets, widgetsOrder, lang }) {
   const claimed = new Set();
-  for (const widget of Object.values(widgets || {})) {
+  // Only a widget the page shows claims its collection, as the listing index reads it.
+  for (const widget of renderedWidgetOrder(widgets, widgetsOrder).map((id) => widgets[id])) {
     if (widget?.settings?.listing_anchor && widget.type) claimed.add(widget.type);
   }
   if (claimed.size === 0) return [];
@@ -946,7 +958,8 @@ async function clearListingAnchorsElsewhere({ scope, storage, keepPageId, widget
     const page = JSON.parse(buf.toString("utf8"));
 
     let modified = false;
-    for (const widget of Object.values(page.widgets || {})) {
+    // Only a widget the page shows holds the anchor; one it doesn't show keeps its setting.
+    for (const widget of renderedWidgetOrder(page.widgets, page.widgetsOrder).map((id) => page.widgets[id])) {
       if (!widget?.settings?.listing_anchor || !widget.type) continue;
       const collectionType = await collectionOf(widget.type);
       if (!collectionType || !claimedCollections.has(collectionType)) continue;
@@ -1011,13 +1024,13 @@ export async function duplicatePage(req, res) {
     // leave two pages claiming the same collection, which the save-time sweep
     // never sees (a duplicate is written directly), so the tie-break would pick
     // by slug rather than by what the user meant. The copy starts unclaimed.
-    const duplicatedWidgets = {};
-    for (const [widgetId, widget] of Object.entries(originalPageData.widgets || {})) {
-      duplicatedWidgets[widgetId] =
-        widget?.settings?.listing_anchor === true
-          ? { ...widget, settings: { ...widget.settings, listing_anchor: false } }
-          : widget;
-    }
+    // fromEntries keeps an own `__proto__` widget key an ordinary key.
+    const duplicatedWidgets = Object.fromEntries(
+      Object.entries(originalPageData.widgets || {}).map(([widgetId, widget]) => [
+        widgetId,
+        widget?.settings?.listing_anchor === true ? { ...widget, settings: { ...widget.settings, listing_anchor: false } } : widget,
+      ]),
+    );
 
     // A copy is a new page in its own translation group, not a translation of the original.
     const uuid = randomUUID();

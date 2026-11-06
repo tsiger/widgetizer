@@ -305,11 +305,12 @@ Used in `PageForm.jsx` and `CollectionItemForm.jsx`.
 
 ## Media Management Hooks
 
-The media library is built from four cooperating hooks. They are documented in full in [Media Library](core-media.md); the one-line roles:
+The media library is built from five cooperating hooks. They are documented in full in [Media Library](core-media.md); the one-line roles:
 
 - `useMediaState` (`packages/editor-ui/src/hooks/useMediaState.js`) — core state, data loading, view-mode persistence, and search filtering for the media library.
 - `useMediaUpload` (`packages/editor-ui/src/hooks/useMediaUpload.js`) — file upload operations with per-file XHR progress and toast feedback; uploaded files go to the top of the list (and the shared media cache), matching the library's newest-first order.
 - `useMediaSelection` (`packages/editor-ui/src/hooks/useMediaSelection.js`) — file selection and deletion workflows, with usage-protection validation via `useConfirmationModal`.
+- `useMediaUsageTitles` (`packages/editor-ui/src/hooks/useMediaUsageTitles.js`) — the titles the "Used in" labels show, from the page list and every collection's items. When the page list can't be loaded it keeps only the global labels and calls `onError`, and the library shows a toast saying the labels show raw references.
 - `useMediaMetadata` (`packages/editor-ui/src/hooks/useMediaMetadata.js`) — metadata-edit drawer state and saving (alt text, title, caption; these three are per language, sent with `?language=`) plus image viewing.
 
 See [Media Library](core-media.md) for the full architecture, API, and usage-protection rules.
@@ -384,7 +385,9 @@ Powers the link picker in `LinkInput.jsx`, the richtext internal-link picker (`R
 **Returns:**
 
 - `options` (array): Grouped option objects. Page options have `{ value: uuid, label, slug, isPage, group: "Pages", language }`; collection-item options have `{ value: uuid, label, isCollectionItem, collectionType, slugPrefix, slug, group, language }`.
-- `loading` (boolean): True while the first load is in flight.
+- `loading` (boolean): True while a load is in flight, the first one or a retry.
+- `failed` (boolean): True when the load couldn't read everything: the page list, the collection list, or some collection's items. The options keep what was read, and each picker shows `LinkTargetsNotice` ("Some pages and items couldn't be loaded…") with **Try again**; a link already set is kept as it is.
+- `retry` (function): Loads again in every mounted picker, so **Try again** in one clears the notice in all of them.
 
 **Named export:**
 
@@ -395,6 +398,7 @@ Powers the link picker in `LinkInput.jsx`, the richtext internal-link picker (`R
 - Module-level cache (1-minute TTL) keyed by project **and** its language list (adding, removing or reordering languages changes the answer under the same project id), shared across all pickers, so the many link inputs a page can host don't each refetch.
 - Single in-flight promise per project deduplicates concurrent loads.
 - A load that was in flight when the cache was invalidated still answers the picker that started it, but doesn't refill the cache, so the next picker loads afresh.
+- A load that couldn't read everything isn't cached either, so the next picker asks again.
 
 #### Used In
 

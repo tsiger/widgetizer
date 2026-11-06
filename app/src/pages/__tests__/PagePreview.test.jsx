@@ -99,7 +99,16 @@ describe("PagePreview — boot-race gate", () => {
 describe("PagePreview — one-shot token resolve", () => {
   it("fetches a standalone token and reports the iframe src once the page is loaded", async () => {
     projectState = { activeProject: { id: "p1" } };
-    pageState = { page: { id: "contact", widgets: {} }, loading: false, error: null, loadPage, globalWidgets: { header: {} } };
+    // The page store's areas go with the page: a load can repair ids in them, and the
+    // server renders its stored areas for any area not sent.
+    pageState = {
+      page: { id: "contact", widgets: {} },
+      loading: false,
+      error: null,
+      loadPage,
+      globalWidgets: { header: {} },
+      sharedAreas: { before_footer: { widgets: {}, widgetsOrder: [] } },
+    };
     fetchPreviewToken.mockResolvedValue({ token: "tok123" });
 
     renderPreview();
@@ -107,7 +116,12 @@ describe("PagePreview — one-shot token resolve", () => {
     await waitFor(() => expect(fetchPreviewToken).toHaveBeenCalled());
     // The page + its global widgets are sent with the standalone preview mode.
     expect(fetchPreviewToken).toHaveBeenCalledWith(
-      { id: "contact", widgets: {}, globalWidgets: { header: {} } },
+      {
+        id: "contact",
+        widgets: {},
+        globalWidgets: { header: {} },
+        sharedAreas: { before_footer: { widgets: {}, widgetsOrder: [] } },
+      },
       {},
       "standalone",
       1,

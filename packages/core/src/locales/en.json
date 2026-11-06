@@ -495,7 +495,10 @@
       "importNewVideo": "Upload a video",
       "fileFormats": "PDF, MP3, MP4",
       "videoFormats": "MP4",
-      "browseLibrary": "Choose from library"
+      "browseLibrary": "Choose from library",
+      "notInLibrary": "Not in the media library. Choose another file or remove it.",
+      "detailsFailed": "This file's details couldn't be loaded.",
+      "retry": "Try again"
     },
     "mediaSelector": {
       "title": "Select Media",
@@ -509,6 +512,10 @@
       "importNew": "Upload image",
       "uploaderTitle": "Upload New Media",
       "uploaderDesc": "Select files to add to your library"
+    },
+    "linkTargets": {
+      "loadFailed": "Some pages and items couldn't be loaded, so they're missing from this list. You can still type a URL.",
+      "retry": "Try again"
     }
   },
   "settings": {
@@ -615,6 +622,9 @@
     "noPagesMatch": "No pages match \"{{term}}\". Try a different search term.",
     "noPagesAvailable": "No pages available",
     "noPagesYet": "No pages yet",
+    "loadFailed": "The pages couldn't be loaded.",
+    "loadFailedStale": "The page list couldn't be refreshed, so it may be out of date.",
+    "retry": "Try again",
     "createFirstPage": "Create your first page to get started.",
     "actions": {
       "design": "Design page",
@@ -701,6 +711,8 @@
   "pageEditor": {
     "loading": "Loading page...",
     "error": "Error: {{message}}",
+    "widgetsLoadError": "The widgets for this page couldn't be loaded.",
+    "widgetsLoadRetry": "Try again",
     "noPageSelected": "No page selected. Please select a page from the Pages list.",
     "noWidgetsFound": "No widgets found",
     "paginate": {
@@ -717,6 +729,10 @@
       "notShown_other": "{{area}}: not shown by this theme. Its {{count}} widgets are kept.",
       "formNotAllowed": "A form can't be placed in a shared area yet.",
       "loadFailed": "Shared areas could not be loaded, so they can't be edited right now."
+    },
+    "idRepairs": {
+      "renamed": "Some ids on this page clashed or weren't valid, so they were renamed: {{ids}}. Custom CSS, scripts or links that use the old ids need updating. Your next save keeps the new ids.",
+      "block": "{{block}} (a block in {{widget}})"
     },
     "listingAnchor": {
       "header": "Collection",
@@ -905,6 +921,11 @@
       "loading": "Loading export history...",
       "noExportsTitle": "No exports yet",
       "noExportsDesc": "Create your first export above!",
+      "loadFailedTitle": "The export history couldn't be loaded",
+      "loadFailedDesc": "Your earlier exports are still there; only the list didn't load. Try again to see them and to export.",
+      "loadFailedStale": "The export history couldn't be refreshed, so it may be out of date.",
+      "loadError": "Couldn't load the export history.",
+      "retry": "Try again",
       "headers": {
         "version": "Version",
         "created": "Created",
@@ -961,6 +982,7 @@
     "emptyTitle": "No media files yet",
     "emptyDesc": "Upload some files using the uploader above.",
     "urlCopied": "URL copied to clipboard",
+    "usageTitlesError": "Couldn't load page and item names, so \"Used in\" shows their raw references.",
     "uploader": {
       "title": "Upload Media",
       "description": "Drag and drop files to upload them to your project library"
@@ -1005,6 +1027,10 @@
     "active": "Active",
     "emptyTitle": "No themes available",
     "emptyDesc": "Upload a theme using the area above to get started",
+    "loadFailedTitle": "The themes couldn't be loaded",
+    "loadFailedDesc": "Your installed themes are still there; only the list didn't load. Try again to see them and to upload a theme.",
+    "loadFailedStale": "The theme list couldn't be refreshed, so it may be out of date.",
+    "retry": "Try again",
     "updateAvailable": "Update available",
     "buttons": {
       "rebuildThemes": "Rebuild Themes",
@@ -1019,7 +1045,8 @@
       "rebuildSuccess": "Rebuilt {{count}} theme(s) successfully",
       "rebuildError": "Failed to rebuild themes",
       "updateSuccess": "Theme updated successfully!",
-      "updateError": "Failed to update theme"
+      "updateError": "Failed to update theme",
+      "loadError": "Couldn't load the themes."
     }
   },
   "pagePreview": {

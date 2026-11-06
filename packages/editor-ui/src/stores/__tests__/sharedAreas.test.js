@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { renderedWidgetOrder } from "@widgetizer/core/widgetOrder";
 
 vi.mock("../../queries/pageManager", () => ({
@@ -35,7 +35,10 @@ const { default: usePageStore } = await import("../pageStore");
 const { default: useWidgetStore, findWidgetOwner, areaModifiedKey } = await import("../widgetStore");
 const { getPage, savePageContent } = await import("../../queries/pageManager");
 const { getSharedAreas, saveSharedArea } = await import("../../queries/sharedAreaManager");
-const { getGlobalWidgets } = await import("../../queries/previewManager");
+const { getGlobalWidgets, saveGlobalWidget } = await import("../../queries/previewManager");
+
+const { announceIdRepairs, dismissIdRepairs, idRepairsMessage } = await import("../../lib/idRepairNotice");
+const { default: useToastStore } = await import("../toastStore");
 
 const clone = (value) => JSON.parse(JSON.stringify(value));
 
@@ -268,8 +271,8 @@ describe("loading a page's shared areas", () => {
 
   // Parsed JSON can hold `__proto__` as a widget id. Copied key by key it would set
   // the rebuilt map's prototype, and the page's other widgets would read as no
-  // widgets map at all.
-  it("keeps the page's widgets a plain map when one is stored as __proto__", async () => {
+  // widgets map at all. The id breaks the rule, so the widget is renamed.
+  it("keeps the page's widgets a plain map when one is stored as __proto__, and renames it", async () => {
     getPage.mockResolvedValue(
       JSON.parse('{"id": "about", "language": "el", "widgets": {"__proto__": {"type": "rich-text"}, "a": {"type": "rich-text"}}, "widgetsOrder": ["__proto__", "a"]}'),
     );
@@ -277,7 +280,7 @@ describe("loading a page's shared areas", () => {
     await usePageStore.getState().loadPage("about", "el");
     const { widgets, widgetsOrder } = usePageStore.getState().page;
     expect(Object.getPrototypeOf(widgets)).toBe(Object.prototype);
-    expect(renderedWidgetOrder(widgets, widgetsOrder)).toEqual(["a"]);
+    expect(renderedWidgetOrder(widgets, widgetsOrder)).toEqual([expect.stringMatching(/^widget_/), "a"]);
   });
 
   it("lists a widget the stored order names twice once, and calls nothing unsaved", async () => {
@@ -310,6 +313,167 @@ describe("loading a page's shared areas", () => {
     expect(state.sharedAreas.before_footer.widgetsOrder).toEqual(AREA.widgetsOrder);
     expect(state.sharedAreas.before_footer.widgets.a1.blocksOrder).toEqual(["z"]);
     expect(useAutoSave.getState().hasUnsavedPageChanges()).toBe(false);
+  });
+
+  // Stored ids can break the rule or clash between the page and an area. The editor
+  // works on a repaired copy and keeps the stored one as its saved baseline, so the
+  // repair reads as unsaved and the next save writes it.
+  describe("repairing ids", () => {
+    const banner = (heading) => ({ type: "rich-text", settings: { heading }, blocks: {}, blocksOrder: [] });
+    const storedPage = () => ({
+      id: "about",
+      language: "el",
+      widgets: { hero: banner("Page hero"), "bad id": banner("Odd") },
+      widgetsOrder: ["hero", "bad id"],
+    });
+    const storedArea = () => ({ widgets: { hero: banner("Area hero"), header: banner("Area header") }, widgetsOrder: ["hero", "header"] });
+    const storedHeader = () => ({ type: "header", settings: {}, blocks: { "x y": { type: "link" } }, blocksOrder: ["x y"] });
+
+    beforeEach(() => {
+      getPage.mockResolvedValue(storedPage());
+      getGlobalWidgets.mockResolvedValue({ header: storedHeader(), footer: null });
+      getSharedAreas.mockResolvedValue({
+        declared: [{ id: "before_footer", label: "Before footer" }],
+        retained: [],
+        areas: { before_footer: storedArea() },
+      });
+    });
+
+    it("works on the repaired copy, keeps the stored one as saved, and reports what it renamed", async () => {
+      await usePageStore.getState().loadPage("about", "el");
+      const state = usePageStore.getState();
+
+      const pageIds = state.page.widgetsOrder;
+      const areaIds = state.sharedAreas.before_footer.widgetsOrder;
+      expect(pageIds[0]).toBe("hero");
+      expect(pageIds[1]).toMatch(/^widget_[0-9a-f]{16}$/);
+      expect(areaIds.every((id) => /^widget_[0-9a-f]{16}$/.test(id))).toBe(true);
+      expect(state.globalWidgets.header.blocksOrder[0]).toMatch(/^block_/);
+
+      expect(state.originalPage.widgetsOrder).toEqual(["hero", "bad id"]);
+      expect(state.originalSharedAreas.before_footer.widgetsOrder).toEqual(["hero", "header"]);
+      expect(state.originalGlobalWidgets.header.blocksOrder).toEqual(["x y"]);
+      expect(useAutoSave.getState().hasUnsavedPageChanges()).toBe(true);
+
+      expect(state.idRepairs.widgets.map((r) => r.from)).toEqual(["bad id", "hero", "header"]);
+      expect(state.idRepairs.blocks.map((r) => r.from)).toEqual(["x y"]);
+    });
+
+    it("writes the repaired page, area and header with one save", async () => {
+      await usePageStore.getState().loadPage("about", "el");
+      const state = usePageStore.getState();
+
+      const result = await useAutoSave.getState().save();
+      expect(result.status).toBe("success");
+      expect(savePageContent.mock.calls[0][1].widgetsOrder).toEqual(state.page.widgetsOrder);
+      expect(saveSharedArea.mock.calls[0][1].widgetsOrder).toEqual(state.sharedAreas.before_footer.widgetsOrder);
+      expect(saveGlobalWidget.mock.calls[0][0]).toBe("header");
+      expect(saveGlobalWidget.mock.calls[0][1].blocksOrder).toEqual(state.globalWidgets.header.blocksOrder);
+      expect(useAutoSave.getState().hasUnsavedChanges()).toBe(false);
+    });
+
+    it("repairs to the same ids on every load", async () => {
+      await usePageStore.getState().loadPage("about", "el");
+      const first = usePageStore.getState();
+      await usePageStore.getState().loadPage("about", "el");
+      const second = usePageStore.getState();
+      expect(second.page.widgetsOrder).toEqual(first.page.widgetsOrder);
+      expect(second.sharedAreas.before_footer.widgetsOrder).toEqual(first.sharedAreas.before_footer.widgetsOrder);
+    });
+
+    describe("the notice", () => {
+      const t = (key, values) => `${key}:${JSON.stringify(values)}`;
+      afterEach(() => {
+        vi.useRealTimers();
+        useToastStore.getState().clearToasts();
+      });
+
+      it("names the old widget and block ids", () => {
+        const message = idRepairsMessage(
+          { widgets: [{ owner: "page", from: "bad id", to: "widget_1" }], blocks: [{ owner: "header", widget: "header", from: "x y", to: "block_1" }] },
+          t,
+        );
+        expect(message).toContain("pageEditor.idRepairs.renamed");
+        expect(message).toContain("bad id");
+        expect(message).toContain("x y");
+      });
+
+      it("says nothing when only order entries that named no widget were dropped", () => {
+        expect(idRepairsMessage({ widgets: [], blocks: [] }, t)).toBeNull();
+      });
+
+      it("shows once, and the autosave it schedules writes the repair", async () => {
+        vi.useFakeTimers();
+        await usePageStore.getState().loadPage("about", "el");
+        announceIdRepairs(t);
+        expect(usePageStore.getState().idRepairs).toBeNull();
+        expect(useToastStore.getState().toasts).toHaveLength(1);
+        expect(useToastStore.getState().toasts[0].variant).toBe("warning");
+        announceIdRepairs(t);
+        expect(useToastStore.getState().toasts).toHaveLength(1);
+
+        expect(savePageContent).not.toHaveBeenCalled();
+        await vi.advanceTimersByTimeAsync(60000);
+        expect(savePageContent).toHaveBeenCalledTimes(1);
+        expect(saveSharedArea).toHaveBeenCalledTimes(1);
+        expect(saveGlobalWidget).toHaveBeenCalledTimes(1);
+        expect(useAutoSave.getState().hasUnsavedChanges()).toBe(false);
+      });
+
+      // The notice stays until dismissed, so it must not outlive the page it is about.
+      it("replaces an earlier page's notice, and goes when another page loads", async () => {
+        await usePageStore.getState().loadPage("about", "el");
+        announceIdRepairs(t);
+        await usePageStore.getState().loadPage("about", "el");
+        announceIdRepairs(t);
+        const live = () => useToastStore.getState().toasts.filter((toast) => toast.phase !== "exiting");
+        expect(live()).toHaveLength(1);
+        dismissIdRepairs();
+        expect(live()).toHaveLength(0);
+      });
+
+      // Each kind of repair on its own still reaches the file.
+      it.each([
+        ["the page", { page: storedPage(), area: AREA, header: null }, () => savePageContent],
+        ["an area", { page: { id: "about", language: "el", widgets: {}, widgetsOrder: [] }, area: storedArea(), header: null }, () => saveSharedArea],
+        ["the header", { page: { id: "about", language: "el", widgets: {}, widgetsOrder: [] }, area: AREA, header: storedHeader() }, () => saveGlobalWidget],
+      ])("autosaves a repair of %s alone", async (_, stored, saver) => {
+        vi.useFakeTimers();
+        getPage.mockResolvedValue(stored.page);
+        getGlobalWidgets.mockResolvedValue({ header: stored.header, footer: null });
+        getSharedAreas.mockResolvedValue({ declared: [{ id: "before_footer", label: "Before footer" }], retained: [], areas: { before_footer: stored.area } });
+        await usePageStore.getState().loadPage("about", "el");
+        announceIdRepairs(t);
+        await vi.advanceTimersByTimeAsync(60000);
+        const calls = [savePageContent, saveSharedArea, saveGlobalWidget].map((fn) => fn.mock.calls.length);
+        expect(saver().mock.calls).toHaveLength(1);
+        expect(calls.reduce((a, b) => a + b, 0)).toBe(1);
+        expect(useAutoSave.getState().hasUnsavedChanges()).toBe(false);
+      });
+
+      it("schedules nothing after a clean load", async () => {
+        vi.useFakeTimers();
+        getPage.mockResolvedValue({ id: "about", language: "el", widgets: { hero: banner("Page hero") }, widgetsOrder: ["hero"] });
+        getGlobalWidgets.mockResolvedValue({ header: null, footer: null });
+        getSharedAreas.mockResolvedValue({ declared: [], retained: [], areas: {} });
+        await usePageStore.getState().loadPage("about", "el");
+        announceIdRepairs(t);
+        expect(useAutoSave.getState().autoSaveInterval).toBeNull();
+        expect(useToastStore.getState().toasts).toHaveLength(0);
+      });
+    });
+
+    it("reports nothing and leaves nothing unsaved for content that follows the rule", async () => {
+      await usePageStore.getState().loadPage("about", "el");
+      expect(usePageStore.getState().idRepairs).not.toBeNull();
+
+      getPage.mockResolvedValue({ id: "about", language: "el", widgets: { hero: banner("Page hero") }, widgetsOrder: ["hero"] });
+      getGlobalWidgets.mockResolvedValue({ header: null, footer: null });
+      getSharedAreas.mockResolvedValue({ declared: [{ id: "before_footer", label: "Before footer" }], retained: [], areas: { before_footer: AREA } });
+      await usePageStore.getState().loadPage("about", "el");
+      expect(usePageStore.getState().idRepairs).toBeNull();
+      expect(useAutoSave.getState().hasUnsavedPageChanges()).toBe(false);
+    });
   });
 
   it("shows no areas, and so saves none, when they cannot be loaded", async () => {

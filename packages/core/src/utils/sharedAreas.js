@@ -97,14 +97,17 @@ export function areaWidgetProblem(widget) {
 export function areaFromTemplate(template) {
   const source = template?.widgets && typeof template.widgets === "object" ? template.widgets : {};
   const order = Array.isArray(template?.widgetsOrder) ? uniqueWidgetOrder(template.widgetsOrder) : Object.keys(source);
-  const area = emptyArea();
+  const entries = [];
   for (const id of order) {
+    if (typeof id !== "string" || !Object.hasOwn(source, id)) continue;
     const widget = source[id];
     if (!widget || typeof widget !== "object" || AREA_UNSUPPORTED_WIDGET_TYPES.has(widget.type)) continue;
     const settings = { ...(widget.settings ?? {}) };
     for (const role of PAGE_ONLY_WIDGET_SETTINGS) if (settings[role] === true) settings[role] = false;
-    area.widgets[id] = { ...widget, settings };
-    area.widgetsOrder.push(id);
+    entries.push([id, { ...widget, settings }]);
   }
-  return area;
+  // Built with fromEntries: parsed JSON can hold `__proto__` as a widget id, and
+  // assigning that key would set the map's prototype, losing the widget before the
+  // editor can rename it.
+  return { ...emptyArea(), widgets: Object.fromEntries(entries), widgetsOrder: entries.map(([id]) => id) };
 }

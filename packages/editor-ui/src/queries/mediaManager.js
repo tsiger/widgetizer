@@ -66,6 +66,7 @@ export async function getProjectMedia(projectId, forceRefresh = false) {
   const fetchPromise = (async () => {
     try {
       const data = await editorFetchJson("/media", {}, {
+        expect: "object",
         fallbackMessage: "Failed to get media files",
       });
 
@@ -271,6 +272,7 @@ export async function deleteMultipleMedia(projectId, fileIds) {
 export async function getMediaFileUsage(fileId) {
   try {
     return await editorFetchJson(`/media/${fileId}/usage`, {}, {
+      expect: "object",
       fallbackMessage: "Failed to get media usage",
     });
   } catch (error) {
