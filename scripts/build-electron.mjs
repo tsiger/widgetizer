@@ -121,7 +121,8 @@ if (platform === "linux") {
   const vipsLibraries = readdirSync(vipsDir).filter((name) => name.startsWith("libvips-cpp.so."));
   if (!vipsLibraries.length) throw new Error(`Missing libvips for ${linuxArch}`);
   for (const binary of [
-    "node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+    // better-sqlite3 loads its bundled Node-API binary for the platform and architecture.
+    `node_modules/better-sqlite3/prebuilds/linux-${linuxArch}.node`,
     `node_modules/@img/sharp-linux-${linuxArch}/lib/sharp-linux-${linuxArch}.node`,
     ...vipsLibraries.map((name) => `${vipsDir}/${name}`),
   ]) {

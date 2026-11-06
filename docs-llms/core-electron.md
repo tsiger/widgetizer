@@ -24,7 +24,7 @@ npm run electron:dev
 
 In dev the script also sets `ELECTRON_DISABLE_INTERNAL_SERVER=1`, so Electron points at the standalone `npm run server` rather than forking its own bundled server.
 
-The `preelectron:dev` npm lifecycle hook runs automatically before `electron:dev`, rebuilding `better-sqlite3` for the local Node dev server and validating locales. Electron ABI rebuilds run during packaged builds in `scripts/build-electron.mjs`.
+The `preelectron:dev` npm lifecycle hook runs automatically before `electron:dev` and validates locales. `better-sqlite3` ships Node-API binaries for every supported platform (`node_modules/better-sqlite3/prebuilds/`), so the same binary loads in Node and in Electron.
 
 Use Electron dev mode when testing Electron-specific features (menus, native dialogs, preview window, auto-update). For regular development, use `npm run dev:all` and open `http://localhost:3000` in your browser.
 
@@ -37,7 +37,7 @@ The `electron:build:*` npm scripts call `node scripts/build-electron.mjs --platf
 1. Preflights `.env.production` (prompts to create it if missing — see below).
 2. Runs the Vite frontend build (`npm run build`).
 3. Runs platform prep: mac swaps in per-arch Sharp binaries via `electron/prepare-mac-sharp.cjs`; Windows builds install win32 x64 optional native deps (`npm install --no-save --platform=win32 --arch=x64 --include=optional`) so modules like `sharp` are present. Linux runs `electron/prepare-linux-sharp.cjs`, which installs both x64 and ARM64 Sharp binaries together, using versions declared by the installed Sharp package. Linux builds must run on Linux.
-4. Runs `npx @electron/rebuild --force` for Electron's native-module ABI, with the selected `--arch` on Linux. Linux also checks SQLite, Sharp and libvips ELF headers against that architecture before packaging.
+4. Runs `npx @electron/rebuild --force` for Electron's native-module ABI, with the selected `--arch` on Linux. It leaves `better-sqlite3` alone: that package builds from source only when it has no bundled binary for the platform. Linux also checks the SQLite binary for the target architecture (`prebuilds/linux-<arch>.node`) and the Sharp and libvips ELF headers before packaging.
 5. Runs `electron-builder --config electron/builder.config.mjs --<platform>`, passing the unsigned flag/env where requested. For Windows unsigned it sets `WIN_UNSIGNED=1`, which `builder.config.mjs` reads to drop the `signtoolOptions` block.
 
 > **There is no `build` key in `package.json`.** The only `build` script there is `vite build`. All electron-builder configuration lives in **`electron/builder.config.mjs`** (passed explicitly via `--config`). Any reference to a "package.json build config" is stale — look in `builder.config.mjs`.
@@ -121,10 +121,6 @@ updates need the `.deb` and the matching generated metadata (`latest-linux.yml`
 for x64; `latest-linux-arm64.yml` for ARM64) on the GitHub release;
 installation can require administrator authentication. End-to-end update behaviour
 must be verified on an installed package before treating Linux updates as release-ready.
-
-Packaging rebuilds `better-sqlite3` for Electron. Before returning to web development
-or backend tests, run `npm rebuild better-sqlite3` to restore the host Node binary
-(`npm run dev:all` also does this in its pre-hook).
 
 Verified on Linux Mint 22.3 x64 (20 September 2026): the `.deb` builds, its metadata,
 icons and installer scripts check out, and the unpacked production app starts with

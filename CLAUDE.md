@@ -125,7 +125,7 @@ Copy `.env.example` to `.env`. Key variables:
 npm run electron:dev   # Starts Vite + Express + Electron together
 ```
 
-Note: the `preelectron:dev` npm lifecycle hook runs automatically before `electron:dev`, rebuilding `better-sqlite3` for the local Node dev server and validating locales. Electron ABI rebuilds run during packaged builds in `scripts/build-electron.mjs`. No need to run those by hand.
+Note: the `preelectron:dev` npm lifecycle hook runs automatically before `electron:dev` and validates locales. `better-sqlite3` ships Node-API binaries for every supported platform, so the same binary loads in Node and in Electron: nothing needs rebuilding when switching between the web app, tests and Electron.
 
 ### Server port (production)
 
