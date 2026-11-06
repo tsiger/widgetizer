@@ -120,10 +120,14 @@ if (platform === "linux") {
   const vipsDir = `node_modules/@img/sharp-libvips-linux-${linuxArch}/lib`;
   const vipsLibraries = readdirSync(vipsDir).filter((name) => name.startsWith("libvips-cpp.so."));
   if (!vipsLibraries.length) throw new Error(`Missing libvips for ${linuxArch}`);
+  // Sharp's binary is named after its version (sharp-linux-x64-0.35.5.node).
+  const sharpDir = `node_modules/@img/sharp-linux-${linuxArch}/lib`;
+  const sharpBinaries = readdirSync(sharpDir).filter((name) => name.endsWith(".node"));
+  if (!sharpBinaries.length) throw new Error(`Missing Sharp for ${linuxArch}`);
   for (const binary of [
     // better-sqlite3 loads its bundled Node-API binary for the platform and architecture.
     `node_modules/better-sqlite3/prebuilds/linux-${linuxArch}.node`,
-    `node_modules/@img/sharp-linux-${linuxArch}/lib/sharp-linux-${linuxArch}.node`,
+    ...sharpBinaries.map((name) => `${sharpDir}/${name}`),
     ...vipsLibraries.map((name) => `${vipsDir}/${name}`),
   ]) {
     const header = readFileSync(binary);

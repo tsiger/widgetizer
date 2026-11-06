@@ -99,9 +99,10 @@ as needed; the first build requires network access.
 `dist-electron/Widgetizer-<version>-amd64.deb`, ARM64 produces `-arm64.deb`.
 `npm run electron:build:linux:arm64` explicitly selects ARM64, including on a Linux
 x64 build machine. It targets **64-bit Raspberry Pi OS with a desktop**, not the
-32-bit edition. Cross-builds depend on a prebuilt SQLite binary for the exact
-Electron version; if unavailable, build on the target architecture with native
-compilation tools. Do not fall back to bundling an x64 binary in an ARM64 package.
+32-bit edition. Cross-builds work because `better-sqlite3` and Sharp ship
+Node-API binaries for both Linux architectures (glibc builds, selected at runtime by
+platform, architecture and C library). Do not fall back to bundling an x64 binary in
+an ARM64 package: the build checks every native binary's architecture.
 
 The build also produces an unpacked app. It passes `--publish never`, so it does not create or upload a
 GitHub release. Package metadata uses `https://widgetizer.org` and
