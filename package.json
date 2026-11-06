@@ -59,7 +59,7 @@
     "@widgetizer/core": "*",
     "@widgetizer/render-engine": "*",
     "better-sqlite3": "^13.0.3",
-    "dotenv": "^17.4.2",
+    "dotenv": "^18.0.9",
     "electron-updater": "^6.8.11",
     "fs-extra": "^11.4.1",
     "i18next": "^25.10.10",
