@@ -13,7 +13,9 @@
 # Both stages use the floating Node 24 tag on purpose: whoever builds the image
 # gets the newest Node 24 release and its security fixes, with no pin to bump.
 # Keep the two stages on the same tag so the native modules compiled here match
-# the runtime.
+# the runtime. (The node-brotli-usage rule wants a pinned patch release; the
+# floating tag is the deliberate choice, and it resolves to a fixed release.)
+# nosemgrep: node-brotli-usage
 FROM node:24-slim AS builder
 WORKDIR /app
 
@@ -53,6 +55,8 @@ RUN npm prune --omit=dev
 # ---------------------------------------------------------------------------
 # Stage 2 (runtime): just Node + the built app. No build tools, no dev deps.
 # ---------------------------------------------------------------------------
+# Same floating tag as the build stage (see the note there).
+# nosemgrep: node-brotli-usage
 FROM node:24-slim AS runtime
 WORKDIR /app
 
