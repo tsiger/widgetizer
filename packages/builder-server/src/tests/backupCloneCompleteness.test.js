@@ -523,7 +523,7 @@ describe("a project directory holding a stale uploads/media.json", () => {
 
     const res = await importBuffer(twoLibraries);
     assert.equal(res._status, 400, JSON.stringify(res._json));
-    assert.match(res._json.error, /more than one media library/i);
+    assert.match(res._json.error, /two media libraries/i);
     assert.equal(projectRepo.getAllProjects().length, before, "nothing was created");
   });
 

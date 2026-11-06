@@ -33,13 +33,12 @@ export class UnsafeZipError extends Error {
 const ZIP_BOMB_MESSAGE = `This ZIP file unpacks to more than ${MAX_COMPRESSION_RATIO} times its own size, which is how a malicious ZIP file (a "ZIP bomb") fills a disk. Nothing was unpacked from it.`;
 const damaged = (entryName) => new UnsafeZipError(`This ZIP file is damaged and could not be read (${entryName}).`);
 
-/** A ZIP that holds two entries under one name; `entryName` is that name. */
+/** A ZIP that holds two entries under one name. */
 export class DuplicateZipEntryError extends UnsafeZipError {
-  constructor(entryName) {
+  constructor() {
     super(
-      `This ZIP file holds more than one file named "${entryName}", so there is no way to tell which one to use. Nothing was unpacked from it.`,
+      "This ZIP file holds more than one file under the same name, so there is no way to tell which one to use. Nothing was unpacked from it.",
     );
-    this.entryName = entryName;
   }
 }
 
@@ -57,8 +56,9 @@ export async function openZip(zipPath) {
     return zip;
   } catch (error) {
     // adm-zip refuses repeated entry names itself and says so only in its message.
-    const duplicate = /Duplicate entry name "(.*)"/.exec(error?.message ?? "");
-    if (duplicate) throw new DuplicateZipEntryError(duplicate[1]);
+    // The name it quotes can't be trusted: adm-zip 0.6.1 keeps the first name it
+    // ever reported and repeats it for every later archive in the process.
+    if (/Duplicate entry name/.test(error?.message ?? "")) throw new DuplicateZipEntryError();
     throw new UnsafeZipError("This file is not a readable ZIP file.");
   }
 }

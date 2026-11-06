@@ -1492,11 +1492,12 @@ export async function importProject(req, res) {
       // A backup made before media metadata became SQLite-only can carry two
       // entries named `uploads/media.json`: the file that was on disk and the
       // serialized library. They describe different libraries and nothing says
-      // which is current, so the import refuses rather than picking one.
-      if (error instanceof DuplicateZipEntryError && error.entryName === "uploads/media.json") {
+      // which is current, so the import refuses rather than picking one. (Which
+      // name repeats isn't known reliably, so the message covers that case.)
+      if (error instanceof DuplicateZipEntryError) {
         return res.status(400).json({
           error:
-            "This backup contains more than one media library (two copies of uploads/media.json), and there is no way to tell which one is current. Re-export the project with this version and import that backup instead.",
+            "This backup holds more than one file under the same name, so there is no way to tell which one is current. Backups made by older versions can carry two media libraries (two copies of uploads/media.json). Re-export the project with this version and import that backup instead.",
         });
       }
       return res.status(400).json({ error: error.message });

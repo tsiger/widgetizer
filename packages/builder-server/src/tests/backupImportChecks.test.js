@@ -393,7 +393,7 @@ describe("ZIP entries that are not plain paths, or not intact", () => {
     assert.match(res._json.error, /not a readable ZIP/);
   });
 
-  it("refuses a ZIP holding two files under one name, and says which", async () => {
+  it("refuses a ZIP holding two files under one name", async () => {
     const entries = new AdmZip(sourceBackup)
       .getEntries()
       .filter((entry) => !entry.isDirectory)
@@ -401,7 +401,7 @@ describe("ZIP entries that are not plain paths, or not intact", () => {
     const [name, data] = entries.find(([n]) => n.startsWith("pages/"));
     const res = await importBuffer(await archiverZip([...entries, [name, data]]));
     assert.equal(res._status, 400, JSON.stringify(res._json));
-    assert.match(res._json.error, new RegExp(`more than one file named "${name}"`));
+    assert.match(res._json.error, /more than one file under the same name/);
   });
 });
 
