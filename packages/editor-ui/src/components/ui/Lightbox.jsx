@@ -1,12 +1,22 @@
-import { useEffect } from "react";
-import { X, ChevronLeft, ChevronRight } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { X, ChevronLeft, ChevronRight, ImageOff } from "lucide-react";
 
 export default function Lightbox({ isOpen, onClose, imageUrl, imageAlt, onPrevious, onNext, hasPrevious, hasNext }) {
+  const { t } = useTranslation();
+  // The address that failed to load; moving to another image clears it by no longer matching.
+  const [failedUrl, setFailedUrl] = useState(null);
+  // Closing forgets a failure, so reopening the same image (its file restored) tries again.
+  const close = () => {
+    setFailedUrl(null);
+    onClose();
+  };
   useEffect(() => {
     if (!isOpen) return;
 
     const handleEscape = (e) => {
       if (e.key === "Escape") {
+        setFailedUrl(null);
         onClose();
       }
     };
@@ -35,7 +45,7 @@ export default function Lightbox({ isOpen, onClose, imageUrl, imageAlt, onPrevio
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm"
-      onClick={onClose}
+      onClick={close}
       role="dialog"
       aria-modal="true"
       aria-label="Image preview"
@@ -43,7 +53,7 @@ export default function Lightbox({ isOpen, onClose, imageUrl, imageAlt, onPrevio
       <div className="relative max-w-[90vw] max-h-[90vh] flex items-center justify-center">
         {/* Close button */}
         <button
-          onClick={onClose}
+          onClick={close}
           className="absolute -top-12 right-0 p-2 text-white hover:text-gray-300 transition-colors rounded-full hover:bg-white/10"
           aria-label="Close lightbox"
         >
@@ -64,13 +74,25 @@ export default function Lightbox({ isOpen, onClose, imageUrl, imageAlt, onPrevio
           </button>
         )}
 
-        {/* Image */}
-        <img
-          src={imageUrl}
-          alt={imageAlt || "Preview"}
-          className="max-w-full max-h-[90vh] object-contain"
-          onClick={(e) => e.stopPropagation()}
-        />
+        {/* Image, or a notice when it can't load (its file is missing or unreadable) */}
+        {failedUrl === imageUrl ? (
+          <div
+            role="alert"
+            className="flex max-w-md flex-col items-center gap-3 rounded-md bg-white/10 px-8 py-10 text-center text-white"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <ImageOff size={40} aria-hidden="true" />
+            <p className="text-sm">{t("components.lightbox.loadError")}</p>
+          </div>
+        ) : (
+          <img
+            src={imageUrl}
+            alt={imageAlt || "Preview"}
+            className="max-w-full max-h-[90vh] object-contain"
+            onClick={(e) => e.stopPropagation()}
+            onError={() => setFailedUrl(imageUrl)}
+          />
+        )}
 
         {/* Next button */}
         {hasNext && (

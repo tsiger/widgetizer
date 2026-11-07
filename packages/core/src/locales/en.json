@@ -466,6 +466,9 @@
       "videos": "Videos",
       "files": "Files"
     },
+    "lightbox": {
+      "loadError": "This image couldn't be loaded. Its file may be missing."
+    },
     "mediaUploader": {
       "dropActive": "Drop the files here...",
       "dropInactive": "Drag and drop images here or",
