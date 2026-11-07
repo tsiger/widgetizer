@@ -75,7 +75,7 @@ export default function Lightbox({ isOpen, onClose, imageUrl, imageAlt, onPrevio
         )}
 
         {/* Image, or a notice when it can't load (its file is missing or unreadable) */}
-        {failedUrl === imageUrl ? (
+        {failedUrl === imageUrl && (
           <div
             role="alert"
             className="flex max-w-md flex-col items-center gap-3 rounded-md bg-white/10 px-8 py-10 text-center text-white"
@@ -84,15 +84,18 @@ export default function Lightbox({ isOpen, onClose, imageUrl, imageAlt, onPrevio
             <ImageOff size={40} aria-hidden="true" />
             <p className="text-sm">{t("components.lightbox.loadError")}</p>
           </div>
-        ) : (
-          <img
-            src={imageUrl}
-            alt={imageAlt || "Preview"}
-            className="max-w-full max-h-[90vh] object-contain"
-            onClick={(e) => e.stopPropagation()}
-            onError={() => setFailedUrl(imageUrl)}
-          />
         )}
+        {/* Kept (hidden) while the notice shows: an embedding app may load the same
+            element again (say, after refreshing its sign-in), and a load clears the notice. */}
+        <img
+          src={imageUrl}
+          alt={imageAlt || "Preview"}
+          className="max-w-full max-h-[90vh] object-contain"
+          hidden={failedUrl === imageUrl}
+          onClick={(e) => e.stopPropagation()}
+          onError={() => setFailedUrl(imageUrl)}
+          onLoad={() => setFailedUrl((failed) => (failed === imageUrl ? null : failed))}
+        />
 
         {/* Next button */}
         {hasNext && (

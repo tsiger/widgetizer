@@ -613,6 +613,16 @@ Deleting a page or removing a language keeps a pointing link's label and empties
 
 **Body at:** `e92cda65:docs-llms/TODO-agents.md`.
 
+### R-ANCHOR · Finish same-page links in Site preview
+
+**Done · Low · OSS · 2026-11-07**
+
+`4c2d6f46` made a bare `#id` link in the standalone preview scroll to its element; it had no test, a `page.html#id` link dropped its fragment (the page opened at the top, even for the page on screen), and an encoded id wasn't found.
+
+**Resolution:** the render names its own file (`data-output-path`), so a `page.html#id` link to the page on screen scrolls in place; a link to another page sends the section with `NAVIGATE_PREVIEW` and the next render opens at it (`usePreviewFrameSrc` takes the route's hash only for a new render, so a hash-only change never reloads a spent render); fragments are decoded. Runtime, message, layout and server tests. Accepted: a same-page jump doesn't update the address or history, and a query-only `?q#id` link goes to the homepage (the link mapper's existing behaviour). Fix `5511bb4e`.
+
+**Body at:** `b8ae9387:docs-llms/TODO-agents.md`.
+
 ## Reconciliation decisions
 
 - GitHub #115, #122, #126, #133, #134 and #135 have implementation evidence. Their remaining local entries are review/documentation/integration work, not instructions to rebuild the features. GitHub statuses were left unchanged.

@@ -17,6 +17,18 @@ describe("Lightbox", () => {
     expect(screen.getByRole("alert")).toHaveTextContent("components.lightbox.loadError");
   });
 
+  it("shows the image after all when the same element loads it on a second try", () => {
+    // An embedding app may reload a failed image itself, e.g. after refreshing its sign-in.
+    render(<Lightbox {...props} imageUrl="/api/media/p/uploads/images/a.jpg" />);
+    const img = screen.getByRole("img", { name: "A photo" });
+    fireEvent.error(img);
+    expect(screen.getByRole("alert")).toBeInTheDocument();
+
+    fireEvent.load(img);
+    expect(screen.queryByRole("alert")).toBeNull();
+    expect(screen.getByRole("img", { name: "A photo" })).toBe(img);
+  });
+
   it("tries the next image again after one failed", () => {
     const { rerender } = render(<Lightbox {...props} imageUrl="/a.jpg" />);
     fireEvent.error(screen.getByRole("img", { name: "A photo" }));
@@ -36,5 +48,6 @@ describe("Lightbox", () => {
     rerender(<Lightbox {...props} isOpen={false} imageUrl="/a.jpg" />);
     rerender(<Lightbox {...props} imageUrl="/a.jpg" />);
     expect(screen.getByRole("img", { name: "A photo" })).toBeInTheDocument();
+    expect(screen.queryByRole("alert")).toBeNull();
   });
 });
