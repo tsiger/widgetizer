@@ -303,7 +303,7 @@ const PreviewPanel = forwardRef(function PreviewPanel(
     updateSeqRef.current += 1;
     renderedStateRef.current = null;
     navigatingRef.current = false;
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- another page or project: start the frame over
+    // Another page or project: start the frame over.
     setPreviewSrc(null);
     setError(null);
     setInitialLoadComplete(false);

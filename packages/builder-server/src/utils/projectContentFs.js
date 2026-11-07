@@ -68,7 +68,7 @@ export async function listPagesFromDir(projectDir, { defaultLanguage } = {}) {
     return pagesData;
   } catch (error) {
     console.error(`Error listing pages data in ${pagesDir}:`, error);
-    throw new Error(`Failed to list pages data in ${pagesDir}: ${error.message}`);
+    throw new Error(`Failed to list pages data in ${pagesDir}: ${error.message}`, { cause: error });
   }
 }
 
@@ -151,8 +151,8 @@ export async function readThemeDataFromDir(projectDir) {
     return JSON.parse(themeDataStr);
   } catch (error) {
     if (error.code === "ENOENT") {
-      throw new Error(`Theme settings file not found at ${themeFile}.`);
+      throw new Error(`Theme settings file not found at ${themeFile}.`, { cause: error });
     }
-    throw new Error(`Failed to read or parse theme settings at ${themeFile}: ${error.message}`);
+    throw new Error(`Failed to read or parse theme settings at ${themeFile}: ${error.message}`, { cause: error });
   }
 }

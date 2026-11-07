@@ -227,13 +227,15 @@ describe("validateHtml", () => {
 <body></body>
 </html>`;
     const result = await validateHtml(html, "test-page");
-    // Should have at least a "missing lang" issue on line 2
-    const langIssue = result.issues.find((i) => i.line === 2);
-    if (langIssue) {
-      const errorLine = langIssue.sourceSnippet.find((l) => l.isError);
-      assert.ok(errorLine, "should have an error line marked");
-      assert.ok(errorLine.code.includes("<html>"));
-    }
+    // The missing lang attribute is reported at the <html> tag on line 2
+    const langIssue = result.issues.find((i) => i.ruleId === "element-required-attributes");
+    assert.ok(langIssue, "should report the missing lang attribute");
+    assert.equal(langIssue.line, 2);
+    assert.equal(langIssue.column, 2);
+    const errorLines = langIssue.sourceSnippet.filter((l) => l.isError);
+    assert.equal(errorLines.length, 1, "exactly one line should be marked");
+    assert.equal(errorLines[0].num, 2);
+    assert.ok(errorLines[0].code.includes("<html>"));
   });
 
   it("counts errors and warnings separately", async () => {

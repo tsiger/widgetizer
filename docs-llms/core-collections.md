@@ -17,7 +17,7 @@ A collection type is defined by `collection-types/{type}/schema.json` in the the
 | `type` (required) | Machine id; must match `^[a-z0-9-]+$` and the folder name. |
 | `settings` (required) | Array of field definitions (the item's editable fields). |
 | `displayName` / `displayNamePlural` | Human labels (singular / plural). |
-| `icon` | Icon identifier for the sidebar nav. |
+| `icon` | Sidebar nav icon: a [Lucide](https://lucide.dev/icons) icon name in PascalCase (`Newspaper`, `ConciergeBell`), case-sensitive. Older Lucide names (`Music`, `Trash2`) still work. Unknown names, and brand logos (Lucide has none), show the default `Database` icon. |
 | `slugPrefix` | URL/output prefix; defaults to `type`; must match `^[a-z0-9-]+$`; `assets` is reserved. |
 | `hasItemPages` | `true` → each item renders a standalone page (requires a `template.liquid`). |
 | `defaultSort` | One of `manual`, `created_desc`, `created_asc`, `title_asc`, `title_desc`, `date_desc`, `date_asc`. |

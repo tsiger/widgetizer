@@ -226,7 +226,7 @@ npx electron-builder --config electron/builder.config.mjs --win appx
 
 Output: `dist-electron/Widgetizer-Setup-1.0.0.appx` (~330 MB).
 
-> `npx @electron/rebuild` leaves native modules on the Electron ABI. The `predev:all` / `preelectron:dev` hooks rebuild them for Node automatically on the next dev run — nothing to do manually.
+> `better-sqlite3` and `sharp` load Node-API binaries, so after packaging the web app and tests run without a rebuild.
 
 ### 4.3 Install locally
 

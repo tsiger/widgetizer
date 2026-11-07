@@ -482,7 +482,8 @@
       "dropHere": "Drop your files here",
       "clickOrDrop": "Click to upload or drag and drop",
       "browseFiles": "Browse Files",
-      "uploading": "Uploading..."
+      "uploading": "Uploading...",
+      "inputLabel": "Choose files to upload"
     },
     "fileInput": {
       "uploadSuccess": "File uploaded successfully.",

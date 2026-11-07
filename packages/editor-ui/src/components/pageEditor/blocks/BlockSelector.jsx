@@ -84,7 +84,6 @@ export default function BlockSelector({ isOpen, onClose, widgetSchema, onSelectB
       }
     }
 
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setPositionStyle({
       position: "fixed",
       top: top,

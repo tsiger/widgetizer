@@ -147,7 +147,6 @@ export default function GalleryInput({ id, value, onChange }) {
   const rootRef = useRef(null);
   const [compact, setCompact] = useState(false);
   useLayoutEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setCompact(!!rootRef.current?.closest(".page-editor-settings"));
   }, []);
 
@@ -160,7 +159,6 @@ export default function GalleryInput({ id, value, onChange }) {
       echoExpected.current = false; // our own emission echoing back — keep local rows
       return;
     }
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setRows(toRows(value)); // external change — rebuild, dropping local-only blank rows
   }, [value]);
 

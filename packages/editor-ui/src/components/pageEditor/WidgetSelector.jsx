@@ -198,7 +198,6 @@ export default function WidgetSelector({
       topPosition = margin;
     }
 
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setStyle({
       position: "fixed",
       top: topPosition,

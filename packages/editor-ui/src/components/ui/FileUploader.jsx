@@ -19,25 +19,27 @@ export default function FileUploader({
 }) {
   const { t } = useTranslation();
 
+  // A drop with more files than allowed (two ZIPs on a single-file uploader) is refused as a whole.
+  // react-dropzone accepts the files up to the limit and rejects only the rest, which would start
+  // uploading one file while reporting the drop as rejected.
   const onDrop = useCallback(
-    (acceptedFiles) => {
-      if (acceptedFiles.length === 0) return;
-      onUpload(acceptedFiles);
+    (acceptedFiles, fileRejections) => {
+      const tooMany = fileRejections.some(({ errors }) => errors.some((error) => error.code === "too-many-files"));
+      if (tooMany) {
+        const tooManyError = fileRejections
+          .flatMap(({ errors }) => errors)
+          .find((error) => error.code === "too-many-files");
+        onReject?.([...acceptedFiles.map((file) => ({ file, errors: [tooManyError] })), ...fileRejections]);
+        return;
+      }
+      if (acceptedFiles.length > 0) onUpload(acceptedFiles);
+      if (fileRejections.length > 0) onReject?.(fileRejections);
     },
-    [onUpload],
-  );
-
-  const onDropRejected = useCallback(
-    (fileRejections) => {
-      if (fileRejections.length === 0 || !onReject) return;
-      onReject(fileRejections);
-    },
-    [onReject],
+    [onUpload, onReject],
   );
 
   const { getRootProps, getInputProps, isDragActive, isDragReject } = useDropzone({
     onDrop,
-    onDropRejected,
     accept,
     multiple,
     maxSize,
@@ -79,7 +81,8 @@ export default function FileUploader({
         {...getRootProps()}
         className={`relative p-8 border-2 border-dashed ${borderColor} ${bgColor} rounded-sm text-center cursor-pointer transition-all duration-200 hover:border-slate-400 focus:outline-none`}
       >
-        <input {...getInputProps()} />
+        {/* react-dropzone labels the hidden input "file upload" in English; give it the uploader's own words. */}
+        <input {...getInputProps({ "aria-label": title || t("components.fileUploader.inputLabel") })} />
 
         <div className="flex flex-col items-center justify-center gap-3">
           <div className={`p-3 rounded-full bg-white shadow-sm ${uploading ? "opacity-50" : ""}`}>

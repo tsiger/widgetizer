@@ -359,7 +359,7 @@ export async function assertIntroducedMediaExists({ assetStorage, scope, previou
 
   const missing = [];
   for (const mediaPath of introduced) {
-    let stat = null;
+    let stat;
     try {
       stat = await assetStorage.stat(scope, assetKeyOf(mediaPath));
     } catch {

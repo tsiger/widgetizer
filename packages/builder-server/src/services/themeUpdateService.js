@@ -286,7 +286,7 @@ async function recoverInterruptedUpdate(projectDir) {
     // No claim about what the project now holds: this branch is exactly the one
     // where that is not known. And nothing for the reader to go and inspect —
     // the details are in the log, and the person seeing this is not reading it.
-    throw new Error("The theme update could not be completed. Please try again.");
+    throw new Error("The theme update could not be completed. Please try again.", { cause: error });
   }
 
   const restored = await undoSwap({ projectDir, backupDir, plan });
@@ -395,8 +395,8 @@ export async function applyThemeUpdateToDir({ themeSourceDir, projectDir, langua
   // failure here has touched nothing the project uses. ----
   const staged = [];
   const additions = [];
-  let mergedThemeJson = null;
-  let clash = null;
+  let mergedThemeJson;
+  let clash;
   const newThemeJsonPath = path.join(themeSourceDir, "theme.json");
 
   try {
@@ -482,7 +482,7 @@ export async function applyThemeUpdateToDir({ themeSourceDir, projectDir, langua
   } catch (error) {
     await fs.remove(stageDir).catch(() => {});
     console.error(`[applyThemeUpdate] Could not prepare the update: ${error.message}`);
-    throw new Error("The update could not be prepared, so nothing in the project was changed.");
+    throw new Error("The update could not be prepared, so nothing in the project was changed.", { cause: error });
   }
 
   if (clash) {
@@ -504,7 +504,7 @@ export async function applyThemeUpdateToDir({ themeSourceDir, projectDir, langua
     if (!(await fs.pathExists(path.join(projectDir, itemPath)))) plan.placedWhereAbsent.push(itemPath);
   }
 
-  let swapped = false;
+  let swapped;
   try {
     await fs.ensureDir(backupDir);
     // Written aside and renamed into place: a plan truncated by a crash would
@@ -539,10 +539,10 @@ export async function applyThemeUpdateToDir({ themeSourceDir, projectDir, langua
     if (!restored) {
       // The backup and its plan stay on disk: they are the only copy of what is
       // now missing, and the next attempt starts by trying the undo again.
-      throw new Error("The theme update could not be completed. Please try again.");
+      throw new Error("The theme update could not be completed. Please try again.", { cause: error });
     }
     await fs.remove(backupDir).catch(() => {});
-    throw new Error("The update could not be applied, so the project was left as it was.");
+    throw new Error("The update could not be applied, so the project was left as it was.", { cause: error });
   }
 
   if (swapped) {

@@ -19,7 +19,7 @@ export async function readPresetSettings(presetDir, presetId) {
     presetData = JSON.parse(await fs.readFile(presetJsonPath, "utf8"));
   } catch (error) {
     console.error(`[presetSettings] Could not read ${presetJsonPath}: ${error.message}`);
-    throw new Error(`The "${presetId}" preset's settings file could not be read.`);
+    throw new Error(`The "${presetId}" preset's settings file could not be read.`, { cause: error });
   }
   if (presetData.settings && Object.keys(presetData.settings).length > 0) {
     return presetData.settings;

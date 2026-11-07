@@ -86,7 +86,7 @@ Prefer to use your own development environment, or want to contribute to Widgeti
 
 ### Step 1: Install Node.js
 
-Widgetizer requires **Node.js version 20.19.5 or higher**.
+Widgetizer requires **Node.js version 24.22.1 or higher**.
 
 #### macOS
 
@@ -115,7 +115,7 @@ Open a terminal (macOS: Terminal app, Windows: Command Prompt or PowerShell) and
 node --version
 ```
 
-You should see a version number like `v20.19.5` or higher. If you see an error or a lower version, restart your terminal and try again.
+You should see a version number like `v24.22.1` or higher. If you see an error or a lower version, restart your terminal and try again.
 
 ### Step 2: Download Widgetizer
 

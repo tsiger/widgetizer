@@ -13,12 +13,14 @@
  *        linux: install both supported Sharp architectures
  *   3. Native rebuild for Electron (`@electron/rebuild --force`)
  *   4. electron-builder with the right platform flag, env vars, and target arg
+ *   5. mac (signed): add the built app's macOS minimum to latest-mac.yml (scripts/mac-update-feed.js)
  */
 
 import { spawnSync } from "node:child_process";
 import { existsSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { createInterface } from "node:readline";
-import { resolve } from "node:path";
+import { join, resolve } from "node:path";
+import { darwinVersionForMacOS, withMinimumSystemVersion } from "./mac-update-feed.js";
 
 const args = process.argv.slice(2);
 const platformIdx = args.indexOf("--platform");
@@ -120,9 +122,14 @@ if (platform === "linux") {
   const vipsDir = `node_modules/@img/sharp-libvips-linux-${linuxArch}/lib`;
   const vipsLibraries = readdirSync(vipsDir).filter((name) => name.startsWith("libvips-cpp.so."));
   if (!vipsLibraries.length) throw new Error(`Missing libvips for ${linuxArch}`);
+  // Sharp's binary is named after its version (sharp-linux-x64-0.35.5.node).
+  const sharpDir = `node_modules/@img/sharp-linux-${linuxArch}/lib`;
+  const sharpBinaries = readdirSync(sharpDir).filter((name) => name.endsWith(".node"));
+  if (!sharpBinaries.length) throw new Error(`Missing Sharp for ${linuxArch}`);
   for (const binary of [
-    "node_modules/better-sqlite3/build/Release/better_sqlite3.node",
-    `node_modules/@img/sharp-linux-${linuxArch}/lib/sharp-linux-${linuxArch}.node`,
+    // better-sqlite3 loads its bundled Node-API binary for the platform and architecture.
+    `node_modules/better-sqlite3/prebuilds/linux-${linuxArch}.node`,
+    ...sharpBinaries.map((name) => `${sharpDir}/${name}`),
     ...vipsLibraries.map((name) => `${vipsDir}/${name}`),
   ]) {
     const header = readFileSync(binary);
@@ -151,4 +158,30 @@ if (platform === "win" && unsigned) {
   builderEnv.WIN_UNSIGNED = "1";
 }
 
+// The Mac feed is finished after electron-builder exits (step 5), so it must never publish by itself
+// (it would on a git tag or in CI); releases are uploaded by hand.
+if (platform === "mac") {
+  builderArgs.push("--publish", "never");
+}
+
 run("npx", builderArgs, builderEnv);
+
+// 5. Mac update feed: electron-updater offers an update to any Mac unless the feed names a minimum.
+if (platform === "mac" && !unsigned) {
+  const feedPath = "dist-electron/latest-mac.yml";
+  if (!existsSync(feedPath)) throw new Error(`${feedPath} is missing after a signed Mac build`);
+  // The config builds x64 (dist-electron/mac) and arm64 (dist-electron/mac-arm64); no other folder.
+  const minimums = ["mac", "mac-arm64"]
+    .map((dir) => join("dist-electron", dir, "Widgetizer.app/Contents/Info.plist"))
+    .filter((plist) => existsSync(plist))
+    .map((plist) => {
+      const result = spawnSync("plutil", ["-extract", "LSMinimumSystemVersion", "raw", plist], { encoding: "utf8" });
+      if (result.status !== 0) throw new Error(`No LSMinimumSystemVersion in ${plist}`);
+      return result.stdout.trim();
+    });
+  if (!minimums.length) throw new Error("No built Mac app in dist-electron/mac or dist-electron/mac-arm64");
+  const darwinVersions = [...new Set(minimums.map(darwinVersionForMacOS))];
+  if (darwinVersions.length !== 1) throw new Error(`The Mac builds disagree on the macOS minimum: ${minimums.join(", ")}`);
+  writeFileSync(feedPath, withMinimumSystemVersion(readFileSync(feedPath, "utf8"), darwinVersions[0]));
+  console.log(`\n${feedPath}: minimumSystemVersion ${darwinVersions[0]} (macOS ${minimums[0]})`);
+}

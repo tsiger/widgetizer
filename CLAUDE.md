@@ -30,7 +30,7 @@ npm run validate:theme -- themes/arch   # App-owned static theme checks (LiquidJ
 - **Hybrid storage** — SQLite (`data/widgetizer.db`) for metadata (projects, media metadata/usage, app settings, export history); filesystem content is split between the `StorageAdapter` (page/menu/global JSON, theme files) and `AssetStorageAdapter` (uploaded binaries).
 - **Frontend**: React 19, Zustand (state), Tailwind CSS 4, Vite 7.
 - **Backend**: Express 5 (ES modules), LiquidJS templates, Sharp for images.
-- **Node**: Requires >=20.19.5.
+- **Node**: Requires >=24.22.1.
 
 ### Directory Layout
 
@@ -100,7 +100,7 @@ npm run test:frontend   # Vitest (editor-ui / core / render-engine)
 
 ## Linting
 
-ESLint 9 flat config covering the packages, the shells, and electron, plus the local `require-scope-arg` rule.
+ESLint 10 flat config covering the packages, the shells, and electron, plus the local `require-scope-arg` rule.
 
 ```bash
 npm run lint            # eslint src packages app server.js
@@ -125,7 +125,7 @@ Copy `.env.example` to `.env`. Key variables:
 npm run electron:dev   # Starts Vite + Express + Electron together
 ```
 
-Note: the `preelectron:dev` npm lifecycle hook runs automatically before `electron:dev`, rebuilding `better-sqlite3` for the local Node dev server and validating locales. Electron ABI rebuilds run during packaged builds in `scripts/build-electron.mjs`. No need to run those by hand.
+Note: the `preelectron:dev` npm lifecycle hook runs automatically before `electron:dev` and validates locales. `better-sqlite3` ships Node-API binaries for every supported platform, so the same binary loads in Node and in Electron: nothing needs rebuilding when switching between the web app, tests and Electron.
 
 ### Server port (production)
 
@@ -157,7 +157,7 @@ Output goes to `dist-electron/`.
 6. Attach **all** of these files from `dist-electron/`:
    - Mac: `.dmg`, `.dmg.blockmap`, `.zip`, `.zip.blockmap`, `latest-mac.yml`
    - Windows: `.exe`, `.exe.blockmap`, `latest.yml`
-7. The `latest-mac.yml` and `latest.yml` files are critical — electron-updater reads them to detect new versions. The `.blockmap` files enable delta updates.
+7. The `latest-mac.yml` and `latest.yml` files are critical — electron-updater reads them to detect new versions. The `.blockmap` files enable delta updates. `latest-mac.yml` must carry `minimumSystemVersion` (the signed Mac build adds it; see `docs-llms/core-electron.md`), or Macs below the app's macOS minimum are offered an update they can't open.
 
 ### Auto-Updates
 

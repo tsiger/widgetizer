@@ -35,6 +35,12 @@ Get the latest desktop builds from the latest GitHub release:
 
 On the release page, grab the `.exe` installer for Windows or the `.dmg` file for macOS.
 
+Widgetizer Desktop runs on:
+
+- **macOS** 13 (Ventura) or later, on Apple silicon or Intel
+- **Windows** 10 or later, 64-bit (x64)
+- **Linux**: no download yet; build the `.deb` package yourself on Linux (`npm run electron:build:linux`, see [Develop Locally](#develop-locally)). It's for 64-bit (x64 or ARM64) Debian-family distributions still supported by their maker, such as Ubuntu, Debian, Linux Mint, or 64-bit Raspberry Pi OS with a desktop
+
 ## 📚 Documentation
 
 Visit **[docs.widgetizer.org](https://docs.widgetizer.org)** for guides on themes, presets, project workflows, export, and customization.
@@ -59,8 +65,14 @@ The code is split into npm workspace packages under `packages/` (core, render en
 
 ### Requirements
 
-- **Node.js:** `>= 20.19.5`
+- **Node.js:** `>= 24.22.1`
 - **npm:** `>= 8`
+- **Operating system** (what Node.js 24 supports):
+  - **macOS** 13.5 or later, on Apple silicon or Intel
+  - **Windows** 10 or later (or Windows Server 2016 or later), 64-bit (x64; ARM64 has partial support from Node.js)
+  - **Linux** with glibc 2.28 or later, 64-bit (x64 or ARM64), such as Ubuntu 20.04+, Debian 10+, or RHEL 8+
+
+Docker runs the web app on any machine that runs Docker; the image brings its own Node.js.
 
 ### Web App
 
@@ -91,6 +103,7 @@ npm run test:frontend       # Frontend tests
 npm run lint                # Lint the packages and app
 npm run electron:build:mac  # Build macOS app
 npm run electron:build:win  # Build Windows app
+npm run electron:build:linux  # Build Linux .deb (on Linux, for its architecture)
 ```
 
 For the normal browser-based development flow, open `http://localhost:3000` after `npm run dev:all`.

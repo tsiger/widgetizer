@@ -33,7 +33,7 @@ const projectRepo = await import("../db/repositories/projectRepository.js");
 const mediaRepo = await import("../db/repositories/mediaRepository.js");
 const { PassThrough } = await import("stream");
 const AdmZip = (await import("adm-zip")).default;
-const archiver = (await import("archiver")).default;
+const { ZipArchive } = await import("archiver");
 
 const THEME = "__backup_checks_theme__";
 
@@ -80,7 +80,7 @@ async function backupOf(projectId) {
 /** A ZIP built by archiver from [name, content] pairs, names kept exactly as given. */
 function archiverZip(entries) {
   return new Promise((resolve, reject) => {
-    const archive = archiver("zip");
+    const archive = new ZipArchive();
     const chunks = [];
     archive.on("data", (c) => chunks.push(c));
     archive.on("error", reject);
@@ -391,6 +391,17 @@ describe("ZIP entries that are not plain paths, or not intact", () => {
     const res = await importBuffer(Buffer.from("this is not a zip"));
     assert.equal(res._status, 400, JSON.stringify(res._json));
     assert.match(res._json.error, /not a readable ZIP/);
+  });
+
+  it("refuses a ZIP holding two files under one name", async () => {
+    const entries = new AdmZip(sourceBackup)
+      .getEntries()
+      .filter((entry) => !entry.isDirectory)
+      .map((entry) => [entry.entryName, entry.getData()]);
+    const [name, data] = entries.find(([n]) => n.startsWith("pages/"));
+    const res = await importBuffer(await archiverZip([...entries, [name, data]]));
+    assert.equal(res._status, 400, JSON.stringify(res._json));
+    assert.match(res._json.error, /more than one file under the same name/);
   });
 });
 

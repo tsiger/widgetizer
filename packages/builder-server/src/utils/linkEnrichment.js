@@ -430,7 +430,7 @@ async function updateCollectionItemsViaStorage(storage, scope, itemTransformer, 
   // collection type directories are the extensionless entries. Listing a
   // non-directory that slips through is tolerated the same way the fs walker
   // tolerates an unreadable type dir: skip it.
-  let typeEntries = [];
+  let typeEntries;
   try {
     typeEntries = (await storage.list(scope, "collections")).filter((name) => !name.includes("."));
   } catch (error) {

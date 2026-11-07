@@ -1,6 +1,6 @@
 import fs from "fs-extra";
 import { isSafePathSegment } from "../utils/pathSecurity.js";
-import { extractZipSafely, openZip, readZipEntry, UnsafeZipError } from "../utils/zipSafety.js";
+import { DuplicateZipEntryError, extractZipSafely, openZip, readZipEntry, UnsafeZipError } from "../utils/zipSafety.js";
 import { mediaLibraryProblem, contentFilesProblem } from "../utils/backupContentChecks.js";
 import path from "path";
 import * as themeController from "./themeController.js";
@@ -541,7 +541,7 @@ export async function createProject(req, res) {
     } catch (error) {
       await discardHalfMadeProject(null, projectDir);
       console.error(`[ProjectController] Reading the preset failed: ${error.message}`);
-      throw new Error("The project could not be created from this preset, so nothing was created.");
+      throw new Error("The project could not be created from this preset, so nothing was created.", { cause: error });
     }
     // A preset the user picked and did not get is a failed creation, not a
     // warning: the project would claim that preset while missing its content,
@@ -554,7 +554,7 @@ export async function createProject(req, res) {
       } catch (error) {
         await discardHalfMadeProject(null, projectDir);
         console.error(`[ProjectController] Seeding preset collections failed: ${error.message}`);
-        throw new Error("The project could not be created from this preset, so nothing was created.");
+        throw new Error("The project could not be created from this preset, so nothing was created.", { cause: error });
       }
     }
 
@@ -593,7 +593,7 @@ export async function createProject(req, res) {
         // The row exists by now, so both halves have to go.
         await discardHalfMadeProject(newProject.id, projectDir);
         console.error(`[ProjectController] Seeding preset media failed: ${error.message}`);
-        throw new Error("The project could not be created from this preset, so nothing was created.");
+        throw new Error("The project could not be created from this preset, so nothing was created.", { cause: error });
       }
     }
 
@@ -787,7 +787,7 @@ export async function updateProject(req, res) {
           await fs.copy(oldDir, newDir);
         } catch (copyError) {
           await discardCopy();
-          throw new Error(`Failed to rename project directory: ${copyError.message}`);
+          throw new Error(`Failed to rename project directory: ${copyError.message}`, { cause: copyError });
         }
       }
 
@@ -949,7 +949,7 @@ export async function duplicateProject(req, res) {
         );
       }
       console.error(`[ProjectController] Duplication failed: ${copyError.message}`);
-      throw new Error("The project could not be duplicated, so no copy was made.");
+      throw new Error("The project could not be duplicated, so no copy was made.", { cause: copyError });
     }
 
     // Save new project to DB
@@ -970,7 +970,7 @@ export async function duplicateProject(req, res) {
     } catch (mediaError) {
       await discardHalfMadeProject(newProject.id, newDir);
       console.error(`[ProjectController] Duplicating the media library failed: ${mediaError.message}`);
-      throw new Error("The project could not be duplicated, so no copy was made.");
+      throw new Error("The project could not be duplicated, so no copy was made.", { cause: mediaError });
     }
 
     await refreshMediaUsageAfterStructuralChange(newProject.id, "project duplication");
@@ -1489,6 +1489,17 @@ export async function importProject(req, res) {
     try {
       zip = await openZip(uploadedFilePath);
     } catch (error) {
+      // A backup made before media metadata became SQLite-only can carry two
+      // entries named `uploads/media.json`: the file that was on disk and the
+      // serialized library. They describe different libraries and nothing says
+      // which is current, so the import refuses rather than picking one. (Which
+      // name repeats isn't known reliably, so the message covers that case.)
+      if (error instanceof DuplicateZipEntryError) {
+        return res.status(400).json({
+          error:
+            "This backup holds more than one file under the same name, so there is no way to tell which one is current. Backups made by older versions can carry two media libraries (two copies of uploads/media.json). Re-export the project with this version and import that backup instead.",
+        });
+      }
       return res.status(400).json({ error: error.message });
     }
     // The unpacking budget is measured against the file as it is on disk.
@@ -1506,18 +1517,6 @@ export async function importProject(req, res) {
 
     if (zipEntries.length === 0) {
       return res.status(400).json({ error: "Uploaded ZIP file is empty" });
-    }
-
-    // A backup made before media metadata became SQLite-only can carry two
-    // entries named `uploads/media.json` — the file that was on disk and the
-    // serialized library. They describe different libraries and nothing says
-    // which is current, so the import refuses rather than picking one.
-    const mediaMetadataEntries = zipEntries.filter((entry) => entry.entryName === "uploads/media.json");
-    if (mediaMetadataEntries.length > 1) {
-      return res.status(400).json({
-        error:
-          "This backup contains more than one media library (two copies of uploads/media.json), and there is no way to tell which one is current. Re-export the project with this version and import that backup instead.",
-      });
     }
 
     // Find and validate manifest
@@ -1683,7 +1682,7 @@ export async function importProject(req, res) {
         try {
           mediaData = await fs.readJson(mediaJsonPath);
         } catch (mediaError) {
-          throw new Error(`This backup's media library could not be read (uploads/media.json): ${mediaError.message}`);
+          throw new Error(`This backup's media library could not be read (uploads/media.json): ${mediaError.message}`, { cause: mediaError });
         }
         // A library with no files is a project that has none, and restores as
         // none. A file that parses but is not a library at all — `{}`, or a
@@ -1704,7 +1703,7 @@ export async function importProject(req, res) {
             mediaRepo.writeMediaData(newProject.id, mediaData);
           }
         } catch (mediaError) {
-          throw new Error(`This backup's media library could not be restored: ${mediaError.message}`);
+          throw new Error(`This backup's media library could not be restored: ${mediaError.message}`, { cause: mediaError });
         }
         // Only now: the file is the restore's input, and deleting it after a
         // failure would turn a recoverable one into a silent loss.

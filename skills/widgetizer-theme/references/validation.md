@@ -19,7 +19,7 @@ A theme may satisfy the first two and fail every later claim. Report which of th
 npm run validate:theme -- <theme-folder>
 ```
 
-Run from a Widgetizer source checkout with its dependencies installed (Node >=20.19.5). The theme path can be absolute or relative to that checkout. Add `--json` for machine-readable output, or `--strict` to make warnings fail too. Exit codes are 0 for no errors, 1 for findings that fail the check, and 2 for invalid command usage. No running web server is needed, and the checker does not modify the theme or create a project.
+Run from a Widgetizer source checkout with its dependencies installed (Node >=24.22.1). The theme path can be absolute or relative to that checkout. Add `--json` for machine-readable output, or `--strict` to make warnings fail too. Exit codes are 0 for no errors, 1 for findings that fail the check, and 2 for invalid command usage. No running web server is needed, and the checker does not modify the theme or create a project.
 
 Each finding names the file, severity, rule and explanation. Review findings against the intended behavior; reproduce suspected checker defects instead of changing theme or app rules blindly. The skill's contract file is an authoring reference. Validation reads the current app source, uses the same configured LiquidJS engine with strict filter checking, and reuses the app's collection-schema validation.
 

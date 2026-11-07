@@ -1,4 +1,4 @@
-import archiver from "archiver";
+import { ZipArchive } from "archiver";
 import { pipeline } from "stream";
 
 /**
@@ -36,7 +36,7 @@ export async function streamZipToResponse(res, entries, { zlibLevel = 9 } = {}) 
   const iterator = entries[Symbol.asyncIterator]?.() ?? entries[Symbol.iterator]();
   let next = await iterator.next();
 
-  const archive = archiver("zip", { zlib: { level: zlibLevel } });
+  const archive = new ZipArchive({ zlib: { level: zlibLevel } });
   let current = null; // the file stream being read, if any
   let clientGone = false;
   let failure = null;
