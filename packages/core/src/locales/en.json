@@ -582,7 +582,7 @@
       "setActiveError": "Failed to set active project",
       "duplicateSuccess": "Project duplicated successfully",
       "duplicateError": "Failed to duplicate project",
-      "exportSuccess": "Backup downloaded successfully",
+      "exportSuccess": "Download started",
       "exportError": "Failed to download backup",
       "exportInProgress": "Preparing backup... This may take a moment for large projects.",
       "importSuccess": "Project \"{{name}}\" imported successfully",
