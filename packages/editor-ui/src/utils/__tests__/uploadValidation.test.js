@@ -124,6 +124,22 @@ describe("mapDropzoneRejections", () => {
     ]);
   });
 
+  it("names the limit in a file-too-large reason when the drop zone's limit is given", () => {
+    const fileRejections = [
+      {
+        file: makeFile({ name: "big.zip", size: 18.5 * 1024 * 1024, type: "application/zip" }),
+        errors: [{ code: "file-too-large", message: "File is larger than 10485760 bytes" }],
+      },
+    ];
+
+    expect(mapDropzoneRejections(fileRejections, { maxSizeMB: 10 })).toEqual([
+      {
+        originalName: "big.zip",
+        reason: "File is too large (18.5MB). Maximum allowed size is 10MB.",
+      },
+    ]);
+  });
+
   it("maps too-many-files rejections", () => {
     const fileRejections = [
       {

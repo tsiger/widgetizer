@@ -64,7 +64,7 @@ export function validateFileSizes(files, { maxSizeMB }) {
   for (const file of files) {
     if (maxSizeMB != null && file.size > maxSizeMB * 1024 * 1024) {
       rejected.push(
-        createRejectedFile(file.name, `File is too large (${toMegabytes(file.size)}MB). Maximum allowed size is ${maxSizeMB}MB.`),
+        createRejectedFile(file.name, tooLargeReason(file, maxSizeMB)),
       );
     } else {
       valid.push(file);
@@ -97,7 +97,7 @@ export function validateZipFiles(files, { maxSizeMB, multiple = false } = {}) {
 
     if (maxSizeMB != null && file.size > maxSizeMB * 1024 * 1024) {
       rejected.push(
-        createRejectedFile(file.name, `File is too large (${toMegabytes(file.size)}MB). Maximum allowed size is ${maxSizeMB}MB.`),
+        createRejectedFile(file.name, tooLargeReason(file, maxSizeMB)),
       );
       continue;
     }
@@ -108,7 +108,12 @@ export function validateZipFiles(files, { maxSizeMB, multiple = false } = {}) {
   return { valid, rejected };
 }
 
-function formatDropzoneError(error, file) {
+function tooLargeReason(file, maxSizeMB) {
+  const size = `File is too large (${toMegabytes(file.size)}MB).`;
+  return maxSizeMB != null ? `${size} Maximum allowed size is ${maxSizeMB}MB.` : size;
+}
+
+function formatDropzoneError(error, file, maxSizeMB) {
   if (error.code === "too-many-files") {
     return "Please upload only one file.";
   }
@@ -118,14 +123,18 @@ function formatDropzoneError(error, file) {
   }
 
   if (error.code === "file-too-large") {
-    return `File is too large (${toMegabytes(file.size)}MB).`;
+    return tooLargeReason(file, maxSizeMB);
   }
 
   return error.message || "File was rejected.";
 }
 
-export function mapDropzoneRejections(fileRejections) {
+/**
+ * @param {Array<{ file: File, errors: Array<{ code: string, message?: string }> }>} fileRejections - react-dropzone's rejections
+ * @param {{ maxSizeMB?: number }} [options] - the limit the drop zone enforced, so a too-large refusal names it
+ */
+export function mapDropzoneRejections(fileRejections, { maxSizeMB } = {}) {
   return fileRejections.map(({ file, errors }) =>
-    createRejectedFile(file.name, errors.map((error) => formatDropzoneError(error, file)).join(" ")),
+    createRejectedFile(file.name, errors.map((error) => formatDropzoneError(error, file, maxSizeMB)).join(" ")),
   );
 }

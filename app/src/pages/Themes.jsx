@@ -395,9 +395,9 @@ export default function Themes() {
 
   const onThemeReject = useCallback(
     (fileRejections) => {
-      showRejectedFiles(showToast, mapDropzoneRejections(fileRejections));
+      showRejectedFiles(showToast, mapDropzoneRejections(fileRejections, { maxSizeMB }));
     },
-    [showToast],
+    [maxSizeMB, showToast],
   );
 
   if (loading) {

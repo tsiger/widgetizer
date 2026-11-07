@@ -141,7 +141,7 @@ export default function MediaSelectorDrawer({
   }, [visible, onClose]);
 
   const handleUploaderReject = (fileRejections) => {
-    showRejectedFiles(showToast, mapDropzoneRejections(fileRejections));
+    showRejectedFiles(showToast, mapDropzoneRejections(fileRejections, { maxSizeMB }));
   };
 
   // Restrict the in-drawer uploader to the active filter's types (and label it to match).

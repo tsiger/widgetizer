@@ -97,7 +97,7 @@ export default function Media() {
   };
 
   const handleUploaderReject = (fileRejections) => {
-    showRejectedFiles(mediaState.showToast, mapDropzoneRejections(fileRejections));
+    showRejectedFiles(mediaState.showToast, mapDropzoneRejections(fileRejections, { maxSizeMB }));
   };
 
   // Get current lightbox image

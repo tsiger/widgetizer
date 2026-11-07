@@ -119,7 +119,7 @@ export default function ProjectImportModal({ isOpen, onClose, onSuccess }) {
   };
 
   const handleReject = (fileRejections) => {
-    const rejected = mapDropzoneRejections(fileRejections);
+    const rejected = mapDropzoneRejections(fileRejections, { maxSizeMB });
     if (rejected.length > 0) {
       setSelectedFile(null);
       setError(rejected[0].reason);
