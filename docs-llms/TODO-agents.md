@@ -121,11 +121,11 @@ LocalPublishAdapter.publish does not use withExportOpLock. Choose shared allocat
 
 **Deferred · Low · OSS**
 
-Export confinement is lexical; realpath/symlink containment was not established. Reproduce via a disposable symlink fixture before changing serving behaviour.
+Viewer containment is lexical; `statSync` follows symlinks. First establish whether backup import, theme uploads or preset media can introduce links into exports, then reproduce linked-file, directory and export-root escapes with disposable fixtures before changing serving behaviour.
 
-**Done when:** The supported boundary is explicit and demonstrated escapes are refused.
+**Done when:** The supported boundary is explicit and demonstrated escapes are refused (compare `realpath` of the publish folder, export folder and file, or refuse link components), with tests for a linked file, folder and export root.
 
-**Start:** [exportController.js](../packages/builder-server/src/controllers/exportController.js). **Source:** Original §67.
+**Start:** [export.js](../packages/builder-server/src/routes/export.js), [exportController.js](../packages/builder-server/src/controllers/exportController.js). **Source:** Original §67; 2026-11-07 review.
 
 #### T71 · Test leave-page prompts with real navigation
 
@@ -226,6 +226,16 @@ Candidates: truncated ZIP, future formatVersion, valid JSON with invalid content
 **Done when:** Chosen case either restores completely or refuses clearly with cleanup.
 
 **Start:** [projects.md](domain/operations/projects.md). **Source:** Domain review R8.
+
+#### R-NARROW · Make wide screens fit narrow windows
+
+**Deferred · Low · OSS**
+
+Owner's list, 2026-11-07, after the main column learned to shrink (`min-w-0` in `Layout.jsx` and `ProjectPickerLayout.jsx`) and the Media table's Filename column became flexible: the top bar now stays in view, but below it some screens are still wider than their cards and the content pane scrolls sideways. Measured: Media table out of its card by 152 px at 1000 px (owner accepted this for now); News items 79 px at 1000 / 279 at 800; Export history 210 at 800; Pages 67 at 800; the Settings panel ~25 px at 800; a theme card's "By Widgetizer" line at 375. Unverified (review): the page editor's top bar doesn't wrap and an ancestor clips it (`EditorTopBar.jsx`, `PageEditor.jsx`), so a very narrow window or a long page name could put controls out of reach. Turned down: making the page grow to its widest table (the header and uploader widen too). A per-table sideways scroll would clip the row menus, which open inside the cells.
+
+**Done when:** each listed screen fits its card down to 800 px (fewer or stacked columns, or a scroll whose row menus aren't clipped), and the editor top bar keeps every control reachable.
+
+**Start:** [MediaListItem.jsx](../packages/editor-ui/src/components/media/MediaListItem.jsx), [Table.jsx](../packages/editor-ui/src/components/ui/Table.jsx), [Layout.jsx](../packages/editor-ui/src/components/layout/Layout.jsx). **Source:** owner, 2026-11-07.
 
 #### QA-EXTRA · Choose extra checks when changing an area
 

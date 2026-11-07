@@ -20,7 +20,7 @@ Bugs, improvements and decisions are on GitHub (issues without a milestone are u
 
 ### Later, only when the need arises
 
-T4 browser smoke test · T17 stricter old tests · T33 repeated editor code · T39 usage labels during a refresh · T43 template trust review · T61 preview startup warnings · T63 unused publishing route · T67 export links through linked folders · T71 real-navigation prompt tests · R1-COORD structural overlap · R1-RESTART edits across a restart · R1-CONTRACT shared save rules · R2-REPAIR repair dead links · R2-MENU menu matching for new setting types · R3-DRAFT recover work after a language is removed · R3-FOLDERS empty language folders · R5-NESTED links inside structured settings · R8-ARCHIVE unusual backup formats · QA-EXTRA extra checks when changing an area
+T4 browser smoke test · T17 stricter old tests · T33 repeated editor code · T39 usage labels during a refresh · T43 template trust review · T61 preview startup warnings · T63 unused publishing route · T67 export links through linked folders · T71 real-navigation prompt tests · R1-COORD structural overlap · R1-RESTART edits across a restart · R1-CONTRACT shared save rules · R2-REPAIR repair dead links · R2-MENU menu matching for new setting types · R3-DRAFT recover work after a language is removed · R3-FOLDERS empty language folders · R5-NESTED links inside structured settings · R8-ARCHIVE unusual backup formats · R-NARROW wide screens in narrow windows (Media, News, Export, Pages, Settings, theme cards; editor top bar) · QA-EXTRA extra checks when changing an area
 
 ### Embedding apps (not OSS release work)
 

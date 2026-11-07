@@ -75,13 +75,19 @@ export default function MediaListItem({
           )}
         </div>
       </td>
-      <td className={`${cellClass} max-w-xs truncate`} title={file.filename}>
+      {/* The one flexible column: it takes the room the others leave and cuts a long
+          name short, so the table fits its card instead of setting the page's width. */}
+      <td className={`${cellClass} w-full max-w-0 truncate`} title={file.filename}>
         {file.type?.startsWith("image/") ? (
-          <button type="button" onClick={onEdit} className="truncate text-left hover:text-pink-600 transition-colors">
+          <button
+            type="button"
+            onClick={onEdit}
+            className="block max-w-full truncate text-left hover:text-pink-600 transition-colors"
+          >
             {file.filename}
           </button>
         ) : (
-          <span className="truncate">{file.filename}</span>
+          <span className="block truncate">{file.filename}</span>
         )}
       </td>
       <td className={cellClass}>{formatFileSize(file.size)}</td>
