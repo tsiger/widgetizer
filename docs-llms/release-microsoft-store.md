@@ -213,7 +213,7 @@ npm run build
 ```
 
 ```bash
-npm install --no-save --platform=win32 --arch=x64 --include=optional
+npm install --no-save --os=win32 --cpu=x64 --include=optional
 ```
 
 ```bash

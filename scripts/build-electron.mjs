@@ -108,7 +108,9 @@ run("npm", ["run", "build"]);
 if (platform === "mac") {
   run("node", ["electron/prepare-mac-sharp.cjs"]);
 } else if (platform === "win") {
-  run("npm", ["install", "--no-save", "--platform=win32", "--arch=x64", "--include=optional"]);
+  // npm picks optional native packages (Sharp's) by its `os` and `cpu` settings; it has no
+  // `platform` or `arch` settings, so those flags were ignored and a build on a Mac got Mac binaries.
+  run("npm", ["install", "--no-save", "--os=win32", "--cpu=x64", "--include=optional"]);
 } else if (platform === "linux") {
   run("node", ["electron/prepare-linux-sharp.cjs"]);
 }
