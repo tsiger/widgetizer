@@ -147,8 +147,18 @@ function serveExportFile(req, res) {
     const ext = path.extname(fileToSend).toLowerCase();
     res.setHeader("Content-Type", getContentType(ext));
 
+    // Sent relative to the export, so only the part inside it is checked for
+    // dot-folders: `send` refuses any path with one ("Not Found"), and the
+    // desktop app's data lives under `~/.config` on Linux.
+    const exportRoot = path.resolve(getPublishDir(), exportDir);
+    // Already true once resolveExportFile found the file there; kept so this
+    // root can never sit outside the publish folder, nor the file outside it.
+    if (!isWithinDirectory(exportRoot, path.resolve(getPublishDir())) || !isWithinDirectory(fileToSend, exportRoot)) {
+      return res.status(404).json({ error: "File not found", path: requestedPath });
+    }
     res.sendFile(
-      fileToSend,
+      path.relative(exportRoot, fileToSend),
+      { root: exportRoot },
       sendFileDone(res, (err) => {
         console.error(`Error sending file ${fileToSend}:`, err);
         res.status(500).json({ error: "Failed to serve file", message: err.message });

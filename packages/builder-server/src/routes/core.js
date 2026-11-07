@@ -1,5 +1,4 @@
 import express from "express";
-import path from "path";
 import { STATIC_CORE_ASSETS_DIR } from "../config.js";
 import { sendFileDone } from "../utils/sendFileOutcome.js";
 
@@ -20,10 +19,10 @@ router.get("/assets/:filename", (req, res) => {
     return res.status(400).json({ error: "Invalid filename" });
   }
 
-  const filePath = path.join(coreAssetsDir, filename);
-
+  // Relative to its folder: `send` refuses a path with a dot-folder anywhere in it.
   res.sendFile(
-    filePath,
+    filename,
+    { root: coreAssetsDir },
     sendFileDone(res, (err) => {
       console.error(`Core asset not found: ${filename}`, err.message);
       res.status(404).json({ error: "Asset not found" });

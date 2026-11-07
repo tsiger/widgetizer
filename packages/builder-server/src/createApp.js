@@ -119,7 +119,8 @@ function mountEditorUiRoutes(app) {
 
   // Handles any requests that don't match the ones above
   app.get(/^\/(?!api|health|render).*/, (req, res) => {
-    res.sendFile(path.join(STATIC_DIST_DIR, "index.html"));
+    // Relative to its folder: `send` refuses a path with a dot-folder anywhere in it.
+    res.sendFile("index.html", { root: STATIC_DIST_DIR });
   });
 }
 
