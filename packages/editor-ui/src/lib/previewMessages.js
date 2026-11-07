@@ -92,9 +92,18 @@ const PAYLOAD_READERS = {
   },
   NAVIGATE_PREVIEW(payload) {
     if (!isPlainObject(payload)) return null;
-    const { url } = payload;
+    const { url, fragment } = payload;
     if (!isShortString(url, MAX_URL_LENGTH)) return null;
-    return { url };
+    // The section the link names on that page (an element id, decoded).
+    if (fragment === undefined) return { url };
+    if (!isShortString(fragment, MAX_URL_LENGTH) || fragment === "") return null;
+    // The listener encodes it into the route; an unpaired surrogate can't be.
+    try {
+      encodeURIComponent(fragment);
+    } catch {
+      return null;
+    }
+    return { url, fragment };
   },
   SCROLL_POSITION(payload) {
     if (!isPlainObject(payload)) return null;

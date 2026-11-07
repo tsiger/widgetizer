@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import { isStandalonePreviewNavigationUrl } from "@widgetizer/editor-ui/utils/previewLinkUtils";
 import { detachPreviewFromOpener } from "@widgetizer/editor-ui/lib/openSitePreview";
 import { readPreviewMessage } from "@widgetizer/editor-ui/lib/previewMessages";
+import { usePreviewFrameSrc } from "@widgetizer/editor-ui/lib/previewFrameSrc";
 import PreviewModeToggle from "@widgetizer/editor-ui/components/preview/PreviewModeToggle.jsx";
 import PreviewStage, { STANDALONE_SANDBOX } from "@widgetizer/editor-ui/components/preview/PreviewStage.jsx";
 import DebugStatePanel from "../components/dev/DebugStatePanel";
@@ -45,7 +46,8 @@ export default function SitePreviewLayout() {
     const handleMessage = (event) => {
       const message = readPreviewMessage(event, iframeRef.current);
       if (message?.type === "NAVIGATE_PREVIEW" && isStandalonePreviewNavigationUrl(message.payload.url)) {
-        navigate(message.payload.url);
+        const { url, fragment } = message.payload;
+        navigate(fragment ? `${url}#${encodeURIComponent(fragment)}` : url);
       }
     };
     window.addEventListener("message", handleMessage);
@@ -61,7 +63,10 @@ export default function SitePreviewLayout() {
   const outletContext = useMemo(() => ({ setPreview }), []);
 
   const isMobile = previewMode === "mobile";
-  const { src, loading, notFound } = preview;
+  const { src: renderSrc, loading, notFound } = preview;
+  // A link to `page.html#section` arrives with the section as this route's hash;
+  // a new render takes it as its own, and the runtime shows that section on load.
+  const src = usePreviewFrameSrc(renderSrc, location.hash);
 
   return (
     <div className="flex h-screen w-screen flex-col overflow-hidden">

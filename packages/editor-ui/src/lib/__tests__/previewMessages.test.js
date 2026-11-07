@@ -262,6 +262,16 @@ describe("readPreviewMessage", () => {
       expect(read({ type: "NAVIGATE_PREVIEW", payload: { url: ["/preview/about"] } })).toBeNull();
       expect(read({ type: "NAVIGATE_PREVIEW", payload: { url: `/preview/${"a".repeat(2048)}` } })).toBeNull();
     });
+
+    it("passes the section a link names, and drops one that is not a non-empty string", () => {
+      expect(
+        read({ type: "NAVIGATE_PREVIEW", payload: { url: "/preview/page/en/about", fragment: "team" } })?.payload,
+      ).toEqual({ url: "/preview/page/en/about", fragment: "team" });
+      expect(read({ type: "NAVIGATE_PREVIEW", payload: { url: "/preview/about", fragment: "" } })).toBeNull();
+      expect(read({ type: "NAVIGATE_PREVIEW", payload: { url: "/preview/about", fragment: 42 } })).toBeNull();
+      // An unpaired surrogate can't be put into an address.
+      expect(read({ type: "NAVIGATE_PREVIEW", payload: { url: "/preview/about", fragment: "\uD800" } })).toBeNull();
+    });
   });
 
   describe("SCROLL_POSITION", () => {

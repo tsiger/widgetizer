@@ -59,6 +59,38 @@ const PREVIEW_SITE = (() => {
   };
 })();
 
+// The preview route of the page on screen, from its own file (`el/about.html`),
+// read the same way as a link to it. Null when the host doesn't say: a
+// `page.html#section` link to this page then reloads it at the section.
+const CURRENT_PAGE_TARGET = (() => {
+  const outputPath = document.querySelector("script[data-preview-mode]")?.dataset?.outputPath || "";
+  return outputPath
+    ? getStandalonePreviewTarget(outputPath, { collectionPrefixes: COLLECTION_PREFIXES, ...PREVIEW_SITE })
+    : null;
+})();
+
+// A link's fragment as an element id: `#caf%C3%A9` names `café`. Malformed
+// escapes are kept as written.
+function fragmentId(fragment) {
+  try {
+    return decodeURIComponent(fragment);
+  } catch {
+    return fragment;
+  }
+}
+
+// The preview's <base> points at the project's files, so the browser would
+// resolve `#section` out of the page; the element is found and shown here
+// instead, with focus moved to it as a real fragment link would.
+function scrollToFragment(id) {
+  if (!id) return;
+  const destination = document.getElementById(id);
+  if (!destination) return;
+  if (!destination.hasAttribute("tabindex")) destination.tabIndex = -1;
+  destination.focus({ preventScroll: true });
+  destination.scrollIntoView();
+}
+
 // The site settings each widget and the layout read during the full render.
 function readThemeReads() {
   try {
@@ -593,25 +625,25 @@ function setupInteractionHandler() {
       const linkElement = event.target.closest("a");
       if (linkElement) {
         if (PREVIEW_MODE === "standalone") {
-          const href = linkElement.getAttribute("href");
-          // The iframe's base URL points at project assets. Resolve fragment
-          // destinations inside the rendered document instead of navigating out.
-          if (href?.startsWith("#")) {
+          const href = linkElement.getAttribute("href") || "";
+          const hashAt = href.indexOf("#");
+          const fragment = hashAt === -1 ? "" : fragmentId(href.slice(hashAt + 1));
+          // A bare `#section` is always this page.
+          if (hashAt === 0) {
             event.preventDefault();
-            const destination = document.getElementById(href.slice(1));
-            if (destination) {
-              if (!destination.hasAttribute("tabindex")) destination.tabIndex = -1;
-              destination.focus({ preventScroll: true });
-              destination.scrollIntoView();
-            }
+            scrollToFragment(fragment);
             return;
           }
           const targetUrl = getStandalonePreviewTarget(href, { collectionPrefixes: COLLECTION_PREFIXES, ...PREVIEW_SITE });
           event.preventDefault();
           event.stopPropagation();
 
-          if (targetUrl) {
-            postToParent({ type: "NAVIGATE_PREVIEW", payload: { url: targetUrl } });
+          if (targetUrl && fragment && targetUrl === CURRENT_PAGE_TARGET) {
+            scrollToFragment(fragment);
+          } else if (targetUrl) {
+            // The section goes with the page: the preview passes it on to the
+            // next render as the frame's #fragment, shown once it has loaded.
+            postToParent({ type: "NAVIGATE_PREVIEW", payload: fragment ? { url: targetUrl, fragment } : { url: targetUrl } });
           }
           return;
         }
@@ -1208,6 +1240,14 @@ function initializeRuntime() {
     postToParent({ type: "PREVIEW_READY", payload: { themeReads: readThemeReads() } });
     reportScrollPosition();
   };
+
+  // A page reached through a `page.html#section` link opens at the section,
+  // once images and fonts have settled the layout.
+  if (PREVIEW_MODE === "standalone" && window.location.hash.length > 1) {
+    const showFragment = () => scrollToFragment(fragmentId(window.location.hash.slice(1)));
+    if (document.readyState === "complete") showFragment();
+    else window.addEventListener("load", showFragment, { once: true });
+  }
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", announceReady);
   } else {

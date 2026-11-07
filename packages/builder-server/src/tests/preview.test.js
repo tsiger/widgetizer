@@ -649,4 +649,16 @@ describe("injectRuntimeScript — the site's languages", () => {
     assert.match(out, /data-default-language="en"/);
     assert.doesNotMatch(out, /<img>/);
   });
+
+  it("names the shown page's file, so a link to it with a #section scrolls in place", () => {
+    const out = injectRuntimeScript(html, "standalone", [], { defaultLanguage: "en", outputPath: "el/news/page/2.html" });
+    assert.match(out, /data-output-path="el\/news\/page\/2.html"/);
+  });
+
+  it("leaves the page's file out unless it is a plain output path", () => {
+    for (const outputPath of ['"><script>x</script>.html', "../secret.html", "about", "/about.html", undefined]) {
+      const out = injectRuntimeScript(html, "standalone", [], { defaultLanguage: "en", outputPath });
+      assert.match(out, /data-output-path=""/, String(outputPath));
+    }
+  });
 });

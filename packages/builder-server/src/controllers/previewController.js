@@ -42,17 +42,23 @@ import { LANGUAGE_CODE_RE, DEFAULT_LANGUAGE } from "@widgetizer/core/languages";
 import { AREA_ID_RE } from "@widgetizer/core/sharedAreas";
 import { isRenderedWidget, renderedWidgetOrder, uniqueBlockOrder, uniqueWidgetOrder } from "@widgetizer/core/widgetOrder";
 
+// An output path as the content-address helpers build it (`el/news/page/2.html`):
+// lower-case segments, no `..`, safe inside an attribute.
+const OUTPUT_PATH_RE = /^(?:[a-z0-9][a-z0-9._-]*\/)*[a-z0-9][a-z0-9._-]*\.html$/;
+
 // Inject the runtime script and base tag into rendered HTML. The site's
 // languages travel with it: a preview renders at the root, so a link reads as
 // `el/contact.html`, and only the enabled codes tell that apart from a
-// collection whose prefix happens to look like one.
+// collection whose prefix happens to look like one. `site.outputPath` is the
+// shown page's own file, so a `page.html#section` link to it can scroll in place.
 export function injectRuntimeScript(html, previewMode = "editor", collectionPrefixes = [], site = {}) {
   const safeMode = previewMode === "standalone" ? "standalone" : "editor";
   const prefixes = collectionPrefixes.filter((prefix) => /^[a-z0-9-]+$/.test(prefix)).join(",");
   const codes = (code) => LANGUAGE_CODE_RE.test(code || "");
   const languages = (site.languages || []).filter(codes).join(",");
   const defaultLanguage = codes(site.defaultLanguage) ? site.defaultLanguage : DEFAULT_LANGUAGE;
-  const script = `<script src="/runtime/previewRuntime.js" type="module" data-preview-mode="${safeMode}" data-collection-prefixes="${prefixes}" data-languages="${languages}" data-default-language="${defaultLanguage}"></script>`;
+  const outputPath = OUTPUT_PATH_RE.test(site.outputPath || "") && !site.outputPath.split("/").includes("..") ? site.outputPath : "";
+  const script = `<script src="/runtime/previewRuntime.js" type="module" data-preview-mode="${safeMode}" data-collection-prefixes="${prefixes}" data-languages="${languages}" data-default-language="${defaultLanguage}" data-output-path="${outputPath}"></script>`;
   html = html.replace(/<\/body>/i, `${script}\n</body>`);
 
   // Editor mode: inject designMode flag in <head> so it's available before
@@ -303,7 +309,10 @@ async function generatePreviewHtml(pageData, rawThemeSettings, previewMode, coll
 
   renderedHtml = injectBaseTag(renderedHtml);
   renderedHtml = injectThemeReads(renderedHtml, sharedGlobals.themeReads);
-  renderedHtml = injectRuntimeScript(renderedHtml, previewMode, await itemPagePrefixes(collectionDeps), projectLanguages(project));
+  renderedHtml = injectRuntimeScript(renderedHtml, previewMode, await itemPagePrefixes(collectionDeps), {
+    ...projectLanguages(project),
+    outputPath: pageOutputPath(pageData.slug || "", pageNumber, { language: pageData.language, defaultLanguage }),
+  });
 
   return renderedHtml;
 }
@@ -523,7 +532,10 @@ export async function createCollectionPreviewToken(req, res) {
     );
 
     html = injectBaseTag(html);
-    html = injectRuntimeScript(html, "standalone", await itemPagePrefixes(collectionDeps), projectLanguages(req.activeProject));
+    html = injectRuntimeScript(html, "standalone", await itemPagePrefixes(collectionDeps), {
+      ...projectLanguages(req.activeProject),
+      outputPath: sharedGlobals.currentCanonicalPath,
+    });
 
     const token = generateToken(html);
     res.json({ token });

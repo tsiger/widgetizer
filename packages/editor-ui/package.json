@@ -15,6 +15,7 @@
     "./lib/uploadRequest": "./src/lib/uploadRequest.js",
     "./lib/previewBase": "./src/lib/previewBase.js",
     "./lib/previewMessages": "./src/lib/previewMessages.js",
+    "./lib/previewFrameSrc": "./src/lib/previewFrameSrc.js",
     "./lib/openSitePreview": "./src/lib/openSitePreview.js",
     "./queries/pageManager": "./src/queries/pageManager.js",
     "./queries/menuManager": "./src/queries/menuManager.js",

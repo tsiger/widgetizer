@@ -83,6 +83,39 @@ describe("SitePreviewLayout", () => {
     await waitFor(() => expect(container.querySelector("iframe")?.getAttribute("src")).toBe("/render/about"));
   });
 
+  it("carries a link's section to the next render as the frame's #fragment", async () => {
+    const { container } = renderAt("/preview/home");
+    await act(async () => {
+      window.dispatchEvent(
+        new MessageEvent("message", {
+          data: { type: "NAVIGATE_PREVIEW", payload: { url: "/preview/about", fragment: "our team" } },
+          origin: window.location.origin,
+          source: container.querySelector("iframe").contentWindow,
+        }),
+      );
+    });
+    await waitFor(() => expect(container.querySelector("iframe")?.getAttribute("src")).toBe("/render/about#our%20team"));
+  });
+
+  it("keeps the frame loaded when only the route's #section changes, so a spent render isn't reloaded", async () => {
+    const { container } = renderAt("/preview/about#team");
+    await waitFor(() => expect(container.querySelector("iframe")?.getAttribute("src")).toBe("/render/about#team"));
+    const frame = container.querySelector("iframe");
+
+    // A plain link to the page on screen (or Back to the entry without the hash).
+    await act(async () => {
+      window.dispatchEvent(
+        new MessageEvent("message", {
+          data: { type: "NAVIGATE_PREVIEW", payload: { url: "/preview/about" } },
+          origin: window.location.origin,
+          source: frame.contentWindow,
+        }),
+      );
+    });
+    expect(container.querySelector("iframe")).toBe(frame);
+    expect(frame.getAttribute("src")).toBe("/render/about#team");
+  });
+
   it("ignores NAVIGATE_PREVIEW messages carrying a non-preview URL", async () => {
     const { container } = renderAt("/preview/home");
     await act(async () => {
