@@ -1,5 +1,7 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { API_URL } from "../lib/config";
+import { useHookRunner } from "../extension/PluginProvider";
 import { saveMediaMetadata } from "../queries/mediaManager";
 
 /**
@@ -31,6 +33,8 @@ export default function useMediaMetadata({ activeProject, showToast, setFiles })
   const [drawerVisible, setDrawerVisible] = useState(false);
   const [selectedFileForEdit, setSelectedFileForEdit] = useState(null);
   const [isSavingMetadata, setIsSavingMetadata] = useState(false);
+  const { t } = useTranslation();
+  const hooks = useHookRunner();
 
   // Handler to open the drawer
   const handleEditMetadata = (file) => {
@@ -71,12 +75,58 @@ export default function useMediaMetadata({ activeProject, showToast, setFiles })
     }
   };
 
-  // Opens a file in a new tab by its ID (works for any file type). Without an
-  // opener: an uploaded HTML or SVG file runs its own scripts, which must not be
+  // Opens a file in a new tab by its ID (works for any file type), always
+  // without a link back to the editor: an SVG or other active file must not be
   // able to navigate the editor window.
-  const handleFileView = (file) => {
-    // Use the ID-based route which works for both images and videos
-    window.open(API_URL(`/api/media/projects/${activeProject.id}/media/${file.id}`), "_blank", "noopener,noreferrer");
+  const handleFileView = async (file) => {
+    const projectId = activeProject.id;
+    const url = API_URL(`/api/media/projects/${projectId}/media/${file.id}`);
+    if (!hooks.has("beforeOpenMediaFile")) {
+      window.open(url, "_blank", "noopener,noreferrer");
+      return;
+    }
+
+    // A host has to get ready first, and a tab opened after waiting would be
+    // blocked as a pop-up, so a blank tab opens now and gets the file after.
+    // (The desktop app never gets here: it registers no hooks, and it refuses
+    // window.open and opens the address itself.)
+    const tab = window.open("", "_blank");
+    if (!tab) {
+      showToast(t("media.viewBlocked"), "error");
+      return;
+    }
+    try {
+      tab.opener = null;
+    } catch {
+      // Checked just below.
+    }
+    if (tab.opener !== null) {
+      tab.close();
+      showToast(t("media.viewFailed"), "error");
+      return;
+    }
+
+    try {
+      const result = await hooks.runBefore("beforeOpenMediaFile", { projectId, fileId: file.id, url });
+      if (tab.closed) return;
+      if (!result.proceed) {
+        tab.close();
+        showToast(result.message || t("media.viewFailed"), "error");
+        return;
+      }
+      // Through a link in the tab itself, so the request sends no referrer
+      // (navigating the tab from here would send the editor's address).
+      const link = tab.document.createElement("a");
+      link.href = new URL(url, window.location.href).href;
+      link.rel = "noreferrer";
+      link.referrerPolicy = "no-referrer";
+      tab.document.body.appendChild(link);
+      link.click();
+    } catch (error) {
+      console.error("Error opening file:", error);
+      if (!tab.closed) tab.close();
+      showToast(t("media.viewFailed"), "error");
+    }
   };
 
   return {

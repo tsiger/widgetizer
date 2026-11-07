@@ -24,8 +24,8 @@ export default function WidgetSelector({
   const listRef = useRef(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [focusedIndex, setFocusedIndex] = useState(-1);
-  // Track the widget type whose preview 404'd, so the placeholder shows in place of a broken image.
-  const [brokenPreviewType, setBrokenPreviewType] = useState(null);
+  // The preview address that failed to load, so the placeholder shows in its place.
+  const [failedPreviewUrl, setFailedPreviewUrl] = useState(null);
 
   // Helper to update search and reset focus in one action
   const updateSearch = useCallback((value) => {
@@ -303,18 +303,26 @@ export default function WidgetSelector({
 
         {hasAnyPreview && (() => {
           const focusedWidget = focusedIndex >= 0 ? filteredWidgets[focusedIndex] : null;
-          const showImage =
-            focusedWidget?.hasPreview && projectId && focusedWidget.type !== brokenPreviewType;
+          const previewUrl =
+            focusedWidget?.hasPreview && projectId
+              ? API_URL(`/api/preview/assets/${projectId}/widgets/${focusedWidget.type}/preview.png`)
+              : null;
+          const previewFailed = previewUrl !== null && failedPreviewUrl === previewUrl;
           return (
             <div className="w-64 bg-slate-50 rounded-r-lg flex flex-col items-center justify-center p-3">
-              {showImage ? (
+              {/* Kept (hidden) when it fails: an embedding app may load the same element
+                  again (say, after refreshing its sign-in), and a load shows it after all. */}
+              {previewUrl && (
                 <img
-                  src={API_URL(`/api/preview/assets/${projectId}/widgets/${focusedWidget.type}/preview.png`)}
+                  src={previewUrl}
                   alt={tTheme(focusedWidget.displayName) || focusedWidget.type}
-                  onError={() => setBrokenPreviewType(focusedWidget.type)}
+                  hidden={previewFailed}
+                  onError={() => setFailedPreviewUrl(previewUrl)}
+                  onLoad={() => setFailedPreviewUrl((failed) => (failed === previewUrl ? null : failed))}
                   className="max-w-full max-h-56 object-contain rounded shadow-sm bg-white"
                 />
-              ) : (
+              )}
+              {(!previewUrl || previewFailed) && (
                 <div className="flex flex-col items-center text-center text-slate-400 px-2">
                   <ImageOff size={28} strokeWidth={1.5} />
                   <p className="text-xs mt-2 leading-snug">

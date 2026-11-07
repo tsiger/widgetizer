@@ -200,7 +200,7 @@ Lives in builder-server. It delegates to `req.adapters.scopeResolver.resolveScop
 ### Extension system (`packages/editor-ui/src/extension/`)
 
 - `buildRegistry(plugins)` — merges declarative `navItems` / `routes` / `commands` from all plugins.
-- `createHookRunner(plugins)` — runs the lifecycle `HOOK_EVENTS` defined in `packages/editor-ui/src/extension/hooks.js` (`before*` run sequentially and halt on the first `{ proceed: false }`; `after*` are fire-and-forget).
+- `createHookRunner(plugins)` — runs the lifecycle `HOOK_EVENTS` defined in `packages/editor-ui/src/extension/hooks.js` (`before*` run sequentially and halt on the first `{ proceed: false }`; `after*` are fire-and-forget); `has(event)` says whether any plugin handles one. `beforeOpenMediaFile({ projectId, fileId, url })` runs before the Media page opens a file in a new tab, for a host whose media requests need preparing (the browser's own request carries cookies, not the host's API credentials); with a handler registered, the page opens a blank tab at once, cuts its opener and sends it to the file once the hook allows it.
 - `SLOT_NAMES`: `sidebarHeader`, `sidebarFooter`, `topbarLeft`, `topbarRight`, `topbarBanner`, `overlay`, `publishConfirmation`, `pageEditorActions` (the page-editor top bar beside Preview/Save, distinct from the admin `topbarRight`).
 - `builtinNavPlugin` — supplies the default nav with `NAV_GROUPS` `site` and `tools`.
 

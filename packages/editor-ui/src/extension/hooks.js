@@ -7,9 +7,15 @@
 //               refuse, `{ proceed: true }` is returned.
 //   - after*  : fire-and-forget; every handler runs, errors are logged not
 //               thrown, nothing is returned.
+//
+// beforeOpenMediaFile({ projectId, fileId, url }) runs before the Media page
+// opens a file in a new tab, so a host can get ready for the browser's own
+// request (which carries cookies, not the host's API credentials). It can only
+// refuse; the address it opens is fixed.
 
 export const HOOK_EVENTS = Object.freeze([
   "beforePublish",
+  "beforeOpenMediaFile",
   "afterPublish",
   "beforeProjectDelete",
   "afterProjectDelete",
@@ -31,6 +37,11 @@ export function createHookRunner(plugins = []) {
   }
 
   return {
+    /** Whether any plugin handles `event`. */
+    has(event) {
+      return handlersFor(event).length > 0;
+    },
+
     /**
      * Run a `before*` event. Returns the first refusal, else `{ proceed: true }`.
      * @returns {Promise<{ proceed: boolean, message?: string }>}

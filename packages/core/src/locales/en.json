@@ -987,6 +987,8 @@
     "emptyDesc": "Upload some files using the uploader above.",
     "urlCopied": "URL copied to clipboard",
     "usageTitlesError": "Couldn't load page and item names, so \"Used in\" shows their raw references.",
+    "viewBlocked": "The browser blocked the new tab. Allow pop-ups for this site to view the file.",
+    "viewFailed": "Couldn't open the file. Try again.",
     "uploader": {
       "title": "Upload Media",
       "description": "Drag and drop files to upload them to your project library"

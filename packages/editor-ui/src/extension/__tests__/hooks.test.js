@@ -8,6 +8,13 @@ describe("createHookRunner", () => {
     expect(HOOK_EVENTS).toContain("beforePageDelete");
   });
 
+  it("has() tells whether any plugin handles an event", () => {
+    const runner = createHookRunner([{ name: "a", hooks: { beforeOpenMediaFile: async () => {} } }, { name: "b" }]);
+    expect(runner.has("beforeOpenMediaFile")).toBe(true);
+    expect(runner.has("beforePublish")).toBe(false);
+    expect(createHookRunner().has("beforeOpenMediaFile")).toBe(false);
+  });
+
   it("runBefore runs handlers in plugin order and resolves proceed:true when none refuse", async () => {
     const calls = [];
     const runner = createHookRunner([
