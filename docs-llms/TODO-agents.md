@@ -227,6 +227,16 @@ Candidates: truncated ZIP, future formatVersion, valid JSON with invalid content
 
 **Start:** [projects.md](domain/operations/projects.md). **Source:** Domain review R8.
 
+#### R-ANCHOR · Finish same-page links in Site preview
+
+**Deferred · Low · OSS**
+
+`4c2d6f46` makes a bare `#id` link in the standalone preview (`packages/core/src/runtime/previewRuntime.js`, click handler) scroll to and focus the element in the same document; checked by hand in OSS and an embedding app's preview on 2026-11-07. Left open: (1) no test (the runtime has `__tests__/`, e.g. `previewRuntimeScroll.test.js`); (2) a same-page link written with the page's name (`about.html#team` while on About) still goes through `getStandalonePreviewTarget`, which drops the fragment and reloads the page at the top; (3) the id is looked up as written, so a percent-encoded fragment (`#caf%C3%A9`) isn't found. Not updating the address or `:target` is fine for a preview.
+
+**Done when:** a test covers the bare `#id` case, and (2)/(3) are either handled or recorded as accepted.
+
+**Start:** [previewRuntime.js](../packages/core/src/runtime/previewRuntime.js), [standalonePreviewTarget.js](../packages/core/src/runtime/standalonePreviewTarget.js). **Source:** review of `4c2d6f46` (2026-11-07).
+
 #### QA-EXTRA · Choose extra checks when changing an area
 
 **Deferred · Low · Tests**
