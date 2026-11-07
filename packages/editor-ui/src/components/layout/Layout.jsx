@@ -21,7 +21,7 @@ export default function Layout() {
       <SlotOutlet name="overlay" />
 
       <div
-        className={`relative z-30 flex flex-1 flex-col ${
+        className={`relative z-30 flex min-w-0 flex-1 flex-col ${
           !isPageEditor ? "ml-[72px] bg-slate-900 md:ml-[var(--sidebar-width)]" : ""
         }`}
       >
