@@ -10,6 +10,8 @@ import { act, cleanup, fireEvent, render, screen } from "@testing-library/react"
 
 const HERO = { id: "h", type: "image/jpeg", path: "/uploads/images/hero.jpg", metadata: { alt: "Hero alt" } };
 const TEAM = { id: "t", type: "image/jpeg", path: "/uploads/images/team.jpg", metadata: { alt: "Team alt" } };
+// Its name ends with hero.jpg's whole name.
+const SUPERHERO = { id: "s", type: "image/jpeg", path: "/uploads/images/superhero.jpg", metadata: { alt: "Superhero alt" } };
 
 const getProjectMedia = vi.fn();
 const saveMediaMetadata = vi.fn();
@@ -129,5 +131,26 @@ describe("ImageInput", () => {
     expect(screen.getByText(`editing ${HERO.path}`)).toBeInTheDocument();
     await act(async () => fireEvent.click(screen.getByText("save metadata")));
     expect(preview()).toHaveAttribute("alt", "New alt");
+  });
+
+  it("shows the stored image, not another whose name ends with the same name", async () => {
+    getProjectMedia.mockResolvedValue({ files: [SUPERHERO, HERO] });
+    renderImage(HERO.path);
+    expect(await screen.findByRole("img")).toHaveAttribute("src", "/api/media/projects/p1/uploads/images/hero.jpg");
+    expect(preview()).toHaveAttribute("alt", "Hero alt");
+    fireEvent.click(screen.getByTitle("Edit metadata"));
+    expect(screen.getByText(`editing ${HERO.path}`)).toBeInTheDocument();
+  });
+
+  it("shows the newest image when an earlier lookup answers last", async () => {
+    let answerHero, answerTeam;
+    getProjectMedia
+      .mockReturnValueOnce(new Promise((r) => (answerHero = r)))
+      .mockReturnValueOnce(new Promise((r) => (answerTeam = r)));
+    const { rerender } = renderImage(HERO.path);
+    await rerender(TEAM.path);
+    await act(async () => answerTeam({ files: [HERO, TEAM] }));
+    await act(async () => answerHero({ files: [HERO, TEAM] }));
+    expect(preview()).toHaveAttribute("alt", "Team alt");
   });
 });

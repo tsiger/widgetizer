@@ -44,22 +44,26 @@ export default function ImageInput({ id, value = "", onChange, size = "full", la
     setCurrentImageFile(null);
   }
 
-  // Get the current image metadata when value changes
+  // Get the current image metadata when value changes. The library record is
+  // the one at exactly the stored path: another image's name can end with this
+  // one's (superhero.jpg, hero.jpg). Only the newest lookup may answer, since
+  // an earlier one can finish last.
   useEffect(() => {
-    if (value && activeProject) {
-      const filename = value.split("/").pop();
-      const fetchImageData = async () => {
-        try {
-          const mediaData = await getProjectMedia(activeProject.id);
-          const imageFile = mediaData.files.find((file) => file.path.includes(filename));
-          setCurrentImageFile(imageFile || null);
-        } catch (error) {
-          console.error("Error fetching image metadata:", error);
-          setCurrentImageFile(null);
-        }
-      };
-      fetchImageData();
-    }
+    if (!value || !activeProject) return undefined;
+    let cancelled = false;
+    (async () => {
+      try {
+        const mediaData = await getProjectMedia(activeProject.id);
+        if (!cancelled) setCurrentImageFile(mediaData.files.find((file) => file.path === value) || null);
+      } catch (error) {
+        if (cancelled) return;
+        console.error("Error fetching image metadata:", error);
+        setCurrentImageFile(null);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, [value, activeProject]);
 
   const handleFileChange = async (event) => {
