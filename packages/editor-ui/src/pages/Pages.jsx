@@ -30,6 +30,9 @@ import { sortItemsByCopyName } from "../utils/copyNameSort";
 import LoadingSpinner from "../components/ui/LoadingSpinner";
 import { useEditorPath } from "../lib/routeBase.jsx";
 
+// Before the first render no project's list has been asked for.
+const NOT_LOADED = Symbol("not loaded");
+
 export default function Pages() {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -57,6 +60,8 @@ export default function Pages() {
   const defaultLanguage = useDefaultLanguage();
   const [activeLanguage, setActiveLanguage] = useListLanguage();
 
+  // Reloads the list (Retry, after a create or a delete). The load when the
+  // project changes, in the effect below, does the same and must stay in step.
   const loadPages = async () => {
     try {
       setLoading(true);
@@ -134,19 +139,45 @@ export default function Pages() {
 
   const { confirm, confirmationModal } = useConfirmationAction(handleDelete);
 
-  useEffect(() => {
-    if (!activeProject?.id) {
+  // Another project (or none) starts with nothing selected; its list loads
+  // behind the spinner, and without a project there is nothing to load. Reset
+  // while rendering, so the previous project's rows are hidden as soon as the
+  // project changes (a failed load still shows them, marked out of date).
+  const projectId = activeProject?.id;
+  const [loadedFor, setLoadedFor] = useState(NOT_LOADED);
+  if (loadedFor !== projectId) {
+    setLoadedFor(projectId);
+    clearSelection();
+    if (projectId) {
+      setLoading(true);
+    } else {
       setPages([]);
       setLoadFailed(false);
       setLoading(false);
-      clearSelection();
-      return;
     }
+  }
 
-    clearSelection();
-    loadPages();
+  // The load runs here rather than through loadPages: the lint rule
+  // react-hooks/set-state-in-effect flags an effect that calls a function of
+  // this component that sets state.
+  useEffect(() => {
+    if (!projectId) return;
+    (async () => {
+      try {
+        const data = await getAllPages();
+        setPages(data);
+        setLoadFailed(false);
+        usePageListStore.getState().notifyPagesChanged();
+      } catch (error) {
+        console.error("Error loading pages:", error);
+        setLoadFailed(true);
+        showToast(t("pages.toasts.loadError"), "error");
+      } finally {
+        setLoading(false);
+      }
+    })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeProject?.id]);
+  }, [projectId]);
 
   useEffect(() => {
     function handleClickOutside(event) {
