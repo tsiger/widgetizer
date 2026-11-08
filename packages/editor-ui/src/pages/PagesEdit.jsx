@@ -27,6 +27,17 @@ export default function PagesEdit() {
   const editorPath = useEditorPath();
   const [page, setPage] = useState(null);
   const [loading, setLoading] = useState(true);
+  // The route can move to another page while this screen stays mounted (a slug
+  // changed on save, another language); the form waits for that page. The
+  // reset runs while rendering, so the previous page's form never shows for a
+  // moment.
+  const pageKey = JSON.stringify([id, language]);
+  const [loadingFor, setLoadingFor] = useState(pageKey);
+  if (loadingFor !== pageKey) {
+    setLoadingFor(pageKey);
+    setPage(null);
+    setLoading(true);
+  }
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccessActions, setShowSuccessActions] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
@@ -35,21 +46,17 @@ export default function PagesEdit() {
 
   const { navigateSafely, getDirtyTitle } = useGuardedFormPage(isDirty);
 
-  const loadPage = async () => {
-    try {
-      const pageData = await getPage(id, language);
-      setPage(pageData);
-      setLoading(false);
-    } catch (err) {
-      showToast(err.message || t("pagesEdit.toasts.loadError"), "error");
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    setPage(null);
-    setLoading(true);
-    loadPage();
+    (async () => {
+      try {
+        const pageData = await getPage(id, language);
+        setPage(pageData);
+        setLoading(false);
+      } catch (err) {
+        showToast(err.message || t("pagesEdit.toasts.loadError"), "error");
+        setLoading(false);
+      }
+    })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, language]);
 
