@@ -177,6 +177,7 @@ describe("buildGraph", () => {
 
   it("keeps going when a builder throws something that is not an Error", () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    /* eslint-disable no-throw-literal -- these builders throw non-Errors on purpose */
     const nodes = buildGraph(withSite, [
       () => {
         throw null;
@@ -190,6 +191,7 @@ describe("buildGraph", () => {
       () => {
         throw { toString: null };
       },
+      /* eslint-enable no-throw-literal */
       () => {
         const error = new Error("hidden");
         Object.defineProperty(error, "message", {

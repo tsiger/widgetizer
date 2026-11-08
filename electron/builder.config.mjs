@@ -64,6 +64,7 @@ export default {
     maintainer: "Widgetizer <hello@widgetizer.org>",
     // The build script selects one architecture after preparing its native libs.
     target: ["deb"],
+    // eslint-disable-next-line no-template-curly-in-string -- electron-builder fills in these placeholders
     artifactName: "Widgetizer-${version}-${arch}.${ext}",
     category: "Development",
     icon: "electron/resources/icon.icns",
@@ -78,6 +79,7 @@ export default {
     createDesktopShortcut: "always",
   },
   win: {
+    // eslint-disable-next-line no-template-curly-in-string -- electron-builder fills in these placeholders
     artifactName: "Widgetizer-Setup-${version}.${ext}",
     target: [
       {

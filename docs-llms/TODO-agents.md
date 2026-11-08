@@ -237,6 +237,16 @@ Owner's list, 2026-11-07, after the main column learned to shrink (`min-w-0` in 
 
 **Start:** [MediaListItem.jsx](../packages/editor-ui/src/components/media/MediaListItem.jsx), [Table.jsx](../packages/editor-ui/src/components/ui/Table.jsx), [Layout.jsx](../packages/editor-ui/src/components/layout/Layout.jsx). **Source:** owner, 2026-11-07.
 
+#### R-ADMZIP · Take adm-zip's fix for its stale duplicate-name message
+
+**Deferred · Low · OSS**
+
+adm-zip 0.6.1 builds its error messages from a template it overwrites on first use, so every later "Duplicate entry name" error in the process quotes the first name it ever reported (upstream [cthackers/adm-zip#578](https://github.com/cthackers/adm-zip/issues/578), fix in PR [#579](https://github.com/cthackers/adm-zip/pull/579); both open on 2026-11-08, 0.6.1 still the latest release). `openZip` therefore ignores the quoted name and throws `DuplicateZipEntryError` with one general message, which covers both a repeated name and an older backup's two media libraries.
+
+**Done when:** a released adm-zip carries the fix; `builder-server` takes it, `openZip` names the repeated entry again, and the backup import tells the two-media-libraries case apart.
+
+**Start:** [zipSafety.js](../packages/builder-server/src/utils/zipSafety.js) (`openZip`), [backupImportChecks.test.js](../packages/builder-server/src/tests/backupImportChecks.test.js). **Source:** dependency upgrade, 2026-11-06.
+
 #### QA-EXTRA · Choose extra checks when changing an area
 
 **Deferred · Low · Tests**

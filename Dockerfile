@@ -19,14 +19,6 @@
 FROM node:24-slim AS builder
 WORKDIR /app
 
-# better-sqlite3 and sharp ship prebuilt Linux binaries, so nothing is compiled.
-# `npm ci` still runs better-sqlite3's node-gyp step, which finds its bundled
-# binary and builds nothing but needs Python and make to run at all. This stage
-# only; the final image has neither.
-RUN apt-get update \
-  && apt-get install -y --no-install-recommends python3 make ca-certificates \
-  && rm -rf /var/lib/apt/lists/*
-
 # Copy only the manifests first so the `npm ci` layer stays cached until a
 # dependency actually changes. This is an npm-workspaces monorepo, so every
 # workspace package.json must exist before install.
@@ -38,7 +30,14 @@ COPY packages/builder-server/package.json ./packages/builder-server/
 COPY packages/editor-ui/package.json ./packages/editor-ui/
 COPY packages/adapters-local/package.json ./packages/adapters-local/
 
-RUN npm ci
+# better-sqlite3 and sharp ship prebuilt Linux binaries, so nothing is compiled
+# and no install script is needed: --ignore-scripts keeps npm from running
+# better-sqlite3's node-gyp step anyway (it builds nothing, but node-gyp needs
+# Python and make just to start), so the image needs no build tools at all.
+# On dependency upgrades, check for new install steps (a package's own install
+# scripts, an implicit node-gyp build from a binding.gyp, workspace hooks), then
+# verify the frontend build and that SQLite and Sharp load after the prune.
+RUN npm ci --ignore-scripts
 
 # Copy the rest of the source (node_modules, dist, data, .env* are excluded via
 # .dockerignore so host artifacts never leak in).

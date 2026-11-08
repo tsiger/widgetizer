@@ -95,5 +95,8 @@
     "react": ">=19",
     "react-dom": ">=19",
     "react-router-dom": ">=7"
+  },
+  "devDependencies": {
+    "@tiptap/core": "^3.32.2"
   }
 }

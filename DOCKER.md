@@ -20,8 +20,8 @@ docker compose up --build
 
 Then open **http://localhost:3001**.
 
-- The first build takes a few minutes (installs dependencies, builds the
-  frontend, compiles the database module). Later runs are fast.
+- The first build takes a few minutes (installs dependencies and builds the
+  frontend). Later runs are fast.
 - Stop it with `Ctrl+C`.
 - To run in the background: `docker compose up --build -d` (stop with
   `docker compose down`).

@@ -3,6 +3,7 @@ import globals from "globals";
 import react from "eslint-plugin-react";
 import reactHooks from "eslint-plugin-react-hooks";
 import reactRefresh from "eslint-plugin-react-refresh";
+import n from "eslint-plugin-n";
 import requireScopeArg from "./eslint-rules/require-scope-arg.js";
 
 // Local-only plugin housing repo-specific lint rules.
@@ -23,6 +24,22 @@ const reactCompilerFindingsAsWarnings = {
 // ESLint 10 tracks JSX references itself (`<Card />` counts as using `Card`), so
 // eslint-plugin-react's workaround for that is redundant.
 const jsxReferencesTrackedByEslint = { "react/jsx-uses-vars": "off" };
+
+// Core rules that catch likely mistakes and cost nothing today: the code passes
+// them all, apart from a few deliberate cases marked inline.
+const mistakeGuards = {
+  "array-callback-return": "error",
+  "default-case-last": "error",
+  eqeqeq: ["error", "smart"],
+  "no-constructor-return": "error",
+  "no-new-wrappers": "error",
+  "no-return-assign": "error",
+  "no-self-compare": "error",
+  "no-template-curly-in-string": "error",
+  "no-throw-literal": "error",
+  "no-unreachable-loop": "error",
+  "prefer-promise-reject-errors": "error",
+};
 
 export default [
   // data/ is runtime state (installed theme copies, projects), not source. A theme
@@ -179,4 +196,8 @@ export default [
       "no-unused-vars": ["error", { argsIgnorePattern: "^_", varsIgnorePattern: "^_" }],
     },
   },
+  // Every linted file. n/no-extraneous-import: each import names a package that
+  // its own package.json or the workspace root declares, so nothing works only
+  // because another package happens to pull it in.
+  { plugins: { n }, rules: { ...mistakeGuards, "n/no-extraneous-import": "error" } },
 ];
