@@ -72,7 +72,7 @@ export default function YouTubeInput({ id, label, description, value = null, onC
         setIsLoading(false);
       }
     },
-    [embedData?.options, defaultOptions, onChange],
+    [embedData, defaultOptions, onChange],
   );
 
   // Keep the latest processor in a ref so the debounce effect below doesn't depend
@@ -119,7 +119,7 @@ export default function YouTubeInput({ id, label, description, value = null, onC
       };
       updateOptions(newOptions);
     },
-    [embedData?.options, updateOptions],
+    [embedData, updateOptions],
   );
 
   // Clear video

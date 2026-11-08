@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { ExternalLink, Check } from "lucide-react";
 import { apiFetch } from "@widgetizer/editor-ui/lib/apiFetch";
 import LoadingSpinner from "@widgetizer/editor-ui/components/ui/LoadingSpinner.jsx";
@@ -77,17 +77,18 @@ export default function ProjectForm({
     handleSubmit: rhfHandleSubmit,
     formState: { errors, isDirty },
     reset,
-    watch,
     setValue,
+    control,
   } = useForm({
     defaultValues: toFormValues(initialData),
   });
 
-  // Watch name for auto-folder-name generation
-  const name = watch("name");
-
-  // Watch theme selection for preset fetching
-  const selectedTheme = watch("theme");
+  // name: auto folder name; theme: preset fetching; the rest feed the identity
+  // fields and the default-language guard.
+  const [name, selectedTheme, identityValues, siteUrl, siteTitle, logoFile, defaultLanguage] = useWatch({
+    control,
+    name: ["name", "theme", "siteIdentity", "siteUrl", "siteTitle", "logoFile", "defaultLanguage"],
+  });
 
   // Notify parent of dirty state changes
   useEffect(() => {
@@ -142,6 +143,29 @@ export default function ProjectForm({
     }
   });
 
+  const loadThemes = async () => {
+    try {
+      const response = await apiFetch("/api/themes");
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      setThemes(data);
+
+      // Auto-select Default theme for new projects
+      if (isNew && !initialData.theme) {
+        const defaultTheme = data.find((theme) => theme.id === "default" || theme.name.toLowerCase() === "default");
+        if (defaultTheme) {
+          setValue("theme", defaultTheme.id);
+        }
+      }
+    } catch {
+      showToast(t("forms.project.loadThemesError"), "error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Load themes and auto-select default
   useEffect(() => {
     loadThemes();
@@ -183,30 +207,6 @@ export default function ProjectForm({
     fetchPresets();
   }, [selectedTheme, isNew, setValue]);
 
-  const loadThemes = async () => {
-    try {
-      const response = await apiFetch("/api/themes");
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const data = await response.json();
-      setThemes(data);
-
-      // Auto-select Default theme for new projects
-      if (isNew && !initialData.theme) {
-        const defaultTheme = data.find((theme) => theme.id === "default" || theme.name.toLowerCase() === "default");
-        if (defaultTheme) {
-          setValue("theme", defaultTheme.id);
-        }
-      }
-    } catch {
-      showToast(t("forms.project.loadThemesError"), "error");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const identityValues = watch("siteIdentity");
   const showBusinessTab =
     identityKind({ category: identityValues?.category }) === "localBusiness" ||
     identityErrors.some(isBusinessIdentityError);
@@ -431,14 +431,14 @@ export default function ProjectForm({
 
   const identityProps = {
     register,
-    watch,
+    identity: identityValues,
     setValue,
     identityErrors,
     project: initialData,
-    siteUrl: watch("siteUrl"),
-    siteTitle: watch("siteTitle"),
+    siteUrl,
+    siteTitle,
     onGoTo: goToReadinessItem,
-    logoFile: watch("logoFile"),
+    logoFile,
     onLogoFileChange: (file) => setValue("logoFile", file, { shouldDirty: true }),
   };
 
@@ -644,7 +644,7 @@ export default function ProjectForm({
                   // Adding a language locks the default on the SERVER, which still
                   // holds the saved one: acting now would lock a value the form is
                   // not showing and make the next Save fail.
-                  blocked={watch("defaultLanguage") !== savedDefaultLanguage}
+                  blocked={defaultLanguage !== savedDefaultLanguage}
                   onBusyChange={setLanguageBusy}
                 />
               )}

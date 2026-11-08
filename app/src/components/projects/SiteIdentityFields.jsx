@@ -19,7 +19,7 @@ function faviconFrom(themeData) {
 export default function SiteIdentityFields({
   section,
   register,
-  watch,
+  identity: values,
   setValue,
   identityErrors,
   project,
@@ -30,7 +30,6 @@ export default function SiteIdentityFields({
   onLogoFileChange,
 }) {
   const { t } = useTranslation();
-  const values = watch("siteIdentity");
 
   const errorFor = (path) => {
     const error = identityErrorAt(identityErrors, path);

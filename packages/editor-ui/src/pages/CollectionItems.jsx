@@ -34,7 +34,7 @@ import LanguageTabs from "../components/content/LanguageTabs";
 import useListLanguage from "../hooks/useListLanguage";
 import TranslationChips from "../components/content/TranslationChips";
 import { itemEditHref, itemAddHref } from "../lib/contentRoutes";
-import { resolveLucideIcon } from "../utils/lucideIcon";
+import { LucideIcon } from "../utils/lucideIcon";
 import { formatDateOnly, toDateOnlyFormat } from "@widgetizer/core/dateFormat";
 import PageLayout from "../components/layout/PageLayout";
 import Button, { IconButton } from "../components/ui/Button";
@@ -288,7 +288,6 @@ function CollectionItemsScreen({ activeLanguage, setActiveLanguage }) {
   const hasItems = itemsInLanguage.length > 0;
 
   const handleNewItem = () => navigate(editorPath(itemAddHref(type, isMultilang ? activeLanguage : undefined)));
-  const SchemaIcon = resolveLucideIcon(schema?.icon);
 
   const renderRowActions = (item) => {
     const menuButtonClass = "w-full px-3 py-2 text-left text-sm flex items-center gap-2 transition-colors";
@@ -449,7 +448,7 @@ function CollectionItemsScreen({ activeLanguage, setActiveLanguage }) {
   // the non-search fallback is a plain string (rendered in Table's empty cell).
   const emptyState = searchTerm ? (
     <div className="text-center">
-      <SchemaIcon className="mx-auto mb-2 text-slate-400" size={32} />
+      <LucideIcon name={schema?.icon} className="mx-auto mb-2 text-slate-400" size={32} />
       <div className="font-medium text-slate-700">{t("collections.noItemsFound")}</div>
       <div className="text-sm text-slate-500">{t("collections.noItemsMatch", { term: searchTerm })}</div>
     </div>
@@ -542,7 +541,7 @@ function CollectionItemsScreen({ activeLanguage, setActiveLanguage }) {
 
       {!hasItems && (
         <div className="p-8 text-center">
-          <SchemaIcon className="mx-auto mb-4 text-slate-400" size={48} />
+          <LucideIcon name={schema?.icon} className="mx-auto mb-4 text-slate-400" size={48} />
           <h2 className="text-xl font-semibold mb-2">{t("collections.noItemsYet", { name: displayNamePlural })}</h2>
           <p className="text-slate-600 mb-4">{t("collections.createFirst", { name: displayName })}</p>
           <Button onClick={handleNewItem} variant="primary" icon={<CirclePlus size={18} />}>

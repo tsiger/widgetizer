@@ -1,3 +1,4 @@
+import { createElement } from "react";
 import { icons, Database } from "lucide-react";
 
 // Icon names themes could use before Lucide 1.x renamed them, mapped to the
@@ -53,4 +54,16 @@ export function resolveLucideIcon(name, fallback = Database) {
   if (typeof name !== "string" || !name) return fallback;
   const current = Object.hasOwn(RENAMED_ICONS, name) ? RENAMED_ICONS[name] : name;
   return Object.hasOwn(icons, current) ? icons[current] : fallback;
+}
+
+/**
+ * Render the Lucide icon a theme names (see resolveLucideIcon), passing the
+ * other props to it. A looked-up icon rendered directly reads, to the React
+ * Compiler, like a component created during render; this module-level wrapper
+ * keeps the lookup out of the caller's render.
+ *
+ * @param {{ name: string, fallback?: React.ComponentType }} props - plus any Lucide icon props
+ */
+export function LucideIcon({ name, fallback, ...props }) {
+  return createElement(resolveLucideIcon(name, fallback), props);
 }

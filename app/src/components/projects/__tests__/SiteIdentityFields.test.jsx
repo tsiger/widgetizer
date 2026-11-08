@@ -36,10 +36,10 @@ function Harness({
   onGoTo = () => {},
 }) {
   const form = useForm({ defaultValues: { siteIdentity: identityToForm(identity), logoFile: null } });
-  const logoFile = useWatch({ control: form.control, name: "logoFile" });
+  const [identityValues, logoFile] = useWatch({ control: form.control, name: ["siteIdentity", "logoFile"] });
   const props = {
     register: form.register,
-    watch: form.watch,
+    identity: identityValues,
     setValue: form.setValue,
     identityErrors,
     project,

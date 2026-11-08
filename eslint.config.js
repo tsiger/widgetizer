@@ -15,11 +15,13 @@ const local = { rules: { "require-scope-arg": requireScopeArg } };
 // code is reworked, one kind at a time; the other hooks rules stay errors.
 const reactCompilerFindingsAsWarnings = {
   "react-hooks/globals": "warn",
-  "react-hooks/preserve-manual-memoization": "warn",
   "react-hooks/purity": "warn",
   "react-hooks/set-state-in-effect": "warn",
-  "react-hooks/static-components": "warn",
 };
+
+// The plugin only warns when a component uses a library the React Compiler can't
+// memoize (react-hook-form's watch(), for one); refuse it, since nothing needs it.
+const reactCompilerIncompatibleLibraryAsError = { "react-hooks/incompatible-library": "error" };
 
 // ESLint 10 tracks JSX references itself (`<Card />` counts as using `Card`), so
 // eslint-plugin-react's workaround for that is redundant.
@@ -160,6 +162,7 @@ export default [
       ...react.configs["jsx-runtime"].rules,
       ...reactHooks.configs.recommended.rules,
       ...reactCompilerFindingsAsWarnings,
+      ...reactCompilerIncompatibleLibraryAsError,
       ...jsxReferencesTrackedByEslint,
       "no-unused-vars": ["error", { argsIgnorePattern: "^_", varsIgnorePattern: "^_" }],
       "react/prop-types": "off",
@@ -213,6 +216,7 @@ export default [
       ...react.configs["jsx-runtime"].rules,
       ...reactHooks.configs.recommended.rules,
       ...reactCompilerFindingsAsWarnings,
+      ...reactCompilerIncompatibleLibraryAsError,
       ...jsxReferencesTrackedByEslint,
       "no-unused-vars": ["error", { argsIgnorePattern: "^_", varsIgnorePattern: "^_" }],
       "react/jsx-no-target-blank": "off",
