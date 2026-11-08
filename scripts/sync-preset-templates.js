@@ -16,7 +16,7 @@
  *
  * --theme defaults to "arch"; --preset defaults to the project folder name.
  */
-import path from "path";
+import path from "node:path";
 import fs from "fs-extra";
 import { THEMES_SEED_DIR, getProjectPagesDir, getProjectMenusDir } from "../packages/builder-server/src/config.js";
 import { stripRichtextLinkRefs } from "../packages/core/src/utils/richtextLinks.js";

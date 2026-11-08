@@ -1,6 +1,6 @@
 import { Liquid } from "liquidjs";
-import fs from "fs/promises";
-import path from "path";
+import fs from "node:fs/promises";
+import path from "node:path";
 import { resolveInside } from "./safePath.js";
 import {
   ThemeSettingsTag,

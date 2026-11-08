@@ -22,7 +22,7 @@
  *
  * --preset defaults to the project folder name; --theme defaults to "arch".
  */
-import path from "path";
+import path from "node:path";
 import fs from "fs-extra";
 import { THEMES_SEED_DIR, getProjectImagesDir } from "../packages/builder-server/src/config.js";
 import { getDb } from "../packages/builder-server/src/db/index.js";

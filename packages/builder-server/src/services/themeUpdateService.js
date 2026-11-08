@@ -4,8 +4,8 @@
  */
 
 import fs from "fs-extra";
-import path from "path";
-import { randomUUID } from "crypto";
+import path from "node:path";
+import { randomUUID } from "node:crypto";
 import { getProjectDir } from "../config.js";
 import { getProjectFolderName } from "../utils/projectHelpers.js";
 import * as projectRepo from "../db/repositories/projectRepository.js";

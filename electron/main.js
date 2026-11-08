@@ -1,9 +1,9 @@
 import { app, BrowserWindow, dialog, ipcMain, Menu, shell, utilityProcess } from "electron";
 import pkg from "electron-updater";
 const { autoUpdater } = pkg;
-import fs from "fs";
-import path from "path";
-import { fileURLToPath } from "url";
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { isSafePreviewPath } from "./previewPath.js";
 import { windowOpenTarget } from "./windowOpenPolicy.js";
 

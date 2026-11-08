@@ -13,8 +13,8 @@
 import { after, before, describe, it } from "node:test";
 import assert from "node:assert/strict";
 import fs from "fs-extra";
-import path from "path";
-import os from "os";
+import path from "node:path";
+import os from "node:os";
 import express from "express";
 
 const TEST_ROOT = path.join(os.tmpdir(), `widgetizer-media-routes-test-${Date.now()}`);

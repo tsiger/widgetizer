@@ -1,5 +1,5 @@
 import fs from "fs-extra";
-import path from "path";
+import path from "node:path";
 
 /**
  * The settings a preset gives a project: its preset.json `settings`, or null

@@ -1,4 +1,4 @@
-import { randomUUID } from "crypto";
+import { randomUUID } from "node:crypto";
 import { isValidLanguageCode, normalizeLanguageCode } from "@widgetizer/core/languages";
 import { uniqueBlockOrder, uniqueBlockOrders, uniqueWidgetOrder } from "@widgetizer/core/widgetOrder";
 import {

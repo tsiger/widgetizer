@@ -1,6 +1,6 @@
 import fs from "fs-extra";
-import path from "path";
-import { randomUUID } from "crypto";
+import path from "node:path";
+import { randomUUID } from "node:crypto";
 import { getProjectPagesDir, getProjectMenusDir, getProjectDir } from "../config.js";
 import { syncCollectionItemMediaUsageOnWrite } from "../services/mediaUsageService.js";
 import { cleanupRichtextLinkRefs, remapRichtextLinkRefs, enrichRichtextLinkRefs } from "@widgetizer/core/richtextLinks";

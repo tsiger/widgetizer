@@ -10,8 +10,8 @@
 
 import { after, before, describe, it } from "node:test";
 import assert from "node:assert/strict";
-import http from "http";
-import { Readable } from "stream";
+import http from "node:http";
+import { Readable } from "node:stream";
 import AdmZip from "adm-zip";
 
 const { streamZipToResponse } = await import("../utils/zipResponse.js");

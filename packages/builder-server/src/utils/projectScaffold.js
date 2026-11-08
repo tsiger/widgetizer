@@ -1,6 +1,6 @@
 import fs from "fs-extra";
-import path from "path";
-import { randomUUID } from "crypto";
+import path from "node:path";
+import { randomUUID } from "node:crypto";
 import * as themeController from "../controllers/themeController.js";
 import { copyMissingAreaTemplates, processTemplatesRecursive } from "./templateHelpers.js";
 import { isSafePathSegment } from "./pathSecurity.js";

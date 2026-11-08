@@ -9,8 +9,8 @@
 import { after, before, describe, it } from "node:test";
 import assert from "node:assert/strict";
 import fs from "fs-extra";
-import path from "path";
-import os from "os";
+import path from "node:path";
+import os from "node:os";
 
 const TEST_ROOT = path.join(os.tmpdir(), `widgetizer-exportview-dot-${Date.now()}`, ".config", "Widgetizer");
 process.env.DATA_ROOT = path.join(TEST_ROOT, "data");

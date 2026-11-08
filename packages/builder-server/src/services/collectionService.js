@@ -18,7 +18,7 @@
  */
 
 import fs from "fs-extra";
-import path from "path";
+import path from "node:path";
 import { randomUUID } from "node:crypto";
 
 import { isSupportedSettingType } from "@widgetizer/core/config/settingTypes";

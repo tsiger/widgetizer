@@ -1,4 +1,4 @@
-import path from "path";
+import path from "node:path";
 
 /**
  * Path-containment guard shared by both shells. One implementation; callers

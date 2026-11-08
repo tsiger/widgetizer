@@ -1,8 +1,8 @@
 import fs from "fs-extra";
-import path from "path";
-import zlib from "zlib";
-import { Readable, Transform } from "stream";
-import { pipeline } from "stream/promises";
+import path from "node:path";
+import zlib from "node:zlib";
+import { Readable, Transform } from "node:stream";
+import { pipeline } from "node:stream/promises";
 import { isWithinDirectory } from "./pathSecurity.js";
 
 /**

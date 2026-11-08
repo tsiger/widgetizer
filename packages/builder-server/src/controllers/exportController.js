@@ -1,5 +1,5 @@
 import fs from "fs-extra";
-import path from "path";
+import path from "node:path";
 import { getProjectDir, getPublishDir, APP_ROOT, STATIC_CORE_ASSETS_DIR } from "../config.js";
 import { isWithinDirectory } from "../utils/pathSecurity.js";
 import { createKeyedSerializer } from "../utils/serializeByKey.js";

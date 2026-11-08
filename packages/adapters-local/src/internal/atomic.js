@@ -6,7 +6,7 @@
 // The unique tmp suffix means concurrent writes to the same target each get a
 // private staging file instead of colliding on a shared `${target}.tmp`.
 
-import fs from "fs/promises";
+import fs from "node:fs/promises";
 import { randomUUID } from "node:crypto";
 
 // Matches a tmp file produced by writeFileAtomic: "<name>.<uuid-v4>.tmp".

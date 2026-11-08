@@ -12,7 +12,7 @@
 // / readGlobalWidgetData in pageController, and the read half of readProjectThemeData
 // in themeController — minus the config.getProjectDir(folderName) reach-through.
 import fs from "fs-extra";
-import path from "path";
+import path from "node:path";
 import { LANGUAGE_CODE_RE } from "@widgetizer/core/languages";
 import { areaKey, globalKey, resolveLanguage } from "@widgetizer/core/contentAddress";
 import { readAreaDeclarations } from "@widgetizer/core/sharedAreas";

@@ -1,4 +1,4 @@
-import path from "path";
+import path from "node:path";
 import slugify from "slugify";
 
 export const MAX_UPLOAD_NAME_LENGTH = 60;

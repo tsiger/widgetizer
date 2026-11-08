@@ -1,5 +1,5 @@
 import fs from "fs-extra";
-import path from "path";
+import path from "node:path";
 import { isSafePathSegment } from "./pathSecurity.js";
 
 // Checks on the content of an unpacked project backup, run before anything is

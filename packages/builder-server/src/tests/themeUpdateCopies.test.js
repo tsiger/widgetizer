@@ -13,8 +13,8 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import fs from "fs-extra";
-import path from "path";
-import { fileURLToPath } from "url";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../../..");
 const THEME_DIR = path.join(REPO_ROOT, "themes", "arch");

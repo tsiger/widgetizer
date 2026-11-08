@@ -1,5 +1,5 @@
 import fs from "fs-extra";
-import path from "path";
+import path from "node:path";
 import { CORE_WIDGETS_DIR, isAsarPath } from "../config.js";
 
 /**

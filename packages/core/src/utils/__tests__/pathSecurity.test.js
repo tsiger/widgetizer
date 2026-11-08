@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import path from "path";
+import path from "node:path";
 import { isWithinDirectory, assertWithin } from "../pathSecurity";
 
 const base = path.resolve("/data/publish");

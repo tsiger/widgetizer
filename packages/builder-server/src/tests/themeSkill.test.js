@@ -15,8 +15,8 @@
 import { describe, it, before, after } from "node:test";
 import assert from "node:assert/strict";
 import fs from "fs-extra";
-import path from "path";
-import os from "os";
+import path from "node:path";
+import os from "node:os";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 

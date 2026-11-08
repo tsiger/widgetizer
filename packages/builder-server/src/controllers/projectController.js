@@ -2,7 +2,7 @@ import fs from "fs-extra";
 import { isSafePathSegment } from "../utils/pathSecurity.js";
 import { DuplicateZipEntryError, extractZipSafely, openZip, readZipEntry, UnsafeZipError } from "../utils/zipSafety.js";
 import { mediaLibraryProblem, contentFilesProblem } from "../utils/backupContentChecks.js";
-import path from "path";
+import path from "node:path";
 import * as themeController from "./themeController.js";
 import { streamZipToResponse } from "../utils/zipResponse.js";
 import {
@@ -12,7 +12,7 @@ import {
   getProjectImagesDir,
   getThemeDir,
 } from "../config.js";
-import { randomUUID } from "crypto";
+import { randomUUID } from "node:crypto";
 import { ZIP_MIME_TYPES } from "../utils/mimeTypes.js";
 import { hasAvailableUpdate } from "../utils/updateStatus.js";
 import * as projectRepo from "../db/repositories/projectRepository.js";

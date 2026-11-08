@@ -1,8 +1,8 @@
 import { after, describe, it } from "node:test";
 import assert from "node:assert/strict";
 import fs from "fs-extra";
-import path from "path";
-import os from "os";
+import path from "node:path";
+import os from "node:os";
 import express from "express";
 import { body } from "express-validator";
 

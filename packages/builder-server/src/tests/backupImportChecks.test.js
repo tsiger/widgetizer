@@ -13,9 +13,9 @@
 import { describe, it, before, after, beforeEach } from "node:test";
 import assert from "node:assert/strict";
 import fs from "fs-extra";
-import path from "path";
-import os from "os";
-import crypto from "crypto";
+import path from "node:path";
+import os from "node:os";
+import crypto from "node:crypto";
 
 const TEST_ROOT = path.join(os.tmpdir(), `widgetizer-backup-checks-${Date.now()}`);
 const TEST_DATA_DIR = path.join(TEST_ROOT, "data");
@@ -31,7 +31,7 @@ const { extractZipSafely } = await import("../utils/zipSafety.js");
 const { closeDb } = await import("../db/index.js");
 const projectRepo = await import("../db/repositories/projectRepository.js");
 const mediaRepo = await import("../db/repositories/mediaRepository.js");
-const { PassThrough } = await import("stream");
+const { PassThrough } = await import("node:stream");
 const AdmZip = (await import("adm-zip")).default;
 const { ZipArchive } = await import("archiver");
 

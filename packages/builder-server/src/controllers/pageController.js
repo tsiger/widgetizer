@@ -1,4 +1,4 @@
-import { randomUUID } from "crypto";
+import { randomUUID } from "node:crypto";
 import { ConflictError } from "@widgetizer/core/errors";
 import {
   syncPageMediaUsageOnDelete,

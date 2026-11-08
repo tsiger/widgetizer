@@ -12,9 +12,9 @@
 import { after, before, describe, it } from "node:test";
 import assert from "node:assert/strict";
 import fs from "fs-extra";
-import path from "path";
-import os from "os";
-import { Readable } from "stream";
+import path from "node:path";
+import os from "node:os";
+import { Readable } from "node:stream";
 
 const TEST_ROOT = path.join(os.tmpdir(), `widgetizer-media-video-test-${Date.now()}`);
 process.env.DATA_ROOT = path.join(TEST_ROOT, "data");

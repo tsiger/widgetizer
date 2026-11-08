@@ -19,10 +19,10 @@
 import { describe, it, before, after } from "node:test";
 import assert from "node:assert/strict";
 import fs from "fs-extra";
-import path from "path";
-import os from "os";
-import crypto from "crypto";
-import { PassThrough } from "stream";
+import path from "node:path";
+import os from "node:os";
+import crypto from "node:crypto";
+import { PassThrough } from "node:stream";
 import { fileURLToPath } from "node:url";
 import AdmZip from "adm-zip";
 

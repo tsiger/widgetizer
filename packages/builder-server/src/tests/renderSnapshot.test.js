@@ -27,9 +27,9 @@
 import { describe, it, before, after } from "node:test";
 import assert from "node:assert/strict";
 import fs from "fs-extra";
-import path from "path";
-import os from "os";
-import { fileURLToPath } from "url";
+import path from "node:path";
+import os from "node:os";
+import { fileURLToPath } from "node:url";
 import sharp from "sharp";
 
 const TEST_ROOT = path.join(os.tmpdir(), `widgetizer-render-snapshot-${Date.now()}`);

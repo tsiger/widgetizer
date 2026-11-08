@@ -1,5 +1,5 @@
 import { ZipArchive } from "archiver";
-import { pipeline } from "stream";
+import { pipeline } from "node:stream";
 
 /**
  * Stream a ZIP built from `entries` as the response body, and stop cleanly

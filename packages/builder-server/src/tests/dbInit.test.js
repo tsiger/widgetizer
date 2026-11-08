@@ -11,8 +11,8 @@
 
 import { describe, it, afterEach, after } from "node:test";
 import assert from "node:assert/strict";
-import path from "path";
-import os from "os";
+import path from "node:path";
+import os from "node:os";
 import fs from "fs-extra";
 import Database from "better-sqlite3";
 

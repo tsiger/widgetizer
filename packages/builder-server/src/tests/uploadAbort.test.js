@@ -12,9 +12,9 @@
 import { after, before, describe, it } from "node:test";
 import assert from "node:assert/strict";
 import fs from "fs-extra";
-import net from "net";
-import path from "path";
-import os from "os";
+import net from "node:net";
+import path from "node:path";
+import os from "node:os";
 
 const TEST_ROOT = path.join(os.tmpdir(), `widgetizer-upload-abort-test-${Date.now()}`);
 process.env.DATA_ROOT = path.join(TEST_ROOT, "data");

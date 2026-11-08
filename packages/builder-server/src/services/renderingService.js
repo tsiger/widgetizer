@@ -31,7 +31,7 @@ import {
 import { schemaHasRichtextSetting } from "@widgetizer/core/richtextLinks";
 import { itemHref } from "@widgetizer/core/internalHref";
 import fs from "fs-extra";
-import path from "path";
+import path from "node:path";
 import { getProjectDir, CORE_WIDGETS_DIR, CORE_SNIPPETS_DIR } from "../config.js";
 import { readMediaFile } from "./mediaService.js";
 import * as projectRepo from "../db/repositories/projectRepository.js";

@@ -1,7 +1,7 @@
-import fs from "fs/promises";
+import fs from "node:fs/promises";
 import { createReadStream, createWriteStream } from "node:fs";
 import { pipeline } from "node:stream/promises";
-import path from "path";
+import path from "node:path";
 import { getContentType } from "@widgetizer/core/mimeTypes";
 import { assertWithin } from "./internal/paths.js";
 

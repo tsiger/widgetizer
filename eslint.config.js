@@ -239,10 +239,20 @@ export default [
       "no-unused-vars": ["error", { argsIgnorePattern: "^_", varsIgnorePattern: "^_" }],
     },
   },
-  // Every linted file. n/no-extraneous-import: each import names a package that
-  // its own package.json or the workspace root declares, so nothing works only
-  // because another package happens to pull it in.
-  { plugins: { n }, rules: { ...mistakeGuards, "n/no-extraneous-import": "error" } },
+  // Every linted file. n/no-extraneous-*: each import or require names a package
+  // that its own package.json or the workspace root declares, so nothing works
+  // only because another package happens to pull it in. n/prefer-node-protocol:
+  // built-ins as node:fs, never confusable with an installed package.
+  {
+    plugins: { n },
+    rules: {
+      ...mistakeGuards,
+      "n/no-extraneous-import": "error",
+      "n/no-extraneous-require": "error",
+      "n/no-deprecated-api": "error",
+      "n/prefer-node-protocol": "error",
+    },
+  },
   { files: ["server.js", "app/server-common.js"], plugins: { n }, rules: devOnlyInProduction() },
   // What the desktop app runs. Its build tooling (*.cjs, builder.config.mjs) may
   // use dev packages; the app gets electron from Electron itself.

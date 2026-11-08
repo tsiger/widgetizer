@@ -12,8 +12,8 @@
 import { describe, it, before, after, beforeEach, mock } from "node:test";
 import assert from "node:assert/strict";
 import fs from "fs-extra";
-import path from "path";
-import os from "os";
+import path from "node:path";
+import os from "node:os";
 import { randomUUID } from "node:crypto";
 
 // ============================================================================
@@ -51,7 +51,7 @@ const {
 const { closeDb } = await import("../db/index.js");
 const projectRepo = await import("../db/repositories/projectRepository.js");
 const mediaRepo = await import("../db/repositories/mediaRepository.js");
-const { PassThrough } = await import("stream");
+const { PassThrough } = await import("node:stream");
 const AdmZip = await import("adm-zip");
 
 // ============================================================================

@@ -13,9 +13,9 @@
 import { describe, it, before, after } from "node:test";
 import assert from "node:assert/strict";
 import fs from "fs-extra";
-import path from "path";
-import { PassThrough } from "stream";
-import { fileURLToPath } from "url";
+import path from "node:path";
+import { PassThrough } from "node:stream";
+import { fileURLToPath } from "node:url";
 import AdmZip from "adm-zip";
 
 import { createExportHarness } from "./helpers/exportHarness.js";

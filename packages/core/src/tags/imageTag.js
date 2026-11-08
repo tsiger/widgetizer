@@ -1,4 +1,4 @@
-import path from "path";
+import path from "node:path";
 import { Hash } from "liquidjs";
 import { renderedLanguage, resolveMediaMetadata } from "../utils/mediaMetadata.js";
 

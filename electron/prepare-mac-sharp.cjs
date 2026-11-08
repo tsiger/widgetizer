@@ -1,6 +1,6 @@
-const fs = require("fs");
-const { spawnSync } = require("child_process");
-const path = require("path");
+const fs = require("node:fs");
+const { spawnSync } = require("node:child_process");
+const path = require("node:path");
 
 function installMacSharpPackages() {
   const sharpPackagePath = path.join(__dirname, "..", "node_modules", "sharp", "package.json");

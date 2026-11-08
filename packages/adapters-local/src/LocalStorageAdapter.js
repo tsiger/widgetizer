@@ -1,5 +1,5 @@
-import fs from "fs/promises";
-import path from "path";
+import fs from "node:fs/promises";
+import path from "node:path";
 import { assertWithin } from "./internal/paths.js";
 import { writeFileAtomic, isAtomicTmpFile } from "./internal/atomic.js";
 

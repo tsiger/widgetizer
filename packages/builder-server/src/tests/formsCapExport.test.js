@@ -15,7 +15,7 @@
 import { describe, it, before, after } from "node:test";
 import assert from "node:assert/strict";
 import fs from "fs-extra";
-import path from "path";
+import path from "node:path";
 
 import { createExportHarness } from "./helpers/exportHarness.js";
 

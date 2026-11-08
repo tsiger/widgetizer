@@ -11,7 +11,7 @@
 
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
-import path from "path";
+import path from "node:path";
 
 import { isWithinDirectory } from "../utils/pathSecurity.js";
 

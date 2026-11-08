@@ -1,4 +1,4 @@
-import { randomUUID } from "crypto";
+import { randomUUID } from "node:crypto";
 import { stripHtmlToText } from "../services/sanitizationService.js";
 import { LIMIT_KEYS, MAX_MENU_ITEMS, MAX_MENU_DEPTH } from "@widgetizer/core/adapters";
 import { generateUniqueSlug } from "../utils/slugHelpers.js";

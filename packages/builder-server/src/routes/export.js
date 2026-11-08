@@ -1,6 +1,6 @@
 import express from "express";
-import path from "path";
-import fs from "fs";
+import path from "node:path";
+import fs from "node:fs";
 import { getPublishDir } from "../config.js";
 import { getContentType } from "../utils/mimeTypes.js";
 import { isWithinDirectory } from "../utils/pathSecurity.js";

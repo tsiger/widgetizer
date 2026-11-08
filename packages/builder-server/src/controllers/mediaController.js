@@ -1,6 +1,6 @@
 import fs from "fs-extra";
-import path from "path";
-import { pipeline } from "stream";
+import path from "node:path";
+import { pipeline } from "node:stream";
 import { v4 as uuidv4 } from "uuid";
 import multer from "multer";
 import sharp from "sharp";

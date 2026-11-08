@@ -12,8 +12,8 @@
 import { describe, it, before, after, beforeEach } from "node:test";
 import assert from "node:assert/strict";
 import fs from "fs-extra";
-import path from "path";
-import os from "os";
+import path from "node:path";
+import os from "node:os";
 
 const TEST_ROOT = path.join(os.tmpdir(), `widgetizer-collection-api-test-${Date.now()}`);
 const TEST_DATA_DIR = path.join(TEST_ROOT, "data");

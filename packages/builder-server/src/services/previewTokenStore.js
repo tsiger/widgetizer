@@ -1,4 +1,4 @@
-import crypto from "crypto";
+import crypto from "node:crypto";
 
 const TOKEN_TTL_MS = 5 * 60 * 1000; // 5 minutes
 const MAX_TOKENS = 1000;

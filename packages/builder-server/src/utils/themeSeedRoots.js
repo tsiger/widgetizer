@@ -4,7 +4,7 @@
 // intentionally. The theme.json requirement stops a stray empty dir from
 // shadowing a real theme.
 import fs from "fs-extra";
-import path from "path";
+import path from "node:path";
 import { THEMES_SEED_DIRS } from "../config.js";
 
 /** @returns {Promise<string|null>} absolute seed dir for the theme, or null */

@@ -1,4 +1,4 @@
-import path from "path";
+import path from "node:path";
 import { createRequire } from "node:module";
 import { getMediaCategory } from "./utils/mimeTypes.js";
 

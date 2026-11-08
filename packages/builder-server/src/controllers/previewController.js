@@ -1,5 +1,5 @@
 import fs from "fs-extra";
-import path from "path";
+import path from "node:path";
 import { getProjectDir, CORE_WIDGETS_DIR, LOCALES_DIR } from "../config.js";
 import { getContentType } from "../utils/mimeTypes.js";
 import { isWithinDirectory } from "../utils/pathSecurity.js";
