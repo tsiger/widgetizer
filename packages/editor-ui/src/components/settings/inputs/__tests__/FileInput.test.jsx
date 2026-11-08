@@ -5,7 +5,7 @@
  * uploaded through the input, or handed straight to the selection callback.
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 
 const PDF = { id: "p", type: "application/pdf", path: "/uploads/files/brochure.pdf", filename: "brochure.pdf" };
 const MP3 = { id: "a", type: "audio/mpeg", path: "/uploads/files/song.mp3", filename: "song.mp3" };
@@ -222,6 +222,35 @@ describe("FileInput — a stored file is always shown", () => {
     expect(screen.getByText("brochure.pdf")).toBeTruthy();
     resolveSecond({ files: LIBRARY });
     await waitFor(() => expect(screen.queryByText("components.fileInput.notInLibrary")).toBeNull());
+  });
+
+  it("looks a file up afresh when it comes back, without its earlier note", async () => {
+    // Going to another file and back (undo, another block) mustn't bring back
+    // what was said about the file before; the new lookup decides.
+    const pending = [];
+    const later = () => new Promise((resolve) => pending.push(resolve));
+    getProjectMedia
+      .mockReset()
+      .mockResolvedValueOnce({ files: LIBRARY })
+      .mockResolvedValueOnce({ files: LIBRARY })
+      .mockImplementation(later);
+    const missing = <FileInput id="f" value="/uploads/files/missing-track.mp3" onChange={vi.fn()} />;
+    const { rerender } = render(missing);
+    expect(await screen.findByText("components.fileInput.notInLibrary")).toBeTruthy();
+
+    rerender(<FileInput id="f" value="/uploads/files/brochure.pdf" onChange={vi.fn()} />);
+    rerender(missing);
+    expect(screen.queryByText("components.fileInput.notInLibrary")).toBeNull();
+    expect(screen.getByText("missing-track.mp3")).toBeTruthy();
+
+    rerender(<FileInput id="f" value="" onChange={vi.fn()} />);
+    rerender(missing);
+    expect(screen.queryByText("components.fileInput.notInLibrary")).toBeNull();
+
+    // The latest lookup still finds the file missing, and says so.
+    await act(async () => pending.splice(0).forEach((resolve) => resolve({ files: LIBRARY })));
+    await act(async () => pending.splice(0).forEach((resolve) => resolve({ files: LIBRARY })));
+    expect(screen.getByText("components.fileInput.notInLibrary")).toBeTruthy();
   });
 
   it("drops the failure note while Try again is loading", async () => {

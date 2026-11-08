@@ -8,14 +8,17 @@ import { HexColorPicker, HexAlphaColorPicker } from "react-colorful";
 export default function ColorInput({ id, value = "#000000", onChange, allow_alpha = false }) {
   const [isOpen, setIsOpen] = useState(false);
   const [localColor, setLocalColor] = useState(value);
+  const [lastValue, setLastValue] = useState(value);
   const [isDragging, setIsDragging] = useState(false);
   const popoverRef = useRef(null);
   const colorPickerRef = useRef(null);
 
-  // Sync local color with prop value when it changes
-  useEffect(() => {
+  // A stored color changed from outside (undo, another widget) replaces the
+  // one shown, a drag in progress included.
+  if (!Object.is(value, lastValue)) {
+    setLastValue(value);
     setLocalColor(value);
-  }, [value]);
+  }
 
   useEffect(() => {
     const handleClickOutside = (event) => {

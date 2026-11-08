@@ -45,27 +45,29 @@ export default function FileInput({ id, value = "", onChange, filterType = "file
   const { settings } = useAppSettings();
 
   const [selectorDrawerVisible, setSelectorDrawerVisible] = useState(false);
+  const [lookupAttempt, setLookupAttempt] = useState(0);
+  // Keyed on the project's id, not the store object, so a new object for the
+  // same project doesn't look the file up again.
+  const activeProjectId = activeProject?.id;
+  const lookupKey = value && activeProjectId ? JSON.stringify([activeProjectId, value, lookupAttempt]) : null;
   // What the media library says about the stored file: `found` (its record),
   // `missing` (the library has no such file) or `failed` (the library couldn't
   // be read). The stored file is shown in every case; only the note differs.
   const [lookup, setLookup] = useState(NOT_LOOKED_UP);
-  const [lookupAttempt, setLookupAttempt] = useState(0);
+  // Each lookup starts clean: a note about the previous file, or about the
+  // failed read being retried, mustn't stay up while this one runs. The
+  // filename from the path shows meanwhile.
+  const [lookupFor, setLookupFor] = useState(lookupKey);
+  if (lookupFor !== lookupKey) {
+    setLookupFor(lookupKey);
+    setLookup(NOT_LOOKED_UP);
+  }
   const currentFile = lookup.record;
 
-  // Get the current file metadata when value changes. Keyed on the project's
-  // id, not the store object, so a new object for the same project doesn't
-  // look the file up again.
-  const activeProjectId = activeProject?.id;
+  // Get the current file metadata when value changes.
   useEffect(() => {
-    if (!value || !activeProjectId) {
-      setLookup(NOT_LOOKED_UP);
-      return undefined;
-    }
+    if (!value || !activeProjectId) return undefined;
     let cancelled = false;
-    // Each lookup starts clean: a note about the previous file, or about the
-    // failed read being retried, mustn't stay up while this one runs. The
-    // filename from the path shows meanwhile.
-    setLookup(NOT_LOOKED_UP);
     (async () => {
       try {
         const findIn = (mediaData) => mediaData.files.find((file) => file.path === value);

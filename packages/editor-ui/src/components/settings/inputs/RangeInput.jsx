@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Slider from "rc-slider";
 import "rc-slider/assets/index.css";
 
@@ -8,12 +8,14 @@ import "rc-slider/assets/index.css";
  */
 export default function RangeInput({ id, value = 0, onChange, min = 0, max = 100, step = 1, unit = "" }) {
   const [localValue, setLocalValue] = useState(value);
+  const [lastValue, setLastValue] = useState(value);
   const [isDragging, setIsDragging] = useState(false);
 
-  // Sync local value with prop value
-  useEffect(() => {
+  // A stored value changed from outside (undo, another widget) replaces the one shown.
+  if (!Object.is(value, lastValue)) {
+    setLastValue(value);
     setLocalValue(value);
-  }, [value]);
+  }
 
   const handleSliderChange = (newValue) => {
     const clampedValue = Math.max(min, Math.min(newValue, max));

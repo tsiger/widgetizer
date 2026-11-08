@@ -37,6 +37,13 @@ export default function ImageInput({ id, value = "", onChange, size = "full", la
   const isNarrow = size === "narrow";
   const isRow = layout === "row";
 
+  // With no image stored there is nothing to describe. Cleared here, before
+  // the preview and the metadata drawer read it, so a lookup for a removed
+  // image that answers late is dropped too.
+  if ((!value || !activeProject) && currentImageFile) {
+    setCurrentImageFile(null);
+  }
+
   // Get the current image metadata when value changes
   useEffect(() => {
     if (value && activeProject) {
@@ -52,8 +59,6 @@ export default function ImageInput({ id, value = "", onChange, size = "full", la
         }
       };
       fetchImageData();
-    } else {
-      setCurrentImageFile(null);
     }
   }, [value, activeProject]);
 
