@@ -14,8 +14,6 @@ const local = { rules: { "require-scope-arg": requireScopeArg } };
 // and shell code (36 places when 7.1.1 came in). Reported as warnings until that
 // code is reworked, one kind at a time; the other hooks rules stay errors.
 const reactCompilerFindingsAsWarnings = {
-  "react-hooks/globals": "warn",
-  "react-hooks/purity": "warn",
   "react-hooks/set-state-in-effect": "warn",
 };
 

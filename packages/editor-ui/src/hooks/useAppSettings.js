@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { getAppSettings, saveAppSettings } from "../queries/appSettingsManager.js";
 import useToastStore from "../stores/toastStore.js";
@@ -28,118 +28,103 @@ import settingsSchema from "../config/appSettings.schema.json";
  * @property {Function} handleCancel - Revert settings to the original loaded values
  */
 
-// Cache for settings to prevent multiple simultaneous fetches
-let settingsCache = null;
-let settingsCachePromise = null;
-let settingsCacheTime = 0;
-const CACHE_DURATION = 60000; // 1 minute cache
+// One copy of the settings for every screen that uses this hook: mounting several
+// at once makes one request, and the copy is reused for a minute. It lives at
+// module level, outside the hook, so rendering never reads or changes it.
+const CACHE_DURATION = 60000;
+let cached = null; // { settings, at }
+let inFlight = null;
+
+/** The settings (schema defaults filled in), from the cache or the server. */
+function loadSettings() {
+  if (cached && Date.now() - cached.at < CACHE_DURATION) return Promise.resolve(cached.settings);
+  inFlight ??= getAppSettings().then(
+    (appSettings) => {
+      inFlight = null;
+      const settings = mergeWithDefaults(appSettings, settingsSchema.settings);
+      cached = { settings, at: Date.now() };
+      return settings;
+    },
+    (error) => {
+      inFlight = null;
+      throw error;
+    },
+  );
+  return inFlight;
+}
+
+/** After a save, so screens mounted later start from what was saved. */
+function rememberSettings(settings) {
+  cached = { settings, at: Date.now() };
+}
+
+// Fill in schema defaults for settings that have no value
+function mergeWithDefaults(loadedSettings, schemaSettings) {
+  const merged = { ...loadedSettings };
+
+  Object.entries(schemaSettings).forEach(([key, config]) => {
+    const value = getNestedValue(merged, key);
+    if (value === undefined || value === null) {
+      setNestedValue(merged, key, config.default);
+    }
+  });
+
+  return merged;
+}
+
+// Get nested value from object using dot notation
+function getNestedValue(obj, path) {
+  return path.split(".").reduce((current, key) => current?.[key], obj);
+}
+
+// Set nested value in object using dot notation
+function setNestedValue(obj, path, value) {
+  const keys = path.split(".");
+  let current = obj;
+
+  // Create nested structure if it doesn't exist
+  for (let i = 0; i < keys.length - 1; i++) {
+    if (!current[keys[i]]) {
+      current[keys[i]] = {};
+    }
+    current = current[keys[i]];
+  }
+
+  current[keys[keys.length - 1]] = value;
+}
 
 export default function useAppSettings() {
   const [settings, setSettings] = useState(null);
   const [originalSettings, setOriginalSettings] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
-  const [hasChanges, setHasChanges] = useState(false);
   const showToast = useToastStore((state) => state.showToast);
   const { i18n } = useTranslation();
 
-  // Check if settings have changed from original
+  const hasChanges = useMemo(
+    () => Boolean(settings && originalSettings) && JSON.stringify(settings) !== JSON.stringify(originalSettings),
+    [settings, originalSettings],
+  );
+
   useEffect(() => {
-    if (settings && originalSettings) {
-      setHasChanges(JSON.stringify(settings) !== JSON.stringify(originalSettings));
-    }
-  }, [settings, originalSettings]);
-
-  const fetchSettings = async () => {
-    // Check cache first
-    const now = Date.now();
-    if (settingsCache && now - settingsCacheTime < CACHE_DURATION) {
-      setSettings(settingsCache);
-      setOriginalSettings(JSON.parse(JSON.stringify(settingsCache)));
-      setLoading(false);
-      return;
-    }
-
-    // If there's already a fetch in progress, wait for it
-    if (settingsCachePromise) {
-      try {
-        const cachedSettings = await settingsCachePromise;
-        setSettings(cachedSettings);
-        setOriginalSettings(JSON.parse(JSON.stringify(cachedSettings)));
-        setLoading(false);
-        return;
-      } catch {
-        // If cached promise fails, continue to fetch
-      }
-    }
-
-    setLoading(true);
-
-    // Create a shared promise for concurrent requests
-    settingsCachePromise = (async () => {
-      try {
-        const appSettings = await getAppSettings();
-
-        // Merge with defaults from schema
-        const settingsWithDefaults = mergeWithDefaults(appSettings, settingsSchema.settings);
-
-        // Update cache
-        settingsCache = settingsWithDefaults;
-        settingsCacheTime = Date.now();
-        settingsCachePromise = null;
-
-        return settingsWithDefaults;
-      } catch (error) {
-        settingsCachePromise = null;
-        throw error;
-      }
-    })();
-
-    try {
-      const settingsWithDefaults = await settingsCachePromise;
-      setSettings(settingsWithDefaults);
-      setOriginalSettings(JSON.parse(JSON.stringify(settingsWithDefaults)));
-    } catch (error) {
-      showToast(error.message || "Failed to load settings", "error");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Merge loaded settings with schema defaults
-  const mergeWithDefaults = (loadedSettings, schemaSettings) => {
-    const merged = { ...loadedSettings };
-
-    Object.entries(schemaSettings).forEach(([key, config]) => {
-      const value = getNestedValue(merged, key);
-      if (value === undefined || value === null) {
-        setNestedValue(merged, key, config.default);
-      }
-    });
-
-    return merged;
-  };
-
-  // Get nested value from object using dot notation
-  const getNestedValue = (obj, path) => {
-    return path.split(".").reduce((current, key) => current?.[key], obj);
-  };
-
-  // Set nested value in object using dot notation
-  const setNestedValue = (obj, path, value) => {
-    const keys = path.split(".");
-    let current = obj;
-
-    // Create nested structure if it doesn't exist
-    for (let i = 0; i < keys.length - 1; i++) {
-      if (!current[keys[i]]) {
-        current[keys[i]] = {};
-      }
-      current = current[keys[i]];
-    }
-
-    current[keys[keys.length - 1]] = value;
-  };
+    let current = true;
+    loadSettings()
+      .then((loaded) => {
+        if (!current) return;
+        setSettings(loaded);
+        setOriginalSettings(JSON.parse(JSON.stringify(loaded)));
+      })
+      .catch((error) => {
+        // Every screen mounted together shares the failed request; one toast says so.
+        if (current) showToast(error.message || "Failed to load settings", "error", { id: "app-settings-load-error" });
+      })
+      .finally(() => {
+        if (current) setLoading(false);
+      });
+    return () => {
+      current = false;
+    };
+  }, [showToast]);
 
   const handleInputChange = (settingKey, value) => {
     setSettings((prev) => {
@@ -162,11 +147,7 @@ export default function useAppSettings() {
 
       setSettings(savedSettings);
       setOriginalSettings(JSON.parse(JSON.stringify(savedSettings)));
-      setHasChanges(false);
-
-      // Invalidate cache so other components get fresh data
-      settingsCache = savedSettings;
-      settingsCacheTime = Date.now();
+      rememberSettings(savedSettings);
 
       // Update language if it changed
       if (savedSettings.general?.language) {
@@ -183,7 +164,6 @@ export default function useAppSettings() {
 
   const handleCancel = () => {
     setSettings(JSON.parse(JSON.stringify(originalSettings)));
-    setHasChanges(false);
   };
 
   // Process settings before saving (convert strings to numbers, etc.)
@@ -205,11 +185,6 @@ export default function useAppSettings() {
 
     return processed;
   };
-
-  useEffect(() => {
-    fetchSettings();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   return {
     settings,
