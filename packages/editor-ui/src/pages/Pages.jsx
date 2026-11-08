@@ -57,6 +57,24 @@ export default function Pages() {
   const defaultLanguage = useDefaultLanguage();
   const [activeLanguage, setActiveLanguage] = useListLanguage();
 
+  const loadPages = async () => {
+    try {
+      setLoading(true);
+      const data = await getAllPages();
+      setPages(data);
+      setLoadFailed(false);
+      // Signal components that derive state from the page list (e.g. the Sidebar's
+      // Site-preview gate) so they re-check after an in-place create/delete.
+      usePageListStore.getState().notifyPagesChanged();
+    } catch (error) {
+      console.error("Error loading pages:", error);
+      setLoadFailed(true);
+      showToast(t("pages.toasts.loadError"), "error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Handle page deletion with confirmation
   const handleDelete = async (data) => {
     try {
@@ -151,24 +169,6 @@ export default function Pages() {
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, []);
-
-  const loadPages = async () => {
-    try {
-      setLoading(true);
-      const data = await getAllPages();
-      setPages(data);
-      setLoadFailed(false);
-      // Signal components that derive state from the page list (e.g. the Sidebar's
-      // Site-preview gate) so they re-check after an in-place create/delete.
-      usePageListStore.getState().notifyPagesChanged();
-    } catch (error) {
-      console.error("Error loading pages:", error);
-      setLoadFailed(true);
-      showToast(t("pages.toasts.loadError"), "error");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleDeletePage = (pageId, pageName, language) => {
     confirm({

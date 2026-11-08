@@ -11,11 +11,10 @@ import requireScopeArg from "./eslint-rules/require-scope-arg.js";
 const local = { rules: { "require-scope-arg": requireScopeArg } };
 
 // React Compiler checks from eslint-plugin-react-hooks that flag existing editor
-// and shell code (7.1.1 found 36 places). Reported as warnings until that code is
-// reworked component by component; the other hooks rules stay errors.
+// and shell code (36 places when 7.1.1 came in). Reported as warnings until that
+// code is reworked, one kind at a time; the other hooks rules stay errors.
 const reactCompilerFindingsAsWarnings = {
   "react-hooks/globals": "warn",
-  "react-hooks/immutability": "warn",
   "react-hooks/preserve-manual-memoization": "warn",
   "react-hooks/purity": "warn",
   "react-hooks/set-state-in-effect": "warn",

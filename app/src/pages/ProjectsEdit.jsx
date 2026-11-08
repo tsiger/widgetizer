@@ -53,11 +53,6 @@ function ProjectDetails() {
     if (!activeProjectLoading && !isActiveProject) navigate("/projects", { replace: true });
   }, [activeProjectLoading, isActiveProject, navigate]);
 
-  useEffect(() => {
-    if (isActiveProject) loadProject();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id, isActiveProject]);
-
   // Whether to offer a theme update; the answer also depends on the project's
   // "Receive Theme Updates" setting, so a save asks again. Only the latest
   // check is used: an earlier one answering late would bring back a stale banner.
@@ -88,6 +83,11 @@ function ProjectDetails() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (isActiveProject) loadProject();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id, isActiveProject]);
 
   const handleApplyUpdate = async () => {
     setIsApplyingUpdate(true);

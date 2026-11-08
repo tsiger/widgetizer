@@ -60,6 +60,17 @@ export default function Projects() {
     ? `/projects/add?next=${encodeURIComponent(searchParams.get("next"))}`
     : "/projects/add";
 
+  const loadProjects = async () => {
+    try {
+      const projectsData = await getAllProjects();
+      setProjects(projectsData);
+    } catch (err) {
+      showToast(err.message, "error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleDelete = async (data) => {
     try {
       const result = await deleteProject(data.projectId);
@@ -108,17 +119,6 @@ export default function Projects() {
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, []);
-
-  const loadProjects = async () => {
-    try {
-      const projectsData = await getAllProjects();
-      setProjects(projectsData);
-    } catch (err) {
-      showToast(err.message, "error");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const openDeleteConfirmation = (id, name) => {
     if (activeProject && id === activeProject.id) {

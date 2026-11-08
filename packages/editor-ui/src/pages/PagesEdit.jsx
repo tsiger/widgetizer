@@ -35,13 +35,6 @@ export default function PagesEdit() {
 
   const { navigateSafely, getDirtyTitle } = useGuardedFormPage(isDirty);
 
-  useEffect(() => {
-    setPage(null);
-    setLoading(true);
-    loadPage();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id, language]);
-
   const loadPage = async () => {
     try {
       const pageData = await getPage(id, language);
@@ -52,6 +45,13 @@ export default function PagesEdit() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    setPage(null);
+    setLoading(true);
+    loadPage();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id, language]);
 
   const handleSubmit = async (formData) => {
     setIsSubmitting(true);

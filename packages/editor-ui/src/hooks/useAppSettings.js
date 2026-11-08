@@ -42,10 +42,6 @@ export default function useAppSettings() {
   const [hasChanges, setHasChanges] = useState(false);
   const showToast = useToastStore((state) => state.showToast);
   const { i18n } = useTranslation();
-  useEffect(() => {
-    fetchSettings();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   // Check if settings have changed from original
   useEffect(() => {
@@ -209,6 +205,11 @@ export default function useAppSettings() {
 
     return processed;
   };
+
+  useEffect(() => {
+    fetchSettings();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return {
     settings,

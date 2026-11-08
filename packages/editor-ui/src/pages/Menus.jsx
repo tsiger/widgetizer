@@ -37,6 +37,18 @@ export default function Menus() {
   const defaultLanguage = useDefaultLanguage();
   const [activeLanguage, setActiveLanguage] = useListLanguage();
 
+  const loadMenus = async () => {
+    try {
+      const menuData = await getAllMenus();
+      setMenus(menuData);
+    } catch (error) {
+      console.error("Failed to load menus:", error);
+      showToast(t("menus.toasts.loadError"), "error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Reload menus when navigating to this page or when active project changes.
   // Choosing a language tab replaces the URL in place, which is not a new visit.
   const navigationType = useNavigationType();
@@ -69,18 +81,6 @@ export default function Menus() {
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, []);
-
-  const loadMenus = async () => {
-    try {
-      const menuData = await getAllMenus();
-      setMenus(menuData);
-    } catch (error) {
-      console.error("Failed to load menus:", error);
-      showToast(t("menus.toasts.loadError"), "error");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleNewMenu = () => {
     // A new menu belongs to the language being looked at.

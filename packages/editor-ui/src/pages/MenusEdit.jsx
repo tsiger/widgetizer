@@ -32,13 +32,6 @@ export default function MenusEdit() {
 
   const { navigateSafely, getDirtyTitle } = useGuardedFormPage(isDirty);
 
-  useEffect(() => {
-    setMenu(null);
-    setLoading(true);
-    loadMenu();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id, language]);
-
   const loadMenu = async () => {
     try {
       const menuData = await getMenu(id, language);
@@ -49,6 +42,13 @@ export default function MenusEdit() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    setMenu(null);
+    setLoading(true);
+    loadMenu();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id, language]);
 
   const handleSubmit = async (formData) => {
     setIsSubmitting(true);

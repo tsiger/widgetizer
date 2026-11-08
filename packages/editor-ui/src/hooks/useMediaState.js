@@ -54,19 +54,6 @@ export default function useMediaState() {
   const activeProject = useProjectStore((state) => state.activeProject);
   const showToast = useToastStore((state) => state.showToast);
 
-  // Load media files when active project changes
-  useEffect(() => {
-    if (activeProject) {
-      loadMediaFiles();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeProject]);
-
-  // Update localStorage when viewMode changes
-  useEffect(() => {
-    localStorage.setItem("mediaViewMode", viewMode);
-  }, [viewMode]);
-
   const loadMediaFiles = async (forceRefresh = false) => {
     if (!activeProject) return;
     setLoading(true);
@@ -89,6 +76,19 @@ export default function useMediaState() {
       setLoading(false);
     }
   };
+
+  // Load media files when active project changes
+  useEffect(() => {
+    if (activeProject) {
+      loadMediaFiles();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeProject]);
+
+  // Update localStorage when viewMode changes
+  useEffect(() => {
+    localStorage.setItem("mediaViewMode", viewMode);
+  }, [viewMode]);
 
   const handleRefreshUsage = async () => {
     if (!activeProject) return;
