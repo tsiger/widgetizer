@@ -93,8 +93,20 @@ export default function Projects() {
 
   const { confirm, confirmationModal } = useConfirmationAction(handleDelete);
 
+  // The first load runs here rather than through loadProjects: the lint rule
+  // react-hooks/set-state-in-effect flags an effect that calls a function of
+  // this component that sets state. It does the same as loadProjects; change
+  // both together.
   useEffect(() => {
-    loadProjects();
+    (async () => {
+      try {
+        setProjects(await getAllProjects());
+      } catch (err) {
+        showToast(err.message, "error");
+      } finally {
+        setLoading(false);
+      }
+    })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
