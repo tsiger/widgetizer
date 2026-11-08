@@ -82,7 +82,15 @@ function CollectionItemsScreen({ activeLanguage, setActiveLanguage }) {
   const [showInvalidOnly, setShowInvalidOnly] = useState(false);
   const [openMenuId, setOpenMenuId] = useState(null);
   const [selectedSlugs, setSelectedSlugs] = useState([]);
-  const [orderedItems, setOrderedItems] = useState([]);
+  // The list's own copy of the fetched order, so a drag shows its new order at
+  // once. Every fetch replaces it with the server's order, while rendering, so
+  // the fetched list shows in the same update rather than one later.
+  const [orderedItems, setOrderedItems] = useState(items);
+  const [orderedFrom, setOrderedFrom] = useState(items);
+  if (items !== orderedFrom) {
+    setOrderedFrom(items);
+    setOrderedItems(items);
+  }
   const menuRef = useRef(null);
 
   const schema = (schemas || []).find((s) => s.type === type) || null;
@@ -91,12 +99,6 @@ function CollectionItemsScreen({ activeLanguage, setActiveLanguage }) {
   const dateField = (schema?.settings || []).find((s) => s.usedAsDate)?.id || null;
   const displayName = schema?.displayName || type;
   const displayNamePlural = schema?.displayNamePlural || displayName;
-
-  // Reset transient UI state when switching collection types.
-  // Keep the local (drag-mutable) order in sync with fetched items.
-  useEffect(() => {
-    setOrderedItems(items);
-  }, [items]);
 
   // Close the actions menu on outside click / Escape.
   useEffect(() => {
