@@ -14,6 +14,11 @@ const local = { rules: { "require-scope-arg": requireScopeArg } };
 // memoize (react-hook-form's watch(), for one); refuse it, since nothing needs it.
 const reactCompilerIncompatibleLibraryAsError = { "react-hooks/incompatible-library": "error" };
 
+// A missing dependency leaves an effect or callback working with stale values (the
+// previous project, item or language), so refuse it rather than warn. A deliberate
+// omission carries an inline exception with its reason.
+const exhaustiveDepsAsError = { "react-hooks/exhaustive-deps": "error" };
+
 // ESLint 10 tracks JSX references itself (`<Card />` counts as using `Card`), so
 // eslint-plugin-react's workaround for that is redundant.
 const jsxReferencesTrackedByEslint = { "react/jsx-uses-vars": "off" };
@@ -153,6 +158,7 @@ export default [
       ...react.configs["jsx-runtime"].rules,
       ...reactHooks.configs.recommended.rules,
       ...reactCompilerIncompatibleLibraryAsError,
+      ...exhaustiveDepsAsError,
       ...jsxReferencesTrackedByEslint,
       "no-unused-vars": ["error", { argsIgnorePattern: "^_", varsIgnorePattern: "^_" }],
       "react/prop-types": "off",
@@ -206,6 +212,7 @@ export default [
       ...react.configs["jsx-runtime"].rules,
       ...reactHooks.configs.recommended.rules,
       ...reactCompilerIncompatibleLibraryAsError,
+      ...exhaustiveDepsAsError,
       ...jsxReferencesTrackedByEslint,
       "no-unused-vars": ["error", { argsIgnorePattern: "^_", varsIgnorePattern: "^_" }],
       "react/jsx-no-target-blank": "off",
