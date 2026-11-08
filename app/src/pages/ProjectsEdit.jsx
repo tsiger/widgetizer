@@ -84,8 +84,28 @@ function ProjectDetails() {
     }
   };
 
+  // The first load runs here rather than through loadProject: the lint rule
+  // react-hooks/set-state-in-effect flags an effect that calls a function of
+  // this component that sets state. It does the same as loadProject; change
+  // both together.
   useEffect(() => {
-    if (isActiveProject) loadProject();
+    if (!isActiveProject) return;
+    (async () => {
+      try {
+        const projects = await getAllProjects();
+        const project = projects.find((p) => p.id === id);
+        if (!project) {
+          showToast(t("projectsEdit.toasts.notFound"), "error");
+          return;
+        }
+        setProject(project);
+        await refreshUpdateStatus();
+      } catch (err) {
+        showToast(err.message || t("projectsEdit.toasts.loadError"), "error");
+      } finally {
+        setLoading(false);
+      }
+    })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, isActiveProject]);
 
