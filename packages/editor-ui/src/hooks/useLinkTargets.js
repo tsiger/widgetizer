@@ -129,6 +129,37 @@ async function loadTargets(languages, defaultLanguage) {
   return { options, complete };
 }
 
+/**
+ * One project's targets in these languages, from the cache or a load (shared
+ * with any load already running for them). Sets no state, so the load effect
+ * can call it.
+ */
+function readTargets(projectId, languageKey) {
+  const key = cacheKey(projectId, languageKey);
+  const cached = cache.get(key);
+  if (cached && Date.now() - cached.time < CACHE_DURATION) {
+    return Promise.resolve({ options: cached.data, complete: true });
+  }
+  let promise = inflight.get(key);
+  if (!promise) {
+    const startedIn = generation;
+    const load = (async () => {
+      try {
+        const languages = languageKey.split(",");
+        const result = await loadTargets(languages, languages[0]);
+        if (result.complete && generation === startedIn) cache.set(key, { data: result.options, time: Date.now() });
+        return result;
+      } finally {
+        // An invalidation may have dropped this load and a newer one taken its key.
+        if (inflight.get(key) === load) inflight.delete(key);
+      }
+    })();
+    inflight.set(key, load);
+    promise = load;
+  }
+  return promise;
+}
+
 export default function useLinkTargets() {
   const activeProjectId = useProjectStore((state) => state.activeProject?.id);
   const defaultLanguage = useDefaultLanguage();
@@ -138,9 +169,25 @@ export default function useLinkTargets() {
   const languageKey = [defaultLanguage, ...extraLanguages].join(",");
 
   const [options, setOptions] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(Boolean(activeProjectId));
   const [failed, setFailed] = useState(false);
   const [attempt, setAttempt] = useState(0);
+
+  // Another project, language set or Try again loads anew; without a project
+  // there is nothing to offer. Reset while rendering, so loading shows as soon
+  // as one of them changes.
+  const loadKey = JSON.stringify([activeProjectId, languageKey, attempt]);
+  const [loadedFor, setLoadedFor] = useState(loadKey);
+  if (loadedFor !== loadKey) {
+    setLoadedFor(loadKey);
+    if (activeProjectId) {
+      setLoading(true);
+    } else {
+      setOptions([]);
+      setFailed(false);
+      setLoading(false);
+    }
+  }
 
   useEffect(() => {
     const listener = () => setAttempt((n) => n + 1);
@@ -149,44 +196,10 @@ export default function useLinkTargets() {
   }, []);
 
   useEffect(() => {
+    if (!activeProjectId) return undefined;
     let cancelled = false;
 
-    if (!activeProjectId) {
-      setOptions([]);
-      setFailed(false);
-      setLoading(false);
-      return undefined;
-    }
-
-    const key = cacheKey(activeProjectId, languageKey);
-    const cached = cache.get(key);
-    if (cached && Date.now() - cached.time < CACHE_DURATION) {
-      setOptions(cached.data);
-      setFailed(false);
-      setLoading(false);
-      return undefined;
-    }
-
-    setLoading(true);
-    let promise = inflight.get(key);
-    if (!promise) {
-      const startedIn = generation;
-      const load = (async () => {
-        try {
-          const languages = languageKey.split(",");
-          const result = await loadTargets(languages, languages[0]);
-          if (result.complete && generation === startedIn) cache.set(key, { data: result.options, time: Date.now() });
-          return result;
-        } finally {
-          // An invalidation may have dropped this load and a newer one taken its key.
-          if (inflight.get(key) === load) inflight.delete(key);
-        }
-      })();
-      inflight.set(key, load);
-      promise = load;
-    }
-
-    promise
+    readTargets(activeProjectId, languageKey)
       .then((result) => {
         if (cancelled) return;
         setOptions(result.options);
