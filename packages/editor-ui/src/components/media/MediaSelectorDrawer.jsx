@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 import { X, Search, FileText, Music, Film } from "lucide-react";
@@ -60,26 +60,29 @@ export default function MediaSelectorDrawer({
     setFiles: setMediaFiles,
   });
 
-  const loadMediaFiles = useCallback(async () => {
-    if (!activeProject) return;
-    setLoading(true);
-
-    try {
-      const data = await getProjectMedia(activeProject.id);
-      setMediaFiles(data.files || []);
-    } catch (error) {
-      console.error("Failed to load media files:", error);
-    } finally {
-      setLoading(false);
-    }
-  }, [activeProject]);
+  // The library is read each time the drawer opens, and again if the project
+  // changes while it is open; the spinner shows meanwhile. Set while rendering,
+  // so the previous list never shows for a moment.
+  const [readFor, setReadFor] = useState({ visible, activeProject });
+  if (readFor.visible !== visible || readFor.activeProject !== activeProject) {
+    setReadFor({ visible, activeProject });
+    if (visible && activeProject) setLoading(true);
+  }
 
   // Load media files when drawer is opened
   useEffect(() => {
-    if (visible && activeProject) {
-      loadMediaFiles();
-    }
-  }, [visible, activeProject, loadMediaFiles]);
+    if (!visible || !activeProject) return;
+    (async () => {
+      try {
+        const data = await getProjectMedia(activeProject.id);
+        setMediaFiles(data.files || []);
+      } catch (error) {
+        console.error("Failed to load media files:", error);
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, [visible, activeProject]);
 
   // Prevent background scroll when drawer is open
   useEffect(() => {
