@@ -3,6 +3,20 @@ import { getProjectMedia, refreshMediaUsage, invalidateMediaCache } from "../que
 import useProjectStore from "../stores/projectStore";
 import useToastStore from "../stores/toastStore";
 
+/** The project's media files, each with a metadata object. Sets no state, so the load effect can call it. */
+async function readMediaFiles(projectId, forceRefresh) {
+  // If forcing refresh, invalidate cache first
+  if (forceRefresh) {
+    invalidateMediaCache(projectId);
+  }
+  const data = await getProjectMedia(projectId, forceRefresh);
+  // Ensure all files have a metadata object
+  return (data.files || []).map((file) => ({
+    ...file,
+    metadata: file.metadata || { alt: "", title: "" },
+  }));
+}
+
 /**
  * Hook for managing the media library state including files, view mode, filtering, and search.
  * Automatically loads media files when the active project changes and persists view mode preference.
@@ -59,17 +73,7 @@ export default function useMediaState() {
     setLoading(true);
 
     try {
-      // If forcing refresh, invalidate cache first
-      if (forceRefresh) {
-        invalidateMediaCache(activeProject.id);
-      }
-      const data = await getProjectMedia(activeProject.id, forceRefresh);
-      // Ensure all files have a metadata object
-      const filesWithMetadata = (data.files || []).map((file) => ({
-        ...file,
-        metadata: file.metadata || { alt: "", title: "" },
-      }));
-      setFiles(filesWithMetadata);
+      setFiles(await readMediaFiles(activeProject.id, forceRefresh));
     } catch {
       showToast("Failed to load media files", "error");
     } finally {
@@ -77,11 +81,28 @@ export default function useMediaState() {
     }
   };
 
-  // Load media files when active project changes
+  // Another project's files load behind the spinner. Set while rendering, so
+  // the spinner shows as soon as the project changes.
+  const [loadedFor, setLoadedFor] = useState(activeProject);
+  if (loadedFor !== activeProject) {
+    setLoadedFor(activeProject);
+    if (activeProject) setLoading(true);
+  }
+
+  // Load media files when active project changes. The load runs here rather
+  // than through loadMediaFiles: an effect may not call a function of this
+  // hook that sets state (react-hooks/set-state-in-effect).
   useEffect(() => {
-    if (activeProject) {
-      loadMediaFiles();
-    }
+    if (!activeProject) return;
+    (async () => {
+      try {
+        setFiles(await readMediaFiles(activeProject.id, false));
+      } catch {
+        showToast("Failed to load media files", "error");
+      } finally {
+        setLoading(false);
+      }
+    })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeProject]);
 
