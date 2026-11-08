@@ -24,6 +24,16 @@ export default function MenusEdit() {
   const editorPath = useEditorPath();
   const [menu, setMenu] = useState(null);
   const [loading, setLoading] = useState(true);
+  // The route can move to another menu or language while this page stays
+  // mounted; the form waits for that menu. Set while rendering, so the previous
+  // menu's form never shows for a moment.
+  const menuKey = JSON.stringify([id, language]);
+  const [loadingFor, setLoadingFor] = useState(menuKey);
+  if (loadingFor !== menuKey) {
+    setLoadingFor(menuKey);
+    setMenu(null);
+    setLoading(true);
+  }
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccessActions, setShowSuccessActions] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
@@ -32,21 +42,17 @@ export default function MenusEdit() {
 
   const { navigateSafely, getDirtyTitle } = useGuardedFormPage(isDirty);
 
-  const loadMenu = async () => {
-    try {
-      const menuData = await getMenu(id, language);
-      setMenu(menuData);
-      setLoading(false);
-    } catch (err) {
-      showToast(err.message || t("menusEdit.toasts.loadError"), "error");
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    setMenu(null);
-    setLoading(true);
-    loadMenu();
+    (async () => {
+      try {
+        const menuData = await getMenu(id, language);
+        setMenu(menuData);
+        setLoading(false);
+      } catch (err) {
+        showToast(err.message || t("menusEdit.toasts.loadError"), "error");
+        setLoading(false);
+      }
+    })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, language]);
 
