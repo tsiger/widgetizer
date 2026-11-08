@@ -4,6 +4,7 @@ import react from "eslint-plugin-react";
 import reactHooks from "eslint-plugin-react-hooks";
 import reactRefresh from "eslint-plugin-react-refresh";
 import n from "eslint-plugin-n";
+import { readFileSync } from "node:fs";
 import requireScopeArg from "./eslint-rules/require-scope-arg.js";
 
 // Local-only plugin housing repo-specific lint rules.
@@ -40,6 +41,48 @@ const mistakeGuards = {
   "no-unreachable-loop": "error",
   "prefer-promise-reject-errors": "error",
 };
+
+// The workspace packages the server runs (core is also bundled into the editor)
+// are installed in production without dev dependencies: the Docker image prunes
+// them and the desktop app packs only dependencies. n/no-unpublished-* can't see
+// that from inside a workspace (it reads only the workspace's own package.json,
+// and the dev packages are declared at the root), so each workspace refuses, by
+// name, the dev packages that neither it nor the root declares for runtime. This
+// protects OSS's own install; a package the root alone declares still passes.
+const readPackage = (dir) => JSON.parse(readFileSync(new URL(`${dir}/package.json`, import.meta.url), "utf8"));
+const rootPackage = readPackage(".");
+const runtimeNames = (p) => [
+  ...Object.keys(p.dependencies ?? {}),
+  ...Object.keys(p.peerDependencies ?? {}),
+  ...Object.keys(p.optionalDependencies ?? {}),
+];
+function devOnlyImportsRefused(workspaceDir) {
+  const workspace = readPackage(workspaceDir);
+  const runtime = new Set([...runtimeNames(rootPackage), ...runtimeNames(workspace)]);
+  const devOnly = [
+    ...new Set([...Object.keys(rootPackage.devDependencies ?? {}), ...Object.keys(workspace.devDependencies ?? {})]),
+  ].filter((name) => !runtime.has(name));
+  // Static, re-exported and literal dynamic imports, and require().
+  const refused = [
+    {
+      name: devOnly.flatMap((name) => [name, `${name}/**`]),
+      message: "a dev dependency, which production doesn't install",
+    },
+  ];
+  return {
+    files: [`${workspaceDir}/src/**/*.js`],
+    ignores: ["**/*.test.js", "**/tests/**", "**/__tests__/**"],
+    plugins: { n },
+    rules: { "n/no-restricted-import": ["error", refused], "n/no-restricted-require": ["error", refused] },
+  };
+}
+
+// The root's own production files: n/no-unpublished-* refuses a dev-only package
+// (ignorePrivate: the root is "private", which the rule skips by default).
+const devOnlyInProduction = (options = {}) => ({
+  "n/no-unpublished-import": ["error", { ignorePrivate: false, ...options }],
+  "n/no-unpublished-require": ["error", { ignorePrivate: false, ...options }],
+});
 
 export default [
   // data/ is runtime state (installed theme copies, projects), not source. A theme
@@ -200,4 +243,16 @@ export default [
   // its own package.json or the workspace root declares, so nothing works only
   // because another package happens to pull it in.
   { plugins: { n }, rules: { ...mistakeGuards, "n/no-extraneous-import": "error" } },
+  { files: ["server.js", "app/server-common.js"], plugins: { n }, rules: devOnlyInProduction() },
+  // What the desktop app runs. Its build tooling (*.cjs, builder.config.mjs) may
+  // use dev packages; the app gets electron from Electron itself.
+  {
+    files: ["electron/*.js"],
+    ignores: ["**/*.test.js"],
+    plugins: { n },
+    rules: devOnlyInProduction({ allowModules: ["electron"] }),
+  },
+  ...["packages/builder-server", "packages/adapters-local", "packages/core", "packages/render-engine"].map(
+    devOnlyImportsRefused,
+  ),
 ];
