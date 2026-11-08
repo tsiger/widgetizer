@@ -22,6 +22,14 @@ export default function CollectionItemAdd() {
   const language = searchParams.get("language") || undefined;
   const [schema, setSchema] = useState(null);
   const [loading, setLoading] = useState(true);
+  // The route can move to another collection while this page stays mounted;
+  // its form waits for that collection's schema. Set while rendering, so the
+  // previous collection's form never shows for a moment first.
+  const [loadingFor, setLoadingFor] = useState(type);
+  if (loadingFor !== type) {
+    setLoadingFor(type);
+    setLoading(true);
+  }
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
 
@@ -31,7 +39,6 @@ export default function CollectionItemAdd() {
 
   useEffect(() => {
     let cancelled = false;
-    setLoading(true);
     getCollectionSchema(type)
       .then((data) => {
         if (!cancelled) setSchema(data);
