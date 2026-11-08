@@ -3,6 +3,26 @@ import { getCollectionItems } from "../queries/collectionManager";
 import useProjectStore, { useDefaultLanguage, useExtraLanguages } from "../stores/projectStore";
 
 /**
+ * One collection's items in every language, joined in language order. Sets no
+ * state, so the load effect can call it. Returns null once `superseded()` says
+ * a newer load has started.
+ */
+async function readItems(type, paramsKey, languageKey, superseded) {
+  const base = paramsKey ? JSON.parse(paramsKey) : undefined;
+  const languages = languageKey.split(",");
+  const merged = [];
+  for (const language of languages) {
+    const data = await getCollectionItems(type, {
+      ...base,
+      ...(language === languages[0] ? {} : { language }),
+    });
+    if (superseded()) return null;
+    if (Array.isArray(data)) merged.push(...data);
+  }
+  return merged;
+}
+
+/**
  * Loads the items of a single collection type for the active project. Plain
  * useState + useEffect, mirroring useCollections. Unlike schemas, item lists are
  * not cached across navigations — list pages mutate them frequently, so each
@@ -23,7 +43,7 @@ export default function useCollectionItems(type, params) {
   const extraLanguages = useExtraLanguages();
   const languageKey = [defaultLanguage, ...extraLanguages].join(",");
   const [items, setItems] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(Boolean(activeProjectId && type));
   const [error, setError] = useState(null);
   // Only the newest load may write. The list screen stays mounted when the user
   // switches collection, so a slower load for the previous one would otherwise
@@ -50,17 +70,9 @@ export default function useCollectionItems(type, params) {
     setError(null);
 
     try {
-      const base = paramsKey ? JSON.parse(paramsKey) : undefined;
-      const languages = languageKey.split(",");
-      const merged = [];
-      for (const language of languages) {
-        const data = await getCollectionItems(type, {
-          ...base,
-          ...(language === languages[0] ? {} : { language }),
-        });
-        if (superseded()) return;
-        if (Array.isArray(data)) merged.push(...data);
-      }
+      const merged = await readItems(type, paramsKey, languageKey, superseded);
+      // Checked again after the await: a newer load may have started meanwhile.
+      if (merged === null || superseded()) return;
       setItems(merged);
     } catch (err) {
       if (superseded()) return;
@@ -71,14 +83,49 @@ export default function useCollectionItems(type, params) {
     }
   }, [activeProjectId, type, paramsKey, languageKey]);
 
+  // A new collection, project or language set loads behind the spinner; without
+  // a project or a collection there is nothing to load. Reset while rendering,
+  // so the spinner shows as soon as one of them changes.
+  const loadKey = JSON.stringify([activeProjectId, type, paramsKey, languageKey]);
+  const [loadedFor, setLoadedFor] = useState(loadKey);
+  if (loadedFor !== loadKey) {
+    setLoadedFor(loadKey);
+    setError(null);
+    if (activeProjectId && type) {
+      setLoading(true);
+    } else {
+      setItems([]);
+      setLoading(false);
+    }
+  }
+
+  // The load runs here rather than through fetchItems: an effect may not call a
+  // function of this hook that sets state (react-hooks/set-state-in-effect).
   useEffect(() => {
-    fetchItems();
+    const load = ++latestLoad.current;
+    const superseded = () => load !== latestLoad.current;
+    if (activeProjectId && type) {
+      (async () => {
+        try {
+          const merged = await readItems(type, paramsKey, languageKey, superseded);
+          // Checked again after the await: a newer load may have started meanwhile.
+          if (merged === null || superseded()) return;
+          setItems(merged);
+        } catch (err) {
+          if (superseded()) return;
+          setError(err);
+          setItems([]);
+        } finally {
+          if (!superseded()) setLoading(false);
+        }
+      })();
+    }
     // Leaving the screen, or a new collection, project or language set, makes
     // any load still running stale.
     return () => {
       latestLoad.current += 1;
     };
-  }, [fetchItems]);
+  }, [activeProjectId, type, paramsKey, languageKey]);
 
   // `refetch` keeps one identity and always loads for the current collection,
   // project and languages: a caller holding it from an earlier render (an edit
