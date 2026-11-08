@@ -233,8 +233,8 @@ export default function Themes() {
   const { settings } = useAppSettings();
   const maxSizeMB = settings?.export?.maxImportSizeMB || 500;
 
-  // The page loads its list whenever fetchThemes changes, so the latest `t` is
-  // read through a ref rather than made a dependency.
+  // The list loads read the latest `t` through a ref rather than depend on it,
+  // so a translation change never reloads the list.
   const tRef = useRef(t);
   useEffect(() => {
     tRef.current = t;
@@ -267,9 +267,29 @@ export default function Themes() {
     [showToast],
   );
 
+  // The first load runs here rather than through fetchThemes: the lint rule
+  // react-hooks/set-state-in-effect flags an effect that calls a function of
+  // this component that sets state. It does the same as fetchThemes (loading is
+  // already on when the page opens); change both together.
   useEffect(() => {
-    fetchThemes();
-  }, [fetchThemes]);
+    const load = ++latestLoadRef.current;
+    const isLatest = () => load === latestLoadRef.current;
+    (async () => {
+      try {
+        const themesData = await getAllThemes(undefined);
+        if (!isLatest()) return;
+        setThemes(themesData);
+        setLoadFailed(false);
+      } catch (error) {
+        if (!isLatest()) return;
+        console.error("Error fetching themes:", error);
+        setLoadFailed(true);
+        showToast(tRef.current("themes.toasts.loadError"), "error");
+      } finally {
+        if (isLatest()) setLoading(false);
+      }
+    })();
+  }, [showToast]);
 
   const handleUploadSuccess = useCallback((newTheme) => {
     if (newTheme.isUpdate) {
