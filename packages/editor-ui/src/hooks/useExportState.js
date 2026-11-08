@@ -5,6 +5,9 @@ import { createAsyncRequestGate } from "../lib/asyncRequestGate";
 import useProjectStore from "../stores/projectStore";
 import useToastStore from "../stores/toastStore";
 
+// No project has had its history state set up yet.
+const NOT_LOADED = Symbol("not loaded");
+
 /**
  * Hook for managing site export state including active project, export history, and last export info.
  * Automatically loads the active project and its export history on mount.
@@ -76,22 +79,32 @@ export default function useExportState() {
     }
   };
 
-  useEffect(() => {
-    if (!activeProject?.id) {
+  // The spinner shows while another project's history loads; without a project
+  // there is no history and nothing about a last export. Reset while rendering,
+  // so the spinner shows as soon as the project changes.
+  const activeProjectId = activeProject?.id;
+  const [historyFor, setHistoryFor] = useState(NOT_LOADED);
+  if (historyFor !== activeProjectId) {
+    setHistoryFor(activeProjectId);
+    if (activeProjectId) {
+      setLoadingHistory(true);
+    } else {
       setExportHistory([]);
       setLastExport(null);
       setStructuredDataSummary(null);
       setSkippedLanguages([]);
       setLoadingHistory(false);
       setHistoryFailed(false);
-      return;
     }
+  }
+
+  useEffect(() => {
+    if (!activeProject?.id) return;
 
     const gate = gateRef.current;
     const token = gate.start();
     const projectId = activeProject.id;
 
-    setLoadingHistory(true);
     getExportHistory(projectId)
       .then((result) => {
         if (!gate.isCurrent(token)) return;
