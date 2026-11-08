@@ -58,6 +58,16 @@ export default function WidgetList({
   const { tTheme } = useThemeLocale();
   const [activeId, setActiveId] = useState(null);
   const [collapsedWidgets, setCollapsedWidgets] = useState({});
+  // A page widget closed by hand opens again when it becomes the selected one,
+  // from the list or from outside it (a click in the preview), so its blocks
+  // stay reachable. Done while rendering, so the list scrolls to it already open.
+  const [lastSelectedWidgetId, setLastSelectedWidgetId] = useState(null);
+  if (selectedWidgetId !== lastSelectedWidgetId) {
+    setLastSelectedWidgetId(selectedWidgetId);
+    if (selectedWidgetId && collapsedWidgets[selectedWidgetId]) {
+      setCollapsedWidgets((prev) => ({ ...prev, [selectedWidgetId]: false }));
+    }
+  }
 
   // WidgetSelector modal state
   const [isWidgetSelectorOpen, setIsWidgetSelectorOpen] = useState(false);
@@ -278,19 +288,6 @@ export default function WidgetList({
       }
     }
   }, [selectedWidgetId, selectedGlobalWidgetId]);
-
-  // Keep externally selected content widgets expanded so their blocks remain accessible.
-  useEffect(() => {
-    if (!selectedWidgetId) return;
-
-    setCollapsedWidgets((prev) => {
-      if (!prev[selectedWidgetId]) return prev;
-      return {
-        ...prev,
-        [selectedWidgetId]: false,
-      };
-    });
-  }, [selectedWidgetId]);
 
   const activeWidget = activeId ? sortableWidgets.find((item) => item.id === activeId) : null;
   const activeWidgetSchema = activeWidget ? widgetSchemas[activeWidget.type] || {} : {};
