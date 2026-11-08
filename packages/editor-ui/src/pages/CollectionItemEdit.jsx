@@ -29,6 +29,16 @@ export default function CollectionItemEdit() {
   const [schema, setSchema] = useState(null);
   const [item, setItem] = useState(null);
   const [loading, setLoading] = useState(true);
+  // The route can move to another item while this page stays mounted (a slug
+  // changed on save, another language); the form waits for that item. Set
+  // while rendering, so the previous item's form never shows for a moment.
+  const itemKey = JSON.stringify([type, slug, language]);
+  const [loadingFor, setLoadingFor] = useState(itemKey);
+  if (loadingFor !== itemKey) {
+    setLoadingFor(itemKey);
+    setItem(null);
+    setLoading(true);
+  }
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showBackAction, setShowBackAction] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
@@ -39,8 +49,6 @@ export default function CollectionItemEdit() {
 
   useEffect(() => {
     let cancelled = false;
-    setItem(null);
-    setLoading(true);
     Promise.all([getCollectionSchema(type), getCollectionItem(type, slug, language)])
       .then(([schemaData, itemData]) => {
         if (cancelled) return;
