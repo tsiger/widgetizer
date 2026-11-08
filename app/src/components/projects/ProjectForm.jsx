@@ -41,6 +41,9 @@ function toFormValues(initialData) {
   };
 }
 
+// presetsFor before the first render has set the presets state up for a theme.
+const PRESETS_NOT_SET = Symbol("presets not set");
+
 export default function ProjectForm({
   initialData = { name: "", description: "", siteTitle: "", theme: "", siteUrl: "", cleanUrls: false },
   onSubmit,
@@ -143,46 +146,58 @@ export default function ProjectForm({
     }
   });
 
-  const loadThemes = async () => {
-    try {
-      const response = await apiFetch("/api/themes");
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const data = await response.json();
-      setThemes(data);
-
-      // Auto-select Default theme for new projects
-      if (isNew && !initialData.theme) {
-        const defaultTheme = data.find((theme) => theme.id === "default" || theme.name.toLowerCase() === "default");
-        if (defaultTheme) {
-          setValue("theme", defaultTheme.id);
-        }
-      }
-    } catch {
-      showToast(t("forms.project.loadThemesError"), "error");
-    } finally {
-      setLoading(false);
-    }
-  };
-
   // Load themes and auto-select default
   useEffect(() => {
-    loadThemes();
+    (async () => {
+      try {
+        const response = await apiFetch("/api/themes");
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        setThemes(data);
+
+        // Auto-select Default theme for new projects
+        if (isNew && !initialData.theme) {
+          const defaultTheme = data.find((theme) => theme.id === "default" || theme.name.toLowerCase() === "default");
+          if (defaultTheme) {
+            setValue("theme", defaultTheme.id);
+          }
+        }
+      } catch {
+        showToast(t("forms.project.loadThemesError"), "error");
+      } finally {
+        setLoading(false);
+      }
+    })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // A new project's presets follow the chosen theme; an edit form, or no theme
+  // yet, has none. The presets state is reset while rendering (an effect that
+  // sets state straight away is what react-hooks/set-state-in-effect refuses),
+  // so it is right from the render the theme changes in; the form's own value,
+  // which lives outside React state, is set by the effect below.
+  const presetsKey = isNew && selectedTheme ? selectedTheme : null;
+  const [presetsFor, setPresetsFor] = useState(PRESETS_NOT_SET);
+  if (presetsFor !== presetsKey) {
+    setPresetsFor(presetsKey);
+    if (presetsKey) {
+      setPresetsLoading(true);
+    } else {
+      setPresets({ default: null, presets: [] });
+      setSelectedPreset(null);
+    }
+  }
 
   // Fetch presets when theme selection changes
   useEffect(() => {
     if (!isNew || !selectedTheme) {
-      setPresets({ default: null, presets: [] });
-      setSelectedPreset(null);
       setValue("preset", "");
       return;
     }
 
-    const fetchPresets = async () => {
-      setPresetsLoading(true);
+    (async () => {
       try {
         const data = await getThemePresets(selectedTheme);
         setPresets(data);
@@ -202,9 +217,7 @@ export default function ProjectForm({
       } finally {
         setPresetsLoading(false);
       }
-    };
-
-    fetchPresets();
+    })();
   }, [selectedTheme, isNew, setValue]);
 
   const showBusinessTab =

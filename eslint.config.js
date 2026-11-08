@@ -10,13 +10,6 @@ import requireScopeArg from "./eslint-rules/require-scope-arg.js";
 // Local-only plugin housing repo-specific lint rules.
 const local = { rules: { "require-scope-arg": requireScopeArg } };
 
-// React Compiler checks from eslint-plugin-react-hooks that flag existing editor
-// and shell code (36 places when 7.1.1 came in). Reported as warnings until that
-// code is reworked, one kind at a time; the other hooks rules stay errors.
-const reactCompilerFindingsAsWarnings = {
-  "react-hooks/set-state-in-effect": "warn",
-};
-
 // The plugin only warns when a component uses a library the React Compiler can't
 // memoize (react-hook-form's watch(), for one); refuse it, since nothing needs it.
 const reactCompilerIncompatibleLibraryAsError = { "react-hooks/incompatible-library": "error" };
@@ -159,7 +152,6 @@ export default [
       ...react.configs.recommended.rules,
       ...react.configs["jsx-runtime"].rules,
       ...reactHooks.configs.recommended.rules,
-      ...reactCompilerFindingsAsWarnings,
       ...reactCompilerIncompatibleLibraryAsError,
       ...jsxReferencesTrackedByEslint,
       "no-unused-vars": ["error", { argsIgnorePattern: "^_", varsIgnorePattern: "^_" }],
@@ -213,7 +205,6 @@ export default [
       ...react.configs.recommended.rules,
       ...react.configs["jsx-runtime"].rules,
       ...reactHooks.configs.recommended.rules,
-      ...reactCompilerFindingsAsWarnings,
       ...reactCompilerIncompatibleLibraryAsError,
       ...jsxReferencesTrackedByEslint,
       "no-unused-vars": ["error", { argsIgnorePattern: "^_", varsIgnorePattern: "^_" }],
