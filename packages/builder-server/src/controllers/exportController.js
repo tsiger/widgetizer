@@ -6,45 +6,12 @@ import { createKeyedSerializer } from "../utils/serializeByKey.js";
 import { getProjectFolderName } from "../utils/projectHelpers.js";
 import { handleProjectResolutionError } from "../utils/projectErrors.js";
 import { streamZipToResponse } from "../utils/zipResponse.js";
-import {
-  renderWidget,
-  renderPageLayout,
-  renderSharedAreas,
-  renderCollectionItemPage,
-  widgetSupportsTransparentHeader,
-  planPagination,
-} from "../services/renderingService.js";
-import {
-  listCollectionSchemas,
-  createCollectionReader,
-  loadCollectionTemplate,
-  loadCollectionItemsByUuid,
-} from "../services/collectionService.js";
-import {
-  listPagesFromDir,
-  readAreasFromDir,
-  readGlobalWidgetFromDir,
-  readThemeDataFromDir,
-} from "../utils/projectContentFs.js";
+import { buildRenderDeps } from "../services/renderingService.js";
+import { generateSite } from "../services/generateSite.js";
+import { createCollectionReader } from "../services/collectionService.js";
 import * as projectRepo from "../db/repositories/projectRepository.js";
-import { formatHtml, validateHtml, generateIssuesReport } from "../utils/htmlProcessor.js";
-import { buildSitemap, buildRobotsTxt } from "../services/seoArtifacts.js";
-import { generateExportSiteIcons } from "../utils/siteIconHelpers.js";
-import { buildFormsManifest } from "../services/formsManifestService.js";
-import TurndownService from "turndown";
-import { buildAssetVersionToken, splitAssetRef } from "@widgetizer/core/assetUrl";
-import { LIMIT_KEYS, MAX_FORMS_PER_SITE } from "@widgetizer/core/adapters";
-import { isHomeSlug, siteUrlBase, absoluteSiteUrl } from "@widgetizer/core/internalHref";
-import { resolveLanguage } from "@widgetizer/core/contentAddress";
-import { buildTranslations } from "@widgetizer/core/translations";
-import { outputPathPrefixFor, prefixInternalHref } from "@widgetizer/core/linkPrefixer";
-import { languageFolder, pageOutputPath, itemOutputPath as itemOutputPathFor } from "@widgetizer/core/contentAddress";
-import { projectLanguages } from "../utils/contentLanguage.js";
-import { identityReadiness } from "@widgetizer/core/siteIdentity";
-import { emptyArticleFields } from "@widgetizer/core/structuredData";
-import { listingParentStatus } from "@widgetizer/core/breadcrumbs";
-import { readThemeSetting } from "@widgetizer/core/themeSettingChanges";
-import { isRenderedWidget, RESERVED_WIDGET_IDS, renderedWidgetOrder, uniqueWidgetOrder } from "@widgetizer/core/widgetOrder";
+import { validateHtml, generateIssuesReport } from "../utils/htmlProcessor.js";
+import { buildAssetVersionToken } from "@widgetizer/core/assetUrl";
 
 function structuredDataIssueMessage(warning) {
   if (warning.code === "emptyArticleFields") {
@@ -56,12 +23,6 @@ function structuredDataIssueMessage(warning) {
   return "No page lists this collection, so this item's breadcrumb trail is Home → item. Add a listing widget for the collection to a page.";
 }
 import * as exportRepo from "../db/repositories/exportRepository.js";
-
-function rewriteStoragePaths(html, outputPathPrefix) {
-  return html
-    .replaceAll("/uploads/images/", `${outputPathPrefix}assets/images/`)
-    .replaceAll("/uploads/files/", `${outputPathPrefix}assets/files/`);
-}
 
 const PACKAGE_JSON_PATH = path.join(APP_ROOT, "package.json");
 let cachedAppVersion = null;
@@ -257,6 +218,57 @@ async function cleanupProjectExportsLocked(projectId) {
   return { deletedDirs: deletedDirs.length, deletedHistory: true, orphanedDirs };
 }
 
+/** The export's own words for each reason a site can't be generated. */
+function refusalFor(code, details) {
+  switch (code) {
+    case "NO_HOMEPAGE":
+      return exportRefusal(
+        'Your project must have a page with the slug "index" to serve as the homepage. Please create or rename a page to have the slug "index" before exporting.',
+        "Export failed: No homepage found",
+      );
+    case "TWO_HOMEPAGES": {
+      const { folder } = details;
+      return exportRefusal(
+        `The ${folder ? `"${folder}" ` : ""}pages include both "index" and "home". Both are published as the homepage (${folder ? `${folder}/` : ""}index.html), so one would replace the other. Rename one of them and export again.`,
+        "Export failed: two homepages",
+      );
+    }
+    case "INVALID_COLLECTION_ITEMS": {
+      const err = exportRefusal(
+        `Export blocked: ${details.items.length} collection item(s) have validation errors. Fix them before exporting.`,
+        "Export failed: invalid collection items",
+      );
+      err.validationErrors = details.items;
+      return err;
+    }
+    case "MISSING_COLLECTION_TEMPLATE":
+      return exportRefusal(
+        `Export blocked: collection(s) ${details.types.join(", ")} have hasItemPages: true with renderable items but no template.liquid. Add the template before exporting.`,
+        "Export failed: missing collection template",
+      );
+    case "HOMEPAGE_PAGES_CLASH": {
+      const { folder, pageDir, collection } = details;
+      const homepage = folder ? `Your "${folder}" homepage` : "Your homepage";
+      return exportRefusal(
+        `${homepage} is split into pages, published at ${pageDir}2.html, ${pageDir}3.html and so on. The "${collection.displayNamePlural || collection.type}" collection publishes its items in the same ${pageDir} folder. Turn off "Split into pages" on that homepage.`,
+        "Export failed: homepage pages clash with a collection",
+      );
+    }
+    case "COLLECTION_LANGUAGE_CLASH": {
+      const { code: language, collection } = details;
+      return exportRefusal(
+        `The "${collection.displayNamePlural || collection.type}" collection publishes its items in the ${language}/ folder, where your "${language}" pages are published, so they could overwrite each other. Your theme sets that folder name, so exporting this site needs a theme version that publishes the collection elsewhere.`,
+        "Export failed: a collection clashes with a language",
+      );
+    }
+    case "INVALID_FORMS":
+      details.error.refusedBeforeWrite = true;
+      return details.error;
+    default:
+      return exportRefusal(`Export blocked (${code}).`, "Export failed");
+  }
+}
+
 /**
  * Exports a project to a directory of static HTML files with assets, sitemap, and robots.txt.
  * This is the core export logic used by the export endpoint.
@@ -284,9 +296,6 @@ export async function exportProjectToDir(projectId, options = {}, collectionDeps
 
   const projectFolderName = projectData.folderName;
   const projectDir = getProjectDir(projectFolderName);
-  const siteUrl = projectData.siteUrl || "";
-  const cleanUrls = !!projectData.cleanUrls;
-  const structuredData = { readiness: identityReadiness(projectData.siteIdentity, projectData), warnings: [] };
 
   const version = exportRepo.getNextVersion(projectId);
   const appVersion = await getAppVersion();
@@ -307,7 +316,7 @@ export async function exportProjectToDir(projectId, options = {}, collectionDeps
     const collectionStorage = collectionDeps?.storage || null;
     const collectionScope = collectionDeps?.scope || null;
     const collectionsEnabled = !!(collectionStorage && collectionScope);
-    // One read per collection for the whole export, so every consumer below sees the same items.
+    // One read per collection for the whole export, so every consumer sees the same items.
     const collectionSnapshot = new Map();
     const collectionReader = collectionsEnabled
       ? createCollectionReader({
@@ -318,741 +327,37 @@ export async function exportProjectToDir(projectId, options = {}, collectionDeps
         })
       : null;
     const renderCollectionDeps = collectionsEnabled ? { ...collectionDeps, snapshot: collectionSnapshot } : collectionDeps;
+    const deps = await buildRenderDeps(projectId, renderCollectionDeps);
 
-    // --- Read-only setup + ALL fail-fast validation BEFORE any disk write, so a
-    // blocked export (missing homepage / invalid collection items / missing
-    // template) leaves no output directory, favicon, or manifest behind. Nothing
-    // below touches disk until the "validation passed" marker. ---
-    const rawThemeSettings = await readThemeDataFromDir(projectDir);
-
-    // Fetch list of page data using the helper function
-    const defaultLanguage = projectData.defaultLanguage;
-    const pageLang = (pageData) => ({ language: pageData.language, defaultLanguage });
-    // A slug is unique per language, so anything keyed by page must key by the
-    // language-qualified output path rather than the id alone.
-    const pageIdentity = (pageData) => pageOutputPath(pageData.id, 1, pageLang(pageData));
-    const allPages = await listPagesFromDir(projectDir, { defaultLanguage });
-    const rootPages = allPages.filter((pageData) => !languageFolder(pageLang(pageData)));
-
-    // The default language needs a homepage: a page slugged "index" or "home",
-    // both of which publish as index.html. page.id is the filename, the
-    // authoritative slug.
-    const hasIndexPage = rootPages.some((page) => isHomeSlug(page.id));
-    if (!hasIndexPage) {
-      throw exportRefusal(
-        'Your project must have a page with the slug "index" to serve as the homepage. Please create or rename a page to have the slug "index" before exporting.',
-        "Export failed: No homepage found",
-      );
-    }
-
-    // `index` and `home` both publish as the language's index.html, so a language
-    // holding both would publish one over the other. The editor refuses the pair,
-    // but older projects, imports and theme updates can still carry one.
-    for (const language of new Set(allPages.map((pageData) => pageData.language))) {
-      const homes = allPages.filter((pageData) => pageData.language === language && isHomeSlug(pageData.id));
-      if (homes.length < 2) continue;
-      const folder = languageFolder(pageLang(homes[0]));
-      throw exportRefusal(
-        `The ${folder ? `"${folder}" ` : ""}pages include both "index" and "home". Both are published as the homepage (${folder ? `${folder}/` : ""}index.html), so one would replace the other. Rename one of them and export again.`,
-        "Export failed: two homepages",
-      );
-    }
-
-    // An enabled language is not an exportable one (§7b). A non-default language
-    // with no homepage is left out of the export entirely and named in the
-    // result: a site with `/el/contact` but no `/el/` sends visitors nowhere.
-    // The DEFAULT language is not subject to this — a missing root homepage
-    // failed the whole export above, because skipping it would publish a site
-    // with no `/` at all. One rule, no readiness state machine.
-    const languageWarnings = [];
-    const exportLanguages = [resolveLanguage("", defaultLanguage)];
-    for (const language of projectLanguages(projectData).languages) {
-      const hasHome = allPages.some(
-        (pageData) => pageData.language === language && isHomeSlug(pageData.id),
-      );
-      if (hasHome) exportLanguages.push(language);
-      else languageWarnings.push({ code: "LANGUAGE_SKIPPED", language });
-    }
-
-    const exported = new Set(exportLanguages);
-    const pagesDataArray = allPages.filter((pageData) =>
-      exported.has(resolveLanguage(pageData.language, defaultLanguage)),
-    );
-    // Link resolution must see the site being PUBLISHED, not the project on
-    // disk. The render engine loads this map itself when nobody supplies one,
-    // and that load reads every page in every language — so a link into a
-    // skipped language (§7b) would resolve to a real-looking href for a file
-    // the export never writes. Seeding it here with the exported pages alone
-    // makes such a target read as absent, and it is cleared exactly like a
-    // deleted one. Built once: the page loop below would otherwise re-read the
-    // whole pages directory for every page it renders.
-    const pagesByUuidForExport = new Map();
-    for (const pageData of pagesDataArray) {
-      if (pageData.uuid) pagesByUuidForExport.set(pageData.uuid, pageData);
-    }
-    // The same rule for collection items, expressed as the language contexts
-    // their loader reads. Stable item refs resolve `link`/`menu` settings and
-    // richtext anchors on pages and on item pages alike, so the map is built
-    // once here and shared by both render loops.
-    const exportLanguageContexts = exportLanguages.map((language) => ({ language, defaultLanguage }));
-    // null, not an empty Map, when there are no collections: "no map" means the
-    // renderer cannot resolve item refs and must leave stored hrefs alone, while
-    // an empty map means it looked and found nothing — which neutralizes every
-    // item anchor.
-    const collectionItemsByUuidForExport = collectionsEnabled
-      ? await loadCollectionItemsByUuid(collectionStorage, collectionScope, collectionReader, exportLanguageContexts)
-      : null;
-
-    // Two-pass collection validation (fail-fast): gather every invalid item across
-    // all collections up front and refuse the export with a full per-item-per-field
-    // error list. Also preflight templates. No HTML is written when this trips.
-    // `manifestCollections` (every collection) feeds manifest.json; `seoItemsByPrefix`
-    // (valid items of hasItemPages collections, in listing order) feeds sitemap/robots
-    // and the item-page render loop.
-    const collectionSchemas = collectionsEnabled ? await listCollectionSchemas(collectionStorage, collectionScope) : [];
-    const manifestCollections = [];
-    const seoItemsByPrefix = new Map();
-    const invalidCollectionItems = [];
-    const missingTemplates = [];
-    for (const schema of collectionSchemas) {
-      // Every language the export is about to write is validated, not just the
-      // default one: an untranslated required field is a broken page whichever
-      // language it is in, and silently dropping the item would publish a site
-      // with a hole and no word about it.
-      let renderableInAnyLanguage = 0;
-      const itemCountByLanguage = {};
-      for (const language of exportLanguages) {
-        const lang = { language, defaultLanguage };
-        const items = await collectionReader.sorted(schema.type, {}, lang);
-        itemCountByLanguage[language] = items.length;
-        for (const item of items) {
-          if (item.invalid) {
-            // Enough to name the item on screen and open it: the collection's own
-            // name, the item's title and the label of each field to fill in.
-            const fieldLabels = new Map((schema.settings || []).map((setting) => [setting.id, setting.label]));
-            invalidCollectionItems.push({
-              collection: schema.type,
-              collectionName: schema.displayName || schema.displayNamePlural || schema.type,
-              slug: item.slug,
-              title: item.title,
-              language,
-              errors: item.validationErrors.map((error) => ({
-                ...error,
-                fieldLabel: fieldLabels.get(error.fieldId) || error.fieldId,
-              })),
-            });
-          }
-        }
-        if (!schema.hasItemPages) continue;
-
-        const validItems = items.filter((item) => !item.invalid);
-        renderableInAnyLanguage += validItems.length;
-        if (validItems.length) {
-          if (!seoItemsByPrefix.has(schema.slugPrefix)) seoItemsByPrefix.set(schema.slugPrefix, []);
-          seoItemsByPrefix.get(schema.slugPrefix).push(...validItems);
-        }
-      }
-      // The manifest describes the site that was published, so the total spans
-      // every exported language — as `itemPages` beside it always has. The
-      // per-language breakdown is what makes the total checkable: a reader that
-      // only wants one language's number no longer has to guess which one the
-      // total meant.
-      manifestCollections.push({
-        type: schema.type,
-        itemPages: !!schema.hasItemPages,
-        itemCount: Object.values(itemCountByLanguage).reduce((sum, count) => sum + count, 0),
-        itemCountByLanguage,
-      });
-      // A hasItemPages collection with renderable items but no template.liquid
-      // must fail BEFORE any disk write, not midway with partial artifacts.
-      if (schema.hasItemPages && renderableInAnyLanguage > 0) {
-        const template = await loadCollectionTemplate(collectionStorage, collectionScope, schema.type);
-        if (template === null) missingTemplates.push(schema.type);
-      }
-    }
-    if (invalidCollectionItems.length > 0) {
-      const err = exportRefusal(
-        `Export blocked: ${invalidCollectionItems.length} collection item(s) have validation errors. Fix them before exporting.`,
-        "Export failed: invalid collection items",
-      );
-      err.validationErrors = invalidCollectionItems;
-      throw err;
-    }
-    if (missingTemplates.length > 0) {
-      throw exportRefusal(
-        `Export blocked: collection(s) ${missingTemplates.join(", ")} have hasItemPages: true with renderable items but no template.liquid. Add the template before exporting.`,
-        "Export failed: missing collection template",
-      );
-    }
-
-    const paginationPlans = new Map();
-    if (collectionsEnabled) {
-      for (const pageData of pagesDataArray) {
-        const plan = await planPagination(
-          projectId,
-          pageData.widgets,
-          pageData.widgetsOrder,
-          { pageSlug: pageData.id, language: pageData.language },
-          renderCollectionDeps,
-        );
-        if (plan) paginationPlans.set(pageIdentity(pageData), plan);
-      }
-    }
-    const pageCounts = new Map(
-      pagesDataArray
-        .filter((pageData) => paginationPlans.has(pageIdentity(pageData)))
-        .map((pageData) => [pageIdentity(pageData), paginationPlans.get(pageIdentity(pageData)).total]),
-    );
-
-    // A split homepage publishes its copies at <language folder>/page/N.html, and
-    // a collection prefixed "page" publishes that language's items in the same
-    // folder, so one would silently overwrite the other. Checked per language:
-    // every language has its own homepage and its own copy of every collection.
-    const pageCollection = collectionSchemas.find((schema) => schema.hasItemPages && schema.slugPrefix === "page");
-    const splitHomepage = pageCollection
-      ? pagesDataArray.find((pageData) => isHomeSlug(pageData.id) && paginationPlans.has(pageIdentity(pageData)))
-      : null;
-    if (splitHomepage) {
-      const folder = languageFolder(pageLang(splitHomepage));
-      const pageDir = folder ? `${folder}/page/` : "page/";
-      const homepage = folder ? `Your "${folder}" homepage` : "Your homepage";
-      throw exportRefusal(
-        `${homepage} is split into pages, published at ${pageDir}2.html, ${pageDir}3.html and so on. The "${pageCollection.displayNamePlural || pageCollection.type}" collection publishes its items in the same ${pageDir} folder. Turn off "Split into pages" on that homepage.`,
-        "Export failed: homepage pages clash with a collection",
-      );
-    }
-
-    // A language publishes into a folder named by its code, and a collection's
-    // main-language items publish into a folder named by its slugPrefix. When the
-    // two names match, items and that language's pages share one folder and can
-    // overwrite each other. Adding a language refuses this; a theme update or an
-    // older project can still bring it in.
-    const exportedFolders = new Set(exportLanguages.map((language) => languageFolder({ language, defaultLanguage })));
-    const languageCollection = collectionSchemas.find(
-      (schema) => schema.hasItemPages && exportedFolders.has(schema.slugPrefix),
-    );
-    if (languageCollection) {
-      const code = languageCollection.slugPrefix;
-      throw exportRefusal(
-        `The "${languageCollection.displayNamePlural || languageCollection.type}" collection publishes its items in the ${code}/ folder, where your "${code}" pages are published, so they could overwrite each other. Your theme sets that folder name, so exporting this site needs a theme version that publishes the collection elsewhere.`,
-        "Export failed: a collection clashes with a language",
-      );
-    }
-
-    // Forms are checked here, with the other refusals, so an invalid form stops
-    // the export before its first file. The distinct-forms ceiling comes from the
-    // limits adapter (OSS: Infinity); the hosted-contract default applies when no
-    // adapter is wired. A limits adapter that throws is a failure, not a refusal.
-    const formsCap = await collectionDeps?.limits?.getLimit?.(collectionScope, LIMIT_KEYS.MAX_FORMS_PER_SITE);
-    const maxForms = typeof formsCap === "number" && formsCap > 0 ? formsCap : MAX_FORMS_PER_SITE;
-    let formsResult;
-    try {
-      formsResult = buildFormsManifest(pagesDataArray, appVersion, maxForms, { defaultLanguage });
-    } catch (error) {
-      if (Number.isInteger(error?.statusCode)) error.refusedBeforeWrite = true;
-      throw error;
-    }
-    const { manifest: formsManifest, warnings: formsWarnings } = formsResult;
-    for (const warning of formsWarnings) {
-      console.warn(`[forms manifest] ${warning}`);
-    }
-
-    // --- Validation passed: from here on, disk writes are safe ---
-    // emptyDir, not ensureDir: a crash leftover (or a version number freed by
-    // a failed delete) can leave stale files at this path, and they must not
-    // survive into the new bundle.
-    await fs.emptyDir(outputDir);
-    await fs.ensureDir(outputAssetsDir);
-    await fs.ensureDir(outputImagesDir);
-    // Sitemap and robots describe every language the export publishes, and the
-    // alternates come from the same `translations` a page's own hreflang does.
-    const seoItemPages = [...seoItemsByPrefix].map(([slugPrefix, items]) => ({ slugPrefix, items }));
-    const seoOptions = {
-      defaultLanguage,
-      translationsOf: (current, kind, slugPrefix) =>
-        buildTranslations({
-          current,
-          kind,
-          slugPrefix,
-          pages: pagesDataArray,
-          items: seoItemsByPrefix.get(slugPrefix) || [],
-          languages: exportLanguages,
-          defaultLanguage,
-          cleanUrls,
-          siteUrl,
-        }),
-    };
-
-    const generatedSiteIcons = await generateExportSiteIcons({
-      outputDir,
-      projectDir,
-      projectName: projectData.name,
-      siteTitle: projectData.siteTitle,
-      siteIconSrc: readThemeSetting(rawThemeSettings, { group: "general", id: "favicon" }) || "",
-    });
-
-    // --- Generate sitemap.xml and robots.txt (shared pure builders; collection
-    // item pages included via seoItemPages) ---
-    if (siteUrl && siteUrl.trim() !== "") {
-      try {
-        const sitemapXml = await buildSitemap(pagesDataArray, siteUrl, seoItemPages, cleanUrls, pageCounts, seoOptions);
-        if (sitemapXml) {
-          await fs.writeFile(path.join(outputDir, "sitemap.xml"), sitemapXml);
-        }
-        const robotsTxt = buildRobotsTxt(pagesDataArray, siteUrl, seoItemPages, cleanUrls, pageCounts, seoOptions);
-        if (robotsTxt) {
-          await fs.writeFile(path.join(outputDir, "robots.txt"), robotsTxt);
-        }
-      } catch (err) {
-        console.warn(`Skipping sitemap/robots generation due to invalid siteUrl: ${siteUrl}`, err.message);
-      }
-    } else {
-      console.warn(`Project ${projectId} has no siteUrl defined. Skipping sitemap.xml and robots.txt generation.`);
-    }
-    // --- End of new SEO file generation ---
-
-    // The markdown alternate links below are absolute when there is a usable Site
-    // URL base, and relative otherwise. Same gate as the canonicals and the
-    // sitemap, so one unusable Site URL does not make some outputs absolute and
-    // others not.
-    const mdBase = siteUrlBase(siteUrl);
-
-    // A language's pages wear that language's header and footer — they are
-    // per-language singletons (§5), not one set for the whole site.
-    const globalsByLanguage = new Map();
-    for (const language of exportLanguages) {
-      const lang = { language, defaultLanguage };
-      globalsByLanguage.set(language, {
-        header: await readGlobalWidgetFromDir(projectDir, "header", lang),
-        footer: await readGlobalWidgetFromDir(projectDir, "footer", lang),
-        // Read once per language, like the header: every page of the export shows
-        // the same saved areas even if one is edited meanwhile. Rendered per page,
-        // since active menu items and relative links depend on the page.
-        areas: await readAreasFromDir(projectDir, lang),
-      });
-    }
-    const globalsFor = (language) =>
-      globalsByLanguage.get(resolveLanguage(language, defaultLanguage)) || { header: null, footer: null, areas: {} };
-
-    // Handle case where no pages are found (except for theme files etc)
-    if (pagesDataArray.length === 0) {
-      console.warn(`No exportable pages found for project ${projectId}. Only copying assets/images.`); // Updated log message
-      // Proceed to asset copying, but maybe indicate this in the response?
-    }
-
-    // Check if developer mode is enabled for HTML validation
     let devModeEnabled = false;
-    try {
-      const { getSetting } = await import("./appSettingsController.js");
-      devModeEnabled = await getSetting("developer.enabled");
-    } catch (error) {
-      console.warn("Could not check developer mode setting:", error.message);
-    }
-
-    // Track HTML validation issues across all pages (only when dev mode is on)
+    // HTML validation issues across all pages (only when developer mode is on).
     const validationIssues = [];
+    const report = {};
 
-    // Basenames of every asset enqueued while rendering pages and collection items.
-    // The project's widgets/ dir holds every theme widget's CSS/JS, used or not —
-    // this set is what lets the copy step below ship only the used ones.
-    // Keys are the raw enqueue `src`, which may carry an author query/fragment
-    // that the emitted URL keeps; the file on disk is named by the path part.
-    const enqueuedAssetFiles = new Set();
-    const collectEnqueuedAssets = (globals) => {
-      for (const src of globals.enqueuedStyles.keys()) enqueuedAssetFiles.add(path.basename(splitAssetRef(src).path));
-      for (const src of globals.enqueuedScripts.keys()) enqueuedAssetFiles.add(path.basename(splitAssetRef(src).path));
-    };
-
-    const pageRenders = pagesDataArray.flatMap((pageData) => {
-      const plan = paginationPlans.get(pageIdentity(pageData)) || null;
-      return Array.from({ length: plan ? plan.total : 1 }, (_, index) => ({ pageData, plan, pageNumber: index + 1 }));
-    });
-
-    for (const { pageData, plan, pageNumber } of pageRenders) {
-      const outputFilename = pageOutputPath(pageData.id, pageNumber, pageLang(pageData));
-      const { header: pageHeaderData, footer: pageFooterData, areas: pageAreasData } = globalsFor(pageData.language);
-      // Per page, not per export: a language with no header of its own must
-      // render none, not the last page's — whose links were built for that
-      // page's depth and language.
-      let headerHtml = "";
-      let footerHtml = "";
-      // Create shared globals for this page (each page gets fresh enqueue Maps)
-      const sharedGlobals = {
-        projectId,
-        apiUrl: "",
-        renderMode: "publish",
-        themeSettingsRaw: rawThemeSettings,
-        siteIcons: generatedSiteIcons,
-        enqueuedStyles: new Map(),
-        enqueuedScripts: new Map(),
-        assetVersion, // For cache busting
-        currentCanonicalPath: pageOutputPath(pageData.id, 1, pageLang(pageData)),
-        currentPageData: pageData,
-        // Seeded, not loaded: see pagesByUuidForExport above. Without these the
-        // engine would resolve links against every language on disk, including
-        // the ones this export refused to publish.
-        pagesByUuid: pagesByUuidForExport,
-        collectionItemsByUuid: collectionItemsByUuidForExport,
-        // The flag snapshotted above, so a toggle landing mid-export cannot
-        // split this page's links/canonical from the sitemap or other pages.
-        cleanUrls,
-        outputPathPrefix: outputPathPrefixFor(outputFilename),
-        ...(plan ? { paginationPlan: { ...plan, current: pageNumber } } : {}),
-      };
-
-      // Render header if exists (for each page to capture enqueued assets)
-      if (pageHeaderData) {
-        headerHtml = await renderWidget(projectId, "header", pageHeaderData, rawThemeSettings, "publish", sharedGlobals, null, renderCollectionDeps);
-      }
-
-      // Render page-specific widgets sequentially
-      let pageWidgetsHtml = "";
-      let widgetIndex = 0;
-      // The widgets the page shows, as every render picks them (see
-      // renderedWidgetOrder); an order entry with no widget behind it is reported.
-      const candidates = Array.isArray(pageData.widgetsOrder)
-        ? uniqueWidgetOrder(pageData.widgetsOrder)
-        : Object.keys(pageData.widgets || {});
-      for (const widgetId of candidates) {
-        if (!isRenderedWidget(pageData.widgets, widgetId)) {
-          // A hand-made order can hold anything; only a missing widget is worth a word.
-          if (typeof widgetId === "string" && !RESERVED_WIDGET_IDS.includes(widgetId)) {
-            console.warn(` -> Widget data missing for ID: ${widgetId} on page ${pageData.id}`);
-          }
-          continue;
-        }
-        const widget = pageData.widgets[widgetId];
-        widgetIndex += 1; // 1-based index (first widget = 1, second = 2, etc.)
-        pageWidgetsHtml += await renderWidget(
-          projectId,
-          widgetId,
-          widget,
-          rawThemeSettings,
-          "publish",
-          sharedGlobals,
-          widgetIndex,
-          renderCollectionDeps,
-        );
-      }
-
-      // Render footer if exists
-      if (pageFooterData) {
-        footerHtml = await renderWidget(projectId, "footer", pageFooterData, rawThemeSettings, "publish", sharedGlobals, null, renderCollectionDeps);
-      }
-
-      const sharedAreas = await renderSharedAreas(
-        projectId,
-        pageAreasData,
-        rawThemeSettings,
-        "publish",
-        sharedGlobals,
-        renderCollectionDeps,
-      );
-
-      // Determine if transparent header should be active for this page
-      let extraBodyClasses = "";
-      if (pageHeaderData?.settings?.transparent_on_hero) {
-        // Over the first widget the page shows.
-        const firstWidgetId = renderedWidgetOrder(pageData.widgets, pageData.widgetsOrder)[0];
-        const firstWidget = firstWidgetId && pageData.widgets[firstWidgetId];
-        if (firstWidget && await widgetSupportsTransparentHeader(projectId, firstWidget.type)) {
-          extraBodyClasses = "transparent-header";
-        }
-      }
-
-      // Pass separated content sections to layout
-      const renderedHtml = await renderPageLayout(
-        projectId,
-        {
-          headerContent: headerHtml,
-          mainContent: pageWidgetsHtml,
-          footerContent: footerHtml,
-          sharedAreas,
-          extraBodyClasses,
-        },
-        pageData,
-        rawThemeSettings,
-        "publish",
-        sharedGlobals,
-        renderCollectionDeps,
-      );
-
-      collectEnqueuedAssets(sharedGlobals);
-
-      // Format HTML using Prettier
-      const formatResult = await formatHtml(renderedHtml);
-      let processedHtml = formatResult.html;
-      if (!formatResult.success) {
-        console.warn(`Could not format HTML for ${pageData.id}.html: ${formatResult.error}. Writing unformatted HTML.`);
-      }
-
-      // Rewrite any remaining /uploads/ storage paths to their published asset locations.
-      // Dedicated tags ({% image %}) already use the publish-mode base path, but generic
-      // link fields store the raw storage path which needs rewriting here.
-      processedHtml = rewriteStoragePaths(processedHtml, sharedGlobals.outputPathPrefix);
-
-      // Validate HTML (only when developer mode is enabled)
-      if (devModeEnabled) {
-        const validation = await validateHtml(processedHtml, pageData.id);
-        if (validation.issues.length > 0) {
-          validationIssues.push({
-            page: pageData.id,
-            filename: outputFilename,
-            issues: validation.issues,
-          });
-        }
-      }
-
-      const appVersion = await getAppVersion();
-
-      // Add easter egg ASCII art comment before doctype
-      const easterEggComment = `<!--
-Made with Widgetizer v${appVersion}
-Per aspera ad astra
--->
-`;
-      // Prepend easter egg at the very beginning of the HTML
-      processedHtml = easterEggComment + processedHtml;
-
-      const outputFilePath = path.join(outputDir, outputFilename);
-
-      // Inject markdown alternate link into <head> when markdown export is enabled
-      // The markdown twin sits beside its page, language folder included; a
-      // relative alternate link is depth-prefixed like every other internal link.
-      const mdFilename = outputFilename.replace(/\.html$/, ".md");
-      if (exportMarkdown && pageNumber === 1) {
-        const mdHref = mdBase
-          ? absoluteSiteUrl(siteUrl, mdFilename)
-          : prefixInternalHref(mdFilename, sharedGlobals.outputPathPrefix);
-        processedHtml = processedHtml.replace("</head>", `  <link rel="alternate" type="text/markdown" href="${mdHref}">\n</head>`);
-      }
-
-      // Write the processed (and potentially formatted) HTML file
-      await fs.outputFile(outputFilePath, processedHtml);
-
-      // Generate markdown version (content only, no layout) - if enabled
-      if (exportMarkdown && pageNumber === 1) {
-        try {
-          const turndown = new TurndownService({
-            headingStyle: "atx",
-            codeBlockStyle: "fenced",
-            bulletListMarker: "-",
-          });
-          // Remove non-content elements (they don't make sense in markdown)
-          turndown.remove(["style", "script", "noscript", "form", "input", "button", "select", "textarea"]);
-          // Strip style/script/form tags and placeholder images from HTML
-          const cleanHtml = pageWidgetsHtml
-            .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, "")
-            .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, "")
-            .replace(/<form[^>]*>[\s\S]*?<\/form>/gi, "")
-            .replace(/<img[^>]*src=["'][^"']*placeholder[^"']*["'][^>]*>/gi, "");
-          const markdownContent = turndown.turndown(cleanHtml);
-
-          // Add YAML frontmatter
-          const frontmatter = [
-            "---",
-            `title: ${pageData.name || pageData.id}`,
-            `description: ${pageData.seo?.description || pageData.description || ""}`,
-            "source_url:",
-            `  html: '${outputFilename}'`,
-            `  md: '${mdFilename}'`,
-            "---",
-            "",
-            "",
-          ].join("\n");
-
-          await fs.outputFile(path.join(outputDir, mdFilename), frontmatter + markdownContent);
-        } catch (mdError) {
-          console.warn(`Could not generate markdown for ${pageData.id}: ${mdError.message}`);
-        }
+    async function prepareOutputDir() {
+      // emptyDir, not ensureDir: a crash leftover (or a version number freed by
+      // a failed delete) can leave stale files at this path, and they must not
+      // survive into the new bundle.
+      await fs.emptyDir(outputDir);
+      await fs.ensureDir(outputAssetsDir);
+      await fs.ensureDir(outputImagesDir);
+      try {
+        const { getSetting } = await import("./appSettingsController.js");
+        devModeEnabled = await getSetting("developer.enabled");
+      } catch (error) {
+        console.warn("Could not check developer mode setting:", error.message);
       }
     }
 
-    // --- Render collection item pages (docs-llms/core-collections.md §6) ---
-    // For each hasItemPages collection, render every valid item to
-    // {slugPrefix}/{itemSlug}.html with fresh per-item globals (no asset bleed),
-    // the full header/footer/layout wrap, and the same HTML post-processing pages
-    // receive — at the depth of each item's output path. Runs
-    // BEFORE the validation report so item-page issues are included in it.
-    if (collectionsEnabled) {
-      const itemAppVersion = await getAppVersion();
-      const itemEasterEgg = `<!--\nMade with Widgetizer v${itemAppVersion}\nPer aspera ad astra\n-->\n`;
-
-      for (const schema of collectionSchemas) {
-        if (!schema.hasItemPages) continue;
-
-        // Renderable in ANY exported language: a template is required because
-        // something will be written, and a collection empty in every language
-        // needs none.
-        const itemsByLanguage = new Map();
-        let renderable = 0;
-        for (const language of exportLanguages) {
-          const langItems = await collectionReader.sorted(schema.type, {}, { language, defaultLanguage });
-          const valid = langItems.filter((item) => !item.invalid);
-          itemsByLanguage.set(language, valid);
-          renderable += valid.length;
-        }
-        if (renderable === 0) continue;
-
-        // Template existence was preflighted in the two-pass validation; re-check
-        // defensively so a race can never write partial output.
-        const template = await loadCollectionTemplate(collectionStorage, collectionScope, schema.type);
-        if (template === null) {
-          const err = new Error(
-            `Collection "${schema.type}" has hasItemPages: true but no template.liquid file at collection-types/${schema.type}/template.liquid`,
-          );
-          err.statusCode = 400;
-          err.errorTitle = "Export failed: missing collection template";
-          throw err;
-        }
-
-        // A collection's items are per language exactly as pages are, and each
-        // language's item pages wear that language's header and footer.
-        for (const language of exportLanguages) {
-          const lang = { language, defaultLanguage };
-          const { header: itemHeaderData, footer: itemFooterData, areas: itemAreasData } = globalsFor(language);
-          const validItems = itemsByLanguage.get(language) || [];
-          if (validItems.length === 0) continue;
-
-          const collectionOutputDir = path.join(outputDir, languageFolder(lang), schema.slugPrefix);
-          await fs.ensureDir(collectionOutputDir);
-
-          for (const item of validItems) {
-            const itemOutputPath = itemOutputPathFor(schema.slugPrefix, item.slug, lang);
-            // Fresh globals per item so enqueued assets never bleed between items.
-            const sharedGlobals = {
-              projectId,
-              apiUrl: "",
-              renderMode: "publish",
-              themeSettingsRaw: rawThemeSettings,
-              siteIcons: generatedSiteIcons,
-              enqueuedStyles: new Map(),
-              enqueuedScripts: new Map(),
-              collectionCache: new Map(),
-              pagesByUuid: pagesByUuidForExport,
-              collectionItemsByUuid: collectionItemsByUuidForExport,
-              assetVersion,
-              outputPathPrefix: outputPathPrefixFor(itemOutputPath),
-              currentCanonicalPath: itemOutputPath,
-              cleanUrls,
-            };
-
-            // One shared pipeline renders the item page — header/footer + resolved
-            // item + template + layout — identical to the page path. Everything
-            // below (format, storage-path rewrite, markdown) stays export-specific.
-            const {
-              html: itemHtmlRendered,
-              mainContentHtml: itemContentHtml,
-              itemPageData,
-            } = await renderCollectionItemPage(
-              projectId,
-              {
-                schema,
-                item,
-                template,
-                rawThemeSettings,
-                renderMode: "publish",
-                sharedGlobals,
-                headerData: itemHeaderData,
-                footerData: itemFooterData,
-                areasData: itemAreasData,
-                projectData,
-                siteUrl,
-              },
-              renderCollectionDeps,
-            );
-            collectEnqueuedAssets(sharedGlobals);
-            let itemHtml = itemHtmlRendered;
-
-            const emptyFields = emptyArticleFields(itemPageData.collectionItem);
-            if (emptyFields.length) {
-              structuredData.warnings.push({ path: itemOutputPath, code: "emptyArticleFields", fields: emptyFields });
-            }
-            if (sharedGlobals.listingPages) {
-              const listing = listingParentStatus(
-                sharedGlobals.listingPages.get(schema.type),
-                sharedGlobals.pagesByUuid || new Map(),
-                item.language,
-              );
-              if (listing !== "resolved") {
-                structuredData.warnings.push({
-                  path: itemOutputPath,
-                  code: listing === "ambiguous" ? "ambiguousListingPage" : "noListingPage",
-                });
-              }
-            }
-
-            const itemFormat = await formatHtml(itemHtml);
-            itemHtml = itemFormat.html;
-            if (!itemFormat.success) {
-              console.warn(`Could not format HTML for ${schema.slugPrefix}/${item.slug}.html: ${itemFormat.error}.`);
-            }
-
-            itemHtml = rewriteStoragePaths(itemHtml, sharedGlobals.outputPathPrefix);
-
-            if (devModeEnabled) {
-              const validation = await validateHtml(itemHtml, `${schema.slugPrefix}/${item.slug}`);
-              if (validation.issues.length > 0) {
-                validationIssues.push({
-                  page: `${schema.slugPrefix}/${item.slug}`,
-                  filename: `${schema.slugPrefix}/${item.slug}.html`,
-                  issues: validation.issues,
-                });
-              }
-            }
-
-            itemHtml = itemEasterEgg + itemHtml;
-
-            // Markdown alternate link → the item's .md (same dir; absolute when siteUrl valid).
-            if (exportMarkdown) {
-              // Relative fallback stays same-dir (the item's own folder); the
-              // absolute form carries the collection prefix.
-              const mdHref = mdBase
-                ? absoluteSiteUrl(siteUrl, itemOutputPath.replace(/\.html$/, ".md"))
-                : `${item.slug}.md`;
-              itemHtml = itemHtml.replace("</head>", `  <link rel="alternate" type="text/markdown" href="${mdHref}">\n</head>`);
-            }
-
-            await fs.outputFile(path.join(collectionOutputDir, `${item.slug}.html`), itemHtml);
-
-            // Markdown parity: content-only .md alongside the item HTML.
-            if (exportMarkdown) {
-              try {
-                const turndown = new TurndownService({
-                  headingStyle: "atx",
-                  codeBlockStyle: "fenced",
-                  bulletListMarker: "-",
-                });
-                turndown.remove(["style", "script", "noscript", "form", "input", "button", "select", "textarea"]);
-                const cleanHtml = itemContentHtml
-                  .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, "")
-                  .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, "")
-                  .replace(/<form[^>]*>[\s\S]*?<\/form>/gi, "")
-                  .replace(/<img[^>]*src=["'][^"']*placeholder[^"']*["'][^>]*>/gi, "");
-                const itemMarkdown = turndown.turndown(cleanHtml);
-                const frontmatter = [
-                  "---",
-                  `title: ${itemPageData.name || item.slug}`,
-                  `description: ${itemPageData.seo?.description || ""}`,
-                  `collection: ${schema.type}`,
-                  `slug: ${item.slug}`,
-                  "source_url:",
-                  `  html: '${item.slug}.html'`,
-                  `  md: '${item.slug}.md'`,
-                  "---",
-                  "",
-                  "",
-                ].join("\n");
-                await fs.outputFile(path.join(collectionOutputDir, `${item.slug}.md`), frontmatter + itemMarkdown);
-              } catch (mdError) {
-                console.warn(`Could not generate markdown for ${schema.slugPrefix}/${item.slug}: ${mdError.message}`);
-              }
-            }
-          }
-        }
-      }
+    async function collectValidationIssues(html, { page, filename }) {
+      if (!devModeEnabled) return;
+      const validation = await validateHtml(html, page);
+      if (validation.issues.length > 0) validationIssues.push({ page, filename, issues: validation.issues });
     }
 
+    // After the pages and items, so their issues are in the report.
+    async function writeReportAndCopyAssets() {
+    const { structuredData } = report;
     if (devModeEnabled) {
       const missing = structuredData.readiness.filter((entry) => !entry.ok).map((entry) => entry.item);
       if (missing.length) {
@@ -1136,35 +441,10 @@ Per aspera ad astra
     } catch (coreAssetError) {
       console.warn("Could not copy core placeholder assets:", coreAssetError.message);
     }
-
-    // --- Copy Widget Assets (CSS/JS) ---
-    const projectWidgetsDir = path.join(projectDir, "widgets");
-    try {
-      if (await fs.pathExists(projectWidgetsDir)) {
-        // Recursively find .css and .js files in the widgets directory (any case,
-        // matching what the asset tags treat as a stylesheet/script)
-        const widgetAssetFiles = await findFilesRecursive(projectWidgetsDir, [/\.css$/i, /\.js$/i]);
-
-        // Copy only assets a rendered page actually enqueued — the widgets dir
-        // holds every theme widget's CSS/JS, whether the site uses it or not.
-        for (const sourcePath of widgetAssetFiles) {
-          const filename = path.basename(sourcePath);
-          if (!enqueuedAssetFiles.has(filename)) continue;
-          const destPath = path.join(outputAssetsDir, filename);
-          try {
-            await fs.copy(sourcePath, destPath, { overwrite: true });
-          } catch (widgetCopyError) {
-            console.error(`Error copying widget asset ${filename}:`, widgetCopyError);
-          }
-        }
-      } else {
-        // It's normal for a project not to have a widgets/ directory if it uses none
-        // console.log(`Project widgets directory not found (this may be normal): ${projectWidgetsDir}`);
-      }
-    } catch (findError) {
-      console.warn("Error finding or copying widget assets:", findError.message);
     }
 
+    // Media is each app's own: this export copies only what the site uses.
+    async function copyMediaAndWriteManifest() {
     // --- Copy Only Used Images ---
     try {
       const { readMediaFile } = await import("../services/mediaService.js");
@@ -1308,18 +588,38 @@ Per aspera ad astra
       assetVersion,
       exportedAt: exportedAt.toISOString(),
       projectName: projectData.name,
-      collections: manifestCollections,
+      collections: report.collections,
     };
     await fs.writeFile(path.join(outputDir, "manifest.json"), JSON.stringify(manifest, null, 2));
-
-    // Write widgetizer.forms.json if the project contains any core-form widgets.
-    if (formsManifest) {
-      await fs.writeFile(
-        path.join(outputDir, "widgetizer.forms.json"),
-        JSON.stringify(formsManifest, null, 2),
-      );
-      console.log(`Wrote widgetizer.forms.json with ${formsManifest.forms.length} form(s)`);
     }
+
+    const stream = generateSite(deps, {
+      projectData,
+      appVersion,
+      assetVersion,
+      refuse: refusalFor,
+      collections: collectionsEnabled ? { storage: collectionStorage, scope: collectionScope, reader: collectionReader } : null,
+      scope: collectionScope,
+      limits: collectionDeps?.limits,
+      exportMarkdown,
+      iconOutputDir: outputDir,
+      beforeFirstFile: prepareOutputDir,
+      inspectHtml: collectValidationIssues,
+      afterPages: writeReportAndCopyAssets,
+      beforeFormsFile: copyMediaAndWriteManifest,
+      report,
+    });
+    for await (const entry of stream) {
+      const target = path.join(outputDir, entry.path);
+      try {
+        if (entry.source) await fs.copy(entry.source, target, { overwrite: true });
+        else await fs.outputFile(target, entry.content);
+      } catch (error) {
+        if (!entry.softFailure) throw error;
+        entry.softFailure(error);
+      }
+    }
+    if (report.formsCount) console.log(`Wrote widgetizer.forms.json with ${report.formsCount} form(s)`);
 
     // Record this export in history (store relative dir name, not absolute path)
     const exportDirName = `${projectFolderName}-v${version}`;
@@ -1327,7 +627,8 @@ Per aspera ad astra
 
     // A language left out of the export is named in the result, not only in a
     // server log: a partially published site is far too easy to miss otherwise.
-    return { outputDir, version, exportDirName, exportRecord, structuredData, warnings: languageWarnings };
+    const warnings = report.languagesSkipped.map((language) => ({ code: "LANGUAGE_SKIPPED", language }));
+    return { outputDir, version, exportDirName, exportRecord, structuredData: report.structuredData, warnings };
 }
 
 /**
@@ -1420,20 +721,6 @@ export async function exportProject(req, res) {
 }
 
 // Helper function to recursively find files matching regex patterns
-async function findFilesRecursive(dir, patterns) {
-  let results = [];
-  const list = await fs.readdir(dir, { withFileTypes: true });
-  for (const dirent of list) {
-    const fullPath = path.join(dir, dirent.name);
-    if (dirent.isDirectory()) {
-      results = results.concat(await findFilesRecursive(fullPath, patterns));
-    } else if (patterns.some((pattern) => pattern.test(dirent.name))) {
-      results.push(fullPath);
-    }
-  }
-  return results;
-}
-
 // Get files in an export directory to find the best entry point
 async function findEntryFile(exportDir) {
   try {

@@ -22,6 +22,7 @@ export { default as errorHandler } from "./middleware/errorHandler.js";
 // export orchestration, which resolves every path through the global DATA_DIR);
 // these are the shared, side-effect-free pieces it invokes directly.
 export { buildFormsManifest } from "./services/formsManifestService.js";
+export { generateSite } from "./services/generateSite.js";
 export { buildSitemap, buildRobotsTxt } from "./services/seoArtifacts.js";
 export { sanitizeWidgetData, sanitizeThemeSettings, stripHtmlToText } from "./services/sanitizationService.js";
 // The business details a request sends, read the way the project routes read them.

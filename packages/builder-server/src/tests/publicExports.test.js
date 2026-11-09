@@ -29,6 +29,7 @@ const modules = {
   themeReads: await import("../utils/themeReads.js"),
   siteIdentityInput: await import("../services/siteIdentityInput.js"),
   presetMedia: await import("../services/presetMedia.js"),
+  generateSite: await import("../services/generateSite.js"),
 };
 
 after(() => fs.remove(TEST_ROOT));
@@ -51,6 +52,7 @@ describe("library entry", () => {
       injectThemeReads: modules.themeReads,
       readSiteIdentity: modules.siteIdentityInput,
       registerPresetMedia: modules.presetMedia,
+      generateSite: modules.generateSite,
     };
     for (const [name, module] of Object.entries(expected)) {
       assert.equal(typeof barrel[name], "function", name);
