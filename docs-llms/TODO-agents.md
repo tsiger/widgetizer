@@ -247,6 +247,16 @@ adm-zip 0.6.1 builds its error messages from a template it overwrites on first u
 
 **Start:** [zipSafety.js](../packages/builder-server/src/utils/zipSafety.js) (`openZip`), [backupImportChecks.test.js](../packages/builder-server/src/tests/backupImportChecks.test.js). **Source:** dependency upgrade, 2026-11-06.
 
+#### R-PRESETLOAD · Show the preset list loading on New project, and wait for it
+
+**Deferred · Low · OSS**
+
+On New project, choosing a theme fetches its presets. While that runs the form shows nothing: the preset block renders only when the list is non-empty (`ProjectForm.jsx` `presets.presets.length > 0`), and the list is cleared at the start of the fetch, so its "Loading presets…" text never appears and the grid pops in afterwards, pushing the form down. Create Project stays enabled meanwhile, so a project created in that moment gets no preset. Today that is the same Blank result as choosing nothing, since no theme names a default preset; a theme that does would have its default skipped.
+
+**Done when:** the preset block shows its loading text during the fetch, and Create Project waits (disabled) until the presets have arrived.
+
+**Start:** [ProjectForm.jsx](../app/src/components/projects/ProjectForm.jsx) (preset fetch effect, preset block). **Source:** owner, 2026-11-08.
+
 #### QA-EXTRA · Choose extra checks when changing an area
 
 **Deferred · Low · Tests**

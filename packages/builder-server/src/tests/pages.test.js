@@ -1717,26 +1717,87 @@ describe("one homepage per language", () => {
 describe("two writes that pick the same slug while the section is busy", () => {
   beforeEach(resetPages);
 
-  /** Run `start` while another write holds the section, then let it go. */
-  async function whileSectionBusy(start) {
+  // A request is queued for the section once its early checks are done. Those
+  // all go through the storage adapters, so each request gets its own copies
+  // that count the calls still under way: with none under way across two turns
+  // of the event loop, all that is left is the wait for the section.
+  function trackedAdapter(adapter, inFlight) {
+    return new Proxy(adapter, {
+      get(target, key) {
+        const value = Reflect.get(target, key, target);
+        if (typeof value !== "function") return value;
+        return (...args) => {
+          const result = value.apply(target, args);
+          if (typeof result?.then !== "function") return result;
+          inFlight.count++;
+          return result.finally(() => inFlight.count--);
+        };
+      },
+    });
+  }
+
+  /** A request to start later: `start()` gives its response and a way to wait until it queues. */
+  function request(controllerFn, options) {
+    return () => {
+      const inFlight = { count: 0 };
+      const req = mockReq(options);
+      req.adapters = {
+        storage: trackedAdapter(pageStorage, inFlight),
+        assetStorage: trackedAdapter(pageAssetStorage, inFlight),
+      };
+      const res = mockRes();
+      const response = controllerFn(req, res).then(() => res);
+      const queued = async () => {
+        for (let quiet = 0; quiet < 2; ) {
+          await new Promise((resolve) => setImmediate(resolve));
+          quiet = inFlight.count === 0 ? quiet + 1 : 0;
+        }
+      };
+      return { response, queued };
+    };
+  }
+
+  /** Run `body` while another write holds the section, then let it go. */
+  async function whileSectionBusy(body) {
     let release;
     const busy = withContentWriteLock(PROJECT_ID, () => new Promise((resolve) => (release = resolve)));
-    const pending = start();
-    // Long enough for every request to finish its early checks and queue.
-    await new Promise((resolve) => setTimeout(resolve, 50));
+    const responses = await body();
     release();
     await busy;
-    return pending;
+    return Promise.all(responses);
   }
+
+  /** Start the requests together, while the section is busy; they queue in whatever order they get there. */
+  const togetherWhileSectionBusy = (...requests) =>
+    whileSectionBusy(async () => {
+      const started = requests.map((start) => start());
+      await Promise.all(started.map(({ queued }) => queued()));
+      return started.map(({ response }) => response);
+    });
+
+  /**
+   * Start the requests in turn, each queued before the next starts, while the
+   * section is busy. Started together, the order they queue in comes down to
+   * disk timing; a case about the later one finding what the earlier one wrote
+   * needs that order fixed.
+   */
+  const inTurnWhileSectionBusy = (...requests) =>
+    whileSectionBusy(async () => {
+      const responses = [];
+      for (const start of requests) {
+        const { response, queued } = start();
+        responses.push(response);
+        await queued();
+      }
+      return responses;
+    });
 
   const pageFile = (slug) => getPagePath(activeProject.folderName, slug);
 
   it("keeps both new pages, the second under the next free slug", async () => {
-    const [first, second] = await whileSectionBusy(() =>
-      Promise.all([
-        callController(createPage, { body: { name: "About", slug: "about" } }),
-        callController(createPage, { body: { name: "About us", slug: "about" } }),
-      ]),
+    const [first, second] = await togetherWhileSectionBusy(
+      request(createPage, { body: { name: "About", slug: "about" } }),
+      request(createPage, { body: { name: "About us", slug: "about" } }),
     );
 
     assert.equal(first._status, 201);
@@ -1749,11 +1810,9 @@ describe("two writes that pick the same slug while the section is busy", () => {
 
   it("keeps a duplicate and a new page that pick the same slug", async () => {
     await createTestPage("Team");
-    const [created, duplicated] = await whileSectionBusy(() =>
-      Promise.all([
-        callController(createPage, { body: { name: "Team (Copy)" } }),
-        callController(duplicatePage, { params: { id: "team" } }),
-      ]),
+    const [created, duplicated] = await togetherWhileSectionBusy(
+      request(createPage, { body: { name: "Team (Copy)" } }),
+      request(duplicatePage, { params: { id: "team" } }),
     );
 
     assert.equal(created._status, 201);
@@ -1766,14 +1825,12 @@ describe("two writes that pick the same slug while the section is busy", () => {
   it("refuses a rename onto a page created meanwhile, and keeps both pages", async () => {
     await createTestPage("Team");
     const team = await fs.readJson(pageFile("team"));
-    const [created, renamed] = await whileSectionBusy(() =>
-      Promise.all([
-        callController(createPage, { body: { name: "Contact", slug: "contact" } }),
-        callController(savePageContent, {
-          params: { id: "team" },
-          body: { ...team, slug: "contact", widgets: {}, widgetsOrder: [] },
-        }),
-      ]),
+    const [created, renamed] = await inTurnWhileSectionBusy(
+      request(createPage, { body: { name: "Contact", slug: "contact" } }),
+      request(savePageContent, {
+        params: { id: "team" },
+        body: { ...team, slug: "contact", widgets: {}, widgetsOrder: [] },
+      }),
     );
 
     assert.equal(created._status, 201);
@@ -1785,25 +1842,22 @@ describe("two writes that pick the same slug while the section is busy", () => {
 
   it("refuses a page-details rename onto a page created meanwhile", async () => {
     await createTestPage("Team");
-    const [created, renamed] = await whileSectionBusy(() =>
-      Promise.all([
-        callController(createPage, { body: { name: "Contact", slug: "contact" } }),
-        callController(updatePage, { params: { id: "team" }, body: { name: "Team", slug: "contact" } }),
-      ]),
+    const [created, renamed] = await inTurnWhileSectionBusy(
+      request(createPage, { body: { name: "Contact", slug: "contact" } }),
+      request(updatePage, { params: { id: "team" }, body: { name: "Team", slug: "contact" } }),
     );
 
     assert.equal(created._status, 201);
     assert.equal(renamed._status, 409);
+    assert.equal(renamed._json.code, "SLUG_TAKEN");
     assert.equal((await fs.readJson(pageFile("contact"))).uuid, created._json.uuid);
     assert.equal(await fs.pathExists(pageFile("team")), true);
   });
 
   it("does not create a second homepage when index and home are created together", async () => {
-    const [index, home] = await whileSectionBusy(() =>
-      Promise.all([
-        callController(createPage, { body: { name: "Welcome", slug: "index" } }),
-        callController(createPage, { body: { name: "Home", slug: "home" } }),
-      ]),
+    const [index, home] = await togetherWhileSectionBusy(
+      request(createPage, { body: { name: "Welcome", slug: "index" } }),
+      request(createPage, { body: { name: "Home", slug: "home" } }),
     );
 
     // Whichever queued first keeps its slug; the other moves on, as if it had arrived later.
@@ -1818,11 +1872,9 @@ describe("two writes that pick the same slug while the section is busy", () => {
 
   it("refuses renaming to home when index was created meanwhile", async () => {
     await createTestPage("About");
-    const [, renamed] = await whileSectionBusy(() =>
-      Promise.all([
-        callController(createPage, { body: { name: "Welcome", slug: "index" } }),
-        callController(updatePage, { params: { id: "about" }, body: { name: "About", slug: "home" } }),
-      ]),
+    const [, renamed] = await inTurnWhileSectionBusy(
+      request(createPage, { body: { name: "Welcome", slug: "index" } }),
+      request(updatePage, { params: { id: "about" }, body: { name: "About", slug: "home" } }),
     );
 
     assert.equal(renamed._status, 409);
@@ -1834,14 +1886,12 @@ describe("two writes that pick the same slug while the section is busy", () => {
   it("does not let a save for a page that was gone write over a page created meanwhile", async () => {
     // The editor still has "Team" open after it was deleted elsewhere; its save
     // finds no file and would recreate the page, but a new page took the slug.
-    const [created, stale] = await whileSectionBusy(() =>
-      Promise.all([
-        callController(createPage, { body: { name: "Team", slug: "team" } }),
-        callController(savePageContent, {
-          params: { id: "team" },
-          body: { name: "Team", slug: "team", widgets: {}, widgetsOrder: [] },
-        }),
-      ]),
+    const [created, stale] = await togetherWhileSectionBusy(
+      request(createPage, { body: { name: "Team", slug: "team" } }),
+      request(savePageContent, {
+        params: { id: "team" },
+        body: { name: "Team", slug: "team", widgets: {}, widgetsOrder: [] },
+      }),
     );
 
     // Either order is fine as long as neither page replaces the other: the save
@@ -1856,11 +1906,9 @@ describe("two writes that pick the same slug while the section is busy", () => {
   it("still saves a page in place, and saves an ordinary rename", async () => {
     await createTestPage("Team");
     const team = await fs.readJson(pageFile("team"));
-    const [inPlace, renamed] = await whileSectionBusy(() =>
-      Promise.all([
-        callController(savePageContent, { params: { id: "team" }, body: { ...team, widgets: {}, widgetsOrder: [] } }),
-        callController(updatePage, { params: { id: "team" }, body: { name: "Crew", slug: "crew" } }),
-      ]),
+    const [inPlace, renamed] = await togetherWhileSectionBusy(
+      request(savePageContent, { params: { id: "team" }, body: { ...team, widgets: {}, widgetsOrder: [] } }),
+      request(updatePage, { params: { id: "team" }, body: { name: "Crew", slug: "crew" } }),
     );
 
     assert.equal(inPlace._status, 200);
