@@ -96,6 +96,7 @@ async function findWidgetAssets(dir) {
  * @param {object} [options.scope] - For `options.limits`.
  * @param {object} [options.limits] - Limits adapter, for the forms ceiling.
  * @param {boolean} [options.exportMarkdown]
+ * @param {boolean} [options.formatPages=true] - Prettier is CPU work that blocks its thread: 2 s or more on a very large page.
  * @param {boolean} [options.generateIcons=true]
  * @param {string} [options.iconOutputDir] - Write the site icons here instead of yielding them.
  * @param {(rawThemeSettings: object) => string} [options.readIconSource] - Which theme setting holds the site icon.
@@ -125,6 +126,7 @@ export async function* generateSite(deps, options) {
     scope = null,
     limits = null,
     exportMarkdown = false,
+    formatPages = true,
     generateIcons = true,
     iconOutputDir = null,
     readIconSource = (theme) => readThemeSetting(theme, { group: "general", id: "favicon" }) || "",
@@ -443,11 +445,15 @@ export async function* generateSite(deps, options) {
     cleanUrls,
   });
 
-  /** Format, rewrite storage paths, then let the app inspect the page before the marker comment goes on. */
+  /** Format (unless turned off), rewrite storage paths, then let the app inspect the page before the marker comment goes on. */
   async function finishHtml(rendered, outputPathPrefix, formatFailureNote, page) {
-    const formatted = await formatHtml(rendered);
-    if (!formatted.success) console.warn(formatFailureNote(formatted.error));
-    const html = rewriteStoragePaths(formatted.html, outputPathPrefix);
+    let source = rendered;
+    if (formatPages) {
+      const formatted = await formatHtml(rendered);
+      source = formatted.html;
+      if (!formatted.success) console.warn(formatFailureNote(formatted.error));
+    }
+    const html = rewriteStoragePaths(source, outputPathPrefix);
     if (inspectHtml) await inspectHtml(html, page);
     return markerComment(appVersion) + html;
   }
