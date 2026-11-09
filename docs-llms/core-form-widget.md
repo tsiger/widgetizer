@@ -267,7 +267,8 @@ Limits enforced at export time (`packages/builder-server/src/services/formsManif
 
 ## What the export pipeline does
 
-When a project is exported (`packages/builder-server/src/controllers/exportController.js`):
+When a project is exported (`packages/builder-server/src/services/generateSite.js`). The forms
+are validated (steps 2 to 4) with the other checks, before any page is rendered or written:
 
 1. Each `core-form` widget renders the markup above — required
    `data-widgetizer-*` attributes, off-screen honeypot named `website`, empty

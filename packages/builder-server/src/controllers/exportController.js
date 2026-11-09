@@ -606,7 +606,6 @@ export async function exportProjectToDir(projectId, options = {}, collectionDeps
       beforeFirstFile: prepareOutputDir,
       inspectHtml: collectValidationIssues,
       afterPages: writeReportAndCopyAssets,
-      beforeFormsFile: copyMediaAndWriteManifest,
       report,
     });
     for await (const entry of stream) {
@@ -620,6 +619,7 @@ export async function exportProjectToDir(projectId, options = {}, collectionDeps
       }
     }
     if (report.formsCount) console.log(`Wrote widgetizer.forms.json with ${report.formsCount} form(s)`);
+    await copyMediaAndWriteManifest();
 
     // Record this export in history (store relative dir name, not absolute path)
     const exportDirName = `${projectFolderName}-v${version}`;

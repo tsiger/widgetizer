@@ -110,8 +110,6 @@ async function findWidgetAssets(dir) {
  * @param {(html: string, page: { page: string, filename: string }) => Promise<void>} [options.inspectHtml]
  * @param {() => Promise<void | AsyncIterable<object>>} [options.afterPages] - Runs after the
  *   page and item pages; may return more entries.
- * @param {() => Promise<void | AsyncIterable<object>>} [options.beforeFormsFile] - Runs after the
- *   widget assets; may return more entries.
  * @param {object} [options.report] - Filled in as the site is generated, since a generator's return
  *   value is lost in `for await`: `languages`, `languagesSkipped`, `structuredData`, `collections`,
  *   `formsCount`.
@@ -139,7 +137,6 @@ export async function* generateSite(deps, options) {
     beforeFirstFile = null,
     inspectHtml = null,
     afterPages = null,
-    beforeFormsFile = null,
     report = {},
   } = options;
   const { projectId, projectDir } = deps;
@@ -662,9 +659,6 @@ export async function* generateSite(deps, options) {
     if (failOnAssetScanError) throw findError;
     console.warn("Error finding or copying widget assets:", findError.message);
   }
-
-  const beforeFormsEntries = beforeFormsFile ? await beforeFormsFile() : null;
-  if (beforeFormsEntries) yield* beforeFormsEntries;
 
   report.formsCount = formsManifest ? formsManifest.forms.length : 0;
   if (formsManifest) yield { path: "widgetizer.forms.json", content: JSON.stringify(formsManifest, null, 2) };
