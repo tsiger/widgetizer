@@ -23,7 +23,7 @@ export { default as errorHandler } from "./middleware/errorHandler.js";
 // these are the shared, side-effect-free pieces it invokes directly.
 export { buildFormsManifest } from "./services/formsManifestService.js";
 export { buildSitemap, buildRobotsTxt } from "./services/seoArtifacts.js";
-export { sanitizeWidgetData, sanitizeThemeSettings } from "./services/sanitizationService.js";
+export { sanitizeWidgetData, sanitizeThemeSettings, stripHtmlToText } from "./services/sanitizationService.js";
 // Change-only theme-settings saves: an embedding route that saves theme settings
 // reads theme.json, merges with this inside its own write section, and writes.
 export { mergeThemeSettingChanges, readThemeSettingChanges } from "./services/themeSettingChanges.js";
@@ -31,6 +31,26 @@ export { mergeThemeSettingChanges, readThemeSettingChanges } from "./services/th
 // after writing theme.json so favicon/themed-image assets are recorded as used.
 // DB-only via the shared getDb() singleton, no scope/adapter needed.
 export { updateThemeSettingsMediaUsage } from "./services/mediaUsageService.js";
+// The media paths theme settings and site identity reference, and the site
+// identity's usage update: an embedding route that saves either compares the
+// paths before and after inside the content-write section, then records usage.
+export {
+  extractMediaPathsFromThemeSettings,
+  extractMediaPathsFromSiteIdentity,
+  updateSiteIdentityMediaUsage,
+} from "./services/mediaUsageService.js";
+// The per-project content-write section. An embedding route that writes project
+// content takes it so its writes are ordered with the mounted routes' writes and
+// with media deletion: the same section object, so it must come from here, never
+// a second serializer. It is innermost (no other per-project lock is taken
+// inside it), not reentrant, and in-process only. assertIntroducedMediaExists,
+// called inside it, refuses a write that newly references a media file this
+// process deleted and that is still missing (a file uploaded again under the same
+// name is accepted).
+export { withContentWriteLock, assertIntroducedMediaExists } from "./services/contentCoordination.js";
+// The site settings each widget reads, embedded in a preview document for the
+// editor's live updates.
+export { injectThemeReads } from "./utils/themeReads.js";
 export { preprocessThemeSettings } from "./utils/themeHelpers.js";
 // Per-key async serialization (in-process). The OSS export operations use it to
 // serialize per project; embedding hosts can wrap their own long-running
@@ -38,6 +58,13 @@ export { preprocessThemeSettings } from "./utils/themeHelpers.js";
 export { createKeyedSerializer } from "./utils/serializeByKey.js";
 export { buildRuntimeSiteIcons, generateExportSiteIcons } from "./utils/siteIconHelpers.js";
 export { CORE_WIDGETS_DIR, CORE_SNIPPETS_DIR, getThemesDir } from "./config.js";
+// A project's { defaultLanguage, languages } from its record, with the defaults
+// OSS applies (languages holds the additional ones, not the default): for an
+// embedding app that reads its own project rows.
+export { projectLanguages } from "./utils/contentLanguage.js";
+// The theme's and core's visitor-facing words for a render, read through the
+// reader the caller passes (relative path → contents).
+export { loadSiteStrings } from "./services/siteStringsService.js";
 
 // Collection enumeration + item-page render for hosted's cloud render/export
 // loop. The render-deps fragment (buildCollectionRenderDeps) and the deps-driven
@@ -58,6 +85,7 @@ export {
   getCollectionSchema,
   loadCollectionTemplate,
   loadCollectionItemsByUuid,
+  readCollectionItem,
 } from "./services/collectionService.js";
 
 // Project-creation building blocks for hosted's "create site with editor" flow.
@@ -92,7 +120,15 @@ export {
 // Theme-update pipeline (check/toggle/apply) for hosted's own theme-update UI —
 // dir-explicit and scope-free like the readers above, so hosted drives the same
 // update logic against its per-tenant working dir instead of forking it.
-export { checkForUpdates, toggleThemeUpdates, applyThemeUpdateToDir } from "./services/themeUpdateService.js";
+export {
+  checkForUpdates,
+  toggleThemeUpdates,
+  applyThemeUpdateToDir,
+  hasInterruptedThemeUpdate,
+} from "./services/themeUpdateService.js";
+// Where installed themes are seeded from: every seed theme id across the seed
+// roots, and the folder a given theme seeds from, in OSS's precedence order.
+export { listSeedThemeIds, resolveSeedThemeDir } from "./utils/themeSeedRoots.js";
 // Global app settings (image sizes, dev mode, export limits) — the editor's
 // client reads these via GET /api/settings; hosted exposes a read-only route.
 export { readAppSettingsFile } from "./controllers/appSettingsController.js";

@@ -205,6 +205,17 @@ const BACKUP_DIR = ".theme-update-backup";
 // from one killed just after finishing.
 const PLAN_FILE = ".in-progress";
 
+/**
+ * Whether the project holds an update that was interrupted partway through:
+ * the next applyThemeUpdateToDir run first undoes it, which changes files. An
+ * embedding app checks this to report that before a run.
+ * @param {string} projectDir  the project's working directory
+ * @returns {Promise<boolean>}
+ */
+export function hasInterruptedThemeUpdate(projectDir) {
+  return fs.pathExists(path.join(projectDir, BACKUP_DIR, PLAN_FILE));
+}
+
 /** Move a path, creating the destination's parent first. */
 async function movePath(from, to) {
   await fs.ensureDir(path.dirname(to));

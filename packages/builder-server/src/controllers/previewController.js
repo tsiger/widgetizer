@@ -41,6 +41,7 @@ import { generateToken, getToken } from "../services/previewTokenStore.js";
 import { LANGUAGE_CODE_RE, DEFAULT_LANGUAGE } from "@widgetizer/core/languages";
 import { AREA_ID_RE } from "@widgetizer/core/sharedAreas";
 import { isRenderedWidget, renderedWidgetOrder, uniqueBlockOrder, uniqueWidgetOrder } from "@widgetizer/core/widgetOrder";
+import { injectThemeReads } from "../utils/themeReads.js";
 
 // An output path as the content-address helpers build it (`el/news/page/2.html`):
 // lower-case segments, no `..`, safe inside an attribute.
@@ -71,12 +72,6 @@ export function injectRuntimeScript(html, previewMode = "editor", collectionPref
   return html;
 }
 
-// The site settings each widget and the layout read, for the editor's live
-// updates; the runtime hands them over with PREVIEW_READY.
-export function injectThemeReads(html, themeReads) {
-  const json = JSON.stringify(themeReads || {}).replace(/</g, "\\u003c");
-  return html.replace(/<\/body>/i, `<script type="application/json" id="widgetizer-theme-reads">${json}</script>\n</body>`);
-}
 
 // Inject an origin-root base tag so any stray relative URL resolves against the
 // render document's own origin (whichever port/host actually served it), not a

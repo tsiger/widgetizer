@@ -257,6 +257,26 @@ On New project, choosing a theme fetches its presets. While that runs the form s
 
 **Start:** [ProjectForm.jsx](../app/src/components/projects/ProjectForm.jsx) (preset fetch effect, preset block). **Source:** owner, 2026-11-08.
 
+#### R-STALELOAD · A superseded load can still land on the menu, page and media screens
+
+**Deferred · Low · OSS**
+
+`MenusEdit.jsx`, `PagesEdit.jsx`, `MediaSelectorDrawer.jsx` (media list) and `useCollections.js` start a load in an effect with nothing in its cleanup, so a reply for what the screen has left can arrive after the current one's and replace it. Shown in a scratch test on 2026-11-09: the menu editor moved from menu `main` to `footer`, `footer` answered, then `main` answered late, and the screen showed `main` under the footer's address. In the app that needs a slow first load and a quick change, e.g. the language switcher on an edit page. The other loaders already guard with a `cancelled` flag.
+
+**Done when:** each of the four ignores a reply for an id, language or project it has left, with a test per screen.
+
+**Start:** the four files' load effects; `PagesEditLoading.test.jsx` and `MenusEditLoading.test.jsx` have the deferred-reply setup. **Source:** React Compiler lint follow-up, 2026-11-08.
+
+#### R-LINKLOAD · Link pickers say "No matching…" while the link targets load
+
+**Deferred · Low · OSS**
+
+`useLinkTargets` reports `loading`, but `LinkInput.jsx` passes only `failed` to its `Combobox`, and the menu editor (`MenuEditor/index.jsx` → `MenuCombobox.jsx`) takes only `options`. Until the targets arrive the list is empty, so the picker reads "No matching pages found. Type to add a custom link." (menus: "No matching results…"), as if the site had no pages. Seen once on a cold start; the rich-text link button already says "Loading…" (`RichTextInput.jsx`).
+
+**Done when:** both pickers show a loading line until the first read answers, then the list or the empty text.
+
+**Start:** [LinkInput.jsx](../packages/editor-ui/src/components/settings/inputs/LinkInput.jsx), [MenuCombobox.jsx](../packages/editor-ui/src/components/menus/MenuEditor/MenuCombobox.jsx), `ComboboxOptionList.jsx` (`notice` / `emptyText`). **Source:** React Compiler lint follow-up, 2026-11-08.
+
 #### QA-EXTRA · Choose extra checks when changing an area
 
 **Deferred · Low · Tests**
