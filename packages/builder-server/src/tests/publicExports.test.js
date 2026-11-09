@@ -27,6 +27,8 @@ const modules = {
   themeUpdates: await import("../services/themeUpdateService.js"),
   themeSeeds: await import("../utils/themeSeedRoots.js"),
   themeReads: await import("../utils/themeReads.js"),
+  siteIdentityInput: await import("../services/siteIdentityInput.js"),
+  presetMedia: await import("../services/presetMedia.js"),
 };
 
 after(() => fs.remove(TEST_ROOT));
@@ -47,6 +49,8 @@ describe("library entry", () => {
       listSeedThemeIds: modules.themeSeeds,
       resolveSeedThemeDir: modules.themeSeeds,
       injectThemeReads: modules.themeReads,
+      readSiteIdentity: modules.siteIdentityInput,
+      registerPresetMedia: modules.presetMedia,
     };
     for (const [name, module] of Object.entries(expected)) {
       assert.equal(typeof barrel[name], "function", name);

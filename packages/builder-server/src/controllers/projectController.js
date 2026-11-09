@@ -21,9 +21,10 @@ import { loadSiteStrings, readerFor } from "../services/siteStringsService.js";
 import { requestLanguage } from "../utils/contentLanguage.js";
 import * as mediaRepo from "../db/repositories/mediaRepository.js";
 import { stripHtmlToText } from "../services/sanitizationService.js";
+import { readSiteIdentity } from "../services/siteIdentityInput.js";
+import { registerPresetMedia } from "../services/presetMedia.js";
 import { isReservedItemSlug } from "@widgetizer/core/contentAddress";
 import { isValidSiteUrl, siteUrlHasQueryOrFragment } from "@widgetizer/core/urlSafety";
-import { normalizeSiteIdentity } from "@widgetizer/core/siteIdentity";
 import {
   DEFAULT_LANGUAGE,
   hasNumericRegion,
@@ -81,31 +82,6 @@ function siteUrlRejection(value) {
     : "Invalid Site Address. Please enter a valid URL (e.g., https://mysite.com).";
 }
 
-function stripTextFields(group, keys) {
-  if (!group || typeof group !== "object" || Array.isArray(group)) return group;
-  const stripped = { ...group };
-  for (const key of keys) {
-    if (typeof stripped[key] === "string") stripped[key] = stripHtmlToText(stripped[key]);
-  }
-  return stripped;
-}
-
-// Only human-readable text is tag-stripped. URLs, email, phone and the logo path
-// are left exactly as sent for core to accept or refuse: stripping re-serialises
-// through DOMPurify, which would silently rewrite a query string.
-function readSiteIdentity(raw) {
-  if (!raw || typeof raw !== "object" || Array.isArray(raw)) return normalizeSiteIdentity(raw);
-  const identity = stripTextFields(raw, ["priceRange"]);
-  identity.text = stripTextFields(raw.text, ["publicName", "description"]);
-  if (Array.isArray(raw.locations)) {
-    identity.locations = raw.locations.map((location) => {
-      const stripped = stripTextFields(location, ["streetAddress", "addressLocality", "addressRegion", "postalCode"]);
-      if (stripped !== location) stripped.text = stripTextFields(location.text, ["label"]);
-      return stripped;
-    });
-  }
-  return normalizeSiteIdentity(identity);
-}
 
 function siteIdentityRejection(errors) {
   return { error: "Invalid business details.", fields: errors };
@@ -297,24 +273,7 @@ export async function seedPresetMedia(folderName, projectId, presetMediaDir) {
   const manifestPath = path.join(presetMediaDir, "manifest.json");
   if (!(await fs.pathExists(manifestPath))) return;
 
-  const manifest = await fs.readJSON(manifestPath);
-  const now = new Date().toISOString();
-  for (const entry of manifest.files || []) {
-    if (!entry.filename) continue;
-    mediaRepo.addMediaFile(projectId, {
-      id: randomUUID(),
-      filename: entry.filename,
-      originalName: entry.originalName || entry.filename,
-      type: entry.type || "",
-      size: entry.size || 0,
-      uploaded: now,
-      path: entry.path || `/uploads/images/${entry.filename}`,
-      width: entry.width || null,
-      height: entry.height || null,
-      metadata: { alt: entry.alt || "", title: entry.title || "", caption: entry.caption || "" },
-      sizes: entry.sizes || {},
-    });
-  }
+  registerPresetMedia(projectId, await fs.readJSON(manifestPath));
 }
 
 /**

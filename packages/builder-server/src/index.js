@@ -24,6 +24,8 @@ export { default as errorHandler } from "./middleware/errorHandler.js";
 export { buildFormsManifest } from "./services/formsManifestService.js";
 export { buildSitemap, buildRobotsTxt } from "./services/seoArtifacts.js";
 export { sanitizeWidgetData, sanitizeThemeSettings, stripHtmlToText } from "./services/sanitizationService.js";
+// The business details a request sends, read the way the project routes read them.
+export { readSiteIdentity } from "./services/siteIdentityInput.js";
 // Change-only theme-settings saves: an embedding route that saves theme settings
 // reads theme.json, merges with this inside its own write section, and writes.
 export { mergeThemeSettingChanges, readThemeSettingChanges } from "./services/themeSettingChanges.js";
@@ -94,6 +96,9 @@ export {
 // dir; listThemes/listThemePresets back the theme/preset picker (the actor-scoped
 // /themes router is not mounted in hosted).
 export { scaffoldProjectContent } from "./utils/projectScaffold.js";
+// A preset's starter images, registered in a new project's media library from
+// its media manifest once the caller has put the binaries in place.
+export { registerPresetMedia } from "./services/presetMedia.js";
 // Dir-explicit project-content readers. Pure FS transforms over a
 // caller-supplied project working directory — the shared, scope-free counterparts
 // of the request-boundary StorageAdapter reads. Hosted's cloud render loop reads

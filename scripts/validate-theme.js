@@ -1901,18 +1901,19 @@ export function validateTheme(dir) {
     }
   }
 
+  /** @returns {Set<string>} the preset ids presets.json lists (none when it can't be read) */
   function checkPresets(rootMenuIds) {
     const root = path.join(themeRoot, "presets");
-    if (!isDir(root)) return;
+    if (!isDir(root)) return new Set();
     const file = path.join(root, "presets.json");
     if (!isFile(file)) {
       error(file, "required-file", "presets/ needs a presets.json registry.");
-      return;
+      return new Set();
     }
     const registry = readJson(file);
     if (!isObject(registry) || !Array.isArray(registry.presets)) {
       error(file, "presets", '"presets" must be an array of { "id", "name", "description" }.');
-      return;
+      return new Set();
     }
     const ids = new Set();
     for (const preset of registry.presets) {
@@ -2011,6 +2012,89 @@ export function validateTheme(dir) {
           }
         }
       }
+    }
+    return ids;
+  }
+
+  // A preset's starter images: binaries under media/images/ and a manifest,
+  // media/manifest.json, that project creation registers in the new project's
+  // media library. It lives in presets/<id>/media/ or preset-media/<id>/. A
+  // manifest that can't be read, or whose entries don't match the images, makes
+  // creating a project from that preset fail or leaves images missing.
+  function checkPresetMedia(presetIds) {
+    const places = [];
+    for (const id of presetIds) {
+      const dir = path.join(themeRoot, "presets", id, "media");
+      if (isDir(dir)) places.push(dir);
+    }
+    const shared = path.join(themeRoot, "preset-media");
+    for (const folder of listDirs(shared)) {
+      const dir = path.join(shared, folder);
+      if (!presetIds.has(folder)) {
+        warn(dir, "preset-media", `preset-media/${folder}/ matches no preset in presets.json, so no project uses it.`);
+      } else if (!isDir(path.join(themeRoot, "presets", folder))) {
+        warn(dir, "preset-media", `preset-media/${folder}/ is not used: the preset has no presets/${folder}/ folder.`);
+      } else if (isDir(path.join(themeRoot, "presets", folder, "media"))) {
+        warn(dir, "preset-media", `preset-media/${folder}/ is not used: presets/${folder}/media/ comes first.`);
+      } else {
+        places.push(dir);
+      }
+    }
+    for (const dir of places) {
+      const imagesDir = path.join(dir, "images");
+      const manifestFile = path.join(dir, "manifest.json");
+      if (!isFile(manifestFile)) {
+        if (isDir(imagesDir))
+          warn(
+            imagesDir,
+            "preset-media",
+            "These images have no manifest.json beside them: they are copied into new projects but not listed in the media library.",
+          );
+        continue;
+      }
+      const manifest = readJson(manifestFile);
+      if (!isObject(manifest)) continue;
+      if (!Array.isArray(manifest.files)) {
+        error(manifestFile, "preset-media", '"files" must be an array, one entry per image.');
+        continue;
+      }
+      const imageFile = (uploadPath) => path.resolve(imagesDir, uploadPath.slice("/uploads/images/".length));
+      const insideImages = (file) => file.startsWith(`${path.resolve(imagesDir)}${path.sep}`);
+      manifest.files.forEach((entry, index) => {
+        const where = `files[${index}]`;
+        if (!isObject(entry)) {
+          error(manifestFile, "preset-media", `${where} must be an object describing one image.`);
+          return;
+        }
+        if (typeof entry.filename !== "string" || entry.filename === "") {
+          error(manifestFile, "preset-media", `${where} needs a "filename"; without one the image is not registered.`);
+          return;
+        }
+        const own = entry.path || `/uploads/images/${entry.filename}`;
+        const paths = [[where, own]];
+        if (entry.sizes !== undefined) {
+          if (!isObject(entry.sizes)) error(manifestFile, "preset-media", `${where}.sizes must be an object of size variants.`);
+          else
+            for (const [size, variant] of Object.entries(entry.sizes)) {
+              // Seeding stores a size without a path as it is, so it doesn't break a project.
+              if (variant?.path) paths.push([`${where}.sizes.${size}`, variant.path]);
+              else warn(manifestFile, "preset-media", `${where}.sizes.${size} has no path, so this size can't be used.`);
+            }
+        }
+        for (const [label, uploadPath] of paths) {
+          if (typeof uploadPath !== "string" || !uploadPath.startsWith("/uploads/images/")) {
+            error(manifestFile, "preset-media", `${label} path must start with /uploads/images/.`);
+          } else if (!insideImages(imageFile(uploadPath))) {
+            error(manifestFile, "preset-media", `${label} path ${uploadPath} leaves images/.`);
+          } else if (!isFile(imageFile(uploadPath))) {
+            error(
+              manifestFile,
+              "preset-media",
+              `${label} names ${uploadPath}, but images/${uploadPath.slice("/uploads/images/".length)} is not there.`,
+            );
+          }
+        }
+      });
     }
   }
 
@@ -2334,7 +2418,7 @@ export function validateTheme(dir) {
       }
     }
     checkTemplates(path.join(themeRoot, "templates"), menuIds);
-    checkPresets(menuIds);
+    checkPresetMedia(checkPresets(menuIds));
     checkUpdates();
     checkUpdatedCollections();
     checkPackage();

@@ -36,10 +36,10 @@ What it checks:
 - **Assets:** enqueued files exist, and no two CSS/JS files share a name across widgets and `assets/`.
 - **Starter pages and menus:** page shape, every widget and block type exists, every stored setting is declared and has the right shape, order arrays match, internal links and menu ids point at something.
 - **Locales:** schema `tTheme:` labels, group names, literal `t` keys and default-key references are checked against English, including core visitor strings.
-- **Collections and presets:** the app's collection-schema rules, item-template presence, preset overrides and starter widget/block data. Core widget values use their complete app schemas.
+- **Collections and presets:** the app's collection-schema rules, item-template presence, preset overrides, starter widget/block data, and each preset's starter media (manifest shape, paths, and that the listed files exist). Core widget values use their complete app schemas.
 - **Updates:** version folder and manifest checks. These do not certify an assembled update or preservation of existing project content.
 
-The checker does not render or export the supplied theme. Computed setting keys, aliases whose values depend on runtime data, dynamic snippet/translation names, preset image binaries, assembled updates, browser behavior, accessibility and visual quality need additional checks. A successful run is a static-check result, not certification of every theme behavior.
+The checker does not render or export the supplied theme. Computed setting keys, aliases whose values depend on runtime data, dynamic snippet/translation names, whether preset image files are valid images, assembled updates, browser behavior, accessibility and visual quality need additional checks. A successful run is a static-check result, not certification of every theme behavior.
 
 If a source checkout is unavailable, use the manual review below and report automated validation as pending. There is currently no standalone validator in the distributed skill or validation button in the desktop app.
 

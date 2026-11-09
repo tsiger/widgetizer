@@ -1130,3 +1130,131 @@ describe("widget and block ids in templates", () => {
     });
   });
 });
+
+// A preset's starter images: project creation copies media/images/ and registers
+// media/manifest.json's entries in the media library. A manifest that can't be
+// read, or that doesn't match its images, makes that preset fail or lose images.
+describe("theme validator checks preset starter media", () => {
+  const presetMedia = (dir, ...parts) => path.join(dir, "preset-media", "demo", ...parts);
+  const ofRule = (findings) => findings.filter((finding) => finding.rule === "preset-media");
+  const entry = (extra = {}) => ({
+    filename: "hero.webp",
+    path: "/uploads/images/hero.webp",
+    sizes: { small: { path: "/uploads/images/hero-small.webp", width: 640, height: 320 } },
+    ...extra,
+  });
+  /** A demo preset with starter media: hero.webp and its small variant, as the manifest lists. */
+  async function withMedia(dir, manifest, { images = ["hero.webp", "hero-small.webp"], listed = true } = {}) {
+    if (listed) {
+      await fs.outputJson(path.join(dir, "presets", "presets.json"), { presets: [{ id: "demo", name: "Demo" }] });
+      await fs.copy(path.join(dir, "screenshot.png"), path.join(dir, "presets", "demo", "screenshot.png"));
+    }
+    for (const image of images) await fs.outputFile(presetMedia(dir, "images", image), "IMG");
+    if (manifest !== undefined) {
+      const file = presetMedia(dir, "manifest.json");
+      if (typeof manifest === "string") await fs.outputFile(file, manifest);
+      else await fs.outputJson(file, manifest);
+    }
+  }
+
+  it("has nothing to say about a manifest that matches its images", async () => {
+    const findings = await findingsAfter("preset-media-ok", (dir) => withMedia(dir, { files: [entry()] }));
+    assert.deepEqual(ofRule(findings), []);
+    assert.equal(hasError(findings, "invalid-json"), false);
+  });
+
+  it("refuses a manifest that isn't valid JSON, or has no files list", async () => {
+    const broken = await findingsAfter("preset-media-json", (dir) => withMedia(dir, '{ "files": [ '));
+    assert.ok(hasError(broken, "invalid-json"), JSON.stringify(broken));
+    const noFiles = await findingsAfter("preset-media-nofiles", (dir) => withMedia(dir, { images: [] }));
+    assert.ok(ofRule(noFiles).some((f) => f.level === "error" && /"files" must be an array/.test(f.message)));
+  });
+
+  it("refuses an entry without a filename, a path outside /uploads/images/, and a missing image or variant", async () => {
+    const findings = await findingsAfter("preset-media-entries", (dir) =>
+      withMedia(
+        dir,
+        {
+          files: [
+            entry(),
+            { path: "/uploads/images/x.webp" },
+            entry({ filename: "away.webp", path: "/images/away.webp", sizes: undefined }),
+            entry({ filename: "gone.webp", path: "/uploads/images/gone.webp", sizes: undefined }),
+            entry({ sizes: { large: { path: "/uploads/images/hero-large.webp" } } }),
+            null,
+          ],
+        },
+        { images: ["hero.webp", "hero-small.webp"] },
+      ),
+    );
+    const messages = ofRule(findings)
+      .filter((f) => f.level === "error")
+      .map((f) => f.message);
+    assert.ok(messages.some((m) => /files\[1\] needs a "filename"/.test(m)), JSON.stringify(messages));
+    assert.ok(messages.some((m) => /files\[2\] path must start with \/uploads\/images\//.test(m)), JSON.stringify(messages));
+    assert.ok(messages.some((m) => /files\[3\] names \/uploads\/images\/gone\.webp, but images\/gone\.webp is not there/.test(m)));
+    assert.ok(messages.some((m) => /files\[4\]\.sizes\.large names .*hero-large\.webp/.test(m)), JSON.stringify(messages));
+    assert.ok(messages.some((m) => /files\[5\] must be an object/.test(m)), JSON.stringify(messages));
+    assert.equal(messages.filter((m) => /files\[0\]/.test(m)).length, 0, JSON.stringify(messages));
+  });
+
+  it("accepts what seeding accepts: an empty path takes the default, and a size without a path only warns", async () => {
+    const findings = await findingsAfter("preset-media-lenient", (dir) =>
+      withMedia(dir, { files: [entry({ path: "", sizes: { small: { width: 640 } } })] }),
+    );
+    assert.deepEqual(ofRule(findings).filter((f) => f.level === "error"), []);
+    assert.ok(ofRule(findings).some((f) => f.level === "warning" && /sizes\.small has no path/.test(f.message)));
+  });
+
+  it("warns about images with no manifest, and media that matches no preset", async () => {
+    const noManifest = await findingsAfter("preset-media-nomanifest", (dir) => withMedia(dir, undefined));
+    assert.ok(ofRule(noManifest).some((f) => f.level === "warning" && /no manifest\.json/.test(f.message)));
+    const orphan = await findingsAfter("preset-media-orphan", (dir) => withMedia(dir, { files: [entry()] }, { listed: false }));
+    assert.ok(ofRule(orphan).some((f) => f.level === "warning" && /matches no preset/.test(f.message)));
+  });
+
+  it("refuses a path that leaves images/, and accepts a subfolder", async () => {
+    const findings = await findingsAfter("preset-media-paths", (dir) =>
+      withMedia(
+        dir,
+        {
+          files: [
+            entry({ filename: "escape.webp", path: "/uploads/images/../manifest.json", sizes: undefined }),
+            entry({ filename: "deep.webp", path: "/uploads/images/sub/deep.webp", sizes: undefined }),
+          ],
+        },
+        { images: ["sub/deep.webp"] },
+      ),
+    );
+    const errors = ofRule(findings).filter((f) => f.level === "error");
+    assert.equal(errors.length, 1, JSON.stringify(errors));
+    assert.match(errors[0].message, /files\[0\] path .* leaves images\//);
+  });
+
+  it("checks only the media a preset uses: its own folder wins over preset-media/", async () => {
+    const findings = await findingsAfter("preset-media-shadowed", async (dir) => {
+      await withMedia(dir, { files: [entry({ filename: "gone.webp", path: "/uploads/images/gone.webp" })] });
+      await fs.outputJson(path.join(dir, "presets", "demo", "media", "manifest.json"), { files: [] });
+    });
+    assert.deepEqual(ofRule(findings).filter((f) => f.level === "error"), []);
+    assert.ok(ofRule(findings).some((f) => f.level === "warning" && /is not used: presets\/demo\/media/.test(f.message)));
+  });
+
+  it("only warns about media for a listed preset that has no folder of its own", async () => {
+    const findings = await findingsAfter("preset-media-nofolder", async (dir) => {
+      await withMedia(dir, "{ broken");
+      await fs.remove(path.join(dir, "presets", "demo"));
+    });
+    assert.equal(hasError(findings, "invalid-json"), false, JSON.stringify(findings));
+    assert.ok(ofRule(findings).some((f) => f.level === "warning" && /has no presets\/demo\/ folder/.test(f.message)));
+  });
+
+  it("checks media inside a preset's own folder too", async () => {
+    const findings = await findingsAfter("preset-media-inside", async (dir) => {
+      await withMedia(dir, undefined, { images: [] });
+      await fs.remove(path.join(dir, "preset-media"));
+      await fs.outputJson(path.join(dir, "presets", "demo", "media", "manifest.json"), { files: [entry()] });
+    });
+    assert.ok(ofRule(findings).some((f) => f.level === "error" && /images\/hero\.webp is not there/.test(f.message)));
+  });
+});
