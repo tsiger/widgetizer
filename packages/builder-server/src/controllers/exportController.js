@@ -539,6 +539,24 @@ export async function exportProjectToDir(projectId, options = {}, collectionDeps
       );
     }
 
+    // Forms are checked here, with the other refusals, so an invalid form stops
+    // the export before its first file. The distinct-forms ceiling comes from the
+    // limits adapter (OSS: Infinity); the hosted-contract default applies when no
+    // adapter is wired. A limits adapter that throws is a failure, not a refusal.
+    const formsCap = await collectionDeps?.limits?.getLimit?.(collectionScope, LIMIT_KEYS.MAX_FORMS_PER_SITE);
+    const maxForms = typeof formsCap === "number" && formsCap > 0 ? formsCap : MAX_FORMS_PER_SITE;
+    let formsResult;
+    try {
+      formsResult = buildFormsManifest(pagesDataArray, appVersion, maxForms, { defaultLanguage });
+    } catch (error) {
+      if (Number.isInteger(error?.statusCode)) error.refusedBeforeWrite = true;
+      throw error;
+    }
+    const { manifest: formsManifest, warnings: formsWarnings } = formsResult;
+    for (const warning of formsWarnings) {
+      console.warn(`[forms manifest] ${warning}`);
+    }
+
     // --- Validation passed: from here on, disk writes are safe ---
     // emptyDir, not ensureDir: a crash leftover (or a version number freed by
     // a failed delete) can leave stale files at this path, and they must not
@@ -1295,20 +1313,6 @@ Per aspera ad astra
     await fs.writeFile(path.join(outputDir, "manifest.json"), JSON.stringify(manifest, null, 2));
 
     // Write widgetizer.forms.json if the project contains any core-form widgets.
-    // Validation errors throw with statusCode 400 and are surfaced by the request handler.
-    // The distinct-forms ceiling comes from the limits adapter (OSS: Infinity);
-    // the hosted-contract default applies when no adapter is wired.
-    const formsCap = await collectionDeps?.limits?.getLimit?.(collectionScope, LIMIT_KEYS.MAX_FORMS_PER_SITE);
-    const maxForms = typeof formsCap === "number" && formsCap > 0 ? formsCap : MAX_FORMS_PER_SITE;
-    const { manifest: formsManifest, warnings: formsWarnings } = buildFormsManifest(
-      pagesDataArray,
-      appVersion,
-      maxForms,
-      { defaultLanguage },
-    );
-    for (const warning of formsWarnings) {
-      console.warn(`[forms manifest] ${warning}`);
-    }
     if (formsManifest) {
       await fs.writeFile(
         path.join(outputDir, "widgetizer.forms.json"),

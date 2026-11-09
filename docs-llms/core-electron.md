@@ -138,14 +138,7 @@ Sharp and libvips binaries selected at runtime are AArch64. The owner subsequent
 reported it working on their Raspberry Pi 5 (8 GB). This is an initial user smoke
 check; the full workflow and installed-update checks above remain unverified there.
 
-Known viewer limitation: **View site** fails under Linux's default `.config` data
-directory. The shared export route passes an absolute filename to Express `sendFile`
-without a root, so its hidden-file filter rejects the `.config` ancestor even when
-the exported page exists. Reproduced separately: the current call returns the same
-500/Not Found response; a relative filename with the export directory as `root`
-serves the page while still refusing hidden files inside the export. That fix has
-not been applied. The initial smoke profile lacked a hidden ancestor and missed
-this case. Mac and Windows have not been tested in this pass.
+**View site** works under Linux's default `.config` data directory: the shared export route sends each file relative to the export directory, with that directory as `root`, so a hidden folder above it doesn't matter while hidden files inside the export are still refused.
 
 ### macOS Output
 

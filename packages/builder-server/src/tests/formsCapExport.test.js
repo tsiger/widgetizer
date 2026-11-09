@@ -40,6 +40,8 @@ const {
   theme: "__forms_cap_export_theme__",
 });
 
+const { getPublishDir } = await import("../config.js");
+
 const { LIMIT_KEYS, MAX_FORMS_PER_SITE } = await import("@widgetizer/core/adapters");
 const { LocalLimitsAdapter } = await import("@widgetizer/adapters-local");
 const { getDb } = await import("../db/index.js");
@@ -147,7 +149,10 @@ describe("the ceiling the limits adapter answers", () => {
 
     assert.equal(res._status, 400, JSON.stringify(res._json));
     assert.match(res._json.message, new RegExp(`${FORM_NAMES.length} distinct forms, more than the 2 limit`));
-    assert.equal(latestStatus(), "failed");
+    // Refused before the first file: no history row, no folder.
+    assert.equal(latestStatus(), undefined);
+    const version = exportRepo.getNextVersion(PROJECT_ID);
+    assert.equal(await fs.pathExists(path.join(getPublishDir(), `${PROJECT_FOLDER}-v${version}`)), false);
   });
 });
 
