@@ -68,6 +68,7 @@ Run the checklist in waves. Do not try to complete the whole thing in one sittin
 4. **Export pass** - export UI, exported site, downloaded ZIP contents, SEO files, form manifest.
 5. **Accessibility and polish pass** - keyboard-only, focus, modals, menus, narrow viewport, zoom.
 6. **Desktop pass** - Electron-only behavior and auto-update flow.
+7. **Docker pass** - the Docker image builds, runs, and keeps its data across a restart.
 
 ## Glossary
 
@@ -2239,6 +2240,28 @@ Arch's **Before footer** area sits between the page content and the footer, on e
 
 - [ ] AREA-021 - Update an older (0.9.10) Arch project to Arch 1.0.0.
   Expected: The update succeeds; the project's pages, header and footer are unchanged, and the empty Before footer area appears in the editor.
+
+## 21. Docker
+
+Checks that the Docker image starts and works on its own. Run it from a fresh clone of the release commit, on a machine with Docker, with nothing else using port 3001.
+
+- [ ] DOCK-001 - Run `docker compose up --build`.
+  Expected: The image builds and the container starts without errors in its log.
+
+- [ ] DOCK-002 - Open `http://localhost:3001`.
+  Expected: The app loads with its first-launch screen.
+
+- [ ] DOCK-003 - Create an Arch project, upload a JPG and an SVG to Media, put the JPG in a widget, save and open Site preview.
+  Expected: The upload succeeds with its image sizes, and the image shows in the editor and in the preview.
+
+- [ ] DOCK-004 - Export the site and download the export ZIP.
+  Expected: The export succeeds and the ZIP's pages show the uploaded image.
+
+- [ ] DOCK-005 - Run `docker compose down`, then `docker compose up` again, and reopen the app.
+  Expected: The project, its pages, media and export are all still there.
+
+- [ ] DOCK-006 - Run `docker compose down -v` to finish.
+  Expected: The container and its data volume are removed.
 
 ---
 

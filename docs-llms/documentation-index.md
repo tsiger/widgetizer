@@ -515,6 +515,7 @@ The [Widgetizer Theme skill](../skills/widgetizer-theme/SKILL.md) provides a tas
 
 ## ✅ Project Tracking
 
+- **[dependency-upgrades.md](dependency-upgrades.md)** — Upgrading npm packages: where each package is declared, what `npm update --save` gets wrong (workspace references, `editor-ui` peers), versions npm skips (`min-release-age`, 0.x, Node floor), known traps (Vite 8 and CommonJS-only packages, the `eslint-plugin-react` override, the theme skill catalog), and the checks to run after.
 - **[user-test-checklist.md](user-test-checklist.md)** — Standalone manual user-test checklist (no codebase knowledge assumed): IDs/actions/expected results, test pack/setup, and run waves for confirming create/edit/preview/export/backup/import/update/delete flows.
 
 ---

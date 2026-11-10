@@ -271,9 +271,11 @@ When the user switches projects, the app must ensure no data from the previous p
 - **Settings.jsx** reads/writes through `themeStore`; it guards save completion against mid-flight project changes, while project-switch reset ownership lives in the route boundary. A failed load shows its error with a **Try again** button, and opening Site settings again reloads a project whose settings never arrived (once per visit, so a load that keeps failing doesn't loop). A save refused because a chosen image is no longer in the media library (`MEDIA_REFERENCE_MISSING`) says so instead of offering a retry.
 - **useExportState / ExportCreator** guard history loads and export completion against project changes mid-flight
 
-### Known limitation
+### Unsaved edits and project switches
 
-`useNavigationGuard` and `useFormNavigationGuard` only watch route changes, not project changes. If the user has unsaved edits and switches projects via the sidebar, they won't see an "unsaved changes" prompt. The server will reject any stale write (409), so no data corruption occurs — but the user loses their edits silently. Acceptable for v1.0 single-user desktop use.
+A project is activated only from the Projects page, so switching projects in the same tab always leaves the current route first: `useNavigationGuard` and `useFormNavigationGuard` show their "Unsaved changes" dialog (Keep editing / Discard changes) before the editor or form is left.
+
+A switch made in **another tab** bypasses those guards. The stale tab keeps its unsaved edits, but can't save them: the server refuses the write (409 `PROJECT_MISMATCH`), `useStaleActiveProjectDetection` notices the change (at once from a same-browser tab through `lib/activeProjectChannel.js`, otherwise when the tab regains focus), and `StaleProjectCurtain` explains that another tab switched the active project, offering Reload or re-opening this project in the other tab. Re-opening it there clears the notice, and saving works again ([Hooks](core-hooks.md)).
 
 ---
 
