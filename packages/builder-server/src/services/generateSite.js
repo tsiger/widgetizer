@@ -112,6 +112,7 @@ async function findWidgetAssets(dir) {
  *   page and item pages; may return more entries.
  * @param {object} [options.report] - Filled in as the site is generated, since a generator's return
  *   value is lost in `for await`: `languages`, `languagesSkipped`, `structuredData`, `collections`,
+ *   `pageOutputs` (`{ pageId, language, path }` for every page HTML file, paginated copies included),
  *   `formsCount`.
  * @returns {AsyncGenerator<{ path: string, content?: string | Buffer, source?: string, softFailure?: (error: Error) => void }>}
  */
@@ -147,6 +148,8 @@ export async function* generateSite(deps, options) {
   const defaultLanguage = projectData.defaultLanguage;
   const structuredData = { readiness: identityReadiness(projectData.siteIdentity, projectData), warnings: [] };
   report.structuredData = structuredData;
+  const pageOutputs = [];
+  report.pageOutputs = pageOutputs;
 
   const collectionStorage = collections?.storage || null;
   const collectionScope = collections?.scope || null;
@@ -540,6 +543,7 @@ export async function* generateSite(deps, options) {
         mdBase ? absoluteSiteUrl(siteUrl, mdFilename) : prefixInternalHref(mdFilename, sharedGlobals.outputPathPrefix),
       );
     }
+    pageOutputs.push({ pageId: pageData.id, language: pageData.language, path: outputFilename });
     yield { path: outputFilename, content: html };
 
     if (withMarkdown) {

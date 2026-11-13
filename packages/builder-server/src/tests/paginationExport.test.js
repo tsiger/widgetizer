@@ -321,6 +321,58 @@ describe("export — homepage pagination", () => {
   });
 });
 
+// The report names the page behind every page file, copies included, so an
+// embedding app can treat a page's files alike without parsing paths.
+describe("generateSite — the page each file came from", () => {
+  let entries;
+  let report;
+  before(async () => {
+    await writePage("index", "Home", grid({ limit: 2, paginate: true }));
+    const { generateSite } = await import("../services/generateSite.js");
+    const { buildRenderDeps } = await import("../services/renderingService.js");
+    const deps = await buildRenderDeps(PROJECT_ID, { storage, scope });
+    report = {};
+    entries = [];
+    for await (const entry of generateSite(deps, {
+      appVersion: "test",
+      assetVersion: "test",
+      refuse: (code) => new Error(code),
+      collections: { storage, scope },
+      scope,
+      formatPages: false,
+      generateIcons: false,
+      report,
+    })) {
+      entries.push(entry.path);
+    }
+  });
+
+  after(async () => {
+    await writePage("index", "Home", grid({ limit: 2 }));
+  });
+
+  it("attributes page 1 and every paginated copy to its page", () => {
+    const byPath = Object.fromEntries(report.pageOutputs.map(({ path: file, ...rest }) => [file, rest]));
+    const language = projectRepo.getProjectById(PROJECT_ID).defaultLanguage;
+    assert.equal(typeof language, "string");
+    assert.deepEqual(byPath, {
+      "index.html": { pageId: "index", language },
+      "page/2.html": { pageId: "index", language },
+      "page/3.html": { pageId: "index", language },
+      "blog.html": { pageId: "blog", language },
+      "blog/page/2.html": { pageId: "blog", language },
+      "blog/page/3.html": { pageId: "blog", language },
+    });
+  });
+
+  it("leaves collection item pages out, and names only files it wrote", () => {
+    assert.ok(entries.includes("news/alpha.html"), "items were written");
+    const paths = report.pageOutputs.map((output) => output.path);
+    assert.ok(!paths.some((file) => file.startsWith("news/")));
+    for (const file of paths) assert.ok(entries.includes(file), file);
+  });
+});
+
 describe("export — homepage copies clash with a collection published under page/", () => {
   before(async () => {
     await writePage("index", "Home", grid({ limit: 2, paginate: true }));
