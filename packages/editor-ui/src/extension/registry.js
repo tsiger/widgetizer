@@ -2,8 +2,9 @@
 // frontend plugin objects (and the built-in OSS registrations) into ordered
 // collections the shell renders from.
 //
-// MVP extension points (consumed here): navItems, routes, commands. Lifecycle
-// `hooks` are handled separately by the hook runner (./hooks.js). A few keys are
+// Extension points (consumed here): navItems, routes, commands,
+// pageSettingsFields. Lifecycle `hooks` are handled separately by the hook
+// runner (./hooks.js). A few keys are
 // reserved for future extension points so plugins that use them don't trigger
 // the unknown-key warning; truly unknown keys are ignored with a dev warning
 // (forward compatibility — adding extension points never breaks old plugins).
@@ -14,6 +15,7 @@ const KNOWN_KEYS = new Set([
   "navItems",
   "routes",
   "commands",
+  "pageSettingsFields",
   "hooks", // consumed by ./hooks.js
   "activate", // escape hatch — reserved; declarative arrays only for MVP
   // Reserved future extension points (ignored for now, no warning):
@@ -35,12 +37,13 @@ function defaultWarn(message) {
  *
  * @param {Array<object>} plugins
  * @param {{ warn?: (msg: string) => void }} [opts]
- * @returns {{ navItems: object[], routes: object[], commands: object[] }}
+ * @returns {{ navItems: object[], routes: object[], commands: object[], pageSettingsFields: object[] }}
  */
 export function buildRegistry(plugins = [], { warn = defaultWarn } = {}) {
   const navItems = [];
   const routes = [];
   const commands = [];
+  const pageSettingsFields = [];
 
   for (const plugin of plugins) {
     if (!plugin || typeof plugin !== "object") continue;
@@ -56,9 +59,10 @@ export function buildRegistry(plugins = [], { warn = defaultWarn } = {}) {
     for (const item of plugin.navItems ?? []) navItems.push(tag(item));
     for (const route of plugin.routes ?? []) routes.push(tag(route));
     for (const command of plugin.commands ?? []) commands.push(tag(command));
+    for (const field of plugin.pageSettingsFields ?? []) pageSettingsFields.push(tag(field));
   }
 
-  return { navItems, routes, commands };
+  return { navItems, routes, commands, pageSettingsFields };
 }
 
 export { KNOWN_KEYS };

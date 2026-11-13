@@ -25,7 +25,7 @@ describe("buildRegistry", () => {
 
   it("tolerates plugins missing extension arrays and non-object entries", () => {
     const reg = buildRegistry([{ name: "empty" }, null, undefined, 42], { warn: () => {} });
-    expect(reg).toEqual({ navItems: [], routes: [], commands: [] });
+    expect(reg).toEqual({ navItems: [], routes: [], commands: [], pageSettingsFields: [] });
   });
 
   it("warns on truly unknown keys but not on reserved future ones", () => {
@@ -36,5 +36,22 @@ describe("buildRegistry", () => {
     );
     expect(warn).toHaveBeenCalledTimes(1);
     expect(warn.mock.calls[0][0]).toContain("somethingWeird");
+  });
+
+  it("collects pageSettingsFields in plugin order, without warning", () => {
+    const warn = vi.fn();
+    const Field = () => null;
+    const reg = buildRegistry(
+      [
+        { name: "a", pageSettingsFields: [{ id: "a1", field: "alpha", Component: Field }] },
+        { name: "b", pageSettingsFields: [{ id: "b1", field: "beta", Component: Field }] },
+      ],
+      { warn },
+    );
+    expect(warn).not.toHaveBeenCalled();
+    expect(reg.pageSettingsFields.map((f) => [f.id, f.field, f.pluginName])).toEqual([
+      ["a1", "alpha", "a"],
+      ["b1", "beta", "b"],
+    ]);
   });
 });

@@ -11,6 +11,7 @@ export {
   useNavItems,
   useCommands,
   usePluginRoutes,
+  usePageSettingsFields,
   useHookRunner,
   useSlot,
 } from "./extension/PluginProvider.jsx";
