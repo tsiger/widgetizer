@@ -838,39 +838,41 @@ export async function savePageContent(req, res) {
     });
     if (paginationError) return res.status(422).json({ error: paginationError });
 
-    // Read existing data to preserve timestamps etc.
-    let existingData = {};
-    let loadedExisting = false;
-    try {
-      const buf = await storage.read(scope, pageKey(id, lang));
-      if (buf != null) {
-        existingData = JSON.parse(buf.toString("utf8"));
-        loadedExisting = true;
-      }
-    } catch (err) {
-      console.warn(`Error reading existing page data for ${id}:`, err);
-      // Decide if this should be a fatal error
-    }
-    // If the file didn't exist (or couldn't be read/parsed), set default created timestamp
-    if (!loadedExisting && !existingData.created) {
-      existingData.created = new Date().toISOString();
-    }
-
-    // Combine existing data with new content, preserving all fields including SEO
-    const updatedPageData = {
-      ...existingData, // Start with existing data
-      ...pageData, // Override with new data (including SEO)
-      uuid: existingData.uuid || randomUUID(), // Preserve existing uuid or generate if missing
-      id: pageData.slug, // Use slug from request body as the ID
-      created: existingData.created, // Always preserve original creation date
-      updated: new Date().toISOString(), // Set new update timestamp
-    };
-    updatedPageData.translationGroupId = existingData.translationGroupId || updatedPageData.uuid;
-
     // ONE section for both writes. The anchor sweep writes other pages in this
     // language, so leaving it outside let a language removal land between the two
     // and the sweep then recreated a page in the language that had just gone.
+    // The stored page is read in the section too, so a page settings save that
+    // lands while this one waits is the page it builds on, not one it overwrites.
     const { usageStale, movedFrom } = await withContentWriteLock(scope.projectId, async () => {
+      // Read existing data to preserve timestamps etc.
+      let existingData = {};
+      let loadedExisting = false;
+      try {
+        const buf = await storage.read(scope, pageKey(id, lang));
+        if (buf != null) {
+          existingData = JSON.parse(buf.toString("utf8"));
+          loadedExisting = true;
+        }
+      } catch (err) {
+        console.warn(`Error reading existing page data for ${id}:`, err);
+        // Decide if this should be a fatal error
+      }
+      // If the file didn't exist (or couldn't be read/parsed), set default created timestamp
+      if (!loadedExisting && !existingData.created) {
+        existingData.created = new Date().toISOString();
+      }
+
+      // Combine existing data with new content, preserving all fields including SEO
+      const updatedPageData = {
+        ...existingData, // Start with existing data
+        ...pageData, // Override with new data (including SEO)
+        uuid: existingData.uuid || randomUUID(), // Preserve existing uuid or generate if missing
+        id: pageData.slug, // Use slug from request body as the ID
+        created: existingData.created, // Always preserve original creation date
+        updated: new Date().toISOString(), // Set new update timestamp
+      };
+      updatedPageData.translationGroupId = existingData.translationGroupId || updatedPageData.uuid;
+
       const persisted = await persistPageInSection({
         scope,
         storage,

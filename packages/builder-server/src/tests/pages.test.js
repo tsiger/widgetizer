@@ -681,6 +681,30 @@ describe("savePageContent", () => {
     assert.equal(onDisk.widgets.w1.settings.title, "Hero Title");
   });
 
+  // The stored page is read once the save holds the write section, so a page
+  // settings save that lands while it waits is the one it builds on.
+  it("keeps a settings change that lands while the save waits for the write section", async () => {
+    const page = await createTestPage("Queued Content Save");
+    const pagePath = path.join(getProjectPagesDir(activeProject.folderName), `${page.slug}.json`);
+    let save;
+    await withContentWriteLock(activeProject.id, async () => {
+      save = callController(savePageContent, {
+        params: { id: page.slug },
+        body: { name: page.name, slug: page.slug, widgets: { w1: { type: "text", settings: {} } }, widgetsOrder: ["w1"] },
+      });
+      // Let the save run up to the section it waits for.
+      await new Promise((resolve) => setTimeout(resolve, 50));
+      const stored = await fs.readJson(pagePath);
+      await fs.writeJson(pagePath, { ...stored, extra: "set in settings", seo: { description: "From settings" } });
+    });
+    const res = await save;
+    assert.equal(res._status, 200);
+    const read = await fs.readJson(pagePath);
+    assert.deepEqual(read.widgetsOrder, ["w1"]);
+    assert.equal(read.extra, "set in settings");
+    assert.equal(read.seo.description, "From settings");
+  });
+
   it("preserves uuid and created date", async () => {
     const page = await createTestPage("Preserve Check");
 
