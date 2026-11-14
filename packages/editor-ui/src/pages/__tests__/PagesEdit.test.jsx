@@ -81,4 +81,19 @@ describe("saving page settings", () => {
     expect(id).toBe("about");
     expect(body).toEqual({ ...formData, language: "el" });
   });
+
+  it("sends a field a plugin added to the form", async () => {
+    render(
+      <MemoryRouter initialEntries={["/pages/about/edit?language=el"]}>
+        <Routes>
+          <Route path="/pages/:id/edit" element={<PagesEdit />} />
+        </Routes>
+      </MemoryRouter>,
+    );
+    await waitFor(() => expect(submitForm).toBeTypeOf("function"));
+
+    await submitForm({ name: "About", slug: "about", seo: {}, parentPageUuid: "", extra: "x" });
+
+    expect(updatePage.mock.calls[0][1].extra).toBe("x");
+  });
 });

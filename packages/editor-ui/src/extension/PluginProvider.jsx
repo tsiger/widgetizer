@@ -37,6 +37,9 @@ function usePluginContext() {
 export const useNavItems = () => usePluginContext().registry.navItems;
 export const useCommands = () => usePluginContext().registry.commands;
 export const usePluginRoutes = () => usePluginContext().registry.routes;
+// Tolerates a missing provider: PageForm renders outside EditorShell too (its
+// own tests), and with no plugins the form has no extra fields.
+export const usePageSettingsFields = () => useContext(PluginContext)?.registry.pageSettingsFields ?? EMPTY_ARRAY;
 export const useHookRunner = () => usePluginContext().hooks;
 export const useSlot = (name) => resolveSlot(usePluginContext().slots, name);
 

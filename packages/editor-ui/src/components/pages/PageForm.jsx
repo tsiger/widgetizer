@@ -12,9 +12,12 @@ import { isHomeSlug } from "@widgetizer/core/internalHref";
 import { isReservedPageSlug, translationGroupIdOf } from "@widgetizer/core/contentAddress";
 import { getAllPages } from "../../queries/pageManager";
 import ParentPagePicker from "./ParentPagePicker";
+import { usePageSettingsFields } from "../../extension/PluginProvider.jsx";
 
-function toFormValues(initialData) {
+// Each contributed field's stored value is carried too, or a save would drop it.
+function toFormValues(initialData, extraFields) {
   return {
+    ...Object.fromEntries(extraFields.map(({ field }) => [field, initialData[field]])),
     name: initialData.name || "",
     slug: initialData.slug || "",
     seo: {
@@ -44,6 +47,7 @@ export default function PageForm({
   const isNew = !initialData.id;
   const [showMoreSettings, setShowMoreSettings] = useState(false);
   const showToast = useToastStore((state) => state.showToast);
+  const extraFields = usePageSettingsFields();
 
   // Sticky action bar: the shadow shows only while the bar floats over scrollable
   // content. Re-checked when "More settings" expands/collapses the SEO block.
@@ -58,7 +62,7 @@ export default function PageForm({
     setValue,
     control,
   } = useForm({
-    defaultValues: toFormValues(initialData),
+    defaultValues: toFormValues(initialData, extraFields),
   });
 
   // Watch fields for auto-slug and media display
@@ -133,7 +137,7 @@ export default function PageForm({
   useEffect(() => {
     const currentInitialDataStr = JSON.stringify(initialData);
     if (prevInitialDataRef.current !== currentInitialDataStr) {
-      reset(toFormValues(initialData));
+      reset(toFormValues(initialData, extraFields));
       prevInitialDataRef.current = currentInitialDataStr;
     }
   });
@@ -216,6 +220,17 @@ export default function PageForm({
             />
           </p>
         </div>
+
+        {extraFields.map(({ id, field, Component }) => (
+          <Component
+            key={id}
+            value={watch(field)}
+            onChange={(value) => setValue(field, value, { shouldDirty: true })}
+            page={initialData}
+            isNew={isNew}
+            language={initialData.language || language}
+          />
+        ))}
       </div>
 
       {/* More Settings Toggle */}

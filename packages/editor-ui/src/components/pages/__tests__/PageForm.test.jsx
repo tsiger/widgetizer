@@ -16,6 +16,7 @@ vi.mock("../../settings/inputs/ImageInput", () => ({ default: () => null }));
 vi.mock("react-i18next", () => ({ useTranslation: () => ({ t: (key) => key }), Trans: () => null }));
 
 import PageForm from "../PageForm.jsx";
+import { PluginProvider } from "../../../extension/PluginProvider.jsx";
 import useProjectStore from "../../../stores/projectStore";
 
 const PAGE = { id: "about", uuid: "u-about", name: "About", slug: "about", parentPageUuid: "u-parent" };
@@ -104,5 +105,70 @@ describe("PageForm parent on a multilingual site", () => {
 
     await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1));
     expect(onSubmit.mock.calls[0][0].parentPageUuid).toBe("u-about-el");
+  });
+});
+
+// A plugin adds its own field to the page settings form; its value is part of
+// what the form submits, on create and on edit.
+describe("PageForm with a plugin field", () => {
+  const seen = [];
+  function ExtraField({ value, onChange, page, isNew, language }) {
+    seen.push({ value, page, isNew, language });
+    return (
+      <button type="button" data-value={value ?? ""} onClick={() => onChange("x")}>
+        set extra
+      </button>
+    );
+  }
+  const plugins = [{ name: "extra", pageSettingsFields: [{ id: "extra", field: "extra", Component: ExtraField }] }];
+  const withPlugins = (ui) => <PluginProvider plugins={plugins}>{ui}</PluginProvider>;
+
+  it("submits the field's value when creating a page", async () => {
+    seen.length = 0;
+    const onSubmit = vi.fn(async () => false);
+    const { container } = render(withPlugins(<PageForm onSubmit={onSubmit} isDirty language="el" />));
+
+    expect(seen.at(-1)).toMatchObject({ isNew: true, language: "el" });
+    fireEvent.change(container.querySelector("#name"), { target: { value: "Members" } });
+    fireEvent.click(screen.getByRole("button", { name: "set extra" }));
+    fireEvent.submit(container.querySelector("form"));
+
+    await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1));
+    expect(onSubmit.mock.calls[0][0]).toMatchObject({ name: "Members", slug: "members", extra: "x" });
+  });
+
+  it("shows the stored value and submits the new one when editing a page", async () => {
+    seen.length = 0;
+    const onSubmit = vi.fn(async () => false);
+    const page = { ...PAGE, extra: "old" };
+    render(withPlugins(<PageForm initialData={page} onSubmit={onSubmit} isDirty />));
+
+    const button = screen.getByRole("button", { name: "set extra" });
+    expect(button.dataset.value).toBe("old");
+    expect(seen.at(-1)).toMatchObject({ isNew: false, page });
+    fireEvent.click(button);
+    expect(button.dataset.value).toBe("x");
+    fireEvent.submit(button.closest("form"));
+
+    await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1));
+    expect(onSubmit.mock.calls[0][0].extra).toBe("x");
+  });
+
+  it("keeps the stored value when the field is left alone", async () => {
+    const onSubmit = vi.fn(async () => false);
+    const { container } = render(withPlugins(<PageForm initialData={{ ...PAGE, extra: "old" }} onSubmit={onSubmit} isDirty />));
+
+    fireEvent.change(container.querySelector("#name"), { target: { value: "About us" } });
+    fireEvent.submit(container.querySelector("form"));
+
+    await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1));
+    expect(onSubmit.mock.calls[0][0].extra).toBe("old");
+  });
+
+  it("marks the form changed when the field changes", async () => {
+    const onDirtyChange = vi.fn();
+    render(withPlugins(<PageForm initialData={PAGE} onSubmit={vi.fn()} onDirtyChange={onDirtyChange} />));
+    fireEvent.click(screen.getByRole("button", { name: "set extra" }));
+    await waitFor(() => expect(onDirtyChange).toHaveBeenLastCalledWith(true));
   });
 });
