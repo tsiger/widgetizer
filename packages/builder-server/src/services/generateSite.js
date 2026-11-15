@@ -299,11 +299,7 @@ export async function* generateSite(deps, options) {
         pageSlug: pageData.id,
         language: pageData.language,
       });
-      // The not-found page is one file shown at every missing address: its list
-      // keeps the per-page limit but gets no copies and no pager.
-      if (plan) {
-        paginationPlans.set(pageIdentity(pageData), isNotFoundSlug(pageData.id) ? { ...plan, total: 1, pager: false } : plan);
-      }
+      if (plan) paginationPlans.set(pageIdentity(pageData), plan);
     }
   }
   // Each copy of a split listing is a full page whose pager links to every other
