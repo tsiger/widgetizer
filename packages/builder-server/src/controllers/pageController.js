@@ -16,9 +16,9 @@ import { stripHtmlToText } from "../services/sanitizationService.js";
 import { LIMIT_KEYS, MAX_WIDGETS_PER_PAGE } from "@widgetizer/core/adapters";
 import { sanitizeSlug, generateUniqueSlug } from "../utils/slugHelpers.js";
 import { generateCopyName } from "../utils/namingHelpers.js";
-import { isHomeSlug, isReservedPageSlug, pageKey, pagesDir } from "@widgetizer/core/contentAddress";
+import { isHomeSlug, isNotFoundSlug, isReservedPageSlug, pageKey, pagesDir } from "@widgetizer/core/contentAddress";
 import { renderedWidgetOrder, uniqueBlockOrders, uniqueWidgetOrder } from "@widgetizer/core/widgetOrder";
-import { requestLanguage, projectLanguageContexts, withoutLanguage } from "../utils/contentLanguage.js";
+import { languageNameForMessage, requestLanguage, projectLanguageContexts, withoutLanguage } from "../utils/contentLanguage.js";
 import {
   assertHasIdentity,
   assertLanguageFree,
@@ -113,6 +113,9 @@ const SLUG_REFUSALS = {
   RESERVED_SLUG: "Reserved slug",
   SLUG_TAKEN: "Slug already exists",
   SECOND_HOMEPAGE: "Slug already exists",
+  NOT_FOUND_ADDRESS_LOCKED: "Address locked",
+  NOT_FOUND_TRANSLATION_ADDRESS: "Address locked",
+  NOT_FOUND_EXISTS: "Not-found page exists",
 };
 
 function respondMissingMedia(res, error) {
@@ -173,6 +176,15 @@ async function claimPageSlug({ scope, storage, pageId, pageData, previousPageId,
       }
       return pageId;
     }
+  }
+
+  // The not-found page's address is set when the page is created and never
+  // changes: renaming it would quietly turn it off, and renaming another page
+  // onto it would make a page the owner never meant as one.
+  if (previousPageId && previousPageId !== pageId && (isNotFoundSlug(previousPageId) || isNotFoundSlug(pageId))) {
+    throw new ConflictError("The not-found page's address (404) can't change, and no other page can take it.", {
+      code: "NOT_FOUND_ADDRESS_LOCKED",
+    });
   }
 
   const current = withCurrentLanguages(scope.projectId, lang);
@@ -1104,7 +1116,33 @@ export async function createPageLanguageVersion(req, res) {
       const groupId = groupIdOf(source);
       assertLanguageFree(await findPageInGroup({ storage, scope, lang: target, groupId }), target.language, "page");
 
-      const desiredSlug = sanitizeSlug(req.body?.slug || "") || source.slug || req.params.id;
+      // A translation of the not-found page is its language's not-found page,
+      // so it keeps the address; no other page's translation may take it.
+      const requestedSlug = sanitizeSlug(req.body?.slug || "");
+      if (requestedSlug && isNotFoundSlug(source.slug) !== isNotFoundSlug(requestedSlug)) {
+        throw new ConflictError("A translation of the not-found page must have the address 404.", {
+          code: "NOT_FOUND_TRANSLATION_ADDRESS",
+        });
+      }
+      if (isNotFoundSlug(source.slug)) {
+        const existingBuf = await storage.read(scope, pageKey(source.slug, target));
+        if (existingBuf != null) {
+          let existingName = source.slug;
+          try {
+            existingName = JSON.parse(existingBuf.toString("utf8")).name || existingName;
+          } catch {
+            // Unreadable: name it by its address.
+          }
+          const language = languageNameForMessage(target.language);
+          throw new ConflictError(
+            `${language} already has a not-found page ("${existingName}"). It's already used for ${language}. ` +
+              "To replace it with a translation of this page, delete it first.",
+            { code: "NOT_FOUND_EXISTS" },
+          );
+        }
+      }
+
+      const desiredSlug = requestedSlug || source.slug || req.params.id;
       const slug = await generateUniqueSlug(desiredSlug, pageSlugTaken(storage, scope, target), { fallback: "page" });
 
       const created = {
