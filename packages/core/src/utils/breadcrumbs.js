@@ -78,9 +78,9 @@ function ancestorsOf(page, pagesByUuid, language) {
     seen.add(parentUuid);
     seen.add(parent.uuid);
     if (isHomeSlug(parent.slug)) break;
-    // A not-found page answers 404 wherever it is linked; the trail stops below it.
-    if (isNotFoundSlug(parent.slug)) break;
-    chain.push(parent);
+    // A not-found page answers 404 wherever it is linked: it is left out of
+    // the trail, which goes on with the pages above it.
+    if (!isNotFoundSlug(parent.slug)) chain.push(parent);
     current = parent;
   }
 

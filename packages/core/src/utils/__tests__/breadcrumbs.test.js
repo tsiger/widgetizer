@@ -521,4 +521,12 @@ describe("the not-found page in breadcrumbs", () => {
     const trail = buildBreadcrumbs({ page: child, pagesByUuid: pagesByUuid(HOME, notFound, child), pageNumber: 1 });
     expect(labels(trail)).toEqual(["Home", "Help"]);
   });
+
+  it("a 404 page in the middle of a chain is skipped, and the trail goes on above it", () => {
+    const about = page("about", "About");
+    const notFound = page("404", "Page not found", { parentPageUuid: about.uuid });
+    const child = page("help", "Help", { parentPageUuid: notFound.uuid });
+    const trail = buildBreadcrumbs({ page: child, pagesByUuid: pagesByUuid(HOME, about, notFound, child), pageNumber: 1 });
+    expect(labels(trail)).toEqual(["Home", "About", "Help"]);
+  });
 });
