@@ -219,15 +219,18 @@ export default function PageForm({
             <span className="text-slate-500 ml-1">.html</span>
           </div>
           {errors.slug && <p className="form-error">{errors.slug.message}</p>}
-          {isNotFoundPage && <p className="form-description">{t("forms.page.notFoundNote")}</p>}
-          <p className="form-description">
-            <Trans
-              i18nKey="forms.page.filenameHelp"
-              components={{
-                strong: <strong className="font-semibold text-slate-700" />,
-              }}
-            />
-          </p>
+          {isNotFoundPage ? (
+            <p className="form-description">{t("forms.page.notFoundNote")}</p>
+          ) : (
+            <p className="form-description">
+              <Trans
+                i18nKey="forms.page.filenameHelp"
+                components={{
+                  strong: <strong className="font-semibold text-slate-700" />,
+                }}
+              />
+            </p>
+          )}
         </div>
 
         {extraFields.map(({ id, field, Component }) => (
@@ -349,7 +352,7 @@ export default function PageForm({
                 <option value="noindex,nofollow">{t("forms.page.robots.noindexNofollow")}</option>
               </select>
             )}
-            <p className="form-description">{isNotFoundPage ? t("forms.page.notFoundNote") : t("forms.page.robotsHelp")}</p>
+            {!isNotFoundPage && <p className="form-description">{t("forms.page.robotsHelp")}</p>}
           </div>
         </div>
       )}

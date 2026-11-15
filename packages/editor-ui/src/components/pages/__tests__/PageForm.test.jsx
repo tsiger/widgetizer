@@ -191,6 +191,14 @@ describe("PageForm on the not-found page", () => {
     expect(container.querySelector("#seo-canonical-url")).toBeNull();
   });
 
+  it("the note shows once, in place of the filename help, with More settings open", () => {
+    const { container } = render(<PageForm initialData={NOT_FOUND} onSubmit={vi.fn()} />);
+    fireEvent.click(screen.getByRole("button", { name: /forms\.project\.moreSettings/ }));
+    expect(screen.getAllByText("forms.page.notFoundNote")).toHaveLength(1);
+    const slugField = container.querySelector("#slug").closest(".form-field");
+    expect(slugField.querySelectorAll(".form-description")).toHaveLength(1);
+  });
+
   it("renaming an existing page to 404 shows notFoundSlugTaken", async () => {
     const onSubmit = vi.fn(async () => false);
     const { container } = render(<PageForm initialData={{ ...PAGE, parentPageUuid: undefined }} onSubmit={onSubmit} isDirty />);
