@@ -34,7 +34,7 @@ What it checks:
 - **Widget and block ids:** the id rule (letters, digits, `_`, `-`; at most 128; no built-in names; no `header`/`footer` widget ids), in maps and orders, and no widget id shared between a shared-area template and a page or another area template.
 - **Layout:** main content, header and footer, asset hooks, and the tags that theme settings depend on.
 - **Assets:** enqueued files exist, and no two CSS/JS files share a name across widgets and `assets/`.
-- **Starter pages and menus:** page shape, every widget and block type exists, every stored setting is declared and has the right shape, order arrays match, internal links and menu ids point at something, and no menu item links the not-found page (`404`).
+- **Starter pages and menus:** page shape, every widget and block type exists, every stored setting is declared and has the right shape, order arrays match, internal links and menu ids point at something, and no menu item links the "404 - Not found" page (`404`, at the root or in a language folder).
 - **Locales:** schema `tTheme:` labels, group names, literal `t` keys and default-key references are checked against English, including core visitor strings.
 - **Collections and presets:** the app's collection-schema rules, item-template presence, preset overrides, starter widget/block data, and each preset's starter media (manifest shape, paths, and that the listed files exist). Core widget values use their complete app schemas.
 - **Updates:** version folder and manifest checks. These do not certify an assembled update or preservation of existing project content.

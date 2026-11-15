@@ -83,7 +83,14 @@ export default function PageForm({
   // The folder the page is written to: `el/about.html` for a Greek page.
   const defaultLanguage = useDefaultLanguage();
   const pageLanguage = initialData.language || language;
-  const folder = languageFolder({ language: pageLanguage, defaultLanguage });
+  // A malformed language in the address makes languageFolder throw; the server
+  // refuses such a page anyway, so the form just shows the root.
+  let folder;
+  try {
+    folder = languageFolder({ language: pageLanguage, defaultLanguage });
+  } catch {
+    folder = "";
+  }
 
   // Candidates for the parent picker. Loaded here so both callers (add + edit)
   // get the field without threading a prop through each.
@@ -274,6 +281,7 @@ export default function PageForm({
             value={watch(field)}
             onChange={(value) => setValue(field, value, { shouldDirty: true })}
             page={initialData}
+            slug={formatSlug(slugValue || "")}
             isNew={isNew}
             language={initialData.language || language}
           />

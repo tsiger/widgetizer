@@ -115,7 +115,7 @@ const SLUG_REFUSALS = {
   SECOND_HOMEPAGE: "Slug already exists",
   NOT_FOUND_ADDRESS_LOCKED: "Address locked",
   NOT_FOUND_TRANSLATION_ADDRESS: "Address locked",
-  NOT_FOUND_EXISTS: "Not-found page exists",
+  NOT_FOUND_EXISTS: "\"404 - Not found\" page exists",
 };
 
 function respondMissingMedia(res, error) {
@@ -189,6 +189,12 @@ async function claimPageSlug({ scope, storage, pageId, pageData, previousPageId,
 
   const current = withCurrentLanguages(scope.projectId, lang);
   if (!previousPageId) {
+    // A language has one "404 - Not found" page: a new page asking for 404 when
+    // another write took it first is refused, not renumbered into an ordinary page.
+    if (isNotFoundSlug(pageId)) {
+      const exists = await notFoundExistsError(storage, scope, lang);
+      if (exists) throw exists;
+    }
     const slug = await generateUniqueSlug(pageId, pageSlugTaken(storage, scope, current), { fallback: "page" });
     if (slug !== pageId) Object.assign(pageData, { id: slug, slug });
     return slug;

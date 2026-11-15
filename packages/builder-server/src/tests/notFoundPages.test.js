@@ -159,6 +159,17 @@ describe("the 404 address in settings and content saves", () => {
     assert.ok(!(await fs.pathExists(pageFile("404-1"))));
   });
 
+  it("two simultaneous creates at 404: one is created, the other refused", async () => {
+    await fs.remove(pageFile("404"));
+    const [a, b] = await Promise.all([
+      call(pageController.createPage, { body: { name: "404" } }),
+      call(pageController.createPage, { body: { name: "Lost", slug: "404" } }),
+    ]);
+    assert.deepEqual([a._status, b._status].sort(), [201, 409], JSON.stringify([a._json, b._json]));
+    assert.equal([a, b].find((r) => r._status === 409)._json.code, "NOT_FOUND_EXISTS");
+    assert.ok(!(await fs.pathExists(pageFile("404-1"))), "no renumbered copy");
+  });
+
   it("POST /pages creates a page at 404", async () => {
     await fs.remove(pageFile("404"));
     const res = await call(pageController.createPage, { body: { name: "Not found", slug: "404" } });

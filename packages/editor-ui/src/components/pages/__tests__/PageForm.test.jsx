@@ -112,8 +112,8 @@ describe("PageForm parent on a multilingual site", () => {
 // what the form submits, on create and on edit.
 describe("PageForm with a plugin field", () => {
   const seen = [];
-  function ExtraField({ value, onChange, page, isNew, language }) {
-    seen.push({ value, page, isNew, language });
+  function ExtraField({ value, onChange, page, slug, isNew, language }) {
+    seen.push({ value, page, slug, isNew, language });
     return (
       <button type="button" data-value={value ?? ""} onClick={() => onChange("x")}>
         set extra
@@ -122,6 +122,18 @@ describe("PageForm with a plugin field", () => {
   }
   const plugins = [{ name: "extra", pageSettingsFields: [{ id: "extra", field: "extra", Component: ExtraField }] }];
   const withPlugins = (ui) => <PluginProvider plugins={plugins}>{ui}</PluginProvider>;
+
+  it("tells the field the filename as it is typed", async () => {
+    seen.length = 0;
+    const { container } = render(withPlugins(<PageForm onSubmit={vi.fn()} />));
+    fireEvent.change(container.querySelector("#slug"), { target: { value: "404" } });
+    await waitFor(() => expect(seen.at(-1)).toMatchObject({ slug: "404" }));
+  });
+
+  it("a malformed language in the address doesn't break the form", () => {
+    const { container } = render(<PageForm initialData={{}} language="not a code!" onSubmit={vi.fn()} />);
+    expect(container.querySelector("#slug")).toBeTruthy();
+  });
 
   it("submits the field's value when creating a page", async () => {
     seen.length = 0;
