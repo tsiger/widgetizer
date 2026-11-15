@@ -172,3 +172,56 @@ describe("PageForm with a plugin field", () => {
     await waitFor(() => expect(onDirtyChange).toHaveBeenLastCalledWith(true));
   });
 });
+
+// The not-found page's address is set when it is created and never changes, and
+// it is always hidden from search engines, so the form shows both as fixed.
+describe("PageForm on the not-found page", () => {
+  const NOT_FOUND = { id: "404", uuid: "u-404", name: "Page not found", slug: "404" };
+
+  it("an existing 404 page shows its address read-only, with the note", () => {
+    const { container } = render(<PageForm initialData={NOT_FOUND} onSubmit={vi.fn()} />);
+    expect(container.querySelector("#slug").readOnly).toBe(true);
+    expect(screen.getByText("forms.page.notFoundNote")).toBeTruthy();
+  });
+
+  it("an existing 404 page shows the search-engine setting fixed", () => {
+    const { container } = render(<PageForm initialData={NOT_FOUND} onSubmit={vi.fn()} />);
+    fireEvent.click(screen.getByRole("button", { name: /forms\.project\.moreSettings/ }));
+    expect(container.querySelector("#seo-robots").disabled).toBe(true);
+    expect(container.querySelector("#seo-canonical-url")).toBeNull();
+  });
+
+  it("renaming an existing page to 404 shows notFoundSlugTaken", async () => {
+    const onSubmit = vi.fn(async () => false);
+    const { container } = render(<PageForm initialData={{ ...PAGE, parentPageUuid: undefined }} onSubmit={onSubmit} isDirty />);
+    fireEvent.change(container.querySelector("#slug"), { target: { value: "404" } });
+    fireEvent.submit(container.querySelector("form"));
+    await waitFor(() => expect(screen.getByText("forms.page.notFoundSlugTaken")).toBeTruthy());
+    expect(onSubmit).not.toHaveBeenCalled();
+  });
+
+  it("a new page may be given the address 404", async () => {
+    const onSubmit = vi.fn(async () => false);
+    const { container } = render(<PageForm initialData={{}} onSubmit={onSubmit} isDirty />);
+    fireEvent.change(container.querySelector("#name"), { target: { value: "Not found" } });
+    fireEvent.change(container.querySelector("#slug"), { target: { value: "404" } });
+    fireEvent.submit(container.querySelector("form"));
+    await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1));
+    expect(onSubmit.mock.calls[0][0].slug).toBe("404");
+  });
+
+  it("the parent picker never offers a page at 404", async () => {
+    useProjectStore.setState({ activeProject: { id: "p1", defaultLanguage: "en", languages: ["el"] } });
+    allPages = [
+      { uuid: "u-services", slug: "services", name: "Services", language: "en" },
+      { uuid: "u-404", slug: "404", name: "Page not found", language: "en" },
+      { uuid: "u-about", slug: "about", name: "About", language: "en" },
+    ];
+    const { container } = render(<PageForm initialData={{ ...PAGE, parentPageUuid: "u-services" }} onSubmit={vi.fn()} />);
+    fireEvent.click(screen.getByRole("button", { name: /forms\.project\.moreSettings/ }));
+    await waitFor(() => expect(container.querySelector("#parent-page").textContent).toContain("Services"));
+    fireEvent.click(container.querySelector("#parent-page"));
+    fireEvent.click(screen.getByRole("button", { name: "All" }));
+    expect(screen.queryByText("Page not found")).toBeNull();
+  });
+});

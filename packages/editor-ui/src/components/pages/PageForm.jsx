@@ -9,7 +9,7 @@ import useStickyActionBar from "../../hooks/useStickyActionBar";
 import Button from "../ui/Button";
 import ImageInput from "../settings/inputs/ImageInput";
 import { isHomeSlug } from "@widgetizer/core/internalHref";
-import { isReservedPageSlug, translationGroupIdOf } from "@widgetizer/core/contentAddress";
+import { isNotFoundSlug, isReservedPageSlug, translationGroupIdOf } from "@widgetizer/core/contentAddress";
 import { getAllPages } from "../../queries/pageManager";
 import ParentPagePicker from "./ParentPagePicker";
 import { usePageSettingsFields } from "../../extension/PluginProvider.jsx";
@@ -45,6 +45,9 @@ export default function PageForm({
 }) {
   const { t } = useTranslation();
   const isNew = !initialData.id;
+  // The not-found page's address is set when it is created and never changes
+  // (the server refuses it too), and it is always hidden from search engines.
+  const isNotFoundPage = !isNew && isNotFoundSlug(initialData.slug);
   const [showMoreSettings, setShowMoreSettings] = useState(false);
   const showToast = useToastStore((state) => state.showToast);
   const extraFields = usePageSettingsFields();
@@ -112,6 +115,7 @@ export default function PageForm({
           page.uuid &&
           !descendants.has(page.uuid) &&
           !isHomeSlug(page.slug) &&
+          !isNotFoundSlug(page.slug) &&
           !(ownGroup && translationGroupIdOf(page) === ownGroup),
       )
       .sort((a, b) => String(a.name || a.slug).localeCompare(String(b.name || b.slug)))
@@ -202,15 +206,20 @@ export default function PageForm({
                   if (isReservedPageSlug(slug) && slug !== initialData.slug) {
                     return t("forms.page.filenameReserved", { slug });
                   }
+                  if (!isNew && isNotFoundSlug(slug) && slug !== initialData.slug) {
+                    return t("forms.page.notFoundSlugTaken");
+                  }
                   return true;
                 },
               })}
               onBlur={handleSlugBlur}
+              readOnly={isNotFoundPage}
               className="form-input flex-1"
             />
             <span className="text-slate-500 ml-1">.html</span>
           </div>
           {errors.slug && <p className="form-error">{errors.slug.message}</p>}
+          {isNotFoundPage && <p className="form-description">{t("forms.page.notFoundNote")}</p>}
           <p className="form-description">
             <Trans
               i18nKey="forms.page.filenameHelp"
@@ -305,25 +314,42 @@ export default function PageForm({
             <p className="form-description">{t("forms.page.socialImageHelp")}</p>
           </div>
 
-          <div className="form-field">
-            <label htmlFor="seo-canonical-url" className="form-label-optional">
-              {t("forms.page.canonicalUrl")}
-            </label>
-            <input type="url" id="seo-canonical-url" {...register("seo.canonical_url")} className="form-input" />
-            <p className="form-description">{t("forms.page.canonicalUrlHelp")}</p>
-          </div>
+          {!isNotFoundPage && (
+            <div className="form-field">
+              <label htmlFor="seo-canonical-url" className="form-label-optional">
+                {t("forms.page.canonicalUrl")}
+              </label>
+              <input type="url" id="seo-canonical-url" {...register("seo.canonical_url")} className="form-input" />
+              <p className="form-description">{t("forms.page.canonicalUrlHelp")}</p>
+            </div>
+          )}
 
           <div className="form-field">
             <label htmlFor="seo-robots" className="form-label">
               {t("forms.page.robotsLabel")}
             </label>
-            <select id="seo-robots" {...register("seo.robots")} className="form-select">
-              <option value="index,follow">{t("forms.page.robots.indexFollow")}</option>
-              <option value="noindex,follow">{t("forms.page.robots.noindexFollow")}</option>
-              <option value="index,nofollow">{t("forms.page.robots.indexNofollow")}</option>
-              <option value="noindex,nofollow">{t("forms.page.robots.noindexNofollow")}</option>
-            </select>
-            <p className="form-description">{t("forms.page.robotsHelp")}</p>
+            {isNotFoundPage ? (
+              // Shown, not registered: the stored value is kept and the export
+              // replaces its index part with noindex.
+              <select
+                id="seo-robots"
+                disabled
+                value={initialData.seo?.robots?.includes("nofollow") ? "noindex,nofollow" : "noindex,follow"}
+                onChange={() => {}}
+                className="form-select"
+              >
+                <option value="noindex,follow">{t("forms.page.robots.noindexFollow")}</option>
+                <option value="noindex,nofollow">{t("forms.page.robots.noindexNofollow")}</option>
+              </select>
+            ) : (
+              <select id="seo-robots" {...register("seo.robots")} className="form-select">
+                <option value="index,follow">{t("forms.page.robots.indexFollow")}</option>
+                <option value="noindex,follow">{t("forms.page.robots.noindexFollow")}</option>
+                <option value="index,nofollow">{t("forms.page.robots.indexNofollow")}</option>
+                <option value="noindex,nofollow">{t("forms.page.robots.noindexNofollow")}</option>
+              </select>
+            )}
+            <p className="form-description">{isNotFoundPage ? t("forms.page.notFoundNote") : t("forms.page.robotsHelp")}</p>
           </div>
         </div>
       )}
