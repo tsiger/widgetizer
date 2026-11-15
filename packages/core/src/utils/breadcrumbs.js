@@ -11,7 +11,7 @@
  */
 import { pageHref, itemHref } from "./internalHref.js";
 import { renderedWidgetOrder } from "./widgetOrder.js";
-import { isHomeSlug, pagedHref, pageOutputPath, itemOutputPath, translationGroupIdOf } from "./contentAddress.js";
+import { isHomeSlug, isNotFoundSlug, pagedHref, pageOutputPath, itemOutputPath, translationGroupIdOf } from "./contentAddress.js";
 
 /** A parent chain longer than this is treated as broken data, not walked. */
 const MAX_DEPTH = 10;
@@ -78,6 +78,8 @@ function ancestorsOf(page, pagesByUuid, language) {
     seen.add(parentUuid);
     seen.add(parent.uuid);
     if (isHomeSlug(parent.slug)) break;
+    // A not-found page answers 404 wherever it is linked; the trail stops below it.
+    if (isNotFoundSlug(parent.slug)) break;
     chain.push(parent);
     current = parent;
   }
@@ -249,6 +251,9 @@ export function indexListingPages(pages, schemasByType) {
   const sorted = [...pages].sort((a, b) => String(a?.slug || "").localeCompare(String(b?.slug || "")));
   for (const page of sorted) {
     if (!page?.uuid) continue;
+    // A not-found page answers 404 wherever it is linked, so it never hangs a
+    // collection's items: "404" sorts before every lettered slug and would win.
+    if (isNotFoundSlug(page.slug)) continue;
     for (const widgetId of renderedWidgetOrder(page.widgets, page.widgetsOrder)) {
       const widget = page.widgets[widgetId];
       const declared = get(widget?.type)?.collection?.type;
