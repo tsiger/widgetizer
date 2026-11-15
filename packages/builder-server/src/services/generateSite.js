@@ -11,10 +11,11 @@ import {
 } from "@widgetizer/render-engine";
 import { MAX_FORMS_PER_SITE, LIMIT_KEYS } from "@widgetizer/core/adapters";
 import { splitAssetRef } from "@widgetizer/core/assetUrl";
-import { isHomeSlug, siteUrlBase, absoluteSiteUrl } from "@widgetizer/core/internalHref";
+import { isHomeSlug, siteUrlBase, absoluteSiteUrl, siteUrlPathname } from "@widgetizer/core/internalHref";
 import {
   resolveLanguage,
   languageFolder,
+  isNotFoundSlug,
   pageOutputPath,
   itemOutputPath as itemOutputPathFor,
 } from "@widgetizer/core/contentAddress";
@@ -116,6 +117,20 @@ async function findWidgetAssets(dir) {
  *   `formsCount`.
  * @returns {AsyncGenerator<{ path: string, content?: string | Buffer, source?: string, softFailure?: (error: Error) => void }>}
  */
+/**
+ * The not-found page is always hidden from search engines, whatever its own
+ * setting: one value that the robots tag, the sitemap, robots.txt and hreflang
+ * all read. The owner's follow choice is kept.
+ */
+function notFoundRobots(robots) {
+  return typeof robots === "string" && robots.includes("nofollow") ? "noindex,nofollow" : "noindex,follow";
+}
+
+function withNotFoundSeo(pageData) {
+  if (!isNotFoundSlug(pageData.id)) return pageData;
+  return { ...pageData, seo: { ...pageData.seo, robots: notFoundRobots(pageData.seo?.robots) } };
+}
+
 export async function* generateSite(deps, options) {
   const {
     appVersion,
@@ -165,7 +180,7 @@ export async function* generateSite(deps, options) {
   // A slug is unique per language, so anything keyed by page must key by the
   // language-qualified output path rather than the id alone.
   const pageIdentity = (pageData) => pageOutputPath(pageData.id, 1, pageLang(pageData));
-  const allPages = filterPages(await listPagesFromDir(projectDir, { defaultLanguage }), projectData);
+  const allPages = filterPages(await listPagesFromDir(projectDir, { defaultLanguage }), projectData).map(withNotFoundSeo);
 
   // The default language needs a homepage: a page slugged "index" or "home",
   // both of which publish as index.html. page.id is the filename, the
@@ -284,7 +299,11 @@ export async function* generateSite(deps, options) {
         pageSlug: pageData.id,
         language: pageData.language,
       });
-      if (plan) paginationPlans.set(pageIdentity(pageData), plan);
+      // The not-found page is one file shown at every missing address: its list
+      // keeps the per-page limit but gets no copies and no pager.
+      if (plan) {
+        paginationPlans.set(pageIdentity(pageData), isNotFoundSlug(pageData.id) ? { ...plan, total: 1, pager: false } : plan);
+      }
     }
   }
   // Each copy of a split listing is a full page whose pager links to every other
@@ -473,7 +492,9 @@ export async function* generateSite(deps, options) {
       ...baseGlobals(),
       currentCanonicalPath: pageOutputPath(pageData.id, 1, pageLang(pageData)),
       currentPageData: pageData,
-      outputPathPrefix: outputPathPrefixFor(outputFilename),
+      // The not-found page is shown at whatever address was missing, so its links
+      // can't be relative to its own file: they start from the Site URL's path.
+      outputPathPrefix: isNotFoundSlug(pageData.id) ? siteUrlPathname(siteUrl) : outputPathPrefixFor(outputFilename),
       ...(plan ? { paginationPlan: { ...plan, current: pageNumber } } : {}),
     };
 
@@ -536,7 +557,7 @@ export async function* generateSite(deps, options) {
     );
 
     const mdFilename = outputFilename.replace(/\.html$/, ".md");
-    const withMarkdown = exportMarkdown && pageNumber === 1;
+    const withMarkdown = exportMarkdown && pageNumber === 1 && !isNotFoundSlug(pageData.id);
     if (withMarkdown) {
       html = withMarkdownLink(
         html,

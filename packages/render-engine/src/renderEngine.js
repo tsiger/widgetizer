@@ -145,8 +145,10 @@ function getProjectData(deps) {
   }
 }
 
+// A plan with `pager: false` still limits the listing (`collectionSlice`) but
+// exposes no pagination: no pager in the widget, no prev/next in the head.
 function paginationContextFor(sharedGlobals) {
-  return sharedGlobals?.paginationPlan
+  return sharedGlobals?.paginationPlan && sharedGlobals.paginationPlan.pager !== false
     ? buildPaginationContext(sharedGlobals.paginationPlan, {
         cleanUrls: sharedGlobals.cleanUrls === true,
         outputPathPrefix: sharedGlobals.outputPathPrefix || "",
@@ -1425,7 +1427,9 @@ async function renderWidget(
           }
         : {}),
       widget: widgetContext,
-      ...(paginationPlan ? { pagination: buildPaginationContext(paginationPlan, { cleanUrls, outputPathPrefix }) } : {}),
+      ...(paginationPlan && paginationPlan.pager !== false
+        ? { pagination: buildPaginationContext(paginationPlan, { cleanUrls, outputPathPrefix }) }
+        : {}),
     };
 
     // Get theme snippets directory for this project
