@@ -236,6 +236,25 @@ describe("PageForm on the not-found page", () => {
     expect(onSubmit.mock.calls[0][0].parentPageUuid).toBe("");
   });
 
+  it("a title typed through 404 doesn't flash the note or hide More settings", async () => {
+    const { container } = render(<PageForm initialData={{}} onSubmit={vi.fn()} />);
+    const name = container.querySelector("#name");
+    let flashed = false;
+    const observer = new MutationObserver(() => {
+      if (container.textContent.includes("forms.page.notFoundNoteNew")) flashed = true;
+      if (!screen.queryByRole("button", { name: /forms\.project\.moreSettings/ })) flashed = true;
+    });
+    observer.observe(container, { childList: true, subtree: true, characterData: true });
+    for (const value of ["4", "40", "404", "404 ", "404 E", "404 Error"]) {
+      fireEvent.change(name, { target: { value } });
+      await new Promise((r) => setTimeout(r, 50));
+    }
+    await new Promise((r) => setTimeout(r, 600));
+    observer.disconnect();
+    expect(container.querySelector("#slug").value).toBe("404-error");
+    expect(flashed).toBe(false);
+  });
+
   it("an existing 404 page has no More settings", () => {
     render(<PageForm initialData={NOT_FOUND} onSubmit={vi.fn()} />);
     expect(screen.queryByRole("button", { name: /forms\.project\.moreSettings/ })).toBeNull();

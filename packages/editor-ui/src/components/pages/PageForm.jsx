@@ -167,7 +167,18 @@ export default function PageForm({
     : null;
   const slugValue = watch("slug");
   const willBeNotFoundPage = isNew && !existingNotFound && isNotFoundSlug(formatSlug(slugValue || ""));
-  const notFoundTreatment = isNotFoundPage || willBeNotFoundPage;
+  // The filename fills itself from the title, so a title like "404 Error" passes
+  // through 404 for a keystroke. What the form shows (the 404 treatment, the
+  // filename plugin fields see) follows the filename once it has stayed put for a
+  // moment; saving still goes by the filename itself.
+  const typedSlug = formatSlug(slugValue || "");
+  const [settledSlug, setSettledSlug] = useState(typedSlug);
+  useEffect(() => {
+    const timer = setTimeout(() => setSettledSlug(typedSlug), 400);
+    return () => clearTimeout(timer);
+  }, [typedSlug]);
+  const notFoundTreatment =
+    isNotFoundPage || (willBeNotFoundPage && isNotFoundSlug(settledSlug) && settledSlug === typedSlug);
 
   // Notify parent of dirty state changes
   useEffect(() => {
@@ -207,7 +218,7 @@ export default function PageForm({
         slug: formatSlug(data.slug),
         // The "404 - Not found" page has no hierarchy or search settings (More
         // settings is hidden for it), so whatever it holds is cleared on save.
-        ...(notFoundTreatment ? NOT_FOUND_CLEARED : {}),
+        ...(isNotFoundPage || willBeNotFoundPage ? NOT_FOUND_CLEARED : {}),
       });
 
       return result;
@@ -298,7 +309,7 @@ export default function PageForm({
             value={watch(field)}
             onChange={(value) => setValue(field, value, { shouldDirty: true })}
             page={initialData}
-            slug={formatSlug(slugValue || "")}
+            slug={settledSlug}
             isNew={isNew}
             language={initialData.language || language}
           />

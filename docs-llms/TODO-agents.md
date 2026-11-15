@@ -277,6 +277,26 @@ On New project, choosing a theme fetches its presets. While that runs the form s
 
 **Start:** [LinkInput.jsx](../packages/editor-ui/src/components/settings/inputs/LinkInput.jsx), [MenuCombobox.jsx](../packages/editor-ui/src/components/menus/MenuEditor/MenuCombobox.jsx), `ComboboxOptionList.jsx` (`notice` / `emptyText`). **Source:** React Compiler lint follow-up, 2026-11-08.
 
+#### R-VIEWROOT · Serve viewed exports where `/` is the export's root
+
+**Deferred · Low · OSS**
+
+The export viewer serves files under `/api/export/view/:exportDir/` (`routes/export.js`), so a root-relative link in an exported page (`/about.html`, `/assets/style.css`, kept as is by `prefixInternalHref` in `linkPrefixer.js`) resolves against the app server and breaks in the viewer, though it works on a real host. Generated pages use relative links, so today only links an owner types with a leading `/` are affected. Possible fix: show exports on their own origin, a custom protocol in Electron (`export://<dir>/`) and a separate port in the web app. A `<base>` tag can't do it: it changes relative links only.
+
+**Done when:** an exported page's root-relative links work in the viewer in both shells, and relative links still do.
+
+**Start:** [export.js](../packages/builder-server/src/routes/export.js), [linkPrefixer.js](../packages/core/src/utils/linkPrefixer.js), T67. **Source:** planning for an exported not-found page (`404.html`) with root-relative links, 2026-11-15.
+
+#### R-ROBOTS · Check robots.txt `Disallow` lines for noindex pages
+
+**Investigate · Low · OSS**
+
+`buildRobotsTxt` (`seoArtifacts.js`) writes a `Disallow` line for every noindex page and collection item. Two questions, unchecked: the lines are prefix matches, so with Clean URLs on `Disallow: /about` also blocks `/about-us` (an ordinary page); and search engines' advice, as remembered, is not to block a noindex page in robots.txt, since a page they can't crawl can't show them its noindex and may stay indexed from links. Possible fixes: end-anchor the paths (`/about$`, supported by Google and Bing), or drop the `Disallow` lines and rely on the robots tag and the sitemap.
+
+**Done when:** the current search-engine guidance is read and recorded, and the lines either match only their own page and are kept for a stated reason, or are removed.
+
+**Start:** [seoArtifacts.js](../packages/builder-server/src/services/seoArtifacts.js) (`buildRobotsTxt`). **Source:** planning for an exported not-found page, 2026-11-15.
+
 #### QA-EXTRA · Choose extra checks when changing an area
 
 **Deferred · Low · Tests**
