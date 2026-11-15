@@ -41,6 +41,9 @@ import { buildContract } from "./build-theme-skill-contract.js";
 // those keeps prefixes like `my-work` quiet.
 const regionNames = new Intl.DisplayNames(["en"], { type: "region", fallback: "none" });
 const scriptNames = new Intl.DisplayNames(["en"], { type: "script", fallback: "none" });
+// The ways a menu item can link the not-found page (a page at address 404).
+const NOT_FOUND_LINKS = new Set(["404", "404.html", "/404", "/404.html"]);
+
 function looksLikeLanguageCode(prefix) {
   if (!isValidLanguageCode(prefix)) return false;
   const subtag = prefix.split("-")[1];
@@ -1485,6 +1488,14 @@ export function validateTheme(dir) {
           }
           if (depth === 4)
             warn(file, "menu", `"${item.label}" is a fourth level; the core menu snippet renders three.`);
+          // The page at address 404 is the site's not-found page: it answers 404
+          // wherever it is linked, so a starter menu must not link it.
+          if (NOT_FOUND_LINKS.has(item.link))
+            error(
+              file,
+              "menu",
+              `"${item.label}" links the not-found page (404), which always answers 404. Remove it from the menu.`,
+            );
           if (item.items !== undefined && !Array.isArray(item.items))
             error(file, "menu", `"${item.label}": "items" must be an array.`);
           else if (item.items) walk(item.items, depth + 1);
@@ -1720,6 +1731,12 @@ export function validateTheme(dir) {
         );
       if (!SLUG_RE.test(slug) || slug === "page")
         error(file, "template-shape", `Page slug "${slug}" must match ${SLUG_RE} and cannot be "page".`);
+      if (slug === "404" && typeof page.seo?.robots === "string" && !page.seo.robots.includes("noindex"))
+        warn(
+          file,
+          "template-shape",
+          "The not-found page (404) is always hidden from search engines; its robots setting is ignored.",
+        );
       for (const foreign of ["sections", "order", "title", "layout"]) {
         if (foreign in page)
           error(

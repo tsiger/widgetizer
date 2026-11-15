@@ -1258,3 +1258,39 @@ describe("theme validator checks preset starter media", () => {
     assert.ok(ofRule(findings).some((f) => f.level === "error" && /images\/hero\.webp is not there/.test(f.message)));
   });
 });
+
+// A page at address 404 is the site's not-found page: it answers 404 wherever it
+// is linked, and the export always hides it from search engines.
+describe("theme validator and the not-found page", () => {
+  const menuFile = (dir) => path.join(dir, "menus", "main-menu.json");
+  const notFoundTemplate = (dir, seo) =>
+    fs.writeJson(path.join(dir, "templates", "404.json"), {
+      name: "Page not found",
+      slug: "404",
+      seo,
+      widgets: {},
+      widgetsOrder: [],
+    });
+
+  it("a menu item linking the not-found page is an error", async () => {
+    for (const link of ["404.html", "/404"]) {
+      const findings = await findingsAfter(`menu-404-${link.replace(/\W/g, "")}`, (dir) =>
+        editJson(menuFile(dir), (menu) => menu.items.push({ label: "Lost", link, items: [] })),
+      );
+      const finding = findings.find((f) => f.rule === "menu" && f.level === "error" && /not-found page/.test(f.message));
+      assert.ok(finding, JSON.stringify(findings));
+    }
+  });
+
+  it("a not-found template set to index is a warning", async () => {
+    const findings = await findingsAfter("template-404-index", (dir) => notFoundTemplate(dir, { robots: "index,follow" }));
+    const finding = findings.find((f) => f.level === "warning" && /not-found page \(404\)/.test(f.message));
+    assert.ok(finding, JSON.stringify(findings));
+    assert.ok(!findings.some((f) => f.level === "error"), JSON.stringify(findings));
+  });
+
+  it("a not-found template set to noindex is clean", async () => {
+    const findings = await findingsAfter("template-404-noindex", (dir) => notFoundTemplate(dir, { robots: "noindex,follow" }));
+    assert.ok(!findings.some((f) => /not-found/.test(f.message)), JSON.stringify(findings));
+  });
+});
