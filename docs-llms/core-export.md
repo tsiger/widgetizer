@@ -139,6 +139,14 @@ A page whose slug is `404` (`isNotFoundSlug` in core `contentAddress.js`) is the
 - **One file.** A paginated list on it keeps its per-page limit but gets no copies and no pager: the render engine's `planPagination` gives a page at `404` a one-page plan with `pager: false` (so the export and every preview agree), and exposes no `pagination` for such a plan. No Markdown twin is written.
 - **Out of trails and switchers.** It is never a collection's listing page, a breadcrumb trail skips it and goes on with the pages above it, and its own trail is always `Home → itself`, whatever parent it stores (`breadcrumbs.js`), and the language switcher never links it: on the not-found page every language goes to its homepage (`buildTranslations`).
 
+Why it works this way, and what was accepted:
+
+- **Root-relative links, not a `<base>` tag.** A `<base>` tag would also make the page work at any depth, but it sends `#section` links (Arch's skip link `#main-content`) to the base address, and the export viewer could only fix it by rewriting the tag. A custom link typed relative (`contact.html`) breaks on this page at a nested address, as it already does on language and item pages.
+- **Forced noindex.** Without it a sitemap entry for `/404.html` shows as "Submitted URL not found (404)" in Search Console, and static hosts serve `/404.html` directly with status 200, so it can get indexed. The `Disallow` line is a prefix match like every noindex page's (with Clean URLs on, `Disallow: /404` also covers `/404-guide`); the 404 page follows them.
+- **No canonical**, because it would name `/404`, an address that answers 404. **Structured data stays**: its JSON-LD names `/404`, but search engines ignore structured data on a noindex page or a 404 answer.
+- **The switcher, both ways.** On the 404 page every language links its homepage (the current one included); on other pages a `404` page in the same translation group (a hand-edited file, an old import) is skipped. A collection item at slug `404`, or a collection with the prefix `404`, is an ordinary page.
+- **Menus.** An owner can still put the 404 page in a menu; that link answers 404, by their choice. Only starter content is checked (`validate:theme`).
+
 ## 3. Collection Item-Page Export
 
 Collections participate in export only when the request supplies a scope-aware capability: the handler builds `collectionDeps = { storage: req.adapters.storage, scope: req.scope }` and threads it through `exportProjectToDir` into every `renderWidget` / `renderPageLayout` / `renderCollectionItemPage` call (so `| collection` filters in exported pages read items through the same storage adapter as the API). Callers that don't supply `collectionDeps` (e.g. tests) skip collections entirely.
