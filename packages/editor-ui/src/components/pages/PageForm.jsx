@@ -40,6 +40,20 @@ function toFormValues(initialData, extraFields) {
   };
 }
 
+// What a "404 - Not found" page is saved with in place of More settings.
+const NOT_FOUND_CLEARED = {
+  parentPageUuid: "",
+  seo: {
+    description: "",
+    og_title: "",
+    og_image: "",
+    og_type: "website",
+    twitter_card: "summary",
+    canonical_url: "",
+    robots: "noindex,follow",
+  },
+};
+
 export default function PageForm({
   initialData = { name: "", slug: "" },
   onSubmit,
@@ -191,6 +205,9 @@ export default function PageForm({
       const result = await onSubmit({
         ...data,
         slug: formatSlug(data.slug),
+        // The "404 - Not found" page has no hierarchy or search settings (More
+        // settings is hidden for it), so whatever it holds is cleared on save.
+        ...(notFoundTreatment ? NOT_FOUND_CLEARED : {}),
       });
 
       return result;

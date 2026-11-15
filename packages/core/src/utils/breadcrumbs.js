@@ -198,7 +198,9 @@ export function buildBreadcrumbs({
   // rules; a page walks its own parent chain.
   const anchorPage = item ? listingParent(listingPages.get(collectionType), pagesByUuid, trailLanguage) : null;
   const branch = item ? anchorPage : page;
-  if (branch && !isHomeSlug(branch.slug)) {
+  // The "404 - Not found" page has no place in the hierarchy: a parent it stores
+  // (a theme template, older data) is ignored, so its trail is Home → itself.
+  if (branch && !isHomeSlug(branch.slug) && !(page && !item && isNotFoundSlug(branch.slug))) {
     for (const ancestor of ancestorsOf(branch, pagesByUuid, trailLanguage)) trail.push(asCrumb(ancestor));
     if (item) trail.push(asCrumb(branch));
   }

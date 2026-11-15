@@ -529,4 +529,12 @@ describe("the not-found page in breadcrumbs", () => {
     const trail = buildBreadcrumbs({ page: child, pagesByUuid: pagesByUuid(HOME, about, notFound, child), pageNumber: 1 });
     expect(labels(trail)).toEqual(["Home", "About", "Help"]);
   });
+
+  it("a 404 page's own trail ignores any parent it stores", () => {
+    const about = page("about", "About");
+    const notFound = page("404", "Page not found", { parentPageUuid: about.uuid });
+    const trail = buildBreadcrumbs({ page: notFound, pagesByUuid: pagesByUuid(HOME, about, notFound), pageNumber: 1 });
+    expect(labels(trail)).toEqual(["Home", "Page not found"]);
+  });
 });
+

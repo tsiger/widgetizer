@@ -198,6 +198,44 @@ describe("PageForm on the not-found page", () => {
 
 
 
+  it("saving a 404 page clears its parent and search settings", async () => {
+    const onSubmit = vi.fn(async () => false);
+    const stored = {
+      ...NOT_FOUND,
+      parentPageUuid: "u-parent",
+      seo: { description: "Lost?", og_title: "Lost", og_image: "/uploads/images/x.png", canonical_url: "https://e.com/x", robots: "index,nofollow" },
+    };
+    const { container } = render(<PageForm initialData={stored} onSubmit={onSubmit} isDirty />);
+    fireEvent.change(container.querySelector("#name"), { target: { value: "Lost? Try these" } });
+    fireEvent.submit(container.querySelector("form"));
+    await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1));
+    const sent = onSubmit.mock.calls[0][0];
+    expect(sent.parentPageUuid).toBe("");
+    expect(sent.seo).toEqual({
+      description: "",
+      og_title: "",
+      og_image: "",
+      og_type: "website",
+      twitter_card: "summary",
+      canonical_url: "",
+      robots: "noindex,follow",
+    });
+  });
+
+  it("a new page given a parent and then the filename 404 is created without them", async () => {
+    allPages = [{ uuid: "u-parent", slug: "services", name: "Services" }];
+    const onSubmit = vi.fn(async () => false);
+    const { container } = render(<PageForm initialData={{}} onSubmit={onSubmit} isDirty />);
+    fireEvent.change(container.querySelector("#name"), { target: { value: "Lost" } });
+    fireEvent.click(screen.getByRole("button", { name: /forms\.project\.moreSettings/ }));
+    fireEvent.change(container.querySelector("#seo-description"), { target: { value: "Find your way" } });
+    fireEvent.change(container.querySelector("#slug"), { target: { value: "404" } });
+    fireEvent.submit(container.querySelector("form"));
+    await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1));
+    expect(onSubmit.mock.calls[0][0].seo.description).toBe("");
+    expect(onSubmit.mock.calls[0][0].parentPageUuid).toBe("");
+  });
+
   it("an existing 404 page has no More settings", () => {
     render(<PageForm initialData={NOT_FOUND} onSubmit={vi.fn()} />);
     expect(screen.queryByRole("button", { name: /forms\.project\.moreSettings/ })).toBeNull();
