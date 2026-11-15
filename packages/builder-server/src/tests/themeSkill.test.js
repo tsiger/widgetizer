@@ -1277,7 +1277,7 @@ describe("theme validator and the not-found page", () => {
       const findings = await findingsAfter(`menu-404-${link.replace(/\W/g, "")}`, (dir) =>
         editJson(menuFile(dir), (menu) => menu.items.push({ label: "Lost", link, items: [] })),
       );
-      const finding = findings.find((f) => f.rule === "menu" && f.level === "error" && /not-found page/.test(f.message));
+      const finding = findings.find((f) => f.rule === "menu" && f.level === "error" && /"404 - Not found" page/.test(f.message));
       assert.ok(finding, JSON.stringify(findings));
     }
   });
@@ -1286,18 +1286,18 @@ describe("theme validator and the not-found page", () => {
     const findings = await findingsAfter("menu-404-similar", (dir) =>
       editJson(menuFile(dir), (menu) => menu.items.push({ label: "Guide", link: "404-guide.html", items: [] }, { label: "Story", link: "news/404.html", items: [] })),
     );
-    assert.ok(!findings.some((f) => /not-found page/.test(f.message)), JSON.stringify(findings));
+    assert.ok(!findings.some((f) => /"404 - Not found" page/.test(f.message)), JSON.stringify(findings));
   });
 
   it("a not-found template set to index is a warning", async () => {
     const findings = await findingsAfter("template-404-index", (dir) => notFoundTemplate(dir, { robots: "index,follow" }));
-    const finding = findings.find((f) => f.level === "warning" && /not-found page \(404\)/.test(f.message));
+    const finding = findings.find((f) => f.level === "warning" && /"404 - Not found" page/.test(f.message));
     assert.ok(finding, JSON.stringify(findings));
     assert.ok(!findings.some((f) => f.level === "error"), JSON.stringify(findings));
   });
 
   it("a not-found template set to noindex is clean", async () => {
     const findings = await findingsAfter("template-404-noindex", (dir) => notFoundTemplate(dir, { robots: "noindex,follow" }));
-    assert.ok(!findings.some((f) => /not-found/.test(f.message)), JSON.stringify(findings));
+    assert.ok(!findings.some((f) => /404 - Not found/.test(f.message)), JSON.stringify(findings));
   });
 });

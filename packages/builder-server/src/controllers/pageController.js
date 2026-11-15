@@ -182,7 +182,7 @@ async function claimPageSlug({ scope, storage, pageId, pageData, previousPageId,
   // changes: renaming it would quietly turn it off, and renaming another page
   // onto it would make a page the owner never meant as one.
   if (previousPageId && previousPageId !== pageId && (isNotFoundSlug(previousPageId) || isNotFoundSlug(pageId))) {
-    throw new ConflictError("The not-found page's address (404) can't change, and no other page can take it.", {
+    throw new ConflictError(`The "404 - Not found" page's address can't change, and no other page can take the address 404.`, {
       code: "NOT_FOUND_ADDRESS_LOCKED",
     });
   }
@@ -1120,7 +1120,7 @@ export async function createPageLanguageVersion(req, res) {
       // so it keeps the address; no other page's translation may take it.
       const requestedSlug = sanitizeSlug(req.body?.slug || "");
       if (requestedSlug && isNotFoundSlug(source.slug) !== isNotFoundSlug(requestedSlug)) {
-        throw new ConflictError("A translation of the not-found page must have the address 404.", {
+        throw new ConflictError('A translation of the "404 - Not found" page must have the address 404.', {
           code: "NOT_FOUND_TRANSLATION_ADDRESS",
         });
       }
@@ -1135,7 +1135,7 @@ export async function createPageLanguageVersion(req, res) {
           }
           const language = languageNameForMessage(target.language);
           throw new ConflictError(
-            `${language} already has a not-found page ("${existingName}"). It's already used for ${language}. ` +
+            `${language} already has a "404 - Not found" page ("${existingName}"). It's already used for ${language}. ` +
               "To replace it with a translation of this page, delete it first.",
             { code: "NOT_FOUND_EXISTS" },
           );

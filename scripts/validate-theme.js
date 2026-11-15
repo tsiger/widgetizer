@@ -1503,7 +1503,7 @@ export function validateTheme(dir) {
             error(
               file,
               "menu",
-              `"${item.label}" links the not-found page (404), which always answers 404. Remove it from the menu.`,
+              `"${item.label}" links the "404 - Not found" page, which always answers 404. Remove it from the menu.`,
             );
           if (item.items !== undefined && !Array.isArray(item.items))
             error(file, "menu", `"${item.label}": "items" must be an array.`);
@@ -1744,7 +1744,7 @@ export function validateTheme(dir) {
         warn(
           file,
           "template-shape",
-          "The not-found page (404) is always hidden from search engines; its robots setting is ignored.",
+          'The "404 - Not found" page is always hidden from search engines; its robots setting is ignored.',
         );
       for (const foreign of ["sections", "order", "title", "layout"]) {
         if (foreign in page)

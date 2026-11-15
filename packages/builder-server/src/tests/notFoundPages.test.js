@@ -188,7 +188,7 @@ describe("translating the 404 page", () => {
     await seedPage("404", "Den vrethike", { language: "el" });
     const res = await call(pageController.createPageLanguageVersion, { params: { id: "404" }, body: { targetLanguage: "el" } });
     assertLocked(res, "NOT_FOUND_EXISTS");
-    assert.match(res._json.message, /Greek already has a not-found page \("Den vrethike"\)/);
+    assert.match(res._json.message, /Greek already has a "404 - Not found" page \("Den vrethike"\)/);
     assert.match(res._json.message, /delete it first/);
   });
 });
