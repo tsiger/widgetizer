@@ -1,6 +1,6 @@
 import { pageHref, itemHref } from "./internalHref.js";
 import { itemUrlAt, pageUrlAt } from "./publishedUrls.js";
-import { homeHref, isHomeSlug, translationGroupIdOf, resolveLanguage } from "./contentAddress.js";
+import { homeHref, isHomeSlug, isNotFoundSlug, translationGroupIdOf, resolveLanguage } from "./contentAddress.js";
 import { hreflangCase, languageDir, nativeLanguageName } from "./languages.js";
 
 /** Whether a page or item asked not to be indexed (the SEO `robots` field). */
@@ -93,11 +93,16 @@ export function buildTranslations({
     if (isHomeSlug(page.slug)) homepages.set(resolveLanguage(page.language, resolvedDefault), translationSibling(page));
   }
 
-  const groupId = translationGroupIdOf(current);
+  // A not-found page answers 404 wherever it is linked, so the switcher never
+  // links one: on a not-found page every language goes to its homepage, and
+  // elsewhere a not-found page is never a sibling (a hand-edited or imported
+  // group can mix one with an ordinary page). Pages only.
+  const groupId = kind === "page" && isNotFoundSlug(current?.slug) ? null : translationGroupIdOf(current);
   const siblings = new Map();
   if (groupId) {
     for (const entry of kind === "item" ? items : pages) {
       if (kind === "item" && slugPrefix && entry.slugPrefix && entry.slugPrefix !== slugPrefix) continue;
+      if (kind === "page" && isNotFoundSlug(entry.slug)) continue;
       if (translationGroupIdOf(entry) !== groupId) continue;
       siblings.set(resolveLanguage(entry.language, resolvedDefault), translationSibling(entry));
     }

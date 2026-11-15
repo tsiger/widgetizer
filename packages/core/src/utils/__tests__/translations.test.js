@@ -188,3 +188,64 @@ describe("page.translations", () => {
     expect(pt.hreflang).toBe("pt-BR");
   });
 });
+
+// A link to a not-found page always answers 404, so the switcher never makes one.
+describe("the not-found page in the switcher", () => {
+  const FR_HOME = { uuid: "u-fr-home", slug: "index", language: "fr" };
+  const EN_404 = { uuid: "u-404", slug: "404", language: "en" };
+  const EL_404 = { uuid: "u-el-404", translationGroupId: "u-404", slug: "404", language: "el" };
+  const FR_404 = { uuid: "u-fr-404", translationGroupId: "u-404", slug: "404", language: "fr" };
+  const FR_ABOUT_MIXED = { uuid: "u-fr-apropos", translationGroupId: "u-404", slug: "a-propos", language: "fr" };
+  const THREE = {
+    languages: ["en", "el", "fr"],
+    defaultLanguage: "en",
+    siteUrl: "https://example.com/",
+  };
+
+  it("on a 404 page every language links its homepage", () => {
+    const entries = buildTranslations({
+      ...THREE,
+      pages: [EN_HOME, EL_HOME, FR_HOME, EN_404, EL_404, FR_404],
+      current: EN_404,
+    });
+    expect(entries.map((e) => e.href)).toEqual(["index.html", "el/index.html", "fr/index.html"]);
+    expect(entries.every((e) => e.fallback)).toBe(true);
+  });
+
+  it("an ordinary page skips a 404 sibling", () => {
+    const entries = buildTranslations({
+      ...THREE,
+      pages: [EN_HOME, EL_HOME, FR_HOME, EN_404, FR_ABOUT_MIXED],
+      current: FR_ABOUT_MIXED,
+    });
+    const en = entries.find((e) => e.language === "en");
+    expect(en.href).toBe("index.html");
+    expect(en.fallback).toBe(true);
+  });
+
+  it("a 404 page in a mixed group still links homepages", () => {
+    const entries = buildTranslations({
+      ...THREE,
+      pages: [EN_HOME, EL_HOME, FR_HOME, EN_404, FR_ABOUT_MIXED],
+      current: EN_404,
+    });
+    const fr = entries.find((e) => e.language === "fr");
+    expect(fr.href).toBe("fr/index.html");
+    expect(fr.fallback).toBe(true);
+  });
+
+  it("a collection item at 404 keeps its translations", () => {
+    const enItem = { uuid: "i-404", slug: "404", language: "en", slugPrefix: "news" };
+    const elItem = { uuid: "i-el-404", translationGroupId: "i-404", slug: "404", language: "el", slugPrefix: "news" };
+    const entries = buildTranslations({
+      ...SITE,
+      kind: "item",
+      slugPrefix: "news",
+      items: [enItem, elItem],
+      current: enItem,
+    });
+    const el = entries.find((e) => e.language === "el");
+    expect(el.fallback).toBe(false);
+    expect(el.href).toBe("el/news/404.html");
+  });
+});
