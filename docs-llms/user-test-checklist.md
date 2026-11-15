@@ -1579,7 +1579,7 @@ SITESET-011 to SITESET-016 use the Site Address field in Project details > Site.
 - [ ] EXPZIP-024 - Export with markdown output enabled and open a page's HTML.
   Expected: The markdown alternate link is a full address under the Site Address, folder included.
 
-### The Not-Found Page
+### The "404 - Not found" Page
 
 - [ ] EXP404-001 - Create a page with the address `404` and some content (a heading, a menu), set a Site Address with a subfolder (e.g. `https://user.github.io/repo/`), and export.
   Expected: The export has `404.html`. Its links and styles start with `/repo/`. It isn't in `sitemap.xml`, `robots.txt` has a `Disallow` line for it, and its head has a `noindex` robots tag and no canonical.
@@ -1588,7 +1588,7 @@ SITESET-011 to SITESET-016 use the Site Address field in Project details > Site.
   Expected: With a server that shows `404.html` for misses, the page looks right at that address, and its links work.
 
 - [ ] EXP404-003 - Open the `404` page's settings.
-  Expected: The address is read-only with a note saying it's the not-found page; under More settings the search setting is fixed and there is no canonical field. Renaming another page to `404` shows an error.
+  Expected: The address is read-only, with a note saying it's your "404 - Not found" page, and there are no More settings. On a new page, the note appears as soon as you type `404` as the address. A Greek page's address field starts with `/el/`. Renaming another page to `404` shows an error.
 
 - [ ] EXP404-004 - On a site with a second language, translate the `404` page.
   Expected: The copy is created at `404` in that language. If that language already has a page at `404`, the translation is refused with a message naming it.

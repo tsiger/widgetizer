@@ -184,19 +184,26 @@ describe("PageForm on the not-found page", () => {
     expect(screen.getByText("forms.page.notFoundNote")).toBeTruthy();
   });
 
-  it("an existing 404 page shows the search-engine setting fixed", () => {
-    const { container } = render(<PageForm initialData={NOT_FOUND} onSubmit={vi.fn()} />);
-    fireEvent.click(screen.getByRole("button", { name: /forms\.project\.moreSettings/ }));
-    expect(container.querySelector("#seo-robots").disabled).toBe(true);
-    expect(container.querySelector("#seo-canonical-url")).toBeNull();
+
+
+  it("an existing 404 page has no More settings", () => {
+    render(<PageForm initialData={NOT_FOUND} onSubmit={vi.fn()} />);
+    expect(screen.queryByRole("button", { name: /forms\.project\.moreSettings/ })).toBeNull();
   });
 
-  it("the note shows once, in place of the filename help, with More settings open", () => {
+  it("the note replaces the filename help", () => {
     const { container } = render(<PageForm initialData={NOT_FOUND} onSubmit={vi.fn()} />);
-    fireEvent.click(screen.getByRole("button", { name: /forms\.project\.moreSettings/ }));
-    expect(screen.getAllByText("forms.page.notFoundNote")).toHaveLength(1);
     const slugField = container.querySelector("#slug").closest(".form-field");
     expect(slugField.querySelectorAll(".form-description")).toHaveLength(1);
+  });
+
+  it("a new page shows the note as soon as its address becomes 404, and loses More settings", async () => {
+    const { container } = render(<PageForm initialData={{}} onSubmit={vi.fn()} />);
+    expect(screen.queryByText("forms.page.notFoundNoteNew")).toBeNull();
+    fireEvent.change(container.querySelector("#slug"), { target: { value: "404" } });
+    await waitFor(() => expect(screen.getByText("forms.page.notFoundNoteNew")).toBeTruthy());
+    expect(screen.queryByRole("button", { name: /forms\.project\.moreSettings/ })).toBeNull();
+    expect(container.querySelector("#slug").readOnly).toBe(false);
   });
 
   it("renaming an existing page to 404 shows notFoundSlugTaken", async () => {
@@ -233,3 +240,25 @@ describe("PageForm on the not-found page", () => {
     expect(screen.queryByText("Page not found")).toBeNull();
   });
 });
+
+// The address field starts with the folder the page is written to.
+describe("PageForm address prefix", () => {
+  it("a page in the main language starts at /", () => {
+    useProjectStore.setState({ activeProject: { id: "p1", defaultLanguage: "en", languages: ["el"] } });
+    const { container } = render(<PageForm initialData={{ ...PAGE, language: "en" }} onSubmit={vi.fn()} />);
+    expect(container.querySelector("#slug").parentElement.textContent).toMatch(/^\/\.html$/);
+  });
+
+  it("a Greek page starts at /el/", () => {
+    useProjectStore.setState({ activeProject: { id: "p1", defaultLanguage: "en", languages: ["el"] } });
+    const { container } = render(<PageForm initialData={{ ...PAGE, language: "el" }} onSubmit={vi.fn()} />);
+    expect(container.querySelector("#slug").parentElement.textContent).toMatch(/^\/el\/\.html$/);
+  });
+
+  it("a new Greek page starts at /el/", () => {
+    useProjectStore.setState({ activeProject: { id: "p1", defaultLanguage: "en", languages: ["el"] } });
+    const { container } = render(<PageForm initialData={{}} language="el" onSubmit={vi.fn()} />);
+    expect(container.querySelector("#slug").parentElement.textContent).toMatch(/^\/el\/\.html$/);
+  });
+});
+

@@ -5,11 +5,12 @@ import { Controller, useForm } from "react-hook-form";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { formatSlug } from "../../utils/slugUtils";
 import useToastStore from "../../stores/toastStore";
+import { useDefaultLanguage } from "../../stores/projectStore";
 import useStickyActionBar from "../../hooks/useStickyActionBar";
 import Button from "../ui/Button";
 import ImageInput from "../settings/inputs/ImageInput";
 import { isHomeSlug } from "@widgetizer/core/internalHref";
-import { isNotFoundSlug, isReservedPageSlug, translationGroupIdOf } from "@widgetizer/core/contentAddress";
+import { isNotFoundSlug, isReservedPageSlug, languageFolder, translationGroupIdOf } from "@widgetizer/core/contentAddress";
 import { getAllPages } from "../../queries/pageManager";
 import ParentPagePicker from "./ParentPagePicker";
 import { usePageSettingsFields } from "../../extension/PluginProvider.jsx";
@@ -71,6 +72,14 @@ export default function PageForm({
   // Watch fields for auto-slug and media display
   const name = watch("name");
   const ogImage = watch("seo.og_image");
+  // A new page given the address 404 becomes the "404 - Not found" page, so it
+  // gets the same treatment as soon as the address is typed.
+  const slugValue = watch("slug");
+  const willBeNotFoundPage = isNew && isNotFoundSlug(formatSlug(slugValue || ""));
+  const notFoundTreatment = isNotFoundPage || willBeNotFoundPage;
+  // The folder the page is written to: `el/about.html` for a Greek page.
+  const defaultLanguage = useDefaultLanguage();
+  const folder = languageFolder({ language: initialData.language || language, defaultLanguage });
 
   // Candidates for the parent picker. Loaded here so both callers (add + edit)
   // get the field without threading a prop through each.
@@ -193,7 +202,7 @@ export default function PageForm({
             {t("forms.page.filenameLabel")} <span className="text-pink-500">*</span>
           </label>
           <div className="flex items-center">
-            <span className="text-slate-500 mr-1">/</span>
+            <span className="text-slate-500 mr-1">{folder ? `/${folder}/` : "/"}</span>
             <input
               type="text"
               id="slug"
@@ -219,8 +228,10 @@ export default function PageForm({
             <span className="text-slate-500 ml-1">.html</span>
           </div>
           {errors.slug && <p className="form-error">{errors.slug.message}</p>}
-          {isNotFoundPage ? (
-            <p className="form-description">{t("forms.page.notFoundNote")}</p>
+          {notFoundTreatment ? (
+            <p className="form-description">
+              {isNotFoundPage ? t("forms.page.notFoundNote") : t("forms.page.notFoundNoteNew")}
+            </p>
           ) : (
             <p className="form-description">
               <Trans
@@ -245,18 +256,21 @@ export default function PageForm({
         ))}
       </div>
 
-      {/* More Settings Toggle */}
-      <button
-        type="button"
-        onClick={() => setShowMoreSettings(!showMoreSettings)}
-        className="flex max-w-xl items-center gap-1 text-sm text-pink-500 hover:text-pink-700 mt-2 mb-4"
-      >
-        {showMoreSettings ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-        {t("forms.project.moreSettings")}
-      </button>
+      {/* More Settings Toggle. The "404 - Not found" page has none of them: it is
+          never indexed or shared, and nothing navigates by its parent. */}
+      {!notFoundTreatment && (
+        <button
+          type="button"
+          onClick={() => setShowMoreSettings(!showMoreSettings)}
+          className="flex max-w-xl items-center gap-1 text-sm text-pink-500 hover:text-pink-700 mt-2 mb-4"
+        >
+          {showMoreSettings ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+          {t("forms.project.moreSettings")}
+        </button>
+      )}
 
       {/* Hierarchy + SEO - Collapsible */}
-      {showMoreSettings && (
+      {showMoreSettings && !notFoundTreatment && (
         <div className="max-w-xl form-section">
           <h3 className="form-section-title">{t("forms.page.hierarchyTitle")}</h3>
 
@@ -282,7 +296,7 @@ export default function PageForm({
         </div>
       )}
 
-      {showMoreSettings && (
+      {showMoreSettings && !notFoundTreatment && (
         <div className="max-w-xl form-section">
           <h3 className="form-section-title">{t("forms.page.seoTitle")}</h3>
 
@@ -317,42 +331,25 @@ export default function PageForm({
             <p className="form-description">{t("forms.page.socialImageHelp")}</p>
           </div>
 
-          {!isNotFoundPage && (
-            <div className="form-field">
-              <label htmlFor="seo-canonical-url" className="form-label-optional">
-                {t("forms.page.canonicalUrl")}
-              </label>
-              <input type="url" id="seo-canonical-url" {...register("seo.canonical_url")} className="form-input" />
-              <p className="form-description">{t("forms.page.canonicalUrlHelp")}</p>
-            </div>
-          )}
+          <div className="form-field">
+            <label htmlFor="seo-canonical-url" className="form-label-optional">
+              {t("forms.page.canonicalUrl")}
+            </label>
+            <input type="url" id="seo-canonical-url" {...register("seo.canonical_url")} className="form-input" />
+            <p className="form-description">{t("forms.page.canonicalUrlHelp")}</p>
+          </div>
 
           <div className="form-field">
             <label htmlFor="seo-robots" className="form-label">
               {t("forms.page.robotsLabel")}
             </label>
-            {isNotFoundPage ? (
-              // Shown, not registered: the stored value is kept and the export
-              // replaces its index part with noindex.
-              <select
-                id="seo-robots"
-                disabled
-                value={initialData.seo?.robots?.includes("nofollow") ? "noindex,nofollow" : "noindex,follow"}
-                onChange={() => {}}
-                className="form-select"
-              >
-                <option value="noindex,follow">{t("forms.page.robots.noindexFollow")}</option>
-                <option value="noindex,nofollow">{t("forms.page.robots.noindexNofollow")}</option>
-              </select>
-            ) : (
-              <select id="seo-robots" {...register("seo.robots")} className="form-select">
-                <option value="index,follow">{t("forms.page.robots.indexFollow")}</option>
-                <option value="noindex,follow">{t("forms.page.robots.noindexFollow")}</option>
-                <option value="index,nofollow">{t("forms.page.robots.indexNofollow")}</option>
-                <option value="noindex,nofollow">{t("forms.page.robots.noindexNofollow")}</option>
-              </select>
-            )}
-            {!isNotFoundPage && <p className="form-description">{t("forms.page.robotsHelp")}</p>}
+            <select id="seo-robots" {...register("seo.robots")} className="form-select">
+              <option value="index,follow">{t("forms.page.robots.indexFollow")}</option>
+              <option value="noindex,follow">{t("forms.page.robots.noindexFollow")}</option>
+              <option value="index,nofollow">{t("forms.page.robots.indexNofollow")}</option>
+              <option value="noindex,nofollow">{t("forms.page.robots.noindexNofollow")}</option>
+            </select>
+            <p className="form-description">{t("forms.page.robotsHelp")}</p>
           </div>
         </div>
       )}
