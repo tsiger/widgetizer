@@ -1,6 +1,8 @@
 import { describe, it, expect } from "vitest";
 import {
   isHomeSlug,
+  isNotFoundSlug,
+  NOT_FOUND_SLUG,
   resolveLanguage,
   languageFolder,
   isReservedPageSlug,
@@ -351,5 +353,15 @@ describe("preview routes", () => {
     expect(parsePreviewRoute("/preview/page/global/contact")).toBeNull();
     expect(parsePreviewRoute("/preview/page/el/blog/page/0")).toBeNull();
     expect(parsePreviewRoute(undefined)).toBeNull();
+  });
+});
+
+describe("the not-found page's address", () => {
+  it('isNotFoundSlug matches only "404"', () => {
+    expect(NOT_FOUND_SLUG).toBe("404");
+    expect(isNotFoundSlug("404")).toBe(true);
+    for (const other of ["404-guide", "4040", "404.html", "", undefined, null, 404]) {
+      expect(isNotFoundSlug(other)).toBe(false);
+    }
   });
 });
