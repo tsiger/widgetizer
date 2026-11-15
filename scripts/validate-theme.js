@@ -41,8 +41,17 @@ import { buildContract } from "./build-theme-skill-contract.js";
 // those keeps prefixes like `my-work` quiet.
 const regionNames = new Intl.DisplayNames(["en"], { type: "region", fallback: "none" });
 const scriptNames = new Intl.DisplayNames(["en"], { type: "script", fallback: "none" });
-// The ways a menu item can link the not-found page (a page at address 404).
-const NOT_FOUND_LINKS = new Set(["404", "404.html", "/404", "/404.html"]);
+// Whether a menu item's link points at a not-found page (a page at address 404),
+// at the root or in a language folder (`el/404.html`, `/fr/404`): a template's
+// subfolders are copied into the project's pages too. A collection item at 404
+// (`news/404.html`) is an ordinary page.
+function linksNotFoundPage(link) {
+  if (typeof link !== "string") return false;
+  const parts = link.split(/[?#]/)[0].replace(/^\/+|\/+$/g, "").split("/");
+  const last = parts.pop();
+  if (last !== "404" && last !== "404.html") return false;
+  return parts.length === 0 || (parts.length === 1 && isValidLanguageCode(parts[0]));
+}
 
 function looksLikeLanguageCode(prefix) {
   if (!isValidLanguageCode(prefix)) return false;
@@ -1490,7 +1499,7 @@ export function validateTheme(dir) {
             warn(file, "menu", `"${item.label}" is a fourth level; the core menu snippet renders three.`);
           // The page at address 404 is the site's not-found page: it answers 404
           // wherever it is linked, so a starter menu must not link it.
-          if (NOT_FOUND_LINKS.has(item.link))
+          if (linksNotFoundPage(item.link))
             error(
               file,
               "menu",

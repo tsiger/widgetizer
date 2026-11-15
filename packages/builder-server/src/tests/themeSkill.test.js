@@ -1273,13 +1273,20 @@ describe("theme validator and the not-found page", () => {
     });
 
   it("a menu item linking the not-found page is an error", async () => {
-    for (const link of ["404.html", "/404"]) {
+    for (const link of ["404.html", "/404", "el/404.html", "/fr/404"]) {
       const findings = await findingsAfter(`menu-404-${link.replace(/\W/g, "")}`, (dir) =>
         editJson(menuFile(dir), (menu) => menu.items.push({ label: "Lost", link, items: [] })),
       );
       const finding = findings.find((f) => f.rule === "menu" && f.level === "error" && /not-found page/.test(f.message));
       assert.ok(finding, JSON.stringify(findings));
     }
+  });
+
+  it("a menu item linking an ordinary page that only looks similar is fine", async () => {
+    const findings = await findingsAfter("menu-404-similar", (dir) =>
+      editJson(menuFile(dir), (menu) => menu.items.push({ label: "Guide", link: "404-guide.html", items: [] }, { label: "Story", link: "news/404.html", items: [] })),
+    );
+    assert.ok(!findings.some((f) => /not-found page/.test(f.message)), JSON.stringify(findings));
   });
 
   it("a not-found template set to index is a warning", async () => {
