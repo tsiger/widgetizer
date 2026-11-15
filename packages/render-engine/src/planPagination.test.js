@@ -137,4 +137,12 @@ describe("planPagination — only a widget that renders", () => {
     expect(await planPagination(deps(), widgets, [], { pageSlug: "blog" })).toBeNull();
     expect((await planPagination(deps(), widgets, undefined, { pageSlug: "blog" })).widgetId).toBe("w1");
   });
+
+  // The not-found page is one file shown at every missing address: its list keeps
+  // the per-page limit but gets no copies and no pager, in the export and in every preview.
+  it("on the not-found page, plans one page and withholds the pager", async () => {
+    const widgets = { w1: paginating({ limit: 3 }) };
+    const plan = await planPagination(deps(), widgets, ["w1"], { pageSlug: "404", currentPage: 2 });
+    expect(plan).toMatchObject({ widgetId: "w1", perPage: 3, total: 1, current: 1, pager: false });
+  });
 });

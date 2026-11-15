@@ -11,7 +11,7 @@
  */
 import { pageHref, itemHref } from "./internalHref.js";
 import { renderedWidgetOrder } from "./widgetOrder.js";
-import { isHomeSlug, pagedHref, pageOutputPath, itemOutputPath, translationGroupIdOf } from "./contentAddress.js";
+import { isHomeSlug, isNotFoundSlug, pagedHref, pageOutputPath, itemOutputPath, translationGroupIdOf } from "./contentAddress.js";
 
 /** A parent chain longer than this is treated as broken data, not walked. */
 const MAX_DEPTH = 10;
@@ -78,7 +78,9 @@ function ancestorsOf(page, pagesByUuid, language) {
     seen.add(parentUuid);
     seen.add(parent.uuid);
     if (isHomeSlug(parent.slug)) break;
-    chain.push(parent);
+    // A not-found page answers 404 wherever it is linked: it is left out of
+    // the trail, which goes on with the pages above it.
+    if (!isNotFoundSlug(parent.slug)) chain.push(parent);
     current = parent;
   }
 
@@ -196,7 +198,9 @@ export function buildBreadcrumbs({
   // rules; a page walks its own parent chain.
   const anchorPage = item ? listingParent(listingPages.get(collectionType), pagesByUuid, trailLanguage) : null;
   const branch = item ? anchorPage : page;
-  if (branch && !isHomeSlug(branch.slug)) {
+  // The "404 - Not found" page has no place in the hierarchy: a parent it stores
+  // (a theme template, older data) is ignored, so its trail is Home → itself.
+  if (branch && !isHomeSlug(branch.slug) && !(page && !item && isNotFoundSlug(branch.slug))) {
     for (const ancestor of ancestorsOf(branch, pagesByUuid, trailLanguage)) trail.push(asCrumb(ancestor));
     if (item) trail.push(asCrumb(branch));
   }
@@ -249,6 +253,9 @@ export function indexListingPages(pages, schemasByType) {
   const sorted = [...pages].sort((a, b) => String(a?.slug || "").localeCompare(String(b?.slug || "")));
   for (const page of sorted) {
     if (!page?.uuid) continue;
+    // A not-found page answers 404 wherever it is linked, so it never hangs a
+    // collection's items: "404" sorts before every lettered slug and would win.
+    if (isNotFoundSlug(page.slug)) continue;
     for (const widgetId of renderedWidgetOrder(page.widgets, page.widgetsOrder)) {
       const widget = page.widgets[widgetId];
       const declared = get(widget?.type)?.collection?.type;

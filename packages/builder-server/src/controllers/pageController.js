@@ -16,9 +16,9 @@ import { stripHtmlToText } from "../services/sanitizationService.js";
 import { LIMIT_KEYS, MAX_WIDGETS_PER_PAGE } from "@widgetizer/core/adapters";
 import { sanitizeSlug, generateUniqueSlug } from "../utils/slugHelpers.js";
 import { generateCopyName } from "../utils/namingHelpers.js";
-import { isHomeSlug, isReservedPageSlug, pageKey, pagesDir } from "@widgetizer/core/contentAddress";
+import { isHomeSlug, isNotFoundSlug, isReservedPageSlug, pageKey, pagesDir } from "@widgetizer/core/contentAddress";
 import { renderedWidgetOrder, uniqueBlockOrders, uniqueWidgetOrder } from "@widgetizer/core/widgetOrder";
-import { requestLanguage, projectLanguageContexts, withoutLanguage } from "../utils/contentLanguage.js";
+import { languageNameForMessage, requestLanguage, projectLanguageContexts, withoutLanguage } from "../utils/contentLanguage.js";
 import {
   assertHasIdentity,
   assertLanguageFree,
@@ -113,6 +113,9 @@ const SLUG_REFUSALS = {
   RESERVED_SLUG: "Reserved slug",
   SLUG_TAKEN: "Slug already exists",
   SECOND_HOMEPAGE: "Slug already exists",
+  NOT_FOUND_ADDRESS_LOCKED: "Address locked",
+  NOT_FOUND_TRANSLATION_ADDRESS: "Address locked",
+  NOT_FOUND_EXISTS: "\"404 - Not found\" page exists",
 };
 
 function respondMissingMedia(res, error) {
@@ -175,8 +178,23 @@ async function claimPageSlug({ scope, storage, pageId, pageData, previousPageId,
     }
   }
 
+  // The not-found page's address is set when the page is created and never
+  // changes: renaming it would quietly turn it off, and renaming another page
+  // onto it would make a page the owner never meant as one.
+  if (previousPageId && previousPageId !== pageId && (isNotFoundSlug(previousPageId) || isNotFoundSlug(pageId))) {
+    throw new ConflictError(`The "404 - Not found" page's filename can't change, and no other page can take the filename 404.`, {
+      code: "NOT_FOUND_ADDRESS_LOCKED",
+    });
+  }
+
   const current = withCurrentLanguages(scope.projectId, lang);
   if (!previousPageId) {
+    // A language has one "404 - Not found" page: a new page asking for 404 when
+    // another write took it first is refused, not renumbered into an ordinary page.
+    if (isNotFoundSlug(pageId)) {
+      const exists = await notFoundExistsError(storage, scope, lang);
+      if (exists) throw exists;
+    }
     const slug = await generateUniqueSlug(pageId, pageSlugTaken(storage, scope, current), { fallback: "page" });
     if (slug !== pageId) Object.assign(pageData, { id: slug, slug });
     return slug;
@@ -704,6 +722,30 @@ export async function bulkDeletePages(req, res) {
  * @param {import('express').Response} res - Express response object
  * @returns {Promise<void>}
  */
+/**
+ * A language has one "404 - Not found" page. When it already has one, a new page
+ * or a translation given the filename 404 is refused, naming that page, rather
+ * than renumbered into an ordinary page.
+ * @returns {Promise<ConflictError|null>}
+ */
+async function notFoundExistsError(storage, scope, lang, { replacing = false } = {}) {
+  const buf = await storage.read(scope, pageKey("404", lang));
+  if (buf == null) return null;
+  let name = "404";
+  try {
+    name = JSON.parse(buf.toString("utf8")).name || name;
+  } catch {
+    // Unreadable: name it by its filename.
+  }
+  const language = languageNameForMessage(lang.language);
+  const how = replacing
+    ? `It's already used for ${language}. To replace it with a translation of this page, delete it first.`
+    : "A language has only one.";
+  return new ConflictError(`${language} already has a "404 - Not found" page ("${name}"). ${how}`, {
+    code: "NOT_FOUND_EXISTS",
+  });
+}
+
 export async function createPage(req, res) {
   try {
     const pageData = req.body; // Get all data including SEO
@@ -722,6 +764,12 @@ export async function createPage(req, res) {
     // Defensive check: ensure name is not empty after sanitization
     if (!pageData.name || typeof pageData.name !== "string" || pageData.name.trim() === "") {
       return res.status(400).json({ error: "Page name is required." });
+    }
+
+    const requested = sanitizeSlug(pageData.slug && pageData.slug.trim() ? pageData.slug : pageData.name);
+    if (isNotFoundSlug(requested)) {
+      const exists = await notFoundExistsError(storage, scope, lang);
+      if (exists) throw exists;
     }
 
     // Use submitted slug if provided, otherwise generate from name
@@ -1104,7 +1152,20 @@ export async function createPageLanguageVersion(req, res) {
       const groupId = groupIdOf(source);
       assertLanguageFree(await findPageInGroup({ storage, scope, lang: target, groupId }), target.language, "page");
 
-      const desiredSlug = sanitizeSlug(req.body?.slug || "") || source.slug || req.params.id;
+      // A translation of the not-found page is its language's not-found page,
+      // so it keeps the address; no other page's translation may take it.
+      const requestedSlug = sanitizeSlug(req.body?.slug || "");
+      if (requestedSlug && isNotFoundSlug(source.slug) !== isNotFoundSlug(requestedSlug)) {
+        throw new ConflictError('A translation of the "404 - Not found" page must have the filename 404.', {
+          code: "NOT_FOUND_TRANSLATION_ADDRESS",
+        });
+      }
+      if (isNotFoundSlug(source.slug)) {
+        const exists = await notFoundExistsError(storage, scope, target, { replacing: true });
+        if (exists) throw exists;
+      }
+
+      const desiredSlug = requestedSlug || source.slug || req.params.id;
       const slug = await generateUniqueSlug(desiredSlug, pageSlugTaken(storage, scope, target), { fallback: "page" });
 
       const created = {

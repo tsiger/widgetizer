@@ -497,3 +497,44 @@ describe("listing pages across languages", () => {
     expect(listingParentStatus(index.get("news"), pagesByUuid({ uuid: "u-a", slug: "news" }))).toBe("resolved");
   });
 });
+
+// A not-found page answers 404 wherever it is linked, so no trail passes through it.
+describe("the not-found page in breadcrumbs", () => {
+  const schemas = { "news-grid": { collection: { type: "news" } } };
+  const withWidgets = (slug, widgets) => ({ ...page(slug, slug), widgets });
+
+  it("a 404 page is never a collection's listing page", () => {
+    const notFound = withWidgets("404", { w1: { type: "news-grid" } });
+    const news = withWidgets("news", { w1: { type: "news-grid" } });
+    const index = indexListingPages([notFound, news], schemas);
+    expect(index.get("news").pageUuids).toEqual([news.uuid]);
+  });
+
+  it("an explicit listing_anchor on a 404 page is ignored", () => {
+    const notFound = withWidgets("404", { w1: { type: "news-grid", settings: { listing_anchor: true } } });
+    expect(indexListingPages([notFound], schemas).has("news")).toBe(false);
+  });
+
+  it("a page whose parent is the 404 page has a trail of Home and itself", () => {
+    const notFound = page("404", "Page not found");
+    const child = page("help", "Help", { parentPageUuid: notFound.uuid });
+    const trail = buildBreadcrumbs({ page: child, pagesByUuid: pagesByUuid(HOME, notFound, child), pageNumber: 1 });
+    expect(labels(trail)).toEqual(["Home", "Help"]);
+  });
+
+  it("a 404 page in the middle of a chain is skipped, and the trail goes on above it", () => {
+    const about = page("about", "About");
+    const notFound = page("404", "Page not found", { parentPageUuid: about.uuid });
+    const child = page("help", "Help", { parentPageUuid: notFound.uuid });
+    const trail = buildBreadcrumbs({ page: child, pagesByUuid: pagesByUuid(HOME, about, notFound, child), pageNumber: 1 });
+    expect(labels(trail)).toEqual(["Home", "About", "Help"]);
+  });
+
+  it("a 404 page's own trail ignores any parent it stores", () => {
+    const about = page("about", "About");
+    const notFound = page("404", "Page not found", { parentPageUuid: about.uuid });
+    const trail = buildBreadcrumbs({ page: notFound, pagesByUuid: pagesByUuid(HOME, about, notFound), pageNumber: 1 });
+    expect(labels(trail)).toEqual(["Home", "Page not found"]);
+  });
+});
+

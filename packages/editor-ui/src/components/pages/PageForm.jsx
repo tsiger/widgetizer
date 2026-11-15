@@ -5,11 +5,18 @@ import { Controller, useForm } from "react-hook-form";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { formatSlug } from "../../utils/slugUtils";
 import useToastStore from "../../stores/toastStore";
+import { useDefaultLanguage } from "../../stores/projectStore";
 import useStickyActionBar from "../../hooks/useStickyActionBar";
 import Button from "../ui/Button";
 import ImageInput from "../settings/inputs/ImageInput";
 import { isHomeSlug } from "@widgetizer/core/internalHref";
-import { isReservedPageSlug, translationGroupIdOf } from "@widgetizer/core/contentAddress";
+import {
+  isNotFoundSlug,
+  isReservedPageSlug,
+  languageFolder,
+  resolveLanguage,
+  translationGroupIdOf,
+} from "@widgetizer/core/contentAddress";
 import { getAllPages } from "../../queries/pageManager";
 import ParentPagePicker from "./ParentPagePicker";
 import { usePageSettingsFields } from "../../extension/PluginProvider.jsx";
@@ -33,6 +40,20 @@ function toFormValues(initialData, extraFields) {
   };
 }
 
+// What a "404 - Not found" page is saved with in place of More settings.
+const NOT_FOUND_CLEARED = {
+  parentPageUuid: "",
+  seo: {
+    description: "",
+    og_title: "",
+    og_image: "",
+    og_type: "website",
+    twitter_card: "summary",
+    canonical_url: "",
+    robots: "noindex,follow",
+  },
+};
+
 export default function PageForm({
   initialData = { name: "", slug: "" },
   onSubmit,
@@ -45,6 +66,9 @@ export default function PageForm({
 }) {
   const { t } = useTranslation();
   const isNew = !initialData.id;
+  // The not-found page's address is set when it is created and never changes
+  // (the server refuses it too), and it is always hidden from search engines.
+  const isNotFoundPage = !isNew && isNotFoundSlug(initialData.slug);
   const [showMoreSettings, setShowMoreSettings] = useState(false);
   const showToast = useToastStore((state) => state.showToast);
   const extraFields = usePageSettingsFields();
@@ -68,6 +92,19 @@ export default function PageForm({
   // Watch fields for auto-slug and media display
   const name = watch("name");
   const ogImage = watch("seo.og_image");
+  // A new page given the address 404 becomes the "404 - Not found" page, so it
+  // gets the same treatment as soon as the address is typed.
+  // The folder the page is written to: `el/about.html` for a Greek page.
+  const defaultLanguage = useDefaultLanguage();
+  const pageLanguage = initialData.language || language;
+  // A malformed language in the address makes languageFolder throw; the server
+  // refuses such a page anyway, so the form just shows the root.
+  let folder;
+  try {
+    folder = languageFolder({ language: pageLanguage, defaultLanguage });
+  } catch {
+    folder = "";
+  }
 
   // Candidates for the parent picker. Loaded here so both callers (add + edit)
   // get the field without threading a prop through each.
@@ -112,11 +149,36 @@ export default function PageForm({
           page.uuid &&
           !descendants.has(page.uuid) &&
           !isHomeSlug(page.slug) &&
+          !isNotFoundSlug(page.slug) &&
           !(ownGroup && translationGroupIdOf(page) === ownGroup),
       )
       .sort((a, b) => String(a.name || a.slug).localeCompare(String(b.name || b.slug)))
       .map((page) => ({ value: page.uuid, label: page.name || page.slug, language: page.language }));
   })();
+
+  // A language has one "404 - Not found" page; a second new page at 404 would be
+  // renumbered by the server, so the form says so first.
+  const existingNotFound = isNew
+    ? allPages.find(
+        (page) =>
+          isNotFoundSlug(page.slug) &&
+          resolveLanguage(page.language, defaultLanguage) === resolveLanguage(pageLanguage, defaultLanguage),
+      )
+    : null;
+  const slugValue = watch("slug");
+  const willBeNotFoundPage = isNew && !existingNotFound && isNotFoundSlug(formatSlug(slugValue || ""));
+  // The filename fills itself from the title, so a title like "404 Error" passes
+  // through 404 for a keystroke. What the form shows (the 404 treatment, the
+  // filename plugin fields see) follows the filename once it has stayed put for a
+  // moment; saving still goes by the filename itself.
+  const typedSlug = formatSlug(slugValue || "");
+  const [settledSlug, setSettledSlug] = useState(typedSlug);
+  useEffect(() => {
+    const timer = setTimeout(() => setSettledSlug(typedSlug), 400);
+    return () => clearTimeout(timer);
+  }, [typedSlug]);
+  const notFoundTreatment =
+    isNotFoundPage || (willBeNotFoundPage && isNotFoundSlug(settledSlug) && settledSlug === typedSlug);
 
   // Notify parent of dirty state changes
   useEffect(() => {
@@ -154,6 +216,9 @@ export default function PageForm({
       const result = await onSubmit({
         ...data,
         slug: formatSlug(data.slug),
+        // The "404 - Not found" page has no hierarchy or search settings (More
+        // settings is hidden for it), so whatever it holds is cleared on save.
+        ...(isNotFoundPage || willBeNotFoundPage ? NOT_FOUND_CLEARED : {}),
       });
 
       return result;
@@ -189,7 +254,7 @@ export default function PageForm({
             {t("forms.page.filenameLabel")} <span className="text-pink-500">*</span>
           </label>
           <div className="flex items-center">
-            <span className="text-slate-500 mr-1">/</span>
+            <span className="text-slate-500 mr-1">{folder ? `/${folder}/` : "/"}</span>
             <input
               type="text"
               id="slug"
@@ -202,23 +267,40 @@ export default function PageForm({
                   if (isReservedPageSlug(slug) && slug !== initialData.slug) {
                     return t("forms.page.filenameReserved", { slug });
                   }
+                  if (!isNew && isNotFoundSlug(slug) && slug !== initialData.slug) {
+                    return t("forms.page.notFoundSlugTaken");
+                  }
+                  if (isNew && isNotFoundSlug(slug) && existingNotFound) {
+                    return t("forms.page.notFoundExists", { name: existingNotFound.name || existingNotFound.slug });
+                  }
                   return true;
                 },
               })}
               onBlur={handleSlugBlur}
-              className="form-input flex-1"
+              readOnly={isNotFoundPage}
+              className={
+                isNotFoundPage
+                  ? "form-input flex-1 bg-slate-50 text-slate-500 border-slate-200 shadow-none"
+                  : "form-input flex-1"
+              }
             />
             <span className="text-slate-500 ml-1">.html</span>
           </div>
           {errors.slug && <p className="form-error">{errors.slug.message}</p>}
-          <p className="form-description">
-            <Trans
-              i18nKey="forms.page.filenameHelp"
-              components={{
-                strong: <strong className="font-semibold text-slate-700" />,
-              }}
-            />
-          </p>
+          {notFoundTreatment ? (
+            <p className="form-description">
+              {isNotFoundPage ? t("forms.page.notFoundNote") : t("forms.page.notFoundNoteNew")}
+            </p>
+          ) : (
+            <p className="form-description">
+              <Trans
+                i18nKey="forms.page.filenameHelp"
+                components={{
+                  strong: <strong className="font-semibold text-slate-700" />,
+                }}
+              />
+            </p>
+          )}
         </div>
 
         {extraFields.map(({ id, field, Component }) => (
@@ -227,24 +309,28 @@ export default function PageForm({
             value={watch(field)}
             onChange={(value) => setValue(field, value, { shouldDirty: true })}
             page={initialData}
+            slug={settledSlug}
             isNew={isNew}
             language={initialData.language || language}
           />
         ))}
       </div>
 
-      {/* More Settings Toggle */}
-      <button
-        type="button"
-        onClick={() => setShowMoreSettings(!showMoreSettings)}
-        className="flex max-w-xl items-center gap-1 text-sm text-pink-500 hover:text-pink-700 mt-2 mb-4"
-      >
-        {showMoreSettings ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-        {t("forms.project.moreSettings")}
-      </button>
+      {/* More Settings Toggle. The "404 - Not found" page has none of them: it is
+          never indexed or shared, and nothing navigates by its parent. */}
+      {!notFoundTreatment && (
+        <button
+          type="button"
+          onClick={() => setShowMoreSettings(!showMoreSettings)}
+          className="flex max-w-xl items-center gap-1 text-sm text-pink-500 hover:text-pink-700 mt-2 mb-4"
+        >
+          {showMoreSettings ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+          {t("forms.project.moreSettings")}
+        </button>
+      )}
 
       {/* Hierarchy + SEO - Collapsible */}
-      {showMoreSettings && (
+      {showMoreSettings && !notFoundTreatment && (
         <div className="max-w-xl form-section">
           <h3 className="form-section-title">{t("forms.page.hierarchyTitle")}</h3>
 
@@ -270,7 +356,7 @@ export default function PageForm({
         </div>
       )}
 
-      {showMoreSettings && (
+      {showMoreSettings && !notFoundTreatment && (
         <div className="max-w-xl form-section">
           <h3 className="form-section-title">{t("forms.page.seoTitle")}</h3>
 

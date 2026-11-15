@@ -41,6 +41,18 @@ import { buildContract } from "./build-theme-skill-contract.js";
 // those keeps prefixes like `my-work` quiet.
 const regionNames = new Intl.DisplayNames(["en"], { type: "region", fallback: "none" });
 const scriptNames = new Intl.DisplayNames(["en"], { type: "script", fallback: "none" });
+// Whether a menu item's link points at a not-found page (a page at address 404),
+// at the root or in a language folder (`el/404.html`, `/fr/404`): a template's
+// subfolders are copied into the project's pages too. A collection item at 404
+// (`news/404.html`) is an ordinary page.
+function linksNotFoundPage(link) {
+  if (typeof link !== "string") return false;
+  const parts = link.split(/[?#]/)[0].replace(/^\/+|\/+$/g, "").split("/");
+  const last = parts.pop();
+  if (last !== "404" && last !== "404.html") return false;
+  return parts.length === 0 || (parts.length === 1 && isValidLanguageCode(parts[0]));
+}
+
 function looksLikeLanguageCode(prefix) {
   if (!isValidLanguageCode(prefix)) return false;
   const subtag = prefix.split("-")[1];
@@ -1485,6 +1497,14 @@ export function validateTheme(dir) {
           }
           if (depth === 4)
             warn(file, "menu", `"${item.label}" is a fourth level; the core menu snippet renders three.`);
+          // The page at address 404 is the site's not-found page: it answers 404
+          // wherever it is linked, so a starter menu must not link it.
+          if (linksNotFoundPage(item.link))
+            error(
+              file,
+              "menu",
+              `"${item.label}" links the "404 - Not found" page, which always answers 404. Remove it from the menu.`,
+            );
           if (item.items !== undefined && !Array.isArray(item.items))
             error(file, "menu", `"${item.label}": "items" must be an array.`);
           else if (item.items) walk(item.items, depth + 1);
@@ -1720,6 +1740,12 @@ export function validateTheme(dir) {
         );
       if (!SLUG_RE.test(slug) || slug === "page")
         error(file, "template-shape", `Page slug "${slug}" must match ${SLUG_RE} and cannot be "page".`);
+      if (slug === "404" && typeof page.seo?.robots === "string" && !page.seo.robots.includes("noindex"))
+        warn(
+          file,
+          "template-shape",
+          'The "404 - Not found" page is always hidden from search engines; its robots setting is ignored.',
+        );
       for (const foreign of ["sections", "order", "title", "layout"]) {
         if (foreign in page)
           error(

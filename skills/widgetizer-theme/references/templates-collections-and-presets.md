@@ -28,6 +28,8 @@ Every `widgetsOrder` key must identify an actual widget instance, and appear onc
 
 `templates/global/areas/<id>.json` is optional starting content for a shared area the theme declares: `{ "widgets": { … }, "widgetsOrder": [ … ] }`, the same shape as a page's widgets, with no `core-form` and no `listing_anchor`/`paginate`. A preset can supply its own under its `templates/global/areas/`; one it doesn't supply comes from the theme. An area renders on every page, so its widget ids must not appear in any page template, or in another area template, of the same theme or preset (the checker refuses a clash). It is copied when a site is created; a site's existing area content, including an area the owner emptied, is never replaced.
 
+**The "404 - Not found" page:** a page whose slug is `404` is the site's "404 - Not found" page. The export writes it as `404.html`, the file static hosts show for a missing address, with links that start from the site root, always hidden from search engines, and without pagination or a Markdown copy. A theme may ship `templates/404.json` as a starting design. Its filename is fixed once the page exists, and it answers 404 wherever it is linked, so no menu or link in the starter content may point at it (the checker refuses a menu item that does). Its SEO robots setting is ignored.
+
 **Convention:** use readable stable widget/block keys; snake_case versus kebab-case is not an engine restriction. Omit project UUIDs, creation timestamps, and project-specific references from starter content. Let scaffolding generate identities. Omit demo SEO by default so a fictional business's metadata does not become a user's authored SEO; this is an authoring convention, not a JSON parser restriction.
 
 ## Menus and links

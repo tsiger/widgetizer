@@ -221,3 +221,21 @@ describe("SeoTag — subfolder Site URL", () => {
     expect(html).toContain('content="https://cdn.example.net/shared.png"');
   });
 });
+
+// The not-found page answers 404 at its own address, so no canonical may name it.
+describe("SeoTag on the not-found page", () => {
+  const project = { siteUrl: "https://example.com/", siteTitle: "Site" };
+
+  it("a 404 page has no canonical link", () => {
+    expect(render({ page: { slug: "404", name: "Not found", seo: {} }, project })).not.toContain('rel="canonical"');
+  });
+
+  it("a hand-set canonical is ignored on a 404 page", () => {
+    const seo = { canonical_url: "https://example.com/help" };
+    expect(render({ page: { slug: "404", name: "Not found", seo }, project })).not.toContain('rel="canonical"');
+  });
+
+  it("an ordinary page keeps its canonical", () => {
+    expect(render({ page: pageWith({}), project })).toContain('<link rel="canonical" href="https://example.com/about.html">');
+  });
+});

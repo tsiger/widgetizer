@@ -1,6 +1,7 @@
 // Purpose: Liquid tag to output SEO meta tags
 
 import { pageUrlAt, publishedImageUrl } from "../utils/publishedUrls.js";
+import { isNotFoundSlug } from "../utils/contentAddress.js";
 import { structuredDataScript } from "../structuredData/index.js";
 import { resolveSiteString } from "../filters/siteStringFilter.js";
 
@@ -47,7 +48,9 @@ export const SeoTag = {
       const pagedUrl = (number) => pageUrlAt(page.slug, number, project, { language: page.language });
       const explicitCanonical = seo.canonical_url && seo.canonical_url.trim() ? seo.canonical_url.trim() : "";
       const canonicalUrl = pageNumber > 1 ? pagedUrl(pageNumber) : explicitCanonical || pagedUrl(1);
-      if (canonicalUrl) {
+      // The not-found page answers 404 at its own address, so it names none,
+      // and a hand-set one would claim it lives somewhere else.
+      if (canonicalUrl && !isNotFoundSlug(page.slug)) {
         metaTags.push(`<link rel="canonical" href="${escapeHtml(canonicalUrl)}">`);
       }
       // hreflang (§7d). A set without a self-reference is invalid and ignored,

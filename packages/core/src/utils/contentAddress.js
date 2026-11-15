@@ -18,6 +18,17 @@ export function isHomeSlug(slug) {
 }
 
 /**
+ * The page at this address is its language's not-found page: exported as
+ * `404.html` (`el/404.html`), the name static hosts serve for a missing
+ * address. Pages only; a collection item slugged `404` is an ordinary item.
+ */
+export const NOT_FOUND_SLUG = "404";
+
+export function isNotFoundSlug(slug) {
+  return slug === NOT_FOUND_SLUG;
+}
+
+/**
  * The translation group a page or item belongs to: the id it joined, else its
  * own uuid. Content that has never been translated is not rewritten to record a
  * group, so the fallback is what makes it findable as a member of its own.

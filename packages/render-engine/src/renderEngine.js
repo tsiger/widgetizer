@@ -39,7 +39,7 @@ import {
 import { prefixInternalHref, prefixSiteIcons } from "@widgetizer/core/linkPrefixer";
 import { pageHref, itemHref } from "@widgetizer/core/internalHref";
 import { buildBreadcrumbs, indexListingPages } from "@widgetizer/core/breadcrumbs";
-import { pagedHref, pageOutputPath, resolveLanguage } from "@widgetizer/core/contentAddress";
+import { isNotFoundSlug, pagedHref, pageOutputPath, resolveLanguage } from "@widgetizer/core/contentAddress";
 import { LANGUAGE_CODE_RE, languageDir } from "@widgetizer/core/languages";
 import { buildAssetUrl } from "@widgetizer/core/assetUrl";
 import { identityForTheme } from "@widgetizer/core/siteIdentity";
@@ -145,8 +145,10 @@ function getProjectData(deps) {
   }
 }
 
+// A plan with `pager: false` still limits the listing (`collectionSlice`) but
+// exposes no pagination: no pager in the widget, no prev/next in the head.
 function paginationContextFor(sharedGlobals) {
-  return sharedGlobals?.paginationPlan
+  return sharedGlobals?.paginationPlan && sharedGlobals.paginationPlan.pager !== false
     ? buildPaginationContext(sharedGlobals.paginationPlan, {
         cleanUrls: sharedGlobals.cleanUrls === true,
         outputPathPrefix: sharedGlobals.outputPathPrefix || "",
@@ -651,6 +653,11 @@ async function planPagination(deps, widgets, widgetsOrder, { pageSlug, currentPa
     const total = Math.ceil(totalItems / perPage);
     if (total < 2) return null;
 
+    // The not-found page is one file shown at every missing address: its list
+    // keeps the per-page limit, but there are no copies and no pager.
+    if (isNotFoundSlug(pageSlug)) {
+      return { widgetId, collectionType, perPage, totalItems, total: 1, current: 1, pager: false, pageSlug, language, defaultLanguage };
+    }
     const current = Math.min(Math.max(Math.floor(Number(currentPage)) || 1, 1), total);
     return { widgetId, collectionType, perPage, totalItems, total, current, pageSlug, language, defaultLanguage };
   }
@@ -1425,7 +1432,9 @@ async function renderWidget(
           }
         : {}),
       widget: widgetContext,
-      ...(paginationPlan ? { pagination: buildPaginationContext(paginationPlan, { cleanUrls, outputPathPrefix }) } : {}),
+      ...(paginationPlan && paginationPlan.pager !== false
+        ? { pagination: buildPaginationContext(paginationPlan, { cleanUrls, outputPathPrefix }) }
+        : {}),
     };
 
     // Get theme snippets directory for this project
