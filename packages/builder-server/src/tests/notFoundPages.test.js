@@ -152,6 +152,13 @@ describe("the 404 address in settings and content saves", () => {
     assert.ok(await fs.pathExists(pageFile("404")));
   });
 
+  it("POST /pages at 404 when the language already has one is refused, naming it", async () => {
+    const res = await call(pageController.createPage, { body: { name: "Oops", slug: "404" } });
+    assertLocked(res, "NOT_FOUND_EXISTS");
+    assert.match(res._json.message, /English already has a "404 - Not found" page \("Page not found"\)/);
+    assert.ok(!(await fs.pathExists(pageFile("404-1"))));
+  });
+
   it("POST /pages creates a page at 404", async () => {
     await fs.remove(pageFile("404"));
     const res = await call(pageController.createPage, { body: { name: "Not found", slug: "404" } });

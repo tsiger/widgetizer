@@ -206,6 +206,36 @@ describe("PageForm on the not-found page", () => {
     expect(container.querySelector("#slug").readOnly).toBe(false);
   });
 
+  it("the read-only address looks read-only", () => {
+    const { container } = render(<PageForm initialData={NOT_FOUND} onSubmit={vi.fn()} />);
+    expect(container.querySelector("#slug").className).toMatch(/bg-slate-50/);
+  });
+
+  it("a new page at 404 in a language that already has one shows notFoundExists and doesn't submit", async () => {
+    useProjectStore.setState({ activeProject: { id: "p1", defaultLanguage: "en", languages: ["el"] } });
+    allPages = [{ uuid: "u-404", slug: "404", name: "Page not found", language: "en" }];
+    const onSubmit = vi.fn(async () => false);
+    const { container } = render(<PageForm initialData={{}} onSubmit={onSubmit} isDirty />);
+    await waitFor(() => expect(allPages.length).toBe(1));
+    fireEvent.change(container.querySelector("#name"), { target: { value: "Oops" } });
+    fireEvent.change(container.querySelector("#slug"), { target: { value: "404" } });
+    fireEvent.submit(container.querySelector("form"));
+    await waitFor(() => expect(screen.getByText("forms.page.notFoundExists")).toBeTruthy());
+    expect(onSubmit).not.toHaveBeenCalled();
+    expect(screen.queryByText("forms.page.notFoundNoteNew")).toBeNull();
+  });
+
+  it("a new Greek page at 404 is fine when only the main language has one", async () => {
+    useProjectStore.setState({ activeProject: { id: "p1", defaultLanguage: "en", languages: ["el"] } });
+    allPages = [{ uuid: "u-404", slug: "404", name: "Page not found", language: "en" }];
+    const onSubmit = vi.fn(async () => false);
+    const { container } = render(<PageForm initialData={{}} language="el" onSubmit={onSubmit} isDirty />);
+    fireEvent.change(container.querySelector("#name"), { target: { value: "Den vrethike" } });
+    fireEvent.change(container.querySelector("#slug"), { target: { value: "404" } });
+    fireEvent.submit(container.querySelector("form"));
+    await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1));
+  });
+
   it("renaming an existing page to 404 shows notFoundSlugTaken", async () => {
     const onSubmit = vi.fn(async () => false);
     const { container } = render(<PageForm initialData={{ ...PAGE, parentPageUuid: undefined }} onSubmit={onSubmit} isDirty />);

@@ -10,7 +10,13 @@ import useStickyActionBar from "../../hooks/useStickyActionBar";
 import Button from "../ui/Button";
 import ImageInput from "../settings/inputs/ImageInput";
 import { isHomeSlug } from "@widgetizer/core/internalHref";
-import { isNotFoundSlug, isReservedPageSlug, languageFolder, translationGroupIdOf } from "@widgetizer/core/contentAddress";
+import {
+  isNotFoundSlug,
+  isReservedPageSlug,
+  languageFolder,
+  resolveLanguage,
+  translationGroupIdOf,
+} from "@widgetizer/core/contentAddress";
 import { getAllPages } from "../../queries/pageManager";
 import ParentPagePicker from "./ParentPagePicker";
 import { usePageSettingsFields } from "../../extension/PluginProvider.jsx";
@@ -74,12 +80,10 @@ export default function PageForm({
   const ogImage = watch("seo.og_image");
   // A new page given the address 404 becomes the "404 - Not found" page, so it
   // gets the same treatment as soon as the address is typed.
-  const slugValue = watch("slug");
-  const willBeNotFoundPage = isNew && isNotFoundSlug(formatSlug(slugValue || ""));
-  const notFoundTreatment = isNotFoundPage || willBeNotFoundPage;
   // The folder the page is written to: `el/about.html` for a Greek page.
   const defaultLanguage = useDefaultLanguage();
-  const folder = languageFolder({ language: initialData.language || language, defaultLanguage });
+  const pageLanguage = initialData.language || language;
+  const folder = languageFolder({ language: pageLanguage, defaultLanguage });
 
   // Candidates for the parent picker. Loaded here so both callers (add + edit)
   // get the field without threading a prop through each.
@@ -130,6 +134,19 @@ export default function PageForm({
       .sort((a, b) => String(a.name || a.slug).localeCompare(String(b.name || b.slug)))
       .map((page) => ({ value: page.uuid, label: page.name || page.slug, language: page.language }));
   })();
+
+  // A language has one "404 - Not found" page; a second new page at 404 would be
+  // renumbered by the server, so the form says so first.
+  const existingNotFound = isNew
+    ? allPages.find(
+        (page) =>
+          isNotFoundSlug(page.slug) &&
+          resolveLanguage(page.language, defaultLanguage) === resolveLanguage(pageLanguage, defaultLanguage),
+      )
+    : null;
+  const slugValue = watch("slug");
+  const willBeNotFoundPage = isNew && !existingNotFound && isNotFoundSlug(formatSlug(slugValue || ""));
+  const notFoundTreatment = isNotFoundPage || willBeNotFoundPage;
 
   // Notify parent of dirty state changes
   useEffect(() => {
@@ -218,12 +235,19 @@ export default function PageForm({
                   if (!isNew && isNotFoundSlug(slug) && slug !== initialData.slug) {
                     return t("forms.page.notFoundSlugTaken");
                   }
+                  if (isNew && isNotFoundSlug(slug) && existingNotFound) {
+                    return t("forms.page.notFoundExists", { name: existingNotFound.name || existingNotFound.slug });
+                  }
                   return true;
                 },
               })}
               onBlur={handleSlugBlur}
               readOnly={isNotFoundPage}
-              className="form-input flex-1"
+              className={
+                isNotFoundPage
+                  ? "form-input flex-1 bg-slate-50 text-slate-500 border-slate-200 shadow-none"
+                  : "form-input flex-1"
+              }
             />
             <span className="text-slate-500 ml-1">.html</span>
           </div>
