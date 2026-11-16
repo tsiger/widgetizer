@@ -24,7 +24,9 @@ services:
       # http://<server-ip>:3001).
       SERVER_URL: http://localhost:3001
       # The export viewer's public address, when it isn't the app's address
-      # with the port one up (e.g. a separate host behind a proxy). Used as is.
+      # with the port one up (e.g. a separate host behind a proxy). Only its
+      # origin counts: the viewer needs the root of its own host or port, so a
+      # proxy that serves it under a path (https://host/view/) can't work.
       # EXPORT_VIEWER_URL: https://view.example.com
       # Last resort, for a setup that can only expose one port: no viewer, and
       # View serves exports from the app as /api/export/view/... There, links

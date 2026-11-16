@@ -64,8 +64,10 @@ sends the browser there, so the viewer port must be reachable from the browser.
   `https://view.example.com`) when the viewer is reached some other way, such
   as a separate host behind the proxy. It must be an absolute `http://` or
   `https://` URL, and only its origin counts (any path, query or fragment is
-  dropped, since the viewer serves the site from `/`); anything else is
-  ignored, with a warning in the log.
+  dropped, with a warning in the log, since the viewer serves the site from
+  `/`). So the viewer needs its own host or port: a proxy that serves it under
+  a path, such as `https://builder.example.com/view/`, can't work. Anything
+  that isn't such a URL is ignored, with a warning in the log.
 - **Updating an existing install.** A compose file or `docker run` line that
   publishes only `3001` must also publish `3002` after updating, or View leads
   to an address that doesn't answer.

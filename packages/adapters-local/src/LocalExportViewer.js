@@ -143,8 +143,15 @@ export class LocalExportViewer {
   async start({ host, appPort, appPortWasRequested }) {
     try {
       const url = this.#env.EXPORT_VIEWER_URL;
-      if (url?.trim() && !overrideOrigin(url)) {
+      const origin = overrideOrigin(url);
+      if (url?.trim() && !origin) {
         console.warn(`Ignoring EXPORT_VIEWER_URL "${url}": it must be an absolute http:// or https:// URL.`);
+      } else if (origin && new URL(url.trim()).href !== `${origin}/`) {
+        // A proxy that serves the viewer under a path can't work: the viewer
+        // serves the export from `/`, so say so rather than drop it silently.
+        console.warn(
+          `EXPORT_VIEWER_URL "${url}": only its origin (${origin}) is used; the viewer needs the root of its own host or port, not a path under it.`,
+        );
       }
       const setting = this.#env.EXPORT_VIEWER_PORT?.trim();
       if (setting === "off") {

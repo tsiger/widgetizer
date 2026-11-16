@@ -123,6 +123,22 @@ describe("LocalExportViewer.start", () => {
     expect(String(warn.mock.calls[0][0])).toMatch(/EXPORT_VIEWER_URL/);
   });
 
+  it("warns once at start that a path, query or fragment in EXPORT_VIEWER_URL is dropped", async () => {
+    const viewer = viewerWith({ EXPORT_VIEWER_PORT: "0", EXPORT_VIEWER_URL: "https://host.example.com/view/" });
+    expect(await viewer.start({ host: "127.0.0.1", appPort: 3001, appPortWasRequested: true })).not.toBeNull();
+    expect(warn).toHaveBeenCalledTimes(1);
+    expect(String(warn.mock.calls[0][0])).toMatch(/only its origin.*https:\/\/host\.example\.com/);
+  });
+
+  it("doesn't warn about an EXPORT_VIEWER_URL that is just an origin, with or without a trailing slash", async () => {
+    for (const url of ["https://view.example.com", "https://view.example.com/"]) {
+      const viewer = viewerWith({ EXPORT_VIEWER_PORT: "0", EXPORT_VIEWER_URL: url });
+      expect(await viewer.start({ host: "127.0.0.1", appPort: 3001, appPortWasRequested: true })).not.toBeNull();
+      await viewer.close();
+    }
+    expect(warn).not.toHaveBeenCalled();
+  });
+
   it("never rejects, even when the bind host is unusable", async () => {
     const viewer = viewerWith({ EXPORT_VIEWER_PORT: "0" });
     await expect(

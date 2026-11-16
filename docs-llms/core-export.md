@@ -293,7 +293,7 @@ The view routes above serve an export on the app's own origin under `/api/export
 
 **Address** (`baseUrlFor(req)`, worked out per request to the app):
 
-1. `EXPORT_VIEWER_URL`'s origin (`overrideOrigin`): an absolute `http://` or `https://` URL, with any path, query or fragment dropped, since the viewer serves the site from `/` and the start page moves on to path-only destinations. Anything else is ignored (a warning when the viewer starts) and the rules below apply; `origins()` and Electron's `viewerOriginsFromEnv` apply the same rule.
+1. `EXPORT_VIEWER_URL`'s origin (`overrideOrigin`): an absolute `http://` or `https://` URL, with any path, query or fragment dropped (a warning when the viewer starts), since the viewer serves the site from `/` and the start page moves on to path-only destinations; a proxy that serves the viewer under a path can't work, so it needs its own host or port. Anything else is ignored (a warning when the viewer starts) and the rules below apply; `origins()` and Electron's `viewerOriginsFromEnv` apply the same rule.
 2. When the port was defaulted to the app's + 1 (not when `EXPORT_VIEWER_PORT` happens to equal it): the request's protocol and hostname with **the port the browser used plus one** (`http://localhost:8080` → `:8081`; `https://builder.example.com` on 443 → `:444`). Under `trust proxy` (on when `NODE_ENV=production`) Express reads `X-Forwarded-Host`/`-Proto`, and a numeric first `X-Forwarded-Port` value is taken as the browser's port.
 3. Otherwise: the request's protocol and hostname with the viewer's own port (the desktop app; a fixed `EXPORT_VIEWER_PORT`, which in Docker must be published on the same host port or paired with `EXPORT_VIEWER_URL`).
 

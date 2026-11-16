@@ -15,6 +15,8 @@
  * @param {Pick<Console, "log"|"error">} [options.log]
  * @returns {Promise<void>}
  */
+const ANY_HOST = new Set(["0.0.0.0", "::"]);
+
 export async function startViewerThenReady({ viewer, host, appPort, appPortWasRequested, onReady, log = console }) {
   let info = null;
   try {
@@ -24,8 +26,15 @@ export async function startViewerThenReady({ viewer, host, appPort, appPortWasRe
     log.error(`Export viewer failed to start: ${err?.message ?? err}`);
   }
 
-  // When the viewer is off or can't bind, it has already logged why.
-  if (info) log.log(`Export viewer is running on ${info.origins[0] ?? `port ${info.port}`}`);
+  // When the viewer is off or can't bind, it has already logged why. Bound to
+  // every interface (Docker's HOST=0.0.0.0) the loopback origin would name the
+  // container's side, not the address a browser uses, so log the port instead.
+  if (info) {
+    const where = ANY_HOST.has(host)
+      ? `port ${info.port} (all interfaces)`
+      : (info.origins[0] ?? `port ${info.port}`);
+    log.log(`Export viewer is running on ${where}`);
+  }
 
   onReady?.(appPort, info);
 }

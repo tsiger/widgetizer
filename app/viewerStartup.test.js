@@ -27,6 +27,22 @@ describe("startViewerThenReady", () => {
     expect(viewer.start).toHaveBeenCalledWith({ host: "127.0.0.1", appPort: 3001, appPortWasRequested: true });
   });
 
+  it("logs the viewer's origin when bound to one address", async () => {
+    const viewer = { start: async () => ({ port: 3002 }), origins: () => ["http://127.0.0.1:3002"] };
+    const log = makeLog();
+    await startViewerThenReady({ ...base, viewer, log });
+    expect(log.log).toHaveBeenCalledWith("Export viewer is running on http://127.0.0.1:3002");
+  });
+
+  it("logs the port, not a loopback origin, when bound to every interface (Docker's HOST=0.0.0.0)", async () => {
+    for (const host of ["0.0.0.0", "::"]) {
+      const viewer = { start: async () => ({ port: 3002 }), origins: () => ["http://127.0.0.1:3002"] };
+      const log = makeLog();
+      await startViewerThenReady({ ...base, host, viewer, log });
+      expect(log.log).toHaveBeenCalledWith("Export viewer is running on port 3002 (all interfaces)");
+    }
+  });
+
   it("calls onReady with null after a delayed null", async () => {
     const viewer = { start: () => delay(20, null), origins: () => [] };
     const onReady = vi.fn();

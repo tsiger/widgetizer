@@ -26,6 +26,8 @@ In dev the script also sets `ELECTRON_DISABLE_INTERNAL_SERVER=1`, so Electron po
 
 It also sets `EXPORT_VIEWER_PORT=3002` for both the server and Electron, since with no `server-ready` message the main process works out the [export viewer's](core-export.md#export-viewer) origins from its own environment (`viewerOriginsFromEnv`, `electron/viewerOrigins.js`: the port's `127.0.0.1` and `localhost` origins plus `EXPORT_VIEWER_URL`'s). It reads plain `process.env`, not the `.env` file, so an `EXPORT_VIEWER_URL` set only in `.env` reaches the server but not Electron: export it in the shell too, or the viewer opens in the system browser.
 
+The bundled server, its `server-ready` message and the OS-assigned ports run only in a packaged build; `npm run electron:build:mac:unsigned` makes a local one for testing that path.
+
 The `preelectron:dev` npm lifecycle hook runs automatically before `electron:dev` and validates locales. `better-sqlite3` ships Node-API binaries for every supported platform (`node_modules/better-sqlite3/prebuilds/`), so the same binary loads in Node and in Electron.
 
 Use Electron dev mode when testing Electron-specific features (menus, native dialogs, preview window, auto-update). For regular development, use `npm run dev:all` and open `http://localhost:3000` in your browser.
