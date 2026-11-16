@@ -90,7 +90,7 @@ Under the project's export-operation lock, allocate the next version, empty its 
 | Follow-up action | Effect |
 | --- | --- |
 | List history / inspect files | Read generated-version metadata and contents |
-| View export | Serve confined bundle paths, with extensionless/index fallbacks |
+| View export | Show it in the export viewer (its own port, the Site URL path as root, the site's 404 page for a miss), or serve confined bundle paths from the app when there is no viewer; extensionless/index fallbacks in both |
 | Download | ZIP the generated bundle |
 | Delete version | Remove generated directory and history entry |
 | Retention cleanup | Remove older generated versions according to settings |

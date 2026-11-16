@@ -134,7 +134,7 @@ After pages: collection item pages ([§3](#3-collection-item-page-export)), the 
 
 A page whose slug is `404` (`isNotFoundSlug` in core `contentAddress.js`) is the site's not-found page, exported as `404.html` and, in another language, `<code>/404.html`. Static hosts show the root `404.html` for a missing address (GitHub Pages, GitLab Pages, Netlify, Vercel, Firebase Hosting; Cloudflare Pages uses the nearest `404.html` up the folder tree; Apache, nginx and S3 take a configured name). `generateSite` gives it this treatment, whatever its own settings:
 
-- **Root-relative links.** The page is shown at whatever address was missing, so its `outputPathPrefix` is the Site URL's path (`siteUrlPathname`: `/repo/` for `https://user.github.io/repo/`, `/` with no Site URL) instead of the usual relative prefix. Everything the generator links (assets, media, menus, page and item links, the language switcher) starts from there; `#section` links stay as they are. A site in a subfolder with no Site URL gets `/`, and its not-found page looks broken there. In the export viewer (`/api/export/view/<dir>/`) and in a file opened from disk the page shows unstyled, since its links start from the server root. What the owner typed is not rewritten: a custom link, custom CSS or a custom script on it should use an address starting with `/` or `https://`.
+- **Root-relative links.** The page is shown at whatever address was missing, so its `outputPathPrefix` is the Site URL's path (`siteUrlPathname`: `/repo/` for `https://user.github.io/repo/`, `/` with no Site URL) instead of the usual relative prefix. Everything the generator links (assets, media, menus, page and item links, the language switcher) starts from there; `#section` links stay as they are. A site in a subfolder with no Site URL gets `/`, and its not-found page looks broken there. The [export viewer](#export-viewer) serves an export with its Site URL path as the root, so the page works there: asked for by name (`/404.html`, status 200) or shown for a missing address (status 404). In a file opened from disk, and in the viewer when it is off, the page shows unstyled, since its links start from the server root. What the owner typed is not rewritten: a custom link, custom CSS or a custom script on it should use an address starting with `/` or `https://`.
 - **Hidden from search engines.** Its `seo.robots` is set to `noindex` plus the owner's follow choice when the pages are loaded, so the robots tag, the sitemap (left out), robots.txt (a `Disallow` line, when there is a Site URL) and `hreflang` all follow. It has no canonical tag, a hand-set one included (`SeoTag.js`).
 - **One file.** A paginated list on it keeps its per-page limit but gets no copies and no pager: the render engine's `planPagination` gives a page at `404` a one-page plan with `pager: false` (so the export and every preview agree), and exposes no `pagination` for such a plan. No Markdown twin is written.
 - **Out of trails and switchers.** It is never a collection's listing page, a breadcrumb trail skips it and goes on with the pages above it, and its own trail is always `Home → itself`, whatever parent it stores (`breadcrumbs.js`), and the language switcher never links it: on the not-found page every language goes to its homepage (`buildTranslations`).
@@ -213,7 +213,7 @@ Issues are collected across all pages and item pages with severity, line/column,
 
 `widgetizer.forms.json` is the last file of the generated site; the export then copies the used media and writes `manifest.json`:
 
-- **`manifest.json`** (always) — `{ generator: "widgetizer", widgetizerVersion, themeId, themeVersion, exportVersion, assetVersion, exportedAt, projectName, collections }`. `assetVersion` is the `?v=` token stamped on this export's CSS/JS, so a live page can be traced back to the export that produced it. `collections` is `manifestCollections` from the two-pass validation: one entry per collection with `{ type, itemPages, itemCount, itemCountByLanguage }`. `itemCount` is the total across every exported language — the same scope `itemPages` describes — and `itemCountByLanguage` maps each exported language code to its own count. A language the export skipped is absent from both.
+- **`manifest.json`** (always) — `{ generator: "widgetizer", widgetizerVersion, themeId, themeVersion, exportVersion, assetVersion, exportedAt, projectName, sitePath, collections }`. `sitePath` is the Site URL's path at export time (`/`, or `/repo/`), the root the [export viewer](#export-viewer) serves the export from. `assetVersion` is the `?v=` token stamped on this export's CSS/JS, so a live page can be traced back to the export that produced it. `collections` is `manifestCollections` from the two-pass validation: one entry per collection with `{ type, itemPages, itemCount, itemCountByLanguage }`. `itemCount` is the total across every exported language — the same scope `itemPages` describes — and `itemCountByLanguage` maps each exported language code to its own count. A language the export skipped is absent from both.
 - **`widgetizer.forms.json`** (only when the project contains `core-form` widgets) — `buildFormsManifest(pages, appVersion)` (`services/formsManifestService.js`) produces a forms manifest describing each form's fields. It is built and validated with the other checks, before the first file is written; validation errors throw `statusCode 400`, are surfaced to the client, and record no failed export; non-fatal warnings are logged. See [Form Widget](core-form-widget.md).
 - **`site.webmanifest`** (when site icons were generated) — references `icon-192.png` and `icon-512.png`.
 
@@ -259,10 +259,51 @@ All export actions mount under `/api/export` (the `export` router is attached to
 | `DELETE /api/export/:version` | `X-Project-Id` → `req.scope` | Delete a specific export version |
 | `GET /api/export/files/:exportDir` | `exportDir` (scope-bound) | Entry-file info for an export |
 | `GET /api/export/download/:exportDir` | `exportDir` (scope-bound) | Download an export as a ZIP |
-| `GET /api/export/view/:exportDir` | `exportDir` (scope-bound) | Serve the export entry file (`index.html`) for preview |
-| `GET /api/export/view/:exportDir/*filePath` | `exportDir` (scope-bound) | Serve a specific exported file for preview; an extensionless path also tries `<path>.html` then `<path>/index.html`; a trailing-slash path tries `<path>.html` then `<path>/index.html` |
+| `GET /api/export/view/:exportDir` | `exportDir` (scope-bound) | View the export's entry file (`index.html`): a `302` to the [export viewer](#export-viewer), or the file itself when there is none |
+| `GET /api/export/view/:exportDir/*filePath` | `exportDir` (scope-bound) | View a specific exported file the same way. Served from the app, an extensionless path also tries `<path>.html` then `<path>/index.html`; a trailing-slash path tries `<path>.html` then `<path>/index.html` |
 
 Every candidate is confined to the selected export directory, and a request that escapes it answers 404 — the route does not distinguish "outside the export" from "missing".
+
+### Export viewer
+
+The view routes above serve an export on the app's own origin under `/api/export/view/<dir>/`, where a URL starting with `/` resolves against the app, not the export. The export viewer serves it on a second origin (its own port) with the Site URL's path as the root, the way a static host does, so root-relative links, the 404 page and missing addresses behave as they will once published.
+
+**Pieces.** `builder-server` never binds a socket: it provides the listener-free site app (`createExportSiteApp({ getCurrent })`, `services/exportSite.js`) and reads an optional `exportViewer` adapter in the view routes (not a required adapter key; hosted injects none and blocks the export routes). The OSS shell supplies `LocalExportViewer` (`packages/adapters-local/src/LocalExportViewer.js`), which owns the port and the address, and starts it after the app binds (`app/viewerStartup.js`); the log says `Export viewer is running on …`, or why it is off or failed. A viewer failure never stops the app.
+
+**The redirect.** After the scope check (`exportDirBelongsToScope`), a ready viewer whose `baseUrlFor(req)` gives an address gets `show({ exportDir, exportRoot, sitePath })`, making that export the one it serves, and the route answers `302` to `<viewer>/__widgetizer/view-start?to=<sitePath><file><query>` (each file-path segment re-encoded, so `#`, `%` and spaces survive). Otherwise (no viewer, not ready, no address, or a scope failure) the file is served from the app as before. `sitePath` comes from the export's `manifest.json` (written by `exportProjectToDir` as `siteUrlPathname(siteUrl)`); an export without it uses the project's current Site URL path, so if that path changed since, its 404 page keeps the old prefix and shows broken until re-exported.
+
+**One viewer, the last export viewed.** There is one viewer port, showing the export last opened: viewing a second version replaces what an open viewer tab shows on its next navigation, and every export shares the viewer's origin.
+
+**The start page** (`/__widgetizer/view-start`, reserved on the viewer origin) answers `200` with `Clear-Site-Data: "storage"` (a normal page, since Safari ignores the header on a redirect) and moves on with `location.replace`, plus a `<noscript>` meta refresh. It parses `to` against a fixed origin and accepts it only when it stays on that origin and has no control characters (so `//host`, `/\host` and absolute URLs fall back to `sitePath`), then emits the parsed **path only** (`pathname + search + hash`), never the raw string; a path starting with `//` gets `/.` in front so it can't be read as a host. Being path-only, the destination resolves against whatever address the browser used for the viewer, so the viewer itself trusts no `Host` or `X-Forwarded-*` header. The script keeps the View URL's `#fragment` when the destination has none.
+
+**Serving** (`createExportSiteApp`):
+
+- `GET`/`HEAD` only (`405` otherwise); every response `Cache-Control: no-store`, since one origin serves different exports over time; no CORS headers.
+- No export shown yet: a short page ("Open an export from the Export page"), status `404`.
+- `/` (and the site path without its trailing slash) redirects to `sitePath` when that isn't `/`; any other path outside `sitePath` is a plain `404`.
+- Inside `sitePath`: the rest is resolved with `resolveExportFile` (the Clean URLs fallbacks above, regular files only, contained), with the same content types and dot-folder handling as the app's view route. Decoded `..`, `.`, backslashes and NUL get a plain `404`.
+- An existing file answers `200`, `404.html` asked for by name included. A miss shows the nearest `404.html` walking up from the requested folder to the export root (`/el/missing` gets `el/404.html` when it exists, else `404.html`) with status `404` (Cloudflare Pages' rule; most hosts show only the root one), or a plain `404` when the export has none.
+
+**Port** (`LocalExportViewer.start`, on the app's `HOST`):
+
+- `EXPORT_VIEWER_PORT` set to a port: that port; if it's taken, the viewer stays off (logged) and View serves from the app.
+- `EXPORT_VIEWER_PORT=off`: no viewer (below).
+- Otherwise, when the app's port was asked for: **one above it** (3001 → 3002), if it is free on `127.0.0.1`, `::1`, `::` and `0.0.0.0` (on macOS a bind on `127.0.0.1:P` succeeds while another program holds `[::1]:P`, and `localhost:P` could reach that program); else an OS-assigned port.
+- When the app itself is on an OS-assigned port (`PORT=0`, the desktop app): an OS-assigned port.
+
+**Address** (`baseUrlFor(req)`, worked out per request to the app):
+
+1. `EXPORT_VIEWER_URL`, used as is.
+2. When the port was defaulted to the app's + 1 (not when `EXPORT_VIEWER_PORT` happens to equal it): the request's protocol and hostname with **the port the browser used plus one** (`http://localhost:8080` → `:8081`; `https://builder.example.com` on 443 → `:444`). Under `trust proxy` (on when `NODE_ENV=production`) Express reads `X-Forwarded-Host`/`-Proto`, and a numeric first `X-Forwarded-Port` value is taken as the browser's port.
+3. Otherwise: the request's protocol and hostname with the viewer's own port (the desktop app; a fixed `EXPORT_VIEWER_PORT`, which in Docker must be published on the same host port or paired with `EXPORT_VIEWER_URL`).
+
+A malformed host gives no address, and View serves from the app. Behind a proxy the address is derived from the request to the **app**, so that proxy must pass `Host` and `X-Forwarded-Proto` (`DOCKER.md` has the nginx and Caddy rules).
+
+**Limits.** `Clear-Site-Data` clears localStorage, sessionStorage and IndexedDB only in a secure context (loopback or HTTPS), so over plain HTTP on a LAN address nothing is cleared. Cookies are never cleared: the `"cookies"` directive clears them for the whole registrable domain, signing the user out of other apps on `localhost`, so a viewed site's cookies survive between views. On loopback the viewer origin passes the API's CORS check (it trusts every local origin), so exported scripts can still call the editor API, as the live preview's can.
+
+**`EXPORT_VIEWER_PORT=off`** is a last resort for installs that can expose only one port: View serves from the app as above, so root-relative links and assets break, every 404 page shows unstyled with dead links, a missing address answers JSON instead of the 404 page, exported scripts run on the app's own origin, and nothing is cleared between views. The exported files are unaffected.
+
+**Desktop app.** The server reports the viewer's origins in `server-ready`, and the content windows accept them (see [Electron](core-electron.md#new-windows-and-outside-links)).
 
 ### Smart entry-file detection
 

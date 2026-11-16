@@ -66,6 +66,8 @@ This index cross-checks the operation directory against the backend surface. It 
 | GET | `/api/export/view/:exportDir` |
 | GET | `/api/export/view/:exportDir/*filePath` |
 
+With the OSS shells' export viewer running, both view routes answer `302` to the viewer's own origin (a second port), which serves `/__widgetizer/view-start` and the export at its Site URL path; it is not mounted under `/api`. See [Site Exporting](../../core-export.md#export-viewer).
+
 ## icons
 
 [Route declarations](../../../packages/builder-server/src/routes/icons.js) · [Behavior walkthrough](themes.md)

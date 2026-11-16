@@ -24,6 +24,8 @@ npm run electron:dev
 
 In dev the script also sets `ELECTRON_DISABLE_INTERNAL_SERVER=1`, so Electron points at the standalone `npm run server` rather than forking its own bundled server.
 
+It also sets `EXPORT_VIEWER_PORT=3002` for both the server and Electron, since with no `server-ready` message the main process works out the [export viewer's](core-export.md#export-viewer) origins from its own environment (`viewerOriginsFromEnv`, `electron/viewerOrigins.js`: the port's `127.0.0.1` and `localhost` origins plus `EXPORT_VIEWER_URL`'s). It reads plain `process.env`, not the `.env` file, so an `EXPORT_VIEWER_URL` set only in `.env` reaches the server but not Electron: export it in the shell too, or the viewer opens in the system browser.
+
 The `preelectron:dev` npm lifecycle hook runs automatically before `electron:dev` and validates locales. `better-sqlite3` ships Node-API binaries for every supported platform (`node_modules/better-sqlite3/prebuilds/`), so the same binary loads in Node and in Electron.
 
 Use Electron dev mode when testing Electron-specific features (menus, native dialogs, preview window, auto-update). For regular development, use `npm run dev:all` and open `http://localhost:3000` in your browser.
@@ -262,7 +264,7 @@ Access these from the app menu: **File → Open Data Folder** or **File → Open
 ## Server Process & Dynamic Port
 
 - **utilityProcess.** Electron spawns the Express server via `utilityProcess.fork()` (`electron/main.js`), which runs with full asar support — unlike `spawn` with `ELECTRON_RUN_AS_NODE`. The forked entry is **`electron/server-bootstrap.js`**, which mirrors the web entry (`server.js`) but reports the bound port back to the parent. It imports `@widgetizer/builder-server/env` and calls `startOssServer` from `app/server-common.js`.
-- **Dynamic port.** The server is forked with `PORT=0`, asks the OS for an ephemeral port at `app.listen` time, then posts `{ type: "server-ready", port }` back to the main process over the `utilityProcess` IPC channel (`process.parentPort.postMessage`). Main reads the actual port, builds the renderer URL from it, and loads the window. This eliminates the TOCTOU race a probe-then-bind approach has and means two packaged apps (or a packaged app alongside another local server) never collide. Set the `PORT` env var to force a specific port; if that port is taken, the server exits non-zero with `EADDRINUSE` instead of hanging.
+- **Dynamic port.** The server is forked with `PORT=0`, asks the OS for an ephemeral port at `app.listen` time, then posts `{ type: "server-ready", port, viewerOrigins }` back to the main process over the `utilityProcess` IPC channel (`process.parentPort.postMessage`). Main reads the actual port, builds the renderer URL from it, and loads the window. `viewerOrigins` lists the export viewer's origins (`127.0.0.1` and `localhost` on its OS-assigned port, plus `EXPORT_VIEWER_URL`'s), or `[]` when it is off or failed; the server sends the message only after the viewer's bind has settled, so the list is final. This eliminates the TOCTOU race a probe-then-bind approach has and means two packaged apps (or a packaged app alongside another local server) never collide. Set the `PORT` env var to force a specific port; if that port is taken, the server exits non-zero with `EADDRINUSE` instead of hanging.
 - **Startup flow.** A loading screen is shown immediately. The UI swaps in once the `server-ready` message arrives, or a 30s timeout fires and surfaces a Startup Error screen with a Retry button.
 
 ## Preview Window
@@ -277,13 +279,13 @@ The editor preview opens in a dedicated Electron `BrowserWindow` (`createPreview
 
 ## New Windows and Outside Links
 
-Every window (editor, preview, and the windows below) gets `applyWindowOpenPolicy`: a `window.open` or `target="_blank"` URL is classified by `windowOpenTarget` (`electron/windowOpenPolicy.js`) against the app server's origins (`127.0.0.1` and `localhost` on the reported port).
+Every window (editor, preview, and the windows below) gets `applyWindowOpenPolicy`: a `window.open` or `target="_blank"` URL is classified by `windowOpenTarget` (`electron/windowOpenPolicy.js`) against the app server's origins (`127.0.0.1` and `localhost` on the reported port) and the export viewer's (`viewerOrigins`; `contentOrigins()` in `main.js`).
 
-- **App server pages** (an export, a media file such as a PDF or MP3) open in a plain `BrowserWindow` with no preload (`openContentWindow`), since they run site code.
+- **App server and export viewer pages** (an export, a media file such as a PDF or MP3) open in a plain `BrowserWindow` with no preload (`openContentWindow`), since they run site code.
 - **Other http(s) addresses** open in the system browser (`shell.openExternal`).
 - **Anything else** is refused.
 
-Inside a content window, `will-navigate` and `will-redirect` apply the same rule, so a link or redirect to another site goes to the browser instead of loading in the app. Redirects in iframes (`isMainFrame === false`) are left alone, so embedded maps and videos keep working. The Help menu's documentation link calls `shell.openExternal` directly; renderer links such as the changelog and live demos go through the preload's `openExternal` (http(s) only) or, as ordinary `_blank` links, through the window-open handler above.
+Inside a content window, `will-navigate` and `will-redirect` apply the same rule, so a link or redirect to another site goes to the browser instead of loading in the app, while View's redirect from the app to the viewer stays in the window. Redirects in iframes (`isMainFrame === false`) are left alone, so embedded maps and videos keep working. The Help menu's documentation link calls `shell.openExternal` directly; renderer links such as the changelog and live demos go through the preload's `openExternal` (http(s) only) or, as ordinary `_blank` links, through the window-open handler above.
 
 ## Error Handling
 

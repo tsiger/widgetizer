@@ -74,7 +74,8 @@ COPY --from=builder --chown=node:node /app ./
 RUN mkdir -p /data && chown node:node /data
 USER node
 
-EXPOSE 3001
+# 3001: the app; 3002: the export viewer (one above the app's port).
+EXPOSE 3001 3002
 VOLUME ["/data"]
 
 # Liveness probe against the built-in health endpoint.

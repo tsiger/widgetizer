@@ -2,7 +2,8 @@
 #
 #   docker compose up --build
 #
-# Then open http://localhost:3001
+# Then open http://localhost:3001 (View on the Export page opens exports on
+# http://localhost:3002, the export viewer).
 
 services:
   widgetizer:
@@ -12,12 +13,26 @@ services:
     ports:
       # host:container. Change the LEFT number to serve on a different host port.
       - "3001:3001"
+      # The export viewer, where View on the Export page shows an export with
+      # its own address as the root. Keep its host port one above the app's:
+      # "8080:3001" goes with "8081:3002".
+      - "3002:3002"
     environment:
       # The address you type in the browser to reach the app. The live preview
       # uses it to load images/assets. Keep as-is for local use; when hosting,
       # set it to your real address (e.g. https://builder.example.com or
       # http://<server-ip>:3001).
       SERVER_URL: http://localhost:3001
+      # The export viewer's public address, when it isn't the app's address
+      # with the port one up (e.g. a separate host behind a proxy). Used as is.
+      # EXPORT_VIEWER_URL: https://view.example.com
+      # Last resort, for a setup that can only expose one port: no viewer, and
+      # View serves exports from the app as /api/export/view/... There, links
+      # and assets starting with "/" break, 404 pages show unstyled with dead
+      # links, a missing address answers JSON instead of the 404 page, the
+      # export's scripts run on the app's own address, and nothing a viewed
+      # site stores is cleared between views. The exported files are unaffected.
+      # EXPORT_VIEWER_PORT: "off"
     volumes:
       # Named volume that keeps your projects, database, uploads and installed
       # themes between restarts. `docker compose down -v` wipes it.
