@@ -5,7 +5,8 @@
 // to import @widgetizer/adapters-local. builder-server must never depend on the
 // local adapters — that structural separation protects the OSS/hosted boundary.
 
-import { createEditorApp, getDb, DATA_DIR } from "@widgetizer/builder-server";
+import { createEditorApp, createExportSiteApp, getDb, DATA_DIR } from "@widgetizer/builder-server";
+import { startViewerThenReady } from "./viewerStartup.js";
 import {
   LocalScopeResolver,
   LocalPreviewScopeResolver,
@@ -13,6 +14,7 @@ import {
   LocalAssetStorageAdapter,
   LocalPublishAdapter,
   LocalLimitsAdapter,
+  LocalExportViewer,
 } from "@widgetizer/adapters-local";
 
 /**
@@ -40,9 +42,13 @@ export async function buildOssApp() {
     assetStorage: new LocalAssetStorageAdapter({ dataRoot: DATA_DIR }),
     publish: new LocalPublishAdapter({ dataRoot: DATA_DIR, db }),
     limits: new LocalLimitsAdapter(db),
+    // Serves exports on their own origin; the view routes read it from here.
+    exportViewer: new LocalExportViewer({ createHandler: createExportSiteApp }),
   };
 
-  return createEditorApp({ adapters });
+  const app = await createEditorApp({ adapters });
+  app.locals.exportViewer = adapters.exportViewer;
+  return app;
 }
 
 /**
@@ -54,7 +60,15 @@ export async function buildOssApp() {
  * (electron/server-bootstrap.js) uses 0 (ephemeral, collision-free) and an
  * onReady that posts the port back to the parent process.
  *
- * @param {{ defaultPort: number|string, onReady?: (port: number) => void }} options
+ * The export viewer binds on the same host after the app does. `onReady` fires
+ * once, after the viewer's bind has settled either way, with `viewer` set to
+ * `{ port, origins }` or null when the viewer is off or could not bind (a
+ * viewer failure is logged and never stops the app).
+ *
+ * @param {{
+ *   defaultPort: number|string,
+ *   onReady?: (port: number, viewer: { port: number, origins: string[] } | null) => void
+ * }} options
  * @returns {Promise<import('http').Server>}
  */
 export async function startOssServer({ defaultPort, onReady } = {}) {
@@ -80,7 +94,19 @@ export async function startOssServer({ defaultPort, onReady } = {}) {
     console.log(`Server is running on ${process.env.SERVER_URL}`);
     console.log(`Environment: ${process.env.NODE_ENV || "development"}`);
 
-    onReady?.(port);
+    // A viewer failure only logs and never stops the app; an onReady error is
+    // fatal, as it is when thrown directly from this callback.
+    startViewerThenReady({
+      viewer: app.locals.exportViewer,
+      host: requestedHost,
+      appPort: port,
+      appPortWasRequested: requestedPort !== 0,
+      onReady,
+      log: console,
+    }).catch((err) => {
+      console.error(`onReady failed: ${err.message}`);
+      process.exit(1);
+    });
   });
 
   server.on("error", (err) => {
