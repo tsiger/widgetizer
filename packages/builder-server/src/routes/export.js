@@ -167,7 +167,10 @@ function viewExport(req, res) {
     // `to` is read as URL syntax by the viewer, so the (decoded) file path is
     // re-encoded per segment; the site path already is encoded, the query raw.
     const encodedFilePath = filePath.split("/").map(encodeURIComponent).join("/");
-    const to = `${sitePath}${encodedFilePath}${search}`;
+    // A `//host`-shaped site path would make `to` read as another origin, which
+    // the viewer refuses (losing the file); `/.` keeps it a path, as startDestination does.
+    const target = `${sitePath}${encodedFilePath}${search}`;
+    const to = target.startsWith("//") ? `/.${target}` : target;
     return res.redirect(`${base}${START_PATH}?to=${encodeURIComponent(to)}`);
   } catch (error) {
     console.error("Error opening export in the viewer:", error);

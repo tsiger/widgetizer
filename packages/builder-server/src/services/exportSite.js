@@ -59,10 +59,11 @@ function pathOnly(url) {
 
 // The site path is assigned as a path, never resolved as a reference, so a
 // `//host`-shaped one (from a Site URL like `https://example.com//other.example/`)
-// stays on the viewer origin.
-function sitePathOnly(sitePath) {
+// stays on the viewer origin. `search` is the raw query, "?" included, or "".
+function sitePathOnly(sitePath, search = "") {
   const url = new URL(PARSE_ORIGIN);
   url.pathname = normalizeSitePath(sitePath);
+  url.search = search;
   return pathOnly(url);
 }
 
@@ -134,7 +135,9 @@ function handle(req, res, current) {
 
   const decodedSitePath = decodeSitePath(sitePath);
   if (sitePath !== "/" && (pathname === "/" || pathname === decodedSitePath.slice(0, -1))) {
-    res.status(302).setHeader("Location", sitePathOnly(sitePath));
+    const queryAt = req.originalUrl.indexOf("?");
+    const search = queryAt < 0 ? "" : req.originalUrl.slice(queryAt);
+    res.status(302).setHeader("Location", sitePathOnly(sitePath, search));
     return res.end();
   }
   if (!pathname.startsWith(decodedSitePath)) return sendPlain(res, 404, "Not found");
@@ -147,9 +150,32 @@ function handle(req, res, current) {
   }
 
   const exportRoot = path.resolve(current.exportRoot);
+  // Read per request: the export can change, and its path may itself run
+  // through a symlinked folder (macOS's /var → /private/var).
+  let realRoot;
+  try {
+    realRoot = fs.realpathSync(exportRoot);
+  } catch {
+    return sendPlain(res, 404, "Not found");
+  }
+  const site = { exportRoot, realRoot };
   const file = resolveExportFile(path.dirname(exportRoot), path.basename(exportRoot), rel || "index.html");
-  if (!file) return sendNotFound(res, exportRoot, rel);
-  sendExportFile(res, exportRoot, file, 200, () => sendNotFound(res, exportRoot, rel));
+  if (!file || !realPathInside(file, realRoot)) return sendNotFound(res, site, rel);
+  sendExportFile(res, exportRoot, file, 200, () => sendNotFound(res, site, rel));
+}
+
+/**
+ * Whether `file`, with every symlink followed, is inside the export. The
+ * lexical checks pass a link inside the export that points elsewhere, and
+ * `send` follows it, so an export carrying `assets/x -> /etc` would serve
+ * outside files. Links to files inside the export still work.
+ */
+function realPathInside(file, realRoot) {
+  try {
+    return isWithinDirectory(fs.realpathSync(file), realRoot);
+  } catch {
+    return false;
+  }
 }
 
 /**
@@ -157,12 +183,13 @@ function handle(req, res, current) {
  * export root (so `/el/missing` gets `el/404.html` when that exists), with
  * status 404; a plain 404 when the export has none.
  */
-function sendNotFound(res, exportRoot, rel) {
+function sendNotFound(res, { exportRoot, realRoot }, rel) {
   const folders = rel.split("/").slice(0, -1).filter(Boolean);
   for (let depth = folders.length; depth >= 0; depth--) {
     const candidate = path.resolve(exportRoot, ...folders.slice(0, depth), "404.html");
     if (!isWithinDirectory(candidate, exportRoot)) continue;
     if (!fs.existsSync(candidate) || !fs.statSync(candidate).isFile()) continue;
+    if (!realPathInside(candidate, realRoot)) continue;
     return sendExportFile(res, exportRoot, candidate, 404, () => sendPlain(res, 404, "Not found"));
   }
   return sendPlain(res, 404, "Not found");

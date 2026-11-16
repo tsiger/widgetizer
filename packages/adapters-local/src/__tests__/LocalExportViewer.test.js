@@ -110,7 +110,17 @@ describe("LocalExportViewer.start", () => {
     const viewer = viewerWith({});
     const result = await viewer.start({ host: "127.0.0.1", appPort, appPortWasRequested: false });
     expect(result.port).toBeGreaterThan(0);
-    expect(result.port).not.toBe(appPort + 1);
+    // The OS may hand out app + 1 itself; what matters is that the port isn't
+    // treated as defaulted, so the address uses the viewer's own port.
+    const req = { protocol: "http", host: "localhost:8080", get: () => undefined, app: { get: () => false } };
+    expect(viewer.baseUrlFor(req)).toBe(`http://localhost:${result.port}`);
+  });
+
+  it("warns once at start about an EXPORT_VIEWER_URL it can't use, and still starts", async () => {
+    const viewer = viewerWith({ EXPORT_VIEWER_PORT: "0", EXPORT_VIEWER_URL: "ftp://view.example.com" });
+    expect(await viewer.start({ host: "127.0.0.1", appPort: 3001, appPortWasRequested: true })).not.toBeNull();
+    expect(warn).toHaveBeenCalledTimes(1);
+    expect(String(warn.mock.calls[0][0])).toMatch(/EXPORT_VIEWER_URL/);
   });
 
   it("never rejects, even when the bind host is unusable", async () => {
@@ -175,10 +185,17 @@ describe("viewerBase", () => {
   const defaulted = { overrideUrl: undefined, viewerPort: 3002, defaultedFromApp: true };
   const req = (over) => ({ protocol: "http", host: "localhost:3001", forwardedPort: undefined, trustProxy: false, ...over });
 
-  it("uses EXPORT_VIEWER_URL as is", () => {
-    expect(viewerBase(req(), { ...defaulted, overrideUrl: "https://view.example.com" })).toBe(
-      "https://view.example.com",
-    );
+  it("uses EXPORT_VIEWER_URL's origin", () => {
+    const over = (overrideUrl) => viewerBase(req(), { ...defaulted, overrideUrl });
+    expect(over("https://view.example.com")).toBe("https://view.example.com");
+    expect(over("https://view.example.com/")).toBe("https://view.example.com");
+    expect(over("http://view.example.com:8081/x/?a=1#b")).toBe("http://view.example.com:8081");
+  });
+
+  it("ignores an EXPORT_VIEWER_URL that isn't an absolute http(s) URL", () => {
+    for (const overrideUrl of ["view.example.com", "view.example.com:8081", "ftp://view.example.com", "/view", " "]) {
+      expect(viewerBase(req(), { ...defaulted, overrideUrl }), overrideUrl).toBe("http://localhost:3002");
+    }
   });
 
   it("adds one to the port the browser used when the viewer port was defaulted", () => {
@@ -241,6 +258,25 @@ describe("LocalExportViewer.origins", () => {
       ]);
     } finally {
       await viewer.close();
+    }
+  });
+});
+
+describe("LocalExportViewer.origins with an unusable EXPORT_VIEWER_URL", () => {
+  it("leaves it out", async () => {
+    for (const url of ["view.example.com", "ftp://view.example.com"]) {
+      const viewer = new LocalExportViewer({
+        createHandler: () => (req, res) => res.end(),
+        env: { EXPORT_VIEWER_PORT: "0", EXPORT_VIEWER_URL: url },
+      });
+      const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+      try {
+        const { port } = await viewer.start({ host: "127.0.0.1", appPort: 3001, appPortWasRequested: true });
+        expect(viewer.origins(), url).toEqual([`http://127.0.0.1:${port}`, `http://localhost:${port}`]);
+      } finally {
+        warn.mockRestore();
+        await viewer.close();
+      }
     }
   });
 });

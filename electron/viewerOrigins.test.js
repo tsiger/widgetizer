@@ -30,5 +30,14 @@ describe("viewerOriginsFromEnv", () => {
     expect(viewerOriginsFromEnv({ EXPORT_VIEWER_PORT: "70000" })).toEqual([]);
     expect(viewerOriginsFromEnv({ EXPORT_VIEWER_URL: "not a url" })).toEqual([]);
     expect(viewerOriginsFromEnv({ EXPORT_VIEWER_URL: "file:///etc/passwd" })).toEqual([]);
+    expect(viewerOriginsFromEnv({ EXPORT_VIEWER_URL: "view.example.com" })).toEqual([]);
+    expect(viewerOriginsFromEnv({ EXPORT_VIEWER_URL: "ftp://view.example.com" })).toEqual([]);
+  });
+
+  it("takes only the origin of a URL with a path, query, fragment or trailing slash", () => {
+    expect(viewerOriginsFromEnv({ EXPORT_VIEWER_URL: "https://v.example.com/" })).toEqual(["https://v.example.com"]);
+    expect(viewerOriginsFromEnv({ EXPORT_VIEWER_URL: "http://v.example.com:8081/x?a=1#b" })).toEqual([
+      "http://v.example.com:8081",
+    ]);
   });
 });

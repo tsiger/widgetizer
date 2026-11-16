@@ -27,6 +27,13 @@ const SITE2 = path.join(PUBLISH, "site-v2");
 const BARE = path.join(PUBLISH, "bare-v1");
 const DOT_PUBLISH = path.join(TEST_ROOT, ".config", "Widgetizer", "data", "publish");
 const DOT_SITE = path.join(DOT_PUBLISH, "dot-v1");
+const OUTSIDE = path.join(TEST_ROOT, "outside");
+const LINKED = path.join(PUBLISH, "linked-v1");
+// An export reached through a symlinked folder, as a data dir under a linked
+// path would be (macOS's /var → /private/var is one).
+const REAL_PARENT = path.join(TEST_ROOT, "real-parent");
+const LINK_PARENT = path.join(TEST_ROOT, "link-parent");
+const VIA_LINK = path.join(LINK_PARENT, "via-link-v1");
 
 let current = null;
 const servers = [];
@@ -72,6 +79,18 @@ before(async () => {
   await fs.outputFile(path.join(PUBLISH, "404.html"), "PUBLISH-404");
   await fs.outputFile(path.join(DOT_SITE, "index.html"), "<p>dot home</p>");
   await fs.outputFile(path.join(DOT_SITE, ".hidden"), "dot-secret");
+
+  await fs.outputFile(path.join(OUTSIDE, "secret.html"), "OUTSIDE-SECRET");
+  await fs.outputFile(path.join(OUTSIDE, "404.html"), "OUTSIDE-404");
+  await fs.outputFile(path.join(LINKED, "index.html"), "<p>linked home</p>");
+  await fs.outputFile(path.join(LINKED, "404.html"), "<p>linked 404</p>");
+  await fs.ensureDir(path.join(LINKED, "assets"));
+  await fs.symlink(path.join(OUTSIDE, "secret.html"), path.join(LINKED, "assets", "secret.html"));
+  await fs.symlink(OUTSIDE, path.join(LINKED, "assets", "outside"), "dir");
+  await fs.symlink("index.html", path.join(LINKED, "same.html"));
+  await fs.outputFile(path.join(REAL_PARENT, "via-link-v1", "index.html"), "<p>via link home</p>");
+  await fs.outputFile(path.join(REAL_PARENT, "via-link-v1", "404.html"), "<p>via link 404</p>");
+  await fs.symlink(REAL_PARENT, LINK_PARENT, "dir");
 
   base = await serve(createExportSiteApp({ getCurrent: () => current }));
 });
@@ -260,6 +279,48 @@ describe("serving with site path /", () => {
   });
 });
 
+describe("symlinks in the export", () => {
+  before(() => {
+    current = { exportRoot: LINKED, sitePath: "/" };
+  });
+
+  it("refuses a linked file that points outside the export", async () => {
+    const res = await fetch(`${base}/assets/secret.html`);
+    assert.equal(res.status, 404);
+    assert.doesNotMatch(await res.text(), /OUTSIDE-SECRET/);
+  });
+
+  it("refuses a linked folder that points outside, for its files and its 404.html", async () => {
+    const file = await fetch(`${base}/assets/outside/secret.html`);
+    assert.equal(file.status, 404);
+    assert.doesNotMatch(await file.text(), /OUTSIDE-SECRET/);
+
+    const miss = await fetch(`${base}/assets/outside/missing`);
+    assert.equal(miss.status, 404);
+    assert.equal(await miss.text(), "<p>linked 404</p>");
+  });
+
+  it("serves a link to another file inside the export", async () => {
+    const res = await fetch(`${base}/same.html`);
+    assert.equal(res.status, 200);
+    assert.equal(await res.text(), "<p>linked home</p>");
+  });
+
+  it("serves an export whose own path runs through a symlinked folder", async () => {
+    current = { exportRoot: VIA_LINK, sitePath: "/" };
+    try {
+      const home = await fetch(`${base}/`);
+      assert.equal(home.status, 200);
+      assert.equal(await home.text(), "<p>via link home</p>");
+      const miss = await fetch(`${base}/missing`);
+      assert.equal(miss.status, 404);
+      assert.equal(await miss.text(), "<p>via link 404</p>");
+    } finally {
+      current = { exportRoot: LINKED, sitePath: "/" };
+    }
+  });
+});
+
 describe("export under a dot-folder", () => {
   it("serves the export and still refuses a dot-file in it", async () => {
     current = { exportRoot: DOT_SITE, sitePath: "/" };
@@ -311,11 +372,23 @@ describe("serving with a site path", () => {
     assert.equal(new URL(location, base).origin, base);
   });
 
-  it("redirects the site path without its trailing slash", async () => {
+  it("redirects the site path without its trailing slash, keeping the query", async () => {
     current = { exportRoot: SITE, sitePath: "/repo/" };
-    const res = await fetch(`${base}/repo?x=1`, { redirect: "manual" });
+    const res = await fetch(`${base}/repo?preview=1`, { redirect: "manual" });
     assert.equal(res.status, 302);
-    assert.equal(res.headers.get("location"), "/repo/");
+    assert.equal(res.headers.get("location"), "/repo/?preview=1");
+  });
+
+  it("keeps the query when redirecting / to the site path", async () => {
+    current = { exportRoot: SITE, sitePath: "/repo/" };
+    const res = await fetch(`${base}/?x=1`, { redirect: "manual" });
+    assert.equal(res.headers.get("location"), "/repo/?x=1");
+
+    current = { exportRoot: SITE, sitePath: "//other.example/" };
+    const dotted = await fetch(`${base}/?x=1`, { redirect: "manual" });
+    const location = dotted.headers.get("location");
+    assert.equal(location, "/.//other.example/?x=1");
+    assert.equal(new URL(location, base).origin, base);
   });
 
   it("treats a site path without a trailing slash as a folder", async () => {

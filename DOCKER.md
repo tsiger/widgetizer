@@ -62,7 +62,10 @@ sends the browser there, so the viewer port must be reachable from the browser.
   `"8080:3001"` goes with `"8081:3002"`.
 - **A different address.** Set `EXPORT_VIEWER_URL` (e.g.
   `https://view.example.com`) when the viewer is reached some other way, such
-  as a separate host behind the proxy. It is used as is.
+  as a separate host behind the proxy. It must be an absolute `http://` or
+  `https://` URL, and only its origin counts (any path, query or fragment is
+  dropped, since the viewer serves the site from `/`); anything else is
+  ignored, with a warning in the log.
 - **Updating an existing install.** A compose file or `docker run` line that
   publishes only `3001` must also publish `3002` after updating, or View leads
   to an address that doesn't answer.
@@ -103,8 +106,8 @@ server {
 ```
 
 Without `proxy_set_header Host $http_host;` nginx sends its upstream name and
-View goes to that name; without `X-Forwarded-Proto $scheme` it goes to
-`http://…:444`.
+View goes to that name; without `X-Forwarded-Proto $scheme` the app takes
+the request for plain HTTP on port 80, so View goes to `http://…:81`.
 
 Caddy (passes both headers by default):
 

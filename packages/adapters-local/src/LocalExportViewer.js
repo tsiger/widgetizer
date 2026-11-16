@@ -7,7 +7,7 @@
  * depend on builder-server.
  *
  * Settings: `EXPORT_VIEWER_PORT` (a port, or `off` for no viewer) and
- * `EXPORT_VIEWER_URL` (the viewer's public address, used as is).
+ * `EXPORT_VIEWER_URL` (the viewer's public address; see `overrideOrigin`).
  */
 import http from "node:http";
 import net from "node:net";
@@ -50,10 +50,32 @@ function forwardedPortNumber(value) {
 }
 
 /**
+ * The origin of an `EXPORT_VIEWER_URL`, or null when it isn't an absolute
+ * http(s) URL (the setting is then ignored). Only the origin counts: the viewer
+ * serves the export with `/` as its root and the start page moves on to
+ * path-only destinations, so a path in the setting couldn't be kept past the
+ * start page anyway, and a query or fragment would break the start page's URL.
+ * electron/viewerOrigins.js applies the same rule; keep the two aligned.
+ *
+ * @param {string|undefined} value
+ * @returns {string|null}
+ */
+export function overrideOrigin(value) {
+  const trimmed = typeof value === "string" ? value.trim() : "";
+  if (!trimmed) return null;
+  try {
+    const url = new URL(trimmed);
+    return url.protocol === "http:" || url.protocol === "https:" ? url.origin : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
  * The viewer's address for one request to the app, or null when it can't be
  * worked out (the caller then serves the export as before).
  *
- * 1. `overrideUrl` (EXPORT_VIEWER_URL), as is.
+ * 1. `overrideUrl` (EXPORT_VIEWER_URL), its origin; ignored when unusable.
  * 2. A port defaulted to the app's + 1: the request's protocol and hostname with
  *    the port the browser used plus one, so a remapped or proxied app port maps
  *    to the viewer's (`https://host` on 443 → `https://host:444`). Under trust
@@ -67,7 +89,8 @@ function forwardedPortNumber(value) {
  * @returns {string|null} an origin, without a trailing slash
  */
 export function viewerBase({ protocol, host, forwardedPort, trustProxy }, { overrideUrl, viewerPort, defaultedFromApp }) {
-  if (overrideUrl) return overrideUrl.replace(/\/+$/, "");
+  const override = overrideOrigin(overrideUrl);
+  if (override) return override;
   if (!host || (protocol !== "http" && protocol !== "https")) return null;
 
   let url;
@@ -119,6 +142,10 @@ export class LocalExportViewer {
    */
   async start({ host, appPort, appPortWasRequested }) {
     try {
+      const url = this.#env.EXPORT_VIEWER_URL;
+      if (url?.trim() && !overrideOrigin(url)) {
+        console.warn(`Ignoring EXPORT_VIEWER_URL "${url}": it must be an absolute http:// or https:// URL.`);
+      }
       const setting = this.#env.EXPORT_VIEWER_PORT?.trim();
       if (setting === "off") {
         console.log("Export viewer is off (EXPORT_VIEWER_PORT=off); exports are served by the app.");
@@ -196,14 +223,8 @@ export class LocalExportViewer {
   /** The origins a desktop shell lets the viewer load in: loopback forms of the port, plus EXPORT_VIEWER_URL's. */
   origins() {
     const list = this.#port ? [`http://127.0.0.1:${this.#port}`, `http://localhost:${this.#port}`] : [];
-    const override = this.#env.EXPORT_VIEWER_URL;
-    if (override) {
-      try {
-        list.push(new URL(override).origin);
-      } catch {
-        // Not a URL: nothing to allow.
-      }
-    }
+    const override = overrideOrigin(this.#env.EXPORT_VIEWER_URL);
+    if (override) list.push(override);
     return list;
   }
 

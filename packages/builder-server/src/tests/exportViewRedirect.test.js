@@ -178,6 +178,29 @@ describe("export view redirect", () => {
     }
   });
 
+  it("keeps the file and query for a //host-shaped site path, all the way to the export site", async () => {
+    const sitePath = "//other.example/";
+    const { dir, root } = await newExport({ sitePath });
+    const res = await get(`${dir}/about.html?x=1`);
+    const to = new URL(res.headers.get("location")).searchParams.get("to");
+    assert.equal(to, "/.//other.example/about.html?x=1");
+    const dest = startDestination(to, sitePath);
+    const siteServer = await new Promise((resolve) => {
+      const s = createExportSiteApp({ getCurrent: () => ({ exportDir: dir, exportRoot: root, sitePath }) }).listen(0, "127.0.0.1", () => resolve(s));
+    });
+    try {
+      const siteOrigin = `http://127.0.0.1:${siteServer.address().port}`;
+      const url = new URL(dest, siteOrigin);
+      assert.equal(url.origin, siteOrigin);
+      assert.equal(url.pathname + url.search, "//other.example/about.html?x=1");
+      const served = await fetch(url);
+      assert.equal(served.status, 200);
+      assert.equal(await served.text(), "<p>about</p>");
+    } finally {
+      await new Promise((resolve) => siteServer.close(resolve));
+    }
+  });
+
   it("404s another project's export without telling the viewer", async () => {
     const res = await get(`${OTHER_FOLDER}-v1/index.html`);
     assert.equal(res.status, 404);

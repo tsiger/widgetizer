@@ -2,7 +2,9 @@
 // them by the server (the internal server is disabled and an external one runs
 // with the same EXPORT_VIEWER_* settings). Mirrors LocalExportViewer's settings:
 // EXPORT_VIEWER_PORT is a port or "off"; EXPORT_VIEWER_URL is the viewer's
-// public address. An invalid port or URL, or a non-http(s) URL, is ignored.
+// public address. An invalid port or URL, or a non-http(s) URL, is ignored, and
+// only the URL's origin counts: the same rule as `overrideOrigin` in
+// packages/adapters-local/src/LocalExportViewer.js; keep the two aligned.
 const MAX_PORT = 65535;
 
 /**
