@@ -643,6 +643,16 @@ Any `window.open` or `target="_blank"` from the preview, an export or a theme sc
 
 **Body at:** `349f5fa5:docs-llms/TODO-agents.md`.
 
+### R-VIEWROOT · Serve viewed exports where `/` is the export's root
+
+**Done · Low · OSS · 2026-11-16**
+
+The export viewer served files under `/api/export/view/:exportDir/`, so root-relative links and assets broke there, every exported `404.html` included, and a missing address answered JSON.
+
+**Resolution:** the OSS shells run an export viewer on a second loopback port (app port + 1 by default; `EXPORT_VIEWER_PORT`, `EXPORT_VIEWER_URL`, `off` as a last resort) that serves the export last opened with its Site URL path as the root, the nearest `404.html` for a missing address, and a start page that clears storage. View hands off to it with a script navigation, since Safari ignores `Clear-Site-Data` after a cross-origin redirect. Checked in Chrome, Firefox and Safari on macOS, Edge, Chrome and Firefox on Windows, Electron and Docker. Documented in [Site Exporting](../core-export.md#export-viewer) and `DOCKER.md`. Fix `06debd1c`…`ba6155bf` (branch `feat/export-viewer`). Follow-up: [GitHub #246](https://github.com/tsiger/widgetizer/issues/246).
+
+**Body at:** `4c024062:docs-llms/TODO-agents.md`.
+
 ## Reconciliation decisions
 
 - GitHub #115, #122, #126, #133, #134 and #135 have implementation evidence. Their remaining local entries are review/documentation/integration work, not instructions to rebuild the features. GitHub statuses were left unchanged.
