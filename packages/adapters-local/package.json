@@ -9,5 +9,8 @@
   },
   "dependencies": {
     "@widgetizer/core": "*"
+  },
+  "devDependencies": {
+    "express": "^5.3.0"
   }
 }
