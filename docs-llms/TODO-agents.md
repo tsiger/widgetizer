@@ -3,7 +3,7 @@
 ## Working rules
 
 - This file and [the human version](TODO-humans.md) are two views of one task register. Update IDs, status, priority and scope together.
-- **GitHub holds the work.** Every bug, improvement and decision we mean to act on is a GitHub issue, scheduled or not; its body carries the technical detail. This register keeps two things only: the open issues of the current milestone, mirrored with their board status (GitHub owns status and assignee; an entry retires to the completed records when its issue closes), and internal notes that are not tasks yet: unconfirmed checks, needs-triggered later work and embedding requirements. A note that proves real becomes a GitHub issue and leaves this file. Change GitHub itself only when asked.
+- **GitHub holds the work.** Every bug, improvement and decision we mean to act on is a GitHub issue, scheduled or not; its body carries the technical detail. GitHub issues, milestones included, are tracked on GitHub only and never mirrored here. This register keeps only what is not issue-worthy yet: unconfirmed checks, needs-triggered later work and embedding requirements. A note that proves real becomes a GitHub issue and leaves this file. Change GitHub itself only when asked.
 - Keep entries short: scope, constraints, done-when, starting points. Human entries explain the consequence and next action. Add detail only when it prevents a mistake.
 - `Tn` preserves original TODO section n; `GHn` is GitHub issue n; `R…` identifies a consolidated review follow-up; `H…` is a generic embedding requirement. Never renumber or reuse retired IDs.
 - Review is not Done; Investigate is not a confirmed bug; Deferred is not release work. Unrated priorities are intentional. Check old reports against current code before implementation.
@@ -17,29 +17,7 @@
 Snapshot: 2026-09-20, source revision `f10e20ce`. Linked-issue assignees are preserved from GitHub; local-only tasks have no assigned owner. Historical reports are evidence, not fresh reproductions.
 Original local details: `git show f10e20ce:docs-llms/TODO.md` (original numbered sections).
 Original review reasoning: `git show f10e20ce:docs-llms/domain/review-status.md` and `git show f10e20ce:docs-llms/domain/review-questions.md`.
-Public board: [OSS Roadmap](https://github.com/users/tsiger/projects/7); current milestone [OSS - 0.9.10](https://github.com/tsiger/widgetizer/milestone/2). Milestone section reconciled with GitHub on 2026-10-22. On 2026-10-22 the register's bugs, improvements and decisions moved to GitHub issues #165–#196 (with the existing #128, #138 and #154); their register bodies are readable at `e92cda65:docs-llms/TODO-agents.md`.
-
-## OSS 0.9.10 milestone (mirrors GitHub)
-
-Open issues in the milestone, with their GitHub board status. Closed in this milestone: #118, #120, #121, #122, #127, #129, #130, #132, #133, #134, #135, #136, #137, #139, #142, #143, #144, #145, #155, #156, #126, #117, #157, #158, #153, #160 (see the milestone's Closed tab).
-
-#### GH115 · Multilingual support
-
-**GitHub: To Be Reviewed · anastis, tsiger**
-
-Steps 0–24 and R1–R8 are built and both real-project walkthroughs passed. The 2026-10-14 docs-llms pass reconciled the multilingual rules, theme switcher, architecture/package maps and domain model with the code, and added the checklist's Multilingual section (LANG-001 to LANG-042) — docs `202e9dfa`. The leftover English on translated pages was fixed under #156. A 2026-10-18 Fable/Codex gap review extended §18 to LANG-074 (refusals, cross-language links and menus, removal cleanup, editor guards, export combinations, preview paths, shared settings) and found the desktop app refusing language preview paths, fixed in `electron/previewPath.js`. Awaiting the partner's review.
-
-**Start:** [Multilingual rules](domain/multilingual.md), [user checklist](user-test-checklist.md). [GitHub #115](https://github.com/tsiger/widgetizer/issues/115)
-
-#### GH162 · Links that open a new window go to the browser in the desktop app
-
-**GitHub: To Be Reviewed · tsiger**
-
-Was DESKTOP-WINDOW-OPEN. `electron/main.js` set no `setWindowOpenHandler`, so any `window.open` or `target="_blank"` from a page (preview, exported site, theme script, pasted embed) created a new `BrowserWindow` that loaded whatever it was given. Fixed by porting the `mcp` branch's policy: `windowOpenTarget` (`electron/windowOpenPolicy.js`) sends the app server's own pages (exports, media files) to a plain sandboxed window without the preload, other `http(s)` addresses to `shell.openExternal`, and denies the rest (`file:`, `data:`, `javascript:`, `about:blank`); the handler is on the main, preview and every content window. Unit test of the decisions in `windowOpenPolicy.test.js`.
-
-**Done when:** in the desktop app, View site, the issues report and Media's file view open in an app window, an outside link in the preview opens the system browser, and nothing else opens a window.
-
-**Start:** [main.js](../electron/main.js), [windowOpenPolicy.js](../electron/windowOpenPolicy.js). [GitHub #162](https://github.com/tsiger/widgetizer/issues/162)
+Public board: [OSS Roadmap](https://github.com/users/tsiger/projects/7). On 2026-10-22 the register's bugs, improvements and decisions moved to GitHub issues #165–#196 (with the existing #128, #138 and #154); their register bodies are readable at `e92cda65:docs-llms/TODO-agents.md`.
 
 ## Internal notes (not on GitHub)
 

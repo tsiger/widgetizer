@@ -623,6 +623,26 @@ Deleting a page or removing a language keeps a pointing link's label and empties
 
 **Body at:** `b8ae9387:docs-llms/TODO-agents.md`.
 
+### GH115 · Multilingual support
+
+**Done · Unrated · OSS · 2026-10-22**
+
+Sites in more than one language: languages are folders (`pages/el/`, `menus/el/`, `collections/<type>/el/`), every key built by `contentAddress.js`.
+
+**Resolution:** Steps 0–24 and R1–R8 built; both real-project walkthroughs passed; docs reconciled with the code (`202e9dfa`) and the checklist's Multilingual section extended to LANG-074 after a Fable/Codex gap review. Reviewed by the owner ("Generally all good"), small issues fixed and the rest logged; closed on GitHub on 2026-10-22. [GitHub #115](https://github.com/tsiger/widgetizer/issues/115)
+
+**Body at:** `349f5fa5:docs-llms/TODO-agents.md`.
+
+### GH162 · Links that open a new window go to the browser in the desktop app
+
+**Done · Unrated · OSS · 2026-10-22**
+
+Any `window.open` or `target="_blank"` from the preview, an export or a theme script opened a bare Widgetizer window.
+
+**Resolution:** `windowOpenTarget` (`electron/windowOpenPolicy.js`) sends the app server's own pages to a sandboxed window without the preload, other `http(s)` addresses to the system browser, and refuses the rest; links and redirects inside those windows follow the same rule. Fix `6f3803cb`, `97724002`. [GitHub #162](https://github.com/tsiger/widgetizer/issues/162)
+
+**Body at:** `349f5fa5:docs-llms/TODO-agents.md`.
+
 ## Reconciliation decisions
 
 - GitHub #115, #122, #126, #133, #134 and #135 have implementation evidence. Their remaining local entries are review/documentation/integration work, not instructions to rebuild the features. GitHub statuses were left unchanged.

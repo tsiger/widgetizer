@@ -5,7 +5,6 @@ import { v4 as uuidv4 } from "uuid";
 import multer from "multer";
 import sharp from "sharp";
 import { normalizeUploadName } from "../utils/uploadFileName.js";
-import DOMPurify from "isomorphic-dompurify";
 import { getThemeJsonPath } from "../config.js";
 import { LIMIT_KEYS } from "@widgetizer/core/adapters";
 import { ALLOWED_MIME_TYPES, ALLOWED_UPLOAD_EXTENSIONS, getContentType, getMediaCategory } from "../utils/mimeTypes.js";
@@ -18,7 +17,7 @@ import { requestLanguage } from "../utils/contentLanguage.js";
 import * as mediaRepo from "../db/repositories/mediaRepository.js";
 import { getDb } from "../db/index.js";
 
-import { stripHtmlToText } from "../services/sanitizationService.js";
+import { stripHtmlToText, sanitizeSvg } from "../services/sanitizationService.js";
 import { readMediaFile } from "../services/mediaService.js";
 
 
@@ -435,9 +434,7 @@ export async function uploadProjectMedia(req, res) {
             }
           }
         } else if (file.mimetype === "image/svg+xml") {
-          const sanitizedSvg = DOMPurify.sanitize(sourceBuffer.toString("utf-8"), {
-            USE_PROFILES: { svg: true },
-          });
+          const sanitizedSvg = sanitizeSvg(sourceBuffer.toString("utf-8"));
           originalBuffer = Buffer.from(sanitizedSvg, "utf-8");
           fileInfo.size = originalBuffer.length;
         }

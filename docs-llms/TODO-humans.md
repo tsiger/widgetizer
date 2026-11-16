@@ -1,18 +1,8 @@
 # Tasks — plain English
 
-Real work lives on GitHub: every bug, improvement and decision is an issue in the [OSS Roadmap](https://github.com/users/tsiger/projects/7), and the ones we plan to do go into a milestone. This file shows two things: the current milestone, and notes that aren't tasks yet. Technical detail for the notes is in [the agent version](TODO-agents.md), under the same ID.
+Real work lives on GitHub: every bug, improvement and decision is an issue in the [OSS Roadmap](https://github.com/users/tsiger/projects/7), and the ones we plan to do go into a milestone. This file holds only notes that aren't GitHub-worthy yet; issues, milestones included, are tracked on GitHub alone. Technical detail for the notes is in [the agent version](TODO-agents.md), under the same ID.
 
-- **Milestone** items follow GitHub: their status is the board column, and they leave this list when the issue closes.
 - **Notes** are not tasks yet. When one turns out to be real, it becomes a GitHub issue and leaves this file.
-
-## OSS 0.9.10 milestone
-
-| Issue | What | GitHub status | Who |
-| --- | --- | --- | --- |
-| [#115](https://github.com/tsiger/widgetizer/issues/115) | Multilingual sites | To Be Reviewed | anastis, tsiger |
-| [#162](https://github.com/tsiger/widgetizer/issues/162) | Desktop app: links that open a new window go to the browser | To Be Reviewed | tsiger |
-
-Closed in this milestone: 26 issues (the milestone's Closed tab).
 
 ## Notes, not on GitHub yet
 
