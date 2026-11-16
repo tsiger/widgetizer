@@ -221,11 +221,25 @@ function sendExportFile(res, exportRoot, file, status, onMiss) {
  * A 200 page, not a redirect: Safari ignores `Clear-Site-Data` on a redirect.
  * Only "storage" is cleared; "cookies" would clear them for the whole
  * registrable domain, signing the user out of other apps on `localhost`.
- * The script keeps the View URL's fragment when the destination has none of its
- * own; the meta refresh covers a browser without scripts.
  */
 function sendStartPage(res, destination) {
   res.setHeader("Clear-Site-Data", '"storage"');
+  sendNavigationPage(res, destination);
+}
+
+/**
+ * A 200 page that moves the browser on to `destination` with `location.replace`
+ * (the meta refresh covers a browser without scripts). The script keeps the
+ * current URL's fragment when the destination has none of its own, since a
+ * script navigation doesn't carry it over the way a redirect does. The view
+ * route uses it to reach the viewer's start page: Safari also ignores
+ * `Clear-Site-Data` on a page reached through a redirect from another origin,
+ * but honours it after a script navigation from one.
+ *
+ * @param {import('express').Response} res
+ * @param {string} destination an absolute URL or a path-only destination
+ */
+export function sendNavigationPage(res, destination) {
   const attr = escapeHtml(destination);
   const json = JSON.stringify(destination)
     .replace(/</g, "\\u003c")
@@ -233,6 +247,7 @@ function sendStartPage(res, destination) {
     .replace(/&/g, "\\u0026")
     .replace(/\u2028/g, "\\u2028")
     .replace(/\u2029/g, "\\u2029");
+  res.setHeader("Cache-Control", "no-store");
   sendHtml(
     res,
     200,

@@ -1,7 +1,7 @@
 /**
  * The export viewer routes hand a ready exportViewer adapter the export and
- * redirect to its start page; without a usable viewer they serve the file as
- * before. The scope check runs before the viewer is told anything.
+ * answer a page that moves on to its start page; without a usable viewer they
+ * serve the file as before. The scope check runs before the viewer is told anything.
  *
  * Run with: node --test packages/builder-server/src/tests/exportViewRedirect.test.js
  */
@@ -68,6 +68,19 @@ async function setSiteUrl(siteUrl) {
 
 const get = (p) => fetch(`${origin}/api/export/view/${p}`, { redirect: "manual" });
 
+// The route answers a page that navigates to the viewer (not a 302, which would
+// stop Safari clearing storage); its link carries the destination.
+const pageUrls = new WeakMap();
+async function viewerUrl(res) {
+  if (!pageUrls.has(res)) {
+    const html = await res.text();
+    const href = html.match(/<a href="([^"]*)">Open the export<\/a>/)?.[1];
+    assert.ok(href, "the page links to the viewer");
+    pageUrls.set(res, href.replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&"));
+  }
+  return pageUrls.get(res);
+}
+
 before(async () => {
   await projectRepo.writeProjectsData({
     projects: [{ id: PROJECT_ID, folderName: PROJECT_FOLDER, name: "Redirect", theme: "arch", created: new Date().toISOString() }],
@@ -112,9 +125,9 @@ describe("export view redirect", () => {
   it("redirects a file to the viewer's start page, keeping path and query, and shows the export", async () => {
     const { dir, root } = await newExport({ sitePath: "/" });
     const res = await get(`${dir}/about.html?x=1`);
-    assert.equal(res.status, 302);
-    assert.equal(res.headers.get("location"), `${VIEWER_BASE}${START_PATH}?to=${encodeURIComponent("/about.html?x=1")}`);
-    assert.equal(res.headers.get("location"), `http://view.test:9/__widgetizer/view-start?to=%2Fabout.html%3Fx%3D1`);
+    assert.equal(res.status, 200);
+    assert.equal((await viewerUrl(res)), `${VIEWER_BASE}${START_PATH}?to=${encodeURIComponent("/about.html?x=1")}`);
+    assert.equal((await viewerUrl(res)), `http://view.test:9/__widgetizer/view-start?to=%2Fabout.html%3Fx%3D1`);
     assert.equal(shown.length, 1);
     assert.deepEqual(shown[0], { exportDir: dir, exportRoot: root, sitePath: "/" });
   });
@@ -122,7 +135,7 @@ describe("export view redirect", () => {
   it("puts the manifest's site path in front of the file", async () => {
     const { dir } = await newExport({ sitePath: "/repo/" });
     const res = await get(`${dir}/about.html`);
-    assert.equal(new URL(res.headers.get("location")).searchParams.get("to"), "/repo/about.html");
+    assert.equal(new URL((await viewerUrl(res))).searchParams.get("to"), "/repo/about.html");
     assert.equal(shown[0].sitePath, "/repo/");
   });
 
@@ -130,22 +143,22 @@ describe("export view redirect", () => {
     await setSiteUrl("https://user.github.io/blog/");
     const { dir } = await newExport({});
     const res = await get(`${dir}/about.html`);
-    assert.equal(new URL(res.headers.get("location")).searchParams.get("to"), "/blog/about.html");
+    assert.equal(new URL((await viewerUrl(res))).searchParams.get("to"), "/blog/about.html");
     assert.equal(shown[0].sitePath, "/blog/");
   });
 
   it("uses the site root when there is neither", async () => {
     const { dir } = await newExport();
     const res = await get(`${dir}/about.html`);
-    assert.equal(new URL(res.headers.get("location")).searchParams.get("to"), "/about.html");
+    assert.equal(new URL((await viewerUrl(res))).searchParams.get("to"), "/about.html");
     assert.equal(shown[0].sitePath, "/");
   });
 
   it("sends the bare export to the index under the site path", async () => {
     const { dir } = await newExport({ sitePath: "/repo/" });
     const res = await get(dir);
-    assert.equal(res.status, 302);
-    assert.equal(new URL(res.headers.get("location")).searchParams.get("to"), "/repo/index.html");
+    assert.equal(res.status, 200);
+    assert.equal(new URL((await viewerUrl(res))).searchParams.get("to"), "/repo/index.html");
   });
 
   it("encodes each segment of the file path once, so odd file names survive", async () => {
@@ -154,8 +167,8 @@ describe("export view redirect", () => {
     for (const name of names) await fs.outputFile(path.join(root, "sub", name), `<p>${name}</p>`);
     for (const name of names) {
       const res = await get(`${dir}/sub/${encodeURIComponent(name)}?q=1`);
-      assert.equal(res.status, 302, name);
-      const to = new URL(res.headers.get("location")).searchParams.get("to");
+      assert.equal(res.status, 200, name);
+      const to = new URL((await viewerUrl(res))).searchParams.get("to");
       assert.equal(to, `/sub/${encodeURIComponent(name)}?q=1`, name);
     }
   });
@@ -164,7 +177,7 @@ describe("export view redirect", () => {
     const { dir, root } = await newExport({ sitePath: "/" });
     await fs.outputFile(path.join(root, "a#1%.html"), "<p>odd</p>");
     const res = await get(`${dir}/${encodeURIComponent("a#1%.html")}`);
-    const to = new URL(res.headers.get("location")).searchParams.get("to");
+    const to = new URL((await viewerUrl(res))).searchParams.get("to");
     const dest = startDestination(to, "/");
     const siteServer = await new Promise((resolve) => {
       const s = createExportSiteApp({ getCurrent: () => ({ exportDir: dir, exportRoot: root, sitePath: "/" }) }).listen(0, "127.0.0.1", () => resolve(s));
@@ -182,7 +195,7 @@ describe("export view redirect", () => {
     const sitePath = "//other.example/";
     const { dir, root } = await newExport({ sitePath });
     const res = await get(`${dir}/about.html?x=1`);
-    const to = new URL(res.headers.get("location")).searchParams.get("to");
+    const to = new URL((await viewerUrl(res))).searchParams.get("to");
     assert.equal(to, "/.//other.example/about.html?x=1");
     const dest = startDestination(to, sitePath);
     const siteServer = await new Promise((resolve) => {
@@ -199,6 +212,30 @@ describe("export view redirect", () => {
     } finally {
       await new Promise((resolve) => siteServer.close(resolve));
     }
+  });
+
+  it("answers a no-store page that navigates by script, not a redirect, and keeps the fragment", async () => {
+    const { dir } = await newExport({ sitePath: "/" });
+    const res = await get(`${dir}/about.html`);
+    assert.equal(res.status, 200);
+    assert.equal(res.headers.get("location"), null);
+    assert.equal(res.headers.get("cache-control"), "no-store");
+    assert.equal(res.headers.get("clear-site-data"), null);
+    const html = await res.text();
+    const dest = `${VIEWER_BASE}${START_PATH}?to=${encodeURIComponent("/about.html")}`;
+    assert.ok(html.includes(`var to = ${JSON.stringify(dest)};`));
+    assert.ok(html.includes("if (location.hash && to.indexOf(\"#\") < 0) to += location.hash;"));
+    assert.ok(html.includes("location.replace(to);"));
+    assert.ok(html.includes(`<meta http-equiv="refresh" content="0;url=${dest.replace(/&/g, "&amp;")}">`));
+  });
+
+  it("escapes the viewer address in the page", async () => {
+    viewer = makeViewer({ baseUrlFor: () => 'http://x.test"></a></script><script>alert(1)</script>' });
+    const { dir } = await newExport({ sitePath: "/" });
+    const html = await (await get(`${dir}/about.html`)).text();
+    assert.equal(html.match(/<script>/g).length, 1);
+    assert.ok(!html.includes("</script><script>alert"));
+    assert.ok(html.includes("\\u003c/script\\u003e"));
   });
 
   it("404s another project's export without telling the viewer", async () => {

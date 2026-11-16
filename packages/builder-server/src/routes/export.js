@@ -13,7 +13,7 @@ import {
   downloadExport,
 } from "../controllers/exportController.js";
 import { standardJsonParser } from "../middleware/jsonParser.js";
-import { START_PATH } from "../services/exportSite.js";
+import { START_PATH, sendNavigationPage } from "../services/exportSite.js";
 import * as projectRepo from "../db/repositories/projectRepository.js";
 import { siteUrlPathname } from "@widgetizer/core/internalHref";
 import { resolveActiveProject } from "../middleware/resolveActiveProject.js";
@@ -171,7 +171,9 @@ function viewExport(req, res) {
     // the viewer refuses (losing the file); `/.` keeps it a path, as startDestination does.
     const target = `${sitePath}${encodedFilePath}${search}`;
     const to = target.startsWith("//") ? `/.${target}` : target;
-    return res.redirect(`${base}${START_PATH}?to=${encodeURIComponent(to)}`);
+    // A page that navigates, not a 302: Safari ignores the start page's
+    // Clear-Site-Data when it is reached through a redirect from another origin.
+    return sendNavigationPage(res, `${base}${START_PATH}?to=${encodeURIComponent(to)}`);
   } catch (error) {
     console.error("Error opening export in the viewer:", error);
     if (!res.headersSent) {

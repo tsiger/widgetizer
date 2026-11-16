@@ -287,7 +287,7 @@ Every window (editor, preview, and the windows below) gets `applyWindowOpenPolic
 - **Other http(s) addresses** open in the system browser (`shell.openExternal`).
 - **Anything else** is refused.
 
-Inside a content window, `will-navigate` and `will-redirect` apply the same rule, so a link or redirect to another site goes to the browser instead of loading in the app, while View's redirect from the app to the viewer stays in the window. Redirects in iframes (`isMainFrame === false`) are left alone, so embedded maps and videos keep working. The Help menu's documentation link calls `shell.openExternal` directly; renderer links such as the changelog and live demos go through the preload's `openExternal` (http(s) only) or, as ordinary `_blank` links, through the window-open handler above.
+Inside a content window, `will-navigate` and `will-redirect` apply the same rule, so a link or redirect to another site goes to the browser instead of loading in the app, while View's step from the app to the viewer (a script navigation) stays in the window. Redirects in iframes (`isMainFrame === false`) are left alone, so embedded maps and videos keep working. The Help menu's documentation link calls `shell.openExternal` directly; renderer links such as the changelog and live demos go through the preload's `openExternal` (http(s) only) or, as ordinary `_blank` links, through the window-open handler above.
 
 ## Error Handling
 
