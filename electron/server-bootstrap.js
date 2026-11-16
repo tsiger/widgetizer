@@ -9,9 +9,9 @@ import { startOssServer } from "../app/server-common.js";
 // so it can build the renderer URL without guessing.
 await startOssServer({
   defaultPort: 0,
-  onReady: (port) => {
+  onReady: (port, viewer) => {
     if (process.parentPort) {
-      process.parentPort.postMessage({ type: "server-ready", port });
+      process.parentPort.postMessage({ type: "server-ready", port, viewerOrigins: viewer?.origins ?? [] });
     }
   },
 });
