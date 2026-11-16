@@ -1,5 +1,5 @@
 /**
- * Export viewer path resolution (routes/export.js#resolveExportFile): the
+ * Export viewer path resolution (utils/exportFiles.js#resolveExportFile): the
  * extensionless fallbacks a Clean-URLs export needs, and containment to the
  * selected export directory. Pure function over a tmp publish dir.
  *
@@ -16,7 +16,7 @@ process.env.DATA_ROOT = path.join(TEST_ROOT, "data");
 process.env.THEMES_ROOT = path.join(TEST_ROOT, "themes");
 process.env.NODE_ENV = "test";
 
-const { resolveExportFile } = await import("../routes/export.js");
+const { resolveExportFile } = await import("../utils/exportFiles.js");
 
 const PUBLISH = path.join(TEST_ROOT, "publish");
 const DIR = "site-v1";

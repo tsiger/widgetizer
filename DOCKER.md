@@ -126,7 +126,10 @@ builder.example.com:444 {
 For a separate host instead (`view.example.com` → `3002`), set
 `EXPORT_VIEWER_URL: https://view.example.com`. Give it HTTPS when the app is on
 HTTPS: the app sends an HSTS header, so browsers turn a plain `http://`
-viewer address on the same host (or one of its subdomains) into `https://`.
+viewer address on the same host (or one of its subdomains) into `https://`,
+keeping the port (`http://builder.example.com:8081` becomes
+`https://builder.example.com:8081`), which then fails unless that port serves
+HTTPS.
 
 ### Turning the viewer off (last resort)
 

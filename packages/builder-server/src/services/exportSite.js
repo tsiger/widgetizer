@@ -12,7 +12,7 @@
 import express from "express";
 import fs from "node:fs";
 import path from "node:path";
-import { resolveExportFile } from "../routes/export.js";
+import { resolveExportFile } from "../utils/exportFiles.js";
 import { getContentType } from "../utils/mimeTypes.js";
 import { isWithinDirectory } from "../utils/pathSecurity.js";
 import { sendFileDone } from "../utils/sendFileOutcome.js";

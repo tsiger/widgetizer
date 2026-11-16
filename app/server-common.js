@@ -104,7 +104,7 @@ export async function startOssServer({ defaultPort, onReady } = {}) {
       onReady,
       log: console,
     }).catch((err) => {
-      console.error(`onReady failed: ${err.message}`);
+      console.error("onReady failed:", err);
       process.exit(1);
     });
   });

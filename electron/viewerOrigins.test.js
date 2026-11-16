@@ -20,6 +20,8 @@ describe("viewerOriginsFromEnv", () => {
   it("gives only the override origin when the port is unset or off", () => {
     expect(viewerOriginsFromEnv({})).toEqual([]);
     expect(viewerOriginsFromEnv({ EXPORT_VIEWER_PORT: "off" })).toEqual([]);
+    expect(viewerOriginsFromEnv({ EXPORT_VIEWER_PORT: "OFF" })).toEqual([]);
+    expect(viewerOriginsFromEnv({ EXPORT_VIEWER_PORT: "0" })).toEqual([]);
     expect(viewerOriginsFromEnv({ EXPORT_VIEWER_PORT: "off", EXPORT_VIEWER_URL: "https://v.example.com" })).toEqual([
       "https://v.example.com",
     ]);

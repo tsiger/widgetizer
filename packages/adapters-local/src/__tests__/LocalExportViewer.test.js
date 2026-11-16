@@ -60,10 +60,15 @@ describe("LocalExportViewer.start", () => {
     cleanups.push(() => closeServer(server));
   }
 
-  it("opens nothing when EXPORT_VIEWER_PORT is off", async () => {
-    const viewer = viewerWith({ EXPORT_VIEWER_PORT: "off" });
-    expect(await viewer.start({ host: "127.0.0.1", appPort: 3001, appPortWasRequested: true })).toBeNull();
-    expect(viewer.isReady()).toBe(false);
+  it("opens nothing when EXPORT_VIEWER_PORT is off, in any case, and says it is off", async () => {
+    for (const off of ["off", "OFF"]) {
+      const viewer = viewerWith({ EXPORT_VIEWER_PORT: off });
+      expect(await viewer.start({ host: "127.0.0.1", appPort: 3001, appPortWasRequested: true })).toBeNull();
+      expect(viewer.isReady()).toBe(false);
+    }
+    expect(warn).not.toHaveBeenCalled();
+    expect(log).toHaveBeenCalledTimes(2);
+    expect(String(log.mock.calls[1][0])).toMatch(/Export viewer is off/);
   });
 
   it("binds a fixed EXPORT_VIEWER_PORT when it is free", async () => {

@@ -10,10 +10,13 @@ export default {
   },
   files: [
     "dist",
-    // OSS shell server assembly — the only backend file under app/ (the rest of
-    // app/ is frontend source already bundled into dist/ by Vite). It composes
+    // OSS shell server assembly — the backend files under app/ (the rest of
+    // app/ is frontend source already bundled into dist/ by Vite). They compose
     // the @widgetizer/* backend packages, which are bundled via dependencies.
+    // A new backend module under app/ must be listed here too, or the packaged
+    // server fails to import it.
     "app/server-common.js",
+    "app/viewerStartup.js",
     // Core assets + preview-iframe runtime modules are supplied by
     // @widgetizer/core and ride along via that dependency.
     "themes",

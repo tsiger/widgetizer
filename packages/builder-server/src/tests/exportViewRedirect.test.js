@@ -1,7 +1,7 @@
 /**
  * The export viewer routes hand a ready exportViewer adapter the export and
  * answer a page that moves on to its start page; without a usable viewer they
- * serve the file as before. The scope check runs before the viewer is told anything.
+ * serve the file themselves. The scope check runs before the viewer is told anything.
  *
  * Run with: node --test packages/builder-server/src/tests/exportViewRedirect.test.js
  */

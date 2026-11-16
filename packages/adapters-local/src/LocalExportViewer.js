@@ -7,15 +7,16 @@
  * depend on builder-server.
  *
  * Settings: `EXPORT_VIEWER_PORT` (a port, or `off` for no viewer) and
- * `EXPORT_VIEWER_URL` (the viewer's public address; see `overrideOrigin`).
+ * `EXPORT_VIEWER_URL` (the viewer's public address), read by
+ * `exportViewerSettings.js`, which the desktop app's main process shares.
  */
 import http from "node:http";
 import net from "node:net";
+import { MAX_PORT, overrideOrigin, viewerOrigins, viewerPortSetting } from "./exportViewerSettings.js";
 
 const PROBE_HOSTS = ["127.0.0.1", "::1", "::", "0.0.0.0"];
 // A bind on a family the machine lacks says nothing about the port.
 const FAMILY_ABSENT = new Set(["EADDRNOTAVAIL", "EAFNOSUPPORT"]);
-const MAX_PORT = 65535;
 
 function probe(port, host) {
   return new Promise((resolve) => {
@@ -50,30 +51,8 @@ function forwardedPortNumber(value) {
 }
 
 /**
- * The origin of an `EXPORT_VIEWER_URL`, or null when it isn't an absolute
- * http(s) URL (the setting is then ignored). Only the origin counts: the viewer
- * serves the export with `/` as its root and the start page moves on to
- * path-only destinations, so a path in the setting couldn't be kept past the
- * start page anyway, and a query or fragment would break the start page's URL.
- * electron/viewerOrigins.js applies the same rule; keep the two aligned.
- *
- * @param {string|undefined} value
- * @returns {string|null}
- */
-export function overrideOrigin(value) {
-  const trimmed = typeof value === "string" ? value.trim() : "";
-  if (!trimmed) return null;
-  try {
-    const url = new URL(trimmed);
-    return url.protocol === "http:" || url.protocol === "https:" ? url.origin : null;
-  } catch {
-    return null;
-  }
-}
-
-/**
  * The viewer's address for one request to the app, or null when it can't be
- * worked out (the caller then serves the export as before).
+ * worked out (the caller then serves the export from the app itself).
  *
  * 1. `overrideUrl` (EXPORT_VIEWER_URL), its origin; ignored when unusable.
  * 2. A port defaulted to the app's + 1: the request's protocol and hostname with
@@ -153,18 +132,18 @@ export class LocalExportViewer {
           `EXPORT_VIEWER_URL "${url}": only its origin (${origin}) is used; the viewer needs the root of its own host or port, not a path under it.`,
         );
       }
-      const setting = this.#env.EXPORT_VIEWER_PORT?.trim();
-      if (setting === "off") {
+      const setting = viewerPortSetting(this.#env.EXPORT_VIEWER_PORT);
+      if (setting.kind === "off") {
         console.log("Export viewer is off (EXPORT_VIEWER_PORT=off); exports are served by the app.");
         return null;
       }
+      if (setting.kind === "invalid") {
+        console.warn(`Export viewer not started: EXPORT_VIEWER_PORT "${setting.value}" is not a port or "off".`);
+        return null;
+      }
 
-      if (setting) {
-        const port = /^\d+$/.test(setting) ? Number(setting) : NaN;
-        if (!(port <= MAX_PORT)) {
-          console.warn(`Export viewer not started: EXPORT_VIEWER_PORT "${setting}" is not a port or "off".`);
-          return null;
-        }
+      if (setting.kind === "port") {
+        const { port } = setting;
         if (port !== 0 && !(await isPortFreeEverywhere(port))) {
           console.warn(`Export viewer not started: port ${port} (EXPORT_VIEWER_PORT) is taken.`);
           return null;
@@ -229,10 +208,7 @@ export class LocalExportViewer {
 
   /** The origins a desktop shell lets the viewer load in: loopback forms of the port, plus EXPORT_VIEWER_URL's. */
   origins() {
-    const list = this.#port ? [`http://127.0.0.1:${this.#port}`, `http://localhost:${this.#port}`] : [];
-    const override = overrideOrigin(this.#env.EXPORT_VIEWER_URL);
-    if (override) list.push(override);
-    return list;
+    return viewerOrigins(this.#port, this.#env.EXPORT_VIEWER_URL);
   }
 
   async close() {

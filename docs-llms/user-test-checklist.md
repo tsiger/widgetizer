@@ -1611,9 +1611,6 @@ SITESET-011 to SITESET-016 use the Site Address field in Project details > Site.
 - [ ] EXP404-010 - View one export version, then View an older one, and go back to the first tab and click a link.
   Expected: The second View opens the older version. The first tab now shows pages from the older version, since the viewer shows the export opened last.
 
-- [ ] EXP404-011 - In the browser, open the app's View address for an export with a section's id added: `http://localhost:3001/api/export/view/<export folder>/index.html#main-content` (the export folders are in the data folder's `publish/`).
-  Expected: The page opens scrolled to that section.
-
 - [ ] EXP404-012 - With Developer mode on, open an issues report from the Export page, then a PDF or image linked from an exported page.
   Expected: Both open on the export viewer's address.
 
@@ -2158,7 +2155,7 @@ Run the web-app sections above in the desktop app too. This section covers only 
 - [ ] ELEC-006 - View an export or export issues report.
   Expected: It opens in its own separate app window (no app controls in it), not in the default browser, even though it moves to the export viewer's address. Links between the site's pages stay in that window. A link to another website inside that window opens in the default browser instead of loading there.
 
-- [ ] ELEC-021 - In the desktop app, View an export that has a `404` page and open a missing address from a link (or type it into a page's link).
+- [ ] ELEC-006A - In the desktop app, View an export that has a `404` page and open a missing address from a link (or type it into a page's link).
   Expected: The styled "404 - Not found" page shows in the same app window.
 
 - [ ] ELEC-007 - Click an external link inside Site preview.
@@ -2301,13 +2298,13 @@ Checks that the Docker image starts and works on its own. Run it from a fresh cl
 - [ ] DOCK-005 - Run `docker compose down`, then `docker compose up` again, and reopen the app.
   Expected: The project, its pages, media and export are all still there.
 
-- [ ] DOCK-006A - View the export from DOCK-004 on the Export page.
+- [ ] DOCK-005A - View the export from DOCK-004 on the Export page.
   Expected: It opens on `http://localhost:3002`, and its pages and images show.
 
-- [ ] DOCK-006B - Change the compose ports to `"8080:3001"` and `"8081:3002"` (and `SERVER_URL` to `http://localhost:8080`), run `docker compose up -d`, open `http://localhost:8080` and View an export.
+- [ ] DOCK-005B - Change the compose ports to `"8080:3001"` and `"8081:3002"` (and `SERVER_URL` to `http://localhost:8080`), run `docker compose up -d`, open `http://localhost:8080` and View an export.
   Expected: The export opens on `http://localhost:8081`. Put the ports back afterwards.
 
-- [ ] DOCK-006C - Uncomment `EXPORT_VIEWER_PORT: "off"` in the compose file, run `docker compose up -d`, and View an export.
+- [ ] DOCK-005C - Uncomment `EXPORT_VIEWER_PORT: "off"` in the compose file, run `docker compose up -d`, and View an export.
   Expected: The export opens from the app's own address (`/api/export/view/...`); its normal pages work, while the "404 - Not found" page shows unstyled. Comment the line out again afterwards.
 
 - [ ] DOCK-006 - Run `docker compose down -v` to finish.

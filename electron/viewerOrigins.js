@@ -1,37 +1,16 @@
 // The export viewer's origins, for when the Electron main process can't be told
 // them by the server (the internal server is disabled and an external one runs
-// with the same EXPORT_VIEWER_* settings). Mirrors LocalExportViewer's settings:
-// EXPORT_VIEWER_PORT is a port or "off"; EXPORT_VIEWER_URL is the viewer's
-// public address. An invalid port or URL, or a non-http(s) URL, is ignored, and
-// only the URL's origin counts: the same rule as `overrideOrigin` in
-// packages/adapters-local/src/LocalExportViewer.js; keep the two aligned.
-const MAX_PORT = 65535;
+// with the same EXPORT_VIEWER_* settings). The settings read exactly as
+// LocalExportViewer reads them; only a fixed port can be known from the env (0
+// asks the OS for one).
+import { viewerOrigins, viewerPortSetting } from "@widgetizer/adapters-local/exportViewerSettings";
 
 /**
  * @param {Record<string, string | undefined>} env
  * @returns {string[]}
  */
 export function viewerOriginsFromEnv(env) {
-  const origins = [];
-
-  const setting = env.EXPORT_VIEWER_PORT?.trim();
-  if (setting && /^\d+$/.test(setting)) {
-    const port = Number(setting);
-    // Port 0 asks for an OS-assigned port, which can't be known from the env.
-    if (port > 0 && port <= MAX_PORT) {
-      origins.push(`http://127.0.0.1:${port}`, `http://localhost:${port}`);
-    }
-  }
-
-  const override = env.EXPORT_VIEWER_URL;
-  if (override) {
-    try {
-      const url = new URL(override);
-      if (url.protocol === "http:" || url.protocol === "https:") origins.push(url.origin);
-    } catch {
-      // Not a URL: nothing to allow.
-    }
-  }
-
-  return origins;
+  const setting = viewerPortSetting(env.EXPORT_VIEWER_PORT);
+  const port = setting.kind === "port" && setting.port > 0 ? setting.port : null;
+  return viewerOrigins(port, env.EXPORT_VIEWER_URL);
 }
