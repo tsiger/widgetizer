@@ -16,6 +16,9 @@ export { DATA_DIR } from "./config.js";
 // error mapper (the routers carry their own JSON parsers + scope middleware, but
 // the WidgetizerError -> HTTP mapping is applied app-wide).
 export { default as errorHandler } from "./middleware/errorHandler.js";
+// The export site a shell serves on its own viewer port: the current export with
+// its site path as the root, plus the start page View redirects to. Listener-free.
+export { createExportSiteApp, startDestination, START_PATH } from "./services/exportSite.js";
 
 // Pure render/export helpers consumed by hosted's cloud publish pipeline. Hosted
 // builds its own render loop + per-project deps bag (it cannot reuse the OSS
