@@ -1,5 +1,13 @@
 # Changelog
 
+## [Unreleased]
+
+### Export Viewer
+
+- **View** on the Export page shows an export on its own port (the app's port + 1, e.g. `http://localhost:3002`) with the site's address as the root, the way a static host serves it: links and assets starting with `/` work, the 404 page looks right, and a missing address shows the site's 404 page. A Site Address with a subfolder (`https://user.github.io/repo/`) opens under `/repo/`. Each view starts by clearing what earlier viewed sites stored in the browser (on `localhost` and over HTTPS)
+- **Docker:** `docker-compose.yml` publishes the viewer on `3002`, and the image exposes it. An existing install that publishes only `3001` must publish `3002` too; a remapped app port keeps the viewer one above it (`8080:3001` with `8081:3002`). `DOCKER.md` has nginx and Caddy examples for a server behind a proxy
+- **Settings:** `EXPORT_VIEWER_PORT` fixes the viewer's port and `EXPORT_VIEWER_URL` sets its public address. `EXPORT_VIEWER_PORT=off` is a last resort for setups that can expose only one port: View then serves exports from the app, where links starting with `/` and 404 pages break
+
 ## [0.9.10] - 2026-10-22
 
 ### Multilingual Sites

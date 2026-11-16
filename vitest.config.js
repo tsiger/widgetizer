@@ -16,6 +16,7 @@ export default mergeConfig(
       env: { VITE_API_URL: "" },
       setupFiles: ["./vitest.setup.js"],
       include: [
+        "app/*.test.js",
         "app/src/**/*.test.{js,jsx}",
         // Electron shell carries a few pure, import-safe helpers (e.g. the preview
         // path guard) that are unit-tested here; main.js itself stays out (it imports

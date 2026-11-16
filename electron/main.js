@@ -6,6 +6,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { isSafePreviewPath } from "./previewPath.js";
 import { windowOpenTarget } from "./windowOpenPolicy.js";
+import { viewerOriginsFromEnv } from "./viewerOrigins.js";
 
 // Constants
 const DEFAULT_PORT = "3001";
@@ -32,6 +33,11 @@ let logsDir = null;
 // the "server-ready" IPC message. When the internal server is disabled, falls
 // back to the env/default port so the renderer can still target an external API.
 let serverPort = null;
+
+// Origins of the export viewer, which serves exports on its own port. The
+// content window may load them. Set from "server-ready", or from the env when
+// the internal server is disabled.
+let viewerOrigins = [];
 
 // Determine if we're in development mode
 function getIsDev() {
@@ -223,6 +229,9 @@ function startServer() {
     serverProcess.on("message", (msg) => {
       if (msg && msg.type === "server-ready" && typeof msg.port === "number") {
         serverPort = String(msg.port);
+        if (Array.isArray(msg.viewerOrigins) && msg.viewerOrigins.every((o) => typeof o === "string")) {
+          viewerOrigins = msg.viewerOrigins;
+        }
         log(`Server reported ready on port ${serverPort}`);
         serverReadyDeferred?.resolve();
       }
@@ -763,7 +772,9 @@ function createAppMenu() {
 }
 
 function contentOrigins() {
-  return serverPort ? [`http://127.0.0.1:${serverPort}`, `http://localhost:${serverPort}`] : [];
+  return serverPort
+    ? [`http://127.0.0.1:${serverPort}`, `http://localhost:${serverPort}`, ...viewerOrigins]
+    : [];
 }
 
 // Pages shown in the app (the preview, an exported site, a theme's script) can call
@@ -915,6 +926,7 @@ app.whenReady().then(async () => {
     // later by the "server-ready" message.
     if (process.env.ELECTRON_DISABLE_INTERNAL_SERVER === "1") {
       serverPort = process.env.PORT || DEFAULT_PORT;
+      viewerOrigins = viewerOriginsFromEnv(process.env);
     }
 
     // Start server (non-blocking)

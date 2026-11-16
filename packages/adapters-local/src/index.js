@@ -8,3 +8,4 @@ export { LocalAssetStorageAdapter } from "./LocalAssetStorageAdapter.js";
 export { LocalScopeResolver, LocalPreviewScopeResolver } from "./LocalScopeResolver.js";
 export { LocalPublishAdapter } from "./LocalPublishAdapter.js";
 export { LocalLimitsAdapter } from "./LocalLimitsAdapter.js";
+export { LocalExportViewer } from "./LocalExportViewer.js";
