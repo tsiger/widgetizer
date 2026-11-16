@@ -864,6 +864,8 @@ describe("exportProject", () => {
     assert.equal(manifest.projectName, "Export Test Project");
     assert.ok(manifest.exportedAt, "Should have exportedAt timestamp");
     assert.ok(manifest.widgetizerVersion, "Should have widgetizerVersion");
+    // The Site URL has no folder, so the site is served from the root.
+    assert.equal(manifest.sitePath, "/");
   });
 
   it("stamps manifest.assetVersion on the enqueued CSS/JS URLs in the exported HTML", async () => {
@@ -1190,6 +1192,18 @@ describe("exportProject without siteUrl", () => {
     const exportDir = res._json.outputDir;
     assert.ok(!(await fs.pathExists(path.join(exportDir, "sitemap.xml"))), "No sitemap without siteUrl");
     assert.ok(!(await fs.pathExists(path.join(exportDir, "robots.txt"))), "No robots.txt without siteUrl");
+    assert.equal((await fs.readJson(path.join(exportDir, "manifest.json"))).sitePath, "/");
+  });
+
+  it("records the Site URL's folder as the manifest's sitePath", async () => {
+    const data = await projectRepo.readProjectsData();
+    data.projects.find((p) => p.id === NO_URL_ID).siteUrl = "https://user.github.io/repo/";
+    await projectRepo.writeProjectsData(data);
+
+    const res = await callController(exportProject, { params: { projectId: NO_URL_ID } });
+    assert.equal(res._status, 200, JSON.stringify(res._json));
+    const manifest = await fs.readJson(path.join(res._json.outputDir, "manifest.json"));
+    assert.equal(manifest.sitePath, "/repo/");
   });
 
 });

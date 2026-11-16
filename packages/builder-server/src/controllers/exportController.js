@@ -12,6 +12,7 @@ import { createCollectionReader } from "../services/collectionService.js";
 import * as projectRepo from "../db/repositories/projectRepository.js";
 import { validateHtml, generateIssuesReport } from "../utils/htmlProcessor.js";
 import { buildAssetVersionToken } from "@widgetizer/core/assetUrl";
+import { siteUrlPathname } from "@widgetizer/core/internalHref";
 
 function structuredDataIssueMessage(warning) {
   if (warning.code === "emptyArticleFields") {
@@ -588,6 +589,8 @@ export async function exportProjectToDir(projectId, options = {}, collectionDeps
       assetVersion,
       exportedAt: exportedAt.toISOString(),
       projectName: projectData.name,
+      // The folder the Site URL puts the site in ("/" or "/repo/"); the export viewer serves from it.
+      sitePath: siteUrlPathname(projectData.siteUrl || ""),
       collections: report.collections,
     };
     await fs.writeFile(path.join(outputDir, "manifest.json"), JSON.stringify(manifest, null, 2));
