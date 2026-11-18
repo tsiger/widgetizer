@@ -1,15 +1,17 @@
 import fs from "fs-extra";
+import { createReadStream } from "node:fs";
+import os from "node:os";
 import path from "node:path";
 import { pipeline } from "node:stream";
 import { v4 as uuidv4 } from "uuid";
-import multer from "multer";
 import sharp from "sharp";
 import { normalizeUploadName } from "../utils/uploadFileName.js";
 import DOMPurify from "isomorphic-dompurify";
 import { getThemeJsonPath } from "../config.js";
-import { LIMIT_KEYS } from "@widgetizer/core/adapters";
 import { ALLOWED_MIME_TYPES, ALLOWED_UPLOAD_EXTENSIONS, getContentType, getMediaCategory } from "../utils/mimeTypes.js";
 import { getSetting } from "./appSettingsController.js";
+import { parseMediaUpload } from "../middleware/parseMediaUpload.js";
+import { getMaxUploadBytes, MAX_SVG_UPLOAD_BYTES } from "../utils/uploadLimits.js";
 import { getMediaUsage, refreshAllMediaUsageFromDir, ensureUsageSourceFormat } from "../services/mediaUsageService.js";
 import { withContentWriteLock, verifyFileUnused, recordDeletedMediaPaths } from "../services/contentCoordination.js";
 import { getProjectFolderName, getProjectDetails } from "../utils/projectHelpers.js";
@@ -156,14 +158,7 @@ export async function atomicUpdateMediaFile(projectId, transformFn) {
   }).immediate();
 }
 
-// Files are buffered in memory (file.buffer); their bytes are persisted through
-// the injected assetStorage adapter (local FS in OSS, R2 in hosted) rather than
-// written straight to a hard-coded data dir. This keeps media tenant-isolated
-// and cloud-portable. The final filename + collision handling moved into
-// uploadProjectMedia (it needs the adapter to dedup against the store).
-const storage = multer.memoryStorage();
-
-// Configure multer file filter. Both signals must pass and agree: the declared
+// Configure the upload file filter. Both signals must pass and agree: the declared
 // MIME is client-controlled, while the stored extension determines both the
 // response Content-Type and which processing/sanitization path is required.
 export const mediaUploadFileFilter = (req, file, cb) => {
@@ -183,36 +178,37 @@ export const mediaUploadFileFilter = (req, file, cb) => {
   }
 };
 
-// Base multer config (shared by uploadWithLimit). The per-file size cap is NOT
-// set here — it is applied per-request by uploadWithLimit from the limits adapter.
-export const upload = multer({
-  storage,
-  fileFilter: mediaUploadFileFilter,
-});
-
-// Platform fallback when no limits adapter is wired (kept in sync with hosted's
-// CloudLimitsAdapter MAX_UPLOAD_SIZE_BYTES).
-const DEFAULT_MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
-
 /**
- * Per-request multer for the media upload route. Sources the per-file size cap
- * from the injected limits adapter and enforces it as a streaming multer limit,
- * so an oversize part is rejected BEFORE the whole file is buffered into memory.
- * resolveActiveProject runs first (router-level), so req.scope + req.adapters are
- * present here. LocalLimitsAdapter returns the configured OSS max; over-size
- * files fail fast with 413.
- * @param {import('express').Request} req
- * @param {import('express').Response} res
- * @param {import('express').NextFunction} next
+ * Multipart parser for the media upload route: streams each file part to a temp
+ * file and marks a part over the per-file limit (from the limits adapter) as
+ * refused instead of failing the batch. See parseMediaUpload.
  */
-export async function uploadWithLimit(req, res, next) {
-  try {
-    const cap = await req.adapters?.limits?.getLimit?.(req.scope, LIMIT_KEYS.MAX_UPLOAD_SIZE_BYTES);
-    const fileSize = Number.isFinite(cap) ? cap : DEFAULT_MAX_UPLOAD_BYTES;
-    multer({ storage, fileFilter: mediaUploadFileFilter, limits: { fileSize, files: 10 } }).array("files", 10)(req, res, next);
-  } catch (err) {
-    next(err);
+export const uploadWithLimit = parseMediaUpload({ fileFilter: mediaUploadFileFilter });
+
+// Files processed at once: each can hold a decoded image in sharp.
+const UPLOAD_CONCURRENCY = 2;
+
+function formatMB(bytes) {
+  const mb = bytes / 1024 / 1024;
+  return Number.isInteger(mb) ? `${mb}MB` : `${mb.toFixed(2)}MB`;
+}
+
+function refusal(originalName, code, limitBytes, sizeBytes, reason) {
+  return { success: false, file: { originalName, code, limitBytes, sizeBytes, reason } };
+}
+
+/** Run `worker` over `items`, at most `limit` at a time; results keep item order. */
+async function mapWithConcurrency(items, limit, worker) {
+  const results = new Array(items.length);
+  let next = 0;
+  async function lane() {
+    while (next < items.length) {
+      const i = next++;
+      results[i] = await worker(items[i]);
+    }
   }
+  await Promise.all(Array.from({ length: Math.min(limit, items.length) }, lane));
+  return results;
 }
 
 /**
@@ -252,8 +248,178 @@ export async function getProjectMedia(req, res) {
 }
 
 /**
- * Uploads media files to a project with dynamic size validation.
- * Processes images (generates thumbnails), sanitizes SVGs, and validates file types.
+ * Stores one uploaded file: checks its size, generates its resized copies (and
+ * any re-encoded original) into `workDir`, reserves the total through the
+ * limits adapter's optional `reserveStorage`, then moves everything into the
+ * asset store and commits the bytes actually stored. Nothing reaches the store
+ * before the reservation is granted; the reservation is released on any failure
+ * after it.
+ */
+async function storeUploadedFile({ file, subdir, filename, originalName }, ctx) {
+  const { scope, assetStorage, limits, maxUploadBytes, imageSizes, workDir } = ctx;
+
+  if (file.refused || file.size > maxUploadBytes) {
+    return refusal(
+      originalName,
+      "FILE_TOO_LARGE",
+      maxUploadBytes,
+      file.size,
+      `File size (${formatMB(file.size)}) exceeds limit of ${formatMB(maxUploadBytes)}.`,
+    );
+  }
+  if (file.mimetype === "image/svg+xml" && file.size > MAX_SVG_UPLOAD_BYTES) {
+    return refusal(
+      originalName,
+      "SVG_TOO_LARGE",
+      MAX_SVG_UPLOAD_BYTES,
+      file.size,
+      `SVG files are limited to ${formatMB(MAX_SVG_UPLOAD_BYTES)}; this one is ${formatMB(file.size)}.`,
+    );
+  }
+  if (!file.path) throw new Error("No file content received");
+
+  const fileInfo = {
+    id: uuidv4(),
+    filename,
+    originalName,
+    type: file.mimetype,
+    size: file.size,
+    uploaded: new Date().toISOString(),
+    path: `/uploads/${subdir}/${filename}`,
+    metadata: { alt: "", title: "", caption: "" },
+    sizes: {},
+  };
+
+  // Where the stored original's bytes come from: the upload itself, or a
+  // re-encoded / sanitized copy of it in workDir.
+  let originalSource = file.path;
+  const copies = [];
+
+  if (file.mimetype.startsWith("image/") && file.mimetype !== "image/svg+xml") {
+    const image = sharp(file.path, { limitInputPixels: 100_000_000 });
+    const metadata = await image.metadata();
+
+    // Safety: reject images with extreme dimensions (always enforced)
+    if (metadata.width > 10_000 || metadata.height > 10_000) {
+      return {
+        success: false,
+        file: {
+          originalName,
+          reason: `Image dimensions (${metadata.width}x${metadata.height}) exceed maximum of ${10_000}px.`,
+          sizeBytes: file.size,
+        },
+      };
+    }
+
+    fileInfo.width = metadata.width;
+    fileInfo.height = metadata.height;
+
+    const ext = path.extname(filename);
+    const encode = (op, quality) => {
+      if (file.mimetype === "image/jpeg") op.jpeg({ quality });
+      else if (file.mimetype === "image/png") op.png({ quality });
+      else if (file.mimetype === "image/webp") op.webp({ quality });
+      return op;
+    };
+
+    // Generate the sizes in parallel; a size that fails to generate is left out.
+    const sizeResults = await Promise.allSettled(
+      Object.entries(imageSizes).map(async ([sizeName, sizeConfig]) => {
+        if (sizeConfig.width >= metadata.width) return null;
+        const resizedFilename = `${path.basename(filename, ext)}-${sizeName}${ext}`;
+        const tempPath = path.join(workDir, `size-${sizeName}${ext}`);
+        const info = await encode(image.clone().resize({ width: sizeConfig.width }), sizeConfig.quality).toFile(tempPath);
+        return {
+          sizeName,
+          key: `images/${resizedFilename}`,
+          tempPath,
+          size: info.size,
+          data: { path: `/uploads/images/${resizedFilename}`, width: info.width, height: info.height },
+        };
+      }),
+    );
+    for (const result of sizeResults) {
+      if (result.status === "fulfilled" && result.value) copies.push(result.value);
+    }
+
+    // Recompress the original when it's no larger than the largest enabled
+    // size (it gets served via the imageTag fallback), reducing file size
+    // without changing dimensions. GIFs are excluded (animation frames).
+    if (file.mimetype !== "image/gif") {
+      const largestEnabledWidth = Math.max(...Object.values(imageSizes).map((s) => s.width));
+      if (metadata.width <= largestEnabledWidth) {
+        const quality = Math.max(...Object.values(imageSizes).map((s) => s.quality));
+        originalSource = path.join(workDir, `original${ext}`);
+        await encode(sharp(file.path), quality).toFile(originalSource);
+      }
+    }
+  } else if (file.mimetype === "image/svg+xml") {
+    // Bounded by MAX_SVG_UPLOAD_BYTES above.
+    const sanitizedSvg = DOMPurify.sanitize(await fs.readFile(file.path, "utf-8"), {
+      USE_PROFILES: { svg: true },
+    });
+    originalSource = path.join(workDir, "original.svg");
+    await fs.writeFile(originalSource, sanitizedSvg, "utf-8");
+  }
+
+  const originalBytes = (await fs.stat(originalSource)).size;
+  fileInfo.size = originalBytes;
+  const outputs = [{ key: `${subdir}/${filename}`, tempPath: originalSource, size: originalBytes }, ...copies];
+  const totalBytes = outputs.reduce((sum, output) => sum + output.size, 0);
+
+  let reservation = null;
+  if (typeof limits?.reserveStorage === "function") {
+    const answer = await limits.reserveStorage(scope, totalBytes);
+    if (!answer?.ok) {
+      const availableBytes = Number.isFinite(answer?.availableBytes) ? answer.availableBytes : 0;
+      return refusal(
+        originalName,
+        "STORAGE_FULL",
+        availableBytes,
+        totalBytes,
+        `Not enough storage left: this file needs ${formatMB(totalBytes)}, ${formatMB(availableBytes)} is available.`,
+      );
+    }
+    reservation = answer;
+  }
+
+  const storedKeys = [];
+  let committed = false;
+  try {
+    let storedBytes = 0;
+    for (const output of outputs) {
+      const result = await assetStorage.upload(scope, output.key, createReadStream(output.tempPath));
+      storedKeys.push(output.key);
+      storedBytes += Number.isFinite(result?.sizeBytes) ? result.sizeBytes : output.size;
+    }
+    if (reservation) {
+      committed = true; // a failing commit has settled the reservation too: never release after it
+      await reservation.commit(storedBytes);
+    }
+  } catch (error) {
+    await Promise.all(
+      storedKeys.map((key) =>
+        Promise.resolve(assetStorage.delete(scope, key)).catch((err) =>
+          console.warn(`Could not remove media asset ${key} after a failed upload: ${err.message}`),
+        ),
+      ),
+    );
+    if (reservation && !committed) {
+      await reservation.release().catch((err) => console.warn(`Could not release a storage reservation: ${err.message}`));
+    }
+    throw error;
+  }
+
+  for (const copy of copies) fileInfo.sizes[copy.sizeName] = copy.data;
+  return { success: true, file: fileInfo };
+}
+
+/**
+ * Uploads media files to a project. `req.files` comes from uploadWithLimit:
+ * each entry's bytes are in a temp file at `path` (a part over the per-file
+ * limit arrives `refused`). Each file is refused or stored on its own, so one
+ * oversized file or one that doesn't fit the remaining storage doesn't fail the
+ * rest of the batch. Images get their resized copies, SVGs are sanitized.
  * @param {import('express').Request} req - Express request object with projectId in params and files in req.files
  * @param {import('express').Response} res - Express response object
  * @returns {Promise<void>}
@@ -271,18 +437,16 @@ export async function uploadProjectMedia(req, res) {
       return res.status(400).json({ error: "No valid files uploaded or received." });
     }
 
-    // Get the dynamic file size limit
-    const maxImageSizeMB = await getSetting("media.maxFileSizeMB");
+    const maxUploadBytes = await getMaxUploadBytes(req.adapters, scope);
     // Pass projectId to allow theme overrides
     const imageSizes = await getImageProcessingSettings(projectId);
 
     // Validate project ownership
     await getProjectFolderName(projectId);
 
-    // Sequential pre-pass: assign a collision-free filename to each file. The
-    // old multer disk-filename callback deduped against the upload dir; now we
-    // dedup against the adapter's existing keys (+ names assigned this request).
-    // Tests pass file.filename directly, bypassing this.
+    // Sequential pre-pass: assign a collision-free filename to each file,
+    // deduped against the adapter's existing keys (+ names assigned this
+    // request). Tests pass file.filename directly, bypassing this.
     const listedNames = {};
     async function uniqueName(subdir, originalName) {
       if (!listedNames[subdir]) {
@@ -305,182 +469,39 @@ export async function uploadProjectMedia(req, res) {
     const prepared = [];
     for (const file of files) {
       const subdir = getMediaCategory(file.mimetype) === "file" ? "files" : "images";
-      // Multer hands the name over as latin1 bytes; decode once so the stored
+      // The multipart name arrives as latin1 bytes; decode once so the stored
       // "original name" is the real one, not mojibake.
       const originalName = decodeFileName(file.originalname);
-      const filename = file.filename || (await uniqueName(subdir, originalName));
+      const filename = file.refused ? null : file.filename || (await uniqueName(subdir, originalName));
       prepared.push({ file, subdir, filename, originalName });
     }
 
-    // Process files in parallel instead of sequentially
-    const filePromises = prepared.map(async ({ file, subdir, filename, originalName }) => {
+    const ctx = { scope, assetStorage, limits: req.adapters.limits, maxUploadBytes, imageSizes };
+    const results = await mapWithConcurrency(prepared, UPLOAD_CONCURRENCY, async (item) => {
+      let workDir = null;
       try {
-        // Check file size against limit
-        const maxSizeMB = maxImageSizeMB || 5;
-        const maxSizeBytes = maxSizeMB * 1024 * 1024;
-
-        if (file.size > maxSizeBytes) {
-          return {
-            success: false,
-            file: {
-              originalName,
-              reason: `File size (${(file.size / 1024 / 1024).toFixed(2)}MB) exceeds limit of ${maxSizeMB}MB.`,
-              sizeBytes: file.size,
-            },
-          };
-        }
-
-        // --- File is within size limit, proceed with processing ---
-        // memoryStorage gives file.buffer; direct-controller tests pass file.path.
-        let sourceBuffer = file.buffer;
-        if (!sourceBuffer && file.path) sourceBuffer = await fs.readFile(file.path);
-        if (!sourceBuffer) throw new Error("No file content received");
-
-        const fileId = uuidv4();
-        const uploadPath = `/uploads/${subdir}/${filename}`;
-
-        const fileInfo = {
-          id: fileId,
-          filename,
-          originalName,
-          type: file.mimetype,
-          size: file.size,
-          uploaded: new Date().toISOString(),
-          path: uploadPath,
-          metadata: { alt: "", title: "", caption: "" },
-          sizes: {}, // Initialize sizes object
-        };
-
-        // The bytes that get stored as the "original" (possibly recompressed /
-        // sanitized below).
-        let originalBuffer = sourceBuffer;
-
-        // Process image files (thumbnails, dimensions etc.)
-        if (file.mimetype.startsWith("image/") && file.mimetype !== "image/svg+xml") {
-          const image = sharp(sourceBuffer, { limitInputPixels: 100_000_000 });
-          const metadata = await image.metadata();
-
-          // Safety: reject images with extreme dimensions (always enforced)
-          if (metadata.width > 10_000 || metadata.height > 10_000) {
-            return {
-              success: false,
-              file: {
-                originalName,
-                reason: `Image dimensions (${metadata.width}x${metadata.height}) exceed maximum of ${10_000}px.`,
-                sizeBytes: file.size,
-              },
-            };
-          }
-
-          fileInfo.width = metadata.width;
-          fileInfo.height = metadata.height;
-
-          // Generate image sizes in parallel, each uploaded through the adapter.
-          const sizePromises = Object.entries(imageSizes).map(async ([sizeName, sizeConfig]) => {
-            if (sizeConfig.width >= metadata.width) return null;
-
-            const ext = path.extname(filename);
-            const resizedFilename = `${path.basename(filename, ext)}-${sizeName}${ext}`;
-
-            // Preserve original format while applying quality settings
-            const resizeOp = image.clone().resize({ width: sizeConfig.width });
-            if (file.mimetype === "image/jpeg") {
-              resizeOp.jpeg({ quality: sizeConfig.quality });
-            } else if (file.mimetype === "image/png") {
-              resizeOp.png({ quality: sizeConfig.quality });
-            } else if (file.mimetype === "image/webp") {
-              resizeOp.webp({ quality: sizeConfig.quality });
-            }
-
-            const { data, info } = await resizeOp.toBuffer({ resolveWithObject: true });
-            await assetStorage.upload(scope, `images/${resizedFilename}`, data);
-
-            return {
-              sizeName,
-              data: {
-                path: `/uploads/images/${resizedFilename}`,
-                width: info.width,
-                height: info.height,
-              },
-            };
-          });
-
-          const sizeResults = await Promise.allSettled(sizePromises);
-          sizeResults.forEach((result) => {
-            if (result.status === "fulfilled" && result.value) {
-              fileInfo.sizes[result.value.sizeName] = result.value.data;
-            }
-          });
-
-          // Recompress the original when it's no larger than the largest enabled
-          // size (it gets served via the imageTag fallback), reducing file size
-          // without changing dimensions. GIFs are excluded (animation frames).
-          if (file.mimetype !== "image/gif") {
-            const largestEnabledWidth = Math.max(...Object.values(imageSizes).map((s) => s.width));
-
-            if (metadata.width <= largestEnabledWidth) {
-              const quality = Math.max(...Object.values(imageSizes).map((s) => s.quality));
-              const compressOp = sharp(sourceBuffer);
-
-              if (file.mimetype === "image/jpeg") {
-                compressOp.jpeg({ quality });
-              } else if (file.mimetype === "image/png") {
-                compressOp.png({ quality });
-              } else if (file.mimetype === "image/webp") {
-                compressOp.webp({ quality });
-              }
-
-              originalBuffer = await compressOp.toBuffer();
-              fileInfo.size = originalBuffer.length;
-            }
-          }
-        } else if (file.mimetype === "image/svg+xml") {
-          const sanitizedSvg = DOMPurify.sanitize(sourceBuffer.toString("utf-8"), {
-            USE_PROFILES: { svg: true },
-          });
-          originalBuffer = Buffer.from(sanitizedSvg, "utf-8");
-          fileInfo.size = originalBuffer.length;
-        }
-
-        // Persist the original bytes through the adapter.
-        await assetStorage.upload(scope, `${subdir}/${filename}`, originalBuffer);
-
-        return {
-          success: true,
-          file: fileInfo,
-        };
+        workDir = await fs.mkdtemp(path.join(os.tmpdir(), "widgetizer-media-"));
+        return await storeUploadedFile(item, { ...ctx, workDir });
       } catch (error) {
-        console.error(`Failed to process file ${originalName}:`, error);
+        console.error(`Failed to process file ${item.originalName}:`, error);
         return {
           success: false,
           file: {
-            originalName,
+            originalName: item.originalName,
             reason: `Processing failed: ${error.message}`,
           },
         };
+      } finally {
+        if (workDir) await fs.rm(workDir, { recursive: true, force: true }).catch(() => {});
       }
     });
-
-    // Wait for all files to be processed
-    const results = await Promise.allSettled(filePromises);
 
     const processedFiles = [];
     const rejectedFiles = [];
-
-    results.forEach((result) => {
-      if (result.status === "fulfilled") {
-        if (result.value.success) {
-          processedFiles.push(result.value.file);
-        } else {
-          rejectedFiles.push(result.value.file);
-        }
-      } else {
-        rejectedFiles.push({
-          originalName: "Unknown file",
-          reason: `Unexpected error: ${result.reason}`,
-        });
-      }
-    });
+    for (const result of results) {
+      if (result.success) processedFiles.push(result.file);
+      else rejectedFiles.push(result.file);
+    }
 
     // Insert each processed file individually (no full read/write cycle)
     for (const file of processedFiles) {
@@ -505,7 +526,6 @@ export async function uploadProjectMedia(req, res) {
     });
   }
 }
-
 /**
  * Updates metadata (alt text, title, caption) for a media file of the request's
  * project (`req.scope`), for the default language or `?language=`.

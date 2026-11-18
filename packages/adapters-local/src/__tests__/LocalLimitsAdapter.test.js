@@ -47,4 +47,8 @@ describe("LocalLimitsAdapter (impl-specific)", () => {
     expect(await a.getLimit(scope, LIMIT_KEYS.CUSTOM_DOMAIN_ALLOWED)).toBe(true);
     expect(await a.getLimit(scope, LIMIT_KEYS.ANALYTICS_TIER)).toBe("none");
   });
+
+  it("has no storage reservation: total storage is unlimited", () => {
+    expect(new LocalLimitsAdapter(makeDb()).reserveStorage).toBeUndefined();
+  });
 });

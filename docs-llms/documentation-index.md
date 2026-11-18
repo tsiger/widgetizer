@@ -273,7 +273,7 @@ The [Widgetizer Theme skill](../skills/widgetizer-theme/SKILL.md) provides a tas
 - Working with usage tracking and deletion protection
 - Troubleshooting upload size limits or streaming
 
-**Key topics**: Per-project storage/resizing, upload file names that keep their words (`normalizeUploadName`), SQLite metadata incl. per-language alt/title/caption (`media_file_translations`), projectScopedRouter media routes (`'/'`, `'/:fileId'`, `'/bulk-delete'`, `'/refresh-usage'`, `'/:fileId/usage'` via `X-Project-Id`; `uploadWithLimit` middleware), `MEDIA_ACCEPT`/`NON_IMAGE_ACCEPT`, `getMediaCategory` (PDF → `uploads/files/`), audio and MP4 video byte-range (HTTP 206) streaming, usage tracking (pages/global/site settings/og_image/embedded-richtext/collection items, recursive scan), decompression-bomb guards, two-gate size enforcement, deletion protection (usage re-derived from content before a delete), Copy URL
+**Key topics**: Per-project storage/resizing, upload file names that keep their words (`normalizeUploadName`), SQLite metadata incl. per-language alt/title/caption (`media_file_translations`), projectScopedRouter media routes (`'/'`, `'/:fileId'`, `'/bulk-delete'`, `'/refresh-usage'`, `'/:fileId/usage'` via `X-Project-Id`; `uploadWithLimit` middleware), `MEDIA_ACCEPT`/`NON_IMAGE_ACCEPT`, `getMediaCategory` (PDF → `uploads/files/`), audio and MP4 video byte-range (HTTP 206) streaming, usage tracking (pages/global/site settings/og_image/embedded-richtext/collection items, recursive scan), decompression-bomb guards, upload limits (per-file limit from the limits adapter, uploads streamed to temp files and refused per file, optional `reserveStorage`, `GET /limits`), deletion protection (usage re-derived from content before a delete), Copy URL
 
 ---
 
@@ -340,7 +340,7 @@ The [Widgetizer Theme skill](../skills/widgetizer-theme/SKILL.md) provides a tas
 - Understanding server-side setting enforcement
 - Implementing setting validation and schema defaults
 
-**Key topics**: Schema-driven UI (`AppSettings.jsx`/`AppSettingsPanel.jsx` in `app/src/`, `useAppSettings.js` + `appSettings.schema.json` in `packages/editor-ui/src/`), active-project-scoped upload (`POST '/'`, `X-Project-Id`/`req.scope`), two-stage enforcement (multer limits-adapter cap + controller `getSetting` comparison), `useGuardedFormPage`, schema defaults (maxFileSizeMB 50, quality 85), pointers to core-media.md/core-export.md/core-packages.md
+**Key topics**: Schema-driven UI (`AppSettings.jsx`/`AppSettingsPanel.jsx` in `app/src/`, `useAppSettings.js` + `appSettings.schema.json` in `packages/editor-ui/src/`), active-project-scoped upload (`POST '/'`, `X-Project-Id`/`req.scope`), the upload size limit (`maxFileSizeMB` reaches uploads only as the local limits adapter's `MAX_UPLOAD_SIZE_BYTES`), `useGuardedFormPage`, schema defaults (maxFileSizeMB 50, quality 85), pointers to core-media.md/core-export.md/core-packages.md
 
 ---
 

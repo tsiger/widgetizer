@@ -72,7 +72,7 @@ Defined as JSDoc typedefs in `packages/core/src/adapters.js`. Every storage/asse
 | `StorageAdapter` | `read`, `write`, `delete`, `list`, `exists`, `stat` — all `(scope, relativePath, …)` |
 | `AssetStorageAdapter` | `upload`, `download(scope, key, range?)`, `stat`, `delete`, `list`, `getUrl` — all `(scope, key, …)`. `download` accepts an optional inclusive `{ start, end }` byte range (powers HTTP 206 media seeking); `stat` returns `{ size }` for `Content-Length` / `Content-Range`; `getUrl` takes `{ context: 'editor' \| 'published' }` |
 | `PublishAdapter` | `publish(scope, renderStream, options)` |
-| `LimitsAdapter` | `getLimit(scope, key)` |
+| `LimitsAdapter` | `getLimit(scope, key)`; optional `reserveStorage(scope, bytes)` → `{ ok: true, commit(actualBytes), release() }` or `{ ok: false, code: "STORAGE_FULL", availableBytes }` (absent = unlimited storage) |
 
 A separate **`previewScopeResolver`** adapter key is also required as a reserved seam. Current preview API routes use the normal `scopeResolver` through `resolveActiveProject`, and `GET /render/:token` dereferences only the preview token store; hosts can wire a distinct preview resolver without changing the required adapter shape.
 
@@ -98,7 +98,7 @@ Exported constants: `MAX_WIDGETS_PER_PAGE = 5000`, `MAX_MENU_ITEMS = 1000`, `MAX
 
 `MAX_COLLECTION_ITEMS` (per-collection item count) and `MAX_COLLECTIONS` (collection-type count per project) guard the collection write path and the export-time per-collection enumeration against unbounded growth.
 
-OSS's `LocalLimitsAdapter` returns the App Settings upload cap for `MAX_UPLOAD_SIZE_BYTES` and `Infinity` for the count/quota DoS keys so OSS stays otherwise unbounded/byte-neutral; the hosted `CloudLimitsAdapter` returns finite tenant ceilings. See [Platform Security](core-security.md) for how these enforce cross-tenant safety.
+OSS's `LocalLimitsAdapter` returns the App Settings upload cap for `MAX_UPLOAD_SIZE_BYTES`, has no `reserveStorage`, and returns `Infinity` for the count/quota DoS keys so OSS stays otherwise unbounded/byte-neutral; the hosted `CloudLimitsAdapter` returns finite tenant ceilings. See [Platform Security](core-security.md) for how these enforce cross-tenant safety.
 
 ### Error types (`packages/core/src/errors.js`)
 

@@ -100,14 +100,11 @@ Unlike theme settings (consumed primarily by the frontend via a global store), A
 - **Controller** — `packages/builder-server/src/controllers/appSettingsController.js` (`getAppSettings`, `updateAppSettings`, and the internal `getSetting(key)` used by other controllers). `updateAppSettings` validates media size limits and image-processing bounds before saving.
 - **Repository** — `packages/builder-server/src/db/repositories/settingsRepository.js` reads/writes the SQLite-backed settings store and deep-merges with `defaultSettings`.
 
-### File Upload Size Enforcement (two-stage)
+### File Upload Size Limit
 
-Uploads go to the **active-project-scoped** route `POST /api/media/` (mounted via `/media` on the project-scoped router). The active project is resolved from the `X-Project-Id` header into `req.scope` by the `resolveActiveProject` middleware — the project id stays out of the path. Two independent checks enforce the size cap:
+Uploads go to the **active-project-scoped** route `POST /api/media/` (mounted via `/media` on the project-scoped router). The active project is resolved from the `X-Project-Id` header into `req.scope` by the `resolveActiveProject` middleware — the project id stays out of the path.
 
-1. **Streaming multer cap (SA-02)** — the `uploadWithLimit` middleware (`mediaController.js`) reads the per-file byte cap from the injected limits adapter (`req.adapters.limits.getLimit(req.scope, LIMIT_KEYS.MAX_UPLOAD_SIZE_BYTES)`) and applies it as a multer `limits.fileSize`, so an oversize part is rejected (413) **before** the whole file is buffered into memory. A platform fallback (`DEFAULT_MAX_UPLOAD_BYTES`, 10 MB) is used when no limits adapter is wired.
-2. **Controller comparison** — `uploadProjectMedia` then reads `media.maxFileSizeMB` via `getSetting(...)` and compares each file's size against it, returning a per-file failure reason for anything over the configured limit.
-
-In OSS these two values agree: the `LocalLimitsAdapter` returns the same configured max that the controller check enforces. The scope-first call shape (`{ actor, projectId, folderName }`) and the limits-adapter / `LIMIT_KEYS` contract are documented in [core-packages.md](core-packages.md).
+`media.maxFileSizeMB` reaches the upload only through the limits adapter: `LocalLimitsAdapter` returns it (in bytes) as `LIMIT_KEYS.MAX_UPLOAD_SIZE_BYTES`, and that value is the one per-file limit the upload parser and `uploadProjectMedia` enforce (a file over it is refused on its own, the rest of the batch is stored). `GET /api/limits` returns it to the editor as `maxUploadBytes`. With no limits adapter wired, 10 MB (`DEFAULT_MAX_UPLOAD_BYTES`) applies. See [core-media.md](core-media.md#upload-limits); the scope-first call shape and the limits-adapter / `LIMIT_KEYS` contract are in [core-packages.md](core-packages.md).
 
 ### Image Processing Configuration
 

@@ -76,7 +76,7 @@ This bounds request body size to mitigate memory-exhaustion DoS while leaving he
 
 Custom error-handling middleware (`packages/builder-server/src/middleware/errorHandler.js`) registered as the final middleware. It:
 
-- Maps multer's `LIMIT_FILE_SIZE` (a streaming per-file cap hit mid-upload) to `413`
+- Maps multer's `LIMIT_FILE_SIZE` (a streaming size cap hit mid-upload on a project or theme ZIP) to `413`
 - Maps a `WidgetizerError`'s numeric `statusCode` (from `@widgetizer/core`, thrown by adapters/handlers) directly to that status, and surfaces its stable machine-readable `code` (e.g. `PROJECT_MISMATCH`) in the JSON body
 - Prevents crashes from unhandled exceptions and **suppresses stack traces in production** (`stack: null` when `NODE_ENV === "production"`)
 
@@ -97,7 +97,7 @@ Custom error-handling middleware (`packages/builder-server/src/middleware/errorH
 File-size and image-dimension safety limits are enforced inline in each upload handler:
 
 - **Image dimensions** — Sharp `limitInputPixels` (100M pixels) in `mediaController` and `themeController`
-- **File sizes** — multer size limits derived from app settings in `mediaController`, `themeController`, and `projectController`; the per-tenant `MAX_UPLOAD_SIZE_BYTES` ceiling is the cross-tenant floor (§11)
+- **File sizes** — media uploads are held to the limits adapter's `MAX_UPLOAD_SIZE_BYTES` per file (streamed to temp files, an oversized file refused on its own, the request aborted past 10 × that) and to its optional `reserveStorage` in total; ZIP imports and theme uploads use multer size limits from app settings in `themeController` and `projectController`. `MAX_UPLOAD_SIZE_BYTES` is the cross-tenant floor (§11)
 - **Request body sizes** — the two-tier JSON body parser (§6)
 - **Stored file names** — `normalizeUploadName` (`packages/builder-server/src/utils/uploadFileName.js`) keeps the uploaded name but reduces it to lower-case ASCII `[a-z0-9-]` (transliterated, at most 60 characters) plus a lower-case extension, falling back to `image`/`file`; the image-path allowlist in §12 relies on that charset. Collisions are numbered case-insensitively so a legacy `photo.JPG` is never overwritten
 
@@ -157,7 +157,7 @@ See [Site Exporting](core-export.md) for the export/import flow detail.
 
 - `MAX_WIDGETS_PER_PAGE` — `savePageContent` returns `422` over-cap. A widget order that names an id more than once is stored and rendered once per id (`uniqueWidgetOrder`, `@widgetizer/core/widgetOrder`), so repeats can't multiply render work past the cap: every render loop goes through it, and so do page and shared-area saves, page/area copies and the editor's load, so stored repeats clean themselves up. A widget's `blocksOrder` follows the same rule (`uniqueBlockOrder`, applied in `renderWidget` for every render); the server does not enforce a schema's `maxBlocks` — only the editor's add-block control does.
 - `MAX_MENU_ITEMS` + `MAX_MENU_DEPTH` (`= 32`, a hard structural cap exported from `@widgetizer/core/adapters`) — `menuController.validateMenuTree` walks the item tree **iteratively** (explicit stack, O(maxItems)) before any recursive sanitize/label/clone, bailing on either ceiling (`422`); the render engine's `resolveMenuItemLinks` is independently depth-capped at `MAX_MENU_DEPTH`.
-- `MAX_UPLOAD_SIZE_BYTES` — `mediaController.uploadWithLimit` applies it as a streaming multer `limits.fileSize`; the `errorHandler` maps `LIMIT_FILE_SIZE` → `413` (§7). See [Media Library](core-media.md).
+- `MAX_UPLOAD_SIZE_BYTES` — `mediaController.uploadWithLimit` (`middleware/parseMediaUpload.js`) stops writing a part once it passes the limit and refuses that file alone; a request whose file bytes pass 10 × the limit is aborted with `413`. See [Media Library](core-media.md#upload-limits).
 
 **Tenant SVG icon sanitization.** `IconInput.jsx`'s `sanitizeIconBody()` (`packages/editor-ui/src/components/settings/inputs/IconInput.jsx`) runs the DOMPurify SVG profile, applied at both `dangerouslySetInnerHTML` sinks. Icon bodies come verbatim from the project's tenant-authored `assets/icons.json` (notably via ZIP import, which copies it unvalidated), so injecting them in the editor origin would be stored XSS. It wraps the body in `<svg>` first so the SVG profile does not blank the bare inner fragment.
 

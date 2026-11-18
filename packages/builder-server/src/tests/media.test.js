@@ -466,6 +466,18 @@ describe("getProjectMedia", () => {
 // uploadProjectMedia — real image processing with sharp
 // ============================================================================
 
+// Uploads arrive as temp files outside the project (the route's parser writes
+// them under the OS temp dir); stage each test's source the same way, so the
+// stored copy is never the file it is read from.
+const STAGING_DIR = path.join(TEST_ROOT, "staging");
+async function stage(name, content) {
+  await fs.ensureDir(STAGING_DIR);
+  const dir = await fs.mkdtemp(path.join(STAGING_DIR, "src-"));
+  const filePath = path.join(dir, name);
+  await fs.writeFile(filePath, content);
+  return filePath;
+}
+
 describe("uploadProjectMedia", () => {
   beforeEach(async () => {
     // Reset media data
@@ -479,7 +491,7 @@ describe("uploadProjectMedia", () => {
     const jpegBuffer = await createTestJpeg(600, 400);
     const imgDir = getProjectImagesDir(PROJECT_FOLDER);
     const filePath = path.join(imgDir, "test-photo.jpg");
-    await fs.writeFile(filePath, jpegBuffer);
+    const srcPath = await stage(path.basename(filePath), jpegBuffer);
 
     const res = await callController(uploadProjectMedia, {
       params: { projectId: PROJECT_ID },
@@ -489,7 +501,7 @@ describe("uploadProjectMedia", () => {
           filename: "test-photo.jpg",
           mimetype: "image/jpeg",
           size: jpegBuffer.length,
-          path: filePath,
+          path: srcPath,
         },
       ],
     });
@@ -523,7 +535,7 @@ describe("uploadProjectMedia", () => {
           originalname: "PHOTO.JPG",
           mimetype: "image/jpeg",
           size: uploadBuffer.length,
-          buffer: uploadBuffer,
+          path: await stage("PHOTO.JPG", uploadBuffer),
         },
       ],
     });
@@ -538,7 +550,7 @@ describe("uploadProjectMedia", () => {
     const largeBuffer = await createTestJpeg(2000, 1500);
     const imgDir = getProjectImagesDir(PROJECT_FOLDER);
     const filePath = path.join(imgDir, "large-image.jpg");
-    await fs.writeFile(filePath, largeBuffer);
+    const srcPath = await stage(path.basename(filePath), largeBuffer);
 
     const res = await callController(uploadProjectMedia, {
       params: { projectId: PROJECT_ID },
@@ -548,7 +560,7 @@ describe("uploadProjectMedia", () => {
           filename: "large-image.jpg",
           mimetype: "image/jpeg",
           size: largeBuffer.length,
-          path: filePath,
+          path: srcPath,
         },
       ],
     });
@@ -578,7 +590,7 @@ describe("uploadProjectMedia", () => {
     const tinyBuffer = await createTestJpeg(100, 80);
     const imgDir = getProjectImagesDir(PROJECT_FOLDER);
     const filePath = path.join(imgDir, "tiny.jpg");
-    await fs.writeFile(filePath, tinyBuffer);
+    const srcPath = await stage(path.basename(filePath), tinyBuffer);
 
     const res = await callController(uploadProjectMedia, {
       params: { projectId: PROJECT_ID },
@@ -588,7 +600,7 @@ describe("uploadProjectMedia", () => {
           filename: "tiny.jpg",
           mimetype: "image/jpeg",
           size: tinyBuffer.length,
-          path: filePath,
+          path: srcPath,
         },
       ],
     });
@@ -603,7 +615,7 @@ describe("uploadProjectMedia", () => {
     const pngBuffer = await createTestPng(300, 250);
     const imgDir = getProjectImagesDir(PROJECT_FOLDER);
     const filePath = path.join(imgDir, "icon.png");
-    await fs.writeFile(filePath, pngBuffer);
+    const srcPath = await stage(path.basename(filePath), pngBuffer);
 
     const res = await callController(uploadProjectMedia, {
       params: { projectId: PROJECT_ID },
@@ -613,7 +625,7 @@ describe("uploadProjectMedia", () => {
           filename: "icon.png",
           mimetype: "image/png",
           size: pngBuffer.length,
-          path: filePath,
+          path: srcPath,
         },
       ],
     });
@@ -629,7 +641,7 @@ describe("uploadProjectMedia", () => {
     const webpBuffer = await createTestWebp(300, 250);
     const imgDir = getProjectImagesDir(PROJECT_FOLDER);
     const filePath = path.join(imgDir, "test.webp");
-    await fs.writeFile(filePath, webpBuffer);
+    const srcPath = await stage(path.basename(filePath), webpBuffer);
 
     const res = await callController(uploadProjectMedia, {
       params: { projectId: PROJECT_ID },
@@ -639,7 +651,7 @@ describe("uploadProjectMedia", () => {
           filename: "test.webp",
           mimetype: "image/webp",
           size: webpBuffer.length,
-          path: filePath,
+          path: srcPath,
         },
       ],
     });
@@ -661,7 +673,7 @@ describe("uploadProjectMedia", () => {
     const gifBuffer = createTestGif();
     const imgDir = getProjectImagesDir(PROJECT_FOLDER);
     const filePath = path.join(imgDir, "test.gif");
-    await fs.writeFile(filePath, gifBuffer);
+    const srcPath = await stage(path.basename(filePath), gifBuffer);
 
     const uploadRes = await withMockedPlatform("win32", async () => callController(uploadProjectMedia, {
       params: { projectId: PROJECT_ID },
@@ -671,7 +683,7 @@ describe("uploadProjectMedia", () => {
           filename: "test.gif",
           mimetype: "image/gif",
           size: gifBuffer.length,
-          path: filePath,
+          path: srcPath,
         },
       ],
     }));
@@ -693,7 +705,7 @@ describe("uploadProjectMedia", () => {
     const imgDir = getProjectImagesDir(PROJECT_FOLDER);
     const filePath = path.join(imgDir, "huge.jpg");
     // Create a small file but claim it's 100MB in the mock
-    await fs.writeFile(filePath, "tiny-content");
+    const srcPath = await stage(path.basename(filePath), "tiny-content");
 
     const res = await callController(uploadProjectMedia, {
       params: { projectId: PROJECT_ID },
@@ -702,8 +714,8 @@ describe("uploadProjectMedia", () => {
           originalname: "huge.jpg",
           filename: "huge.jpg",
           mimetype: "image/jpeg",
-          size: 100 * 1024 * 1024, // 100MB — exceeds default 50MB limit
-          path: filePath,
+          size: 100 * 1024 * 1024, // 100MB — over the 10 MB default (no limits adapter here)
+          path: srcPath,
         },
       ],
     });
@@ -721,16 +733,12 @@ describe("uploadProjectMedia", () => {
   });
 
   it("handles mixed success and rejection", async () => {
-    const imgDir = getProjectImagesDir(PROJECT_FOLDER);
-
     // Good file
     const goodBuffer = await createTestJpeg(200, 150);
-    const goodPath = path.join(imgDir, "good.jpg");
-    await fs.writeFile(goodPath, goodBuffer);
+    const goodSrc = await stage("good.jpg", goodBuffer);
 
     // Oversized file
-    const badPath = path.join(imgDir, "bad.jpg");
-    await fs.writeFile(badPath, "tiny");
+    const badSrc = await stage("bad.jpg", "tiny");
 
     const res = await callController(uploadProjectMedia, {
       params: { projectId: PROJECT_ID },
@@ -740,14 +748,14 @@ describe("uploadProjectMedia", () => {
           filename: "good.jpg",
           mimetype: "image/jpeg",
           size: goodBuffer.length,
-          path: goodPath,
+          path: goodSrc,
         },
         {
           originalname: "bad.jpg",
           filename: "bad.jpg",
           mimetype: "image/jpeg",
           size: 50 * 1024 * 1024, // Over limit
-          path: badPath,
+          path: badSrc,
         },
       ],
     });
@@ -780,7 +788,7 @@ describe("uploadProjectMedia", () => {
 
     const imgDir = getProjectImagesDir(PROJECT_FOLDER);
     const filePath = path.join(imgDir, "compress-test.jpg");
-    await fs.writeFile(filePath, uncompressedBuffer);
+    const srcPath = await stage(path.basename(filePath), uncompressedBuffer);
     const originalSize = uncompressedBuffer.length;
 
     const res = await callController(uploadProjectMedia, {
@@ -791,7 +799,7 @@ describe("uploadProjectMedia", () => {
           filename: "compress-test.jpg",
           mimetype: "image/jpeg",
           size: originalSize,
-          path: filePath,
+          path: srcPath,
         },
       ],
     });
@@ -821,7 +829,7 @@ describe("uploadProjectMedia", () => {
     const largeBuffer = await createTestJpeg(2000, 1500);
     const imgDir = getProjectImagesDir(PROJECT_FOLDER);
     const filePath = path.join(imgDir, "no-compress.jpg");
-    await fs.writeFile(filePath, largeBuffer);
+    const srcPath = await stage(path.basename(filePath), largeBuffer);
     const originalSize = largeBuffer.length;
 
     const res = await callController(uploadProjectMedia, {
@@ -832,7 +840,7 @@ describe("uploadProjectMedia", () => {
           filename: "no-compress.jpg",
           mimetype: "image/jpeg",
           size: originalSize,
-          path: filePath,
+          path: srcPath,
         },
       ],
     });
@@ -848,7 +856,7 @@ describe("uploadProjectMedia", () => {
     const jpegBuffer = await createTestJpeg(200, 150);
     const imgDir = getProjectImagesDir(PROJECT_FOLDER);
     const filePath = path.join(imgDir, "persisted.jpg");
-    await fs.writeFile(filePath, jpegBuffer);
+    const srcPath = await stage(path.basename(filePath), jpegBuffer);
 
     await callController(uploadProjectMedia, {
       params: { projectId: PROJECT_ID },
@@ -858,7 +866,7 @@ describe("uploadProjectMedia", () => {
           filename: "persisted.jpg",
           mimetype: "image/jpeg",
           size: jpegBuffer.length,
-          path: filePath,
+          path: srcPath,
         },
       ],
     });
@@ -875,7 +883,7 @@ describe("uploadProjectMedia", () => {
     const filePath = path.join(imgDir, "icon.svg");
     // SVG with an onload XSS attack vector
     const maliciousSvg = '<svg xmlns="http://www.w3.org/2000/svg" onload="alert(1)"><circle r="10"/></svg>';
-    await fs.writeFile(filePath, maliciousSvg);
+    const srcPath = await stage(path.basename(filePath), maliciousSvg);
 
     const res = await callController(uploadProjectMedia, {
       params: { projectId: PROJECT_ID },
@@ -885,7 +893,7 @@ describe("uploadProjectMedia", () => {
           filename: "icon.svg",
           mimetype: "image/svg+xml",
           size: maliciousSvg.length,
-          path: filePath,
+          path: srcPath,
         },
       ],
     });
