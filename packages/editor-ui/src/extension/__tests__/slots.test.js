@@ -13,6 +13,7 @@ describe("slots", () => {
       "publishConfirmation",
       "pageEditorActions",
       "mediaHeader",
+      "mediaToolbarTop",
     ]);
   });
 

@@ -139,6 +139,8 @@ export default function Media() {
         maxSizeText={maxUploadBytes == null ? t("components.mediaUploader.supportedFormats") : `${t("components.mediaUploader.supportedFormats")} - ${formatLimitMB(maxUploadBytes)} max`}
       />
 
+      <SlotOutlet name="mediaToolbarTop" />
+
       {mediaState.files.length > 0 && (
         <>
           <MediaToolbar

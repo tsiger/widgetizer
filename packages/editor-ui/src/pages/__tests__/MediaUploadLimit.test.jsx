@@ -1,13 +1,14 @@
 // @vitest-environment jsdom
 /**
  * The Media page's drop zone words the project's upload limit (not the media
- * setting), and the shell's `mediaHeader` slot sits above the upload area.
+ * setting), and the shell's `mediaHeader` and `mediaToolbarTop` slots sit above the upload area and between it and the toolbar.
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { cleanup, render, screen } from "@testing-library/react";
 
 let uploaderProps;
 let limits;
+let files = [];
 
 vi.mock("../../hooks/useProjectLimits", () => ({
   default: () => limits,
@@ -16,7 +17,9 @@ vi.mock("../../hooks/useProjectLimits", () => ({
 vi.mock("../../hooks/useMediaState", () => ({
   default: () => ({
     loading: false,
-    files: [],
+    get files() {
+      return files;
+    },
     filteredFiles: [],
     activeProject: { id: "p1" },
     showToast: vi.fn(),
@@ -44,7 +47,7 @@ vi.mock("../../components/ui/FileUploader", () => ({
     return <div data-testid="uploader" />;
   },
 }));
-vi.mock("../../components/media/MediaToolbar", () => ({ default: () => null }));
+vi.mock("../../components/media/MediaToolbar", () => ({ default: () => <div data-testid="toolbar" /> }));
 vi.mock("../../components/media/MediaGrid", () => ({ default: () => null }));
 vi.mock("../../components/media/MediaList", () => ({ default: () => null }));
 vi.mock("../../components/media/MediaDrawer", () => ({ default: () => null }));
@@ -63,6 +66,7 @@ const renderMedia = () =>
 
 beforeEach(() => {
   uploaderProps = undefined;
+  files = [];
   limits = { maxUploadBytes: 50 * 1024 * 1024, maxSizeMB: 50, loaded: true };
 });
 afterEach(cleanup);
@@ -103,4 +107,25 @@ describe("Media page upload limit", () => {
     expect(header.compareDocumentPosition(uploader) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 
+  it("renders the mediaToolbarTop slot after the upload area and before the toolbar", () => {
+    files = [{ id: "f1" }];
+    render(
+      <PluginProvider slots={{ mediaToolbarTop: <div data-testid="toolbar-top">notice</div> }}>
+        <Media />
+      </PluginProvider>,
+    );
+
+    const uploader = screen.getByTestId("uploader");
+    const slot = screen.getByTestId("toolbar-top");
+    const toolbar = screen.getByTestId("toolbar");
+    expect(uploader.compareDocumentPosition(slot) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(slot.compareDocumentPosition(toolbar) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
+  it("renders nothing between the upload area and the toolbar when the slot is empty", () => {
+    files = [{ id: "f1" }];
+    renderMedia();
+
+    expect(screen.getByTestId("uploader").nextElementSibling).toBe(screen.getByTestId("toolbar"));
+  });
 });
