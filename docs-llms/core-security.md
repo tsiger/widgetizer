@@ -99,7 +99,7 @@ File-size and image-dimension safety limits are enforced inline in each upload h
 - **Image dimensions** — Sharp `limitInputPixels` (100M pixels) in `mediaController` and `themeController`
 - **File sizes** — media uploads are held to the limits adapter's `MAX_UPLOAD_SIZE_BYTES` per file (streamed to temp files, an oversized file refused on its own, the request aborted past 10 × that) and to its optional `reserveStorage` in total; ZIP imports and theme uploads use multer size limits from app settings in `themeController` and `projectController`. `MAX_UPLOAD_SIZE_BYTES` is the cross-tenant floor (§11)
 - **Request body sizes** — the two-tier JSON body parser (§6)
-- **Stored file names** — `normalizeUploadName` (`packages/builder-server/src/utils/uploadFileName.js`) keeps the uploaded name but reduces it to lower-case ASCII `[a-z0-9-]` (transliterated, at most 60 characters) plus a lower-case extension, falling back to `image`/`file`; the image-path allowlist in §12 relies on that charset. Collisions are numbered case-insensitively so a legacy `photo.JPG` is never overwritten
+- **Stored file names** — `normalizeUploadName` (`packages/builder-server/src/utils/uploadFileName.js`) keeps the uploaded name but reduces it to lower-case ASCII `[a-z0-9-]` (transliterated, at most 60 characters) plus a lower-case extension, falling back to `image`/`file`; the image-path allowlist in §12 relies on that charset. Collisions are numbered case-insensitively, counting a raster image's `-{size}` variant names too, so neither a legacy `photo.JPG` nor an existing `photo-small.jpg` is ever overwritten
 
 See [Media Library](core-media.md) for the upload pipeline.
 

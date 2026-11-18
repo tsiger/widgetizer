@@ -460,9 +460,14 @@ export async function uploadProjectMedia(req, res) {
 
     // Sequential pre-pass: assign a collision-free filename to each file,
     // deduped against the adapter's existing keys (+ names assigned this
-    // request). Tests pass file.filename directly, bypassing this.
+    // request). A raster image also writes `<name>-<size><ext>` copies, so a
+    // name is free only when every one of those is free too: a copy written
+    // over an existing asset would overwrite it, and a failed upload's cleanup
+    // would then delete it while its media record and page references remain.
+    // Tests pass file.filename directly, bypassing this.
+    const sizeNames = Object.keys(imageSizes);
     const listedNames = {};
-    async function uniqueName(subdir, originalName) {
+    async function uniqueName(subdir, originalName, variantSizes) {
       if (!listedNames[subdir]) {
         const keys = await Promise.resolve(assetStorage.list(scope, `${subdir}/`)).catch(() => []);
         listedNames[subdir] = new Set(keys.map((k) => path.basename(k).toLowerCase()));
@@ -471,22 +476,26 @@ export async function uploadProjectMedia(req, res) {
       const normalized = normalizeUploadName(originalName, { fallback: subdir === "files" ? "file" : "image" });
       const ext = path.extname(normalized);
       const base = path.basename(normalized, ext);
-      let name = `${base}${ext}`;
-      let counter = 1;
       // Case-insensitively: on Windows/macOS a legacy `photo.JPG` IS `photo.jpg`, so a
       // case-sensitive check would hand out a name that overwrites the existing file.
-      while (taken.has(name.toLowerCase())) name = `${base}-${counter++}${ext}`;
-      taken.add(name.toLowerCase());
-      return name;
+      const namesFor = (stem) => [`${stem}${ext}`, ...variantSizes.map((size) => `${stem}-${size}${ext}`)];
+      let stem = base;
+      let counter = 1;
+      while (namesFor(stem).some((name) => taken.has(name.toLowerCase()))) stem = `${base}-${counter++}`;
+      for (const name of namesFor(stem)) taken.add(name.toLowerCase());
+      return `${stem}${ext}`;
     }
 
     const prepared = [];
     for (const file of files) {
       const subdir = getMediaCategory(file.mimetype) === "file" ? "files" : "images";
+      const isRaster = Boolean(file.mimetype?.startsWith("image/")) && file.mimetype !== "image/svg+xml";
       // The multipart name arrives as latin1 bytes; decode once so the stored
       // "original name" is the real one, not mojibake.
       const originalName = decodeFileName(file.originalname);
-      const filename = file.refused ? null : file.filename || (await uniqueName(subdir, originalName));
+      const filename = file.refused
+        ? null
+        : file.filename || (await uniqueName(subdir, originalName, isRaster ? sizeNames : []));
       prepared.push({ file, subdir, filename, originalName });
     }
 

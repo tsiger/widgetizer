@@ -356,6 +356,40 @@ describe("storage reservation", () => {
     assert.deepEqual(await tempLeftovers(), []);
   });
 
+  it("an image's copies never take an existing asset's name", async () => {
+    // An earlier upload named like one of photo.jpg's copies.
+    const seeded = await upload([["photo-small.jpg", await jpeg(100, 100), "image/jpeg"]]);
+    assert.equal(seeded.status, 201);
+    const existingBytes = await fs.readFile(path.join(uploadsDir("images"), "photo-small.jpg"));
+
+    const { status, json } = await upload([["photo.jpg", await jpeg(2000, 1500), "image/jpeg"]]);
+    assert.equal(status, 201);
+    assert.equal(json.processedFiles[0].filename, "photo-1.jpg");
+    assert.equal(json.processedFiles[0].sizes.small.path, "/uploads/images/photo-1-small.jpg");
+    assert.deepEqual(await fs.readFile(path.join(uploadsDir("images"), "photo-small.jpg")), existingBytes);
+  });
+
+  it("a failed store's cleanup leaves an existing asset named like a copy alone", async () => {
+    const seeded = await upload([["photo-small.jpg", await jpeg(100, 100), "image/jpeg"]]);
+    assert.equal(seeded.status, 201);
+    const existingId = seeded.json.processedFiles[0].id;
+    const existingBytes = await fs.readFile(path.join(uploadsDir("images"), "photo-small.jpg"));
+
+    limits.reserveStorage = makeReservingLimits(100 * MB, localLimits).reserveStorage;
+    failUploadOf = "-medium";
+    events.length = 0;
+    const { status, json } = await upload([["photo.jpg", await jpeg(2000, 1500), "image/jpeg"]]);
+    assert.equal(status, 400);
+    assert.match(json.rejectedFiles[0].reason, /store failed/);
+    assert.ok(
+      events.filter((e) => e.type === "upload" || e.type === "delete").every((e) => e.key !== "images/photo-small.jpg"),
+      "the existing asset is neither written nor deleted",
+    );
+    assert.deepEqual(await fs.readdir(uploadsDir("images")), ["photo-small.jpg"]);
+    assert.deepEqual(await fs.readFile(path.join(uploadsDir("images"), "photo-small.jpg")), existingBytes);
+    assert.ok(mediaRepo.getMediaFiles(PROJECT_ID).files.some((f) => f.id === existingId));
+  });
+
   it("a failed commit removes the stored files and the media record", async () => {
     const reserving = makeReservingLimits(100 * MB, localLimits);
     limits.reserveStorage = async (scope, bytes) => {
