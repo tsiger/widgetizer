@@ -11,6 +11,7 @@ import fs from "fs-extra";
 import nodeFs from "node:fs";
 import path from "node:path";
 import os from "node:os";
+import net from "node:net";
 import sharp from "sharp";
 
 const TEST_ROOT = path.join(os.tmpdir(), `widgetizer-upload-limits-test-${Date.now()}`);
@@ -35,6 +36,7 @@ const { getDb, closeDb } = await import("../db/index.js");
 const { DATA_DIR, getProjectDir } = await import("../config.js");
 const projectRepo = await import("../db/repositories/projectRepository.js");
 const { saveSettings } = await import("../db/repositories/settingsRepository.js");
+const mediaRepo = await import("../db/repositories/mediaRepository.js");
 const { uploadProjectMedia } = await import("../controllers/mediaController.js");
 const { getMaxUploadBytes, DEFAULT_MAX_UPLOAD_BYTES } = await import("../utils/uploadLimits.js");
 const { LIMIT_KEYS } = await import("@widgetizer/core/adapters");
@@ -77,7 +79,9 @@ function recordingAssetStorage(inner) {
       return async (scope, ...rest) => {
         if (prop === "upload" || prop === "delete") events.push({ type: prop, key: rest[0] });
         if (prop === "upload" && failUploadOf && rest[0].includes(failUploadOf)) {
+          // A store that fails partway: some bytes reach the key, then it throws.
           rest[1]?.destroy?.();
+          await value.call(target, scope, rest[0], Buffer.from("partial"));
           throw new Error("store failed");
         }
         return value.call(target, scope, ...rest);
@@ -338,7 +342,7 @@ describe("storage reservation", () => {
     assert.equal(events.at(-1).bytes, storedBytes, "the commit carries the bytes actually stored");
   });
 
-  it("a failed store releases the reservation and removes what was stored", async () => {
+  it("a failed store releases the reservation and removes what was stored, partial bytes too", async () => {
     limits.reserveStorage = makeReservingLimits(100 * MB, localLimits).reserveStorage;
     failUploadOf = "-medium";
     const photo = await jpeg(2000, 1500);
@@ -352,6 +356,22 @@ describe("storage reservation", () => {
     assert.deepEqual(await tempLeftovers(), []);
   });
 
+  it("a failed commit removes the stored files and the media record", async () => {
+    const reserving = makeReservingLimits(100 * MB, localLimits);
+    limits.reserveStorage = async (scope, bytes) => {
+      const granted = await reserving.reserveStorage(scope, bytes);
+      return { ...granted, commit: async () => Promise.reject(new Error("commit failed")) };
+    };
+
+    const recordsBefore = mediaRepo.getMediaFiles(PROJECT_ID).files.length;
+    const { status, json } = await upload([["photo.jpg", await jpeg(600, 400), "image/jpeg"]]);
+    assert.equal(status, 400);
+    assert.match(json.rejectedFiles[0].reason, /commit failed/);
+    assert.equal(events.filter((e) => e.type === "release").length, 0, "no release after a commit attempt");
+    assert.deepEqual(await fs.readdir(uploadsDir("images")), []);
+    assert.equal(mediaRepo.getMediaFiles(PROJECT_ID).files.length, recordsBefore);
+  });
+
   runLimitsAdapterConformance({
     describe,
     it,
@@ -360,6 +380,141 @@ describe("storage reservation", () => {
     makeAdapter: () => makeReservingLimits(1000, localLimits),
     makeAdapterWithRoom: (room) => makeReservingLimits(room, localLimits),
     makeScope: (id) => ({ ...SCOPE, projectId: `p-${id}`, folderName: `f-${id}` }),
+  });
+});
+
+/** Collect the write streams the parser opens for upload temp files. */
+function spyOnTempWriters() {
+  const original = nodeFs.createWriteStream;
+  const opened = [];
+  nodeFs.createWriteStream = function (p, ...rest) {
+    const stream = original.call(this, p, ...rest);
+    if (typeof p === "string" && p.startsWith(TMP_DIR)) opened.push(stream);
+    return stream;
+  };
+  return { opened, restore: () => (nodeFs.createWriteStream = original) };
+}
+
+async function until(check) {
+  for (let i = 0; i < 150 && !(await check()); i++) await new Promise((resolve) => setTimeout(resolve, 20));
+  return check();
+}
+
+const BOUNDARY = "limits-test-boundary";
+const partHead = (field, name, type) =>
+  `--${BOUNDARY}\r\nContent-Disposition: form-data; name="${field}"; filename="${name}"\r\nContent-Type: ${type}\r\n\r\n`;
+
+describe("parser failures", () => {
+  it("a client that aborts mid-part leaves no open temp file or temp folder", async () => {
+    const spy = spyOnTempWriters();
+    try {
+      await new Promise((resolve, reject) => {
+        const socket = net.connect(server.address().port, "127.0.0.1", () => {
+          socket.write(
+            `POST /api/media HTTP/1.1\r\nHost: 127.0.0.1\r\nX-Project-Id: ${PROJECT_ID}\r\n` +
+              `Content-Type: multipart/form-data; boundary=${BOUNDARY}\r\nContent-Length: 10000000\r\n\r\n`,
+          );
+          socket.write(partHead("files", "half.pdf", "application/pdf"));
+          socket.write(Buffer.alloc(256 * 1024, 0x41));
+          setTimeout(() => {
+            socket.destroy();
+            resolve();
+          }, 150);
+        });
+        socket.on("error", reject);
+      });
+      assert.ok(spy.opened.length > 0, "the part reached a temp file");
+      assert.ok(await until(() => spy.opened.every((s) => s.closed)), "every temp write stream is closed");
+      assert.deepEqual(await tempLeftovers(), []);
+    } finally {
+      spy.restore();
+    }
+  });
+
+  it("a malformed body fails the request and leaves no open temp file or temp folder", async () => {
+    const spy = spyOnTempWriters();
+    try {
+      // A part with no closing boundary: the form ends mid-file.
+      const body = Buffer.concat([Buffer.from(partHead("files", "cut.pdf", "application/pdf")), Buffer.alloc(64 * 1024, 0x41)]);
+      const response = await fetch(`${baseUrl}/api/media`, {
+        method: "POST",
+        headers: { "X-Project-Id": PROJECT_ID, "Content-Type": `multipart/form-data; boundary=${BOUNDARY}` },
+        body,
+      });
+      assert.equal(response.status, 400);
+      assert.equal((await response.json()).code, "MALFORMED_UPLOAD");
+      assert.ok(await until(() => spy.opened.every((s) => s.closed)), "every temp write stream is closed");
+      assert.deepEqual(await tempLeftovers(), []);
+      assert.equal((await fs.readdir(uploadsDir("files"))).length, 0);
+    } finally {
+      spy.restore();
+    }
+  });
+
+  it("a temp folder that can't be created fails the request without crashing", async () => {
+    const original = nodeFs.promises.mkdtemp;
+    nodeFs.promises.mkdtemp = async (prefix, ...rest) => {
+      if (String(prefix).includes("widgetizer-upload-")) {
+        throw Object.assign(new Error("ENOSPC: no space left on device"), { code: "ENOSPC" });
+      }
+      return original(prefix, ...rest);
+    };
+    try {
+      const { status } = await upload([["doc.pdf", pdf(4000), "application/pdf"]]);
+      assert.equal(status, 500);
+    } finally {
+      nodeFs.promises.mkdtemp = original;
+    }
+    assert.deepEqual(await getLimits(), { maxUploadBytes: 50 * MB }, "the server still answers");
+  });
+
+  it("a temp file that can't be written fails the request without crashing", async () => {
+    const original = nodeFs.createWriteStream;
+    // Opening a file in a folder that doesn't exist errors asynchronously, as ENOSPC would.
+    nodeFs.createWriteStream = (p, ...rest) =>
+      original(typeof p === "string" && p.startsWith(TMP_DIR) ? path.join(TMP_DIR, "missing", "x") : p, ...rest);
+    try {
+      const { status } = await upload([["doc.pdf", pdf(4000), "application/pdf"]]);
+      assert.equal(status, 500);
+    } finally {
+      nodeFs.createWriteStream = original;
+    }
+    assert.deepEqual(await tempLeftovers(), []);
+    assert.deepEqual(await getLimits(), { maxUploadBytes: 50 * MB }, "the server still answers");
+  });
+
+  it("field values count toward the request bound", async () => {
+    maxUploadOverride = 100; // the request may carry at most 1000 bytes
+    const form = new FormData();
+    form.append("note", "x".repeat(5000));
+    form.append("files", new Blob([pdf(50)], { type: "application/pdf" }), "tiny.pdf");
+    const response = await fetch(`${baseUrl}/api/media`, { method: "POST", headers: { "X-Project-Id": PROJECT_ID }, body: form });
+    assert.equal(response.status, 413);
+    assert.deepEqual(await fs.readdir(uploadsDir("files")), []);
+  });
+
+  it("a file under another field name fails the request", async () => {
+    const form = new FormData();
+    form.append("other", new Blob([pdf(100 * 1024)], { type: "application/pdf" }), "side.pdf");
+    const response = await fetch(`${baseUrl}/api/media`, { method: "POST", headers: { "X-Project-Id": PROJECT_ID }, body: form });
+    assert.equal(response.status, 400);
+    assert.equal((await response.json()).code, "LIMIT_UNEXPECTED_FILE");
+  });
+
+  it("form fields stay bounded with no per-file limit", async () => {
+    maxUploadOverride = Infinity;
+    const form = new FormData();
+    for (let i = 0; i < 11; i++) form.append(`f${i}`, "v");
+    form.append("files", new Blob([pdf(50)], { type: "application/pdf" }), "tiny.pdf");
+    const response = await fetch(`${baseUrl}/api/media`, { method: "POST", headers: { "X-Project-Id": PROJECT_ID }, body: form });
+    assert.equal(response.status, 400);
+    assert.equal((await response.json()).code, "LIMIT_FIELD_COUNT");
+
+    const big = new FormData();
+    big.append("note", "x".repeat(65 * 1024));
+    const tooLong = await fetch(`${baseUrl}/api/media`, { method: "POST", headers: { "X-Project-Id": PROJECT_ID }, body: big });
+    assert.equal(tooLong.status, 400);
+    assert.equal((await tooLong.json()).code, "LIMIT_FIELD_VALUE");
   });
 });
 

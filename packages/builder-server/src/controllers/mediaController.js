@@ -251,9 +251,9 @@ export async function getProjectMedia(req, res) {
  * Stores one uploaded file: checks its size, generates its resized copies (and
  * any re-encoded original) into `workDir`, reserves the total through the
  * limits adapter's optional `reserveStorage`, then moves everything into the
- * asset store and commits the bytes actually stored. Nothing reaches the store
- * before the reservation is granted; the reservation is released on any failure
- * after it.
+ * asset store, writes the media record and commits the bytes actually stored.
+ * Nothing reaches the store before the reservation is granted; any failure after
+ * it removes what was stored (and the record) and releases the reservation.
  */
 async function storeUploadedFile({ file, subdir, filename, originalName }, ctx) {
   const { scope, assetStorage, limits, maxUploadBytes, imageSizes, workDir } = ctx;
@@ -383,20 +383,35 @@ async function storeUploadedFile({ file, subdir, filename, originalName }, ctx) 
     reservation = answer;
   }
 
+  // A key is listed before its upload starts: an upload that fails partway can
+  // still leave bytes at the key (deleting a missing key is a no-op).
   const storedKeys = [];
+  let recorded = false;
   let committed = false;
   try {
     let storedBytes = 0;
     for (const output of outputs) {
-      const result = await assetStorage.upload(scope, output.key, createReadStream(output.tempPath));
       storedKeys.push(output.key);
+      const result = await assetStorage.upload(scope, output.key, createReadStream(output.tempPath));
       storedBytes += Number.isFinite(result?.sizeBytes) ? result.sizeBytes : output.size;
     }
+    for (const copy of copies) fileInfo.sizes[copy.sizeName] = copy.data;
+    // The record is written before the bytes are committed, so a record that
+    // can't be written leaves nothing stored or counted.
+    mediaRepo.addMediaFile(scope.projectId, fileInfo);
+    recorded = true;
     if (reservation) {
       committed = true; // a failing commit has settled the reservation too: never release after it
       await reservation.commit(storedBytes);
     }
   } catch (error) {
+    if (recorded) {
+      try {
+        mediaRepo.deleteMediaFile(scope.projectId, fileInfo.id);
+      } catch (err) {
+        console.warn(`Could not remove the media record ${fileInfo.id} after a failed upload: ${err.message}`);
+      }
+    }
     await Promise.all(
       storedKeys.map((key) =>
         Promise.resolve(assetStorage.delete(scope, key)).catch((err) =>
@@ -410,7 +425,6 @@ async function storeUploadedFile({ file, subdir, filename, originalName }, ctx) 
     throw error;
   }
 
-  for (const copy of copies) fileInfo.sizes[copy.sizeName] = copy.data;
   return { success: true, file: fileInfo };
 }
 
@@ -501,11 +515,6 @@ export async function uploadProjectMedia(req, res) {
     for (const result of results) {
       if (result.success) processedFiles.push(result.file);
       else rejectedFiles.push(result.file);
-    }
-
-    // Insert each processed file individually (no full read/write cycle)
-    for (const file of processedFiles) {
-      mediaRepo.addMediaFile(projectId, file);
     }
 
     // Determine response status based on results
