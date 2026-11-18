@@ -11,8 +11,16 @@ vi.mock("../../lib/apiFetch", () => ({
 }));
 vi.mock("../../lib/apiBase", () => ({ getApiBase: vi.fn(() => "/api") }));
 vi.mock("../../lib/uploadRequest", () => ({ uploadFormData: vi.fn() }));
-vi.mock("../useAppSettings", () => ({
-  default: () => ({ settings: { media: { maxFileSizeMB: 50 } } }),
+let mockLimit = 50 * 1024 * 1024;
+vi.mock("../useProjectLimits", () => ({
+  default: () => ({ maxUploadBytes: mockLimit, maxSizeMB: mockLimit == null ? null : mockLimit / 1024 / 1024, loaded: true }),
+}));
+let mockFormat = null;
+vi.mock("../../extension/PluginProvider", () => ({
+  useUploadRefusalFormatter: () =>
+    mockFormat
+      ? (list) => list.map((r) => (r.code ? { ...r, reason: mockFormat(r) ?? r.reason } : r))
+      : (list) => list,
 }));
 
 const EXISTING = { id: "existing", originalName: "existing.png" };
@@ -67,24 +75,84 @@ describe("useMediaUpload — order of freshly uploaded files", () => {
   });
 });
 
+function bigFile(name, bytes) {
+  const file = new File(["x"], name, { type: "video/mp4" });
+  Object.defineProperty(file, "size", { value: bytes });
+  return file;
+}
+
 describe("useMediaUpload — client-side size limit", () => {
-  it("rejects a file over the media size setting without sending it", async () => {
+  let uploadFormData;
+  let useMediaUpload;
+
+  beforeEach(async () => {
     vi.resetModules();
-    const { uploadFormData } = await import("../../lib/uploadRequest");
-    const { default: useMediaUpload } = await import("../useMediaUpload.js");
+    mockLimit = 50 * 1024 * 1024;
+    mockFormat = null;
+    ({ uploadFormData } = await import("../../lib/uploadRequest"));
+    ({ default: useMediaUpload } = await import("../useMediaUpload.js"));
     uploadFormData.mockReset();
+  });
 
-    const big = new File(["x"], "clip.mp4", { type: "video/mp4" });
-    Object.defineProperty(big, "size", { value: 51 * 1024 * 1024 });
-    const showToast = vi.fn();
-
+  const upload = async (files, showToast = vi.fn()) => {
     const { result } = renderHook(() =>
       useMediaUpload({ activeProject: { id: "project-1" }, showToast, setFiles: vi.fn() }),
     );
+    await result.current.handleUpload(files);
+    return showToast;
+  };
 
-    await result.current.handleUpload([big]);
+  it("rejects a file over the project's upload limit without sending it", async () => {
+    const showToast = await upload([bigFile("clip.mp4", 51 * 1024 * 1024)]);
 
     expect(uploadFormData).not.toHaveBeenCalled();
     expect(showToast.mock.calls.flat().join(" ")).toMatch(/too large/i);
+  });
+
+  it("uses the limit from the project's limits, not the media setting", async () => {
+    mockLimit = 2 * 1024 * 1024;
+    uploadFormData.mockResolvedValue({ status: 201, data: { processedFiles: [], rejectedFiles: [] } });
+
+    const showToast = await upload([bigFile("clip.mp4", 3 * 1024 * 1024)]);
+
+    expect(uploadFormData).not.toHaveBeenCalled();
+    expect(showToast.mock.calls.flat().join(" ")).toContain("Maximum allowed size is 2MB");
+  });
+
+  it("sends any size when there is no limit", async () => {
+    mockLimit = null;
+    uploadFormData.mockResolvedValue({ status: 201, data: { processedFiles: [uploaded(1)], rejectedFiles: [] } });
+
+    await upload([bigFile("clip.mp4", 900 * 1024 * 1024)]);
+
+    expect(uploadFormData).toHaveBeenCalledTimes(1);
+  });
+
+  it("words a server refusal with the shell's formatter, and keeps the server's reason when it declines", async () => {
+    const refusal = {
+      originalName: "clip.mp4",
+      code: "FILE_TOO_LARGE",
+      limitBytes: 1024,
+      sizeBytes: 2048,
+      reason: "Server wording",
+    };
+    uploadFormData.mockResolvedValue({ status: 400, data: { processedFiles: [], rejectedFiles: [refusal] } });
+    mockFormat = (r) => `Shell wording ${r.code} ${r.limitBytes}`;
+
+    let showToast = await upload([bigFile("clip.mp4", 10)]);
+    expect(showToast.mock.calls.flat().join(" ")).toContain("clip.mp4: Shell wording FILE_TOO_LARGE 1024");
+
+    mockFormat = () => null;
+    showToast = await upload([bigFile("clip.mp4", 10)]);
+    expect(showToast.mock.calls.flat().join(" ")).toContain("clip.mp4: Server wording");
+  });
+
+  it("words a client-side too-large refusal with the shell's formatter too", async () => {
+    mockFormat = (r) => `Shell wording ${r.limitBytes}`;
+
+    const showToast = await upload([bigFile("clip.mp4", 51 * 1024 * 1024)]);
+
+    expect(uploadFormData).not.toHaveBeenCalled();
+    expect(showToast.mock.calls.flat().join(" ")).toContain(`clip.mp4: Shell wording ${50 * 1024 * 1024}`);
   });
 });

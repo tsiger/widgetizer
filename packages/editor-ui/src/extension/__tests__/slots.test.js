@@ -12,6 +12,7 @@ describe("slots", () => {
       "overlay",
       "publishConfirmation",
       "pageEditorActions",
+      "mediaHeader",
     ]);
   });
 

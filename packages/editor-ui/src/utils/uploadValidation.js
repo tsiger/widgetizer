@@ -57,15 +57,24 @@ export function createRejectedFile(originalName, reason) {
   return { originalName, reason };
 }
 
+// A too-large refusal in the same shape the server uses for a file over the
+// limit, so a shell's `formatUploadRefusal` words both alike.
+function tooLargeRefusal(file, maxSizeMB) {
+  return {
+    ...createRejectedFile(file.name, tooLargeReason(file, maxSizeMB)),
+    code: "FILE_TOO_LARGE",
+    limitBytes: Math.round(maxSizeMB * 1024 * 1024),
+    sizeBytes: file.size,
+  };
+}
+
 export function validateFileSizes(files, { maxSizeMB }) {
   const valid = [];
   const rejected = [];
 
   for (const file of files) {
     if (maxSizeMB != null && file.size > maxSizeMB * 1024 * 1024) {
-      rejected.push(
-        createRejectedFile(file.name, tooLargeReason(file, maxSizeMB)),
-      );
+      rejected.push(tooLargeRefusal(file, maxSizeMB));
     } else {
       valid.push(file);
     }
@@ -134,7 +143,9 @@ function formatDropzoneError(error, file, maxSizeMB) {
  * @param {{ maxSizeMB?: number }} [options] - the limit the drop zone enforced, so a too-large refusal names it
  */
 export function mapDropzoneRejections(fileRejections, { maxSizeMB } = {}) {
-  return fileRejections.map(({ file, errors }) =>
-    createRejectedFile(file.name, errors.map((error) => formatDropzoneError(error, file, maxSizeMB)).join(" ")),
-  );
+  return fileRejections.map(({ file, errors }) => {
+    const reason = errors.map((error) => formatDropzoneError(error, file, maxSizeMB)).join(" ");
+    const tooLarge = maxSizeMB != null && errors.length === 1 && errors[0].code === "file-too-large";
+    return tooLarge ? { ...tooLargeRefusal(file, maxSizeMB), reason } : createRejectedFile(file.name, reason);
+  });
 }

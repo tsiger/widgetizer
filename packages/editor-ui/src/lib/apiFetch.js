@@ -51,6 +51,17 @@ export function isApiError(error) {
   return error instanceof ApiError || error?.name === "ApiError";
 }
 
+/**
+ * The message the server's reply carried (`message` or `error`), or null when
+ * the failure had none (a network error, an empty or non-JSON body). Lets a
+ * caller show the route's own wording and fall back to its generic text.
+ */
+export function serverErrorMessage(error) {
+  if (!isApiError(error)) return null;
+  const message = error.data?.message || error.data?.error;
+  return typeof message === "string" && message.trim() ? message : null;
+}
+
 export function rethrowQueryError(error, fallbackMessage) {
   if (isApiError(error)) {
     throw error;

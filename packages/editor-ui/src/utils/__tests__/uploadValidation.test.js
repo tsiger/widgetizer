@@ -36,6 +36,9 @@ describe("validateFileSizes", () => {
       {
         originalName: "large.jpg",
         reason: "File is too large (6.0MB). Maximum allowed size is 5MB.",
+        code: "FILE_TOO_LARGE",
+        limitBytes: 5 * 1024 * 1024,
+        sizeBytes: 6 * 1024 * 1024,
       },
     ]);
   });
@@ -136,6 +139,9 @@ describe("mapDropzoneRejections", () => {
       {
         originalName: "big.zip",
         reason: "File is too large (18.5MB). Maximum allowed size is 10MB.",
+        code: "FILE_TOO_LARGE",
+        limitBytes: 10 * 1024 * 1024,
+        sizeBytes: 18.5 * 1024 * 1024,
       },
     ]);
   });

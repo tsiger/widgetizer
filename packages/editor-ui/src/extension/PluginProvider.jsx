@@ -12,16 +12,19 @@ import { EMPTY_ARRAY, EMPTY_OBJECT } from "../lib/emptyValues.js";
 const PluginContext = createContext(null);
 
 /**
- * @param {{ plugins?: Array<object>, slots?: Record<string, React.ReactNode>, children: React.ReactNode }} props
+ * @param {{ plugins?: Array<object>, slots?: Record<string, React.ReactNode>,
+ *   formatUploadRefusal?: (refusal: { code: string, limitBytes?: number, sizeBytes?: number, originalName: string }) => string|null,
+ *   children: React.ReactNode }} props
  */
-export function PluginProvider({ plugins = EMPTY_ARRAY, slots = EMPTY_OBJECT, children }) {
+export function PluginProvider({ plugins = EMPTY_ARRAY, slots = EMPTY_OBJECT, formatUploadRefusal, children }) {
   const value = useMemo(
     () => ({
       registry: buildRegistry(plugins),
       hooks: createHookRunner(plugins),
       slots,
+      formatUploadRefusal,
     }),
-    [plugins, slots],
+    [plugins, slots, formatUploadRefusal],
   );
   return <PluginContext.Provider value={value}>{children}</PluginContext.Provider>;
 }
@@ -42,6 +45,29 @@ export const usePluginRoutes = () => usePluginContext().registry.routes;
 export const usePageSettingsFields = () => useContext(PluginContext)?.registry.pageSettingsFields ?? EMPTY_ARRAY;
 export const useHookRunner = () => usePluginContext().hooks;
 export const useSlot = (name) => resolveSlot(usePluginContext().slots, name);
+
+
+const NO_FORMATTER = (refusals) => refusals;
+
+/**
+ * Returns a function that rewords a list of refused uploads
+ * (`{ originalName, reason, code?, limitBytes?, sizeBytes? }`) with the shell's
+ * `formatUploadRefusal`. A refusal the shell returns null for, or one with no
+ * `code`, keeps the `reason` it came with. Without a provider or a formatter the
+ * list is returned as is.
+ */
+export function useUploadRefusalFormatter() {
+  const formatUploadRefusal = useContext(PluginContext)?.formatUploadRefusal;
+  return useMemo(() => {
+    if (!formatUploadRefusal) return NO_FORMATTER;
+    return (refusals) =>
+      refusals.map((refusal) => {
+        if (!refusal?.code) return refusal;
+        const text = formatUploadRefusal(refusal);
+        return typeof text === "string" && text ? { ...refusal, reason: text } : refusal;
+      });
+  }, [formatUploadRefusal]);
+}
 
 /** Render the node a shell placed in a named slot (nothing if unset). */
 export function SlotOutlet({ name }) {
