@@ -134,7 +134,7 @@ const { actorScopedRouter, projectScopedRouter, mediaFileRouter, previewRouter }
 | Router | Mounts |
 | --- | --- |
 | `actorScopedRouter` | `/projects`, `/themes`, `/settings`, `/core` |
-| `projectScopedRouter` | `/pages`, `/menus`, `/media`, `/preview`, `/export`, `/widgets`, `/icons`, `/collections`, `/languages`, `/translations` |
+| `projectScopedRouter` | `/pages`, `/menus`, `/media`, `/preview`, `/export`, `/widgets`, `/icons`, `/collections`, `/languages`, `/translations`, `/limits` |
 | `mediaFileRouter` | `GET /projects/:projectId/media/:fileId`, `/projects/:projectId/uploads/images/:filename`, `/projects/:projectId/uploads/files/:filename` — browser-loaded media files. The OSS shell mounts it at `/api/media`; an embedding app that serves those URLs itself leaves it out. |
 | `previewRouter` | `GET /render/:token` |
 
