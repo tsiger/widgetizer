@@ -2,7 +2,7 @@
 
 Agent Skills for people who build with Widgetizer. Each skill folder contains portable authoring guidance and assets. Executable theme validation belongs to the app checkout; the skill explains when that validation is available and when it remains pending. These maintainer notes are not part of a distributed skill.
 
-For skill/tooling progress and remaining work, see [STATUS.md](STATUS.md). Premium theme documentation lives with the private theme sources: `docs-llms-premium-themes/premium-themes.md` (how premium themes are made) and `docs-llms-premium-themes/theme-plan.md` (the planned themes). Keep it in that private repository rather than in this skill folder.
+For skill/tooling progress and remaining work, see [STATUS.md](STATUS.md). Premium theme documentation lives with the private theme sources: `docs/premium-themes.md` (how premium themes are made) and `docs/theme-plan.md` (the planned themes). Keep it in that private repository rather than in this skill folder.
 
 ## widgetizer-theme-design
 
@@ -10,7 +10,7 @@ The [design skill](widgetizer-theme-design/SKILL.md) covers the theme brief, sel
 
 Each exploration carries forward existing answers, asks about material gaps and records its intended character. Premium explorations follow their own process, kept in the private premium themes repository.
 
-The Widgetizer premium collection's design rules live in the private premium themes repository, in `docs-llms-premium-themes/design-rules.md`. They stay outside the portable skills, so other theme authors keep their own preferences.
+The Widgetizer premium collection's design rules live in the private premium themes repository, in `docs/design-rules.md`. They stay outside the portable skills, so other theme authors keep their own preferences.
 
 Curated design examples and quality criteria for the completed theme are still to develop. The preview guidance includes an initial desktop/mobile visual review. The shared widget pool will grow from actual theme work. Repository themes normally live under `themes/`; the premium collection uses a separate private source repository connected through `THEMES_EXTRA_ROOTS`. The skill does not relocate existing themes. App discovery of external sources does not make the development sync scripts use those roots; see [STATUS.md](STATUS.md).
 

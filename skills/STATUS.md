@@ -5,7 +5,7 @@ This is the maintainer handoff for the reusable skills and app-owned authoring t
 ## Where to continue
 
 - **Skill and tooling work:** use this file and [README.md](README.md).
-- **Premium themes:** use `docs-llms-premium-themes/` in the private premium themes repository beside this checkout: `premium-themes.md`, `design-rules.md`, `preset-process.md` and `theme-plan.md`. The folder name of that checkout differs between computers, so it is not linked. Keep private collection details there rather than duplicating them here.
+- **Premium themes:** use `docs/` in the private premium themes repository beside this checkout: `premium-themes.md`, `design-rules.md`, `preset-process.md` and `theme-plan.md`. The folder name of that checkout differs between computers, so it is not linked. Keep private collection details there rather than duplicating them here.
 
 The collection notebook and theme sources belong together in the private repository. The reusable skills and app tooling remain in Widgetizer's public repository.
 
