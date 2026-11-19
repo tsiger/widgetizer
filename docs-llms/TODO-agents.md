@@ -305,6 +305,16 @@ A refused duplicate shows the server's message (`serverErrorMessage(error) || t(
 
 **Start:** `PagesDuplicateError.test.jsx` in `packages/editor-ui/src/pages/__tests__/` as the template. **Source:** upload-limit review, 2026-11-19.
 
+#### R-PORTFLAKE · Server tests can reach another test file's server
+
+**Deferred · Low · Tests**
+
+About one full `npm test` run in five fails one test whose request got another server's answer: "returns 400 with validator errors when validation fails" (`infrastructure.test.js`) once read a plain "Forbidden" body, and "does not grant CORS to a foreign web origin" failed once. Each passes when its file runs alone. Seen 2026-11-19 on `storage-limits` (1 of 8 runs) and on its merge with `1.0.0` (2 of 8); `1.0.0` alone passed 8 of 8. Likely cause, not proven: the test files run in parallel processes, some servers listen on every address (`app.listen(0)`, e.g. `infrastructure.test.js:26`) and others on `127.0.0.1` only (`mediaUploadLimits.test.js:144` and about ten more files), and macOS lets the two kinds share a port number, so a request to `127.0.0.1:<port>` can reach the other process. `mediaUploadLimits.test.js` starts many servers, which would make a clash likelier.
+
+**Done when:** every test server binds `127.0.0.1` (or the real cause is found), and repeated full runs show no such failure.
+
+**Start:** `grep -rn "listen(0" packages app` in the test files. **Source:** `storage-limits` merge, 2026-11-19.
+
 #### QA-EXTRA · Choose extra checks when changing an area
 
 **Deferred · Low · Tests**
