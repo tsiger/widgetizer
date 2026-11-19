@@ -307,7 +307,7 @@ Every value in a `settings` object is keyed by a setting defined in the widget/b
 | `richtext` | Tiptap HTML string — emit with `\| raw`; sanitized server-side at save/render boundaries |
 | `code` | Raw string — not sanitized or transformed; ordinary `{{ }}` output still autoescapes, so emit only through explicit raw/custom sinks when intended |
 | `select` / `radio` | One of the option `value` strings |
-| `checkbox` / `toggle` | Boolean |
+| `checkbox` | Boolean |
 | `number` / `range` | Number |
 | `color` | Hex color string |
 | `image` | Upload-path string (`"/uploads/images/…"`) |
@@ -469,9 +469,9 @@ Located in `menus/`. Each menu is a separate JSON file.
 |-------|----------|-------------|
 | `label` | Yes | Display text in the navigation |
 | `link` | Yes | URL — use `"{slug}.html"` for internal pages (e.g., `"about.html"`, `"index.html"`) |
-| `items` | Yes | Array of child menu items (empty array `[]` for leaf items). The theme convention supports up to 4 nesting levels. |
+| `items` | Yes | Array of child menu items (empty array `[]` for leaf items). The core menu snippet renders up to three item levels. |
 
-> The 4-level limit is a theme-authoring convention, distinct from the backend's hard caps (`MAX_MENU_DEPTH`, `MAX_MENU_ITEMS`). See [core-menus.md](core-menus.md).
+> The three-level limit is what the core menu snippet renders, distinct from the backend's hard caps (`MAX_MENU_DEPTH`, `MAX_MENU_ITEMS`). See [core-menus.md](core-menus.md).
 
 **Do not include `pageUuid`** in preset menu templates. UUIDs and `pageUuid` references are generated and enriched automatically at project creation time based on matching page slugs.
 

@@ -765,7 +765,7 @@ Pick dimensions by **the widget that will render the image**, not by what "looks
 | `image` widget (editorial, full-width) | 1920×1280 | 3:2 | Full-width standalone image |
 | `image-hotspots` | 1600×1200 | 4:3 | Zoomed in for hotspot interactions |
 | `comparison-slider` `before`/`after` | 1600×1067 | 3:2 | Paired images — same dimensions |
-| `testimonials` / `testimonial-slider` avatar | 512×512 | 1:1 | Renders at 40–80px (thumb variant); don't waste budget here |
+| `testimonials` / `testimonial-slider` avatar | 512×512 | 1:1 | Renders at 40–80px (small variant); don't waste budget here |
 | `testimonial-hero` feature portrait | 1024×1280 | 4:5 | Single large portrait |
 
 **Hard cap:** do not exceed 1920 on either dimension. If you find yourself specifying 2400×1350, you've overshot what the render pipeline will ever serve.

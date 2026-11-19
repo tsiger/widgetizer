@@ -8,9 +8,9 @@ For skill/tooling progress and remaining work, see [STATUS.md](STATUS.md). Premi
 
 The [design skill](widgetizer-theme-design/SKILL.md) covers the theme brief, selective questions, author-selected visual review formats, including static homepage/styleguide approval before theme conversion, a working responsive preview with a compact style guide and representative layouts, supplied or generated imagery, and a simple editing model. It works alongside the technical skill below.
 
-Each exploration carries forward existing answers, asks about material gaps and records its intended character. Premium explorations now use a standalone static homepage and separate styleguide, reviewed in the browser and explicitly approved before Widgetizer conversion. Preserve the approved static source and compare the converted theme against it. Premium themes can pursue different levels of intensity, with layouts and motion suited to each theme's character.
+Each exploration carries forward existing answers, asks about material gaps and records its intended character. Premium explorations follow their own process, kept in the private premium themes repository.
 
-The Widgetizer premium collection's standing design rules live in [theme-collections/widgetizer-premium.json](theme-collections/widgetizer-premium.json). Read them for Common and new themes in that collection. This repository-specific brief stays outside the portable skills, so other theme authors keep their own preferences.
+The Widgetizer premium collection's design rules live in the private premium themes repository, in `docs-llms-premium-themes/design-rules.md`. They stay outside the portable skills, so other theme authors keep their own preferences.
 
 Curated design examples and quality criteria for the completed theme are still to develop. The preview guidance includes an initial desktop/mobile visual review. The shared widget pool will grow from actual theme work. Repository themes normally live under `themes/`; the premium collection uses a separate private source repository connected through `THEMES_EXTRA_ROOTS`. The skill does not relocate existing themes. App discovery of external sources does not make the development sync scripts use those roots; see [STATUS.md](STATUS.md).
 
