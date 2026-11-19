@@ -275,6 +275,36 @@ The public docs (`docs-website/src/`) are usually updated with a feature, with a
 
 **Start:** `git log --stat 0.9.10..HEAD -- packages themes app electron` against `git log 0.9.10..HEAD -- docs-website/src`; [CHANGELOG.md](../CHANGELOG.md). **Source:** export viewer docs, 2026-11-16.
 
+#### R-LIMITSHOOK · Settle `useProjectLimits`' cache and its unused `loaded`
+
+**Deferred · Low · OSS**
+
+`packages/editor-ui/src/hooks/useProjectLimits.js` caches each project's limit for 60 s (`CACHE_DURATION`), so a limit the server changes shows in the drop zones up to a minute late; the server's answer stays final either way. It also returns `loaded`, and no caller reads it: `FileInput`, `ImageInput`, `MediaSelectorDrawer`, `useMediaUpload` and `Media` take only `maxUploadBytes` or `maxSizeMB`.
+
+**Done when:** the cache lifetime is either explained in a comment or shortened (or cleared when the project changes), and `loaded` is either used or removed.
+
+**Start:** the hook and its callers. **Source:** upload-limit review, 2026-11-19.
+
+#### R-UPLOADNITS · Tidy style in the upload-limit changes
+
+**Deferred · Low · OSS**
+
+Style only, no behaviour: `CollectionItems.jsx` and `Menus.jsx` import `serverErrorMessage` on line 2, above the `react-router-dom` import, out of the file's import order; `Media.jsx` has the `maxSizeText` prop on one very long line; `PluginProvider.jsx` has two blank lines before `NO_FORMATTER` and a long `formatUploadRefusal` line in the props JSDoc. The repo has no formatter, so nothing catches these.
+
+**Done when:** the four files read in the order and line lengths of their neighbours, in a pass that touches them anyway.
+
+**Start:** [CollectionItems.jsx](../packages/editor-ui/src/pages/CollectionItems.jsx), [Menus.jsx](../packages/editor-ui/src/pages/Menus.jsx), [Media.jsx](../packages/editor-ui/src/pages/Media.jsx), [PluginProvider.jsx](../packages/editor-ui/src/extension/PluginProvider.jsx). **Source:** upload-limit review, 2026-11-19.
+
+#### R-DUPTESTS · Test the duplicate-error toast on Collections and Menus
+
+**Deferred · Low · Tests**
+
+A refused duplicate shows the server's message (`serverErrorMessage(error) || t(...)`) on three screens, but only Pages has a test (`PagesDuplicateError.test.jsx`). `handleDuplicate` in `CollectionItems.jsx` and in `Menus.jsx` carries the same line with none.
+
+**Done when:** each of the two has a test that a rejected duplicate shows the server's message, and the translated fallback when the error carries none.
+
+**Start:** `PagesDuplicateError.test.jsx` in `packages/editor-ui/src/pages/__tests__/` as the template. **Source:** upload-limit review, 2026-11-19.
+
 #### QA-EXTRA · Choose extra checks when changing an area
 
 **Deferred · Low · Tests**
