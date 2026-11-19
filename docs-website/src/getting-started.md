@@ -59,7 +59,7 @@ Need an older version or the file checksums? See the full [GitHub Releases](http
 
 # Run It with Docker
 
-Want Widgetizer on a home server or a VPS, or just prefer containers? The repository ships a `Dockerfile` and `docker-compose.yml` that package the web app (the editor and the API together, served on one port).
+Want Widgetizer on a home server or a VPS, or just prefer containers? The repository ships a `Dockerfile` and `docker-compose.yml` that package the web app (the editor and the API together on port 3001, plus a second port, 3002, for viewing exports).
 
 All you need is **Docker Desktop** (Windows/Mac) or Docker Engine (Linux). Node.js is not required.
 

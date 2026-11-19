@@ -27,10 +27,21 @@ export default defineConfig({
     __APP_VERSION__: JSON.stringify(packageJson.version),
     __APP_NAME__: JSON.stringify("Widgetizer Desktop"),
   },
+  optimizeDeps: {
+    entries: ["index.html"],
+  },
   server: {
     port: 3000,
     watch: {
-      ignored: ["**/data/**", "**/themes/**"],
+      ignored: [
+        "**/data/**",
+        "**/themes/**",
+        "**/tmp/**",
+        "**/temp/**",
+        "**/temp-webp/**",
+        "**/dist-electron/**",
+        "**/docs-website/**",
+      ],
     },
   },
 });

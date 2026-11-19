@@ -4,6 +4,7 @@ import fs from "node:fs";
 import { getPublishDir } from "../config.js";
 import { getContentType } from "../utils/mimeTypes.js";
 import { isWithinDirectory } from "../utils/pathSecurity.js";
+import { resolveExportFile } from "../utils/exportFiles.js";
 import { sendFileDone } from "../utils/sendFileOutcome.js";
 import {
   exportProject,
@@ -13,6 +14,9 @@ import {
   downloadExport,
 } from "../controllers/exportController.js";
 import { standardJsonParser } from "../middleware/jsonParser.js";
+import { START_PATH, sendNavigationPage } from "../services/exportSite.js";
+import * as projectRepo from "../db/repositories/projectRepository.js";
+import { siteUrlPathname } from "@widgetizer/core/internalHref";
 import { resolveActiveProject } from "../middleware/resolveActiveProject.js";
 
 const router = express.Router();
@@ -60,13 +64,13 @@ const normalizeExportPath = (rawPath) => {
 // GET /api/export/view/:exportDir
 router.get("/view/:exportDir", (req, res) => {
   req.params.filePath = "index.html";
-  return serveExportFile(req, res);
+  return viewExport(req, res);
 });
 
 // Route to serve exported files for viewing (file path)
 // GET /api/export/view/:exportDir/*filePath
 router.get("/view/:exportDir/*filePath", (req, res) => {
-  return serveExportFile(req, res);
+  return viewExport(req, res);
 });
 
 // An export dir belongs to the actor only when it is the active project's own
@@ -88,46 +92,53 @@ function exportDirBelongsToScope(req, exportDir) {
   return exportDir.startsWith(prefix) && /^\d+$/.test(exportDir.slice(prefix.length));
 }
 
-/**
- * Resolve a viewer request to the file to send, or null. Beyond the exact
- * path, an extensionless request also tries `<path>.html` then
- * `<path>/index.html` — projects with Clean URLs on emit links like `about`
- * that a real host resolves to `about.html`; a directory-style request
- * (`about/`) tries the flat file then its index. Every candidate is confined
- * to the selected export directory (never merely the publish root), so a
- * fallback can never reach a sibling export.
- *
- * @param {string} publishDir - the global publish directory
- * @param {string} exportDir - the export's directory name (already scope-checked)
- * @param {string} requestedPath - normalized request path, no leading slash
- * @returns {string|null} absolute path of a regular file, or null
- */
-export function resolveExportFile(publishDir, exportDir, requestedPath) {
-  const exportRoot = path.resolve(publishDir, exportDir);
-  if (!isWithinDirectory(exportRoot, path.resolve(publishDir))) return null;
-
-  const trailingSlash = requestedPath.endsWith("/");
-  const trimmed = requestedPath.replace(/\/+$/, "");
-  const base = path.resolve(exportRoot, trimmed);
-  const lastSegment = trimmed.split("/").pop() || "";
-
-  let candidates;
-  if (trailingSlash) {
-    candidates = [`${base}.html`, path.join(base, "index.html")];
-  } else if (lastSegment.includes(".")) {
-    candidates = [base];
-  } else {
-    candidates = [base, `${base}.html`, path.join(base, "index.html")];
+// The folder the export's site is served from: the manifest's sitePath, else the
+// project's current Site URL path (exports made before the manifest carried it).
+// Always starts and ends with "/".
+function exportSitePath(exportRoot, projectId) {
+  let sitePath;
+  try {
+    const manifest = JSON.parse(fs.readFileSync(path.join(exportRoot, "manifest.json"), "utf8"));
+    if (typeof manifest?.sitePath === "string") sitePath = manifest.sitePath;
+  } catch {
+    // No readable manifest: use the project's Site URL.
   }
+  if (sitePath === undefined) sitePath = siteUrlPathname(projectRepo.getProjectById(projectId)?.siteUrl || "");
+  return sitePath.endsWith("/") ? sitePath : `${sitePath}/`;
+}
 
-  for (const candidate of candidates) {
-    const abs = path.resolve(candidate);
-    if (!isWithinDirectory(abs, exportRoot)) continue;
-    if (!fs.existsSync(abs)) continue;
-    if (!fs.statSync(abs).isFile()) continue;
-    return abs;
+// With a ready export viewer the export is shown there, with "/" as its root;
+// otherwise (no viewer, not ready, no address) the file is served from this app.
+function viewExport(req, res) {
+  try {
+    const { exportDir } = req.params;
+    const viewer = req.adapters?.exportViewer;
+    if (!exportDirBelongsToScope(req, exportDir) || !viewer?.isReady()) return serveExportFile(req, res);
+    const base = viewer.baseUrlFor(req);
+    if (!base) return serveExportFile(req, res);
+
+    const exportRoot = path.resolve(getPublishDir(), exportDir);
+    const sitePath = exportSitePath(exportRoot, req.scope.projectId);
+    viewer.show({ exportDir, exportRoot, sitePath });
+
+    const filePath = normalizeExportPath(req.params.filePath ?? req.params[0]);
+    const search = req.originalUrl.includes("?") ? req.originalUrl.slice(req.originalUrl.indexOf("?")) : "";
+    // `to` is read as URL syntax by the viewer, so the (decoded) file path is
+    // re-encoded per segment; the site path already is encoded, the query raw.
+    const encodedFilePath = filePath.split("/").map(encodeURIComponent).join("/");
+    // A `//host`-shaped site path would make `to` read as another origin, which
+    // the viewer refuses (losing the file); `/.` keeps it a path, as startDestination does.
+    const target = `${sitePath}${encodedFilePath}${search}`;
+    const to = target.startsWith("//") ? `/.${target}` : target;
+    // A page that navigates, not a 302: Safari ignores the start page's
+    // Clear-Site-Data when it is reached through a redirect from another origin.
+    return sendNavigationPage(res, `${base}${START_PATH}?to=${encodeURIComponent(to)}`);
+  } catch (error) {
+    console.error("Error opening export in the viewer:", error);
+    if (!res.headersSent) {
+      res.status(500).json({ error: "Failed to serve file", message: error.message });
+    }
   }
-  return null;
 }
 
 function serveExportFile(req, res) {

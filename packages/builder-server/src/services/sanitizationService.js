@@ -86,6 +86,16 @@ export function sanitizeRichText(value, { allowImages = false, allowHeadings = f
 }
 
 /**
+ * Sanitize an uploaded SVG file's markup: DOMPurify's SVG profile, which drops
+ * scripts, event-handler attributes and javascript: URLs.
+ * @param {string} markup - The SVG file's text.
+ * @returns {string} Sanitized SVG markup.
+ */
+export function sanitizeSvg(markup) {
+  return DOMPurify.sanitize(markup, { USE_PROFILES: { svg: true } });
+}
+
+/**
  * Sanitize a link object: block dangerous protocols in href.
  * The link.text field is left for LiquidJS autoescape to handle.
  * @param {object} linkObj - Link object with text, href, target properties

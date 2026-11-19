@@ -1,18 +1,8 @@
 # Tasks — plain English
 
-Real work lives on GitHub: every bug, improvement and decision is an issue in the [OSS Roadmap](https://github.com/users/tsiger/projects/7), and the ones we plan to do go into a milestone. This file shows two things: the current milestone, and notes that aren't tasks yet. Technical detail for the notes is in [the agent version](TODO-agents.md), under the same ID.
+Real work lives on GitHub: every bug, improvement and decision is an issue in the [OSS Roadmap](https://github.com/users/tsiger/projects/7), and the ones we plan to do go into a milestone. This file holds only notes that aren't GitHub-worthy yet; issues, milestones included, are tracked on GitHub alone. Technical detail for the notes is in [the agent version](TODO-agents.md), under the same ID.
 
-- **Milestone** items follow GitHub: their status is the board column, and they leave this list when the issue closes.
 - **Notes** are not tasks yet. When one turns out to be real, it becomes a GitHub issue and leaves this file.
-
-## OSS 0.9.10 milestone
-
-| Issue | What | GitHub status | Who |
-| --- | --- | --- | --- |
-| [#115](https://github.com/tsiger/widgetizer/issues/115) | Multilingual sites | To Be Reviewed | anastis, tsiger |
-| [#162](https://github.com/tsiger/widgetizer/issues/162) | Desktop app: links that open a new window go to the browser | To Be Reviewed | tsiger |
-
-Closed in this milestone: 26 issues (the milestone's Closed tab).
 
 ## Notes, not on GitHub yet
 
@@ -20,7 +10,7 @@ Bugs, improvements and decisions are on GitHub (issues without a milestone are u
 
 ### Later, only when the need arises
 
-T4 browser smoke test · T17 stricter old tests · T33 repeated editor code · T39 usage labels during a refresh · T43 template trust review · T61 preview startup warnings · T63 unused publishing route · T67 export links through linked folders · T71 real-navigation prompt tests · R1-COORD structural overlap · R1-RESTART edits across a restart · R1-CONTRACT shared save rules · R2-REPAIR repair dead links · R2-MENU menu matching for new setting types · R3-DRAFT recover work after a language is removed · R3-FOLDERS empty language folders · R5-NESTED links inside structured settings · R8-ARCHIVE unusual backup formats · R-NARROW wide screens in narrow windows (Media, News, Export, Pages, Settings, theme cards; editor top bar) · R-ADMZIP clearer message for a backup with a repeated file name, once the ZIP library fixes its own · R-PRESETLOAD New project shows nothing while a theme's presets load, and Create Project doesn't wait for them · R-STALELOAD the menu, page and media screens can show what they just left when its reply arrives late · R-LINKLOAD link pickers say no pages match while the pages are still loading · R-VIEWROOT links starting with `/` break when viewing an export in the app · R-ROBOTS robots.txt lines for hidden pages may block similar addresses and hide the "don't index" note · QA-EXTRA extra checks when changing an area
+T4 browser smoke test · T17 stricter old tests · T33 repeated editor code · T39 usage labels during a refresh · T43 template trust review · T61 preview startup warnings · T63 unused publishing route · T67 export links through linked folders · T71 real-navigation prompt tests · R1-COORD structural overlap · R1-RESTART edits across a restart · R1-CONTRACT shared save rules · R2-REPAIR repair dead links · R2-MENU menu matching for new setting types · R3-DRAFT recover work after a language is removed · R3-FOLDERS empty language folders · R5-NESTED links inside structured settings · R8-ARCHIVE unusual backup formats · R-NARROW wide screens in narrow windows (Media, News, Export, Pages, Settings, theme cards; editor top bar) · R-ADMZIP clearer message for a backup with a repeated file name, once the ZIP library fixes its own · R-PRESETLOAD New project shows nothing while a theme's presets load, and Create Project doesn't wait for them · R-STALELOAD the menu, page and media screens can show what they just left when its reply arrives late · R-LINKLOAD link pickers say no pages match while the pages are still loading · R-ROBOTS robots.txt lines for hidden pages may block similar addresses and hide the "don't index" note · R-WEBDOCS find what changed since 0.9.10 without a docs-website update (the 404 page, for one) · R-LIMITSHOOK the upload-limit lookup's one-minute cache and an unused field · R-UPLOADNITS style tidy-ups in the upload-limit changes · R-DUPTESTS duplicate-error messages tested for Pages only · QA-EXTRA extra checks when changing an area
 
 ### Embedding apps (not OSS release work)
 

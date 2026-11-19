@@ -6,7 +6,6 @@ import { pipeline } from "node:stream";
 import { v4 as uuidv4 } from "uuid";
 import sharp from "sharp";
 import { normalizeUploadName } from "../utils/uploadFileName.js";
-import DOMPurify from "isomorphic-dompurify";
 import { getThemeJsonPath } from "../config.js";
 import { ALLOWED_MIME_TYPES, ALLOWED_UPLOAD_EXTENSIONS, getContentType, getMediaCategory } from "../utils/mimeTypes.js";
 import { getSetting } from "./appSettingsController.js";
@@ -20,7 +19,7 @@ import { requestLanguage } from "../utils/contentLanguage.js";
 import * as mediaRepo from "../db/repositories/mediaRepository.js";
 import { getDb } from "../db/index.js";
 
-import { stripHtmlToText } from "../services/sanitizationService.js";
+import { stripHtmlToText, sanitizeSvg } from "../services/sanitizationService.js";
 import { readMediaFile } from "../services/mediaService.js";
 
 
@@ -355,9 +354,7 @@ async function storeUploadedFile({ file, subdir, filename, originalName }, ctx) 
     }
   } else if (file.mimetype === "image/svg+xml") {
     // Bounded by MAX_SVG_UPLOAD_BYTES above.
-    const sanitizedSvg = DOMPurify.sanitize(await fs.readFile(file.path, "utf-8"), {
-      USE_PROFILES: { svg: true },
-    });
+    const sanitizedSvg = sanitizeSvg(await fs.readFile(file.path, "utf-8"));
     originalSource = path.join(workDir, "original.svg");
     await fs.writeFile(originalSource, sanitizedSvg, "utf-8");
   }
