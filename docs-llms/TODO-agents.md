@@ -315,6 +315,16 @@ About one full `npm test` run in five fails one test whose request got another s
 
 **Start:** `grep -rn "listen(0" packages app` in the test files. **Source:** `storage-limits` merge, 2026-11-19.
 
+#### R-SPLITFOCUS · Disabled SplitButton menu items can't be focused, so their reason isn't announced
+
+**Deferred · Low · OSS**
+
+`SplitButton` (`packages/editor-ui/src/components/ui/SplitButton.jsx:208-229`) renders a disabled menu item as `<button disabled title=…>`. A disabled button is skipped by keyboard focus, and screen readers don't reach it, so the `title` (often the only explanation of why the action is unavailable) is never read out; arrow-key navigation skips disabled items too (`enabledIndexes`, `:59`).
+
+**Done when:** disabled items stay reachable and announce their reason while a click or Enter still does nothing (for example `aria-disabled="true"` instead of `disabled`, included in arrow-key navigation, the reason tied in with `aria-describedby` or visible text), with a test that a disabled item takes focus and exposes its reason.
+
+**Start:** [SplitButton.jsx](../packages/editor-ui/src/components/ui/SplitButton.jsx). **Source:** upload-limit review, 2026-11-19.
+
 #### QA-EXTRA · Choose extra checks when changing an area
 
 **Deferred · Low · Tests**
