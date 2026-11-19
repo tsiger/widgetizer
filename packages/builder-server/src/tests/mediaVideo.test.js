@@ -2,7 +2,7 @@
  * MP4 upload and playback serving over real HTTP.
  *
  * The controller suites hand `req.files` straight to the handler, which would
- * not notice the multer gate rejecting MP4. This suite goes through the full
+ * not notice the upload parser's type filter rejecting MP4. This suite goes through the full
  * OSS app — multipart upload, the per-request size cap from the limits
  * adapter, and byte-range serving that a <video> element needs to seek.
  *
@@ -85,7 +85,7 @@ async function upload(name, bytes, type) {
   try {
     json = JSON.parse(text);
   } catch {
-    // multer rejections may come back as plain text from the error handler
+    // a rejected request may come back as plain text from the error handler
   }
   return { status: response.status, json, text };
 }
@@ -173,8 +173,9 @@ describe("MP4 upload over HTTP", () => {
     saveSettings({ media: { maxFileSizeMB: 1 } });
     try {
       const big = Buffer.alloc(Math.ceil(1.5 * 1024 * 1024), 1);
-      const { status } = await upload("too-big.mp4", big, "video/mp4");
-      assert.equal(status, 413);
+      const { status, json } = await upload("too-big.mp4", big, "video/mp4");
+      assert.equal(status, 400);
+      assert.equal(json.rejectedFiles[0].code, "FILE_TOO_LARGE");
       assert.equal(await fs.pathExists(path.join(getProjectDir(PROJECT_FOLDER), "uploads", "files", "too-big.mp4")), false);
     } finally {
       saveSettings({ media: { maxFileSizeMB: 50 } });

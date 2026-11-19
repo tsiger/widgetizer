@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { serverErrorMessage } from "../lib/apiFetch";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
@@ -220,7 +221,7 @@ function CollectionItemsScreen({ activeLanguage, setActiveLanguage }) {
       afterMutation();
     } catch (error) {
       console.error("Error duplicating item:", error);
-      showToast(t("collections.toasts.duplicateError"), "error");
+      showToast(serverErrorMessage(error) || t("collections.toasts.duplicateError"), "error");
     }
   };
 

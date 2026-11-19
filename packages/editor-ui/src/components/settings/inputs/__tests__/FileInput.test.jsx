@@ -29,8 +29,8 @@ vi.mock("../../../../stores/projectStore", () => ({
 vi.mock("../../../../stores/toastStore", () => ({
   default: (selector) => selector({ showToast }),
 }));
-vi.mock("../../../../hooks/useAppSettings", () => ({
-  default: () => ({ settings: { media: { maxFileSizeMB: 1 } } }),
+vi.mock("../../../../hooks/useProjectLimits", () => ({
+  default: () => ({ maxUploadBytes: 1024 * 1024, maxSizeMB: 1, loaded: true }),
 }));
 vi.mock("../../../../components/media/MediaSelectorDrawer", () => ({
   default: (props) => {

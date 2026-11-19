@@ -1,7 +1,8 @@
 import { useState } from "react";
 import DOMPurify from "dompurify";
 import { uploadProjectMedia } from "../queries/mediaManager";
-import useAppSettings from "./useAppSettings";
+import useProjectLimits from "./useProjectLimits";
+import { useUploadRefusalFormatter } from "../extension/PluginProvider";
 import { validateFileSizes } from "../utils/mediaValidation";
 import { showUploadOutcome } from "../utils/uploadFeedback";
 
@@ -27,7 +28,8 @@ const CHUNK_SIZE = 5; // Process 5 files at a time
 export default function useMediaUpload({ activeProject, showToast, setFiles }) {
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState({});
-  const { settings } = useAppSettings();
+  const { maxSizeMB } = useProjectLimits();
+  const formatRefusals = useUploadRefusalFormatter();
 
   const sanitizeFiles = async (files) => {
     const sanitizedFiles = await Promise.all(
@@ -65,6 +67,7 @@ export default function useMediaUpload({ activeProject, showToast, setFiles }) {
             rejectedFiles: filesChunk.map((file) => ({
               originalName: file.name,
               reason: error?.message || "Upload failed due to network error",
+              ...(error?.data?.code ? { code: error.data.code } : {}),
             })),
           });
         });
@@ -82,10 +85,8 @@ export default function useMediaUpload({ activeProject, showToast, setFiles }) {
     // Client-side size validation — rejects files before any network request
     let filesToProcess = acceptedFiles;
     const preRejected = [];
-    if (settings?.media) {
-      const { valid, rejected } = validateFileSizes(acceptedFiles, {
-        maxSizeMB: settings.media.maxFileSizeMB,
-      });
+    if (maxSizeMB != null) {
+      const { valid, rejected } = validateFileSizes(acceptedFiles, { maxSizeMB });
       filesToProcess = valid;
       preRejected.push(...rejected);
     }
@@ -165,7 +166,7 @@ export default function useMediaUpload({ activeProject, showToast, setFiles }) {
         showToast,
         {
           processedFiles: allProcessedFiles,
-          rejectedFiles: allRejectedFiles,
+          rejectedFiles: formatRefusals(allRejectedFiles),
         },
         {
           successMessage: `Successfully uploaded ${allProcessedFiles.length} file(s)${chunkInfo}.`,

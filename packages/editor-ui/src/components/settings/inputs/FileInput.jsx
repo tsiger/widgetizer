@@ -4,7 +4,8 @@ import { uploadProjectMedia, getProjectMedia } from "../../../queries/mediaManag
 import { FileText, Film, X, UploadCloud } from "lucide-react";
 import useProjectStore from "../../../stores/projectStore";
 import useToastStore from "../../../stores/toastStore";
-import useAppSettings from "../../../hooks/useAppSettings";
+import useProjectLimits from "../../../hooks/useProjectLimits";
+import { useUploadRefusalFormatter } from "../../../extension/PluginProvider";
 import MediaSelectorDrawer from "../../../components/media/MediaSelectorDrawer";
 import Button from "../../ui/Button";
 import { showRejectedFiles, showUploadOutcome } from "../../../utils/uploadFeedback";
@@ -42,7 +43,8 @@ export default function FileInput({ id, value = "", onChange, filterType = "file
   const fileInputRef = useRef(null);
   const activeProject = useProjectStore((state) => state.activeProject);
   const showToast = useToastStore((state) => state.showToast);
-  const { settings } = useAppSettings();
+  const { maxSizeMB } = useProjectLimits();
+  const formatRefusals = useUploadRefusalFormatter();
 
   const [selectorDrawerVisible, setSelectorDrawerVisible] = useState(false);
   const [lookupAttempt, setLookupAttempt] = useState(0);
@@ -103,10 +105,9 @@ export default function FileInput({ id, value = "", onChange, filterType = "file
       return;
     }
 
-    const limitMB = settings?.media?.maxFileSizeMB ?? 50;
-    const { valid, rejected } = validateFileSizes([file], { maxSizeMB: limitMB });
+    const { valid, rejected } = validateFileSizes([file], { maxSizeMB });
     if (rejected.length > 0) {
-      showRejectedFiles(showToast, rejected);
+      showRejectedFiles(showToast, formatRefusals(rejected));
       if (fileInputRef.current) fileInputRef.current.value = "";
       return;
     }
@@ -125,7 +126,7 @@ export default function FileInput({ id, value = "", onChange, filterType = "file
 
       showUploadOutcome(
         showToast,
-        { processedFiles, rejectedFiles, error },
+        { processedFiles, rejectedFiles: formatRefusals(rejectedFiles ?? []), error },
         {
           successMessage: t("components.fileInput.uploadSuccess"),
           networkErrorMessage: t("components.fileInput.uploadFailed"),

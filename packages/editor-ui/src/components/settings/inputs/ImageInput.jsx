@@ -4,7 +4,8 @@ import { uploadProjectMedia, getProjectMedia, saveMediaMetadata } from "../../..
 import { API_URL } from "../../../lib/config";
 import useProjectStore from "../../../stores/projectStore";
 import useToastStore from "../../../stores/toastStore";
-import useAppSettings from "../../../hooks/useAppSettings";
+import useProjectLimits from "../../../hooks/useProjectLimits";
+import { useUploadRefusalFormatter } from "../../../extension/PluginProvider";
 import { X, Edit, UploadCloud } from "lucide-react";
 import MediaDrawer from "../../../components/media/MediaDrawer";
 import MediaSelectorDrawer from "../../../components/media/MediaSelectorDrawer";
@@ -26,7 +27,8 @@ export default function ImageInput({ id, value = "", onChange, size = "full", la
   const fileInputRef = useRef(null);
   const activeProject = useProjectStore((state) => state.activeProject);
   const showToast = useToastStore((state) => state.showToast);
-  const { settings } = useAppSettings();
+  const { maxSizeMB } = useProjectLimits();
+  const formatRefusals = useUploadRefusalFormatter();
 
   // State for the media drawers
   const [metadataDrawerVisible, setMetadataDrawerVisible] = useState(false);
@@ -70,10 +72,9 @@ export default function ImageInput({ id, value = "", onChange, size = "full", la
     const file = event.target.files[0];
     if (!file || !activeProject) return;
 
-    const limitMB = settings?.media?.maxFileSizeMB ?? 50;
-    const { valid, rejected } = validateFileSizes([file], { maxSizeMB: limitMB });
+    const { valid, rejected } = validateFileSizes([file], { maxSizeMB });
     if (rejected.length > 0) {
-      showRejectedFiles(showToast, rejected);
+      showRejectedFiles(showToast, formatRefusals(rejected));
       if (fileInputRef.current) fileInputRef.current.value = "";
       return;
     }
@@ -94,7 +95,7 @@ export default function ImageInput({ id, value = "", onChange, size = "full", la
         showToast,
         {
           processedFiles,
-          rejectedFiles,
+          rejectedFiles: formatRefusals(rejectedFiles ?? []),
           error,
         },
         {

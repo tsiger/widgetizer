@@ -17,6 +17,12 @@ export const SLOT_NAMES = Object.freeze([
   // Publish button). Distinct from `topbarRight`, which is the admin-shell
   // Layout's top bar — a different region.
   "pageEditorActions",
+  // Above the Media page's upload area. Empty by default; a shell fills it with
+  // its own notice about the media library (e.g. a limit reached or about to be).
+  "mediaHeader",
+  // Between the Media page's upload area and its toolbar. Empty by default; a
+  // shell fills it with its own summary of the library (e.g. how much of it is used).
+  "mediaToolbarTop",
 ]);
 
 /**

@@ -34,7 +34,8 @@ import CollectionItemEdit from "./pages/CollectionItemEdit.jsx";
 //   - hosted passes a known `project` (+ cloud `scope`) to seed without a fetch.
 //
 // @param {{ apiBase?: string, project?: object, scope?: object,
-//           plugins?: Array<object>, slots?: Record<string, React.ReactNode> }} props
+//           plugins?: Array<object>, slots?: Record<string, React.ReactNode>,
+//           formatUploadRefusal?: (refusal: { code, limitBytes, sizeBytes, originalName }) => string|null }} props
 // EditorProvider is the chrome-agnostic core: it registers plugins (incl. the
 // built-in nav) into a <PluginProvider> and binds the two per-shell singletons
 // (api base, active project) on mount, then renders whatever chrome the host
@@ -51,6 +52,7 @@ export function EditorProvider({
   scope,
   plugins = EMPTY_ARRAY,
   slots = EMPTY_OBJECT,
+  formatUploadRefusal,
   children,
 }) {
   const allPlugins = useMemo(() => [builtinNavPlugin, ...plugins], [plugins]);
@@ -76,7 +78,7 @@ export function EditorProvider({
   }, [project, scope]);
 
   return (
-    <PluginProvider plugins={allPlugins} slots={slots}>
+    <PluginProvider plugins={allPlugins} slots={slots} formatUploadRefusal={formatUploadRefusal}>
       {/* No ConfirmProvider here: the confirm dialog is one surface per window,
           so the shell that owns the window mounts it — exactly like
           ToastContainer. Every embedding shell mounts exactly one; the
@@ -96,6 +98,7 @@ export function EditorShell({
   scope,
   plugins = EMPTY_ARRAY,
   slots = EMPTY_OBJECT,
+  formatUploadRefusal,
 }) {
   return (
     <EditorProvider
@@ -108,6 +111,7 @@ export function EditorShell({
       scope={scope}
       plugins={plugins}
       slots={slots}
+      formatUploadRefusal={formatUploadRefusal}
     >
       <Layout />
     </EditorProvider>

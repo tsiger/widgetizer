@@ -27,8 +27,8 @@ router.use(resolveActiveProject);
 // Get all media for the active project
 router.get("/", getProjectMedia);
 
-// Upload media to the active project (per-request multer with a fileSize cap
-// sourced from the limits adapter).
+// Upload media to the active project. uploadWithLimit streams each file to a
+// temp file and refuses (per file) one over the limits adapter's per-file limit.
 router.post("/", uploadWithLimit, uploadProjectMedia);
 
 // Bulk delete media files

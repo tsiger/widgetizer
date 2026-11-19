@@ -9,6 +9,7 @@ import {
   bulkDeletePages,
   createPageLanguageVersion,
 } from "../queries/pageManager";
+import { serverErrorMessage } from "../lib/apiFetch";
 import { invalidateMediaCache } from "../queries/mediaManager";
 import { hasIncompleteReferenceCleanup } from "../lib/referenceCleanupWarning";
 import { invalidateLinkTargetsCache } from "../hooks/useLinkTargets";
@@ -239,7 +240,7 @@ export default function Pages() {
       }
     } catch (error) {
       console.error("Error duplicating page:", error);
-      showToast(t("pages.toasts.duplicateError"), "error");
+      showToast(serverErrorMessage(error) || t("pages.toasts.duplicateError"), "error");
     }
   };
 

@@ -56,6 +56,7 @@ describe("uploadFormData", () => {
   afterEach(() => {
     vi.clearAllMocks();
     delete globalThis.XMLHttpRequest;
+    vi.unstubAllGlobals();
   });
 
   it("uploads form data, reports progress, and resolves parsed JSON", async () => {
@@ -200,6 +201,47 @@ describe("uploadFormData", () => {
     xhr.status = 200;
     // Simulate a followed redirect: the final URL differs from the requested one.
     xhr.responseURL = "http://api.test/login";
+    xhr.responseText = JSON.stringify({ ok: true });
+    xhr.onload();
+    await promise;
+
+    expect(handler).not.toHaveBeenCalled();
+  });
+
+  it("notifies when the API base is relative and the browser reports the absolute response URL", async () => {
+    const { API_URL } = await import("../config");
+    API_URL.mockImplementation((path) => path);
+    vi.stubGlobal("location", { href: "http://localhost:3000/editor" });
+    const { uploadFormData } = await import("../uploadRequest");
+    const { subscribeMutationSuccess } = await import("../mutationEvents");
+    const handler = vi.fn();
+    subscribeMutationSuccess(handler);
+
+    const promise = uploadFormData("/api/projects/p1/media", {});
+    const xhr = xhrInstances[0];
+    xhr.status = 201;
+    // Real XHR always reports an absolute responseURL, even for a relative request.
+    xhr.responseURL = new URL("/api/projects/p1/media", "http://localhost:3000/").href;
+    xhr.responseText = JSON.stringify({ ok: true });
+    xhr.onload();
+    await promise;
+
+    expect(handler).toHaveBeenCalledWith({ method: "POST", path: "/api/projects/p1/media" });
+  });
+
+  it("does not notify when the API base is relative and the request was redirected elsewhere", async () => {
+    const { API_URL } = await import("../config");
+    API_URL.mockImplementation((path) => path);
+    vi.stubGlobal("location", { href: "http://localhost:3000/editor" });
+    const { uploadFormData } = await import("../uploadRequest");
+    const { subscribeMutationSuccess } = await import("../mutationEvents");
+    const handler = vi.fn();
+    subscribeMutationSuccess(handler);
+
+    const promise = uploadFormData("/api/projects/p1/media", {});
+    const xhr = xhrInstances[0];
+    xhr.status = 200;
+    xhr.responseURL = new URL("/login", "http://localhost:3000/").href;
     xhr.responseText = JSON.stringify({ ok: true });
     xhr.onload();
     await promise;

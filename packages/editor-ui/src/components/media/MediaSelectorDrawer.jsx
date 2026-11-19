@@ -8,7 +8,8 @@ import LoadingSpinner from "../ui/LoadingSpinner";
 import FileUploader from "../ui/FileUploader";
 import Tooltip from "../ui/Tooltip";
 import useMediaUpload from "../../hooks/useMediaUpload";
-import useAppSettings from "../../hooks/useAppSettings";
+import useProjectLimits, { formatLimitMB } from "../../hooks/useProjectLimits";
+import { useUploadRefusalFormatter } from "../../extension/PluginProvider";
 import useToastStore from "../../stores/toastStore";
 import { showRejectedFiles } from "../../utils/uploadFeedback";
 import {
@@ -49,8 +50,8 @@ export default function MediaSelectorDrawer({
   // keep the prop's type via `effectiveFilter` below.
   const [activeFilter, setActiveFilter] = useState(filterType);
   const showToast = useToastStore((state) => state.showToast);
-  const { settings } = useAppSettings();
-  const maxSizeMB = settings?.media?.maxFileSizeMB ?? 50;
+  const { maxUploadBytes, maxSizeMB } = useProjectLimits();
+  const formatRefusals = useUploadRefusalFormatter();
   const effectiveFilter = showTypeFilter ? activeFilter : filterType;
 
   // Initialize media upload hook
@@ -144,7 +145,7 @@ export default function MediaSelectorDrawer({
   }, [visible, onClose]);
 
   const handleUploaderReject = (fileRejections) => {
-    showRejectedFiles(showToast, mapDropzoneRejections(fileRejections, { maxSizeMB }));
+    showRejectedFiles(showToast, formatRefusals(mapDropzoneRejections(fileRejections, { maxSizeMB })));
   };
 
   // Restrict the in-drawer uploader to the active filter's types (and label it to match).
@@ -199,9 +200,9 @@ export default function MediaSelectorDrawer({
             uploadProgress={uploadProgress}
             accept={uploadAccept}
             multiple={true}
-            maxSize={maxSizeMB * 1024 * 1024}
+            maxSize={maxUploadBytes ?? undefined}
             title={t("components.mediaSelector.upload")}
-            maxSizeText={`${supportedLabel} - ${maxSizeMB}MB max`}
+            maxSizeText={maxUploadBytes == null ? supportedLabel : `${supportedLabel} - ${formatLimitMB(maxUploadBytes)} max`}
           />
           <div className="mt-3 flex items-center gap-2">
             <div className="relative flex-1 min-w-0">

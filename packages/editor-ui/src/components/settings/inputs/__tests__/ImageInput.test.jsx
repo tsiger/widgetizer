@@ -27,7 +27,9 @@ vi.mock("../../../../queries/mediaManager", () => ({
 const PROJECT_STATE = { activeProject: { id: "p1" } };
 vi.mock("../../../../stores/projectStore", () => ({ default: (selector) => selector(PROJECT_STATE) }));
 vi.mock("../../../../stores/toastStore", () => ({ default: (selector) => selector({ showToast: () => {} }) }));
-vi.mock("../../../../hooks/useAppSettings", () => ({ default: () => ({ settings: { media: { maxFileSizeMB: 5 } } }) }));
+vi.mock("../../../../hooks/useProjectLimits", () => ({
+  default: () => ({ maxUploadBytes: 5 * 1024 * 1024, maxSizeMB: 5, loaded: true }),
+}));
 vi.mock("../../../../components/media/MediaSelectorDrawer", () => ({
   default: (props) => (
     <button type="button" onClick={() => props.onSelect(TEAM)}>

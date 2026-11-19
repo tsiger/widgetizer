@@ -5,6 +5,7 @@ import themeRoutes from "./routes/themes.js";
 import pagesRoutes from "./routes/pages.js";
 import menusRoutes from "./routes/menus.js";
 import mediaRoutes from "./routes/media.js";
+import limitsRoutes from "./routes/limits.js";
 import mediaFileRoutes from "./routes/mediaFiles.js";
 import previewRoutes from "./routes/preview.js";
 import sharedAreasRoutes from "./routes/sharedAreas.js";
@@ -60,7 +61,7 @@ function attachAdapters(router, adapters) {
  *  - actorScopedRouter   — operations not tied to a selected project
  *                          (projects, theme library, app settings, core assets)
  *  - projectScopedRouter — operations on the active project's content
- *                          (pages, menus, media, preview, export)
+ *                          (pages, menus, media, limits, preview, export)
  *  - mediaFileRouter     — the project's media files as the browser loads them
  *                          (`/projects/:projectId/...`, project id in the path)
  *  - previewRouter       — token-based preview render endpoint
@@ -94,6 +95,7 @@ export function setupBuilderServer({ adapters, plugins = [] } = {}) {
   projectScopedRouter.use("/pages", pagesRoutes);
   projectScopedRouter.use("/menus", menusRoutes);
   projectScopedRouter.use("/media", mediaRoutes);
+  projectScopedRouter.use("/limits", limitsRoutes);
   projectScopedRouter.use("/preview", previewRoutes);
   projectScopedRouter.use("/shared-areas", sharedAreasRoutes);
   projectScopedRouter.use("/export", exportRoutes);

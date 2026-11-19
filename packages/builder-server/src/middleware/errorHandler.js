@@ -7,8 +7,8 @@ const errorHandler = (err, req, res, next) => {
   // error (answering here would fail with ERR_HTTP_HEADERS_SENT and lose it).
   if (res.headersSent) return next(err);
 
-  // Multer reports per-file size breaches mid-stream, before the whole file is
-  // buffered. Map those uploads to 413.
+  // Multer (project and theme ZIP uploads) reports size breaches mid-stream,
+  // before the whole file is written. Map those uploads to 413.
   if (err?.code === "LIMIT_FILE_SIZE") {
     return res.status(413).json({ message: "File too large", code: "LIMIT_FILE_SIZE" });
   }

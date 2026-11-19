@@ -15,8 +15,8 @@ Uploaded binaries are stored through the **`AssetStorageAdapter`** (local FS in 
 
 The controller chooses the subdir inline from `getMediaCategory(file.mimetype)` (`packages/builder-server/src/utils/mimeTypes.js`): `"image"` MIME types go to `images/`, everything else (PDF, audio, video) to `files/`. The adapter key is `${subdir}/${filename}` (originals) or `images/${variantFilename}` (generated sizes) — the historical disk layout minus the `/uploads/` URL prefix. There is no `getMediaDir` path-builder; the backend never constructs absolute paths from user input — all binary I/O routes through the adapter over `req.scope`. See [Packages & Adapter Architecture](core-packages.md).
 
-- **File naming** (`utils/uploadFileName.js`, `normalizeUploadName`): every non-letter, non-digit becomes a single hyphen, so words survive instead of being glued together (`filename_like_that.jpg` → `filename-like-that.jpg`, `logo (final)_v2.svg` → `logo-final-v2.svg`). The name and the extension are lower-cased, accents and other scripts are transliterated by `slugify` (`Café déjà vu.png` → `cafe-deja-vu.png`, `Привет.png` → `privet.png`), and a name left empty by a script `slugify` cannot transliterate (CJK) falls back to `image` / `file` by subdir. The base name (without the extension, which is kept on top) is limited to 60 characters, backing up to the last hyphen when it falls past 60% of the limit; otherwise a long word is cut mid-word. The resulting `[a-z0-9-]` + lower-case extension charset is a contract: `sanitizationService`'s image-path allowlist blanks anything outside it, so a non-ASCII stored name would render as a placeholder and never reach an export. Collisions are deduped **case-insensitively** against the adapter's existing keys (plus names assigned earlier in the same request) by appending a counter (`my-awesome-picture-1.jpg`) — older uploads kept their own case (`photo.JPG`), and on Windows and macOS that IS `photo.jpg`, so a case-sensitive check would hand out a name that overwrites the existing file. The uploaded name itself is stored as `originalName`, decoded from multer's latin1 bytes.
-- **Automatic resizing**: For each uploaded raster image (not SVG), the system generates multiple sizes whose widths/quality come from App Settings or a theme override (§ Image Sizes). Variants are stored alongside the original with `-{size}` suffixes (`photo-thumb.jpg`).
+- **File naming** (`utils/uploadFileName.js`, `normalizeUploadName`): every non-letter, non-digit becomes a single hyphen, so words survive instead of being glued together (`filename_like_that.jpg` → `filename-like-that.jpg`, `logo (final)_v2.svg` → `logo-final-v2.svg`). The name and the extension are lower-cased, accents and other scripts are transliterated by `slugify` (`Café déjà vu.png` → `cafe-deja-vu.png`, `Привет.png` → `privet.png`), and a name left empty by a script `slugify` cannot transliterate (CJK) falls back to `image` / `file` by subdir. The base name (without the extension, which is kept on top) is limited to 60 characters, backing up to the last hyphen when it falls past 60% of the limit; otherwise a long word is cut mid-word. The resulting `[a-z0-9-]` + lower-case extension charset is a contract: `sanitizationService`'s image-path allowlist blanks anything outside it, so a non-ASCII stored name would render as a placeholder and never reach an export. Collisions are deduped **case-insensitively** against the adapter's existing keys (plus names assigned earlier in the same request) by appending a counter (`my-awesome-picture-1.jpg`) — older uploads kept their own case (`photo.JPG`), and on Windows and macOS that IS `photo.jpg`, so a case-sensitive check would hand out a name that overwrites the existing file. The uploaded name itself is stored as `originalName`, decoded from the multipart parser's latin1 bytes.
+- **Automatic resizing**: For each uploaded raster image (not SVG), the system generates multiple sizes whose widths/quality come from App Settings or a theme override (§ Image Sizes). Variants are stored alongside the original with `-{size}` suffixes (`photo-thumb.jpg`). A name is chosen only when the original's name and every variant's name are free, so `photo.jpg` uploaded next to an existing `photo-small.jpg` is stored as `photo-1.jpg`: no variant ever overwrites an existing asset, and a failed upload's cleanup (which removes every key the upload wrote) never touches one.
 - **Smart size generation**: Only sizes meaningfully smaller than the original are generated (`sizeConfig.width >= metadata.width` is skipped). If an 800px image has `large` configured at 1920px, no `large` variant is produced.
 - **Original compression**: When the original is no larger than the largest enabled size (so the original is the effective top delivery asset), it is recompressed in place at the configured quality — dimensions preserved, only file size reduced. GIFs are excluded to preserve animation frames. When the original exceeds the largest enabled size, it is stored untouched (the `large` variant becomes the public delivery ceiling).
 
@@ -37,14 +37,16 @@ Image processing through `sharp` is bounded so a small malicious file cannot exh
 - `sharp(buffer, { limitInputPixels: 100_000_000 })` caps decoded pixels.
 - After reading metadata, images with `width > 10_000` or `height > 10_000` are rejected with a descriptive `reason` (never processed).
 
-### Two-Gate Size Enforcement
+### Upload Limits
 
-Upload size is enforced at **two** points:
+- **Per-file limit** — the limits adapter's `LIMIT_KEYS.MAX_UPLOAD_SIZE_BYTES` (`getMaxUploadBytes` in `utils/uploadLimits.js`) is the only per-file limit. `Infinity` means no per-file check; with no limits adapter wired the `DEFAULT_MAX_UPLOAD_BYTES` (10 MB) applies. OSS's `LocalLimitsAdapter` derives it from `media.maxFileSizeMB` (App Settings, default 50). The editor reads it from `GET /limits` (`{ maxUploadBytes }`, `null` = no limit) through `useProjectLimits`: the Media page, the media picker drawer and the image/file setting inputs size their drop zone and their client-side check from it (the drop zone names it, e.g. "50MB max"); with no limit, or until it has loaded, the browser checks nothing and the server's refusal is the answer. Upload refusals (`rejectedFiles` entries carry `code`, `limitBytes`, `sizeBytes`, `reason`) are shown with the `reason`, or with the shell's `formatUploadRefusal` wording when one is given.
+- **Streamed, refused per file** — `uploadWithLimit` (`middleware/parseMediaUpload.js`, on busboy) writes each file part to a temp file under the OS temp dir as it arrives. A part over the per-file limit stops being written and is drained; it reaches the controller marked `refused`, and only that file is reported. A request whose bytes (every file part and field value) pass 10 × the per-file limit is aborted as a whole (`413`, `UPLOAD_TOO_LARGE`). Whatever the per-file limit, a body is held to 10 file parts (`LIMIT_FILE_COUNT`), 10 form fields of at most 64 KB (`LIMIT_FIELD_COUNT`, `LIMIT_FIELD_VALUE`) and 20 parts (`LIMIT_PART_COUNT`); a file under a field name other than `files` (`LIMIT_UNEXPECTED_FILE`) and a malformed form (`MALFORMED_UPLOAD`) are `400`s. Every failure — those, a client that disconnects mid-upload, a temp file that can't be written — goes through one teardown that stops parsing, closes every open temp file and removes the temp directory; it is otherwise removed when the response closes.
+- **SVGs** are sanitized as one in-memory string, so they are capped at 5 MB (`MAX_SVG_UPLOAD_BYTES`) whatever the per-file limit.
+- **Total storage** — the limits adapter's optional `reserveStorage(scope, bytes)`. Each file's outputs (the stored original plus its generated sizes) are written to temp files first, and their total is reserved before anything is moved into the asset store; the media record is written, and then the reservation is committed with the bytes actually stored. Any failure removes every key whose upload was started (a failed upload can leave partial bytes) and the record, and releases the reservation unless the commit itself was attempted. An adapter without `reserveStorage` means unlimited storage — OSS's case.
 
-1. **Streaming gate (SA-02)** — `uploadWithLimit` builds a per-request `multer` whose `limits.fileSize` is sourced from the `LimitsAdapter` (`LIMIT_KEYS.MAX_UPLOAD_SIZE_BYTES`). An oversize part is rejected mid-stream **before** the whole file is buffered into memory; `errorHandler` maps multer's `LIMIT_FILE_SIZE` to `413`. OSS returns a finite cap from app settings (default fallback `10 MB` when no adapter is wired); hosted returns its tenant ceiling.
-2. **Post-buffer gate** — inside `uploadProjectMedia`, each buffered file is re-checked against `media.maxFileSizeMB` (App Settings); over-limit files are reported in `rejectedFiles` with a human-readable reason rather than throwing.
+A refused file comes back in `rejectedFiles` as `{ originalName, code, limitBytes, sizeBytes, reason }`, `code` being `FILE_TOO_LARGE`, `SVG_TOO_LARGE` or `STORAGE_FULL` (for which `limitBytes` is the room left); the rest of the batch is stored.
 
-The streaming gate is the DoS-safe floor; the post-buffer gate enforces the user-configurable per-file limit. File-type acceptance is enforced by multer's `fileFilter` (`mediaUploadFileFilter`): the declared MIME must be in `ALLOWED_MIME_TYPES`, the extension in `ALLOWED_UPLOAD_EXTENSIONS`, **and the two must agree** (the MIME must be the extension's canonical content type; `audio/mp3` alias accepted for `.mp3`; `.mp4` only as `video/mp4`). The declared MIME is client-controlled while the stored extension drives the served `Content-Type` and processing branches on MIME — so allowlisting each independently isn't enough (e.g. an SVG declared `image/jpeg` would skip SVG sanitization).
+File-type acceptance is enforced by the parser's `fileFilter` (`mediaUploadFileFilter`): the declared MIME must be in `ALLOWED_MIME_TYPES`, the extension in `ALLOWED_UPLOAD_EXTENSIONS`, **and the two must agree** (the MIME must be the extension's canonical content type; `audio/mp3` alias accepted for `.mp3`; `.mp4` only as `video/mp4`). A part that fails it fails the request. The declared MIME is client-controlled while the stored extension drives the served `Content-Type` and processing branches on MIME — so allowlisting each independently isn't enough (e.g. an SVG declared `image/jpeg` would skip SVG sanitization).
 
 ### Image Sizes (App Settings + Theme Overrides)
 
@@ -203,7 +205,7 @@ Targeted updates run automatically on the corresponding write/delete/rename:
 
 ## 3. Backend Implementation
 
-Express 5 + `multer` (memory storage) + `sharp`. Controller: `packages/builder-server/src/controllers/mediaController.js`. The backend is adapter-agnostic and scope-first — every storage/limits call takes `req.scope` (`{ actor, projectId, folderName }`). See [Packages & Adapter Architecture](core-packages.md) and [Platform Security](core-security.md#11-cross-tenant-safety-multi-tenant-host-contract).
+Express 5 + `busboy` (uploads streamed to temp files) + `sharp`. Controller: `packages/builder-server/src/controllers/mediaController.js`. The backend is adapter-agnostic and scope-first — every storage/limits call takes `req.scope` (`{ actor, projectId, folderName }`). See [Packages & Adapter Architecture](core-packages.md) and [Platform Security](core-security.md#11-cross-tenant-safety-multi-tenant-host-contract).
 
 ### API Routes (`packages/builder-server/src/routes/media.js`, `routes/mediaFiles.js`)
 
@@ -212,7 +214,7 @@ Express 5 + `multer` (memory storage) + `sharp`. Controller: `packages/builder-s
 | Method | Endpoint (under the media router) | Middleware | Controller | Description |
 | --- | --- | --- | --- | --- |
 | `GET` | `/` | | `getProjectMedia` | List media metadata (from SQLite) for the active project. |
-| `POST` | `/` | `uploadWithLimit` | `uploadProjectMedia` | Upload files (multer `array("files", 10)`; streaming size cap). |
+| `POST` | `/` | `uploadWithLimit` | `uploadProjectMedia` | Upload up to 10 files (field `files`), each streamed to a temp file and refused on its own when over a limit. |
 | `POST` | `/bulk-delete` | `body.fileIds isArray` | `bulkDeleteProjectMedia` | Delete multiple files; skips in-use files. |
 | `POST` | `/refresh-usage` | | `refreshMediaUsage` | Full usage rescan for the project. |
 | `GET` | `/:fileId/usage` | | `getMediaFileUsage` | Usage info for one file. |
@@ -233,16 +235,16 @@ Express 5 + `multer` (memory storage) + `sharp`. Controller: `packages/builder-s
 
 ### Upload Flow (`uploadProjectMedia`)
 
-1. `multer` (memory storage) buffers each file; `fileFilter` (`mediaUploadFileFilter`) rejects files whose declared MIME is outside `ALLOWED_MIME_TYPES`, whose extension is outside `ALLOWED_UPLOAD_EXTENSIONS`, or whose MIME doesn't match the extension's canonical content type.
+1. `uploadWithLimit` streams each file part to a temp file (see [Upload Limits](#upload-limits)); `fileFilter` (`mediaUploadFileFilter`) rejects files whose declared MIME is outside `ALLOWED_MIME_TYPES`, whose extension is outside `ALLOWED_UPLOAD_EXTENSIONS`, or whose MIME doesn't match the extension's canonical content type.
 2. A sequential pre-pass decodes each uploaded name and assigns a collision-free stored name per file via `normalizeUploadName` (deduped against adapter keys + names assigned this request).
-3. Per file, in parallel (`Promise.allSettled`):
-   - Re-check `media.maxFileSizeMB` (post-buffer gate); over-limit → `rejectedFiles`.
+3. Per file, at most two at a time, each with its own temp work dir (removed afterwards):
+   - Refuse a part the parser marked over the per-file limit, or whose size passes it, and an SVG over 5 MB → `rejectedFiles`.
    - Mint a UUID media id; build the `fileInfo` record (`path: /uploads/{subdir}/{filename}`).
-   - **Raster images** (`image/*` except SVG): read dimensions via `sharp` (decompression-bomb guards apply), generate each enabled size smaller than the original (preserving format at the size's quality), upload each variant through the adapter, then recompress the original when it is no larger than the largest enabled size (GIFs excluded).
+   - **Raster images** (`image/*` except SVG): `sharp` reads the temp file (decompression-bomb guards apply), generates each enabled size smaller than the original (preserving format at the size's quality) into the work dir, then recompresses the original there when it is no larger than the largest enabled size (GIFs excluded).
    - **SVG**: re-sanitize server-side with `DOMPurify` (`USE_PROFILES: { svg: true }`) before storing — defense-in-depth atop the client-side sanitize.
    - **Non-image** (PDF, audio, video): skip all image processing; store as-is with `width/height: null`, `sizes: {}`.
-   - Upload the (possibly recompressed/sanitized) original bytes through `assetStorage.upload(scope, key, buffer)`.
-4. Insert each processed record via `mediaRepo.addMediaFile`. Respond `201` (or `400` when all files were rejected) with `processedFiles` / `rejectedFiles`.
+   - Reserve the original's and the sizes' total through `limits.reserveStorage` when the adapter has it (refused → `STORAGE_FULL`), stream each into the store with `assetStorage.upload(scope, key, stream)`, insert the record (`mediaRepo.addMediaFile`), then commit the stored bytes; any failure deletes what was stored and the record and releases the reservation.
+4. Respond `201` (or `400` when all files were rejected) with `processedFiles` / `rejectedFiles`.
 
 ### Metadata Update (`updateMediaMetadata`)
 
@@ -293,7 +295,7 @@ The thumbnail/preview path falls back to the original image when a `thumb` varia
 
 ## 5. Security
 
-Upload validation (MIME allowlist, two-gate size enforcement, decompression-bomb guards, SVG sanitization), the project-scoped metadata save (TI-03), and per-scope asset isolation are summarized above. For the platform-wide contract see [Platform Security](core-security.md).
+Upload validation (MIME allowlist, per-file and storage limits, decompression-bomb guards, SVG sanitization), the project-scoped metadata save (TI-03), and per-scope asset isolation are summarized above. For the platform-wide contract see [Platform Security](core-security.md).
 
 ---
 

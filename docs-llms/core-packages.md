@@ -72,7 +72,7 @@ Defined as JSDoc typedefs in `packages/core/src/adapters.js`. Every storage/asse
 | `StorageAdapter` | `read`, `write`, `delete`, `list`, `exists`, `stat` — all `(scope, relativePath, …)` |
 | `AssetStorageAdapter` | `upload`, `download(scope, key, range?)`, `stat`, `delete`, `list`, `getUrl` — all `(scope, key, …)`. `download` accepts an optional inclusive `{ start, end }` byte range (powers HTTP 206 media seeking); `stat` returns `{ size }` for `Content-Length` / `Content-Range`; `getUrl` takes `{ context: 'editor' \| 'published' }` |
 | `PublishAdapter` | `publish(scope, renderStream, options)` |
-| `LimitsAdapter` | `getLimit(scope, key)` |
+| `LimitsAdapter` | `getLimit(scope, key)`; optional `reserveStorage(scope, bytes)` → `{ ok: true, commit(actualBytes), release() }` or `{ ok: false, code: "STORAGE_FULL", availableBytes }` (absent = unlimited storage) |
 
 A separate **`previewScopeResolver`** adapter key is also required as a reserved seam. Current preview API routes use the normal `scopeResolver` through `resolveActiveProject`, and `GET /render/:token` dereferences only the preview token store; hosts can wire a distinct preview resolver without changing the required adapter shape.
 
@@ -98,7 +98,7 @@ Exported constants: `MAX_WIDGETS_PER_PAGE = 5000`, `MAX_MENU_ITEMS = 1000`, `MAX
 
 `MAX_COLLECTION_ITEMS` (per-collection item count) and `MAX_COLLECTIONS` (collection-type count per project) guard the collection write path and the export-time per-collection enumeration against unbounded growth.
 
-OSS's `LocalLimitsAdapter` returns the App Settings upload cap for `MAX_UPLOAD_SIZE_BYTES` and `Infinity` for the count/quota DoS keys so OSS stays otherwise unbounded/byte-neutral; the hosted `CloudLimitsAdapter` returns finite tenant ceilings. See [Platform Security](core-security.md) for how these enforce cross-tenant safety.
+OSS's `LocalLimitsAdapter` returns the App Settings upload cap for `MAX_UPLOAD_SIZE_BYTES`, has no `reserveStorage`, and returns `Infinity` for the count/quota DoS keys so OSS stays otherwise unbounded/byte-neutral; the hosted `CloudLimitsAdapter` returns finite tenant ceilings. See [Platform Security](core-security.md) for how these enforce cross-tenant safety.
 
 ### Error types (`packages/core/src/errors.js`)
 
@@ -134,7 +134,7 @@ const { actorScopedRouter, projectScopedRouter, mediaFileRouter, previewRouter }
 | Router | Mounts |
 | --- | --- |
 | `actorScopedRouter` | `/projects`, `/themes`, `/settings`, `/core` |
-| `projectScopedRouter` | `/pages`, `/menus`, `/media`, `/preview`, `/export`, `/widgets`, `/icons`, `/collections`, `/languages`, `/translations` |
+| `projectScopedRouter` | `/pages`, `/menus`, `/media`, `/preview`, `/export`, `/widgets`, `/icons`, `/collections`, `/languages`, `/translations`, `/limits` |
 | `mediaFileRouter` | `GET /projects/:projectId/media/:fileId`, `/projects/:projectId/uploads/images/:filename`, `/projects/:projectId/uploads/files/:filename` — browser-loaded media files. The OSS shell mounts it at `/api/media`; an embedding app that serves those URLs itself leaves it out. |
 | `previewRouter` | `GET /render/:token` |
 
@@ -192,7 +192,7 @@ Lives in builder-server. It delegates to `req.adapters.scopeResolver.resolveScop
 
 ### Provider / shell / routes
 
-- `EditorProvider({ apiBase, previewRenderBase, standalonePreviewPath, standaloneCollectionPreviewPath, routeBase, project, scope, plugins, slots })` — binds the singletons, seeds the project store, composes `[builtinNavPlugin, ...plugins]`, and wraps children in `PluginProvider` + `RouteBaseProvider`.
+- `EditorProvider({ apiBase, previewRenderBase, standalonePreviewPath, standaloneCollectionPreviewPath, routeBase, project, scope, plugins, slots, formatUploadRefusal })` — binds the singletons, seeds the project store, composes `[builtinNavPlugin, ...plugins]`, and wraps children in `PluginProvider` + `RouteBaseProvider`.
 - `EditorShell` — adds the editor's own `Layout` on top of `EditorProvider`.
 - `createEditorRoutes({ … })` — returns a react-router route object. `EditorShell` deliberately owns **no** router, so the host supplies a single data-router context (needed for `useBlocker`). `excludePaths` (default: none, every route kept) drops child routes by their relative `path` (e.g. `"export-site"`), so a host can 404 a surface server-side without a dead client route. It is route-only: the built-in nav plugin still advertises every entry, so a host using the stock `Layout`/`Sidebar` must filter its navigation separately.
 - `ConfirmProvider` / `useConfirm`, `ToastContainer` — per-window surfaces the **host shell mounts once** above the router (EditorProvider mounts neither). The navigation guards prompt through `useConfirm()`, which throws without a `ConfirmProvider` above it; the toast store renders nowhere without a `ToastContainer`.
@@ -202,7 +202,8 @@ Lives in builder-server. It delegates to `req.adapters.scopeResolver.resolveScop
 - `buildRegistry(plugins)` — merges declarative `navItems` / `routes` / `commands` / `pageSettingsFields` from all plugins, in plugin order.
 - `pageSettingsFields: [{ id, field, Component }]` — extra fields on the page settings form (`PageForm`, used by both the add and the edit screen), rendered after the filename field. `field` names a top-level page property: the form starts from the page's stored value, and whatever the field holds is submitted with the form's own fields (the server stores page properties it doesn't know as they are). `Component` receives `{ value, onChange(value), page, slug, isNew, language }`, where `slug` is the filename as typed, once it has stayed the same for a moment (the filename fills itself from the title, so it can pass through other values; the stored page is `page`); `onChange` marks the form changed. `usePageSettingsFields()` reads them (an empty list outside a `PluginProvider`). With none contributed, the form is unchanged.
 - `createHookRunner(plugins)` — runs the lifecycle `HOOK_EVENTS` defined in `packages/editor-ui/src/extension/hooks.js` (`before*` run sequentially and halt on the first `{ proceed: false }`; `after*` are fire-and-forget); `has(event)` says whether any plugin handles one. `beforeOpenMediaFile({ projectId, fileId, url })` runs before the Media page opens a file in a new tab, for a host whose media requests need preparing (the browser's own request carries cookies, not the host's API credentials); with a handler registered, the page opens a blank tab at once, cuts its opener and sends it to the file once the hook allows it.
-- `SLOT_NAMES`: `sidebarHeader`, `sidebarFooter`, `topbarLeft`, `topbarRight`, `topbarBanner`, `overlay`, `publishConfirmation`, `pageEditorActions` (the page-editor top bar beside Preview/Save, distinct from the admin `topbarRight`).
+- `SLOT_NAMES`: `sidebarHeader`, `sidebarFooter`, `topbarLeft`, `topbarRight`, `topbarBanner`, `overlay`, `publishConfirmation`, `pageEditorActions` (the page-editor top bar beside Preview/Save, distinct from the admin `topbarRight`), `mediaHeader` (above the Media page's upload area; empty in the OSS app), `mediaToolbarTop` (between the Media page's upload area and its toolbar; empty in the OSS app).
+- `formatUploadRefusal({ code, limitBytes, sizeBytes, originalName }) => string | null` — optional `EditorProvider`/`EditorShell` prop. A file the server (or the browser's own size check) refuses carries one of those `code`s (`FILE_TOO_LARGE`, `STORAGE_FULL`, `SVG_TOO_LARGE`, or a request-level code); the editor shows the string the function returns in place of the refusal's `reason`, and the `reason` itself when the function is absent, returns null, or the refusal has no `code`.
 - `builtinNavPlugin` — supplies the default nav with `NAV_GROUPS` `site` and `tools`.
 
 ### Tailwind v4 preset

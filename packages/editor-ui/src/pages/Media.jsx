@@ -17,7 +17,8 @@ import useMediaState from "../hooks/useMediaState";
 import useMediaUpload from "../hooks/useMediaUpload";
 import useMediaSelection from "../hooks/useMediaSelection";
 import useMediaMetadata from "../hooks/useMediaMetadata";
-import useAppSettings from "../hooks/useAppSettings";
+import useProjectLimits, { formatLimitMB } from "../hooks/useProjectLimits";
+import { SlotOutlet, useUploadRefusalFormatter } from "../extension/PluginProvider";
 import useMediaUsageTitles from "../hooks/useMediaUsageTitles";
 import { useDefaultLanguage, useExtraLanguages } from "../stores/projectStore";
 import { showRejectedFiles } from "../utils/uploadFeedback";
@@ -25,10 +26,10 @@ import { MEDIA_ACCEPT, mapDropzoneRejections } from "../utils/uploadValidation";
 
 export default function Media() {
   const { t } = useTranslation();
-  const { settings } = useAppSettings();
+  const { maxUploadBytes, maxSizeMB } = useProjectLimits();
+  const formatRefusals = useUploadRefusalFormatter();
   // Use our custom hooks to manage different aspects of media functionality
   const mediaState = useMediaState();
-  const maxSizeMB = settings?.media?.maxFileSizeMB ?? 50;
   const defaultLanguage = useDefaultLanguage();
   const languages = useExtraLanguages();
 
@@ -97,7 +98,7 @@ export default function Media() {
   };
 
   const handleUploaderReject = (fileRejections) => {
-    showRejectedFiles(mediaState.showToast, mapDropzoneRejections(fileRejections, { maxSizeMB }));
+    showRejectedFiles(mediaState.showToast, formatRefusals(mapDropzoneRejections(fileRejections, { maxSizeMB })));
   };
 
   // Get current lightbox image
@@ -124,6 +125,7 @@ export default function Media() {
 
   return (
     <PageLayout title={t("media.title")}>
+      <SlotOutlet name="mediaHeader" />
       <FileUploader
         onUpload={mediaUpload.handleUpload}
         onReject={handleUploaderReject}
@@ -131,11 +133,13 @@ export default function Media() {
         uploadProgress={mediaUpload.uploadProgress}
         accept={MEDIA_ACCEPT}
         multiple={true}
-        maxSize={maxSizeMB * 1024 * 1024}
+        maxSize={maxUploadBytes ?? undefined}
         title={t("media.uploader.title")}
         description={t("media.uploader.description")}
-        maxSizeText={`${t("components.mediaUploader.supportedFormats")} - ${maxSizeMB}MB max`}
+        maxSizeText={maxUploadBytes == null ? t("components.mediaUploader.supportedFormats") : `${t("components.mediaUploader.supportedFormats")} - ${formatLimitMB(maxUploadBytes)} max`}
       />
+
+      <SlotOutlet name="mediaToolbarTop" />
 
       {mediaState.files.length > 0 && (
         <>

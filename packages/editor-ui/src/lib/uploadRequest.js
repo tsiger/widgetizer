@@ -20,6 +20,16 @@ function getErrorMessage(data, fallbackMessage) {
   return fallbackMessage;
 }
 
+// Resolves a possibly-relative URL against the document location; returns it
+// unchanged where there is no location (non-browser contexts).
+function resolveAbsoluteUrl(url) {
+  try {
+    return new URL(url, globalThis.location?.href).href;
+  } catch {
+    return url;
+  }
+}
+
 export function createUploadError(message, status, data) {
   const error = new Error(message);
   error.status = status;
@@ -85,7 +95,9 @@ export async function uploadFormData(path, formData, { onProgress, signal } = {}
         // the requested URL) means the upload endpoint never actually ran —
         // skip the announce in that case, same reasoning as apiFetch's
         // `!response.redirected` guard.
-        const followedRedirect = xhr.responseURL && xhr.responseURL !== API_URL(path);
+        // responseURL is always absolute, while API_URL(path) is relative when
+        // no VITE_API_URL is set, so compare against the resolved form.
+        const followedRedirect = xhr.responseURL && xhr.responseURL !== resolveAbsoluteUrl(API_URL(path));
         if (!followedRedirect) {
           notifyMutationSuccess({ method: "POST", path });
         }

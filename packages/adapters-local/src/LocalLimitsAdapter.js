@@ -5,9 +5,10 @@ const DEFAULT_MAX_FILE_SIZE_MB = 50;
 
 /**
  * OSS LimitsAdapter — single-user, so most limits are unbounded. The only
- * configurable limit is the per-file upload size (from app_settings). Reads the
- * OSS schema directly via the injected db handle. Implements the LimitsAdapter
- * contract from @widgetizer/core/adapters.
+ * configurable limit is the per-file upload size (`media.maxFileSizeMB` in
+ * app_settings). It has no `reserveStorage`: total storage is unlimited. Reads
+ * the OSS schema directly via the injected db handle. Implements the
+ * LimitsAdapter contract from @widgetizer/core/adapters.
  */
 export class LocalLimitsAdapter {
   /** @param {import('better-sqlite3').Database} db */

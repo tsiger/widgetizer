@@ -68,9 +68,35 @@
  */
 
 /**
+ * A granted storage reservation. Exactly one of `commit` or `release` is called,
+ * once: `commit` with the bytes actually stored once everything is in place,
+ * `release` when anything failed and nothing (or nothing kept) was stored.
+ * @typedef {Object} StorageReservation
+ * @property {true} ok
+ * @property {(actualBytes: number) => Promise<void>} commit
+ * @property {() => Promise<void>} release
+ */
+
+/**
+ * A refused storage reservation: the project has `availableBytes` of room left.
+ * @typedef {Object} StorageRefusal
+ * @property {false} ok
+ * @property {'STORAGE_FULL'} code
+ * @property {number} availableBytes
+ */
+
+/**
  * Tier/limit lookups. Keys come from LIMIT_KEYS.
+ *
+ * `reserveStorage` is optional; an adapter without it means total storage is
+ * unlimited. The media upload calls it once per uploaded file, for that file's
+ * outputs together (the stored original plus every generated copy). Nothing
+ * that settles a reservation waits on another reservation, so an implementation
+ * may hold a non-reentrant per-project lock from `reserveStorage` until the
+ * matching `commit` or `release` (other files' reservations wait their turn).
  * @typedef {Object} LimitsAdapter
  * @property {(scope: Scope, key: string) => Promise<number | string | boolean>} getLimit
+ * @property {(scope: Scope, bytes: number) => Promise<StorageReservation | StorageRefusal>} [reserveStorage]
  */
 
 /**

@@ -18,7 +18,10 @@ vi.mock("../../../queries/mediaManager", () => ({ getProjectMedia: async () => (
 vi.mock("../../../hooks/useMediaUpload", () => ({
   default: () => ({ uploading: false, uploadProgress: {}, handleUpload: vi.fn() }),
 }));
-vi.mock("../../../hooks/useAppSettings", () => ({ default: () => ({ settings: { media: { maxFileSizeMB: 50 } } }) }));
+vi.mock("../../../hooks/useProjectLimits", () => ({
+  default: () => ({ maxUploadBytes: 50 * 1024 * 1024, maxSizeMB: 50, loaded: true }),
+  formatLimitMB: (bytes) => `${bytes / 1024 / 1024}MB`,
+}));
 vi.mock("../../ui/FileUploader", () => ({
   default: (props) => {
     uploaderProps = props;

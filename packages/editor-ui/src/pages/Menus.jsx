@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { serverErrorMessage } from "../lib/apiFetch";
 import { Link, useNavigate, useLocation, useNavigationType } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { ListTree, Trash2, Pencil, CirclePlus, Copy, MoreVertical } from "lucide-react";
@@ -110,7 +111,7 @@ export default function Menus() {
       showToast(t("menus.toasts.duplicateSuccess"), "success");
     } catch (error) {
       console.error("Failed to duplicate menu:", error);
-      showToast(t("menus.toasts.duplicateError"), "error");
+      showToast(serverErrorMessage(error) || t("menus.toasts.duplicateError"), "error");
     }
   };
 
