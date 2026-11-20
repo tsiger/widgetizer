@@ -167,7 +167,13 @@ export function parseMediaUpload({ fileFilter }) {
           return fail(err);
         }
         writers.add(out);
-        out.on("error", (err) => fail(err));
+        // A refused part's writer is destroyed mid-file, and a write still in
+        // flight then errors with ERR_STREAM_DESTROYED. Any error after the
+        // refusal is about bytes already being discarded, so it must not fail
+        // the rest of the batch.
+        out.on("error", (err) => {
+          if (!entry.refused) fail(err);
+        });
         out.on("close", () => {
           writers.delete(out);
           succeed();
