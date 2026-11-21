@@ -32,7 +32,8 @@
     "common": {
       "next": "Next",
       "previous": "Previous",
-      "email": "Email"
+      "email": "Email",
+      "rating": "Rated {{ rating }} out of 5"
     },
     "comparison_slider": {
       "drag": "Drag to compare before and after images"
