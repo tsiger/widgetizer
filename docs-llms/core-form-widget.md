@@ -214,7 +214,7 @@ them; do not rename or hardcode the platform-injected pieces.
 | `name="<fieldKey>"` | on each input/textarea/select | Identifies the field. Must match a `key` in the manifest's `fields` exactly. |
 | `data-widgetizer-honeypot` + `name="website"` | hidden input | The Worker rejects submissions where `website` is non-empty. The name `website` is hardcoded in the Worker — the widget bakes it in. |
 | `data-widgetizer-turnstile` | on a `<div>` | The Worker injects `class="cf-turnstile"`, `data-sitekey`, and the Turnstile loader script. Layout classes on the element are preserved. |
-| `data-widgetizer-form-status` | any element | The client script renders the generic success/error message here. Uses `aria-live="polite"`. |
+| `data-widgetizer-form-status` | any element | The client script renders the generic success/error message here and sets `data-state` on the element to `success`, `warning` (the form refused the message) or `error` (the visitor should check the form, or the request failed); it removes `data-state` while there is no message. Uses `aria-live="polite"`. The widget doesn't style the states. |
 
 **The widget never includes:** the client script tag, the Turnstile script tag,
 a `data-sitekey` value, or `class="cf-turnstile"` — the Worker injects all of
