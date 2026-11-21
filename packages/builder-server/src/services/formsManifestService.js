@@ -246,6 +246,19 @@ function buildFormFromWidget(widget, widgetId, pageId, pagePath, errors, langFol
 }
 
 /**
+ * The distinct-forms ceiling for a limits adapter's MAX_FORMS_PER_SITE answer, as
+ * a site build applies it. A positive number (Infinity included) is the ceiling;
+ * anything else is no usable answer and gets the default, never "unlimited", so
+ * a malformed answer can't lift a cap.
+ *
+ * @param {unknown} answer
+ * @returns {number}
+ */
+export function resolveMaxFormsPerSite(answer) {
+  return typeof answer === "number" && answer > 0 ? answer : MAX_FORMS_PER_SITE;
+}
+
+/**
  * Builds the widgetizer.forms.json manifest from a project's pages.
  *
  * Form keys and field keys are auto-derived from the user-supplied form name and field

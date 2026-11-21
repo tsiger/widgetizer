@@ -9,7 +9,7 @@ import {
   widgetSupportsTransparentHeader,
   planPagination,
 } from "@widgetizer/render-engine";
-import { MAX_FORMS_PER_SITE, LIMIT_KEYS } from "@widgetizer/core/adapters";
+import { LIMIT_KEYS } from "@widgetizer/core/adapters";
 import { splitAssetRef } from "@widgetizer/core/assetUrl";
 import { isHomeSlug, siteUrlBase, absoluteSiteUrl, siteUrlPathname } from "@widgetizer/core/internalHref";
 import {
@@ -34,10 +34,10 @@ import {
   loadCollectionItemsByUuid,
 } from "./collectionService.js";
 import { buildSitemap, buildRobotsTxt } from "./seoArtifacts.js";
-import { buildFormsManifest } from "./formsManifestService.js";
+import { buildFormsManifest, resolveMaxFormsPerSite } from "./formsManifestService.js";
+import { selectBuildPages } from "./selectBuildPages.js";
 import { generateExportSiteIcons } from "../utils/siteIconHelpers.js";
 import { formatHtml } from "../utils/htmlProcessor.js";
-import { projectLanguages } from "../utils/contentLanguage.js";
 import { listPagesFromDir, readAreasFromDir, readGlobalWidgetFromDir, readThemeDataFromDir } from "../utils/projectContentFs.js";
 
 function rewriteStoragePaths(html, outputPathPrefix) {
@@ -180,43 +180,15 @@ export async function* generateSite(deps, options) {
   // A slug is unique per language, so anything keyed by page must key by the
   // language-qualified output path rather than the id alone.
   const pageIdentity = (pageData) => pageOutputPath(pageData.id, 1, pageLang(pageData));
-  const allPages = filterPages(await listPagesFromDir(projectDir, { defaultLanguage }), projectData).map(withNotFoundSeo);
-
-  // The default language needs a homepage: a page slugged "index" or "home",
-  // both of which publish as index.html. page.id is the filename, the
-  // authoritative slug.
-  if (!allPages.some((pageData) => !languageFolder(pageLang(pageData)) && isHomeSlug(pageData.id))) {
-    throw refuse("NO_HOMEPAGE", {});
-  }
-
-  // `index` and `home` both publish as the language's index.html, so a language
-  // holding both would publish one over the other. The editor refuses the pair,
-  // but older projects, imports and theme updates can still carry one.
-  for (const language of new Set(allPages.map((pageData) => pageData.language))) {
-    const homes = allPages.filter((pageData) => pageData.language === language && isHomeSlug(pageData.id));
-    if (homes.length < 2) continue;
-    throw refuse("TWO_HOMEPAGES", { folder: languageFolder(pageLang(homes[0])) });
-  }
-
-  // An enabled language is not a publishable one. A non-default language with no
-  // homepage is left out entirely and named in the report: a site with
-  // `/el/contact` but no `/el/` sends visitors nowhere. The default language is
-  // not subject to this: a missing root homepage is refused above, because
-  // skipping it would publish a site with no `/` at all.
-  const languagesSkipped = [];
-  const siteLanguages = [resolveLanguage("", defaultLanguage)];
-  for (const language of projectLanguages(projectData).languages) {
-    if (allPages.some((pageData) => pageData.language === language && isHomeSlug(pageData.id))) {
-      siteLanguages.push(language);
-    } else {
-      languagesSkipped.push(language);
-    }
-  }
-  report.languagesSkipped = languagesSkipped;
-  report.languages = siteLanguages.slice(1);
-
-  const included = new Set(siteLanguages);
-  const pages = allPages.filter((pageData) => included.has(resolveLanguage(pageData.language, defaultLanguage)));
+  const selection = selectBuildPages(
+    filterPages(await listPagesFromDir(projectDir, { defaultLanguage }), projectData).map(withNotFoundSeo),
+    projectData,
+    { refuse },
+  );
+  const { pages } = selection;
+  report.languagesSkipped = selection.languagesSkipped;
+  report.languages = selection.languages;
+  const siteLanguages = [resolveLanguage("", defaultLanguage), ...selection.languages];
 
   // Link resolution must see the site being generated, not the project on disk.
   // The render engine loads this map itself when nobody supplies one, and that
@@ -338,8 +310,7 @@ export async function* generateSite(deps, options) {
   // the site before its first file. The ceiling comes from the limits adapter;
   // the default applies when there is no usable answer. A limits adapter that
   // throws is a failure, not a refusal.
-  const formsCap = await limits?.getLimit?.(scope, LIMIT_KEYS.MAX_FORMS_PER_SITE);
-  const maxForms = typeof formsCap === "number" && formsCap > 0 ? formsCap : MAX_FORMS_PER_SITE;
+  const maxForms = resolveMaxFormsPerSite(await limits?.getLimit?.(scope, LIMIT_KEYS.MAX_FORMS_PER_SITE));
   let formsResult;
   try {
     formsResult = buildFormsManifest(pages, appVersion, maxForms, { defaultLanguage });
