@@ -16,8 +16,10 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { Liquid } from "liquidjs";
 
-import { buildFormsManifest } from "../services/formsManifestService.js";
+import { buildFormsManifest, resolveMaxFormsPerSite } from "../services/formsManifestService.js";
+import { resolveMaxFormsPerSite as exportedResolveMaxFormsPerSite } from "../index.js";
 import { registerHandleizeFilter } from "@widgetizer/core";
+import { MAX_FORMS_PER_SITE } from "@widgetizer/core/adapters";
 
 // Tests run with cwd = repo root, where core widget templates resolve via the
 // workspace package path.
@@ -811,4 +813,33 @@ describe("buildFormsManifest — only the forms a page renders", () => {
     const pages = [{ id: "index", widgets: { header: widget, footer: widget }, widgetsOrder: ["header", "footer"] }];
     assert.equal(buildFormsManifest(pages, APP_VERSION).manifest, null);
   });
+});
+
+// The ceiling a build applies for a limits answer. formsCapExport.test.js drives
+// the same answers through a real export.
+describe("resolveMaxFormsPerSite", () => {
+  it("is exported from the package entry", () => {
+    assert.equal(exportedResolveMaxFormsPerSite, resolveMaxFormsPerSite);
+  });
+
+  it("takes a positive number as the ceiling, Infinity included", () => {
+    assert.equal(resolveMaxFormsPerSite(2), 2);
+    assert.equal(resolveMaxFormsPerSite(100), 100);
+    assert.equal(resolveMaxFormsPerSite(Infinity), Infinity);
+  });
+
+  // No usable answer means the default ceiling, never "unlimited".
+  for (const [label, answer] of [
+    ["no answer", undefined],
+    ["null", null],
+    ["0", 0],
+    ["a negative number", -1],
+    ["-Infinity", -Infinity],
+    ["NaN", Number.NaN],
+    ["a numeric string", "100"],
+  ]) {
+    it(`falls back to ${MAX_FORMS_PER_SITE} for ${label}`, () => {
+      assert.equal(resolveMaxFormsPerSite(answer), MAX_FORMS_PER_SITE);
+    });
+  }
 });

@@ -9,7 +9,7 @@ import {
   widgetSupportsTransparentHeader,
   planPagination,
 } from "@widgetizer/render-engine";
-import { MAX_FORMS_PER_SITE, LIMIT_KEYS } from "@widgetizer/core/adapters";
+import { LIMIT_KEYS } from "@widgetizer/core/adapters";
 import { splitAssetRef } from "@widgetizer/core/assetUrl";
 import { isHomeSlug, siteUrlBase, absoluteSiteUrl, siteUrlPathname } from "@widgetizer/core/internalHref";
 import {
@@ -34,7 +34,7 @@ import {
   loadCollectionItemsByUuid,
 } from "./collectionService.js";
 import { buildSitemap, buildRobotsTxt } from "./seoArtifacts.js";
-import { buildFormsManifest } from "./formsManifestService.js";
+import { buildFormsManifest, resolveMaxFormsPerSite } from "./formsManifestService.js";
 import { selectBuildPages } from "./selectBuildPages.js";
 import { generateExportSiteIcons } from "../utils/siteIconHelpers.js";
 import { formatHtml } from "../utils/htmlProcessor.js";
@@ -310,8 +310,7 @@ export async function* generateSite(deps, options) {
   // the site before its first file. The ceiling comes from the limits adapter;
   // the default applies when there is no usable answer. A limits adapter that
   // throws is a failure, not a refusal.
-  const formsCap = await limits?.getLimit?.(scope, LIMIT_KEYS.MAX_FORMS_PER_SITE);
-  const maxForms = typeof formsCap === "number" && formsCap > 0 ? formsCap : MAX_FORMS_PER_SITE;
+  const maxForms = resolveMaxFormsPerSite(await limits?.getLimit?.(scope, LIMIT_KEYS.MAX_FORMS_PER_SITE));
   let formsResult;
   try {
     formsResult = buildFormsManifest(pages, appVersion, maxForms, { defaultLanguage });

@@ -25,6 +25,9 @@ export { createExportSiteApp, startDestination, START_PATH } from "./services/ex
 // export orchestration, which resolves every path through the global DATA_DIR);
 // these are the shared, side-effect-free pieces it invokes directly.
 export { buildFormsManifest } from "./services/formsManifestService.js";
+// The distinct-forms ceiling for a limits adapter's MAX_FORMS_PER_SITE answer,
+// with the default the build applies when there is no usable answer.
+export { resolveMaxFormsPerSite } from "./services/formsManifestService.js";
 // The pages and languages the next build would include, and its homepage refusals,
 // without building: generateSite builds from the same selection.
 export { selectBuildPages } from "./services/selectBuildPages.js";
