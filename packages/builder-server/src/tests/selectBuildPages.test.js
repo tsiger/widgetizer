@@ -4,11 +4,15 @@
  * selection; multilangExport.test.js covers the same rules end to end.
  */
 
-import { describe, it } from "node:test";
+import { describe, it, after } from "node:test";
 import assert from "node:assert/strict";
+import fs from "fs-extra";
+import os from "node:os";
+import path from "node:path";
 
 import { selectBuildPages } from "../services/selectBuildPages.js";
 import { selectBuildPages as exported } from "../index.js";
+import { generateSite } from "../services/generateSite.js";
 
 const refuse = (code, details) => Object.assign(new Error(code), { code, details });
 const page = (language, id) => ({ id, language, uuid: `${language}-${id}` });
@@ -79,5 +83,89 @@ describe("selectBuildPages", () => {
       () => selectBuildPages(pages, project, { refuse }),
       (error) => error.code === "TWO_HOMEPAGES" && error.details.folder === "fr",
     );
+  });
+});
+
+// generateSite's own contract through the selection: what it reports, and what it
+// hands the caller's refuse. A build stops at beforeFirstFile, which runs once
+// every check has passed, so nothing past the checks needs a real project.
+describe("generateSite — languages and homepage refusals", () => {
+  const roots = [];
+  after(() => Promise.all(roots.map((root) => fs.remove(root))));
+
+  async function projectWith(files) {
+    const projectDir = await fs.mkdtemp(path.join(os.tmpdir(), "widgetizer-select-build-pages-"));
+    roots.push(projectDir);
+    for (const file of files) await fs.outputJson(path.join(projectDir, "pages", `${file}.json`), { name: file });
+    return projectDir;
+  }
+
+  const STOP = new Error("stopped before the first file");
+
+  async function build(files, projectData) {
+    const projectDir = await projectWith(files);
+    const refusals = [];
+    const report = {};
+    let error = null;
+    try {
+      for await (const entry of generateSite(
+        { projectId: "select-build-pages", projectDir, getProjectData: () => projectData },
+        {
+          appVersion: "test",
+          assetVersion: "test",
+          refuse: (code, details) => {
+            refusals.push({ code, details });
+            return Object.assign(new Error(code), { code });
+          },
+          readTheme: async () => ({}),
+          formatPages: false,
+          generateIcons: false,
+          beforeFirstFile: async () => {
+            throw STOP;
+          },
+          report,
+        },
+      )) {
+        assert.fail(`wrote ${entry.path} past beforeFirstFile`);
+      }
+    } catch (caught) {
+      error = caught;
+    }
+    return { error, refusals, report };
+  }
+
+  it("reports the languages built and skipped in the project's order", async () => {
+    const { error, refusals, report } = await build(["index", "el/index", "de/kontakt", "fr/home", "it/index"], {
+      defaultLanguage: "en",
+      languages: ["it", "de", "el", "pt", "fr"],
+    });
+    assert.equal(error, STOP);
+    assert.deepEqual(refusals, []);
+    assert.deepEqual(report.languages, ["it", "el", "fr"]);
+    assert.deepEqual(report.languagesSkipped, ["de", "pt"]);
+  });
+
+  it("hands refuse NO_HOMEPAGE with empty details", async () => {
+    const { error, refusals } = await build(["about", "el/index"], { defaultLanguage: "en", languages: ["el"] });
+    assert.equal(error.code, "NO_HOMEPAGE");
+    assert.deepEqual(refusals, [{ code: "NO_HOMEPAGE", details: {} }]);
+  });
+
+  it("hands refuse TWO_HOMEPAGES with the folder of the language holding both", async () => {
+    const { error, refusals } = await build(["index", "el/index", "el/home"], {
+      defaultLanguage: "en",
+      languages: ["el"],
+    });
+    assert.equal(error.code, "TWO_HOMEPAGES");
+    assert.deepEqual(refusals, [{ code: "TWO_HOMEPAGES", details: { folder: "el" } }]);
+  });
+
+  it("refuses NO_HOMEPAGE first when another language holds two homepages", async () => {
+    const { error, refusals } = await build(["about", "el/index", "el/home"], {
+      defaultLanguage: "en",
+      languages: ["el"],
+    });
+    assert.equal(error.code, "NO_HOMEPAGE");
+    assert.deepEqual(refusals, [{ code: "NO_HOMEPAGE", details: {} }]);
   });
 });
