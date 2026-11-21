@@ -19,7 +19,8 @@ npm run electron:dev
 ```
 
 - API server: `http://localhost:3001`
-- Vite dev server: `http://localhost:3000` — the `electron:dev` script sets `VITE_DEV_SERVER_URL=http://localhost:3000` and waits on that port (`wait-on http://localhost:3000`). Electron loads that URL.
+- Vite dev server: `http://localhost:3000` — the `electron:dev` script sets `VITE_DEV_SERVER_URL=http://localhost:3000`. Electron loads that URL.
+- Electron starts only once both answer: the script runs `wait-on -t 120000 http://localhost:3000 http://localhost:3001/health`, so the window never opens before the API server is up. The ports are fixed for this workflow: with a `PORT` override the server listens elsewhere, nothing answers on 3001, and the wait gives up after two minutes with an error instead of opening Electron.
 - `http://localhost:5173` is only the hardcoded **fallback** in `electron/main.js` (`process.env.VITE_DEV_SERVER_URL || "http://localhost:5173"`) for when `VITE_DEV_SERVER_URL` is unset. The dev script always sets it, so the live dev URL is 3000.
 
 In dev the script also sets `ELECTRON_DISABLE_INTERNAL_SERVER=1`, so Electron points at the standalone `npm run server` rather than forking its own bundled server.
