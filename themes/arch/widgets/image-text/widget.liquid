@@ -120,7 +120,7 @@
                     {% endfor %}
                   </span>
                   <span class="visually-hidden">
-                    Rated {{ rating }} out of 5
+                    {{ 'site.common.rating' | t: rating: rating }}
                   </span>
                 </div>
               {% when 'image' %}
