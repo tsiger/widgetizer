@@ -25,6 +25,9 @@ export { createExportSiteApp, startDestination, START_PATH } from "./services/ex
 // export orchestration, which resolves every path through the global DATA_DIR);
 // these are the shared, side-effect-free pieces it invokes directly.
 export { buildFormsManifest } from "./services/formsManifestService.js";
+// The pages and languages the next build would include, and its homepage refusals,
+// without building: generateSite builds from the same selection.
+export { selectBuildPages } from "./services/selectBuildPages.js";
 export { generateSite } from "./services/generateSite.js";
 export { buildSitemap, buildRobotsTxt } from "./services/seoArtifacts.js";
 export { sanitizeWidgetData, sanitizeThemeSettings, stripHtmlToText } from "./services/sanitizationService.js";
