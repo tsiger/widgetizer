@@ -178,20 +178,23 @@ Work on a GitHub issue follows one path, and the issue's row on the [OSS - Roadm
    gh pr create --base 1.0.0 --milestone "OSS - 1.0.0" --title "..." --body-file <file>
    ```
 
-3. **Link the pull request to the issue.** `Closes #<issue>` links only a pull request that targets the default branch (`master`), so the board's **Linked pull requests** column stays empty. Point the pull request at `master` and straight back; the link made in between stays:
+3. **Link the pull request to the issue.** `Closes #<issue>` links only a pull request that targets the default branch (`master`), so the board's **Linked pull requests** column stays empty. Point the pull request at `master`, wait until GitHub has made the link, then point it back; the link stays.
 
    ```bash
-   gh pr edit <pr> --base master && gh pr edit <pr> --base 1.0.0
+   gh pr edit <pr> --base master
+   # Repeat until it lists the issue. GitHub makes the link a few seconds after the base changes.
+   gh api graphql -f query='query { repository(owner:"tsiger", name:"widgetizer") { pullRequest(number: <pr>) { closingIssuesReferences(first: 5) { nodes { number } } } } }'
+   gh pr edit <pr> --base 1.0.0
    ```
 
-   Then check both: the pull request is back on `1.0.0`, and the issue names it.
+   Do not switch straight back: that works most times and then, without an error, leaves a pull request unlinked. Afterwards check both: the pull request is back on `1.0.0`, and the issue names it.
 
    ```bash
    gh pr view <pr> --json baseRefName --jq .baseRefName
    gh api graphql -f query='query { repository(owner:"tsiger", name:"widgetizer") { issue(number: <issue>) { closedByPullRequestsReferences(first: 5, includeClosedPrs: true) { nodes { number } } } } }'
    ```
 
-4. **Set the issue's Status to "To Be Reviewed" on the board:**
+4. **Set the issue's Status to "To Be Reviewed" on the board,** after the link is made: linking moves the issue to "In progress" on its own, which would undo a status set earlier.
 
    ```bash
    gh project item-list 7 --owner tsiger --limit 500 --format json --jq '.items[] | select(.content.number == <issue>) | .id'
