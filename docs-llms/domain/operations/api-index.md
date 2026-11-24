@@ -197,7 +197,6 @@ With the OSS shells' export viewer running, both view routes answer a page that 
 | GET | `/api/themes/:id/presets` |
 | POST | `/api/themes/:id/update` |
 | GET | `/api/themes/project/:projectId` |
-| POST | `/api/themes/project/:projectId` |
 | PATCH | `/api/themes/project/:projectId` |
 | GET | `/api/themes/project/:projectId/locales/:lang` |
 | POST | `/api/themes/upload` |

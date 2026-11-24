@@ -11,7 +11,7 @@ All setting types share the following common properties:
 - `description` (string, optional): Usually a `tTheme:` prefixed key for help text displayed below the input (e.g., `"tTheme:carousel.settings.title.description"`). Direct strings are also supported.
 - `default` (any, optional): The default value for the setting if none is provided.
 - `defaultKey` (string, optional, widget and block settings): Names a visitor-facing site string (`"site.news_grid.empty"`) whose wording, in the language of the page being rendered, is the starting value until the owner types one. Beside a literal `default`, the resolved word is instead written into the widget when it is added. A `defaultBlocks` entry names its words through a `defaultKeys` map (`{ "label": "site.core_form.name_field" }`). See [Visitor-facing text](theming.md#visitor-facing-text).
-- `outputAsCssVar` (boolean, optional): For a **global theme setting**, `true` makes `{% theme_settings %}` output its value as a CSS custom property. This flag does not automatically generate variables for widget/block settings; render those explicitly in the widget's scoped styling.
+- `outputAsCssVar` (boolean, optional): For a **global theme setting**, `true` makes `{% theme_settings %}` output its value as a CSS custom property. This flag does not automatically generate variables for widget/block settings; render those explicitly in the widget's scoped styling. The value is one CSS value: on a `text` or `textarea` setting it must not contain `;`, `{`, `}`, `<`, `>` or a line break (a saved value that does is reset to the default), and the flag is not supported on a `code` setting, which is never written as a variable. The setting's group and `id` form the variable's name, so both must be made of letters, digits, `_` and `-`.
 
 ---
 
@@ -354,7 +354,7 @@ A set of radio buttons for selecting a single option from a list. The `options` 
 
 ### Font Picker
 
-A specialized input with two dropdowns for selecting a font family and its corresponding weight. The value is an object containing `stack` and `weight`. **Note:** This type automatically outputs CSS variables for `-family` and `-weight` and does not require the `outputAsCssVar` flag.
+A specialized input with two dropdowns for selecting a font family and its corresponding weight. The value is an object containing `stack` and `weight`. **Note:** This type automatically outputs CSS variables for `-family` and `-weight` and does not require the `outputAsCssVar` flag. A saved value must be a font from the app's font list at a weight that font offers; anything else is reset to the setting's `default`. The `default` itself is not checked, so a theme may ship a stack of its own there.
 
 ```json
 {

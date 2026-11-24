@@ -17,7 +17,7 @@ import { useThemeLocale } from "../hooks/useThemeLocale";
  * corrected value names its setting the way the field is labelled (the theme's
  * label, translated); while the theme's words are not loaded yet the setting
  * goes unnamed rather than showing its key. A correction that names no
- * setting, as the older whole-file save reports them, keeps the server's sentence.
+ * setting keeps the server's sentence when it sent one.
  */
 function describeWarning(warning, t, tTheme) {
   switch (warning.code) {

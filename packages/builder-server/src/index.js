@@ -33,12 +33,12 @@ export { resolveMaxFormsPerSite } from "./services/formsManifestService.js";
 export { selectBuildPages } from "./services/selectBuildPages.js";
 export { generateSite } from "./services/generateSite.js";
 export { buildSitemap, buildRobotsTxt } from "./services/seoArtifacts.js";
-export { sanitizeWidgetData, sanitizeThemeSettings, stripHtmlToText } from "./services/sanitizationService.js";
+export { sanitizeWidgetData, stripHtmlToText } from "./services/sanitizationService.js";
 // The business details a request sends, read the way the project routes read them.
 export { readSiteIdentity } from "./services/siteIdentityInput.js";
 // Change-only theme-settings saves: an embedding route that saves theme settings
 // reads theme.json, merges with this inside its own write section, and writes.
-export { mergeThemeSettingChanges, readThemeSettingChanges } from "./services/themeSettingChanges.js";
+export { mergeThemeSettingChanges, readThemeSettingChanges, previewThemeSettings } from "./services/themeSettingChanges.js";
 // Media-usage tracking for theme settings — hosted's theme-save route calls this
 // after writing theme.json so favicon/themed-image assets are recorded as used.
 // DB-only via the shared getDb() singleton, no scope/adapter needed.

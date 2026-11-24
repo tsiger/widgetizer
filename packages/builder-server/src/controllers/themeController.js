@@ -24,7 +24,6 @@ import { extractZipSafely, openZip, readZipEntry, UnsafeZipError } from "../util
 import { ZIP_MIME_TYPES } from "../utils/mimeTypes.js";
 import { updateThemeSettingsMediaUsage, extractMediaPathsFromThemeSettings } from "../services/mediaUsageService.js";
 import { withContentWriteLock, assertIntroducedMediaExists } from "../services/contentCoordination.js";
-import { sanitizeThemeSettings } from "../services/sanitizationService.js";
 import { mergeThemeSettingChanges, readThemeSettingChanges } from "../services/themeSettingChanges.js";
 import { validateThemeCollectionSchemas } from "../services/collectionService.js";
 import { readAppSettingsFile } from "./appSettingsController.js";
@@ -1791,87 +1790,6 @@ export async function getProjectThemeSettings(req, res) {
     if (handleProjectResolutionError(res, error)) return;
     console.error(`API Error in getProjectThemeSettings for ${req.scope?.projectId}:`, error);
     res.status(500).json({ message: "Error reading project theme settings" });
-  }
-}
-
-/**
- * Save theme settings (theme.json) for a specific project.
- * @param {import('express').Request} req - Express request with projectId param and theme data body
- * @param {import('express').Response} res - Express response object
- * @returns {Promise<void>}
- */
-export async function saveProjectThemeSettings(req, res) {
-  try {
-    const { scope } = req;
-    const { storage } = req.adapters;
-
-    // Validate and sanitize theme settings before writing.
-    const { data: sanitizedThemeData, warnings } = sanitizeThemeSettings(req.body);
-
-    // The write and its usage sync are one media section, so media deletion cannot
-    // verify between them. See services/contentCoordination.
-    const outcome = await withContentWriteLock(scope.projectId, async () => {
-      // A favicon picked from the library just before it was deleted must not be
-      // written in; references the settings already carried are left alone.
-      // No theme.json yet: nothing to compare against or known to be pre-existing.
-      // An unreadable or unparsable one is not "no file" — reading past it would
-      // skip the version check below — so it fails the save instead.
-      const buf = await storage.read(scope, "theme.json");
-      const current = buf == null ? null : JSON.parse(buf.toString("utf8"));
-      const previousPaths = current ? extractMediaPathsFromThemeSettings(current) : [];
-      // A whole file from a screen that loaded the theme before an update would
-      // put the old version and structure back while the project row keeps the
-      // new version, so the update is never offered again. Refuse it.
-      if (current?.version && sanitizedThemeData?.version && current.version !== sanitizedThemeData.version) {
-        return { versionChanged: true };
-      }
-      await assertIntroducedMediaExists({
-        assetStorage: req.adapters.assetStorage,
-        scope,
-        previousPaths,
-        nextPaths: extractMediaPathsFromThemeSettings(sanitizedThemeData),
-      });
-
-      // Write theme.json through the injected storage adapter over the resolved scope.
-      // The active project's existence is already guaranteed by the
-      // resolveActiveProject middleware (and the write-guard asserts route :projectId
-      // matches scope), so the former manual fs.access project-existence check is gone.
-      await storage.write(scope, "theme.json", JSON.stringify(sanitizedThemeData, null, 2));
-
-      // Track media used in theme settings (e.g. favicon) for usage and export
-      try {
-        await updateThemeSettingsMediaUsage(scope.projectId, sanitizedThemeData);
-        return { usageStale: false };
-      } catch (usageError) {
-        console.warn("Failed to update theme settings media usage:", usageError.message);
-        return { usageStale: true };
-      }
-    });
-
-    if (outcome.versionChanged) {
-      return res.status(409).json({
-        message: "The theme was updated since these settings were loaded. Reload to continue.",
-        code: "THEME_VERSION_CHANGED",
-      });
-    }
-    const { usageStale } = outcome;
-    const response = { message: "Theme settings saved successfully" };
-    // Joins the sanitization warnings already carried here: the settings ARE saved,
-    // and this says only that the derived image-usage rows are behind.
-    const allWarnings = usageStale
-      ? [...warnings, { code: "MEDIA_USAGE_STALE", path: "theme.json" }]
-      : warnings;
-    if (allWarnings.length > 0) {
-      response.warnings = allWarnings;
-    }
-    res.json(response);
-  } catch (error) {
-    if (error?.code === "MEDIA_REFERENCE_MISSING") {
-      return res.status(error.statusCode).json({ message: error.message, code: error.code });
-    }
-    if (handleProjectResolutionError(res, error)) return;
-    console.error("Error saving project theme:", error);
-    res.status(500).json({ message: "Error saving project theme" });
   }
 }
 

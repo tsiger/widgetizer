@@ -45,7 +45,7 @@ const { remapCollectionItemLinkRefs, enrichSeededRichtextLinksFromDir } = await 
   "../utils/linkEnrichment.js"
 );
 const { renderPageLayout, renderWidget } = await import("../services/renderingService.js");
-const { saveProjectThemeSettings } = await import("../controllers/themeController.js");
+const { saveProjectThemeSettingChanges } = await import("../controllers/themeController.js");
 const { closeDb } = await import("../db/index.js");
 const { LocalStorageAdapter } = await import("@widgetizer/adapters-local");
 
@@ -601,11 +601,12 @@ describe("a reference a user picked in theme richtext", () => {
   it("survives the save, reference and all", async () => {
     // The picker is worthless if saving strips what it wrote. Theme richtext is
     // sanitized when theme.json is saved, so this goes through the real save path.
+    await writeTheme(richTheme(undefined));
     const res = mockRes();
-    await saveProjectThemeSettings(
+    await saveProjectThemeSettingChanges(
       {
         params: {},
-        body: richTheme(PICKED_PAGE),
+        body: { changes: [{ group: "general", id: "intro", value: PICKED_PAGE }] },
         query: {},
         scope,
         activeProject: projectRepo.getProjectById(PROJECT_ID),
@@ -618,7 +619,7 @@ describe("a reference a user picked in theme richtext", () => {
 
     assert.equal(res._status, 200, JSON.stringify(res._json));
     assert.match(await introOf(), new RegExp(`data-page-uuid="${PAGE_UUID}"`), "the reference is stored");
-    assert.equal(res._json.warnings, undefined, "and saving it is not reported as an invalid value");
+    assert.deepEqual(res._json.warnings, [], "and saving it is not reported as an invalid value");
   });
 
   it("follows the page when it is renamed", async () => {

@@ -173,13 +173,22 @@ describe("preview theme reads", () => {
   });
 
   it("records the date format under the group the theme files it in", async () => {
+    // A preview takes its settings' structure from the stored file, so the theme
+    // that files the date format elsewhere has to be the project's own.
     const theme = { settings: { global: { dates: [{ id: "date_format", type: "select", default: "YYYY-MM-DD" }] } } };
-    const res = mockRes();
-    await renderSingleWidget(
-      mockReq({ widgetId: "dated", widget: PAGE.widgets.dated, themeSettings: theme, page: PAGE, withThemeReads: true }),
-      res,
-    );
-    assert.ok(res._json.themeReads.includes("dates.date_format"), JSON.stringify(res._json.themeReads));
+    const themeFile = path.join(getProjectDir(PROJECT_FOLDER), "theme.json");
+    const before = await fs.readFile(themeFile, "utf8");
+    await fs.outputJson(themeFile, theme);
+    try {
+      const res = mockRes();
+      await renderSingleWidget(
+        mockReq({ widgetId: "dated", widget: PAGE.widgets.dated, themeSettings: theme, page: PAGE, withThemeReads: true }),
+        res,
+      );
+      assert.ok(res._json.themeReads.includes("dates.date_format"), JSON.stringify(res._json.themeReads));
+    } finally {
+      await fs.outputFile(themeFile, before);
+    }
   });
 
   it("a date formatted with an explicit format does not depend on the site's format", async () => {

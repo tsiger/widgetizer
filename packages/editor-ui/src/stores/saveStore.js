@@ -401,7 +401,7 @@ const useAutoSave = create((set, get) => ({
             // Discarded mid-flight. The submitted values DID reach the server, and
             // no local state can undo that. themeStore normally takes the server's
             // copy in place of the discarded draft itself (reading it back when the
-            // whole-file fallback returns none). This is a safety net for a result
+            // answer carries none). This is a safety net for a result
             // it did not adopt: read the server back here — only while nothing has
             // edited the theme since the discard, because the editor the user is
             // now looking at stays editable throughout.

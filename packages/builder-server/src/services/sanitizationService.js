@@ -1,5 +1,7 @@
 import DOMPurify from "isomorphic-dompurify";
 import { sanitizeHref } from "@widgetizer/core/urlSafety";
+import { hasCssValueBreaker } from "@widgetizer/core/cssVariables";
+import fontDefinitions from "@widgetizer/core/config/fonts.json" with { type: "json" };
 
 // Two passes settle every case seen so far; the cap only bounds crafted input.
 const MAX_STRIP_PASSES = 5;
@@ -328,18 +330,11 @@ function buildSettingMap(schemaSettings) {
 
 const HEX_COLOR_REGEX = /^#[0-9a-fA-F]{6}([0-9a-fA-F]{2})?$/;
 
-/**
- * Sanitize a value for safe interpolation into a CSS <style> tag.
- * Strips <, >, {, } — these never appear in legitimate CSS values
- * (hex colors, font stacks, pixel values) but can cause style tag
- * breakout or CSS injection.
- * @param {*} value - The value to sanitize
- * @returns {*} Sanitized value (strings cleaned, non-strings returned as-is)
- */
-export function sanitizeCssValue(value) {
-  if (typeof value !== "string") return value;
-  return value.replace(/[<>{}]/g, "");
-}
+// The fonts a font setting can hold: the picker offers these and no others, so a
+// saved value is one of them, with a weight that font has.
+const FONT_WEIGHTS_BY_STACK = new Map(
+  [...fontDefinitions.system, ...fontDefinitions.google].map((font) => [font.stack, font.availableWeights || []]),
+);
 
 function validateColor(value) {
   if (typeof value !== "string") return undefined;
@@ -370,7 +365,11 @@ function validateFontPicker(value) {
   if (typeof value.stack !== "string") return undefined;
   const weight = typeof value.weight === "number" ? value.weight : Number(value.weight);
   if (isNaN(weight)) return undefined;
-  return { stack: sanitizeCssValue(value.stack), weight };
+  // The stack goes into the page's CSS as written, so it is held to the font
+  // list, not cleaned: anything else is not a font the app can load anyway.
+  const weights = FONT_WEIGHTS_BY_STACK.get(value.stack);
+  if (!weights || !weights.includes(weight)) return undefined;
+  return { stack: value.stack, weight };
 }
 
 /**
@@ -431,10 +430,12 @@ export function sanitizeThemeSettingValue(value, schema) {
       break;
     case "text":
     case "textarea":
-      if (typeof value !== "string") {
+      // As a CSS variable the text is one declaration's value; text that could
+      // end the declaration is refused, like any other invalid value.
+      if (typeof value !== "string" || (schema.outputAsCssVar && hasCssValueBreaker(value))) {
         sanitized = schema.default;
       } else {
-        sanitized = schema.outputAsCssVar ? sanitizeCssValue(value) : value;
+        sanitized = value;
       }
       break;
     case "richtext":
@@ -468,36 +469,6 @@ export function sanitizeThemeSettingValue(value, schema) {
   // Check if the value was changed by sanitization
   const corrected = JSON.stringify(sanitized) !== JSON.stringify(value);
   return { value: sanitized, corrected };
-}
-
-/**
- * Sanitize all theme settings values based on their declared types.
- * Walks themeData.settings.global and validates each setting's value.
- * Returns a new object (does not mutate the input).
- * @param {object} themeData - The full theme.json data
- * @returns {{ data: object, warnings: string[] }} Sanitized theme data and any validation warnings
- */
-export function sanitizeThemeSettings(themeData) {
-  if (!themeData?.settings?.global) return { data: themeData, warnings: [] };
-
-  const sanitized = JSON.parse(JSON.stringify(themeData));
-  const warnings = [];
-
-  for (const [, items] of Object.entries(sanitized.settings.global)) {
-    if (!Array.isArray(items)) continue;
-    for (const item of items) {
-      if (!item.id || !item.type || item.type === "header") continue;
-      if (item.value !== undefined) {
-        const result = sanitizeThemeSettingValue(item.value, item);
-        if (result.corrected) {
-          warnings.push(`"${item.label || item.id}" contained an invalid value and was reset.`);
-        }
-        item.value = result.value;
-      }
-    }
-  }
-
-  return { data: sanitized, warnings };
 }
 
 // ============================================================================

@@ -154,7 +154,6 @@ describe("themeStore", () => {
       expect(saveThemeSettingChanges).toHaveBeenCalledWith(
         "project-a",
         [{ group: "colors", id: "primary_color", baseValue: "#ff0000", value: "#0000ff" }],
-        expect.any(Object),
       );
       expect(useThemeStore.getState().hasUnsavedThemeChanges()).toBe(false);
     });
@@ -464,7 +463,7 @@ describe("themeStore", () => {
       });
     });
 
-    describe("against a server without the change-only route", () => {
+    describe("when the answer carries no file", () => {
       it("rebaselines to what it sent when nothing was corrected", async () => {
         seedSettings();
         useThemeStore.getState().updateThemeSetting("colors", "primary_color", "#0000ff");

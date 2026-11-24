@@ -90,7 +90,7 @@ const useThemeStore = create((set, get) => {
 
     let result;
     try {
-      result = await saveThemeSettingChanges(projectId, changes, sent);
+      result = await saveThemeSettingChanges(projectId, changes);
     } catch (err) {
       if (err?.status === 409 && CONFLICT_CODES.has(err.code)) return resolveConflict(projectId, generation, err);
       throw err;
@@ -112,7 +112,7 @@ const useThemeStore = create((set, get) => {
     if (result.theme) {
       dropped = adoptOver(result.theme);
     } else if (discardedTo() || result.warnings.some((warning) => warning.code === "VALUE_CORRECTED")) {
-      // The whole-file fallback returns no file; read back what it corrected —
+      // An answer that carries no file: read back what the save corrected —
       // or, for a draft discarded meanwhile, what it saved: rebaselining to the
       // sent values under the reverted draft would leave a dirty draft that the
       // next save sends back over the saved one.
@@ -126,8 +126,8 @@ const useThemeStore = create((set, get) => {
 
     invalidateMediaCache(projectId);
     // `adopted`: the store now holds the server's copy (false only when the
-    // whole-file fallback saved a draft that was not discarded, without
-    // returning or correcting anything).
+    // answer carried no file, for a draft that was not discarded and a save
+    // that corrected nothing).
     return { warnings: [...result.warnings, ...dropped], adopted };
   };
 

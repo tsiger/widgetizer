@@ -71,7 +71,6 @@ const {
   deleteTheme,
   uploadTheme,
   getProjectThemeSettings,
-  saveProjectThemeSettings,
   resolvePresetPaths,
   getThemePresets,
   getProjectThemeLocale,
@@ -1391,7 +1390,7 @@ describe("copyThemeToProject", () => {
 });
 
 // ============================================================================
-// getProjectThemeSettings / saveProjectThemeSettings (scope + storage adapter)
+// getProjectThemeSettings (scope + storage adapter)
 // ============================================================================
 
 describe("getProjectThemeSettings", () => {
@@ -1426,22 +1425,6 @@ describe("getProjectThemeSettings", () => {
     } finally {
       await fs.outputFile(themePath, original); // restore for later tests
     }
-  });
-});
-
-describe("saveProjectThemeSettings", () => {
-  it("saves theme settings to project", async () => {
-    const newSettings = { settings: { global: { colors: [{ id: "bg", value: "#000" }] } } };
-    const res = await callController(saveProjectThemeSettings, {
-      params: { projectId: "theme-test-project-uuid" },
-      body: newSettings,
-    });
-    assert.equal(res._status, 200);
-    assert.ok(res._json.message.includes("saved"));
-
-    // Verify persisted — read back through the same storage adapter the handler wrote.
-    const saved = JSON.parse((await themeStorage.read(TEST_SCOPE, "theme.json")).toString("utf8"));
-    assert.equal(saved.settings.global.colors[0].id, "bg");
   });
 });
 

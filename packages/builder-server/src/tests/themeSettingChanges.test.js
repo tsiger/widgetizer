@@ -32,9 +32,7 @@ console.error = () => {};
 
 const { getProjectDir, getProjectThemeJsonPath } = await import("../config.js");
 const projectRepo = await import("../db/repositories/projectRepository.js");
-const { saveProjectThemeSettings, saveProjectThemeSettingChanges } = await import(
-  "../controllers/themeController.js"
-);
+const { saveProjectThemeSettingChanges } = await import("../controllers/themeController.js");
 const { mergeThemeSettingChanges, readThemeSettingChanges } = await import("../services/themeSettingChanges.js");
 const { recordDeletedMediaPaths, clearDeletedMediaPaths } = await import("../services/contentCoordination.js");
 const { closeDb } = await import("../db/index.js");
@@ -271,34 +269,16 @@ describe("PATCH theme settings", () => {
   });
 });
 
-describe("POST theme settings (whole file)", () => {
-  it("refuses a file from an older theme version, writing nothing", async () => {
-    await writeTheme(updated());
-    const before = await fs.readFile(themePath(), "utf8");
-    const res = await call(saveProjectThemeSettings, OLD_THEME);
-    assert.equal(res._status, 409);
-    assert.equal(res._json.code, "THEME_VERSION_CHANGED");
-    assert.equal(await fs.readFile(themePath(), "utf8"), before);
-  });
+// The whole-file save took its structure, the setting types included, from the
+// request. Saving goes through PATCH alone, which takes them from the stored file.
+describe("the whole-file theme settings save is gone", () => {
+  it("has no POST route for a project's theme settings, and no handler", async () => {
+    const { default: router } = await import("../routes/themes.js");
+    const routes = router.stack.filter((layer) => layer.route).map((layer) => layer.route);
+    const forProject = routes.filter((route) => route.path === "/project/:projectId");
+    assert.deepEqual(forProject.map((route) => Object.keys(route.methods).sort()).flat().sort(), ["get", "patch"]);
 
-  // Reading past an unreadable file would skip the version check, so a stale
-  // whole file could replace whatever is there.
-  it("refuses to write when the stored file cannot be parsed", async () => {
-    await fs.outputFile(themePath(), "{ not json");
-    const res = await call(saveProjectThemeSettings, OLD_THEME);
-    assert.equal(res._status, 500);
-    assert.equal(await fs.readFile(themePath(), "utf8"), "{ not json");
-  });
-
-  it("still saves a file of the same version, or one without a version, with the old response shape", async () => {
-    const same = JSON.parse(JSON.stringify(OLD_THEME));
-    item(same, "accent").value = "#0000ff";
-    const res = await call(saveProjectThemeSettings, same);
-    assert.equal(res._status, 200);
-    assert.deepEqual(Object.keys(res._json), ["message"]);
-
-    const { version: _omit, ...unversioned } = same;
-    const res2 = await call(saveProjectThemeSettings, unversioned);
-    assert.equal(res2._status, 200);
+    const controller = await import("../controllers/themeController.js");
+    assert.equal(controller.saveProjectThemeSettings, undefined);
   });
 });

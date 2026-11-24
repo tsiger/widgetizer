@@ -20,6 +20,17 @@ describe("collectThemeFonts", () => {
     expect(fonts).toEqual({ "Playfair Display": [600] });
   });
 
+  // The weights are written into the stylesheet URL, so a stored value that is
+  // not one of the font's weights loads nothing rather than reaching the link.
+  it("skips a weight the font does not offer, text included", () => {
+    for (const weight of ['600" onload="alert(1)', "600", 650, 9999]) {
+      const { fonts } = collectThemeFonts(
+        theme({ typography: [{ id: "heading_font", type: "font_picker", value: { stack: INTER, weight } }] }),
+      );
+      expect(fonts).toEqual({});
+    }
+  });
+
   it("adds the best bold weight for a body font at 400", () => {
     const { fonts } = collectThemeFonts(
       theme({ typography: [{ id: "body_font", type: "font_picker", value: { stack: INTER, weight: 400 } }] }),
