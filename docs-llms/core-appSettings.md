@@ -19,7 +19,7 @@ The setting catalog is defined declaratively in `packages/editor-ui/src/config/a
 ### General Settings
 
 - **Language** (`general.language`, default `en`): the UI language. The shipped UI exposes **English only**; the locale infrastructure remains in place for future re-expansion. This is unrelated to a site's own languages, which are per project ([Project Management](core-projects.md#7-site-languages)).
-- **Date Format** (`general.dateFormat`, default `MMMM D, YYYY h:mm A`, e.g. `December 31, 2024 2:15 PM`): how dates are displayed throughout the platform.
+- **Date Format** (`general.dateFormat`, default `MMMM D, YYYY h:mm A`, e.g. `December 31, 2024 2:15 PM`): how dates are displayed in the app UI (list tables, export history). Rendered site dates use the theme's `date_format` setting and the page's language (`packages/core/src/filters/dateFilter.js`), not this setting.
 
 ### Media Settings
 

@@ -2,7 +2,7 @@
 
 Features to work on after the 1.0.0 launch, in order. Recorded 2026-11-16. This is a proposed order, not a commitment or a schedule.
 
-1. **AI assistant and site skill.** Let AI assistants read and edit a Widgetizer site, with approval and undo, then add a guided "build me a site" workflow on top. Mostly built on the `mcp` branch; it needs merging onto 1.0.0 and testing in the packaged apps. ([#202](https://github.com/tsiger/widgetizer/issues/202), [#208](https://github.com/tsiger/widgetizer/issues/208), [future-mcp.md](future-mcp.md), [future-skills-site.md](future-skills-site.md))
+1. **AI assistant and site skill.** Let AI assistants read and edit a Widgetizer site, with approval and undo, then add a guided "build me a site" workflow on top. The MCP assistant is built on the `mcp` branch (needs merging onto 1.0.0 and testing in the packaged apps); the standalone site skill remains a proposal. ([#202](https://github.com/tsiger/widgetizer/issues/202), [#208](https://github.com/tsiger/widgetizer/issues/208), [future-mcp.md](future-mcp.md), [future-skills-site.md](future-skills-site.md))
 
 2. **Image optimization.** Themes load the right image size for each place, new uploads are optimized automatically, and later existing media libraries too. ([#128](https://github.com/tsiger/widgetizer/issues/128), [future-image-optimization.md](future-image-optimization.md))
 

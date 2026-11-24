@@ -43,7 +43,7 @@ Code is organized by concern across the workspace packages and the OSS shell:
 `setupBuilderServer({ adapters, plugins })` (`packages/builder-server/src/setupBuilderServer.js`) returns four routers:
 
 - `actorScopedRouter` — `/projects`, `/themes`, `/settings`, `/core`
-- `projectScopedRouter` — `/pages`, `/menus`, `/media`, `/preview`, `/export`, `/widgets`, `/icons`, `/collections`, `/languages`, `/translations`
+- `projectScopedRouter` — `/pages`, `/menus`, `/media`, `/limits`, `/preview`, `/shared-areas`, `/export`, `/widgets`, `/icons`, `/collections`, `/languages`, `/translations`
 - `mediaFileRouter` — the media files as the browser loads them, `/projects/:projectId/{media/:fileId,uploads/images/:filename,uploads/files/:filename}` (project id in the path, since a browser load can't send `X-Project-Id`)
 - `previewRouter` — `GET /render/:token`
 
@@ -92,6 +92,7 @@ Each subsystem has a dedicated doc. This map records only each subsystem's packa
 | App Settings | `packages/builder-server/src/controllers/appSettingsController.js` | `app/src/pages/AppSettings.jsx` (admin shell), `app/src/components/settings/` | [core-appSettings.md](core-appSettings.md) |
 | Preview | `packages/builder-server/src/controllers/previewController.js`, `services/previewTokenStore.js`; runtime at `packages/core/src/runtime/previewRuntime.js` | `packages/editor-ui/src/components/preview/`, `app/src/pages/SitePreviewLayout.jsx`, `PagePreview.jsx`, `CollectionItemPagePreview.jsx` | (see [core-page-editor.md](core-page-editor.md) / [core-security.md](core-security.md)) |
 | Page Editor | — | `packages/editor-ui/src/pages/PageEditor.jsx`, `components/pageEditor/`, `stores/` | [core-page-editor.md](core-page-editor.md) |
+| Shared Areas | `packages/builder-server/src/controllers/sharedAreaController.js`, `services/sharedAreaService.js`, `routes/sharedAreas.js` | `packages/editor-ui/src/queries/sharedAreaManager.js`, page-editor components/stores | [domain/entities/shared-area.md](domain/entities/shared-area.md) |
 | Widgets (theme + core) | `packages/builder-server/src/controllers/projectController.js` (`/widgets`), core widget schemas under `packages/core/src/widgets/` | — | [core-widgets.md](core-widgets.md) |
 | Languages & translations | `packages/builder-server/src/controllers/languageController.js`, `translationController.js`, `services/languageService.js`, `translationService.js`, `services/siteStringsService.js` | `packages/editor-ui/src/components/content/` (`LanguageTabs`, `LanguageMenu`, `TranslationChips`), `hooks/useListLanguage.js`, `useTranslationVersions.js`; add/remove in `app/src/components/projects/LanguagesSection.jsx` | [domain/multilingual.md](domain/multilingual.md) |
 | Database / repositories | `packages/builder-server/src/db/` (repositories: project, media, settings, export) | — | [core-database.md](core-database.md) |

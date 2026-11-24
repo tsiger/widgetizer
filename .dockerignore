@@ -24,7 +24,6 @@ data
 
 # Large non-runtime directories.
 docs-website
-docs-entities
 logs
 temp
 tmp
