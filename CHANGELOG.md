@@ -8,6 +8,10 @@
 - **Docker:** `docker-compose.yml` publishes the viewer on `3002`, and the image exposes it. An existing install that publishes only `3001` must publish `3002` too; a remapped app port keeps the viewer one above it (`8080:3001` with `8081:3002`). `DOCKER.md` has nginx and Caddy examples for a server behind a proxy
 - **Settings:** `EXPORT_VIEWER_PORT` fixes the viewer's port and `EXPORT_VIEWER_URL` sets its public address. `EXPORT_VIEWER_PORT=off` is a last resort for setups that can expose only one port: View then serves exports from the app, where links starting with `/` and 404 pages break
 
+### Export
+
+- A failed export no longer leaves its unfinished folder in the publish folder, where nothing listed or removed it. An export is now built in a temporary folder and takes its final name only when complete
+
 ## [0.9.10] - 2026-10-22
 
 ### Multilingual Sites
