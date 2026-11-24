@@ -551,6 +551,11 @@ before(async () => {
   await fs.writeFile(path.join(projectDir, "assets", ".DS_Store"), "junk");
   await fs.ensureDir(path.join(projectDir, "assets", "__MACOSX"));
   await fs.writeFile(path.join(projectDir, "assets", "__MACOSX", "foo"), "junk");
+  // Dot entries: never something to publish.
+  await fs.writeFile(path.join(projectDir, "assets", ".hidden-note.txt"), "private");
+  await fs.outputFile(path.join(projectDir, "assets", ".git", "config"), "[core]");
+  await fs.writeFile(path.join(projectDir, "assets", "css", ".env"), "SECRET=1");
+  await fs.outputFile(path.join(projectDir, "assets", ".well-known", "security.txt"), "Contact: x");
   // Render-time icon source — inlined into HTML at render, never fetched by pages.
   await fs.writeFile(path.join(projectDir, "assets", "icons.json"), JSON.stringify({ star: { body: "<svg/>" } }));
 
@@ -574,6 +579,8 @@ before(async () => {
 <div class="hero-slider">slides</div>`,
   );
   await fs.writeFile(path.join(widgetAssetsDir, "hero-slider.css"), ".hero { display: flex; }");
+  // A hidden folder holding a file with the enqueued name: never the one published.
+  await fs.outputFile(path.join(widgetAssetsDir, ".backup", "hero-slider.css"), ".hero { display: none; }");
   await fs.writeFile(path.join(widgetAssetsDir, "hero-slider.js"), "// slider init");
   // Uppercase extension + author query: the copier must match on the real
   // filename (any case), ignoring the query the tag emits in the URL.
@@ -791,6 +798,21 @@ describe("exportProject", () => {
     );
   });
 
+  it("leaves every dot-named file and folder of the project's assets out of the export", async () => {
+    const exportDir = await getLatestExportDir();
+    const dotEntries = [];
+    async function walk(dir) {
+      for (const entry of await fs.readdir(dir, { withFileTypes: true })) {
+        if (entry.name.startsWith(".")) dotEntries.push(path.relative(exportDir, path.join(dir, entry.name)));
+        if (entry.isDirectory()) await walk(path.join(dir, entry.name));
+      }
+    }
+    await walk(exportDir);
+    // `.well-known` counts only at the site's root, which assets/ is not.
+    assert.deepEqual(dotEntries, [], "no hidden note, .git folder, .env or assets/.well-known");
+    assert.ok(await fs.pathExists(path.join(exportDir, "assets", "css", "styles.css")), "its neighbours are still copied");
+  });
+
   it("copies image size variants", async () => {
     const exportDir = await getLatestExportDir();
     const mediumPath = path.join(exportDir, "assets", "images", "hero-medium.jpg");
@@ -833,6 +855,12 @@ describe("exportProject", () => {
     const widgetJs = path.join(exportDir, "assets", "hero-slider.js");
     assert.ok(await fs.pathExists(widgetCss), "Used widget CSS should be copied to assets/");
     assert.ok(await fs.pathExists(widgetJs), "Used widget JS should be copied to assets/");
+  });
+
+  it("publishes the widget's own asset, not a same-named file in a hidden folder", async () => {
+    const exportDir = await getLatestExportDir();
+    const published = await fs.readFile(path.join(exportDir, "assets", "hero-slider.css"), "utf8");
+    assert.equal(published, ".hero { display: flex; }");
   });
 
   it("skips widget assets no page enqueued", async () => {
@@ -1300,7 +1328,7 @@ describe("getExportFiles", () => {
 // downloadExport — ZIP streaming
 // ========================================================================
 
-describe("isExportableEntry (export ZIP system-junk filter)", () => {
+describe("isExportableEntry (what an export and its ZIP leave out)", () => {
   it("excludes OS/system metadata files anywhere in the tree", () => {
     assert.equal(isExportableEntry(".DS_Store"), false);
     assert.equal(isExportableEntry("assets/.DS_Store"), false);
@@ -1310,12 +1338,27 @@ describe("isExportableEntry (export ZIP system-junk filter)", () => {
     assert.equal(isExportableEntry("assets/__MACOSX/bar.css"), false);
   });
 
-  it("keeps real site files (including legitimate dotfiles)", () => {
+  it("excludes every file and folder whose name starts with a dot", () => {
+    assert.equal(isExportableEntry("assets/.hidden-note.txt"), false);
+    assert.equal(isExportableEntry("assets/.git"), false);
+    assert.equal(isExportableEntry("assets/.git/config"), false);
+    assert.equal(isExportableEntry("assets/css/.env"), false);
+    assert.equal(isExportableEntry(".htaccess"), false);
+    assert.equal(isExportableEntry(".nojekyll"), false);
+  });
+
+  it("keeps real site files, a dot inside a name included", () => {
     assert.equal(isExportableEntry("index.html"), true);
     assert.equal(isExportableEntry("assets/style.css"), true);
     assert.equal(isExportableEntry("assets/placeholder.svg"), true);
-    assert.equal(isExportableEntry(".nojekyll"), true);
+    assert.equal(isExportableEntry("assets/js/app.min.js"), true);
+  });
+
+  it("keeps .well-known at the export root only, and not a dot entry inside it", () => {
+    assert.equal(isExportableEntry(".well-known"), true);
     assert.equal(isExportableEntry(".well-known/security.txt"), true);
+    assert.equal(isExportableEntry(".well-known/.secret"), false);
+    assert.equal(isExportableEntry("assets/.well-known/security.txt"), false);
   });
 });
 
@@ -1378,7 +1421,7 @@ describe("downloadExport", () => {
     assert.ok(res._headers["Content-Disposition"].includes(".zip"), "Should have .zip extension");
   });
 
-  it("zips folders (empty ones too) and dotfiles, and leaves out system junk", async () => {
+  it("zips folders (empty ones too), and leaves out dot entries and system junk", async () => {
     const dir = "test-download-entries";
     const full = path.join(PUBLISH_DIR, dir);
     await fs.outputFile(path.join(full, "index.html"), "a");
@@ -1386,6 +1429,9 @@ describe("downloadExport", () => {
     await fs.ensureDir(path.join(full, "empty"));
     await fs.outputFile(path.join(full, ".htaccess"), "c");
     await fs.outputFile(path.join(full, "sub", ".hidden", "h.txt"), "d");
+    await fs.outputFile(path.join(full, "sub", "kept.txt"), "e");
+    await fs.outputFile(path.join(full, ".well-known", "security.txt"), "f");
+    await fs.symlink("index.html", path.join(full, ".link"));
     await fs.outputFile(path.join(full, ".DS_Store"), "junk");
     await fs.outputFile(path.join(full, "assets", "Thumbs.db"), "junk");
     await fs.outputFile(path.join(full, "__MACOSX", "x"), "junk");
@@ -1404,7 +1450,8 @@ describe("downloadExport", () => {
       const entries = new AdmZip(res.body()).getEntries();
       const names = entries.map((entry) => entry.entryName).sort();
       assert.deepEqual(names, [
-        ".htaccess",
+        ".well-known/",
+        ".well-known/security.txt",
         "assets/",
         "assets/css/",
         "assets/css/s.css",
@@ -1414,8 +1461,7 @@ describe("downloadExport", () => {
         "link.html",
         "linkdir",
         "sub/",
-        "sub/.hidden/",
-        "sub/.hidden/h.txt",
+        "sub/kept.txt",
       ]);
       const SYMLINK = 0o120000;
       const links = Object.fromEntries(
