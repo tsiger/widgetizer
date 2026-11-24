@@ -30,7 +30,7 @@ import {
 } from "@widgetizer/core";
 import { escapeHtml } from "@widgetizer/core/escapeHtml";
 import { renderedWidgetOrder, uniqueWidgetOrder } from "@widgetizer/core/widgetOrder";
-import { resolveRichtextMediaInWidgetData } from "@widgetizer/core/richtextMedia";
+import { resolveRichtextMediaInWidgetData, createPublishedImageNamer } from "@widgetizer/core/richtextMedia";
 import {
   resolveRichtextLinksInWidgetData,
   resolveRichtextLinksInSettings,
@@ -1113,6 +1113,10 @@ async function createBaseRenderContext(deps, rawThemeSettings, renderMode = "pre
     globals,
     imagePath: imageBasePath,
     filePath: fileBasePath,
+    // A published site holds an image's sizes, not its original once a `large`
+    // size exists, so a path in content that names the original is renamed. A
+    // preview serves the originals and leaves them alone.
+    publishedImageName: renderMode === "publish" ? createPublishedImageNamer(mediaFiles) : null,
     // Export-generated site icons carry root-relative filenames, so prefix them
     // per render depth. Runtime icons are built from the already-prefixed
     // imageBasePath, so they need no further prefixing.
@@ -1378,7 +1382,13 @@ async function renderWidget(
     // renders — so a richtext <img> loads in both preview and export with no per-template
     // wiring. Runs on the already-sanitized clone; stored values keep their portable path.
     const baseContext = await createBaseRenderContext(deps, rawThemeSettings, renderMode, sharedGlobals);
-    resolveRichtextMediaInWidgetData(resolvedWidgetData, schema, baseContext.imagePath, baseContext.filePath);
+    resolveRichtextMediaInWidgetData(
+      resolvedWidgetData,
+      schema,
+      baseContext.imagePath,
+      baseContext.filePath,
+      baseContext.publishedImageName,
+    );
 
     // Resolve stable internal-link refs embedded in richtext anchors (data-page-uuid /
     // data-collection-item-uuid) to current slugs, depth-aware — the richtext analogue of
@@ -1699,6 +1709,7 @@ async function renderCollectionItemPage(
   const resolvedItem = prepareItem(item, schema, sharedGlobals.pagesByUuid, sharedGlobals.outputPathPrefix, menuDeps, {
     imagePath: baseContext.imagePath,
     filePath: baseContext.filePath,
+    publishedImageName: baseContext.publishedImageName,
   });
 
   // Seed the trail before the header renders: an item's label comes from the item,

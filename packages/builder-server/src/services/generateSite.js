@@ -36,13 +36,23 @@ import {
 import { buildSitemap, buildRobotsTxt } from "./seoArtifacts.js";
 import { buildFormsManifest, resolveMaxFormsPerSite } from "./formsManifestService.js";
 import { selectBuildPages } from "./selectBuildPages.js";
+import { createPublishedImageNamer } from "@widgetizer/core/richtextMedia";
 import { generateExportSiteIcons } from "../utils/siteIconHelpers.js";
 import { formatHtml } from "../utils/htmlProcessor.js";
 import { listPagesFromDir, readAreasFromDir, readGlobalWidgetFromDir, readThemeDataFromDir } from "../utils/projectContentFs.js";
 
-function rewriteStoragePaths(html, outputPathPrefix) {
+// A stored image path left in the page as written (a template printing it, an
+// inline style): the file name runs to the first character a URL in HTML or CSS
+// can't hold unescaped, or to its query or fragment.
+const UPLOAD_IMAGE_PATH_RE = /\/uploads\/images\/([^"'\s()<>,?#&]*)/g;
+
+/**
+ * @param {(name: string) => string} publishedImageName - The file the site carries
+ *   for an image's file name: an original with a `large` size is not published.
+ */
+function rewriteStoragePaths(html, outputPathPrefix, publishedImageName) {
   return html
-    .replaceAll("/uploads/images/", `${outputPathPrefix}assets/images/`)
+    .replace(UPLOAD_IMAGE_PATH_RE, (_match, name) => `${outputPathPrefix}assets/images/${publishedImageName(name)}`)
     .replaceAll("/uploads/files/", `${outputPathPrefix}assets/files/`);
 }
 
@@ -431,6 +441,15 @@ export async function* generateSite(deps, options) {
     cleanUrls,
   });
 
+  // Read once for the whole site, like the renderer's own copy: which images
+  // have a `large` size decides the file a stored path is published as.
+  let publishedImageName = (name) => name;
+  try {
+    publishedImageName = createPublishedImageNamer((await deps.getMediaFiles?.())?.files);
+  } catch (error) {
+    console.warn(`Could not read the media list for project ${projectId}: ${error.message}`);
+  }
+
   /** Format (unless turned off), rewrite storage paths, then let the app inspect the page before the marker comment goes on. */
   async function finishHtml(rendered, outputPathPrefix, formatFailureNote, page) {
     let source = rendered;
@@ -439,7 +458,7 @@ export async function* generateSite(deps, options) {
       source = formatted.html;
       if (!formatted.success) console.warn(formatFailureNote(formatted.error));
     }
-    const html = rewriteStoragePaths(source, outputPathPrefix);
+    const html = rewriteStoragePaths(source, outputPathPrefix, publishedImageName);
     if (inspectHtml) await inspectHtml(html, page);
     return markerComment(appVersion) + html;
   }
