@@ -575,7 +575,8 @@
       "noFileSelected": "Please select a file to import",
       "fileTooLarge": "File size ({{size}}MB) exceeds the maximum allowed size of {{max}}MB. Please reduce the project size or increase the limit in Settings.",
       "importButton": "Import Backup",
-      "importError": "Failed to import backup"
+      "importError": "Failed to import backup",
+      "themeNotInstalled": "This backup needs the theme \"{{theme}}\", which is not installed. Nothing was uploaded. Install the theme first, then import the backup again."
     },
     "toasts": {
       "deleteSuccess": "Project \"{{name}}\" was deleted successfully",
