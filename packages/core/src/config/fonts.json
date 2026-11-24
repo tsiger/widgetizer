@@ -46,7 +46,7 @@
     },
     {
       "name": "Abril Fatface",
-      "stack": "\"Abril Fatface\", display",
+      "stack": "\"Abril Fatface\", serif",
       "isGoogleFont": true,
       "availableWeights": [
         400
@@ -153,7 +153,7 @@
     },
     {
       "name": "Alfa Slab One",
-      "stack": "\"Alfa Slab One\", display",
+      "stack": "\"Alfa Slab One\", serif",
       "isGoogleFont": true,
       "availableWeights": [
         400
@@ -207,7 +207,7 @@
     },
     {
       "name": "Amatic SC",
-      "stack": "\"Amatic SC\", handwriting",
+      "stack": "\"Amatic SC\", cursive",
       "isGoogleFont": true,
       "availableWeights": [
         400,
@@ -362,8 +362,27 @@
       ]
     },
     {
+      "name": "Atkinson Hyperlegible Next",
+      "stack": "\"Atkinson Hyperlegible Next\", sans-serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin",
+        "latin-ext"
+      ]
+    },
+    {
       "name": "Baloo 2",
-      "stack": "\"Baloo 2\", display",
+      "stack": "\"Baloo 2\", sans-serif",
       "isGoogleFont": true,
       "availableWeights": [
         400,
@@ -382,7 +401,7 @@
     },
     {
       "name": "Balsamiq Sans",
-      "stack": "\"Balsamiq Sans\", display",
+      "stack": "\"Balsamiq Sans\", sans-serif",
       "isGoogleFont": true,
       "availableWeights": [
         400,
@@ -398,7 +417,7 @@
     },
     {
       "name": "Bangers",
-      "stack": "\"Bangers\", display",
+      "stack": "\"Bangers\", sans-serif",
       "isGoogleFont": true,
       "availableWeights": [
         400
@@ -549,6 +568,45 @@
       ]
     },
     {
+      "name": "Bona Nova",
+      "stack": "\"Bona Nova\", serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        400,
+        700
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "greek",
+        "hebrew",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
+    },
+    {
+      "name": "Bricolage Grotesque",
+      "stack": "\"Bricolage Grotesque\", sans-serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
+    },
+    {
       "name": "Brygada 1918",
       "stack": "\"Brygada 1918\", serif",
       "isGoogleFont": true,
@@ -604,7 +662,7 @@
     },
     {
       "name": "Cabin Sketch",
-      "stack": "\"Cabin Sketch\", display",
+      "stack": "\"Cabin Sketch\", sans-serif",
       "isGoogleFont": true,
       "availableWeights": [
         400,
@@ -684,7 +742,7 @@
     },
     {
       "name": "Carter One",
-      "stack": "\"Carter One\", display",
+      "stack": "\"Carter One\", sans-serif",
       "isGoogleFont": true,
       "availableWeights": [
         400
@@ -718,7 +776,7 @@
     },
     {
       "name": "Caveat",
-      "stack": "\"Caveat\", handwriting",
+      "stack": "\"Caveat\", cursive",
       "isGoogleFont": true,
       "availableWeights": [
         400,
@@ -735,8 +793,27 @@
       ]
     },
     {
+      "name": "Chakra Petch",
+      "stack": "\"Chakra Petch\", sans-serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        300,
+        400,
+        500,
+        600,
+        700
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin",
+        "latin-ext",
+        "thai",
+        "vietnamese"
+      ]
+    },
+    {
       "name": "Chewy",
-      "stack": "\"Chewy\", display",
+      "stack": "\"Chewy\", sans-serif",
       "isGoogleFont": true,
       "availableWeights": [
         400
@@ -788,7 +865,7 @@
     },
     {
       "name": "Cinzel Decorative",
-      "stack": "\"Cinzel Decorative\", display",
+      "stack": "\"Cinzel Decorative\", serif",
       "isGoogleFont": true,
       "availableWeights": [
         400,
@@ -803,7 +880,7 @@
     },
     {
       "name": "Comfortaa",
-      "stack": "\"Comfortaa\", display",
+      "stack": "\"Comfortaa\", sans-serif",
       "isGoogleFont": true,
       "availableWeights": [
         300,
@@ -919,7 +996,7 @@
     },
     {
       "name": "Dancing Script",
-      "stack": "\"Dancing Script\", handwriting",
+      "stack": "\"Dancing Script\", cursive",
       "isGoogleFont": true,
       "availableWeights": [
         400,
@@ -1180,7 +1257,7 @@
     },
     {
       "name": "Forum",
-      "stack": "\"Forum\", display",
+      "stack": "\"Forum\", serif",
       "isGoogleFont": true,
       "availableWeights": [
         400
@@ -1268,6 +1345,25 @@
       ]
     },
     {
+      "name": "Gentium Book Plus",
+      "stack": "\"Gentium Book Plus\", serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        400,
+        700
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "greek",
+        "greek-ext",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
+    },
+    {
       "name": "Geologica",
       "stack": "\"Geologica\", sans-serif",
       "isGoogleFont": true,
@@ -1303,6 +1399,20 @@
       "defaultWeight": 400,
       "subsets": [
         "devanagari",
+        "latin",
+        "latin-ext"
+      ]
+    },
+    {
+      "name": "Gloock",
+      "stack": "\"Gloock\", serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        400
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "cyrillic-ext",
         "latin",
         "latin-ext"
       ]
@@ -1397,7 +1507,7 @@
     },
     {
       "name": "Great Vibes",
-      "stack": "\"Great Vibes\", handwriting",
+      "stack": "\"Great Vibes\", cursive",
       "isGoogleFont": true,
       "availableWeights": [
         400
@@ -1428,7 +1538,7 @@
     },
     {
       "name": "Handlee",
-      "stack": "\"Handlee\", handwriting",
+      "stack": "\"Handlee\", cursive",
       "isGoogleFont": true,
       "availableWeights": [
         400
@@ -1603,7 +1713,7 @@
     },
     {
       "name": "Indie Flower",
-      "stack": "\"Indie Flower\", handwriting",
+      "stack": "\"Indie Flower\", cursive",
       "isGoogleFont": true,
       "availableWeights": [
         400
@@ -1623,6 +1733,19 @@
         500,
         600,
         700
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin",
+        "latin-ext"
+      ]
+    },
+    {
+      "name": "Instrument Serif",
+      "stack": "\"Instrument Serif\", serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        400
       ],
       "defaultWeight": 400,
       "subsets": [
@@ -1789,7 +1912,7 @@
     },
     {
       "name": "Kalam",
-      "stack": "\"Kalam\", handwriting",
+      "stack": "\"Kalam\", cursive",
       "isGoogleFont": true,
       "availableWeights": [
         300,
@@ -1972,6 +2095,33 @@
       ]
     },
     {
+      "name": "Libre Caslon Display",
+      "stack": "\"Libre Caslon Display\", serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        400
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin",
+        "latin-ext"
+      ]
+    },
+    {
+      "name": "Libre Caslon Text",
+      "stack": "\"Libre Caslon Text\", serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        400,
+        700
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin",
+        "latin-ext"
+      ]
+    },
+    {
       "name": "Libre Franklin",
       "stack": "\"Libre Franklin\", sans-serif",
       "isGoogleFont": true,
@@ -2043,7 +2193,7 @@
     },
     {
       "name": "Lobster",
-      "stack": "\"Lobster\", display",
+      "stack": "\"Lobster\", serif",
       "isGoogleFont": true,
       "availableWeights": [
         400
@@ -2059,7 +2209,7 @@
     },
     {
       "name": "Lobster Two",
-      "stack": "\"Lobster Two\", display",
+      "stack": "\"Lobster Two\", serif",
       "isGoogleFont": true,
       "availableWeights": [
         400,
@@ -2131,7 +2281,7 @@
     },
     {
       "name": "Macondo",
-      "stack": "\"Macondo\", display",
+      "stack": "\"Macondo\", serif",
       "isGoogleFont": true,
       "availableWeights": [
         400
@@ -2268,7 +2418,7 @@
     },
     {
       "name": "Monoton",
-      "stack": "\"Monoton\", display",
+      "stack": "\"Monoton\", sans-serif",
       "isGoogleFont": true,
       "availableWeights": [
         400
@@ -2951,7 +3101,7 @@
     },
     {
       "name": "Oleo Script",
-      "stack": "\"Oleo Script\", display",
+      "stack": "\"Oleo Script\", serif",
       "isGoogleFont": true,
       "availableWeights": [
         400,
@@ -3106,7 +3256,7 @@
     },
     {
       "name": "Pacifico",
-      "stack": "\"Pacifico\", handwriting",
+      "stack": "\"Pacifico\", cursive",
       "isGoogleFont": true,
       "availableWeights": [
         400
@@ -3135,7 +3285,7 @@
     },
     {
       "name": "Patrick Hand",
-      "stack": "\"Patrick Hand\", handwriting",
+      "stack": "\"Patrick Hand\", cursive",
       "isGoogleFont": true,
       "availableWeights": [
         400
@@ -3149,7 +3299,7 @@
     },
     {
       "name": "Patua One",
-      "stack": "\"Patua One\", display",
+      "stack": "\"Patua One\", serif",
       "isGoogleFont": true,
       "availableWeights": [
         400
@@ -3188,6 +3338,45 @@
         "latin",
         "latin-ext",
         "vietnamese"
+      ]
+    },
+    {
+      "name": "Piazzolla",
+      "stack": "\"Piazzolla\", serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        100,
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "greek",
+        "greek-ext",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
+    },
+    {
+      "name": "Pirata One",
+      "stack": "\"Pirata One\", serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        400
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin",
+        "latin-ext"
       ]
     },
     {
@@ -3317,7 +3506,7 @@
     },
     {
       "name": "Press Start 2P",
-      "stack": "\"Press Start 2P\", display",
+      "stack": "\"Press Start 2P\", sans-serif",
       "isGoogleFont": true,
       "availableWeights": [
         400
@@ -3532,7 +3721,7 @@
     },
     {
       "name": "Righteous",
-      "stack": "\"Righteous\", display",
+      "stack": "\"Righteous\", sans-serif",
       "isGoogleFont": true,
       "availableWeights": [
         400
@@ -3615,6 +3804,32 @@
       ]
     },
     {
+      "name": "Roboto Slab",
+      "stack": "\"Roboto Slab\", serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        100,
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "greek",
+        "greek-ext",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
+    },
+    {
       "name": "Rokkitt",
       "stack": "\"Rokkitt\", serif",
       "isGoogleFont": true,
@@ -3681,7 +3896,7 @@
     },
     {
       "name": "Sacramento",
-      "stack": "\"Sacramento\", handwriting",
+      "stack": "\"Sacramento\", cursive",
       "isGoogleFont": true,
       "availableWeights": [
         400
@@ -3694,7 +3909,7 @@
     },
     {
       "name": "Salsa",
-      "stack": "\"Salsa\", display",
+      "stack": "\"Salsa\", sans-serif",
       "isGoogleFont": true,
       "availableWeights": [
         400
@@ -3728,7 +3943,7 @@
     },
     {
       "name": "Satisfy",
-      "stack": "\"Satisfy\", handwriting",
+      "stack": "\"Satisfy\", cursive",
       "isGoogleFont": true,
       "availableWeights": [
         400
@@ -3813,7 +4028,7 @@
     },
     {
       "name": "Shrikhand",
-      "stack": "\"Shrikhand\", display",
+      "stack": "\"Shrikhand\", serif",
       "isGoogleFont": true,
       "availableWeights": [
         400
@@ -3845,7 +4060,7 @@
     },
     {
       "name": "Sniglet",
-      "stack": "\"Sniglet\", display",
+      "stack": "\"Sniglet\", sans-serif",
       "isGoogleFont": true,
       "availableWeights": [
         400,
@@ -4071,7 +4286,7 @@
     },
     {
       "name": "Staatliches",
-      "stack": "\"Staatliches\", display",
+      "stack": "\"Staatliches\", sans-serif",
       "isGoogleFont": true,
       "availableWeights": [
         400
@@ -4262,6 +4477,29 @@
       ]
     },
     {
+      "name": "Unbounded",
+      "stack": "\"Unbounded\", sans-serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
+    },
+    {
       "name": "Varela Round",
       "stack": "\"Varela Round\", sans-serif",
       "isGoogleFont": true,
@@ -4402,7 +4640,7 @@
     },
     {
       "name": "Yeseva One",
-      "stack": "\"Yeseva One\", display",
+      "stack": "\"Yeseva One\", serif",
       "isGoogleFont": true,
       "availableWeights": [
         400
@@ -4413,6 +4651,46 @@
         "cyrillic-ext",
         "latin",
         "latin-ext",
+        "vietnamese"
+      ]
+    },
+    {
+      "name": "Young Serif",
+      "stack": "\"Young Serif\", serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        400
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin",
+        "latin-ext"
+      ]
+    },
+    {
+      "name": "Ysabeau",
+      "stack": "\"Ysabeau\", sans-serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        100,
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "greek",
+        "latin",
+        "latin-ext",
+        "math",
+        "symbols",
         "vietnamese"
       ]
     },

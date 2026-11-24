@@ -388,7 +388,7 @@
     "\"Abel\", sans-serif": [
       400
     ],
-    "\"Abril Fatface\", display": [
+    "\"Abril Fatface\", serif": [
       400
     ],
     "\"Actor\", sans-serif": [
@@ -425,7 +425,7 @@
       800,
       900
     ],
-    "\"Alfa Slab One\", display": [
+    "\"Alfa Slab One\", serif": [
       400
     ],
     "\"Alice\", serif": [
@@ -438,7 +438,7 @@
       400,
       700
     ],
-    "\"Amatic SC\", handwriting": [
+    "\"Amatic SC\", cursive": [
       400,
       700
     ],
@@ -497,18 +497,27 @@
       700,
       800
     ],
-    "\"Baloo 2\", display": [
+    "\"Atkinson Hyperlegible Next\", sans-serif": [
+      200,
+      300,
       400,
       500,
       600,
       700,
       800
     ],
-    "\"Balsamiq Sans\", display": [
+    "\"Baloo 2\", sans-serif": [
+      400,
+      500,
+      600,
+      700,
+      800
+    ],
+    "\"Balsamiq Sans\", sans-serif": [
       400,
       700
     ],
-    "\"Bangers\", display": [
+    "\"Bangers\", sans-serif": [
       400
     ],
     "\"Barlow\", sans-serif": [
@@ -571,6 +580,19 @@
       800,
       900
     ],
+    "\"Bona Nova\", serif": [
+      400,
+      700
+    ],
+    "\"Bricolage Grotesque\", sans-serif": [
+      200,
+      300,
+      400,
+      500,
+      600,
+      700,
+      800
+    ],
     "\"Brygada 1918\", serif": [
       400,
       500,
@@ -589,7 +611,7 @@
       600,
       700
     ],
-    "\"Cabin Sketch\", display": [
+    "\"Cabin Sketch\", sans-serif": [
       400,
       700
     ],
@@ -614,7 +636,7 @@
       400,
       700
     ],
-    "\"Carter One\", display": [
+    "\"Carter One\", sans-serif": [
       400
     ],
     "\"Catamaran\", sans-serif": [
@@ -628,13 +650,20 @@
       800,
       900
     ],
-    "\"Caveat\", handwriting": [
+    "\"Caveat\", cursive": [
       400,
       500,
       600,
       700
     ],
-    "\"Chewy\", display": [
+    "\"Chakra Petch\", sans-serif": [
+      300,
+      400,
+      500,
+      600,
+      700
+    ],
+    "\"Chewy\", sans-serif": [
       400
     ],
     "\"Chivo\", sans-serif": [
@@ -656,12 +685,12 @@
       800,
       900
     ],
-    "\"Cinzel Decorative\", display": [
+    "\"Cinzel Decorative\", serif": [
       400,
       700,
       900
     ],
-    "\"Comfortaa\", display": [
+    "\"Comfortaa\", sans-serif": [
       300,
       400,
       500,
@@ -699,7 +728,7 @@
       600,
       700
     ],
-    "\"Dancing Script\", handwriting": [
+    "\"Dancing Script\", cursive": [
       400,
       500,
       600,
@@ -798,7 +827,7 @@
     "\"Fjalla One\", sans-serif": [
       400
     ],
-    "\"Forum\", display": [
+    "\"Forum\", serif": [
       400
     ],
     "\"Francois One\", sans-serif": [
@@ -831,6 +860,10 @@
       600,
       700
     ],
+    "\"Gentium Book Plus\", serif": [
+      400,
+      700
+    ],
     "\"Geologica\", sans-serif": [
       100,
       200,
@@ -845,6 +878,9 @@
     "\"Glegoo\", serif": [
       400,
       700
+    ],
+    "\"Gloock\", serif": [
+      400
     ],
     "\"Golos Text\", sans-serif": [
       400,
@@ -871,14 +907,14 @@
       800,
       900
     ],
-    "\"Great Vibes\", handwriting": [
+    "\"Great Vibes\", cursive": [
       400
     ],
     "\"Gudea\", sans-serif": [
       400,
       700
     ],
-    "\"Handlee\", handwriting": [
+    "\"Handlee\", cursive": [
       400
     ],
     "\"Hedvig Letters Sans\", sans-serif": [
@@ -946,7 +982,7 @@
       800,
       900
     ],
-    "\"Indie Flower\", handwriting": [
+    "\"Indie Flower\", cursive": [
       400
     ],
     "\"Instrument Sans\", sans-serif": [
@@ -954,6 +990,9 @@
       500,
       600,
       700
+    ],
+    "\"Instrument Serif\", serif": [
+      400
     ],
     "\"Inter\", sans-serif": [
       100,
@@ -1018,7 +1057,7 @@
       600,
       700
     ],
-    "\"Kalam\", handwriting": [
+    "\"Kalam\", cursive": [
       300,
       400,
       700
@@ -1096,6 +1135,13 @@
       600,
       700
     ],
+    "\"Libre Caslon Display\", serif": [
+      400
+    ],
+    "\"Libre Caslon Text\", serif": [
+      400,
+      700
+    ],
     "\"Libre Franklin\", sans-serif": [
       100,
       200,
@@ -1127,10 +1173,10 @@
       700,
       900
     ],
-    "\"Lobster\", display": [
+    "\"Lobster\", serif": [
       400
     ],
-    "\"Lobster Two\", display": [
+    "\"Lobster Two\", serif": [
       400,
       700
     ],
@@ -1152,7 +1198,7 @@
       800,
       900
     ],
-    "\"Macondo\", display": [
+    "\"Macondo\", serif": [
       400
     ],
     "\"Mada\", sans-serif": [
@@ -1199,7 +1245,7 @@
       600,
       700
     ],
-    "\"Monoton\", display": [
+    "\"Monoton\", sans-serif": [
       400
     ],
     "\"Montserrat\", sans-serif": [
@@ -1501,7 +1547,7 @@
       800,
       900
     ],
-    "\"Oleo Script\", display": [
+    "\"Oleo Script\", serif": [
       400,
       700
     ],
@@ -1561,16 +1607,16 @@
       400,
       700
     ],
-    "\"Pacifico\", handwriting": [
+    "\"Pacifico\", cursive": [
       400
     ],
     "\"Pathway Gothic One\", sans-serif": [
       400
     ],
-    "\"Patrick Hand\", handwriting": [
+    "\"Patrick Hand\", cursive": [
       400
     ],
-    "\"Patua One\", display": [
+    "\"Patua One\", serif": [
       400
     ],
     "\"Paytone One\", sans-serif": [
@@ -1579,6 +1625,20 @@
     "\"Philosopher\", sans-serif": [
       400,
       700
+    ],
+    "\"Piazzolla\", serif": [
+      100,
+      200,
+      300,
+      400,
+      500,
+      600,
+      700,
+      800,
+      900
+    ],
+    "\"Pirata One\", serif": [
+      400
     ],
     "\"Playfair\", serif": [
       300,
@@ -1626,7 +1686,7 @@
     "\"Prata\", serif": [
       400
     ],
-    "\"Press Start 2P\", display": [
+    "\"Press Start 2P\", sans-serif": [
       400
     ],
     "\"Prompt\", sans-serif": [
@@ -1703,7 +1763,7 @@
       800,
       900
     ],
-    "\"Righteous\", display": [
+    "\"Righteous\", sans-serif": [
       400
     ],
     "\"Roboto\", sans-serif": [
@@ -1731,6 +1791,17 @@
       500,
       600,
       700
+    ],
+    "\"Roboto Slab\", serif": [
+      100,
+      200,
+      300,
+      400,
+      500,
+      600,
+      700,
+      800,
+      900
     ],
     "\"Rokkitt\", serif": [
       100,
@@ -1760,10 +1831,10 @@
       800,
       900
     ],
-    "\"Sacramento\", handwriting": [
+    "\"Sacramento\", cursive": [
       400
     ],
-    "\"Salsa\", display": [
+    "\"Salsa\", sans-serif": [
       400
     ],
     "\"Sarabun\", sans-serif": [
@@ -1776,7 +1847,7 @@
       700,
       800
     ],
-    "\"Satisfy\", handwriting": [
+    "\"Satisfy\", cursive": [
       400
     ],
     "\"Schibsted Grotesk\", sans-serif": [
@@ -1803,7 +1874,7 @@
     "\"Share Tech Mono\", monospace": [
       400
     ],
-    "\"Shrikhand\", display": [
+    "\"Shrikhand\", serif": [
       400
     ],
     "\"Signika\", sans-serif": [
@@ -1813,7 +1884,7 @@
       600,
       700
     ],
-    "\"Sniglet\", display": [
+    "\"Sniglet\", sans-serif": [
       400,
       800
     ],
@@ -1904,7 +1975,7 @@
     "\"Spinnaker\", sans-serif": [
       400
     ],
-    "\"Staatliches\", display": [
+    "\"Staatliches\", sans-serif": [
       400
     ],
     "\"STIX Two Text\", serif": [
@@ -1964,6 +2035,16 @@
       400,
       700
     ],
+    "\"Unbounded\", sans-serif": [
+      200,
+      300,
+      400,
+      500,
+      600,
+      700,
+      800,
+      900
+    ],
     "\"Varela Round\", sans-serif": [
       400
     ],
@@ -2010,8 +2091,22 @@
       600,
       700
     ],
-    "\"Yeseva One\", display": [
+    "\"Yeseva One\", serif": [
       400
+    ],
+    "\"Young Serif\", serif": [
+      400
+    ],
+    "\"Ysabeau\", sans-serif": [
+      100,
+      200,
+      300,
+      400,
+      500,
+      600,
+      700,
+      800,
+      900
     ],
     "\"Zilla Slab\", serif": [
       300,
