@@ -469,12 +469,14 @@ export default function RichTextInput({
   // throws "Cannot read properties of null (reading 'cached')".
   useEffect(() => {
     if (!editor || editor.isDestroyed) return;
-    // Resolve internal-link hrefs to current slugs for display (Issue 3). setContent with
-    // emitUpdate=false means this is display-only — it does NOT fire onUpdate/onChange, so
-    // the field isn't dirtied and the stored value is untouched until a real edit.
+    // Resolve internal-link hrefs to current slugs for display. setContent with
+    // emitUpdate: false is display-only: it does NOT fire onUpdate/onChange, so the
+    // field isn't dirtied and the stored value is untouched until a real edit. The
+    // option has to be the object form; a bare `false` is read as "no options" and
+    // the update is emitted.
     const displayValue = resolveForDisplay(value);
     if (displayValue !== editor.getHTML()) {
-      editor.commands.setContent(displayValue, false);
+      editor.commands.setContent(displayValue, { emitUpdate: false });
       // eslint-disable-next-line react-hooks/set-state-in-effect -- syncing external value to source mode
       setSourceValue(value); // source view shows the raw stored HTML, not the resolved display
     }
@@ -484,7 +486,7 @@ export default function RichTextInput({
   const handleToggleSource = useCallback(() => {
     if (isSourceMode && editor && !editor.isDestroyed) {
       // Switching from source to rich: apply source changes to editor
-      editor.commands.setContent(sourceValue, false);
+      editor.commands.setContent(sourceValue, { emitUpdate: false });
       onChange(sourceValue);
     }
     setIsSourceMode(!isSourceMode);
@@ -497,7 +499,7 @@ export default function RichTextInput({
   // Apply source changes on blur (when clicking away)
   const handleSourceBlur = useCallback(() => {
     if (editor && !editor.isDestroyed) {
-      editor.commands.setContent(sourceValue, false);
+      editor.commands.setContent(sourceValue, { emitUpdate: false });
       onChange(sourceValue);
     }
   }, [editor, sourceValue, onChange]);
@@ -513,7 +515,7 @@ export default function RichTextInput({
     document.body.style.overflow = "";
     // Apply any pending source changes when collapsing
     if (isSourceMode && editor && !editor.isDestroyed) {
-      editor.commands.setContent(sourceValue, false);
+      editor.commands.setContent(sourceValue, { emitUpdate: false });
       onChange(sourceValue);
     }
   }, [isSourceMode, editor, sourceValue, onChange]);
