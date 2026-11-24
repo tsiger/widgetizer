@@ -204,6 +204,11 @@ Work on a GitHub issue follows one path, and the issue's row on the [OSS - Roadm
 
    If the ids have changed, `gh project view 7 --owner tsiger --format json` gives the project's and `gh project field-list 7 --owner tsiger --format json` the Status field's and its options'.
 
+**Two rules for every pull request:**
+
+- **Do not touch `CHANGELOG.md`.** It is written once, at release.
+- **Write each pull request as if it were the only change on the release branch.** Put code where it belongs. Never move it, restructure it or pick a position in a file to avoid a conflict with another open pull request. When two open pull requests do conflict, say so in the description and resolve it when one of them merges.
+
 ## Important Patterns
 
 - ES modules throughout (`"type": "module"` in package.json)
