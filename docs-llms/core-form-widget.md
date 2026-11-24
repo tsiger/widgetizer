@@ -21,7 +21,7 @@ See the [domain guide](domain/entities/form.md) and [form workflow](domain/opera
 | Widget markup | `packages/core/src/widgets/core-form/widget.liquid` |
 | Authoring/usage guidance | `packages/core/src/widgets/core-form/insights.md` |
 | Manifest builder | `packages/builder-server/src/services/formsManifestService.js` |
-| Export wiring | `packages/builder-server/src/controllers/exportController.js` (writes `widgetizer.forms.json`) |
+| Export wiring | `packages/builder-server/src/services/generateSite.js` (validates forms pre-write and yields `widgetizer.forms.json`); `exportController.js` writes the stream to disk |
 | Locale strings | `packages/core/src/widgets/locales/en.json` (editor labels and `site.core_form.*`); `el.json` supplies Greek visitor strings |
 | Tests | `packages/builder-server/src/tests/formsManifest.test.js` |
 
@@ -33,15 +33,15 @@ Both live inside the exported ZIP:
 
 1. **Form HTML markup**, rendered by `widget.liquid` into whatever page hosts
    the widget.
-2. **`widgetizer.forms.json`** at the ZIP root, written by the export
-   controller via `buildFormsManifest()`.
+2. **`widgetizer.forms.json`** at the ZIP root, emitted by `generateSite()` via
+   `buildFormsManifest()`.
 
 If either is missing or malformed, the hosted service ignores forms for that
 site. There is no partial recognition — the manifest must validate and the
 markup must match it exactly. Export rejects the build (HTTP 400) if any form
 configuration violates the hosted contract, so a broken manifest never ships.
 
-Forms validation runs late in export, after rendering/assets work, rather than in the initial page/collection preflight. The error prevents a successful export; it is not a claim that no intermediate output was written.
+Forms validation runs fail-fast in `generateSite()` alongside homepage and collection checks, before any page is rendered or written to disk, so an invalid form leaves no output folder and records no failed export.
 
 ### Minimal rendered markup (one field)
 
@@ -258,7 +258,7 @@ Enforced by the hosted service; the manifest builder applies the matching
 
 Limits enforced at export time (`packages/builder-server/src/services/formsManifestService.js`):
 
-- **Forms per site** (distinct derived form keys) — adapter-backed via `LIMIT_KEYS.MAX_FORMS_PER_SITE`: OSS is unbounded (`Infinity` from the local limits adapter); the hosted-contract default is 5, which also applies when no limits adapter is wired
+- **Forms per site** (distinct derived form keys) — adapter-backed via `LIMIT_KEYS.MAX_FORMS_PER_SITE`, interpreted through `resolveMaxFormsPerSite(answer)` (exported from `@widgetizer/builder-server`; accepts any positive number including `Infinity`, otherwise falls back to `MAX_FORMS_PER_SITE = 5`). OSS is unbounded (`Infinity` from the local limits adapter); the hosted-contract default is 5 when no usable answer or limits adapter is supplied
 - **Max 30 fields per form**
 - **Max 50 options per choice field**, each value/label ≤ 200 chars
 - Base form handles and field keys match `/^[a-z0-9_-]{1,64}$/`; translated form keys additionally carry the language prefix

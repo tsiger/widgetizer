@@ -10,10 +10,10 @@ The repo is an npm workspace (`"workspaces": ["packages/*"]` in the root `packag
 
 | Package | Role | Key exports | Depends on |
 | --- | --- | --- | --- |
-| `@widgetizer/core` | Shared FE/BE primitives: Liquid tags/filters/snippets, fonts config, 3 core widgets (`core-divider`, `core-form`, `core-spacer`) with their `site` locales, browser helpers, structured data, **plus the adapter contracts, error types, `LIMIT_KEYS`, and runner-agnostic conformance suites** | `adapters`, `errors`, `test-helpers/*`, Liquid tags/filters, the utility subpaths listed below, `config/fonts.json`, `config/settingTypes`, `locales/*` | `liquidjs ^10.26.0`, `slugify` |
+| `@widgetizer/core` | Shared FE/BE primitives: Liquid tags/filters/snippets, fonts config, 3 core widgets (`core-divider`, `core-form`, `core-spacer`) with their `site` locales, browser helpers, structured data, **plus the adapter contracts, error types, `LIMIT_KEYS`, and runner-agnostic conformance suites** | `adapters`, `errors`, `test-helpers/*`, Liquid tags/filters, the utility subpaths listed below, `config/fonts.json`, `config/settingTypes`, `locales/*`, `widgets/locales/*` | `liquidjs ^10.30.1`, `slugify` |
 | `@widgetizer/render-engine` | Scope-free LiquidJS rendering — functions take a per-project `deps` bag; never resolves projects or touches SQLite, and reads templates/schemas from paths supplied by `deps` | `renderWidget`, `renderPageLayout`, `renderCollectionItemPage`, `renderEnqueuedAssetTags`, `widgetSupportsTransparentHeader`, `planPagination`, `createLiquidEngine` / `widgetizerLiquidTags` (the runtime Liquid dialect, reused by theme tooling), `resolveMenuSettings` / `schemaHasMenuSetting`, `resolveThemeSettingReferences` | `@widgetizer/core`, `liquidjs` |
-| `@widgetizer/builder-server` | Express 5 backend: routes/controllers/services/SQLite db layer | `setupBuilderServer`, `createEditorApp`, `initDb` / `getDb` / `closeDb`, `runMigrations`, `errorHandler`, plus scope-free render/export/scaffold/theme-update helpers for embedding hosts (see `packages/builder-server/src/index.js`); `./env` subpath | `@widgetizer/core`, `@widgetizer/render-engine` (**not** `@widgetizer/adapters-local`) |
-| `@widgetizer/editor-ui` | Mountable React editor library | Root exports: extension API plus `EditorShell`, `EditorProvider`, `createEditorRoutes`; host-facing stores/hooks/queries/API clients are exposed through explicit subpath exports | `@widgetizer/core`; peers: `react`/`react-dom` >=19, `react-router-dom` >=7 |
+| `@widgetizer/builder-server` | Express 5 backend: routes/controllers/services/SQLite db layer | `setupBuilderServer`, `createEditorApp`, `initDb` / `getDb` / `closeDb`, `runMigrations`, `errorHandler`, `createExportSiteApp`, `withContentWriteLock` / `assertIntroducedMediaExists`, `selectBuildPages` / `resolveMaxFormsPerSite` / `generateSite`, `listAreas` / `readArea`, `readSiteIdentity`, `registerPresetMedia`, `loadSiteStrings`, `projectLanguages`, `injectThemeReads`, `hasInterruptedThemeUpdate`, `listSeedThemeIds` / `resolveSeedThemeDir`, media-path/usage & collection/render/theme-update helpers (see `packages/builder-server/src/index.js`); `./env` subpath | `@widgetizer/core`, `@widgetizer/render-engine` (**not** `@widgetizer/adapters-local`) |
+| `@widgetizer/editor-ui` | Mountable React editor library | Root exports: extension API plus `EditorShell`, `EditorProvider`, `createEditorRoutes`; host-facing stores/hooks/queries/API clients/utils are exposed through explicit subpath exports (incl. `./queries/sharedAreaManager`, `./utils/structuredDataSummary`) | `@widgetizer/core`; peers: `react`/`react-dom` >=19, `react-router-dom` >=7 |
 | `@widgetizer/adapters-local` | OSS (local FS + SQLite) implementations of the adapter contracts | `LocalScopeResolver`, `LocalPreviewScopeResolver`, `LocalStorageAdapter`, `LocalAssetStorageAdapter`, `LocalPublishAdapter`, `LocalLimitsAdapter` | `@widgetizer/core` |
 
 ### `@widgetizer/core` subpath exports
@@ -35,13 +35,15 @@ Besides the root index, `packages/core/package.json` maps these subpaths (all un
 | `./siteIdentity` | Site identity normalization, readiness and theme projection |
 | `./mediaMetadata` | Per-language alt/title/caption resolution |
 | `./themeSettingChanges` | Diff/apply helpers for change-only theme-settings saves |
+| `./themeReads`, `./themeFonts` | Theme-setting read tracking (for targeted preview re-renders) and font-resolution helpers |
+| `./sharedAreas` | Theme-declared shared widget area helpers and validation |
 | `./dateFormat` | Date-only formatting in the page's language |
 | `./assetUrl` | Versioned theme/widget asset URLs |
 | `./urlSafety`, `./escapeHtml`, `./pathSecurity` | `sanitizeHref` / site-URL validation, HTML escaping, `isWithinDirectory` / `assertWithin` |
 | `./richtextLinks`, `./richtextMedia` | Stable-reference link and media path handling inside richtext |
 | `./widgetOrder` | `uniqueWidgetOrder` / `uniqueBlockOrder` / `uniqueBlockOrders`: a page's or area's widget order, and a widget's `blocksOrder`, with each id kept once (first place); used by every render and by saves, page/area/language copies and the editor's load |
 | `./mimeTypes`, `./youtube`, `./blockLimits` | Content types, YouTube embed helpers, block caps |
-| `./config/settingTypes`, `./config/fonts.json`, `./locales/*` | Setting-type registry, font list, core widget dictionaries |
+| `./config/settingTypes`, `./config/fonts.json`, `./locales/*`, `./widgets/locales/*` | Setting-type registry, font list, app UI locales, core widget dictionaries |
 
 ### Shell directories (not packages)
 
@@ -134,7 +136,7 @@ const { actorScopedRouter, projectScopedRouter, mediaFileRouter, previewRouter }
 | Router | Mounts |
 | --- | --- |
 | `actorScopedRouter` | `/projects`, `/themes`, `/settings`, `/core` |
-| `projectScopedRouter` | `/pages`, `/menus`, `/media`, `/preview`, `/export`, `/widgets`, `/icons`, `/collections`, `/languages`, `/translations`, `/limits` |
+| `projectScopedRouter` | `/pages`, `/menus`, `/media`, `/limits`, `/preview`, `/shared-areas`, `/export`, `/widgets`, `/icons`, `/collections`, `/languages`, `/translations` |
 | `mediaFileRouter` | `GET /projects/:projectId/media/:fileId`, `/projects/:projectId/uploads/images/:filename`, `/projects/:projectId/uploads/files/:filename` — browser-loaded media files. The OSS shell mounts it at `/api/media`; an embedding app that serves those URLs itself leaves it out. |
 | `previewRouter` | `GET /render/:token` |
 

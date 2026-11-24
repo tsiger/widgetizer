@@ -103,7 +103,7 @@ The [Widgetizer Theme skill](../skills/widgetizer-theme/SKILL.md) provides a tas
 - Using layout containers, grids, carousels, and component/block classes
 - Tracing the CSS variable pipeline from theme.json to rendered CSS
 
-**Key topics**: Design tokens (`--space-*`/`--font-size-*` tables, single source), color-scheme classes, typography (Inter heading + body defaults), spacing scale (`spacing-airy` 1.2, `--section-padding-block` × `--spacing-scale`), layout containers, grid/carousel system, card/button/form/icon components, block system, header/footer globals, `--card-shadow` token, reveal animations, responsive breakpoints, widget inventory (56 page + 2 global), snippets inventory, CSS variable pipeline
+**Key topics**: Design tokens (`--space-*`/`--font-size-*` tables, single source), color-scheme classes, typography (Inter heading + body defaults), spacing scale (`spacing-airy` 1.2, `--section-padding-block` × `--spacing-scale`), layout containers, grid/carousel system, card/button/form/icon components, block system, header/footer globals, `--card-shadow` token, reveal animations, responsive breakpoints, widget inventory (57 page + 2 global), snippets inventory, CSS variable pipeline
 
 ---
 
@@ -430,7 +430,7 @@ The [Widgetizer Theme skill](../skills/widgetizer-theme/SKILL.md) provides a tas
 
 ### **[future-mcp.md](future-mcp.md)** - Future: Widgetizer MCP Server
 
-**Purpose**: Proposal and rationale for a local MCP (Model Context Protocol) server that lets MCP-compatible LLM clients drive Widgetizer through its existing local API and documented schema rules **When to use**:
+**Purpose**: Proposal and rationale for a local MCP (Model Context Protocol) server that lets MCP-compatible LLM clients drive Widgetizer through its existing local API and documented schema rules (an initial MCP assistant implementation lives on the unmerged `mcp` branch; not merged into `1.0.0`). **When to use**:
 
 - Evaluating the case for a Widgetizer MCP server
 - Understanding the proposed MCP-tool ↔ REST-API mapping and resource model
@@ -470,9 +470,9 @@ The [Widgetizer Theme skill](../skills/widgetizer-theme/SKILL.md) provides a tas
 
 ---
 
-### **[future-shared-widget-areas.md](future-shared-widget-areas.md)** - Future: Shared Widget Areas
+### **[future-shared-widget-areas.md](future-shared-widget-areas.md)** - Shared Widget Areas (Design Notes)
 
-**Purpose**: Brainstorming notes for theme-defined shared areas (e.g. After header, Before footer) that hold ordinary widgets per language, and what saving, links, media, languages and export must account for. Not implemented.
+**Purpose**: Design notes for theme-defined shared areas (e.g. After header, Before footer) that hold ordinary widgets per language, and what saving, links, media, languages and export must account for. First version (Arch's per-language `Before footer` area — editing, saving, preview and export) is implemented on `1.0.0` (not yet released) and documented in [domain/entities/shared-area.md](domain/entities/shared-area.md); follow-ups live in [roadmap.md](roadmap.md) and the implementation plan is in [future-shared-widget-areas-plan.md](future-shared-widget-areas-plan.md).
 
 ---
 
@@ -515,7 +515,9 @@ The [Widgetizer Theme skill](../skills/widgetizer-theme/SKILL.md) provides a tas
 
 ## ✅ Project Tracking
 
-- **[dependency-upgrades.md](dependency-upgrades.md)** — Upgrading npm packages: where each package is declared, what `npm update --save` gets wrong (workspace references, `editor-ui` peers), versions npm skips (`min-release-age`, 0.x, Node floor), known traps (Vite 8 and CommonJS-only packages, the `eslint-plugin-react` override, the theme skill catalog), and the checks to run after.
+- **[roadmap.md](roadmap.md)** — Proposed feature order after the 1.0.0 launch (links to GitHub issues and `future-*.md` notes).
+- **[TODO-agents.md](TODO-agents.md)** / **[TODO-humans.md](TODO-humans.md)** — Paired internal notes register (agent and plain-English views) for unconfirmed checks, deferred items, and embedding requirements not tracked on GitHub. Completed notes retire to [history/completed-tasks.md](history/completed-tasks.md).
+- **[dependency-upgrades.md](dependency-upgrades.md)** — Upgrading npm packages: where each package is declared, what `npm update --save` gets wrong (workspace references, `editor-ui` peers), versions npm skips (`min-release-age`, 0.x, Node/npm floor), known traps (Vite 8 and CommonJS-only packages, the `eslint-plugin-react` override, the theme skill catalog), and the checks to run after.
 - **[user-test-checklist.md](user-test-checklist.md)** — Standalone manual user-test checklist (no codebase knowledge assumed): IDs/actions/expected results, test pack/setup, and run waves for confirming create/edit/preview/export/backup/import/update/delete flows.
 
 ---

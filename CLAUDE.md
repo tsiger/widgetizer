@@ -167,6 +167,40 @@ Output goes to `dist-electron/`.
 - Update flow: detect → user clicks Update → download with progress → user clicks Restart Now → install
 - Config in `electron/builder.config.mjs` under `publish` (provider: github, owner: tsiger, repo: widgetizer)
 
+## Issues, Branches and Pull Requests
+
+Work on a GitHub issue follows one path, and the issue's row on the [OSS - Roadmap](https://github.com/users/tsiger/projects/7) board must show it. Commit, push and open a pull request only when asked; once asked, do every step below yourself.
+
+1. **One issue, one branch, one pull request.** Start the branch from the release branch as it is on GitHub (`origin/1.0.0` today) and put the issue number in its name (`export-partial-folder-220`). Keep unrelated local commits out of it.
+2. **Open the pull request against the release branch,** in its milestone, with `Closes #<issue>` in the body:
+
+   ```bash
+   gh pr create --base 1.0.0 --milestone "OSS - 1.0.0" --title "..." --body-file <file>
+   ```
+
+3. **Link the pull request to the issue.** `Closes #<issue>` links only a pull request that targets the default branch (`master`), so the board's **Linked pull requests** column stays empty. Point the pull request at `master` and straight back; the link made in between stays:
+
+   ```bash
+   gh pr edit <pr> --base master && gh pr edit <pr> --base 1.0.0
+   ```
+
+   Then check both: the pull request is back on `1.0.0`, and the issue names it.
+
+   ```bash
+   gh pr view <pr> --json baseRefName --jq .baseRefName
+   gh api graphql -f query='query { repository(owner:"tsiger", name:"widgetizer") { issue(number: <issue>) { closedByPullRequestsReferences(first: 5, includeClosedPrs: true) { nodes { number } } } } }'
+   ```
+
+4. **Set the issue's Status to "To Be Reviewed" on the board:**
+
+   ```bash
+   gh project item-list 7 --owner tsiger --limit 500 --format json --jq '.items[] | select(.content.number == <issue>) | .id'
+   gh project item-edit --project-id PVT_kwHOAA1fn84BfXNr --id <item id> \
+     --field-id PVTSSF_lAHOAA1fn84BfXNrzhZqoi8 --single-select-option-id 0aee8614
+   ```
+
+   If the ids have changed, `gh project view 7 --owner tsiger --format json` gives the project's and `gh project field-list 7 --owner tsiger --format json` the Status field's and its options'.
+
 ## Important Patterns
 
 - ES modules throughout (`"type": "module"` in package.json)
