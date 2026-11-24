@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Trash2, FolderOpen, CirclePlus, Copy, Download, MoreVertical, Check } from "lucide-react";
+import { Trash2, FolderOpen, CirclePlus, Copy, Download, MoreVertical, Check, Pencil } from "lucide-react";
 
 import PageLayout from "@widgetizer/editor-ui/components/layout/PageLayout.jsx";
 import LoadingSpinner from "@widgetizer/editor-ui/components/ui/LoadingSpinner.jsx";
@@ -363,7 +363,20 @@ export default function Projects() {
                             <FolderOpen size={14} />
                             {t("projects.actions.openProject")}
                           </button>
-                          {!isCurrentProject && (
+                          {isCurrentProject ? (
+                            // The details page opens for the active project only, so no other row offers it.
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setOpenMenuId(null);
+                                navigate(`/projects/edit/${project.id}`);
+                              }}
+                              className={`${menuButtonClass} text-slate-700 hover:bg-slate-50`}
+                            >
+                              <Pencil size={14} />
+                              {t("navigation.projectDetails", "Project details")}
+                            </button>
+                          ) : (
                             <button
                               type="button"
                               onClick={() => {

@@ -29,7 +29,7 @@ The application uses `react-router-dom` to handle navigation between these pages
 - `/`: Redirects to `/pages` when an active project exists, otherwise `/projects`
 - `/projects`: Renders the `Projects.jsx` page, showing the list of all projects.
 - `/projects/add`: Renders the `ProjectsAdd.jsx` page.
-- `/projects/edit/:id`: Renders the `ProjectsEdit.jsx` page, where `:id` is the unique ID of the project being edited. Only the active project's details open: any other id redirects to `/projects`, and the Projects list has no link to this page (it opens from the admin menu).
+- `/projects/edit/:id`: Renders the `ProjectsEdit.jsx` page, where `:id` is the unique ID of the project being edited. Only the active project's details open: any other id redirects to `/projects`. It opens from the admin menu and from the "Project details" action in the active project's row menu in the Projects list; no other row shows that action.
 
 ### Admin vs Workspace Flow
 
@@ -99,7 +99,7 @@ If a user navigates to any site-workspace route without an active project select
 3.  **Open Project / Set Active**: Clicking the project name opens that project. If it is not already active, `Projects.jsx` first calls `setActiveProject(id)`, refreshes `projectStore`, shows a success toast, and then navigates into the workspace destination (`/pages` by default, or preserved `next`).
 4.  **Visual Status**: The active project shows an "Active" badge. The theme column can also show a theme-update indicator when `hasThemeUpdate` is true.
 5.  **Actions Menu**: Each row exposes an overflow menu with:
-    - **Open project** and, for a non-active row, **Set as active project**. There is no Edit item and the "Update available" badge is a plain label: Project details opens only for the active project, from the admin menu.
+    - **Open project**, then **Project details** on the active row or **Set as active project** on any other row. Project details goes to `/projects/edit/<id>`, the same page as the admin menu item; it is offered on the active row only because the page opens for the active project alone. The "Update available" badge is a plain label.
     - **Duplicate**: Calls `duplicateProject(id)`. The duplication process includes UUID regeneration for all pages and automatic updating of all `pageUuid` references in widgets and menus to point to the new UUIDs. Duplicates are named with the suffix pattern `Project Name (Copy)`, `Project Name (Copy 2)`, etc., and the list sorting groups them after the original project. If the copy, the UUID remap or the media-library copy fails, the duplicate is removed and the request fails, rather than returning a copy whose links still name the original's content.
     - **Download backup**: Triggers project ZIP export.
     - **Delete**: Opens a localized confirmation modal. The currently active project cannot be deleted. The row is removed first, then the folder; a folder that cannot be fully removed (a file locked by another program) still answers success, with `folderLeftBehind` naming the path, and the Projects screen shows a warning that stays until dismissed. Create, import, duplicate and folder rename all treat a folder left on disk as taken, so it is never reused.
