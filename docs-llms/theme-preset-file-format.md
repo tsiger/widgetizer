@@ -537,7 +537,7 @@ Links (and menu items) can also point at a **collection item** rather than a pag
 
 These behave exactly like `pageUuid` for stability: the system stores the stable UUID and re-derives the live `href` from the target's current slug. When a project is created from a preset, or a project is duplicated, `collectionItemUuid` values are **auto-remapped** to the freshly seeded/regenerated item UUIDs (the same mechanism that remaps `pageUuid`).
 
-In **preset source** you normally do not hand-author `collectionItemUuid` — write the internal `href` and let seeding wire up the references, just as with page links. (Seeded item UUIDs are generated on seed, so any hand-written UUID would be stale.)
+In **preset source** you normally do not hand-author `collectionItemUuid` — write the internal `href` and let seeding wire up the references, just as with page links. (Seeded item UUIDs are generated on seed, so any hand-written UUID would be stale.) This holds for link fields in pages, globals and collection items, for menu items, and for richtext links. The address may end with a `#part` (`furniture.html#living`, `projects/industrial-group.html#photos`): it is kept, and the rest of the address gets the reference.
 
 ### Button blocks with two links
 

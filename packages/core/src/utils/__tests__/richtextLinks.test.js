@@ -85,6 +85,34 @@ describe("resolveRichtextLinkRefs", () => {
   });
 });
 
+describe("resolveRichtextLinkRefs keeps the stored href's #part", () => {
+  it("on a page link and an item link, at any depth", () => {
+    const html =
+      '<a href="stale.html#team" data-page-uuid="page-1">x</a>' +
+      '<a data-collection-item-uuid="item-1" href="old/old.html#photos">y</a>';
+    expect(resolveRichtextLinkRefs(html, depsNested)).toBe(
+      '<a href="../about-us.html#team" data-page-uuid="page-1">x</a>' +
+        '<a data-collection-item-uuid="item-1" href="../news/hello-world.html#photos">y</a>',
+    );
+  });
+
+  it("after an extensionless address, the homepage's included", () => {
+    const pages = new Map([
+      ["page-1", { slug: "about-us" }],
+      ["home", { slug: "index" }],
+    ]);
+    const html = '<a href="about-us.html#team" data-page-uuid="page-1">x</a><a href="index.html#top" data-page-uuid="home">h</a>';
+    expect(resolveRichtextLinkRefs(html, { pagesByUuid: pages, cleanUrls: true })).toBe(
+      '<a href="about-us#team" data-page-uuid="page-1">x</a><a href="./#top" data-page-uuid="home">h</a>',
+    );
+  });
+
+  it("drops it with the href when the target is gone", () => {
+    const html = '<a href="gone.html#team" data-page-uuid="missing">x</a>';
+    expect(resolveRichtextLinkRefs(html, deps)).toBe("<a>x</a>");
+  });
+});
+
 describe("resolveRichtextLinksInWidgetData", () => {
   it("resolves richtext in top-level settings and block settings", () => {
     const schema = {
@@ -151,6 +179,27 @@ describe("enrichRichtextLinkRefs (href → stamp uuid)", () => {
   it("leaves external / unresolved hrefs untouched", () => {
     expect(enrichRichtextLinkRefs('<a href="https://x.com">e</a>', { pageSlugToUuid })).toBe('<a href="https://x.com">e</a>');
     expect(enrichRichtextLinkRefs('<a href="unknown.html">u</a>', { pageSlugToUuid })).toBe('<a href="unknown.html">u</a>');
+  });
+});
+
+describe("enrichRichtextLinkRefs with a #part at the end of the href", () => {
+  const maps = {
+    pageSlugToUuid: new Map([["about", "page-1"]]),
+    itemUuidBySlugPath: new Map([["news/hello", "item-1"]]),
+  };
+
+  it("stamps the page or item the rest of the href names, and leaves the href whole", () => {
+    expect(enrichRichtextLinkRefs('<a href="about.html#team">x</a>', maps)).toBe(
+      '<a data-page-uuid="page-1" href="about.html#team">x</a>',
+    );
+    expect(enrichRichtextLinkRefs('<a href="news/hello.html#photos">y</a>', maps)).toBe(
+      '<a data-collection-item-uuid="item-1" href="news/hello.html#photos">y</a>',
+    );
+  });
+
+  it("leaves a bare anchor and an unknown page alone", () => {
+    const html = '<a href="#team">x</a><a href="nope.html#team">y</a>';
+    expect(enrichRichtextLinkRefs(html, maps)).toBe(html);
   });
 });
 

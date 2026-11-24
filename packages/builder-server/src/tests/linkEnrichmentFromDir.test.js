@@ -135,6 +135,94 @@ describe("enrichSeededRichtextLinksFromDir", () => {
   });
 });
 
+describe("enrichSeededRichtextLinksFromDir — link settings and menu items", () => {
+  const link = (href, extra = {}) => ({ href, text: "Go", target: "_self", ...extra });
+  const menuPath = () => path.join(PROJECT_DIR, "menus", "main.json");
+
+  beforeEach(async () => {
+    await writeSchema("services", "our-services");
+    await writeItem("services", "roof-repair", "item-roof", {
+      title: "Roof repair",
+      back: link("services.html"),
+      next: link("our-services/roof-repair.html#prices"),
+    });
+    await writePage("services", "page-services");
+    await writePage("home", "page-home", {
+      w1: {
+        type: "cta",
+        settings: {
+          toItem: link("our-services/roof-repair.html"),
+          toPart: link("services.html#roofs"),
+          toItemPart: link("our-services/roof-repair.html#prices"),
+          kept: link("services.html", { pageUuid: "page-set-earlier" }),
+          keptItem: link("our-services/roof-repair.html", { collectionItemUuid: "item-set-earlier", collectionType: "services" }),
+          external: link("https://example.com/services.html#roofs"),
+          anchor: link("#roofs"),
+          unknown: link("nowhere.html#roofs"),
+        },
+        blocks: { b1: { type: "button", settings: { link: link("our-services/roof-repair.html") } } },
+      },
+    });
+    await fs.outputJSON(menuPath(), {
+      id: "main",
+      uuid: "menu-main",
+      items: [
+        { id: "1", label: "Roofs", link: "services.html#roofs" },
+        {
+          id: "2",
+          label: "Roof repair",
+          link: "our-services/roof-repair.html",
+          items: [{ id: "3", label: "Prices", link: "our-services/roof-repair.html#prices" }],
+        },
+        { id: "4", label: "Remapped", link: "our-services/roof-repair.html", collectionItemUuid: "item-set-earlier" },
+        { id: "5", label: "Elsewhere", link: "https://example.com/" },
+      ],
+    });
+    await enrichSeededRichtextLinksFromDir({ projectDir: PROJECT_DIR });
+  });
+
+  it("gives a link field inside a collection item its page or item reference", async () => {
+    const { back, next } = (await readItem("services", "roof-repair")).settings;
+    assert.deepEqual(back, link("services.html", { pageUuid: "page-services" }));
+    assert.deepEqual(next, link("our-services/roof-repair.html#prices", { collectionItemUuid: "item-roof", collectionType: "services" }));
+  });
+
+  it("gives a link field that names an item the item's reference, in settings and blocks", async () => {
+    const widget = (await readPage("home")).widgets.w1;
+    const itemRef = { collectionItemUuid: "item-roof", collectionType: "services" };
+    assert.deepEqual(widget.settings.toItem, link("our-services/roof-repair.html", itemRef));
+    assert.deepEqual(widget.blocks.b1.settings.link, link("our-services/roof-repair.html", itemRef));
+  });
+
+  it("looks up the address without its #part and leaves the href whole", async () => {
+    const { toPart, toItemPart } = (await readPage("home")).widgets.w1.settings;
+    assert.deepEqual(toPart, link("services.html#roofs", { pageUuid: "page-services" }));
+    assert.equal(toItemPart.href, "our-services/roof-repair.html#prices");
+    assert.equal(toItemPart.collectionItemUuid, "item-roof");
+  });
+
+  it("keeps a reference a link already carries, and leaves other addresses alone", async () => {
+    const { kept, keptItem, external, anchor, unknown } = (await readPage("home")).widgets.w1.settings;
+    assert.equal(kept.pageUuid, "page-set-earlier");
+    assert.equal(keptItem.collectionItemUuid, "item-set-earlier");
+    assert.deepEqual(external, link("https://example.com/services.html#roofs"));
+    assert.deepEqual(anchor, link("#roofs"));
+    assert.deepEqual(unknown, link("nowhere.html#roofs"));
+  });
+
+  it("gives menu items their page or item reference, nested ones too", async () => {
+    const [roofs, repair, remapped, elsewhere] = (await fs.readJSON(menuPath())).items;
+    assert.equal(roofs.pageUuid, "page-services");
+    assert.equal(roofs.link, "services.html#roofs");
+    assert.equal(repair.collectionItemUuid, "item-roof");
+    assert.equal(repair.collectionType, "services");
+    assert.equal(repair.items[0].collectionItemUuid, "item-roof");
+    assert.equal(repair.items[0].link, "our-services/roof-repair.html#prices");
+    assert.equal(remapped.collectionItemUuid, "item-set-earlier", "a reference preset seeding set is kept");
+    assert.deepEqual(elsewhere, { id: "5", label: "Elsewhere", link: "https://example.com/" });
+  });
+});
+
 describe("cleanupDeletedPageReferences", () => {
   it("cleanupDeletedPageReferences blanks links via the storage adapter only", async () => {
     const storage = makeMemoryStorage({

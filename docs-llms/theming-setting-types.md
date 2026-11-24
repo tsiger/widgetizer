@@ -652,7 +652,9 @@ The picker offers all pages plus the items of every `hasItemPages` collection, g
 
 The UUID system ensures links remain valid even when the target is renamed or deleted:
 
-1. **Project Creation**: When a project is created from a theme, internal page links in widget settings and menus are automatically enriched with `pageUuid`. This includes links defined in theme templates and schema defaults.
+1. **Project Creation**: When a project is created from a theme, internal page links in widget settings and menus are automatically enriched with `pageUuid`. This includes links defined in theme templates and schema defaults. Links that name a collection item (`services/roof-repair.html`) get `collectionType` + `collectionItemUuid`, and link fields inside a preset's collection items get their references too, in a second pass that runs once the items are seeded (`enrichSeededRichtextLinksFromDir`). A link that already carries a reference is left as it is.
+
+   A `#part` at the end of an internal address (`furniture.html#living`) is kept. The reference comes from the address without it, the stored `href` keeps it, and every place that rebuilds the `href` from the target's current slug (render, export, the editor's link picker) puts it back, so the link still lands on that part after a rename.
 
 2. **User Selection**: When a user selects an internal target from the dropdown, the system stores both the stable reference (`pageUuid`, or `collectionType` + `collectionItemUuid`) and the current `href` (slug-based filename).
 

@@ -37,7 +37,7 @@ import {
   schemaHasRichtextSetting,
 } from "@widgetizer/core/richtextLinks";
 import { prefixInternalHref, prefixSiteIcons } from "@widgetizer/core/linkPrefixer";
-import { pageHref, itemHref } from "@widgetizer/core/internalHref";
+import { pageHref, itemHref, hrefFragment } from "@widgetizer/core/internalHref";
 import { buildBreadcrumbs, indexListingPages } from "@widgetizer/core/breadcrumbs";
 import { isNotFoundSlug, pagedHref, pageOutputPath, resolveLanguage } from "@widgetizer/core/contentAddress";
 import { LANGUAGE_CODE_RE, languageDir } from "@widgetizer/core/languages";
@@ -248,7 +248,8 @@ function schemaHasLinkSetting(schema) {
 /**
  * Resolve a single link object's pageUuid/collectionItemUuid to its current slug.
  * If the target exists but was deleted, clears the link. Resolved internal hrefs
- * are depth-prefixed (outputPathPrefix) so they stay valid from nested item pages.
+ * are depth-prefixed (outputPathPrefix) so they stay valid from nested item pages,
+ * and keep the stored href's `#part`.
  * @param {object} linkValue - The link object { pageUuid?, collectionItemUuid?, collectionType?, href, text, target }
  * @param {Map} pagesByUuid - Map of uuid -> page data
  * @param {string} [outputPathPrefix] - "" at root, "../" for nested item pages
@@ -277,7 +278,7 @@ function resolveLinkValue(
     const entry = collectionItemsByUuid && collectionItemsByUuid.get(collectionItemUuid);
     if (entry) {
       const opts = { cleanUrls, outputPathPrefix, language: entry.language, defaultLanguage };
-      return { ...linkValue, href: itemHref(entry.slugPrefix, entry.slug, opts) };
+      return { ...linkValue, href: itemHref(entry.slugPrefix, entry.slug, opts) + hrefFragment(linkValue.href) };
     }
     // Collection item was deleted - clear the link
     return { href: "", text: "", target: "_self" };
@@ -294,7 +295,7 @@ function resolveLinkValue(
   if (page) {
     // Page exists - update href to current slug, depth-aware for nested pages
     const opts = { cleanUrls, outputPathPrefix, language: page.language, defaultLanguage };
-    return { ...linkValue, href: pageHref(page.slug, opts) };
+    return { ...linkValue, href: pageHref(page.slug, opts) + hrefFragment(linkValue.href) };
   } else {
     // Page was deleted - clear the link
     return {

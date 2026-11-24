@@ -23,6 +23,25 @@ describe("resolveMenuItemLinks — flag OFF is unchanged", () => {
   });
 });
 
+describe("resolveMenuItemLinks — a #part on the stored link", () => {
+  const withParts = [
+    { id: "1", label: "Team", link: "old-about.html#team", pageUuid: "p-about" },
+    { id: "2", label: "Photos", link: "rooms/old.html#photos", collectionItemUuid: "i-suite", collectionType: "rooms" },
+  ];
+
+  it("stays on the link built from the current slug, at any depth and in both shapes", () => {
+    const linksAt = (...args) => resolveMenuItemLinks(withParts, pagesByUuid, ...args).map((i) => i.link);
+    expect(linksAt("", collectionItemsByUuid)).toEqual(["about.html#team", "rooms/suite.html#photos"]);
+    expect(linksAt("../", collectionItemsByUuid)).toEqual(["../about.html#team", "../rooms/suite.html#photos"]);
+    expect(linksAt("", collectionItemsByUuid, 1, true)).toEqual(["about#team", "rooms/suite#photos"]);
+  });
+
+  it("is not part of canonicalPath, so the item is still active on its page", () => {
+    const out = resolveMenuItemLinks(withParts, pagesByUuid, "", collectionItemsByUuid);
+    expect(out.map((i) => i.canonicalPath)).toEqual(["about.html", "rooms/suite.html"]);
+  });
+});
+
 describe("resolveMenuItemLinks — flag ON", () => {
   it("emits extensionless links for uuid-resolved items, home as ./, typed links untouched", () => {
     const out = resolveMenuItemLinks(items, pagesByUuid, "", collectionItemsByUuid, 1, true);

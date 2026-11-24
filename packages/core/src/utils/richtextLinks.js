@@ -15,7 +15,7 @@
  * Render resolution runs on the per-render clone; stored values keep the portable form.
  */
 
-import { pageHref, itemHref } from "./internalHref.js";
+import { pageHref, itemHref, splitHrefFragment } from "./internalHref.js";
 
 // Render content is DOMPurify-normalized (double-quoted), but the on-disk lifecycle
 // helpers also run on RAW stored HTML (source-mode / imported / preset), which may use
@@ -25,6 +25,13 @@ const ANCHOR_OPEN_TAG_RE = /<a\b[^>]*>/gi;
 const PAGE_UUID_ATTR_RE = /\s+data-page-uuid=["']([^"']*)["']/i;
 const ITEM_UUID_ATTR_RE = /\s+data-collection-item-uuid=["']([^"']*)["']/i;
 const HREF_ATTR_RE = /\s+href=["'][^"']*["']/i;
+const HREF_VALUE_RE = /\s+href=["']([^"']*)["']/i;
+
+/** The `#part` of an anchor's stored href, which a rebuilt href keeps. */
+function fragmentOf(openTag) {
+  const match = openTag.match(HREF_VALUE_RE);
+  return match ? splitHrefFragment(match[1]).fragment : "";
+}
 
 function setHref(openTag, href) {
   if (HREF_ATTR_RE.test(openTag)) {
@@ -44,7 +51,7 @@ function stripAttrs(openTag, ...res) {
  *   - map is `undefined`/`null` (caller can't resolve) → leave the stored href (fallback).
  *   - map is a loaded `Map` and the uuid is absent (target deleted) → neutralize the anchor
  *     (drop `href` + the data-uuid attr) so it renders as harmless non-navigable text.
- *   - uuid found → rewrite `href`.
+ *   - uuid found → rewrite `href`, keeping the stored href's `#part`.
  * External anchors (no data-uuid) pass through untouched.
  * @param {*} html
  * @param {{ pagesByUuid?: Map, collectionItemsByUuid?: Map, outputPathPrefix?: string, cleanUrls?: boolean, defaultLanguage?: string }} deps
@@ -63,7 +70,7 @@ export function resolveRichtextLinkRefs(
       const entry = collectionItemsByUuid.get(itemMatch[1]);
       if (entry) {
         const opts = { cleanUrls, outputPathPrefix, language: entry.language, defaultLanguage };
-        return setHref(openTag, itemHref(entry.slugPrefix, entry.slug, opts));
+        return setHref(openTag, itemHref(entry.slugPrefix, entry.slug, opts) + fragmentOf(openTag));
       }
       return stripAttrs(openTag, HREF_ATTR_RE, ITEM_UUID_ATTR_RE); // deleted → neutralize
     }
@@ -72,7 +79,8 @@ export function resolveRichtextLinkRefs(
       if (!pagesByUuid) return openTag;
       const page = pagesByUuid.get(pageMatch[1]);
       if (page) {
-        return setHref(openTag, pageHref(page.slug, { cleanUrls, outputPathPrefix, language: page.language, defaultLanguage }));
+        const opts = { cleanUrls, outputPathPrefix, language: page.language, defaultLanguage };
+        return setHref(openTag, pageHref(page.slug, opts) + fragmentOf(openTag));
       }
       return stripAttrs(openTag, HREF_ATTR_RE, PAGE_UUID_ATTR_RE);
     }
@@ -183,7 +191,8 @@ export function remapRichtextLinkRefs(html, { pageMap, itemMap } = {}) {
 /**
  * Enrichment / backfill: derive a stable ref from each internal anchor's `href` slug and stamp
  * the matching `data-*-uuid` (clearing the other kind). Used for presets with stripped attrs
- * and slug-only stored links. External / unresolved hrefs are left as-is.
+ * and slug-only stored links. External / unresolved hrefs are left as-is. A `#part` at the
+ * end of the href is ignored for the lookup and stays in the href.
  * @param {*} html
  * @param {{ pageSlugToUuid?: Map<string,string>, itemUuidBySlugPath?: Map<string,string> }} maps
  * @returns {*}
@@ -191,11 +200,13 @@ export function remapRichtextLinkRefs(html, { pageMap, itemMap } = {}) {
 export function enrichRichtextLinkRefs(html, { pageSlugToUuid, itemUuidBySlugPath } = {}) {
   if (typeof html !== "string" || !html.includes("<a")) return html;
   return html.replace(ANCHOR_OPEN_TAG_RE, (openTag) => {
-    const hrefMatch = openTag.match(/\s+href=["']([^"']*)["']/i);
+    const hrefMatch = openTag.match(HREF_VALUE_RE);
     if (!hrefMatch) return openTag;
     const href = hrefMatch[1];
-    if (!href || href.includes("://") || href.startsWith("#") || !href.endsWith(".html")) return openTag;
-    const itemM = href.match(/^([^/]+)\/([^/]+)\.html$/);
+    if (!href || href.includes("://") || href.startsWith("#")) return openTag;
+    const target = splitHrefFragment(href).path;
+    if (!target.endsWith(".html")) return openTag;
+    const itemM = target.match(/^([^/]+)\/([^/]+)\.html$/);
     if (itemM && itemUuidBySlugPath) {
       const uuid = itemUuidBySlugPath.get(`${itemM[1]}/${itemM[2]}`);
       if (uuid) {
@@ -205,7 +216,7 @@ export function enrichRichtextLinkRefs(html, { pageSlugToUuid, itemUuidBySlugPat
         );
       }
     }
-    const pageM = href.match(/^([^/]+)\.html$/);
+    const pageM = target.match(/^([^/]+)\.html$/);
     if (pageM && pageSlugToUuid) {
       const uuid = pageSlugToUuid.get(pageM[1]);
       if (uuid) {

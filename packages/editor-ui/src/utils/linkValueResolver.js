@@ -1,9 +1,13 @@
+import { splitHrefFragment } from "@widgetizer/core/internalHref";
+
 /**
  * Resolve a stored `link` setting value to a display-ready shape for the editor's
  * link picker (LinkInput). Pure + side-effect free so it can be unit-tested.
  *
  * Stable refs (`pageUuid` / `collectionItemUuid`) get a live href derived from the
  * target's CURRENT slug when that target is present in the loaded picker options.
+ * A `#part` at the end of the stored href is kept: the picker saves this value
+ * back when the text or target changes, so dropping it here would lose it.
  *
  * Crucially, when a stable ref is NOT found in the options, the **raw value is
  * preserved** — the editor must not infer deletion from an inconclusive option
@@ -22,6 +26,7 @@ export function resolveStoredLink(value = {}, optionsByUuid, pageOptionBySlug, l
   if (loading) return value;
 
   const { pageUuid, collectionItemUuid, collectionType, href = "", text = "", target = "_self" } = value;
+  const { path: hrefPath, fragment } = splitHrefFragment(href);
 
   // Collection item target.
   if (collectionItemUuid) {
@@ -30,7 +35,7 @@ export function resolveStoredLink(value = {}, optionsByUuid, pageOptionBySlug, l
       return {
         collectionType: collectionType || opt.collectionType,
         collectionItemUuid,
-        href: `${opt.slugPrefix}/${opt.slug}.html`,
+        href: `${opt.slugPrefix}/${opt.slug}.html${fragment}`,
         text,
         target,
       };
@@ -42,15 +47,15 @@ export function resolveStoredLink(value = {}, optionsByUuid, pageOptionBySlug, l
   if (pageUuid) {
     const opt = optionsByUuid.get(pageUuid);
     if (opt) {
-      return { pageUuid, href: `${opt.slug}.html`, text, target };
+      return { pageUuid, href: `${opt.slug}.html${fragment}`, text, target };
     }
     return value; // absent from options — preserve the ref
   }
 
   // No stable ref: match a slug-only internal href to a page so the picker shows
   // the page name and a future save stores its uuid.
-  if (href && href.endsWith(".html") && !href.includes("://") && !href.startsWith("#")) {
-    const slug = href.replace(".html", "");
+  if (hrefPath.endsWith(".html") && !href.includes("://")) {
+    const slug = hrefPath.slice(0, -".html".length);
     const opt = pageOptionBySlug.get(slug);
     if (opt) {
       return { pageUuid: opt.value, href, text, target };
