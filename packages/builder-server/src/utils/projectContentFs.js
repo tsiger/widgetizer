@@ -17,18 +17,26 @@ import { LANGUAGE_CODE_RE } from "@widgetizer/core/languages";
 import { areaKey, globalKey, resolveLanguage } from "@widgetizer/core/contentAddress";
 import { readAreaDeclarations } from "@widgetizer/core/sharedAreas";
 
+/** A file's path relative to the project, forward-slashed: what an owner can be shown. */
+function relativeKey(projectDir, filePath) {
+  return path.relative(projectDir, filePath).split(path.sep).join("/");
+}
+
 /**
  * Lists and parses every publishable page in `<projectDir>/pages`: the root
  * folder and every language folder beside `global/`. The language is derived
  * from the folder, never read from the file, and stamped resolved.
  * @param {string} projectDir - Absolute path to the project working directory.
- * @param {{ defaultLanguage?: string }} [project]
+ * @param {{ defaultLanguage?: string, unreadable?: string[] }} [project] - `unreadable`
+ *   collects the path, relative to the project, of every file that was skipped
+ *   because it could not be read or parsed. A site build refuses to go on with
+ *   any; a listing for the editor shows the rest.
  * @returns {Promise<Array<object>>} Parsed page objects, each with `id` set from
  *   its filename and `language`. Returns [] when the pages directory does not
  *   exist; skips files that fail to read/parse.
  * @throws {Error} If the pages directory exists but cannot be read.
  */
-export async function listPagesFromDir(projectDir, { defaultLanguage } = {}) {
+export async function listPagesFromDir(projectDir, { defaultLanguage, unreadable } = {}) {
   const pagesDir = path.join(projectDir, "pages");
   try {
     if (!(await fs.pathExists(pagesDir))) {
@@ -58,6 +66,7 @@ export async function listPagesFromDir(projectDir, { defaultLanguage } = {}) {
             return { ...parsedData, id: pageId, language };
           } catch (readError) {
             console.error(`Error reading or parsing page file ${pagePath}:`, readError);
+            unreadable?.push(relativeKey(projectDir, pagePath));
             return null; // Skip a single unreadable/unparseable page, keep the rest.
           }
         }),
@@ -78,10 +87,13 @@ export async function listPagesFromDir(projectDir, { defaultLanguage } = {}) {
  * @param {string} projectDir - Absolute path to the project working directory.
  * @param {'header'|'footer'} widgetType
  * @param {{ language?: string, defaultLanguage?: string }} [lang]
+ * @param {{ unreadable?: string[] }} [options] - Collects the file's path when it
+ *   exists but could not be read or parsed, which the null answer alone can't tell
+ *   from a missing file.
  * @returns {Promise<object|null>} Parsed widget data with `type` injected, or null
  *   for an invalid type, a missing file, or a read/parse error.
  */
-export async function readGlobalWidgetFromDir(projectDir, widgetType, lang) {
+export async function readGlobalWidgetFromDir(projectDir, widgetType, lang, { unreadable } = {}) {
   if (widgetType !== "header" && widgetType !== "footer") {
     console.error(`Invalid global widget type requested: ${widgetType}`);
     return null;
@@ -97,6 +109,7 @@ export async function readGlobalWidgetFromDir(projectDir, widgetType, lang) {
     return widgetData;
   } catch (error) {
     console.error(`Error reading global widget data (${widgetType}) in ${projectDir}:`, error);
+    unreadable?.push(relativeKey(projectDir, globalWidgetPath));
     return null;
   }
 }
@@ -108,9 +121,10 @@ export async function readGlobalWidgetFromDir(projectDir, widgetType, lang) {
  * shows nothing for it, and only the save path refuses to overwrite it.
  * @param {string} projectDir - Absolute path to the project working directory.
  * @param {{ language?: string, defaultLanguage?: string }} [lang]
+ * @param {{ unreadable?: string[] }} [options] - Collects the path of every area left out.
  * @returns {Promise<Record<string, { widgets: object, widgetsOrder: string[] }>>}
  */
-export async function readAreasFromDir(projectDir, lang) {
+export async function readAreasFromDir(projectDir, lang, { unreadable } = {}) {
   let themeJson;
   try {
     themeJson = await fs.readJson(path.join(projectDir, "theme.json"));
@@ -130,6 +144,7 @@ export async function readAreasFromDir(projectDir, lang) {
       areas[id] = { widgets, widgetsOrder: Array.isArray(data?.widgetsOrder) ? data.widgetsOrder : Object.keys(widgets) };
     } catch (error) {
       console.error(`Error reading shared area ${id} in ${projectDir}:`, error.message);
+      unreadable?.push(relativeKey(projectDir, file));
     }
   }
   return areas;

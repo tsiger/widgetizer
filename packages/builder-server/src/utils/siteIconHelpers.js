@@ -103,7 +103,19 @@ function icoFromPng(pngBuffer, size) {
   return Buffer.concat([header, pngBuffer]);
 }
 
-export async function generateExportSiteIcons({ outputDir, projectDir, projectName, siteTitle, siteIconSrc }) {
+/**
+ * @param {object} options
+ * @param {boolean} [options.failOnError=false] - Throw when the icons can't be made from the
+ *   source image, instead of answering "no icons". Some of the files may be written by then.
+ */
+export async function generateExportSiteIcons({
+  outputDir,
+  projectDir,
+  projectName,
+  siteTitle,
+  siteIconSrc,
+  failOnError = false,
+}) {
   if (!siteIconSrc) return emptySiteIcons();
 
   const sourcePath = path.join(projectDir, "uploads", "images", path.basename(siteIconSrc));
@@ -164,6 +176,7 @@ export async function generateExportSiteIcons({ outputDir, projectDir, projectNa
 
     await fs.writeJson(path.join(outputDir, "site.webmanifest"), manifest, { spaces: 2 });
   } catch (error) {
+    if (failOnError) throw error;
     console.warn(`Could not generate site icon assets: ${error.message}`);
     return emptySiteIcons();
   }

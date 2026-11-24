@@ -63,6 +63,23 @@ function htmlToMarkdown(html) {
 
 const frontmatter = (lines) => ["---", ...lines, "---", "", ""].join("\n");
 
+// An absolute path at the start of the text or after a space, quote or bracket,
+// up to its last separator: what is left is the file's own name.
+const ABSOLUTE_DIR_RE = /(^|[\s'"(`])(?:[A-Za-z]:)?[\\/](?:[^\\/\s'"`]+[\\/])+/g;
+
+/**
+ * An error message with the server's folders taken out: a path inside the
+ * project becomes relative to it, any other absolute path keeps its file name
+ * only. Render and file errors quote the path they failed on, and a refusal's
+ * message reaches the site's owner.
+ */
+function withoutServerPaths(message, projectDir) {
+  return String(message ?? "")
+    .split(`${projectDir}${path.sep}`)
+    .join("")
+    .replace(ABSOLUTE_DIR_RE, "$1");
+}
+
 async function findWidgetAssets(dir) {
   let results = [];
   for (const dirent of await fs.readdir(dir, { withFileTypes: true })) {
@@ -92,7 +109,13 @@ async function findWidgetAssets(dir) {
  * @param {(code: string, details: object) => Error} options.refuse - The error for a site that
  *   can't be generated, in the app's own words. Codes: NO_HOMEPAGE, TWO_HOMEPAGES,
  *   INVALID_COLLECTION_ITEMS, MISSING_COLLECTION_TEMPLATE, LISTING_TOO_MANY_PAGES,
- *   HOMEPAGE_PAGES_CLASH, COLLECTION_LANGUAGE_CLASH, INVALID_FORMS.
+ *   HOMEPAGE_PAGES_CLASH, COLLECTION_LANGUAGE_CLASH, INVALID_FORMS, and the ones
+ *   for a site that would be built broken: UNREADABLE_CONTENT (`{ files }`: page,
+ *   header, footer or shared-area files that can't be parsed) and MISSING_LAYOUT,
+ *   both before the first file; RENDER_FAILED (`{ path, pageId?, name?, errors }`:
+ *   a page or item page whose layout, widget or item template failed) and
+ *   SITE_ICON_FAILED (`{ message }`), which can come after files were yielded.
+ *   Their messages never hold a server path.
  * @param {{ storage: object, scope: object, reader?: object }} [options.collections] - No collections when absent.
  * @param {object} [options.scope] - For `options.limits`.
  * @param {object} [options.limits] - Limits adapter, for the forms ceiling.
@@ -104,7 +127,8 @@ async function findWidgetAssets(dir) {
  * @param {boolean} [options.failOnAssetScanError] - Fail when the widgets folder can't be read, instead of warning.
  * @param {(pages: object[], projectData: object) => object[]} [options.filterPages] - Pages left in the running.
  * @param {(projectDir: string) => Promise<object>} [options.readTheme]
- * @param {(lang: object) => Promise<object>} [options.readAreas]
+ * @param {(lang: object, options: { unreadable: string[] }) => Promise<object>} [options.readAreas] -
+ *   May push the path of an area it could not read onto `unreadable`.
  * @param {number} [options.maxListingPages] - Refuse a listing split into more pages than this.
  * @param {number} [options.maxWidgetsPerPage] - Stop rendering a page's widgets past this many.
  * @param {() => Promise<void>} [options.beforeFirstFile] - Runs once every check has passed.
@@ -180,8 +204,11 @@ export async function* generateSite(deps, options) {
   // A slug is unique per language, so anything keyed by page must key by the
   // language-qualified output path rather than the id alone.
   const pageIdentity = (pageData) => pageOutputPath(pageData.id, 1, pageLang(pageData));
+  // Files that exist but can't be parsed. Left out quietly they would ship a
+  // site missing a page or its header, so the site is refused instead.
+  const unreadable = [];
   const selection = selectBuildPages(
-    filterPages(await listPagesFromDir(projectDir, { defaultLanguage }), projectData).map(withNotFoundSeo),
+    filterPages(await listPagesFromDir(projectDir, { defaultLanguage, unreadable }), projectData).map(withNotFoundSeo),
     projectData,
     { refuse },
   );
@@ -321,6 +348,26 @@ export async function* generateSite(deps, options) {
   const { manifest: formsManifest, warnings: formsWarnings } = formsResult;
   for (const warning of formsWarnings) console.warn(`[forms manifest] ${warning}`);
 
+  // A language's pages wear that language's header and footer. Areas are read
+  // once per language too, so every page shows the same saved areas even if one
+  // is edited meanwhile; they are rendered per page, since active menu items and
+  // relative links depend on the page.
+  const globalsByLanguage = new Map();
+  for (const language of siteLanguages) {
+    const lang = { language, defaultLanguage };
+    globalsByLanguage.set(language, {
+      header: await readGlobalWidgetFromDir(projectDir, "header", lang, { unreadable }),
+      footer: await readGlobalWidgetFromDir(projectDir, "footer", lang, { unreadable }),
+      areas: readAreas ? await readAreas(lang, { unreadable }) : await readAreasFromDir(projectDir, lang, { unreadable }),
+    });
+  }
+  const globalsFor = (language) =>
+    globalsByLanguage.get(resolveLanguage(language, defaultLanguage)) || { header: null, footer: null, areas: {} };
+
+  if (unreadable.length > 0) throw refuse("UNREADABLE_CONTENT", { files: [...new Set(unreadable)].sort() });
+  // Every page is built inside the layout, so without it there is no site.
+  if (!(await fs.pathExists(path.join(projectDir, "layout.liquid")))) throw refuse("MISSING_LAYOUT", {});
+
   // --- Every check has passed: from here on, files are written ---
   if (beforeFirstFile) await beforeFirstFile();
 
@@ -351,12 +398,15 @@ export async function* generateSite(deps, options) {
         projectName: projectData.name,
         siteTitle: projectData.siteTitle,
         siteIconSrc: readIconSource(rawThemeSettings),
+        failOnError: true,
       });
       if (!iconOutputDir) {
         for (const entry of await fs.readdir(iconsDir)) {
           yield { path: entry, content: await fs.readFile(path.join(iconsDir, entry)) };
         }
       }
+    } catch (error) {
+      throw refuse("SITE_ICON_FAILED", { message: withoutServerPaths(error.message, projectDir) });
     } finally {
       if (!iconOutputDir) await fs.remove(iconsDir);
     }
@@ -387,22 +437,6 @@ export async function* generateSite(deps, options) {
   // and relative otherwise: the same gate as the canonicals and the sitemap.
   const mdBase = siteUrlBase(siteUrl);
 
-  // A language's pages wear that language's header and footer. Areas are read
-  // once per language too, so every page shows the same saved areas even if one
-  // is edited meanwhile; they are rendered per page, since active menu items and
-  // relative links depend on the page.
-  const globalsByLanguage = new Map();
-  for (const language of siteLanguages) {
-    const lang = { language, defaultLanguage };
-    globalsByLanguage.set(language, {
-      header: await readGlobalWidgetFromDir(projectDir, "header", lang),
-      footer: await readGlobalWidgetFromDir(projectDir, "footer", lang),
-      areas: readAreas ? await readAreas(lang) : await readAreasFromDir(projectDir, lang),
-    });
-  }
-  const globalsFor = (language) =>
-    globalsByLanguage.get(resolveLanguage(language, defaultLanguage)) || { header: null, footer: null, areas: {} };
-
   if (pages.length === 0) {
     console.warn(`No exportable pages found for project ${projectId}. Only copying assets/images.`);
   }
@@ -429,7 +463,16 @@ export async function* generateSite(deps, options) {
     pagesByUuid,
     collectionItemsByUuid,
     cleanUrls,
+    // The renderer answers error markup for a layout or widget that fails and
+    // records it here; a page with any is refused, not written.
+    renderErrors: [],
   });
+
+  const refuseFailedRender = (renderErrors, page) => {
+    if (renderErrors.length === 0) return;
+    const errors = renderErrors.map((problem) => ({ ...problem, message: withoutServerPaths(problem.message, projectDir) }));
+    throw refuse("RENDER_FAILED", { ...page, errors });
+  };
 
   /** Format (unless turned off), rewrite storage paths, then let the app inspect the page before the marker comment goes on. */
   async function finishHtml(rendered, outputPathPrefix, formatFailureNote, page) {
@@ -515,6 +558,7 @@ export async function* generateSite(deps, options) {
       sharedGlobals,
     );
     collectEnqueuedAssets(sharedGlobals);
+    refuseFailedRender(sharedGlobals.renderErrors, { path: outputFilename, pageId: pageData.id, name: pageData.name });
 
     let html = await finishHtml(
       renderedHtml,
@@ -535,20 +579,18 @@ export async function* generateSite(deps, options) {
     yield { path: outputFilename, content: html };
 
     if (withMarkdown) {
-      const warn = (error) => console.warn(`Could not generate markdown for ${pageData.id}: ${error.message}`);
-      try {
-        const content =
-          frontmatter([
-            `title: ${pageData.name || pageData.id}`,
-            `description: ${pageData.seo?.description || pageData.description || ""}`,
-            "source_url:",
-            `  html: '${outputFilename}'`,
-            `  md: '${mdFilename}'`,
-          ]) + htmlToMarkdown(pageWidgetsHtml);
-        yield { path: mdFilename, content, softFailure: warn };
-      } catch (error) {
-        warn(error);
-      }
+      // The page already links to this file, so a conversion that fails is
+      // not caught here: the page would point at a file nobody wrote.
+      const warn = (error) => console.warn(`Could not write markdown for ${pageData.id}: ${error.message}`);
+      const content =
+        frontmatter([
+          `title: ${pageData.name || pageData.id}`,
+          `description: ${pageData.seo?.description || pageData.description || ""}`,
+          "source_url:",
+          `  html: '${outputFilename}'`,
+          `  md: '${mdFilename}'`,
+        ]) + htmlToMarkdown(pageWidgetsHtml);
+      yield { path: mdFilename, content, softFailure: warn };
     }
   }
 
@@ -565,7 +607,9 @@ export async function* generateSite(deps, options) {
           outputPathPrefix: outputPathPrefixFor(itemPath),
           currentCanonicalPath: itemPath,
         };
-        const { html: rendered, mainContentHtml, itemPageData } = await renderCollectionItemPageWithDeps(deps, {
+        // The item's own template is rendered outside the renderer's catches, so
+        // its failure arrives as a throw and joins the recorded ones.
+        const itemRender = await renderCollectionItemPageWithDeps(deps, {
           schema,
           item,
           template,
@@ -577,7 +621,12 @@ export async function* generateSite(deps, options) {
           areasData,
           projectData,
           siteUrl,
+        }).catch((error) => {
+          sharedGlobals.renderErrors.push({ kind: "item", type: schema.type, message: error.message });
+          return null;
         });
+        refuseFailedRender(sharedGlobals.renderErrors, { path: itemPath, name: item.settings?.title || item.slug });
+        const { html: rendered, mainContentHtml, itemPageData } = itemRender;
         collectEnqueuedAssets(sharedGlobals);
 
         const emptyFields = emptyArticleFields(itemPageData.collectionItem);
@@ -609,22 +658,18 @@ export async function* generateSite(deps, options) {
         yield { path: itemPath, content: html };
 
         if (exportMarkdown) {
-          const warn = (error) => console.warn(`Could not generate markdown for ${schema.slugPrefix}/${item.slug}: ${error.message}`);
-          try {
-            const content =
-              frontmatter([
-                `title: ${itemPageData.name || item.slug}`,
-                `description: ${itemPageData.seo?.description || ""}`,
-                `collection: ${schema.type}`,
-                `slug: ${item.slug}`,
-                "source_url:",
-                `  html: '${item.slug}.html'`,
-                `  md: '${item.slug}.md'`,
-              ]) + htmlToMarkdown(mainContentHtml);
-            yield { path: mdPath, content, softFailure: warn };
-          } catch (error) {
-            warn(error);
-          }
+          const warn = (error) => console.warn(`Could not write markdown for ${schema.slugPrefix}/${item.slug}: ${error.message}`);
+          const content =
+            frontmatter([
+              `title: ${itemPageData.name || item.slug}`,
+              `description: ${itemPageData.seo?.description || ""}`,
+              `collection: ${schema.type}`,
+              `slug: ${item.slug}`,
+              "source_url:",
+              `  html: '${item.slug}.html'`,
+              `  md: '${item.slug}.md'`,
+            ]) + htmlToMarkdown(mainContentHtml);
+          yield { path: mdPath, content, softFailure: warn };
         }
       }
     }

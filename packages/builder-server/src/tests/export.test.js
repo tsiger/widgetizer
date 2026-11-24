@@ -415,6 +415,13 @@ before(async () => {
   // -----------------------------------------------------------
   // 7. Global widgets (header + footer)
   // -----------------------------------------------------------
+  // Their templates, as a theme ships them: a header or footer whose template
+  // is missing fails the export.
+  for (const name of ["header", "footer"]) {
+    const dir = path.join(projectDir, "widgets", "global", name);
+    await fs.outputFile(path.join(dir, "schema.json"), JSON.stringify({ type: name, displayName: name, settings: [] }));
+    await fs.outputFile(path.join(dir, "widget.liquid"), `<div class="site-${name}"></div>`);
+  }
   await fs.writeFile(
     path.join(pagesDir, "global", "header.json"),
     JSON.stringify(

@@ -321,6 +321,41 @@ function refusalFor(code, details) {
     case "INVALID_FORMS":
       details.error.refusedBeforeWrite = true;
       return details.error;
+    case "UNREADABLE_CONTENT": {
+      const { files } = details;
+      return exportRefusal(
+        `${files.length === 1 ? "This file" : "These files"} can't be read, so the site would be published without ${files.length === 1 ? "it" : "them"}: ${files.join(", ")}. Restore ${files.length === 1 ? "it" : "them"} from a backup or delete ${files.length === 1 ? "it" : "them"} from the project, then export again.`,
+        "Export failed: unreadable content",
+      );
+    }
+    case "MISSING_LAYOUT":
+      return exportRefusal(
+        "The theme's layout.liquid is missing from this project, so no page can be built. Update or reinstall the theme, then export again.",
+        "Export failed: the theme's layout is missing",
+      );
+    case "RENDER_FAILED": {
+      const { path: pagePath, name, errors } = details;
+      const parts = errors.map((problem) => {
+        if (problem.kind === "layout") return `the theme's layout failed (${problem.message})`;
+        if (problem.kind === "item") return `the "${problem.type}" item template failed (${problem.message})`;
+        return `the "${problem.type || "unknown"}" widget failed (${problem.message})`;
+      });
+      const err = exportRefusal(
+        `${name ? `"${name}" (${pagePath})` : pagePath} could not be built: ${parts.join("; ")}. Fix or remove what failed, then export again.`,
+        "Export failed: a page could not be built",
+      );
+      // Pages before this one were already written: a failed export, not a refusal.
+      err.refusedBeforeWrite = false;
+      return err;
+    }
+    case "SITE_ICON_FAILED": {
+      const err = exportRefusal(
+        `The site icon could not be made from the image chosen in Site settings (${details.message}). Choose another image, then export again.`,
+        "Export failed: the site icon could not be made",
+      );
+      err.refusedBeforeWrite = false;
+      return err;
+    }
     default:
       return exportRefusal(`Export blocked (${code}).`, "Export failed");
   }
@@ -389,6 +424,15 @@ export async function exportProjectToDir(projectId, options = {}, collectionDeps
     const deps = await buildRenderDeps(projectId, renderCollectionDeps);
 
     let devModeEnabled = false;
+    // Every file that could not be copied into the export. A site missing its
+    // styles or an image is not a finished export, so any entry here fails it.
+    const copyFailures = [];
+    const failOnCopyFailures = () => {
+      if (copyFailures.length === 0) return;
+      throw new Error(
+        `${copyFailures.length === 1 ? "A file" : `${copyFailures.length} files`} could not be copied into the export: ${copyFailures.join("; ")}`,
+      );
+    };
     // HTML validation issues across all pages (only when developer mode is on).
     const validationIssues = [];
     const report = {};
@@ -479,7 +523,7 @@ export async function exportProjectToDir(projectId, options = {}, collectionDeps
         console.warn(`Project assets directory not found: ${projectAssetsDir}`);
       }
     } catch (copyError) {
-      console.error("Error copying assets:", copyError);
+      copyFailures.push(`the theme's assets (${copyError.message})`);
     }
 
     // --- Copy Core Assets (placeholder images) ---
@@ -497,7 +541,7 @@ export async function exportProjectToDir(projectId, options = {}, collectionDeps
         }
       }
     } catch (coreAssetError) {
-      console.warn("Could not copy core placeholder assets:", coreAssetError.message);
+      copyFailures.push(`the placeholder images (${coreAssetError.message})`);
     }
     }
 
@@ -534,7 +578,7 @@ export async function exportProjectToDir(projectId, options = {}, collectionDeps
                 copiedCount++;
               }
             } catch (copyError) {
-              console.error(`Error copying image ${imageFile.filename}:`, copyError);
+              copyFailures.push(`${imageFile.filename} (${copyError.message})`);
             }
           }
 
@@ -557,7 +601,7 @@ export async function exportProjectToDir(projectId, options = {}, collectionDeps
                   await fs.copy(sourceSizePath, targetSizePath);
                 }
               } catch (sizeError) {
-                console.error(`Error copying ${sizeName} size for ${imageFile.filename}:`, sizeError);
+                copyFailures.push(`the ${sizeName} size of ${imageFile.filename} (${sizeError.message})`);
               }
             }
           }
@@ -583,7 +627,7 @@ export async function exportProjectToDir(projectId, options = {}, collectionDeps
           console.log("Fallback: Copied all images due to media tracking error");
         }
       } catch (fallbackError) {
-        console.error("Error in fallback image copying:", fallbackError);
+        copyFailures.push(`the project's images (${fallbackError.message})`);
       }
     }
     // --- End Image Copy ---
@@ -611,7 +655,7 @@ export async function exportProjectToDir(projectId, options = {}, collectionDeps
               fileCopiedCount++;
             }
           } catch (copyError) {
-            console.error(`Error copying file asset ${fileAsset.filename}:`, copyError);
+            copyFailures.push(`${fileAsset.filename} (${copyError.message})`);
           }
         }
 
@@ -630,7 +674,7 @@ export async function exportProjectToDir(projectId, options = {}, collectionDeps
           console.log("Fallback: Copied all file assets due to tracking error");
         }
       } catch (fallbackError) {
-        console.error("Error in fallback file asset copying:", fallbackError);
+        copyFailures.push(`the project's files (${fallbackError.message})`);
       }
     }
     // --- End File Asset Copy ---
@@ -663,6 +707,8 @@ export async function exportProjectToDir(projectId, options = {}, collectionDeps
         scope: collectionScope,
         limits: collectionDeps?.limits,
         exportMarkdown,
+        // A widgets folder that can't be read would ship every page without its widgets' CSS and JS.
+        failOnAssetScanError: true,
         iconOutputDir: buildDir,
         beforeFirstFile: prepareOutputDir,
         inspectHtml: collectValidationIssues,
@@ -671,16 +717,15 @@ export async function exportProjectToDir(projectId, options = {}, collectionDeps
       });
       for await (const entry of stream) {
         const target = path.join(buildDir, entry.path);
-        try {
-          if (entry.source) await fs.copy(entry.source, target, { overwrite: true });
-          else await fs.outputFile(target, entry.content);
-        } catch (error) {
-          if (!entry.softFailure) throw error;
-          entry.softFailure(error);
-        }
+        // An entry's softFailure is for an app that can carry on without the
+        // file. This one can't: a site with no sitemap or a widget's CSS missing
+        // would be recorded as a finished export.
+        if (entry.source) await fs.copy(entry.source, target, { overwrite: true });
+        else await fs.outputFile(target, entry.content);
       }
       if (report.formsCount) console.log(`Wrote widgetizer.forms.json with ${report.formsCount} form(s)`);
       await copyMediaAndWriteManifest();
+      failOnCopyFailures();
 
       // A crash between this rename and the history row, or a version number
       // freed by a failed delete, can leave a folder under the final name. No

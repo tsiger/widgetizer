@@ -1136,6 +1136,18 @@ async function createBaseRenderContext(deps, rawThemeSettings, renderMode = "pre
  * @param {{ area?: string }} [placement] - The shared area the widget belongs to, if any
  * @returns {Promise<string>} Rendered HTML string, or error HTML if rendering fails
  */
+/**
+ * A render that fails still answers markup, which suits a preview: the editor
+ * shows the error where the widget would be. A caller that must not ship that
+ * markup (a site build) puts a `renderErrors` array on its shared globals; every
+ * failure is recorded there as well, for it to act on.
+ * @param {object|null} sharedGlobals
+ * @param {{ kind: "widget"|"layout", message: string, widgetId?: string, type?: string }} problem
+ */
+function recordRenderError(sharedGlobals, problem) {
+  if (Array.isArray(sharedGlobals?.renderErrors)) sharedGlobals.renderErrors.push(problem);
+}
+
 async function renderWidget(
   deps,
   widgetId,
@@ -1184,6 +1196,7 @@ async function renderWidget(
     const schemaPath = await resolveInside(baseDir, ...widgetFolder, "schema.json");
     if (!widgetPath) {
       console.warn(`Widget type escapes its allowed directory, refusing to render: ${type}`);
+      recordRenderError(sharedGlobals, { kind: "widget", widgetId, type, message: `Widget template not found: ${type}.liquid` });
       return `<div class="widget-error">Widget template not found: ${escapeHtml(type)}.liquid</div>`;
     }
 
@@ -1194,6 +1207,7 @@ async function renderWidget(
     } catch (error) {
       // If template not found, return an informative error message instead of crashing
       console.warn(`Widget template not found at ${widgetPath}. Error: ${error.message}`);
+      recordRenderError(sharedGlobals, { kind: "widget", widgetId, type, message: `Widget template not found: ${type}.liquid` });
       return `<div class="widget-error">Widget template not found: ${escapeHtml(type)}.liquid</div>`;
     }
 
@@ -1470,6 +1484,7 @@ async function renderWidget(
     }
   } catch (error) {
     console.error(`Error rendering widget ${widgetId} (Project: ${deps.projectId}):`, error);
+    recordRenderError(sharedGlobals, { kind: "widget", widgetId, type: widgetData?.type, message: error.message });
     // Return a more informative error message in the HTML
     // Everything interpolated here comes from page JSON (widget id and type are
     // author-controlled keys/values) or from an error message that can quote it.
@@ -1521,6 +1536,7 @@ async function renderPageLayout(
       layoutTemplate = await fs.readFile(layoutPath, "utf-8");
     } catch (readErr) {
       console.error(`Layout template not readable under ${projectDir}`);
+      recordRenderError(sharedGlobals, { kind: "layout", message: "layout.liquid could not be read" });
       return `<html><body><h1>Error: Layout template not found</h1><pre>${escapeHtml(readErr.message)}</pre></body></html>`;
     }
 
@@ -1584,6 +1600,7 @@ async function renderPageLayout(
     }
   } catch (error) {
     console.error(`Error rendering page layout for project ${deps.projectId}:`, error);
+    recordRenderError(sharedGlobals, { kind: "layout", message: error.message });
     return `<html><body><h1>Error rendering page</h1><pre>${escapeHtml(error.message)}</pre></body></html>`;
   }
 }
