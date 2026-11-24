@@ -13,7 +13,7 @@
  * Run with: node --test server/tests/media.test.js
  */
 
-import { describe, it, before, after, beforeEach } from "node:test";
+import { describe, it, before, after, beforeEach, mock } from "node:test";
 import assert from "node:assert/strict";
 import fs from "fs-extra";
 import path from "node:path";
@@ -904,6 +904,137 @@ describe("uploadProjectMedia", () => {
     const sanitized = await fs.readFile(filePath, "utf8");
     assert.ok(!sanitized.includes("onload"), "onload handler should be stripped");
     assert.ok(sanitized.includes("<circle"), "Valid SVG content should remain");
+  });
+
+  // An upload sent with the browser's name, as the route sends it (no `filename`).
+  async function jpegUpload(originalname, width, height) {
+    const buffer = await createTestJpeg(width, height);
+    return { originalname, mimetype: "image/jpeg", size: buffer.length, path: await stage(originalname, buffer) };
+  }
+  const upload = (file) => callController(uploadProjectMedia, { params: { projectId: PROJECT_ID }, files: [file] });
+  const storedWidth = async (name) =>
+    (await sharp(path.join(getProjectImagesDir(PROJECT_FOLDER), name)).metadata()).width;
+
+  it("refuses the upload when the folder can't be listed, and leaves the file with that name alone", async () => {
+    const existingPath = path.join(getProjectImagesDir(PROJECT_FOLDER), "photo.jpg");
+    const existing = await createTestJpeg(120, 90);
+    await fs.writeFile(existingPath, existing);
+
+    mock.method(testAssetStorage, "list", async () => {
+      throw new Error("listing unavailable");
+    });
+    let res;
+    try {
+      res = await upload(await jpegUpload("photo.jpg", 300, 200));
+    } finally {
+      mock.restoreAll();
+    }
+
+    assert.equal(res._status, 500);
+    assert.match(res._json.error, /listing unavailable/);
+    assert.deepEqual(await fs.readFile(existingPath), existing, "the existing file must be untouched");
+    assert.equal((await readMediaFile(PROJECT_ID)).files.length, 0, "nothing was recorded");
+
+    // The failed request holds no name and no lock: the next upload goes through.
+    const next = await upload(await jpegUpload("photo.jpg", 300, 200));
+    assert.equal(next._status, 201);
+    assert.equal(next._json.processedFiles[0].path, "/uploads/images/photo-1.jpg");
+  });
+
+  it("holds no name when a batch's second folder can't be listed", async () => {
+    const realList = testAssetStorage.list.bind(testAssetStorage);
+    mock.method(testAssetStorage, "list", async (scope, prefix) => {
+      if (prefix === "files/") throw new Error("listing unavailable");
+      return realList(scope, prefix);
+    });
+    const pdf = Buffer.from("%PDF-1.4 test");
+    let res;
+    try {
+      res = await callController(uploadProjectMedia, {
+        params: { projectId: PROJECT_ID },
+        files: [
+          await jpegUpload("mixed.jpg", 100, 80),
+          { originalname: "mixed.pdf", mimetype: "application/pdf", size: pdf.length, path: await stage("mixed.pdf", pdf) },
+        ],
+      });
+    } finally {
+      mock.restoreAll();
+    }
+    assert.equal(res._status, 500);
+
+    // The image was given its name before the files listing failed.
+    const next = await upload(await jpegUpload("mixed.jpg", 100, 80));
+    assert.equal(next._json.processedFiles[0].path, "/uploads/images/mixed.jpg");
+  });
+
+  it("gives two overlapping uploads of one name different names", async () => {
+    // Hold the first upload at its write, so the second lists the folder while
+    // the first's file is not in it yet.
+    const realUpload = testAssetStorage.upload.bind(testAssetStorage);
+    let firstReachedWrite;
+    const reached = new Promise((resolve) => (firstReachedWrite = resolve));
+    let letFirstWrite;
+    const gate = new Promise((resolve) => (letFirstWrite = resolve));
+    let held = false;
+    mock.method(testAssetStorage, "upload", async (...args) => {
+      if (!held) {
+        held = true;
+        firstReachedWrite();
+        await gate;
+      }
+      return realUpload(...args);
+    });
+
+    let first, second;
+    try {
+      const firstPending = upload(await jpegUpload("photo.jpg", 100, 80));
+      await reached;
+      second = await upload(await jpegUpload("photo.jpg", 160, 120));
+      letFirstWrite();
+      first = await firstPending;
+    } finally {
+      letFirstWrite();
+      mock.restoreAll();
+    }
+
+    assert.equal(first._status, 201, JSON.stringify(first._json));
+    assert.equal(second._status, 201, JSON.stringify(second._json));
+    assert.equal(first._json.processedFiles[0].path, "/uploads/images/photo.jpg");
+    assert.equal(second._json.processedFiles[0].path, "/uploads/images/photo-1.jpg");
+    assert.equal(await storedWidth("photo.jpg"), 100, "the first upload's file is its own");
+    assert.equal(await storedWidth("photo-1.jpg"), 160, "the second upload's file is its own");
+    const records = (await readMediaFile(PROJECT_ID)).files.map((file) => file.path).sort();
+    assert.deepEqual(records, ["/uploads/images/photo-1.jpg", "/uploads/images/photo.jpg"]);
+  });
+
+  it("frees a name when its upload is done, so it can be used again after a delete", async () => {
+    const first = await upload(await jpegUpload("photo.jpg", 100, 80));
+    assert.equal(first._json.processedFiles[0].path, "/uploads/images/photo.jpg");
+
+    const deleted = await callController(deleteProjectMedia, {
+      params: { projectId: PROJECT_ID, fileId: first._json.processedFiles[0].id },
+    });
+    assert.equal(deleted._status, 200, JSON.stringify(deleted._json));
+
+    const again = await upload(await jpegUpload("photo.jpg", 160, 120));
+    assert.equal(again._json.processedFiles[0].path, "/uploads/images/photo.jpg");
+  });
+
+  it("frees the names of an upload that was refused or failed", async () => {
+    mock.method(testAssetStorage, "upload", async () => {
+      throw new Error("disk full");
+    });
+    let failed;
+    try {
+      failed = await upload(await jpegUpload("photo.jpg", 100, 80));
+    } finally {
+      mock.restoreAll();
+    }
+    assert.equal(failed._status, 400);
+    assert.match(failed._json.rejectedFiles[0].reason, /disk full/);
+
+    const next = await upload(await jpegUpload("photo.jpg", 100, 80));
+    assert.equal(next._json.processedFiles[0].path, "/uploads/images/photo.jpg");
   });
 });
 

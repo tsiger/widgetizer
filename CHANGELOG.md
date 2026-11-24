@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Media
+
+- Two uploads of a file with the same name at the same moment no longer end up as one file shared by two media entries, and an upload can no longer replace an existing file when the uploads folder can't be read
+
 ### Export Viewer
 
 - **View** on the Export page shows an export on its own port (the app's port + 1, e.g. `http://localhost:3002`) with the site's address as the root, the way a static host serves it: links and assets starting with `/` work, the 404 page looks right, and a missing address shows the site's 404 page. A Site Address with a subfolder (`https://user.github.io/repo/`) opens under `/repo/`. Each view starts by clearing what earlier viewed sites stored in the browser (on `localhost` and over HTTPS)
