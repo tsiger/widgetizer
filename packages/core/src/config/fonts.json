@@ -1741,19 +1741,6 @@
       ]
     },
     {
-      "name": "Instrument Serif",
-      "stack": "\"Instrument Serif\", serif",
-      "isGoogleFont": true,
-      "availableWeights": [
-        400
-      ],
-      "defaultWeight": 400,
-      "subsets": [
-        "latin",
-        "latin-ext"
-      ]
-    },
-    {
       "name": "Inter",
       "stack": "\"Inter\", sans-serif",
       "isGoogleFont": true,

@@ -92,7 +92,6 @@ category,name,stack,availableWeights,defaultWeight,isGoogleFont
 "google","Inconsolata","""Inconsolata"", monospace","200|300|400|500|600|700|800|900","400","true"
 "google","Indie Flower","""Indie Flower"", cursive","400","400","true"
 "google","Instrument Sans","""Instrument Sans"", sans-serif","400|500|600|700","400","true"
-"google","Instrument Serif","""Instrument Serif"", serif","400","400","true"
 "google","Inter","""Inter"", sans-serif","100|200|300|400|500|600|700|800|900","400","true"
 "google","Inter Tight","""Inter Tight"", sans-serif","100|200|300|400|500|600|700|800|900","400","true"
 "google","Istok Web","""Istok Web"", sans-serif","400|700","400","true"
