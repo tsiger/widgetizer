@@ -93,7 +93,7 @@ Not sure? Leave it off. Your site works on any host with the setting off.
 
 Click a project's name on the **Projects** screen to open it. If it isn't the active project yet, it becomes the active one.
 
-To change a project's settings, open it first, then choose **Manage › Project details** at the top right. Project details always shows the active project.
+To change a project's settings, open it first, then choose **Manage › Project details** at the top right. Project details always shows the active project. On the **Projects** screen you can also open the active project's **actions menu** (⋮) and choose **Project details**.
 
 1. Choose **Manage › Project details**
 2. Update the fields you want to change, on any tab
