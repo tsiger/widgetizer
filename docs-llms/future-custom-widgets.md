@@ -1,6 +1,6 @@
 # Protected Custom Widgets — Feature Proposal
 
-**Status:** Early proposal for discussion, recorded 21 September 2026. Not implemented or scheduled. Saving this specification does not settle its open decisions.
+**Status:** Early proposal for discussion, recorded 21 September 2026 (follow-up notes added 26 November 2026). Not implemented or scheduled. Saving this specification does not settle its open decisions.
 
 ## 1. Purpose
 
@@ -319,6 +319,54 @@ The feature is complete when we can show that:
 - Decide whether a convenient "Open custom widgets folder" action is worth including initially.
 
 Everything else should aim to reuse the existing widget experience rather than invent another one.
+
+## 19. Follow-up discussion: broader `custom/` project overlay (26 November 2026)
+
+Community feedback highlighted that developers customizing a project often go beyond widgets alone, adding or editing files in `widgets/`, `collection-types/`, `snippets/`, `assets/`, `locales/`, and occasionally `layout.liquid` — all of which are currently replaced wholesale during theme updates (`UPDATABLE_PATHS`). Separately, future hosted AI site generation also needs a protected home for project-owned `collection-types/` and display widgets that survive theme updates.
+
+Instead of a widgets-only `custom-widgets/` folder, an alternative direction to evaluate when we revisit this work is a single project-owned `custom/` root folder mirroring the theme's own structure:
+
+```text
+My project/
+  layout.liquid          # theme-owned (replaced on update)
+  widgets/               # theme-owned
+  collection-types/      # theme-owned
+  snippets/              # theme-owned
+  assets/                # theme-owned
+  locales/               # theme-owned
+
+  custom/                # project-owned (never touched by theme updates)
+    widgets/
+    collection-types/
+    snippets/
+    assets/
+    locales/
+    layout.liquid        # open decision — highest update-freeze risk
+```
+
+### Why this fits the existing architecture
+
+- **Theme updates stay simple:** `themeUpdateService.js` only swaps the explicit `UPDATABLE_PATHS`, so a top-level `custom/` folder survives updates, rollbacks, interrupted-update recovery, backups, and project duplication without complicating the swap mechanism.
+- **Layered resolution already exists in parts of the codebase:**
+  - `renderEngine.js` already passes an ordered search-path array to LiquidJS (`[themeSnippetsDir, coreSnippetsDir]`), which naturally extends to `[customSnippetsDir, themeSnippetsDir, coreSnippetsDir]`.
+  - `siteStringsService.js` (and editor theme locale loading) already deep-merges `core → theme`, which naturally extends to `core → theme → custom`.
+- **Shared foundation across OSS and hosted:** One unified project-owned layer can serve both OSS developers/agencies and future hosted project-owned collection extensions instead of maintaining two separate mechanisms.
+
+### Per-folder behaviour and tradeoffs
+
+- **`custom/widgets/`:** Clean for new widget IDs. If overrides of existing theme widget IDs are ever permitted, they must be all-or-nothing per widget folder (never mixing a custom template with a theme schema, or vice versa).
+- **`custom/collection-types/`:** High value for project-specific content types (e.g., Courses, Properties). Same whole-folder rule applies if overrides are allowed. Theme updates must check `slugPrefix` and language-folder collisions against `custom/collection-types/` as well.
+- **`custom/snippets/`:** Straightforward via LiquidJS search roots. Additions are low risk; overriding a theme snippet risks drifting out of sync if a future theme update changes the parameters passed to it.
+- **`custom/locales/`:** Safe for both additions and overrides because merging is key-by-key (`core → theme → custom`), so owners can add strings for custom widgets/collections or reword individual theme strings while still receiving new theme translations.
+- **`custom/assets/`:** Useful for additional scripts, stylesheets, or fonts. Overriding core theme stylesheets (such as `base.css`) is risky for small tweaks because it freezes future theme styling fixes; additive files or Site Settings Custom CSS should remain the recommended path.
+- **`custom/layout.liquid`:** Highest risk of silent breakage across theme updates, since theme releases regularly add tags or markup to `layout.liquid` (e.g., site icons, structured data, animation controls). Before allowing a full `layout.liquid` override, evaluate whether safer injection points (such as optional hook snippets like `head-end`, `body-start`, `body-end`, alongside existing Custom CSS and Head/Footer Scripts) cover the real use cases.
+
+### Additional decisions to revisit later
+
+- **Scope:** Single `custom/` mirror folder vs. `custom-widgets/` only.
+- **Additions vs. overrides:** Keep the strict additions-only rule from §4, or allow explicit overrides of theme files/folders. If overrides are allowed, surface them visibly in the editor / Project Details (e.g., listing active custom overrides that theme updates will not update) to avoid silent drift and confusing bug reports.
+- **`layout.liquid` strategy:** Optional injection hooks vs. full `custom/layout.liquid` override (or both, with clear warnings).
+- **Unified resolver:** Ensure every consumer (widget discovery, rendering, preview asset serving, export, collection loading/validation, locales, media tracking, link maintenance) resolves through one shared project-layer resolver rather than ad-hoc path checks.
 
 ## Current implementation reference
 
