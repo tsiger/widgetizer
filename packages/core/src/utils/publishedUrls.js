@@ -70,7 +70,16 @@ export function publishedImageUrl(rawValue, siteUrl, mediaFiles = {}) {
   return absoluteSiteUrl(siteUrl, `assets/images/${publicImageFilename(filename, mediaFiles)}`);
 }
 
-function publicImageFilename(filename, mediaFiles) {
+/**
+ * The file a published site carries for an image's file name. A site holds an
+ * image's sizes; once a raster has a `large` one its original stays out, and the
+ * `large` file is the biggest copy there is. An original with no `large` size
+ * (too small for one) and an SVG are published as they are.
+ * @param {string} filename
+ * @param {object} [mediaFiles] - Media records keyed by filename.
+ * @returns {string}
+ */
+export function publicImageFilename(filename, mediaFiles) {
   const mediaFile = mediaFiles?.[filename];
   const isSvg = mediaFile?.type === "image/svg+xml" || filename?.toLowerCase().endsWith(".svg");
   const largePath = mediaFile?.sizes?.large?.path;

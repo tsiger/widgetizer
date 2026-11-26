@@ -1328,6 +1328,7 @@ export function prepareCollectionItemForRender(
       schema.settings,
       mediaBasePaths.imagePath,
       mediaBasePaths.filePath,
+      mediaBasePaths.publishedImageName,
     );
   }
   // Resolve stable internal-link refs in richtext anchors (data-page-uuid /

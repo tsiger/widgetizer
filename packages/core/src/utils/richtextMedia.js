@@ -16,11 +16,40 @@
  * portable path. Lives under src/core so it imports no backend-only code.
  */
 
+import { publicImageFilename } from "./publishedUrls.js";
+
 // Match a `src="`/`href="` (group 1) immediately followed by an `/uploads/{images,files}/`
 // path — i.e. an attribute whose value *starts with* the upload path, not a coincidental
 // `/uploads/` substring elsewhere (a longer URL, prose, or another attribute like class).
-const UPLOAD_IMAGE_ATTR_RE = /((?:src|href)=")\/uploads\/images\//g;
+const UPLOAD_IMAGE_ATTR_RE = /((?:src|href)=")\/uploads\/images\/([^"]*)/g;
 const UPLOAD_FILE_ATTR_RE = /((?:src|href)=")\/uploads\/files\//g;
+
+/**
+ * A path in content that names an image's original (a link or an image written
+ * into rich text) has to name the file the site carries instead, or it points at
+ * a file nobody published: see {@link publicImageFilename}, the rule the image
+ * tag, og:image and the export's own copy follow.
+ *
+ * @param {Array<object> | Record<string, object>} mediaFiles - The project's media
+ *   records, as a list or keyed by file name.
+ * @returns {(name: string) => string} The published file name for an image file
+ *   name. A query or fragment after the name is kept.
+ */
+export function createPublishedImageNamer(mediaFiles) {
+  const byName = Array.isArray(mediaFiles)
+    ? Object.fromEntries(
+        mediaFiles
+          .map((file) => [file?.filename || String(file?.path ?? "").split("/").pop(), file])
+          .filter(([name]) => name),
+      )
+    : mediaFiles || {};
+  return (name) => {
+    if (typeof name !== "string") return name;
+    const end = name.search(/[?#]/);
+    const file = end === -1 ? name : name.slice(0, end);
+    return `${publicImageFilename(file, byName)}${end === -1 ? "" : name.slice(end)}`;
+  };
+}
 
 /**
  * Rewrite embedded `/uploads/images|files/…` paths in one richtext HTML string to the
@@ -28,9 +57,11 @@ const UPLOAD_FILE_ATTR_RE = /((?:src|href)=")\/uploads\/files\//g;
  * @param {*} html - The richtext HTML value.
  * @param {string} imagePath - Base for `/uploads/images/` (the `imagePath` render global).
  * @param {string} filePath - Base for `/uploads/files/` (the `filePath` render global).
+ * @param {(name: string) => string} [publishedImageName] - For a published site: the
+ *   file it carries for an image file name (see {@link createPublishedImageNamer}).
  * @returns {*} The rewritten string (or the input unchanged when not a non-empty string).
  */
-export function resolveRichtextMediaPaths(html, imagePath, filePath) {
+export function resolveRichtextMediaPaths(html, imagePath, filePath, publishedImageName = null) {
   if (typeof html !== "string" || html === "") return html;
   let out = html;
   // Only a `src`/`href` value that IS an upload path is rewritten — never a `/uploads/`
@@ -38,7 +69,12 @@ export function resolveRichtextMediaPaths(html, imagePath, filePath) {
   // attribute. The value has already passed through DOMPurify (double-quoted attrs), so
   // anchoring on `src="`/`href="` is reliable. The function replacement sidesteps
   // `$`-pattern handling if a base path contains `$`.
-  if (imagePath) out = out.replace(UPLOAD_IMAGE_ATTR_RE, (_m, attr) => `${attr}${imagePath}/`);
+  if (imagePath) {
+    out = out.replace(
+      UPLOAD_IMAGE_ATTR_RE,
+      (_m, attr, name) => `${attr}${imagePath}/${publishedImageName ? publishedImageName(name) : name}`,
+    );
+  }
   if (filePath) out = out.replace(UPLOAD_FILE_ATTR_RE, (_m, attr) => `${attr}${filePath}/`);
   return out;
 }
@@ -50,12 +86,13 @@ export function resolveRichtextMediaPaths(html, imagePath, filePath) {
  * @param {Array} schemaSettings - The schema's `settings` array (id + type per field).
  * @param {string} imagePath - The `imagePath` render global.
  * @param {string} filePath - The `filePath` render global.
+ * @param {(name: string) => string} [publishedImageName] - See resolveRichtextMediaPaths.
  */
-export function resolveRichtextMediaInSettings(settings, schemaSettings, imagePath, filePath) {
+export function resolveRichtextMediaInSettings(settings, schemaSettings, imagePath, filePath, publishedImageName = null) {
   if (!settings || !Array.isArray(schemaSettings)) return;
   for (const setting of schemaSettings) {
     if (setting.type === "richtext" && setting.id && typeof settings[setting.id] === "string") {
-      settings[setting.id] = resolveRichtextMediaPaths(settings[setting.id], imagePath, filePath);
+      settings[setting.id] = resolveRichtextMediaPaths(settings[setting.id], imagePath, filePath, publishedImageName);
     }
   }
 }
@@ -67,15 +104,16 @@ export function resolveRichtextMediaInSettings(settings, schemaSettings, imagePa
  * @param {object} schema - Widget schema with `.settings` and optional `.blocks` arrays.
  * @param {string} imagePath - The `imagePath` render global.
  * @param {string} filePath - The `filePath` render global.
+ * @param {(name: string) => string} [publishedImageName] - See resolveRichtextMediaPaths.
  */
-export function resolveRichtextMediaInWidgetData(widgetData, schema, imagePath, filePath) {
+export function resolveRichtextMediaInWidgetData(widgetData, schema, imagePath, filePath, publishedImageName = null) {
   if (!widgetData || !schema) return;
-  resolveRichtextMediaInSettings(widgetData.settings, schema.settings, imagePath, filePath);
+  resolveRichtextMediaInSettings(widgetData.settings, schema.settings, imagePath, filePath, publishedImageName);
   if (widgetData.blocks && Array.isArray(schema.blocks)) {
     const settingsByType = new Map(schema.blocks.filter((b) => b.type).map((b) => [b.type, b.settings]));
     for (const block of Object.values(widgetData.blocks)) {
       if (block && block.type && block.settings && settingsByType.has(block.type)) {
-        resolveRichtextMediaInSettings(block.settings, settingsByType.get(block.type), imagePath, filePath);
+        resolveRichtextMediaInSettings(block.settings, settingsByType.get(block.type), imagePath, filePath, publishedImageName);
       }
     }
   }

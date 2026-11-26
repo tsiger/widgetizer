@@ -13,6 +13,7 @@ import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 
 import {
+  createPublishedImageNamer,
   resolveRichtextMediaPaths,
   resolveRichtextMediaInSettings,
   resolveRichtextMediaInWidgetData,
@@ -77,6 +78,62 @@ describe("resolveRichtextMediaPaths", () => {
     assert.equal(resolveRichtextMediaPaths('<img src="/uploads/images/a.jpg">'), '<img src="/uploads/images/a.jpg">');
     assert.equal(resolveRichtextMediaPaths("", "assets/images", "assets/files"), "");
     assert.equal(resolveRichtextMediaPaths(null, "assets/images", "assets/files"), null);
+  });
+});
+
+// A published site holds an image's sizes; once it has a `large` one, the original
+// is not published and a path that names it must name the `large` file.
+describe("createPublishedImageNamer", () => {
+  const files = [
+    { filename: "hero.jpg", path: "/uploads/images/hero.jpg", sizes: { medium: { path: "/uploads/images/hero-medium.jpg" }, large: { path: "/uploads/images/hero-large.jpg" } } },
+    { filename: "small.jpg", path: "/uploads/images/small.jpg", sizes: { medium: { path: "/uploads/images/small-medium.jpg" } } },
+    { filename: "logo.svg", path: "/uploads/images/logo.svg", sizes: {} },
+  ];
+  const name = createPublishedImageNamer(files);
+
+  it("names the large size for an original that has one", () => {
+    assert.equal(name("hero.jpg"), "hero-large.jpg");
+  });
+
+  it("keeps a query or fragment after the name", () => {
+    assert.equal(name("hero.jpg?v=2#top"), "hero-large.jpg?v=2#top");
+  });
+
+  it("leaves an original with no large size, an SVG, a size's own file and an unknown name alone", () => {
+    assert.equal(name("small.jpg"), "small.jpg");
+    assert.equal(name("logo.svg"), "logo.svg");
+    assert.equal(name("hero-large.jpg"), "hero-large.jpg");
+    assert.equal(name("hero-medium.jpg"), "hero-medium.jpg");
+    assert.equal(name("unknown.jpg"), "unknown.jpg");
+  });
+
+  it("takes the records keyed by file name too, and none at all", () => {
+    assert.equal(createPublishedImageNamer({ "hero.jpg": files[0] })("hero.jpg"), "hero-large.jpg");
+    assert.equal(createPublishedImageNamer(undefined)("hero.jpg"), "hero.jpg");
+  });
+});
+
+describe("resolveRichtextMediaPaths with a published-image namer", () => {
+  const name = createPublishedImageNamer([
+    { path: "/uploads/images/hero.jpg", sizes: { large: { path: "/uploads/images/hero-large.jpg" } } },
+  ]);
+
+  it("points a link and an image at the large file, and leaves other images and files alone", () => {
+    const html =
+      '<a href="/uploads/images/hero.jpg">full size</a><img src="/uploads/images/hero.jpg">' +
+      '<img src="/uploads/images/other.jpg"><a href="/uploads/files/hero.jpg">a file with the same name</a>';
+    assert.equal(
+      resolveRichtextMediaPaths(html, "../assets/images", "../assets/files", name),
+      '<a href="../assets/images/hero-large.jpg">full size</a><img src="../assets/images/hero-large.jpg">' +
+        '<img src="../assets/images/other.jpg"><a href="../assets/files/hero.jpg">a file with the same name</a>',
+    );
+  });
+
+  it("is not applied when none is given (a preview serves the original)", () => {
+    assert.equal(
+      resolveRichtextMediaPaths('<img src="/uploads/images/hero.jpg">', PREVIEW_IMG, PREVIEW_FILE),
+      `<img src="${PREVIEW_IMG}/hero.jpg">`,
+    );
   });
 });
 
