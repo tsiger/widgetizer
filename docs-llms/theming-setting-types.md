@@ -794,7 +794,7 @@ A uniform repeating-row field: an **ordered array of row objects**, each keyed b
 
 **Additional Properties:**
 
-- **`columns`** (array, required): the row shape. Each column is `{ "id": string, "type": "text", "label": string }`. `id` must match `^[a-zA-Z][a-zA-Z0-9_]*$` and must not be a reserved name (`__proto__`, `constructor`, `prototype`). The `columns` array must be non-empty.
+- **`columns`** (array, required): the row shape. Each column is `{ "id": string, "type": "text", "label": string }`. `id` must match `^[a-zA-Z][a-zA-Z0-9_]*$` and must not be a reserved name (`__proto__`, `constructor`, `prototype`). The `columns` array must be non-empty. A column `label` is a theme string like the setting's own label: write it plainly or as a `tTheme:` key, and the editor shows the string from the theme's locale file (`validate:theme` checks the key exists). A column with no label shows its `id`.
 
 ```json
 {

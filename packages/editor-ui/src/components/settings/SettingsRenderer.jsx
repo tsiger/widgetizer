@@ -39,7 +39,7 @@ export default function SettingsRenderer({
   const { t } = useTranslation();
   const { tTheme } = useThemeLocale();
 
-  const { type, id, label, description, required, options, min, max, step, unit, allow_alpha, language, size, compact, layout } =
+  const { type, id, label, description, required, options, columns, min, max, step, unit, allow_alpha, language, size, compact, layout } =
     setting || {};
 
   // Translate options (select/radio) via theme locale
@@ -49,6 +49,14 @@ export default function SettingsRenderer({
       typeof opt === "object" && opt.label ? { ...opt, label: tTheme(opt.label) } : opt,
     );
   }, [options, tTheme]);
+
+  // A table's column labels are theme strings like its own label and its options'.
+  const translatedColumns = useMemo(() => {
+    if (!Array.isArray(columns)) return columns;
+    return columns.map((col) =>
+      col && typeof col === "object" && typeof col.label === "string" ? { ...col, label: tTheme(col.label) } : col,
+    );
+  }, [columns, tTheme]);
 
   if (!setting || !setting.type) {
     return <div>Error: Invalid setting configuration.</div>;
@@ -137,7 +145,7 @@ export default function SettingsRenderer({
       case "gallery":
         return <GalleryInput {...inputProps} />;
       case "table":
-        return <TableInput {...inputProps} columns={setting.columns} />;
+        return <TableInput {...inputProps} columns={translatedColumns} />;
       case "file":
         return <FileInput {...inputProps} />;
       case "video":
