@@ -23,7 +23,7 @@ import { randomUUID } from "node:crypto";
 
 import { isSupportedSettingType } from "@widgetizer/core/config/settingTypes";
 import { prefixInternalHref } from "@widgetizer/core/linkPrefixer";
-import { pageHref, itemHref } from "@widgetizer/core/internalHref";
+import { pageHref, itemHref, hrefFragment } from "@widgetizer/core/internalHref";
 import { itemUrlAt } from "@widgetizer/core/publishedUrls";
 import { resolveRichtextMediaInSettings } from "@widgetizer/core/richtextMedia";
 import { resolveRichtextLinksInSettings } from "@widgetizer/core/richtextLinks";
@@ -1205,7 +1205,7 @@ function resolveLink(
       return { href: "", text: "", target: "_self" }; // item deleted — clear the link
     }
     const itemOpts = { cleanUrls, outputPathPrefix, language: entry.language, defaultLanguage };
-    return { ...linkValue, href: itemHref(entry.slugPrefix, entry.slug, itemOpts) };
+    return { ...linkValue, href: itemHref(entry.slugPrefix, entry.slug, itemOpts) + hrefFragment(linkValue.href) };
   }
   if (!pageUuid) {
     // Custom URL — depth-prefix internal-looking hrefs, leave the rest as-is.
@@ -1215,10 +1215,8 @@ function resolveLink(
   if (!page) {
     return { href: "", text: "", target: "_self" }; // page deleted — clear the link
   }
-  return {
-    ...linkValue,
-    href: pageHref(page.slug, { cleanUrls, outputPathPrefix, language: page.language, defaultLanguage }),
-  };
+  const pageOpts = { cleanUrls, outputPathPrefix, language: page.language, defaultLanguage };
+  return { ...linkValue, href: pageHref(page.slug, pageOpts) + hrefFragment(linkValue.href) };
 }
 
 /**

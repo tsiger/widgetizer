@@ -11,7 +11,7 @@
 import { MAX_MENU_DEPTH } from "@widgetizer/core/adapters";
 import { prefixInternalHref, normalize } from "@widgetizer/core/linkPrefixer";
 import { sanitizeHref } from "@widgetizer/core/urlSafety";
-import { pageHref, itemHref } from "@widgetizer/core/internalHref";
+import { pageHref, itemHref, hrefFragment } from "@widgetizer/core/internalHref";
 import { pageOutputPath, itemOutputPath } from "@widgetizer/core/contentAddress";
 import { languageFolder } from "@widgetizer/core/contentAddress";
 
@@ -58,7 +58,8 @@ export function resolveMenuItemLinks(
       const entry = collectionItemsByUuid && collectionItemsByUuid.get(item.collectionItemUuid);
       if (entry) {
         const lang = { language: entry.language, defaultLanguage };
-        resolved.link = itemHref(entry.slugPrefix, entry.slug, { cleanUrls, outputPathPrefix, ...lang });
+        // The stored link's `#part` stays on the link; the canonical path is the page alone.
+        resolved.link = itemHref(entry.slugPrefix, entry.slug, { cleanUrls, outputPathPrefix, ...lang }) + hrefFragment(item.link);
         resolved.canonicalPath = normalize(itemOutputPath(entry.slugPrefix, entry.slug, lang));
       } else {
         // Collection item was deleted - clear the link
@@ -71,7 +72,7 @@ export function resolveMenuItemLinks(
       const page = pagesByUuid && pagesByUuid.get(item.pageUuid);
       if (page) {
         const lang = { language: page.language, defaultLanguage };
-        resolved.link = pageHref(page.slug, { cleanUrls, outputPathPrefix, ...lang });
+        resolved.link = pageHref(page.slug, { cleanUrls, outputPathPrefix, ...lang }) + hrefFragment(item.link);
         resolved.canonicalPath = normalize(pageOutputPath(page.slug, 1, lang));
       } else {
         // Page was deleted - clear the link

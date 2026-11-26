@@ -35,6 +35,25 @@ export function pageHref(slug, { cleanUrls = false, outputPathPrefix = "", langu
 }
 
 /**
+ * A stored internal address split at its `#part`: `furniture.html#living` is the
+ * path `furniture.html` and the fragment `#living` ("" when there is none). A
+ * link that carries a stable reference keeps its fragment in the stored address,
+ * and whatever rebuilds the address from the target's current slug puts it back.
+ * @param {*} href
+ * @returns {{ path: string, fragment: string }}
+ */
+export function splitHrefFragment(href) {
+  if (typeof href !== "string") return { path: "", fragment: "" };
+  const at = href.indexOf("#");
+  return at === -1 ? { path: href, fragment: "" } : { path: href.slice(0, at), fragment: href.slice(at) };
+}
+
+/** The `#part` a stored internal address ends with, "" when there is none. */
+export function hrefFragment(href) {
+  return splitHrefFragment(href).fragment;
+}
+
+/**
  * @param {string} slugPrefix
  * @param {string} slug
  * @param {{ cleanUrls?: boolean, outputPathPrefix?: string, language?: string, defaultLanguage?: string }} [opts]

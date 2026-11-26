@@ -1,5 +1,29 @@
 import { describe, it, expect } from "vitest";
-import { isHomeSlug, pageHref, itemHref, siteUrlBase, absoluteSiteUrl, siteUrlPathname } from "../internalHref.js";
+import {
+  isHomeSlug,
+  pageHref,
+  itemHref,
+  splitHrefFragment,
+  hrefFragment,
+  siteUrlBase,
+  absoluteSiteUrl,
+  siteUrlPathname,
+} from "../internalHref.js";
+
+describe("splitHrefFragment", () => {
+  it("splits a stored address at its #part", () => {
+    expect(splitHrefFragment("furniture.html#living")).toEqual({ path: "furniture.html", fragment: "#living" });
+    expect(splitHrefFragment("projects/a.html#x#y")).toEqual({ path: "projects/a.html", fragment: "#x#y" });
+    expect(splitHrefFragment("#top")).toEqual({ path: "", fragment: "#top" });
+  });
+
+  it("answers an empty fragment when there is none, or no address", () => {
+    expect(splitHrefFragment("furniture.html")).toEqual({ path: "furniture.html", fragment: "" });
+    expect(splitHrefFragment(undefined)).toEqual({ path: "", fragment: "" });
+    expect(hrefFragment("furniture.html")).toBe("");
+    expect(hrefFragment("furniture.html#living")).toBe("#living");
+  });
+});
 
 describe("isHomeSlug", () => {
   it("recognises the two home slugs only", () => {

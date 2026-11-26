@@ -76,4 +76,23 @@ describe("resolveStoredLink", () => {
     );
     expect(out).toEqual({ href: "https://x.com", text: "X", target: "_blank" });
   });
+
+  it("keeps the stored href's #part on a page ref, an item ref and a slug-only href", () => {
+    const resolve = (value) => resolveStoredLink(value, optionsByUuid, pageOptionBySlug, false);
+    expect(resolve({ pageUuid: "page-1", href: "old.html#team", text: "T", target: "_self" })).toEqual({
+      pageUuid: "page-1",
+      href: "about.html#team",
+      text: "T",
+      target: "_self",
+    });
+    expect(resolve({ collectionItemUuid: "item-1", href: "rooms/old.html#photos", text: "T", target: "_self" }).href).toBe(
+      "rooms/suite.html#photos",
+    );
+    expect(resolve({ href: "about.html#team", text: "T", target: "_self" })).toEqual({
+      pageUuid: "page-1",
+      href: "about.html#team",
+      text: "T",
+      target: "_self",
+    });
+  });
 });
