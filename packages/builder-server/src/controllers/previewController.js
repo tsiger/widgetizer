@@ -38,6 +38,7 @@ import {
 } from "../services/contentCoordination.js";
 import { isProjectResolutionError } from "../utils/projectErrors.js";
 import { generateToken, getToken } from "../services/previewTokenStore.js";
+import { previewThemeSettings } from "../services/themeSettingChanges.js";
 import { LANGUAGE_CODE_RE, DEFAULT_LANGUAGE } from "@widgetizer/core/languages";
 import { AREA_ID_RE } from "@widgetizer/core/sharedAreas";
 import { isRenderedWidget, renderedWidgetOrder, uniqueBlockOrder, uniqueWidgetOrder } from "@widgetizer/core/widgetOrder";
@@ -88,6 +89,34 @@ function collectionDepsFromReq(req) {
   const storage = req?.adapters?.storage;
   const scope = req?.scope;
   return storage && scope ? { storage, scope } : null;
+}
+
+/**
+ * The theme settings a preview renders: the project's stored `theme.json` with
+ * the editor's unsaved values laid over it (see previewThemeSettings). The
+ * stored file is read through the request's own storage and scope, and is never
+ * replaced by what the request sent: a project with no theme file, or one that
+ * can't be read, has no preview.
+ */
+async function themeSettingsForPreview(req) {
+  const { scope } = req;
+  const buf = await req.adapters.storage.read(scope, "theme.json");
+  if (buf == null) {
+    throw Object.assign(new Error("This project has no theme settings file, so it can't be previewed."), {
+      status: 404,
+      code: "THEME_SETTINGS_MISSING",
+    });
+  }
+  let stored;
+  try {
+    stored = JSON.parse(buf.toString("utf8"));
+  } catch {
+    throw Object.assign(new Error("This project's theme settings file can't be read, so it can't be previewed."), {
+      status: 500,
+      code: "THEME_SETTINGS_UNREADABLE",
+    });
+  }
+  return previewThemeSettings(stored, req.body?.themeSettings);
 }
 
 async function itemPagePrefixes(collectionDeps) {
@@ -320,10 +349,10 @@ async function generatePreviewHtml(pageData, rawThemeSettings, previewMode, coll
  */
 export async function generatePreview(req, res) {
   try {
-    const { pageData, themeSettings: rawThemeSettings, previewMode, pageNumber } = req.body;
+    const { pageData, previewMode, pageNumber } = req.body;
     const html = await generatePreviewHtml(
       pageData,
-      rawThemeSettings,
+      await themeSettingsForPreview(req),
       previewMode,
       collectionDepsFromReq(req),
       Number(pageNumber) || 1,
@@ -347,10 +376,10 @@ export async function generatePreview(req, res) {
  */
 export async function createPreviewToken(req, res) {
   try {
-    const { pageData, themeSettings: rawThemeSettings, previewMode, pageNumber } = req.body;
+    const { pageData, previewMode, pageNumber } = req.body;
     const html = await generatePreviewHtml(
       pageData,
-      rawThemeSettings,
+      await themeSettingsForPreview(req),
       previewMode,
       collectionDepsFromReq(req),
       Number(pageNumber) || 1,
@@ -360,9 +389,13 @@ export async function createPreviewToken(req, res) {
   } catch (error) {
     console.error("Error creating preview token:", error);
     if (error.status === 404 || isProjectResolutionError(error)) {
-      return res.status(404).json({ error: error.message });
+      return res.status(404).json({ error: error.message, ...(error.code ? { code: error.code } : {}) });
     }
-    res.status(500).json({ error: "Failed to create preview token", message: error.message });
+    res.status(500).json({
+      error: "Failed to create preview token",
+      message: error.message,
+      ...(error.code ? { code: error.code } : {}),
+    });
   }
 }
 
@@ -551,7 +584,8 @@ export async function createCollectionPreviewToken(req, res) {
  */
 export async function renderSingleWidget(req, res) {
   try {
-    const { widgetId, widget, themeSettings: rawThemeSettings, currentCanonicalPath, page, area, withThemeReads } = req.body;
+    const { widgetId, widget, currentCanonicalPath, page, area, withThemeReads } = req.body;
+    const rawThemeSettings = await themeSettingsForPreview(req);
     const activeProjectId = req.activeProject.id;
     const isPlainObject = (value) => !!value && typeof value === "object" && !Array.isArray(value);
     const currentPage = isPlainObject(page) ? page : null;
@@ -619,7 +653,7 @@ export async function renderSingleWidget(req, res) {
       activeProjectId,
       widgetId,
       widget,
-      rawThemeSettings || {},
+      rawThemeSettings,
       "preview",
       sharedGlobals,
       // A widget of a shared area is not in the page's order, so it keeps a null index.
@@ -640,6 +674,9 @@ export async function renderSingleWidget(req, res) {
     console.error("Widget rendering error:", error);
     if (isProjectResolutionError(error)) {
       return res.status(404).json({ error: "Project not found", message: error.message });
+    }
+    if (error.code === "THEME_SETTINGS_MISSING" || error.code === "THEME_SETTINGS_UNREADABLE") {
+      return res.status(error.status).json({ error: error.message, code: error.code });
     }
     res.status(500).json({
       error: "Failed to render widget",

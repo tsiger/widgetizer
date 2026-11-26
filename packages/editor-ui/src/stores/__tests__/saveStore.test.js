@@ -11,7 +11,7 @@ vi.mock("../../queries/previewManager", () => ({
 }));
 vi.mock("../../queries/themeManager", () => ({
   getThemeSettings: vi.fn(),
-  saveThemeSettings: vi.fn().mockResolvedValue({}),
+  saveThemeSettingChanges: vi.fn().mockResolvedValue({ theme: null, warnings: [] }),
 }));
 vi.mock("../../queries/mediaManager", () => ({
   invalidateMediaCache: vi.fn(),

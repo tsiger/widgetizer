@@ -21,6 +21,9 @@ export function collectThemeFonts(theme) {
     const fontInfo = ALL_FONTS_LIST.find((font) => font.stack === value.stack);
     if (!fontInfo?.isGoogleFont) continue;
 
+    // The weights go into the stylesheet URL as written, so only one the font
+    // offers is taken: a stored value that is not a real weight loads nothing.
+    if (!(fontInfo.availableWeights || []).includes(value.weight)) continue;
     const weights = (weightsByFont[fontInfo.name] ??= new Set());
     weights.add(value.weight);
     if (setting.id === "body_font" && value.weight === 400) {

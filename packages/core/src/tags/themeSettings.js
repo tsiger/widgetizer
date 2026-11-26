@@ -1,4 +1,5 @@
 import fontDefinitions from "../config/fonts.json" with { type: "json" };
+import { cssVariableValue, isCssVariableName } from "../utils/cssVariables.js";
 
 const ALL_FONTS_LIST = [...fontDefinitions.system, ...fontDefinitions.google];
 
@@ -22,6 +23,9 @@ export const ThemeSettingsTag = {
     Object.entries(globalSettings).forEach(([category, items]) => {
       if (Array.isArray(items)) {
         items.forEach((item) => {
+          // The name `--<group>-<id>` is written as it is, so both parts must be
+          // plain names. A setting that isn't is left out, not repaired.
+          if (!isCssVariableName(category, item?.id)) return;
           // Handle font_picker type specifically
           if (item.type === "font_picker") {
             const value = item.value !== undefined ? item.value : item.default;
@@ -52,7 +56,8 @@ export const ThemeSettingsTag = {
             }
           }
           // Handle other types marked for CSS variable output
-          else if (item.id && item.outputAsCssVar === true) {
+          // (A `code` setting holds markup or CSS of its own; it is never a single value.)
+          else if (item.id && item.outputAsCssVar === true && item.type !== "code") {
             // Use value if present, otherwise use default
             let value = item.value !== undefined ? item.value : item.default;
             if (value !== undefined) {
@@ -72,12 +77,11 @@ export const ThemeSettingsTag = {
       return "";
     }
 
-    // Defense-in-depth: strip <>{} from CSS values to prevent style tag breakout
-    const escapeCssValue = (v) => String(v).replace(/[<>{}]/g, "");
-
-    // Format as CSS string
+    // Every value is stripped here whatever checked it on the way in: a value
+    // saved before those checks, or copied across by a theme update, is still
+    // written by this tag on every render.
     const cssString = Object.entries(cssVariables)
-      .map(([key, value]) => `${key}: ${escapeCssValue(value)};`)
+      .map(([key, value]) => `${key}: ${cssVariableValue(value)};`)
       .join("\n  ");
 
     const output = `<style id="theme-settings-styles">\n:root {\n  ${cssString}\n}\n</style>`;

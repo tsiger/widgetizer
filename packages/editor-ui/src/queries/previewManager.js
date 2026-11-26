@@ -2,6 +2,7 @@ import { editorFetch, editorFetchJson, rethrowQueryError, throwApiError } from "
 import useProjectStore from "../stores/projectStore";
 import useWidgetStore from "../stores/widgetStore";
 import fontDefinitions from "@widgetizer/core/config/fonts.json" with { type: "json" };
+import { isCssVariableName } from "@widgetizer/core/cssVariables";
 import { getPreviewTargetOrigin } from "../lib/previewBase";
 import { pageOpensTransparent } from "../lib/transparentHeader";
 import { readThemeSetting, themeSettingsOfType } from "@widgetizer/core/themeSettingChanges";
@@ -494,6 +495,8 @@ function settingsToCssVariables(settings) {
   Object.entries(global).forEach(([category, items]) => {
     if (Array.isArray(items)) {
       items.forEach((item) => {
+        // The same two rules `{% theme_settings %}` follows on a full render.
+        if (!isCssVariableName(category, item?.id)) return;
         if (item.type === "font_picker") {
           const value = item.value !== undefined ? item.value : item.default;
           if (value && typeof value === "object" && value.stack && value.weight !== undefined) {
@@ -517,7 +520,7 @@ function settingsToCssVariables(settings) {
               }
             }
           }
-        } else if (item.id && item.outputAsCssVar === true) {
+        } else if (item.id && item.outputAsCssVar === true && item.type !== "code") {
           let value = item.value !== undefined ? item.value : item.default;
           if (value !== undefined) {
             if (item.type === "range" && item.unit && typeof value === "number") {

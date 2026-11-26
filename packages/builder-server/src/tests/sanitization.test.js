@@ -20,12 +20,31 @@ import {
   sanitizeWidgetData,
   sanitizeCollectionItemData,
   stripHtmlToText,
-  sanitizeCssValue,
-  sanitizeThemeSettings,
+  sanitizeThemeSettingValue,
   sanitizeImagePath,
   sanitizeImageSettingValue,
   sanitizeVideoPath,
 } from "../services/sanitizationService.js";
+import { cssVariableValue, hasCssValueBreaker, isCssVariableName } from "@widgetizer/core/cssVariables";
+
+// The per-setting check applied to every setting of a theme that has a value,
+// as a save applies it to each setting it changes and a preview to each value
+// the editor sends. The input is not changed.
+function sanitizeThemeSettings(themeData) {
+  if (!themeData?.settings?.global) return { data: themeData, warnings: [] };
+  const data = JSON.parse(JSON.stringify(themeData));
+  const warnings = [];
+  for (const items of Object.values(data.settings.global)) {
+    if (!Array.isArray(items)) continue;
+    for (const item of items) {
+      if (!item.id || !item.type || item.type === "header" || item.value === undefined) continue;
+      const result = sanitizeThemeSettingValue(item.value, item);
+      if (result.corrected) warnings.push(`"${item.label || item.id}" contained an invalid value and was reset.`);
+      item.value = result.value;
+    }
+  }
+  return { data, warnings };
+}
 
 // ============================================================================
 // sanitizeRichText
@@ -1420,46 +1439,60 @@ describe("plain-text sanitizing — one helper on both layers", () => {
 });
 
 // ============================================================================
-// sanitizeCssValue
+// What a CSS variable may hold (@widgetizer/core/cssVariables)
 // ============================================================================
 
-describe("sanitizeCssValue", () => {
-  it("strips < from string", () => {
-    assert.equal(sanitizeCssValue("</style>"), "/style");
+describe("cssVariableValue", () => {
+  it("strips what could close the <style> tag or the rule", () => {
+    assert.equal(cssVariableValue("</style><script>alert(1)</script>"), "/stylescriptalert(1)/script");
+    assert.equal(cssVariableValue("} .evil { display: none"), " .evil  display: none");
   });
 
-  it("strips > from string", () => {
-    assert.equal(sanitizeCssValue("<script>"), "script");
+  it("strips the semicolon that would start another declaration", () => {
+    assert.equal(
+      cssVariableValue("Inter; background:url(https://example.com/seen.png)"),
+      "Inter background:url(https://example.com/seen.png)",
+    );
   });
 
-  it("strips { from string", () => {
-    assert.equal(sanitizeCssValue("red; } body {"), "red;  body ");
+  it("strips control characters, a newline included", () => {
+    assert.equal(cssVariableValue("red\n\u0000\tblue\u007f"), "redblue");
   });
 
-  it("strips } from string", () => {
-    assert.equal(sanitizeCssValue("} .evil { display: none"), " .evil  display: none");
+  it("leaves real values as they are", () => {
+    assert.equal(cssVariableValue("#DE1877"), "#DE1877");
+    assert.equal(cssVariableValue('"Inter", sans-serif'), '"Inter", sans-serif');
+    assert.equal(cssVariableValue("16px"), "16px");
+    assert.equal(cssVariableValue(600), "600");
+  });
+});
+
+describe("hasCssValueBreaker", () => {
+  it("finds each character that could end a declaration, every time it is asked", () => {
+    for (const text of ["a;b", "a{b", "a}b", "a<b", "a>b", "a\nb", "a\u0000b"]) {
+      assert.equal(hasCssValueBreaker(text), true, JSON.stringify(text));
+      assert.equal(hasCssValueBreaker(text), true, `${JSON.stringify(text)} asked again`);
+    }
   });
 
-  it("strips all dangerous chars from style tag breakout", () => {
-    assert.equal(sanitizeCssValue('</style><script>alert(1)</script>'), "/stylescriptalert(1)/script");
+  it("passes real values and non-strings", () => {
+    for (const value of ["#DE1877", '"Inter", sans-serif', "16px", "calc(100% - 2rem)", 42, null]) {
+      assert.equal(hasCssValueBreaker(value), false, JSON.stringify(value));
+    }
+  });
+});
+
+describe("isCssVariableName", () => {
+  it("takes a group and an id made of letters, digits, _ and -", () => {
+    assert.equal(isCssVariableName("typography", "heading_font"), true);
+    assert.equal(isCssVariableName("colors", "accent-2"), true);
   });
 
-  it("leaves hex colors intact", () => {
-    assert.equal(sanitizeCssValue("#DE1877"), "#DE1877");
-  });
-
-  it("leaves font stacks intact", () => {
-    assert.equal(sanitizeCssValue('"Inter", sans-serif'), '"Inter", sans-serif');
-  });
-
-  it("leaves pixel values intact", () => {
-    assert.equal(sanitizeCssValue("16px"), "16px");
-  });
-
-  it("returns non-strings unchanged", () => {
-    assert.equal(sanitizeCssValue(42), 42);
-    assert.equal(sanitizeCssValue(null), null);
-    assert.equal(sanitizeCssValue(true), true);
+  it("refuses anything that could leave the name", () => {
+    assert.equal(isCssVariableName("colors", "x: red; background"), false);
+    assert.equal(isCssVariableName("colors}", "x"), false);
+    assert.equal(isCssVariableName("colors", ""), false);
+    assert.equal(isCssVariableName("colors", undefined), false);
   });
 });
 
@@ -1654,17 +1687,40 @@ describe("sanitizeThemeSettings", () => {
       });
     });
 
-    it("strips <> from font stack", () => {
-      const theme = makeTheme("typography", [
-        {
-          type: "font_picker",
-          id: "heading_font",
-          default: { stack: '"Inter", sans-serif', weight: 400 },
-          value: { stack: '</style><script>alert(1)</script>', weight: 400 },
-        },
-      ]);
-      const result = sanitizeThemeSettings(theme);
-      assert.doesNotMatch(result.data.settings.global.typography[0].value.stack, /[<>]/);
+    // A font setting holds a font from the list, with a weight that font has.
+    // Anything else is not cleaned up into one: it falls back to the default.
+    const fontDefault = { stack: '"Inter", sans-serif', weight: 400 };
+    const fontValue = (value) =>
+      sanitizeThemeSettings(
+        makeTheme("typography", [{ type: "font_picker", id: "heading_font", label: "Heading font", default: fontDefault, value }]),
+      );
+
+    it("resets a stack that carries extra CSS after a real font", () => {
+      const result = fontValue({ stack: "Inter; background:url(https://example.com/seen.png)", weight: 600 });
+      assert.deepEqual(result.data.settings.global.typography[0].value, fontDefault);
+      assert.equal(result.warnings.length, 1);
+    });
+
+    it("resets a stack that is not in the font list, markup included", () => {
+      for (const stack of ['</style><script>alert(1)</script>', '"My Own Font", serif', '"Inter",sans-serif']) {
+        const result = fontValue({ stack, weight: 400 });
+        assert.deepEqual(result.data.settings.global.typography[0].value, fontDefault, stack);
+      }
+    });
+
+    it("resets a weight the font does not offer", () => {
+      const result = fontValue({ stack: '"Abel", sans-serif', weight: 700 });
+      assert.deepEqual(result.data.settings.global.typography[0].value, fontDefault);
+    });
+
+    it("keeps every font in the list at each of its weights", async () => {
+      const fonts = JSON.parse(readFileSync(new URL("../../../core/src/config/fonts.json", import.meta.url), "utf8"));
+      for (const font of [...fonts.system, ...fonts.google]) {
+        for (const weight of font.availableWeights) {
+          const value = { stack: font.stack, weight };
+          assert.deepEqual(fontValue(value).data.settings.global.typography[0].value, value, font.name);
+        }
+      }
     });
 
     it("rejects missing stack — falls back to default", () => {
@@ -1711,33 +1767,23 @@ describe("sanitizeThemeSettings", () => {
       assert.equal(result.data.settings.global.custom[0].value, "16px");
     });
 
-    it("strips style tag breakout from CSS var text", () => {
-      const theme = makeTheme("custom", [
-        {
-          type: "text",
-          id: "val",
-          default: "",
-          outputAsCssVar: true,
-          value: '</style><script>alert(1)</script>',
-        },
-      ]);
-      const result = sanitizeThemeSettings(theme);
-      assert.doesNotMatch(result.data.settings.global.custom[0].value, /[<>]/);
-    });
-
-    it("strips CSS injection braces from CSS var text", () => {
-      const theme = makeTheme("custom", [
-        {
-          type: "text",
-          id: "val",
-          default: "",
-          outputAsCssVar: true,
-          value: "red; } body { display: none; } :root {",
-        },
-      ]);
-      const result = sanitizeThemeSettings(theme);
-      assert.doesNotMatch(result.data.settings.global.custom[0].value, /[{}]/);
-    });
+    // As a CSS variable the text is one declaration's value. Text that could end
+    // the declaration is refused whole, not trimmed into something else.
+    for (const [what, value] of [
+      ["a semicolon", "16px; background: url(https://example.com/seen.png)"],
+      ["a style tag breakout", "</style><script>alert(1)</script>"],
+      ["braces", "red } body { display: none"],
+      ["a newline", "16px\ncolor: red"],
+    ]) {
+      it(`resets CSS variable text holding ${what} to the default`, () => {
+        for (const type of ["text", "textarea"]) {
+          const theme = makeTheme("custom", [{ type, id: "val", label: "Val", default: "12px", outputAsCssVar: true, value }]);
+          const result = sanitizeThemeSettings(theme);
+          assert.equal(result.data.settings.global.custom[0].value, "12px", type);
+          assert.equal(result.warnings.length, 1, type);
+        }
+      });
+    }
 
     it("text without outputAsCssVar is left as-is", () => {
       const theme = makeTheme("custom", [

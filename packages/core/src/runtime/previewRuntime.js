@@ -102,6 +102,8 @@ function readThemeReads() {
 
 // ── CSS Variables + Fonts ───────────────────────────────────────────────────
 
+const CSS_VARIABLE_KEY = /^--[A-Za-z0-9_-]+$/;
+
 function updateCssVariables(variables) {
   const styleTag = document.getElementById("theme-settings-styles");
   if (!styleTag) {
@@ -109,11 +111,22 @@ function updateCssVariables(variables) {
     return;
   }
 
-  const cssString = Object.entries(variables)
-    .map(([key, value]) => `${key}: ${value};`)
-    .join("\n  ");
+  // Each variable is set as a property of the tag's own `:root` rule, never
+  // written as CSS text: a value can then only ever be a value, whatever it
+  // holds. The tag's rule is used, not the root element's inline style, so the
+  // variables keep the place in the cascade they have on the published page.
+  const sheet = styleTag.sheet;
+  if (!sheet) return;
+  let rule = Array.from(sheet.cssRules).find((candidate) => candidate.selectorText === ":root");
+  if (!rule) rule = sheet.cssRules[sheet.insertRule(":root {}", 0)];
 
-  styleTag.textContent = `:root {\n  ${cssString}\n}`;
+  // The theme fixes the set of variables, so the whole map replaces the rule's.
+  // A key that is not a custom property's name is left out: set as a property
+  // it would be a real declaration (`background`), not a variable.
+  rule.style.cssText = "";
+  for (const [key, value] of Object.entries(variables || {})) {
+    if (CSS_VARIABLE_KEY.test(key)) rule.style.setProperty(key, String(value));
+  }
 }
 
 const FONT_STYLESHEET_HOSTS = ["https://fonts.googleapis.com/", "https://fonts.bunny.net/"];

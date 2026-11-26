@@ -75,7 +75,7 @@ A project's data lives in **three planes**, and one boundary principle governs a
 
 The former adapter-*bypass* read exceptions have been closed against this principle:
 
-- **Project theme settings → adapter.** `getProjectThemeSettings` / `saveProjectThemeSettings` now read/write
+- **Project theme settings → adapter.** `getProjectThemeSettings` / `saveProjectThemeSettingChanges` now read/write
   `storage.{read,write}(req.scope, 'theme.json')` (the old `readProjectThemeData` helper is gone).
 - **Render-path page/global/theme reads → dir-explicit readers.** `pageController.listProjectPagesData` /
   `readGlobalWidgetData` were replaced by `utils/projectContentFs.js`'s `listPagesFromDir` /

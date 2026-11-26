@@ -39,9 +39,6 @@ router.post("/:id/update", themeId, themeController.updateTheme);
 // GET /api/themes/project/:projectId - Get project theme settings
 router.get("/project/:projectId", resolveActiveProject, themeController.getProjectThemeSettings);
 
-// POST /api/themes/project/:projectId - Save project theme settings
-router.post("/project/:projectId", resolveActiveProject, themeController.saveProjectThemeSettings);
-
 // PATCH /api/themes/project/:projectId - Save only the changed theme settings
 router.patch("/project/:projectId", resolveActiveProject, themeController.saveProjectThemeSettingChanges);
 

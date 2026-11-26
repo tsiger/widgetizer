@@ -23,6 +23,7 @@
     "./urlSafety": "./src/utils/urlSafety.js",
     "./richtextMedia": "./src/utils/richtextMedia.js",
     "./richtextLinks": "./src/utils/richtextLinks.js",
+    "./cssVariables": "./src/utils/cssVariables.js",
     "./linkPrefixer": "./src/utils/linkPrefixer.js",
     "./internalHref": "./src/utils/internalHref.js",
     "./publishedUrls": "./src/utils/publishedUrls.js",
