@@ -208,12 +208,13 @@ async function _ensureThemesDirectoryOnce() {
       if (await fs.pathExists(dest)) continue; // already installed
       const seedThemeDir = await resolveSeedThemeDir(themeId);
       if (!seedThemeDir) continue; // dir without theme.json — not a theme
-      // Skip preset-media/: project creation resolves it from the seed directly
-      // (see resolvePresetPaths), so copying it would waste ~180MB per install.
+      // Skip preset-media/ (resolved from seed directly, ~180MB per install) and
+      // VCS metadata so a single-theme git repo can be used directly as a seed dir.
+      const seedCopyExcludes = new Set(["preset-media", ".git", ".gitignore"]);
       await fs.copy(seedThemeDir, dest, {
         filter: (src) => {
           const rel = path.relative(seedThemeDir, src);
-          return rel === "" || rel.split(path.sep)[0] !== "preset-media";
+          return rel === "" || !seedCopyExcludes.has(rel.split(path.sep)[0]);
         },
       });
       provisioned += 1;
@@ -1160,7 +1161,15 @@ export async function copyThemeToProject(themeName, projectDir, excludeDirs = []
     // Copy theme directory to project, skipping excluded top-level dirs during the
     // copy (filter) rather than copying everything and deleting after. This avoids
     // copying then throwing away large dirs like presets/ (200MB+ for Arch).
-    const allExcludes = new Set([...excludeDirs, "updates", "latest", "presets", "preset-media"]);
+    const allExcludes = new Set([
+      ...excludeDirs,
+      "updates",
+      "latest",
+      "presets",
+      "preset-media",
+      ".git",
+      ".gitignore",
+    ]);
     await fs.cp(sourceDir, projectDir, {
       recursive: true,
       filter: (src) => {
