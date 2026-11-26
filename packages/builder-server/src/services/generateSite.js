@@ -66,6 +66,9 @@ const frontmatter = (lines) => ["---", ...lines, "---", "", ""].join("\n");
 async function findWidgetAssets(dir) {
   let results = [];
   for (const dirent of await fs.readdir(dir, { withFileTypes: true })) {
+    // A hidden folder in a widget (`.git/`, `.backup/`) can hold a file with an
+    // enqueued asset's name; it must not be the one that is published.
+    if (dirent.name.startsWith(".")) continue;
     const fullPath = path.join(dir, dirent.name);
     if (dirent.isDirectory()) results = results.concat(await findWidgetAssets(fullPath));
     else if (/\.(css|js)$/i.test(dirent.name)) results.push(fullPath);

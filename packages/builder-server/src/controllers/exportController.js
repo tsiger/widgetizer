@@ -404,20 +404,14 @@ export async function exportProjectToDir(projectId, options = {}, collectionDeps
     const projectAssetsDir = path.join(projectDir, "assets");
     try {
       if (await fs.pathExists(projectAssetsDir)) {
-        // Skip OS/system metadata (.DS_Store, __MACOSX, …) so it never lands in
-        // the export directory or the packaged ZIP. fs-extra hands the filter an
-        // absolute path; normalize to a relative, forward-slash path so the junk
-        // check works on Windows (where the absolute path is backslash-separated).
-        await fs.copy(projectAssetsDir, outputAssetsDir, {
-          filter: (src) => {
-            const rel = path.relative(projectAssetsDir, src).split(path.sep).join("/");
-            // icons.json is a render-time source: the icon snippet inlines its
-            // SVGs into the HTML, so no published page ever fetches it. Keep
-            // the ~1MB file out of exports.
-            if (rel === "icons.json") return false;
-            return isExportableEntry(rel);
-          },
-        });
+        // Skip dot entries and OS/system metadata (.DS_Store, __MACOSX, …) so
+        // they never land in the export directory or the packaged ZIP.
+        const exportable = exportableUnder(projectAssetsDir, "assets");
+        // icons.json is a render-time source: the icon snippet inlines its SVGs
+        // into the HTML, so no published page ever fetches it. Keep the ~1MB
+        // file out of exports.
+        const iconsJson = path.join(projectAssetsDir, "icons.json");
+        await fs.copy(projectAssetsDir, outputAssetsDir, { filter: (src) => src !== iconsJson && exportable(src) });
       } else {
         console.warn(`Project assets directory not found: ${projectAssetsDir}`);
       }
@@ -522,7 +516,7 @@ export async function exportProjectToDir(projectId, options = {}, collectionDeps
       const projectImagesDir = path.join(projectDir, "uploads", "images");
       try {
         if (await fs.pathExists(projectImagesDir)) {
-          await fs.copy(projectImagesDir, outputImagesDir);
+          await fs.copy(projectImagesDir, outputImagesDir, { filter: exportableUnder(projectImagesDir, "assets/images") });
           console.log("Fallback: Copied all images due to media tracking error");
         }
       } catch (fallbackError) {
@@ -569,7 +563,7 @@ export async function exportProjectToDir(projectId, options = {}, collectionDeps
       try {
         if (await fs.pathExists(projectFilesDir)) {
           const outputFilesDir = path.join(outputDir, "assets", "files");
-          await fs.copy(projectFilesDir, outputFilesDir);
+          await fs.copy(projectFilesDir, outputFilesDir, { filter: exportableUnder(projectFilesDir, "assets/files") });
           console.log("Fallback: Copied all file assets due to tracking error");
         }
       } catch (fallbackError) {
@@ -810,9 +804,9 @@ export async function getExportFiles(req, res) {
   }
 }
 
-// OS/system metadata that must never ship inside an exported ZIP. The ZIP walk
-// includes dotfiles, so these would otherwise be bundled (the same junk the theme
-// upload path already strips via removeDSStoreRecursive / __MACOSX filtering).
+// OS/system metadata that must never ship in an export. The dot rule in
+// isExportableEntry covers the dot-named ones; they stay listed for the names
+// that have no dot.
 const SYSTEM_JUNK_FILENAMES = new Set([
   ".DS_Store",
   "Thumbs.db",
@@ -823,21 +817,41 @@ const SYSTEM_JUNK_FILENAMES = new Set([
 ]);
 
 /**
- * Whether a directory entry (path relative to the export root) should be included
- * in the exported ZIP. Excludes OS/system metadata files and __MACOSX trees.
- * @param {string} relPath - Forward-slash relative path of the entry
+ * Whether an entry belongs in an export, in its folder and in its ZIP. Left out:
+ * every file and folder whose name starts with a dot, OS/system metadata, and
+ * __MACOSX trees. A dot entry in a project's assets is never something to
+ * publish: a hidden note, a credentials file, a `.git/` folder. Nothing the
+ * export writes has such a name, so none is lost.
+ *
+ * The one exception is `.well-known/` at the export root, the only place a host
+ * reads it from. Anything inside it follows the rule again.
+ * @param {string} relPath - Forward-slash path of the entry, relative to the export root
  * @returns {boolean}
  */
 export function isExportableEntry(relPath) {
   const segments = relPath.split("/");
   if (segments.includes("__MACOSX")) return false;
-  return !SYSTEM_JUNK_FILENAMES.has(segments[segments.length - 1]);
+  if (SYSTEM_JUNK_FILENAMES.has(segments[segments.length - 1])) return false;
+  return segments.every((segment, index) => !segment.startsWith(".") || (index === 0 && segment === ".well-known"));
+}
+
+/**
+ * An fs-extra copy filter for a folder copied whole into an export: `sourceDir`
+ * lands at `exportRelDir` (`assets`, `assets/images`), and each entry is judged
+ * by the path it would have in the export. fs-extra hands the filter absolute
+ * paths, backslash-separated on Windows.
+ */
+function exportableUnder(sourceDir, exportRelDir) {
+  return (src) => {
+    const rel = path.relative(sourceDir, src).split(path.sep).join("/");
+    return rel === "" || isExportableEntry(`${exportRelDir}/${rel}`);
+  };
 }
 
 /**
  * The ZIP entries for an export folder: every folder (empty ones too) and file
- * under `root`, dotfiles included, minus what {@link isExportableEntry} leaves
- * out. Files are opened only when the ZIP reaches them (see streamZipToResponse).
+ * under `root`, minus what {@link isExportableEntry} leaves out (dot entries and
+ * system junk; an export made before that rule can still hold some). Files are opened only when the ZIP reaches them (see streamZipToResponse).
  *
  * A symbolic link is stored as a link, with its target relative to its folder,
  * and never followed: following one would put a linked folder's files in twice,
