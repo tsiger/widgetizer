@@ -403,6 +403,23 @@ export async function getThemePresets(themeId) {
 }
 
 /**
+ * Whether a theme's folder is installed, by the same test a project import
+ * applies. Asks the presets route because it answers 404 only for a missing
+ * folder: the themes list also leaves out a theme whose `theme.json` can't be
+ * read, and is cached.
+ * @param {string} themeId - The ID of the theme
+ * @returns {Promise<boolean|null>} `null` when the server's answer doesn't settle it
+ */
+export async function isThemeInstalled(themeId) {
+  try {
+    await apiFetchJson(`/api/themes/${encodeURIComponent(themeId)}/presets`, {}, { expect: "object" });
+    return true;
+  } catch (error) {
+    return error?.status === 404 ? false : null;
+  }
+}
+
+/**
  * Generate the URL for a preset's screenshot image.
  * Falls back to the theme's root screenshot if the preset has no custom screenshot.
  * @param {string} themeId - The ID of the theme

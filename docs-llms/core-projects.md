@@ -125,6 +125,7 @@ Projects can be imported from ZIP files previously exported from Widgetizer.
 2.  **File Selection**: The user selects or drag-and-drops a ZIP file. Client-side validation checks:
     - File type (must be `.zip` with proper MIME type)
     - File size (must not exceed the configurable `maxImportSizeMB` limit from App Settings)
+    - Theme: `readBackupTheme` (`app/src/lib/backupManifest.js`) reads the theme id from the backup's `project-export.json` in the browser, taking only the ZIP's directory and that one entry from the file, and the dialog asks the server whether that theme's folder is installed (`isThemeInstalled`, which uses `GET /api/themes/:id/presets` because it answers 404 only for a missing folder, the test the import itself applies). A theme that isn't installed is named in the dialog, the file is dropped and nothing is uploaded. The Import button waits while this check runs. When the check can't tell (a file it can't read that far, a ZIP64 archive, a failed request), the import goes ahead: the server makes the same check and stays the authority.
 3.  **Upload**: The user clicks "Import Project" to upload the ZIP file via `POST /api/projects/import`.
 4.  **Server-Side Validation**: The backend validates:
     - ZIP structure contains `project-export.json` manifest

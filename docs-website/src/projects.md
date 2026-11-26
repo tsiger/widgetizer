@@ -180,6 +180,8 @@ Click **"Import Backup"** at the top of the Projects screen and select a backup 
 
 A backup is checked before anything is created. One whose files are damaged is refused with a message naming the problem, and one that uses a newer backup format asks you to update Widgetizer first. Either way, no project is created and your backup file is untouched.
 
+A backup needs the theme it was made with. If that theme isn't installed, the dialog normally tells you which theme is missing as soon as you choose the file, before anything is uploaded. If it can't read the backup on your computer, the same check happens after the upload. Either way, install the theme, then import the backup again.
+
 # Theme Updates for Projects
 
 When a theme author releases an update, projects using that theme can receive the improvements.

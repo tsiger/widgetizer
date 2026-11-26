@@ -4,10 +4,21 @@ import { X, Upload, AlertCircle } from "lucide-react";
 import FileUploader from "@widgetizer/editor-ui/components/ui/FileUploader.jsx";
 import Button from "@widgetizer/editor-ui/components/ui/Button.jsx";
 import { importProject } from "@widgetizer/editor-ui/queries/projectManager";
+import { isThemeInstalled } from "@widgetizer/editor-ui/queries/themeManager";
 import useAppSettings from "@widgetizer/editor-ui/hooks/useAppSettings";
 import useToastStore from "@widgetizer/editor-ui/stores/toastStore";
 import { showRejectedFiles } from "@widgetizer/editor-ui/utils/uploadFeedback";
 import { ZIP_ACCEPT, mapDropzoneRejections, validateZipFiles } from "@widgetizer/editor-ui/utils/uploadValidation";
+import { readBackupTheme } from "../../lib/backupManifest";
+
+// The theme a backup needs, when this installation doesn't have it. `null`
+// covers both "installed" and "can't tell" (an unreadable file, a failed
+// request): the server makes the same check and stays the authority.
+async function findMissingTheme(file) {
+  const theme = await readBackupTheme(file);
+  if (!theme) return null;
+  return (await isThemeInstalled(theme)) === false ? theme : null;
+}
 
 export default function ProjectImportModal({ isOpen, onClose, onSuccess }) {
   const { t } = useTranslation();
@@ -17,7 +28,11 @@ export default function ProjectImportModal({ isOpen, onClose, onSuccess }) {
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState({});
   const [error, setError] = useState(null);
+  const [checkingTheme, setCheckingTheme] = useState(false);
   const abortControllerRef = useRef(null);
+  // The file whose theme check is in flight; a newer choice or a close replaces
+  // it, so a late answer for an older file is dropped.
+  const themeCheckRef = useRef(null);
 
   const maxSizeMB = settings?.export?.maxImportSizeMB || 500;
   const canClose = !uploading;
@@ -27,6 +42,8 @@ export default function ProjectImportModal({ isOpen, onClose, onSuccess }) {
       return;
     }
 
+    themeCheckRef.current = null;
+    setCheckingTheme(false);
     setSelectedFile(null);
     setError(null);
     setUploading(false);
@@ -46,10 +63,12 @@ export default function ProjectImportModal({ isOpen, onClose, onSuccess }) {
 
   if (!isOpen) return null;
 
-  const handleFileSelect = (files) => {
+  const handleFileSelect = async (files) => {
     const { valid, rejected } = validateZipFiles(files, { maxSizeMB, multiple: false });
 
     if (rejected.length > 0) {
+      themeCheckRef.current = null;
+      setCheckingTheme(false);
       setError(rejected[0].reason);
       setSelectedFile(null);
       showRejectedFiles(showToast, rejected);
@@ -58,8 +77,21 @@ export default function ProjectImportModal({ isOpen, onClose, onSuccess }) {
 
     if (valid.length === 0) return;
 
-    setSelectedFile(valid[0]);
+    const file = valid[0];
+    setSelectedFile(file);
     setError(null);
+
+    // Refuse a backup whose theme isn't installed now, before its upload.
+    themeCheckRef.current = file;
+    setCheckingTheme(true);
+    const missingTheme = await findMissingTheme(file);
+    if (themeCheckRef.current !== file) return;
+    themeCheckRef.current = null;
+    setCheckingTheme(false);
+    if (missingTheme) {
+      setSelectedFile(null);
+      setError(t("projects.importModal.themeNotInstalled", { theme: missingTheme }));
+    }
   };
 
   const handleImport = async () => {
@@ -67,6 +99,7 @@ export default function ProjectImportModal({ isOpen, onClose, onSuccess }) {
       setError(t("projects.importModal.noFileSelected"));
       return;
     }
+    if (checkingTheme) return;
 
     const controller = new AbortController();
     abortControllerRef.current = controller;
@@ -104,12 +137,13 @@ export default function ProjectImportModal({ isOpen, onClose, onSuccess }) {
     }
   };
 
-
   const handleCancel = () => {
     if (uploading && abortControllerRef.current) {
       abortControllerRef.current.abort();
     }
 
+    themeCheckRef.current = null;
+    setCheckingTheme(false);
     setSelectedFile(null);
     setError(null);
     setUploading(false);
@@ -121,6 +155,8 @@ export default function ProjectImportModal({ isOpen, onClose, onSuccess }) {
   const handleReject = (fileRejections) => {
     const rejected = mapDropzoneRejections(fileRejections, { maxSizeMB });
     if (rejected.length > 0) {
+      themeCheckRef.current = null;
+      setCheckingTheme(false);
       setSelectedFile(null);
       setError(rejected[0].reason);
       showRejectedFiles(showToast, rejected);
@@ -199,8 +235,8 @@ export default function ProjectImportModal({ isOpen, onClose, onSuccess }) {
           </Button>
           <Button
             onClick={handleImport}
-            disabled={!selectedFile || uploading}
-            loading={uploading}
+            disabled={!selectedFile || uploading || checkingTheme}
+            loading={uploading || checkingTheme}
           >
             {t("projects.importModal.importButton")}
           </Button>
