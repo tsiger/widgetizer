@@ -236,7 +236,7 @@ Express 5 + `busboy` (uploads streamed to temp files) + `sharp`. Controller: `pa
 ### Upload Flow (`uploadProjectMedia`)
 
 1. `uploadWithLimit` streams each file part to a temp file (see [Upload Limits](#upload-limits)); `fileFilter` (`mediaUploadFileFilter`) rejects files whose declared MIME is outside `ALLOWED_MIME_TYPES`, whose extension is outside `ALLOWED_UPLOAD_EXTENSIONS`, or whose MIME doesn't match the extension's canonical content type.
-2. A sequential pre-pass decodes each uploaded name and assigns a collision-free stored name per file via `normalizeUploadName` (deduped against adapter keys + names assigned this request).
+2. A sequential pre-pass decodes each uploaded name and assigns a collision-free stored name per file via `normalizeUploadName`. It runs one request at a time per project (`serializeUploadNames`) and a name is free only when it is in neither the adapter's listing of the folder nor `uploadNamesInFlight`, the names (originals and their size copies) that uploads still being processed hold; a request gives its names back, inside the same serialized section, once every file is stored or refused. So two overlapping uploads of `photo.jpg` get `photo.jpg` and `photo-1.jpg`. A listing that fails is not read as an empty folder: the request answers 500 before anything is stored. Both are in-process only: a host running several server processes over one asset store needs its own guard.
 3. Per file, at most two at a time, each with its own temp work dir (removed afterwards):
    - Refuse a part the parser marked over the per-file limit, or whose size passes it, and an SVG over 5 MB → `rejectedFiles`.
    - Mint a UUID media id; build the `fileInfo` record (`path: /uploads/{subdir}/{filename}`).

@@ -18,6 +18,7 @@ import { handleProjectResolutionError } from "../utils/projectErrors.js";
 import { requestLanguage } from "../utils/contentLanguage.js";
 import * as mediaRepo from "../db/repositories/mediaRepository.js";
 import { getDb } from "../db/index.js";
+import { createKeyedSerializer } from "../utils/serializeByKey.js";
 
 import { stripHtmlToText, sanitizeSvg } from "../services/sanitizationService.js";
 import { readMediaFile } from "../services/mediaService.js";
@@ -246,6 +247,32 @@ export async function getProjectMedia(req, res) {
   }
 }
 
+// Upload names are handed out per project, one request at a time, and stay
+// taken in memory until the request that holds them has stored or refused every
+// file. A request's own listing of the folder can't see a file another request
+// is still processing, so without this two overlapping uploads of `photo.jpg`
+// are both given `photo.jpg`: the later write wins and two media records share
+// one file. In-process only, like the keyed serializer itself.
+const serializeUploadNames = createKeyedSerializer();
+/** projectId -> lower-cased `<subdir>/<name>` of every asset an upload in flight will write. */
+const uploadNamesInFlight = new Map();
+
+/**
+ * Give the names back once a request's files are stored or refused. Inside the
+ * serialized section, so it can't land between another request's listing and
+ * its choice of names: that request would no longer find the name here and
+ * might not have it in its listing yet.
+ */
+function releaseUploadNames(projectId, names) {
+  if (names.length === 0) return Promise.resolve();
+  return serializeUploadNames(projectId, async () => {
+    const inFlight = uploadNamesInFlight.get(projectId);
+    if (!inFlight) return;
+    for (const name of names) inFlight.delete(name);
+    if (inFlight.size === 0) uploadNamesInFlight.delete(projectId);
+  });
+}
+
 /**
  * Stores one uploaded file: checks its size, generates its resized copies (and
  * any re-encoded original) into `workDir`, reserves the total through the
@@ -456,65 +483,88 @@ export async function uploadProjectMedia(req, res) {
     await getProjectFolderName(projectId);
 
     // Sequential pre-pass: assign a collision-free filename to each file,
-    // deduped against the adapter's existing keys (+ names assigned this
-    // request). A raster image also writes `<name>-<size><ext>` copies, so a
-    // name is free only when every one of those is free too: a copy written
-    // over an existing asset would overwrite it, and a failed upload's cleanup
-    // would then delete it while its media record and page references remain.
+    // deduped against the adapter's existing keys and the names uploads in
+    // flight hold (this request's included). A raster image also writes
+    // `<name>-<size><ext>` copies, so a name is free only when every one of
+    // those is free too: a copy written over an existing asset would overwrite
+    // it, and a failed upload's cleanup would then delete it while its media
+    // record and page references remain.
     // Tests pass file.filename directly, bypassing this.
     const sizeNames = Object.keys(imageSizes);
-    const listedNames = {};
-    async function uniqueName(subdir, originalName, variantSizes) {
-      if (!listedNames[subdir]) {
-        const keys = await Promise.resolve(assetStorage.list(scope, `${subdir}/`)).catch(() => []);
-        listedNames[subdir] = new Set(keys.map((k) => path.basename(k).toLowerCase()));
-      }
-      const taken = listedNames[subdir];
-      const normalized = normalizeUploadName(originalName, { fallback: subdir === "files" ? "file" : "image" });
-      const ext = path.extname(normalized);
-      const base = path.basename(normalized, ext);
-      // Case-insensitively: on Windows/macOS a legacy `photo.JPG` IS `photo.jpg`, so a
-      // case-sensitive check would hand out a name that overwrites the existing file.
-      const namesFor = (stem) => [`${stem}${ext}`, ...variantSizes.map((size) => `${stem}-${size}${ext}`)];
-      let stem = base;
-      let counter = 1;
-      while (namesFor(stem).some((name) => taken.has(name.toLowerCase()))) stem = `${base}-${counter++}`;
-      for (const name of namesFor(stem)) taken.add(name.toLowerCase());
-      return `${stem}${ext}`;
-    }
-
+    const heldNames = [];
     const prepared = [];
-    for (const file of files) {
-      const subdir = getMediaCategory(file.mimetype) === "file" ? "files" : "images";
-      const isRaster = Boolean(file.mimetype?.startsWith("image/")) && file.mimetype !== "image/svg+xml";
-      // The multipart name arrives as latin1 bytes; decode once so the stored
-      // "original name" is the real one, not mojibake.
-      const originalName = decodeFileName(file.originalname);
-      const filename = file.refused
-        ? null
-        : file.filename || (await uniqueName(subdir, originalName, isRaster ? sizeNames : []));
-      prepared.push({ file, subdir, filename, originalName });
+    try {
+      await serializeUploadNames(projectId, async () => {
+        const listedNames = {};
+        async function uniqueName(subdir, originalName, variantSizes) {
+          if (!listedNames[subdir]) {
+            // A listing that fails is not an empty folder: every name would look
+            // free, and the upload would overwrite the file that has it.
+            const keys = await assetStorage.list(scope, `${subdir}/`);
+            listedNames[subdir] = new Set(keys.map((k) => path.basename(k).toLowerCase()));
+          }
+          const listed = listedNames[subdir];
+          if (!uploadNamesInFlight.has(projectId)) uploadNamesInFlight.set(projectId, new Set());
+          const inFlight = uploadNamesInFlight.get(projectId);
+          const normalized = normalizeUploadName(originalName, { fallback: subdir === "files" ? "file" : "image" });
+          const ext = path.extname(normalized);
+          const base = path.basename(normalized, ext);
+          // Case-insensitively: on Windows/macOS a legacy `photo.JPG` IS `photo.jpg`, so a
+          // case-sensitive check would hand out a name that overwrites the existing file.
+          const namesFor = (stem) =>
+            [`${stem}${ext}`, ...variantSizes.map((size) => `${stem}-${size}${ext}`)].map((name) => name.toLowerCase());
+          const isTaken = (name) => listed.has(name) || inFlight.has(`${subdir}/${name}`);
+          let stem = base;
+          let counter = 1;
+          while (namesFor(stem).some(isTaken)) stem = `${base}-${counter++}`;
+          for (const name of namesFor(stem)) {
+            inFlight.add(`${subdir}/${name}`);
+            heldNames.push(`${subdir}/${name}`);
+          }
+          return `${stem}${ext}`;
+        }
+
+        for (const file of files) {
+          const subdir = getMediaCategory(file.mimetype) === "file" ? "files" : "images";
+          const isRaster = Boolean(file.mimetype?.startsWith("image/")) && file.mimetype !== "image/svg+xml";
+          // The multipart name arrives as latin1 bytes; decode once so the stored
+          // "original name" is the real one, not mojibake.
+          const originalName = decodeFileName(file.originalname);
+          const filename = file.refused
+            ? null
+            : file.filename || (await uniqueName(subdir, originalName, isRaster ? sizeNames : []));
+          prepared.push({ file, subdir, filename, originalName });
+        }
+      });
+    } catch (error) {
+      await releaseUploadNames(projectId, heldNames);
+      throw error;
     }
 
     const ctx = { scope, assetStorage, limits: req.adapters.limits, maxUploadBytes, imageSizes };
-    const results = await mapWithConcurrency(prepared, UPLOAD_CONCURRENCY, async (item) => {
-      let workDir = null;
-      try {
-        workDir = await fs.mkdtemp(path.join(os.tmpdir(), "widgetizer-media-"));
-        return await storeUploadedFile(item, { ...ctx, workDir });
-      } catch (error) {
-        console.error(`Failed to process file ${item.originalName}:`, error);
-        return {
-          success: false,
-          file: {
-            originalName: item.originalName,
-            reason: `Processing failed: ${error.message}`,
-          },
-        };
-      } finally {
-        if (workDir) await fs.rm(workDir, { recursive: true, force: true }).catch(() => {});
-      }
-    });
+    let results;
+    try {
+      results = await mapWithConcurrency(prepared, UPLOAD_CONCURRENCY, async (item) => {
+        let workDir = null;
+        try {
+          workDir = await fs.mkdtemp(path.join(os.tmpdir(), "widgetizer-media-"));
+          return await storeUploadedFile(item, { ...ctx, workDir });
+        } catch (error) {
+          console.error(`Failed to process file ${item.originalName}:`, error);
+          return {
+            success: false,
+            file: {
+              originalName: item.originalName,
+              reason: `Processing failed: ${error.message}`,
+            },
+          };
+        } finally {
+          if (workDir) await fs.rm(workDir, { recursive: true, force: true }).catch(() => {});
+        }
+      });
+    } finally {
+      await releaseUploadNames(projectId, heldNames);
+    }
 
     const processedFiles = [];
     const rejectedFiles = [];
