@@ -98,6 +98,52 @@ function uploadSourcePath(projectDir, mediaPath, folder) {
   return isWithinDirectory(resolved, path.resolve(projectDir, "uploads", folder)) ? resolved : null;
 }
 
+// An export is built in `<folder>-v<N>.partial` and renamed to `<folder>-v<N>`
+// once it is complete, so a folder under the final name is always a whole
+// export. The suffix also keeps a half-built one out of the viewer and the
+// download, which accept `<folder>-v<digits>` only.
+const PARTIAL_SUFFIX = ".partial";
+
+async function removeLogged(dir) {
+  try {
+    await fs.remove(dir);
+    return true;
+  } catch (error) {
+    console.warn(`Failed to remove export directory: ${dir}. Error: ${error.message}`);
+    return false;
+  }
+}
+
+/**
+ * Remove a project's unfinished export folders: what a crash mid-export left,
+ * or a failed export whose own removal failed. No history row points at them,
+ * so retention never would. Must run under the per-project export lock, where
+ * no export of this project is in flight and every such folder is a leftover.
+ * @param {string} projectFolderName
+ * @returns {Promise<{removed: string[], failed: string[]}>} The folders removed, and those that could not be
+ */
+async function removePartialExports(projectFolderName) {
+  const publishDir = getPublishDir();
+  let names;
+  try {
+    names = await fs.readdir(publishDir);
+  } catch (error) {
+    if (error.code === "ENOENT") return { removed: [], failed: [] };
+    throw error;
+  }
+  const prefix = `${projectFolderName}-v`;
+  const removed = [];
+  const failed = [];
+  for (const name of names) {
+    if (!name.startsWith(prefix) || !name.endsWith(PARTIAL_SUFFIX)) continue;
+    // Digits only between the two: "site-v2-v1.partial" belongs to the project "site-v2".
+    if (!/^\d+$/.test(name.slice(prefix.length, -PARTIAL_SUFFIX.length))) continue;
+    const dir = path.join(publishDir, name);
+    ((await removeLogged(dir)) ? removed : failed).push(dir);
+  }
+  return { removed, failed };
+}
+
 /**
  * Run fn under the per-project export lock, serialized with every export
  * operation (export, delete, cleanup). For callers outside this module whose
@@ -127,8 +173,14 @@ async function recordExport(projectId, version, outputDir, status = "success") {
     console.warn("Could not load app settings for export limit, using default of 10. Error:", error.message);
   }
 
-  // Trim old exports beyond the limit
-  const trimmed = exportRepo.trimExports(projectId, maxExports);
+  // Trim old exports beyond the limit. The export's own row is written by now,
+  // so a failure here must not turn a finished export into a failed one.
+  let trimmed = [];
+  try {
+    trimmed = exportRepo.trimExports(projectId, maxExports);
+  } catch (error) {
+    console.warn(`Could not trim old exports for project ${projectId}: ${error.message}`);
+  }
   for (const old of trimmed) {
     const dir = resolveOutputDir(old.outputDir);
     if (dir && (await fs.pathExists(dir))) {
@@ -152,7 +204,7 @@ async function recordExport(projectId, version, outputDir, status = "success") {
  */
 export async function cleanupProjectExports(projectId, { withinLock = false } = {}) {
   try {
-    await getProjectFolderName(projectId);
+    const folderName = await getProjectFolderName(projectId);
     console.log(`Cleaning up exports for deleted project: ${projectId}`);
 
     // Serialized with the other export operations so an in-flight export can't
@@ -160,9 +212,9 @@ export async function cleanupProjectExports(projectId, { withinLock = false } = 
     // withExportOpLock section for the same project — the lock is not
     // reentrant, so taking it twice deadlocks.
     if (withinLock) {
-      return await cleanupProjectExportsLocked(projectId);
+      return await cleanupProjectExportsLocked(projectId, folderName);
     }
-    return await serializeExportOps(projectId, () => cleanupProjectExportsLocked(projectId));
+    return await serializeExportOps(projectId, () => cleanupProjectExportsLocked(projectId, folderName));
   } catch (error) {
     console.error(`Error cleaning up exports for project ${projectId}:`, error);
     throw error;
@@ -182,16 +234,20 @@ export async function cleanupProjectExports(projectId, { withinLock = false } = 
 // regardless — and aborting the deletion would make a project undeletable
 // over one stuck directory. The cost is an orphaned directory, so orphans are
 // warned loudly with their paths and reported in the return value.
-async function cleanupProjectExportsLocked(projectId) {
+async function cleanupProjectExportsLocked(projectId, folderName) {
+  // Before the early return: a project whose only export crashed has an
+  // unfinished folder and no history.
+  const partials = await removePartialExports(folderName);
+
   const records = exportRepo.getExports(projectId);
 
   if (records.length === 0) {
     console.log(`No export history found for project ${projectId}`);
-    return { deletedDirs: 0, deletedHistory: false, orphanedDirs: [] };
+    return { deletedDirs: partials.removed.length, deletedHistory: false, orphanedDirs: partials.failed };
   }
 
-  const deletedDirs = [];
-  const orphanedDirs = [];
+  const deletedDirs = [...partials.removed];
+  const orphanedDirs = [...partials.failed];
   for (const record of records) {
     const dir = resolveOutputDir(record.outputDir);
     if (dir && (await fs.pathExists(dir))) {
@@ -265,6 +321,41 @@ function refusalFor(code, details) {
     case "INVALID_FORMS":
       details.error.refusedBeforeWrite = true;
       return details.error;
+    case "UNREADABLE_CONTENT": {
+      const { files } = details;
+      return exportRefusal(
+        `${files.length === 1 ? "This file" : "These files"} can't be read, so the site would be published without ${files.length === 1 ? "it" : "them"}: ${files.join(", ")}. Restore ${files.length === 1 ? "it" : "them"} from a backup or delete ${files.length === 1 ? "it" : "them"} from the project, then export again.`,
+        "Export failed: unreadable content",
+      );
+    }
+    case "MISSING_LAYOUT":
+      return exportRefusal(
+        "The theme's layout.liquid is missing from this project, so no page can be built. Update or reinstall the theme, then export again.",
+        "Export failed: the theme's layout is missing",
+      );
+    case "RENDER_FAILED": {
+      const { path: pagePath, name, errors } = details;
+      const parts = errors.map((problem) => {
+        if (problem.kind === "layout") return `the theme's layout failed (${problem.message})`;
+        if (problem.kind === "item") return `the "${problem.type}" item template failed (${problem.message})`;
+        return `the "${problem.type || "unknown"}" widget failed (${problem.message})`;
+      });
+      const err = exportRefusal(
+        `${name ? `"${name}" (${pagePath})` : pagePath} could not be built: ${parts.join("; ")}. Fix or remove what failed, then export again.`,
+        "Export failed: a page could not be built",
+      );
+      // Pages before this one were already written: a failed export, not a refusal.
+      err.refusedBeforeWrite = false;
+      return err;
+    }
+    case "SITE_ICON_FAILED": {
+      const err = exportRefusal(
+        `The site icon could not be made from the image chosen in Site settings (${details.message}). Choose another image, then export again.`,
+        "Export failed: the site icon could not be made",
+      );
+      err.refusedBeforeWrite = false;
+      return err;
+    }
     default:
       return exportRefusal(`Export blocked (${code}).`, "Export failed");
   }
@@ -308,8 +399,10 @@ export async function exportProjectToDir(projectId, options = {}, collectionDeps
   const exportedAt = new Date();
   const assetVersion = buildAssetVersionToken({ exportNumber: version, appVersion, date: exportedAt });
   const outputBaseDir = getPublishDir();
-  const outputDir = path.join(outputBaseDir, `${projectFolderName}-v${version}`);
-    const outputAssetsDir = path.join(outputDir, "assets");
+  const exportDirName = `${projectFolderName}-v${version}`;
+  const outputDir = path.join(outputBaseDir, exportDirName);
+  const buildDir = `${outputDir}${PARTIAL_SUFFIX}`;
+    const outputAssetsDir = path.join(buildDir, "assets");
     const outputImagesDir = path.join(outputAssetsDir, "images");
 
     // The scope-aware collection capability (storage adapter + scope) supplied by
@@ -331,15 +424,23 @@ export async function exportProjectToDir(projectId, options = {}, collectionDeps
     const deps = await buildRenderDeps(projectId, renderCollectionDeps);
 
     let devModeEnabled = false;
+    // Every file that could not be copied into the export. A site missing its
+    // styles or an image is not a finished export, so any entry here fails it.
+    const copyFailures = [];
+    const failOnCopyFailures = () => {
+      if (copyFailures.length === 0) return;
+      throw new Error(
+        `${copyFailures.length === 1 ? "A file" : `${copyFailures.length} files`} could not be copied into the export: ${copyFailures.join("; ")}`,
+      );
+    };
     // HTML validation issues across all pages (only when developer mode is on).
     const validationIssues = [];
     const report = {};
 
     async function prepareOutputDir() {
-      // emptyDir, not ensureDir: a crash leftover (or a version number freed by
-      // a failed delete) can leave stale files at this path, and they must not
-      // survive into the new bundle.
-      await fs.emptyDir(outputDir);
+      // Also clears a leftover at this export's own build path, so the build
+      // starts empty.
+      await removePartialExports(projectFolderName);
       await fs.ensureDir(outputAssetsDir);
       await fs.ensureDir(outputImagesDir);
       try {
@@ -393,7 +494,7 @@ export async function exportProjectToDir(projectId, options = {}, collectionDeps
       if (validationIssues.length > 0) {
         const totalIssues = validationIssues.reduce((sum, page) => sum + page.issues.length, 0);
         const issuesHtml = generateIssuesReport(validationIssues);
-        await fs.outputFile(path.join(outputDir, "__export__issues.html"), issuesHtml);
+        await fs.outputFile(path.join(buildDir, "__export__issues.html"), issuesHtml);
         console.log(`HTML validation: ${totalIssues} issue(s) found. See __export__issues.html`);
       } else {
         console.log("HTML validation: No issues found.");
@@ -422,7 +523,7 @@ export async function exportProjectToDir(projectId, options = {}, collectionDeps
         console.warn(`Project assets directory not found: ${projectAssetsDir}`);
       }
     } catch (copyError) {
-      console.error("Error copying assets:", copyError);
+      copyFailures.push(`the theme's assets (${copyError.message})`);
     }
 
     // --- Copy Core Assets (placeholder images) ---
@@ -440,7 +541,7 @@ export async function exportProjectToDir(projectId, options = {}, collectionDeps
         }
       }
     } catch (coreAssetError) {
-      console.warn("Could not copy core placeholder assets:", coreAssetError.message);
+      copyFailures.push(`the placeholder images (${coreAssetError.message})`);
     }
     }
 
@@ -462,7 +563,7 @@ export async function exportProjectToDir(projectId, options = {}, collectionDeps
         for (const imageFile of usedImages) {
           const sourceImagePath = uploadSourcePath(projectDir, imageFile.path, "images");
           // Export images under the public assets/images/ directory.
-          const targetImagePath = path.join(outputDir, "assets", "images", path.basename(imageFile.path));
+          const targetImagePath = path.join(buildDir, "assets", "images", path.basename(imageFile.path));
           const hasLargeVariant = Boolean(imageFile.sizes?.large?.path);
           const isSvg = imageFile.type === "image/svg+xml" || imageFile.filename?.toLowerCase().endsWith(".svg");
 
@@ -477,7 +578,7 @@ export async function exportProjectToDir(projectId, options = {}, collectionDeps
                 copiedCount++;
               }
             } catch (copyError) {
-              console.error(`Error copying image ${imageFile.filename}:`, copyError);
+              copyFailures.push(`${imageFile.filename} (${copyError.message})`);
             }
           }
 
@@ -492,7 +593,7 @@ export async function exportProjectToDir(projectId, options = {}, collectionDeps
                 continue;
               }
               // Export generated image sizes under the public assets/images/ directory.
-              const targetSizePath = path.join(outputDir, "assets", "images", path.basename(sizeInfo.path));
+              const targetSizePath = path.join(buildDir, "assets", "images", path.basename(sizeInfo.path));
 
               try {
                 if (await fs.pathExists(sourceSizePath)) {
@@ -500,7 +601,7 @@ export async function exportProjectToDir(projectId, options = {}, collectionDeps
                   await fs.copy(sourceSizePath, targetSizePath);
                 }
               } catch (sizeError) {
-                console.error(`Error copying ${sizeName} size for ${imageFile.filename}:`, sizeError);
+                copyFailures.push(`the ${sizeName} size of ${imageFile.filename} (${sizeError.message})`);
               }
             }
           }
@@ -526,7 +627,7 @@ export async function exportProjectToDir(projectId, options = {}, collectionDeps
           console.log("Fallback: Copied all images due to media tracking error");
         }
       } catch (fallbackError) {
-        console.error("Error in fallback image copying:", fallbackError);
+        copyFailures.push(`the project's images (${fallbackError.message})`);
       }
     }
     // --- End Image Copy ---
@@ -545,7 +646,7 @@ export async function exportProjectToDir(projectId, options = {}, collectionDeps
 
         for (const fileAsset of usedFiles) {
           const sourceFilePath = uploadSourcePath(projectDir, fileAsset.path, "files");
-          const targetFilePath = path.join(outputDir, "assets", "files", path.basename(fileAsset.path));
+          const targetFilePath = path.join(buildDir, "assets", "files", path.basename(fileAsset.path));
 
           try {
             if (sourceFilePath && (await fs.pathExists(sourceFilePath))) {
@@ -554,7 +655,7 @@ export async function exportProjectToDir(projectId, options = {}, collectionDeps
               fileCopiedCount++;
             }
           } catch (copyError) {
-            console.error(`Error copying file asset ${fileAsset.filename}:`, copyError);
+            copyFailures.push(`${fileAsset.filename} (${copyError.message})`);
           }
         }
 
@@ -568,12 +669,12 @@ export async function exportProjectToDir(projectId, options = {}, collectionDeps
       const projectFilesDir = path.join(projectDir, "uploads", "files");
       try {
         if (await fs.pathExists(projectFilesDir)) {
-          const outputFilesDir = path.join(outputDir, "assets", "files");
+          const outputFilesDir = path.join(buildDir, "assets", "files");
           await fs.copy(projectFilesDir, outputFilesDir);
           console.log("Fallback: Copied all file assets due to tracking error");
         }
       } catch (fallbackError) {
-        console.error("Error in fallback file asset copying:", fallbackError);
+        copyFailures.push(`the project's files (${fallbackError.message})`);
       }
     }
     // --- End File Asset Copy ---
@@ -593,40 +694,60 @@ export async function exportProjectToDir(projectId, options = {}, collectionDeps
       sitePath: siteUrlPathname(projectData.siteUrl || ""),
       collections: report.collections,
     };
-    await fs.writeFile(path.join(outputDir, "manifest.json"), JSON.stringify(manifest, null, 2));
+    await fs.writeFile(path.join(buildDir, "manifest.json"), JSON.stringify(manifest, null, 2));
     }
 
-    const stream = generateSite(deps, {
-      projectData,
-      appVersion,
-      assetVersion,
-      refuse: refusalFor,
-      collections: collectionsEnabled ? { storage: collectionStorage, scope: collectionScope, reader: collectionReader } : null,
-      scope: collectionScope,
-      limits: collectionDeps?.limits,
-      exportMarkdown,
-      iconOutputDir: outputDir,
-      beforeFirstFile: prepareOutputDir,
-      inspectHtml: collectValidationIssues,
-      afterPages: writeReportAndCopyAssets,
-      report,
-    });
-    for await (const entry of stream) {
-      const target = path.join(outputDir, entry.path);
-      try {
+    try {
+      const stream = generateSite(deps, {
+        projectData,
+        appVersion,
+        assetVersion,
+        refuse: refusalFor,
+        collections: collectionsEnabled ? { storage: collectionStorage, scope: collectionScope, reader: collectionReader } : null,
+        scope: collectionScope,
+        limits: collectionDeps?.limits,
+        exportMarkdown,
+        // A widgets folder that can't be read would ship every page without its widgets' CSS and JS.
+        failOnAssetScanError: true,
+        iconOutputDir: buildDir,
+        beforeFirstFile: prepareOutputDir,
+        inspectHtml: collectValidationIssues,
+        afterPages: writeReportAndCopyAssets,
+        report,
+      });
+      for await (const entry of stream) {
+        const target = path.join(buildDir, entry.path);
+        // An entry's softFailure is for an app that can carry on without the
+        // file. This one can't: a site with no sitemap or a widget's CSS missing
+        // would be recorded as a finished export.
         if (entry.source) await fs.copy(entry.source, target, { overwrite: true });
         else await fs.outputFile(target, entry.content);
-      } catch (error) {
-        if (!entry.softFailure) throw error;
-        entry.softFailure(error);
       }
+      if (report.formsCount) console.log(`Wrote widgetizer.forms.json with ${report.formsCount} form(s)`);
+      await copyMediaAndWriteManifest();
+      failOnCopyFailures();
+
+      // A crash between this rename and the history row, or a version number
+      // freed by a failed delete, can leave a folder under the final name. No
+      // row points at it and its files must not survive into this export.
+      await fs.remove(outputDir);
+      await fs.rename(buildDir, outputDir);
+    } catch (error) {
+      // No history row will point at this folder, so nothing else would remove it.
+      await removeLogged(buildDir);
+      throw error;
     }
-    if (report.formsCount) console.log(`Wrote widgetizer.forms.json with ${report.formsCount} form(s)`);
-    await copyMediaAndWriteManifest();
 
     // Record this export in history (store relative dir name, not absolute path)
-    const exportDirName = `${projectFolderName}-v${version}`;
-    const exportRecord = await recordExport(projectId, version, exportDirName, "success");
+    let exportRecord;
+    try {
+      exportRecord = await recordExport(projectId, version, exportDirName, "success");
+    } catch (error) {
+      // Without its row the finished folder is as untracked as an unfinished one.
+      // The version is still free only when the row was not written.
+      if (exportRepo.getNextVersion(projectId) === version) await removeLogged(outputDir);
+      throw error;
+    }
 
     // A language left out of the export is named in the result, not only in a
     // server log: a partially published site is far too easy to miss otherwise.

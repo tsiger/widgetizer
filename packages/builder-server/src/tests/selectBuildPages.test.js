@@ -97,6 +97,8 @@ describe("generateSite — languages and homepage refusals", () => {
     const projectDir = await fs.mkdtemp(path.join(os.tmpdir(), "widgetizer-select-build-pages-"));
     roots.push(projectDir);
     for (const file of files) await fs.outputJson(path.join(projectDir, "pages", `${file}.json`), { name: file });
+    // A site with no layout is refused before beforeFirstFile runs.
+    await fs.outputFile(path.join(projectDir, "layout.liquid"), "{{ main_content | raw }}");
     return projectDir;
   }
 

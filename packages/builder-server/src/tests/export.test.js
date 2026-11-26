@@ -16,7 +16,7 @@
  * Run with: node --test server/tests/export.test.js
  */
 
-import { describe, it, before, after } from "node:test";
+import { describe, it, before, after, mock } from "node:test";
 import assert from "node:assert/strict";
 import fs from "fs-extra";
 import path from "node:path";
@@ -415,6 +415,13 @@ before(async () => {
   // -----------------------------------------------------------
   // 7. Global widgets (header + footer)
   // -----------------------------------------------------------
+  // Their templates, as a theme ships them: a header or footer whose template
+  // is missing fails the export.
+  for (const name of ["header", "footer"]) {
+    const dir = path.join(projectDir, "widgets", "global", name);
+    await fs.outputFile(path.join(dir, "schema.json"), JSON.stringify({ type: name, displayName: name, settings: [] }));
+    await fs.outputFile(path.join(dir, "widget.liquid"), `<div class="site-${name}"></div>`);
+  }
   await fs.writeFile(
     path.join(pagesDir, "global", "header.json"),
     JSON.stringify(
@@ -1053,6 +1060,85 @@ describe("concurrent exports are serialized per project", () => {
     } finally {
       projectRepo.deleteProject(DEL_ID);
       await fs.remove(getProjectDir(DEL_FOLDER));
+    }
+  });
+});
+
+// ========================================================================
+// An export is built under a temporary name and renamed when complete
+// ========================================================================
+
+describe("unfinished exports leave no folder behind", () => {
+  const publishedNames = async () => (await fs.readdir(PUBLISH_DIR)).filter((n) => n.startsWith(`${PROJECT_FOLDER}-v`));
+
+  before(async () => {
+    await cleanExportHistory();
+  });
+
+  it("an export that fails after writing files removes its folder and records a failure", async () => {
+    const seeded = await callController(exportProject, { params: { projectId: PROJECT_ID } });
+    assert.equal(seeded._status, 200, JSON.stringify(seeded._json));
+    const before = await publishedNames();
+    const failing = exportRepo.getNextVersion(PROJECT_ID);
+
+    // The manifest is the export's last file: pages, assets and media are on disk by then.
+    const writeFile = fs.writeFile;
+    let sawBuiltFiles = false;
+    mock.method(fs, "writeFile", async (file, ...rest) => {
+      if (path.basename(String(file)) !== "manifest.json") return writeFile(file, ...rest);
+      sawBuiltFiles = await fs.pathExists(path.join(path.dirname(String(file)), "index.html"));
+      throw new Error("disk full");
+    });
+    let res;
+    try {
+      res = await callController(exportProject, { params: { projectId: PROJECT_ID } });
+    } finally {
+      mock.restoreAll();
+    }
+
+    assert.equal(res._status, 500, JSON.stringify(res._json));
+    assert.ok(sawBuiltFiles, "the export had written its pages before it failed");
+    assert.deepEqual(await publishedNames(), before, "no folder for the failed version, under either name");
+    const [latest] = readExportHistory(PROJECT_ID);
+    assert.equal(latest.version, failing);
+    assert.equal(latest.status, "failed");
+    assert.equal(latest.outputDir, null);
+  });
+
+  it("the export after a failure ends in <folder>-v<N>, complete", async () => {
+    const next = exportRepo.getNextVersion(PROJECT_ID);
+
+    const res = await callController(exportProject, { params: { projectId: PROJECT_ID } });
+
+    assert.equal(res._status, 200, JSON.stringify(res._json));
+    const dir = path.join(PUBLISH_DIR, `${PROJECT_FOLDER}-v${next}`);
+    assert.equal(res._json.outputDir, dir);
+    assert.ok(await fs.pathExists(path.join(dir, "index.html")));
+    assert.ok(await fs.pathExists(path.join(dir, "manifest.json")));
+    assert.ok(!(await fs.pathExists(`${dir}.partial`)), "the build folder was renamed, not copied");
+  });
+
+  it("the next export removes what a crash mid-export left, and only this project's", async () => {
+    const next = exportRepo.getNextVersion(PROJECT_ID);
+    const crashed = path.join(PUBLISH_DIR, `${PROJECT_FOLDER}-v${next + 40}.partial`);
+    const sameVersion = path.join(PUBLISH_DIR, `${PROJECT_FOLDER}-v${next}.partial`);
+    // A project whose folder is "<this one>-v2" builds its own exports under this name.
+    const otherProjects = path.join(PUBLISH_DIR, `${PROJECT_FOLDER}-v2-v1.partial`);
+    for (const dir of [crashed, sameVersion, otherProjects]) await fs.outputFile(path.join(dir, "stale.html"), "junk");
+
+    try {
+      const res = await callController(exportProject, { params: { projectId: PROJECT_ID } });
+
+      assert.equal(res._status, 200, JSON.stringify(res._json));
+      assert.ok(!(await fs.pathExists(crashed)), "a leftover from another version is removed");
+      assert.ok(!(await fs.pathExists(sameVersion)), "this version's build folder is gone after the rename");
+      assert.ok(
+        !(await fs.pathExists(path.join(PUBLISH_DIR, `${PROJECT_FOLDER}-v${next}`, "stale.html"))),
+        "a leftover's files do not reach the new export",
+      );
+      assert.ok(await fs.pathExists(otherProjects), "another project's build folder is left alone");
+    } finally {
+      await fs.remove(otherProjects);
     }
   });
 });
@@ -1705,6 +1791,17 @@ describe("cleanupProjectExports", () => {
   it("removes project entry from export history", async () => {
     const exportsAfter = readExportHistory(CLEANUP_ID);
     assert.equal(exportsAfter.length, 0, "Project should have no export history");
+  });
+
+  it("removes an unfinished export folder, also when the project has no history", async () => {
+    const crashed = path.join(PUBLISH_DIR, `${CLEANUP_FOLDER}-v3.partial`);
+    await fs.outputFile(path.join(crashed, "index.html"), "half an export");
+
+    const result = await cleanupProjectExports(CLEANUP_ID);
+
+    assert.equal(result.deletedHistory, false, "there was no history left to delete");
+    assert.equal(result.deletedDirs, 1);
+    assert.ok(!(await fs.pathExists(crashed)), "the unfinished folder is removed with the project's exports");
   });
 
   it("throws for non-existent project (ownership check)", async () => {
